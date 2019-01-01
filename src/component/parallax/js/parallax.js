@@ -77,6 +77,9 @@ class parallaxClass {
     if( element.offset + element.height > eventManager.scrollTop()
       && element.offset < eventManager.scrollTop() + eventManager.windowsHeight()) {
 
+      if(element.align == 'start') {
+        element.yPos = Math.floor(eventManager.scrollTop() / element.velocity);
+      }
 
       if(element.align == 'top') {
         element.yPos = Math.floor(((eventManager.scrollTop() - element.offset) / element.velocity));
