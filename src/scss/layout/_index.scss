@@ -1,0 +1,24 @@
+.sidebar {
+  background-color: #bbb;
+
+  @include _mq('tablet') {
+    width: 30%;
+    float: left;
+    padding: 1rem;
+  }
+}
+
+.content {
+  @include _mq('tablet') {
+    width: 70%;
+    float: right;
+    padding: 1rem;
+  }
+}
+
+.parallax__item-test {
+  width: rem(140px);
+  height: rem(140px);
+  background-color: red;
+  z-index: 10;
+}

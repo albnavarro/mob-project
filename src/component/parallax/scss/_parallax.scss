@@ -1,0 +1,10 @@
+.parallax {
+  &__item {
+    position: relative;
+
+    &.smooth-transition {
+      transition: transform .5s;
+      transition-timing-function: ease-out;
+    }
+  }
+}

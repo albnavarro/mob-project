@@ -1,0 +1,171 @@
+// LIGHTBOX
+
+.lighbox {
+  background-color: rgba($black , .8);
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 11;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .35s, visibility .35s;
+
+  &.active {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+.lighbox__wrap {
+  width: calc(100% - #{rem(30px)});
+  max-width: 550px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50% , -50%);
+  transition: width .35s, height .35s;
+
+  @include when-inside('.lighbox--image') {
+    max-width: none;
+    width: auto;
+  }
+
+  @include when-inside('.lighbox--video') {
+    max-width: none;
+    width: auto;
+  }
+}
+
+.lighbox__container {
+  background-color: $white;
+  padding: .5rem;
+}
+
+.lighbox__dinamic-content {
+  min-height: 8rem;
+  transition: width .35s, height .35s;
+
+  @include when-inside('.lighbox--image') {
+    height: 200px;
+    width: 200px;
+  }
+
+  @include when-inside('.lighbox--video') {
+    height: 200px;
+    width: 200px;
+  }
+}
+
+.lighbox__closeBtn {
+  float: right;
+  width: 1rem;
+  height: 1rem;
+  background-color: $black;
+  border: 0;
+}
+
+// COMMON STYLE FOR IMAGE ADDED BY JS
+
+.lightbox__img,
+.video-container {
+  width: 100%;
+  opacity: 0;
+  transition: opacity .35s;
+  display: block;
+
+  &.visible {
+    opacity: 1;
+  }
+}
+
+
+.video-container {
+  position: relative;
+  padding-bottom: 56.25%; /*16:9*/
+  padding-top: 30px;
+  height: 0;
+  overflow: hidden;
+}
+
+.video-container iframe,
+.video-container object,
+.video-container embed {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+// SLIDE NAV
+
+.lighbox-image-slide__prev {
+  float: left;
+}
+
+.lighbox-image-slide__next {
+  float: right;
+}
+
+// DESCRIPTION
+
+.lighbox_description {
+  position: fixed;
+  top: 0;
+  left: 0;
+  max-width: 300px;
+  width: 100%;
+  min-height: 100px;
+  background-color: $black;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .35s, visibility .35s, transform .35s;
+  padding: 1rem;
+  transform: translateY(-100%);
+
+  p,h2 {
+    color: $white;
+  }
+
+  &.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  &.active.show {
+    transform: translateY(0);
+  }
+
+  &.active.hide {
+    transform: translateY(-100%);
+  }
+
+  &.show {
+
+    .lighbox_description__show {
+      display: none;
+    }
+
+    .lighbox_description__hide {
+      display: inline-block;
+    }
+  }
+
+  &.hide {
+
+    .lighbox_description__show {
+      display: inline-block;
+    }
+
+    .lighbox_description__hide {
+      display: none;
+    }
+  }
+}
+
+.lighbox_description__btn {
+  position: absolute;
+  top: 100%;
+}

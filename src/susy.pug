@@ -1,0 +1,56 @@
+<!doctype html>
+html
+  head
+    include pug/head.pug
+		
+  body
+    div(id="spriteSvg" data-svg="assets/svg/svg.svg")
+		
+    header
+      .container.menu-container
+        include component/navigation/pug/menu.pug
+        
+    main
+      .container
+        .susy-wrap1.clearfix
+          .susy-wrap1__col Col1
+          .susy-wrap1__col Col2
+          .susy-wrap1__col Col3
+          .susy-wrap1__col Col4
+          .susy-wrap1__col Col1
+          .susy-wrap1__col Col2
+          .susy-wrap1__col Col3
+          .susy-wrap1__col Col4
+        .susy-wrap2.clearfix
+          .susy-wrap2__col Col1
+          .susy-wrap2__col Col2
+          .susy-wrap2__col Col3
+          .susy-wrap2__col Col4
+          .susy-wrap2__col Col1
+          .susy-wrap2__col Col2
+          .susy-wrap2__col Col3
+          .susy-wrap2__col Col4
+        .susy-wrap3.clearfix
+          .susy-wrap3__col Col1
+          .susy-wrap3__col Col2
+          .susy-wrap3__col Col3
+        .susy-wrap4.clearfix
+          .susy-wrap4__col Col1
+          .susy-wrap4__col.clearfix
+            .nest1
+              | nest one
+            .nest2
+              | nest two
+          .susy-wrap4__col Col3
+
+    footer
+      include component/to-top/pug/toTop.pug
+
+    script
+      include ../www/assets/js/fontfaceobserver.js
+    	
+    script
+      include ../www/assets/js/async-assets-loading.min.js
+      
+    script(src="assets/js/vendor/jquery.min.js")
+    script(src="assets/js/main.js")

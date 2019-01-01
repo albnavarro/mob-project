@@ -1,0 +1,153 @@
+// MARGIN MODE
+.susy-wrap1,
+.susy-wrap3 {
+  @include _mq('tablet') {
+    background: susy-svg-grid() no-repeat scroll;
+    margin-bottom: 2rem;
+  }
+}
+
+
+.susy-wrap1__col {
+  background-color: rgba(0,0,0,.3);
+
+  // USE DEFAULT GUTTER NARROW
+  @include _mq('tablet' , 'desktop') {
+    width: span(6);
+    margin-right: gutter();
+    float: left;
+    &:nth-of-type(2n) {
+      margin-right: 0;
+      float: right;
+    }
+  }
+
+  // CANGEs DEFAULT GUTTER
+  @include _mq('desktop') {
+    width: span(4);
+    margin-right: gutter();
+    float: left;
+    &:nth-of-type(3n) {
+      margin-right: 0;
+      float: right;
+    }
+  }
+
+}
+
+
+// WIDE sMODE
+
+.susy-wrap2 {
+  // @include _mq('tablet') {
+    background: susy-svg-grid($wideconf) no-repeat scroll;
+    margin-bottom: 2rem;
+  // }
+}
+
+
+.susy-wrap2__col {
+
+  @include susy-use($wideconf) {
+    background-color: rgba($black,.3);
+    //set complete value
+    width: span(12);
+    padding: 0 120px;
+
+    @include _mq('tablet' , 'desktop') {
+      width: span(6);
+      padding: 0 gutter();
+      float: left;
+    }
+
+    @include _mq('desktop') {
+      width: span(4);
+      padding: 0 gutter();
+      float: left;
+    }
+  }
+
+}
+
+// NARROW WIDE
+
+.susy-wrap3__col {
+  background-color: rgba($black , .4);
+
+  @include _mq('tablet') {
+
+    &:nth-of-type(1) {
+      width: span(2);
+      margin-right: gutter();
+      float: left;
+    }
+    &:nth-of-type(2n) {
+      width: span(2);
+      float: left;
+    }
+    &:nth-of-type(3n) {
+      width: span(8 wide);
+      float: left;
+    }
+  }
+}
+
+// ASYMMETRIC MODE
+
+.susy-wrap4 {
+
+  @include _mq('tablet') {
+    background: susy-svg-grid($asymmetriconf) no-repeat scroll;
+    margin-bottom: 2rem;
+  }
+}
+
+.susy-wrap4__col {
+
+  @include _mq('tablet') {
+    @include susy-use($asymmetriconf) {
+      &:nth-of-type(1) {
+        width: span(1 first);
+        margin-right: gutter();
+        background-color: rgba($black,.5);
+        float: left;
+      }
+
+      &:nth-of-type(2n) {
+        width: span(4 at 2);
+        margin-right: gutter();
+        background-color: rgba($black,.5);
+        float: left;
+      }
+
+      &:nth-of-type(3n) {
+        width: span(1 last);
+        background-color: rgba($black,.5);
+        float: right;
+      }
+    }
+  }
+}
+
+.nest1 {
+
+  @include _mq('tablet') {
+    @include susy-use($asymmetriconf) {
+      width: span(1 of (1 1 1 1));
+      background-color: rgba($black,.3);
+      margin-right: gutter();
+      float: left;
+    }
+  }
+}
+
+.nest2 {
+
+  @include _mq('tablet') {
+    @include susy-use($asymmetriconf) {
+      width: span(3 of (1 1 1 1));
+      background-color: rgba($black,.3);
+      float: left;
+    }
+  }
+}

@@ -1,0 +1,11 @@
+node_modules
+bower_components
+www/assets/css/maps
+www/assets/css/critical.css
+www/assets/css/main.css
+www/assets/js/main.js
+www/assets/svg/svg.svg
+www/assets/img/*.*
+www/assets/js/async-assets-loading.min.js
+www/**/*.html
+config.json

@@ -1,0 +1,225 @@
+.nav{
+
+  @include _mq('max','tablet') {
+    display: none;
+  }
+
+  @include _mq('tablet') {
+    display: block!important;
+  }
+}
+
+.main-menu {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+
+  @include _mq('tablet') {
+    display: flex;
+
+    @include when-inside('.nav--vertical') {
+      flex-direction: column;
+    }
+  }
+}
+
+.menu-item {
+  position: relative;
+
+  @include on-event() {
+    @include _mq('tablet') {
+      @include when-inside('.no-touchevents'){
+        > .sub-menu {
+          display: block;
+        }
+      }
+    }
+  }
+}
+
+.main-menu > .menu-item {
+
+  @include _mq('tablet') {
+    flex: 1 auto;
+  }
+
+  @include _mq('tablet') {
+    display: inline-block;
+    text-align: center;
+  }
+
+  > a {
+    background-color: $black;
+    color: $white;
+    display: block;
+    position: relative;
+    text-transform: uppercase;
+    transition: background-color .35s, line-height .35s;
+  }
+}
+
+.menu-item-has-children {
+
+  &:hover {
+    > .arrow-submenu {
+      @include when-inside('.no-touchevents') {
+        @include _mq('tablet') {
+          transform: rotate(-180deg);
+          right: 11px;
+        }
+      }
+    }
+  }
+}
+
+.sub-menu {
+  display: none;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+
+  @include  _mq('tablet') {
+    position: absolute;
+    top: 100%;
+    height: 100%;
+    width: 200px;
+    left: 0;
+
+    @include when-inside('.nav--vertical') {
+      top: 0;
+    }
+
+    @include when-inside('.nav--vertical--left') {
+      left: 100%;
+      right: auto;
+    }
+
+    @include when-inside('.nav--vertical--right') {
+      right: 100%;
+      left: auto;
+    }
+  }
+
+  a {
+    color: $white;
+    background-color: $black;
+    display: block;
+  }
+
+  .sub-menu {
+    @include when-inside('.nav--horizontal') {
+      @include _mq('tablet') {
+        top: 0;
+      }
+    }
+  }
+
+  &.active {
+    @include _mq('tablet') {
+      display: block;
+    }
+  }
+}
+
+// ARROW AGGIUNTA DA JS
+.arrow-submenu{
+  cursor: pointer;
+  height: 20px;
+  position: absolute;
+  right: 8px;
+  top: 0;
+  transform: rotate(0);
+  transition: transform .35s, top .35s;
+  width: 20px;
+  z-index: 10;
+
+  @include when-inside('.nav--vertical--right') {
+    left: 8px;
+    right: auto;
+  }
+
+  &:after{
+    border-left: 1px $white solid;
+    border-top: 1px $white solid;
+    content: '';
+    height: 7px;
+    left: 5px;
+    position: absolute;
+    top: 5px;
+    transform: rotate(-135deg);
+    width: 7px;
+  }
+
+  &.arrow-selected {
+    transform: rotate(-180deg);
+    right: 11px;
+  }
+}
+
+//TOGGLE
+.toggle-wrap {
+  padding: 1rem;
+  position: relative;
+
+  @include _mq('tablet') {
+    display: none;
+  }
+}
+
+.toggle-element {
+  cursor: pointer;
+  float: right;
+  height: 32px;
+  position: relative;
+  transform: rotate(0deg);
+  transition: .5s ease-in-out;
+  width: 35px;
+
+  & > span {
+    background: $black;
+    border-radius: 2px;
+    display: block;
+    height: 5px;
+    left: 0;
+    opacity: 1;
+    position: absolute;
+    transform: rotate(0deg);
+    transition: .25s ease-in-out;
+    width: 100%;
+
+    &:nth-child(1) {
+      top: 0;
+    }
+
+    &:nth-child(2),
+    &:nth-child(3) {
+      top: 10px;
+    }
+
+    &:nth-child(4) {
+      top: 20px;
+    }
+  }
+
+  &.open > span {
+    &:nth-child(1) {
+      left: 50%;
+      top: 18px;
+      width: 0%;
+    }
+
+    &:nth-child(2) {
+      transform: rotate(45deg);
+    }
+
+    &:nth-child(3) {
+      transform: rotate(-45deg);
+    }
+
+    &:nth-child(4) {
+      left: 50%;
+      top: 18px;
+      width: 0%;
+    }
+  }
+}

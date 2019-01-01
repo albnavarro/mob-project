@@ -1,0 +1,29 @@
+.img-responsive {
+  width: 100%;
+}
+
+.homebox {
+  transition: opacity .5s;
+}
+
+.hideBox {
+  opacity: 0;
+}
+
+.showBox {
+  opacity: 1;
+}
+
+
+.homebox-translate {
+  transition: transform .5s;
+  margin-bottom: .3rem;
+}
+
+.hideBox-translate {
+  transform: translateX(100%);
+}
+
+.showBox-translate {
+  transform: translateX(0);
+}
