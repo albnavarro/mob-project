@@ -87,6 +87,8 @@ class parallaxBackgroundClass {
   }
 
   executeParallax(element) {
+    // Esegui i colcoli solo se l'lemento è visibile nello schemro
+    // valutare la possibilita di eliminarlo
     if( element.bgParentOffset+element.bgParentheight > eventManager.scrollTop()
       && element.bgParentOffset < eventManager.scrollTop() + eventManager.windowsHeight()) {
 

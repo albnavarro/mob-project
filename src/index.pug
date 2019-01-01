@@ -27,19 +27,24 @@ html
 				include component/threeGallery/pug/threeGallery.pug
 									
 				section.overflow-hidden
-					.parallax-background__container.homebox.hideBox
+					
+					.parallax__item.parallax__item-test(data-velocity='2', data-align='top', data-ease="smooth", data-direction="horizontal")
+							
+					.parallax-background__container.homebox.hideBox(style="min-height:300px;")
 						.parallax-background__item(data-velocity='3', data-height='1.5', data-align='center', data-ease="smooth")
 							img.parallax-background__img(src='assets/img/parallax.jpg')
 						|Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry&apos;s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, 
 						
 					.parallax__item.parallax__item-test(data-velocity='2', data-align='center', data-ease="smooth")
-						
-					.parallax-background__container.homebox.hideBox
+
+					.parallax-background__container.homebox.hideBox(style="min-height:300px;")
 						.parallax-background__item(data-velocity='2', data-ease="linear")
 							img.parallax-background__img(src='assets/img/parallax.jpg')
-						|Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry&apos;s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, 
+						|Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry&apos;s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, 	
 						
-					.parallax-background__container.homebox.hideBox
+					.parallax__item.parallax__item-test(data-velocity='2', data-align='bottom', data-ease="smooth", data-direction="rotate")
+						
+					.parallax-background__container.homebox.hideBox(style="min-height:300px;")
 						.parallax-background__item(data-velocity='14', data-ease="linear")
 							img.parallax-background__img(src='assets/img/parallax.jpg')
 						|Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry&apos;s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, 
