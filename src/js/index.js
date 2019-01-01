@@ -55,3 +55,11 @@ const sidebarMenu = new menuClass({
       direction: 'vertical',
       sideDirection: 'left'
     });
+
+// Provvisorio
+const forceResize = () => {
+  setTimeout(() => {
+    $(window).resize()
+  }, 200);
+}
+eventManager.push('load', forceResize);
