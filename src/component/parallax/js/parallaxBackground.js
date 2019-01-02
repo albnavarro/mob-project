@@ -66,11 +66,7 @@ class parallaxBackgroundClass {
       item.calcHeight()
       item.calcParentOffset();
       item.item.css('height',item.height);
-    }
-
-    // fitImages.rescanImages()
-    for( let element of this.$.itemArray ) {
-      this.executeParallax(element)
+      this.executeParallax(item)
     }
   }
 
@@ -88,7 +84,6 @@ class parallaxBackgroundClass {
 
   executeParallax(element) {
     // Esegui i colcoli solo se l'lemento è visibile nello schemro
-    // valutare la possibilita di eliminarlo
     if( element.bgParentOffset+element.bgParentheight > eventManager.scrollTop()
       && element.bgParentOffset < eventManager.scrollTop() + eventManager.windowsHeight()) {
 

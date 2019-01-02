@@ -1,6 +1,9 @@
 .parallax {
+  position: relative;
+
   &__item {
     position: relative;
+
 
     &.smooth-transition {
       transition: transform .5s;
