@@ -14,6 +14,7 @@ class eventManagerClass {
         windowsHeight : window.innerHeight,
         windowsWidth : window.innerWidth,
         scrollTop : window.pageYOffset,
+        documentHeight: document.documentElement.scrollHeight,
         ticking : false,
         stackId : -1,
         timeout: null,
@@ -43,6 +44,10 @@ class eventManagerClass {
 
     document.onreadystatechange = () => {
       if (document.readyState === "complete") {
+        this.$.windowsWidth = window.innerWidth
+        this.$.windowsHeight = window.innerHeight
+        this.$.scrollTop =  window.pageYOffset
+        this.$.documentHeight = document.documentElement.scrollHeight
         this.execute('load')
       }
     }
@@ -66,6 +71,7 @@ class eventManagerClass {
     this.$.windowsWidth = window.innerWidth
     this.$.windowsHeight = window.innerHeight
     this.$.scrollTop =  window.pageYOffset
+    this.$.documentHeight = document.documentElement.scrollHeight
     this.execute('resize')
   }
 
@@ -115,15 +121,19 @@ class eventManagerClass {
   }
 
   windowsHeight() {
-    return this.$.windowsHeight;
+    return this.$.windowsHeight
   }
 
   windowsWidth() {
-    return this.$.windowsWidth;
+    return this.$.windowsWidth
   }
 
   scrollTop() {
-    return this.$.scrollTop;
+    return this.$.scrollTop
+  }
+
+  documentHeight() {
+    return this.$.documentHeight
   }
 }
 
