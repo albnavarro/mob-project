@@ -15,6 +15,10 @@ class eventManagerClass {
         windowsWidth : window.innerWidth,
         scrollTop : window.pageYOffset,
         documentHeight: document.documentElement.scrollHeight,
+        lastScrollTop: window.pageYOffset,
+        scrollUp: 'UP',
+        scrollDown: 'DOWN',
+        scrollDirection: '',
         ticking : false,
         stackId : -1,
         timeout: null,
@@ -28,6 +32,9 @@ class eventManagerClass {
   }
 
   init(scrollUtility = false, useThrottle = true){
+    this.$.scrollDirection = this.$.scrollDown
+
+
     this.$._scrollUtility = scrollUtility
     this.$._throttle = useThrottle
 
@@ -59,6 +66,15 @@ class eventManagerClass {
 
   onScroll() {
     this.$.scrollTop = window.pageYOffset
+
+    if (this.$.lastScrollTop > this.$.scrollTop ) {
+      this.$.scrollDirection = this.$.scrollUp
+    } else {
+      this.$.scrollDirection = this.$.scrollDown
+    }
+
+    this.$.lastScrollTop = this.$.scrollTop
+
     this.requestTick()
 
     if (!this.$.isScrolling && this.$._scrollUtility) {
@@ -134,6 +150,10 @@ class eventManagerClass {
 
   documentHeight() {
     return this.$.documentHeight
+  }
+
+  scrollDirection() {
+    return this.$.scrollDirection
   }
 }
 
