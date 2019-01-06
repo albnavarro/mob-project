@@ -22,8 +22,10 @@ class parallaxClass {
 
 
 
-  init(){
-    this.$.smoothType = this.$.smoothJs
+  init(smoothType = this.$.smoothCss){
+    let _smoothType = smoothType
+
+    this.$.smoothType = _smoothType
     eventManager.push('scroll', this.linearParallax.bind(this));
     eventManager.push('scrollThrottle', this.smoothParallax.bind(this));
     eventManager.push('resize', this.updateArray.bind(this));
@@ -41,7 +43,8 @@ class parallaxClass {
       this.diff = 0
       this.startValue = 0
       this.height = 0
-      this.velocity = (this.item.attr('data-velocity') || 2 )
+      this.distance = (this.item.attr('data-distance') || 2 )
+      this.jsVelocity = (this.item.attr('data-jsVelocity') || 20 )
       this.align = (this.item.attr('data-align') || 'top' )
       this.ease = (this.item.attr('data-ease') || 'linear' )
       this.direction = (this.item.attr('data-direction') || 'vertical' )
@@ -136,7 +139,7 @@ class parallaxClass {
     let _this = this,
         _timeStamp = parseInt(timeStamp),
         start = _timeStamp,
-        end = start + this.$.duration;
+        end = start + this.$.duration
 
     function draw(timeStamp) {
       let _timeStamp = parseInt(timeStamp)
@@ -146,8 +149,8 @@ class parallaxClass {
            if(element.ease == 'linear') return;
 
             let partial = _this.easing(((_timeStamp - start) / _this.$.duration)),
-            val = parseInt(element.startValue + (element.diff - element.startValue) * partial),
-            x = parseInt((element.diff - element.startValue)/20);
+                val = parseInt(element.startValue + (element.diff - element.startValue) / element.jsVelocity * partial),
+                x = parseInt((element.diff - element.startValue) / element.jsVelocity);
 
             val +=  Math.floor(x);
             element.startValue = val;
@@ -175,23 +178,23 @@ class parallaxClass {
 
       switch(element.align) {
         case 'start':
-          element.diff = Math.floor(eventManager.scrollTop() / element.velocity);
+          element.diff = Math.floor(eventManager.scrollTop() / element.distance);
           break;
 
         case 'top':
-          element.diff = Math.floor(((eventManager.scrollTop() - element.offset) / element.velocity));
+          element.diff = Math.floor(((eventManager.scrollTop() - element.offset) / element.distance));
           break;
 
         case 'center':
-          element.diff = Math.floor((((eventManager.scrollTop() + (eventManager.windowsHeight()/2 - element.height/2)) - element.offset) / element.velocity));
+          element.diff = Math.floor((((eventManager.scrollTop() + (eventManager.windowsHeight()/2 - element.height/2)) - element.offset) / element.distance));
           break;
 
         case 'bottom':
-          element.diff = Math.floor((((eventManager.scrollTop() + (eventManager.windowsHeight() - element.height)) - element.offset) / element.velocity));
+          element.diff = Math.floor((((eventManager.scrollTop() + (eventManager.windowsHeight() - element.height)) - element.offset) / element.distance));
           break;
 
         case 'end':
-          element.diff = -Math.floor((eventManager.documentHeight() - (eventManager.scrollTop() + eventManager.windowsHeight())) / element.velocity);
+          element.diff = -Math.floor((eventManager.documentHeight() - (eventManager.scrollTop() + eventManager.windowsHeight())) / element.distance);
           break;
       }
 

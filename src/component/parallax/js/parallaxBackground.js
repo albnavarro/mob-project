@@ -27,7 +27,7 @@ class parallaxBackgroundClass {
       this.bgParentOffset = 0
       this.bgParentheight = 0
       this.yPos = 0
-      this.velocity = (this.item.attr('data-velocity') || 2 )
+      this.distance = (this.item.attr('data-distance') || 2 )
       this.align = (this.item.attr('data-align') || 'top' )
       this.ease = (this.item.attr('data-ease') || 'linear' )
       this.height = 0
@@ -88,17 +88,17 @@ class parallaxBackgroundClass {
       && element.bgParentOffset < eventManager.scrollTop() + eventManager.windowsHeight()) {
 
       if(element.align == 'top') {
-        element.yPos = Math.floor(((eventManager.scrollTop() - element.bgParentOffset) / element.velocity));
+        element.yPos = Math.floor(((eventManager.scrollTop() - element.bgParentOffset) / element.distance));
       }
 
       if(element.align == 'center') {
-        element.yPos = Math.floor((((eventManager.scrollTop() + (eventManager.windowsHeight()/2 - element.bgParentheight/2)) - element.bgParentOffset) / element.velocity));
+        element.yPos = Math.floor((((eventManager.scrollTop() + (eventManager.windowsHeight()/2 - element.bgParentheight/2)) - element.bgParentOffset) / element.distance));
         let gap = (element.height - element.bgParentheight)/2
         element.yPos -= gap
       }
 
       if(element.align == 'bottom') {
-        element.yPos = Math.floor((((eventManager.scrollTop() + (eventManager.windowsHeight() - element.bgParentheight)) - element.bgParentOffset) / element.velocity));
+        element.yPos = Math.floor((((eventManager.scrollTop() + (eventManager.windowsHeight() - element.bgParentheight)) - element.bgParentOffset) / element.distance));
         let gap = (element.height - element.bgParentheight)
         element.yPos -= gap
       }

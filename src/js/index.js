@@ -3,7 +3,7 @@
 eventManager.init(false,true);
 tGallery.init();
 parallaxBackground.init();
-parallax.init();
+parallax.init('JS');
 fitImages.init();
 toolTip.init();
 totop.init();
