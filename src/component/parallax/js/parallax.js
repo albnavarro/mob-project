@@ -67,7 +67,9 @@ class parallaxClass {
       }
     })
 
-    for( let element of this.$.itemArray ) {
+    for (let index = 0; index < this.$.itemArray.length; index++) {
+      const element = this.$.itemArray[index];
+
       this.executeParallax(element)
     }
 
@@ -81,7 +83,9 @@ class parallaxClass {
 
 
   updateArray() {
-    for( let element of this.$.itemArray ) {
+    for (let index = 0; index < this.$.itemArray.length; index++) {
+      const element = this.$.itemArray[index];
+
       element.calcOffset()
       element.calcHeight();
       this.executeParallax(element)
@@ -97,7 +101,8 @@ class parallaxClass {
 
 
   linearParallax() {
-    for( let element of this.$.itemArray ) {
+    for (let index = 0; index < this.$.itemArray.length; index++) {
+      const element = this.$.itemArray[index];
       if(element.ease == 'linear') this.executeParallax(element)
     }
   }
@@ -106,7 +111,8 @@ class parallaxClass {
 
 
   smoothParallax() {
-    for( let element of this.$.itemArray ) {
+    for (let index = 0; index < this.$.itemArray.length; index++) {
+      const element = this.$.itemArray[index];
 
       // Se è un item con ease smooth in css calcolo ivalori e li applico
       if(element.ease == 'smooth' && this.$.smoothType == this.$.smoothCss) {
@@ -136,33 +142,35 @@ class parallaxClass {
 
   // RAF
   onReuqestAnim(timeStamp) {
-    let _this = this,
-        _timeStamp = parseInt(timeStamp),
+    const _timeStamp = parseInt(timeStamp),
         start = _timeStamp,
         end = start + this.$.duration
 
-    function draw(timeStamp) {
-      let _timeStamp = parseInt(timeStamp)
+    const draw = (timeStamp) => {
+      const _timeStamp = parseInt(timeStamp)
 
-      for( let element of _this.$.itemArray ) {
-        ((element) => {
+      for (let index = 0; index < this.$.itemArray.length; index++) {
+        const element = this.$.itemArray[index];
+
+        (() => {
            if(element.ease == 'linear') return;
 
-            let partial = _this.easing(((_timeStamp - start) / _this.$.duration)),
-                val = parseInt(element.startValue + (element.diff - element.startValue) / element.jsVelocity * partial),
-                x = parseInt((element.diff - element.startValue) / element.jsVelocity);
+           // partial: valore tra o e 1 per dare un minimo di easing
+            const partial = this.easing(((_timeStamp - start) / this.$.duration)),
+                x = parseInt((element.diff - element.startValue) / element.jsVelocity),
+                val = parseInt(element.startValue + (element.diff - element.startValue) / element.jsVelocity * partial) + Math.floor(x);
 
-            val +=  Math.floor(x);
             element.startValue = val;
-            element.item.css(_this.setStyle(element,val));
+            element.item.css(this.setStyle(element,val));
 
-        })(element)
+        })()
+
       }
 
       if(_timeStamp > end) return;
 
-      if( _this.$.req ) cancelAnimationFrame(_this.$.req);
-      _this.$.req = requestAnimationFrame(draw)
+      if( this.$.req ) cancelAnimationFrame(this.$.req);
+      this.$.req = requestAnimationFrame(draw)
     }
 
     draw(timeStamp)
