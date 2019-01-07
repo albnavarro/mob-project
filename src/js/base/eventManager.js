@@ -110,7 +110,9 @@ class eventManagerClass {
 
   execute(_properties) {
     if(this.$.data.hasOwnProperty(_properties)) {
-      for( let item of this.$.data[_properties] ) {
+      for (let index = 0; index < this.$.data[_properties].length; index++) {
+        const item = this.$.data[_properties][index];
+
         item.func()
       }
     }

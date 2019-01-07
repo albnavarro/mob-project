@@ -37,7 +37,9 @@ class showElementClass {
   }
 
   updateArray() {
-    for( let item of this.$.itemArray ) {
+    for (let index = 0; index < this.$.itemArray.length; index++) {
+      const item = this.$.itemArray[index];
+
       item.calcPos();
     }
     this.$.entryGap = eventManager.windowsHeight()/6
@@ -45,8 +47,9 @@ class showElementClass {
   }
 
   checkPosition() {
-    for( let element of this.$.itemArray ) {
-      const postion = element.pos - eventManager.windowsHeight() + this.$.entryGap;
+    for (let index = 0; index < this.$.itemArray.length; index++) {
+      const element = this.$.itemArray[index],
+            postion = element.pos - eventManager.windowsHeight() + this.$.entryGap;
 
       if( postion < eventManager.scrollTop() && element.hide) {
         element.item.removeClass(this.$.offClass).addClass(this.$.onClass);

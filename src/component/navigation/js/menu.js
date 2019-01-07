@@ -139,7 +139,9 @@ class menuClass {
 
   SetPosition(){
     if( mq.min('tablet') ) {
-      for( let item of this.$.menuArr ) {
+      for (let index = 0; index < this.$.menuArr.length; index++) {
+        const item = this.$.menuArr[index];
+
         item.parentItemPos = item.parentItem.position().left;
         item.parentItemWidth = item.parentItem.outerWidth();
         item.totalWidth = item.parentItemPos + item.parentItemWidth + (item.maxLevel * this.$.subMenuWidth);

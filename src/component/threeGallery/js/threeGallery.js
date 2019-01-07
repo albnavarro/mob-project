@@ -103,7 +103,8 @@ class tGalleryClass {
       $innerElement.css('width', width);
     })
 
-    for( let item of this.$.arrItem ) {
+    for (let index = 0; index < this.$.arrItem.length; index++) {
+      const item = this.$.arrItem[index];
       item.calcCenter()
     }
   }

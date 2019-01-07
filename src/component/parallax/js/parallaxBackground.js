@@ -61,7 +61,9 @@ class parallaxBackgroundClass {
   }
 
   updateArray() {
-    for( let item of this.$.itemArray ) {
+    for (let index = 0; index < this.$.itemArray.length; index++) {
+      const item = this.$.itemArray[index];
+
       item.calcParentHeight()
       item.calcHeight()
       item.calcParentOffset();
@@ -71,14 +73,18 @@ class parallaxBackgroundClass {
   }
 
   linearParallax() {
-    for( let element of this.$.itemArray ) {
+    for (let index = 0; index < this.$.itemArray.length; index++) {
+      const element = this.$.itemArray[index];
+
       if(element.ease == 'linear') this.executeParallax(element)
     }
   }
 
   smoothParallax() {
-    for( let element of this.$.itemArray ) {
-        if(element.ease == 'smooth') this.executeParallax(element)
+    for (let index = 0; index < this.$.itemArray.length; index++) {
+      const element = this.$.itemArray[index];
+
+      if(element.ease == 'smooth') this.executeParallax(element)
     }
   }
 
