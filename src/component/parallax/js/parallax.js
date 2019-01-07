@@ -152,19 +152,15 @@ class parallaxClass {
       for (let index = 0; index < this.$.itemArray.length; index++) {
         const element = this.$.itemArray[index];
 
-        (() => {
-           if(element.ease == 'linear') return;
+           if(element.ease != 'linear') {
+             // partial: valore tra o e 1 per dare un minimo di easing
+             const partial = this.easing(((_timeStamp - start) / this.$.duration)),
+             x = parseInt((element.diff - element.startValue) / element.jsVelocity),
+             val = parseInt(element.startValue + (element.diff - element.startValue) / element.jsVelocity * partial) + Math.floor(x);
 
-           // partial: valore tra o e 1 per dare un minimo di easing
-            const partial = this.easing(((_timeStamp - start) / this.$.duration)),
-                x = parseInt((element.diff - element.startValue) / element.jsVelocity),
-                val = parseInt(element.startValue + (element.diff - element.startValue) / element.jsVelocity * partial) + Math.floor(x);
-
-            element.startValue = val;
-            element.item.css(this.setStyle(element,val));
-
-        })()
-
+             element.startValue = val;
+             element.item.css(this.setStyle(element,val));
+           }
       }
 
       if(_timeStamp > end) return;
