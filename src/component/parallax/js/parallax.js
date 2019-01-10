@@ -45,9 +45,10 @@ class parallaxClass {
       this.height = 0
       this.distance = (this.item.attr('data-distance') || 2 )
       this.jsVelocity = (this.item.attr('data-jsVelocity') || 20 )
+      this.reverse = (this.item.attr('data-reverse') || false )
       this.align = (this.item.attr('data-align') || 'top' )
       this.ease = (this.item.attr('data-ease') || 'linear' )
-      this.direction = (this.item.attr('data-direction') || 'vertical' )
+      this.propierties = (this.item.attr('data-propierties') || 'vertical' )
       this.calcOffset = () => {
         this.offset = parseInt(this.container.offset().top)
       }
@@ -213,7 +214,9 @@ class parallaxClass {
   setStyle(element,val) {
     let style = {};
 
-    switch(element.direction ) {
+    if (element.reverse) val = -val;
+
+    switch(element.propierties ) {
       case 'vertical':
         style[this.$.transformProperty] = `translate3d(0,0,0) translateY(${val}px)`;
         break;

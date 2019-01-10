@@ -21,4 +21,8 @@
   height: rem(140px);
   background-color: red;
   z-index: 10;
+
+  &--float {
+    float: left;
+  }
 }
