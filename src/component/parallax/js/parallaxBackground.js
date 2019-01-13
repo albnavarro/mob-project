@@ -27,7 +27,7 @@ class parallaxBackgroundClass {
       this.bgParentOffset = 0
       this.bgParentheight = 0
       this.yPos = 0
-      this.distance = (this.item.attr('data-distance') || 2 )
+      this.distance = (this.item.attr('data-distance') || 8 )
       this.align = (this.item.attr('data-align') || 'top' )
       this.ease = (this.item.attr('data-ease') || 'linear' )
       this.height = 0
@@ -53,11 +53,22 @@ class parallaxBackgroundClass {
       this.$.itemArray[this.$.itemArray.length-1].calcHeight()
       this.$.itemArray[this.$.itemArray.length-1].calcParentOffset();
       this.$.itemArray[this.$.itemArray.length-1].item.css('height',this.$.itemArray[this.$.itemArray.length-1].height);
+      this.$.itemArray[this.$.itemArray.length-1].distance = this.normalizeDistance(  this.$.itemArray[this.$.itemArray.length-1].distance)
 
       if(this.$.itemArray[this.$.itemArray.length-1].ease == 'smooth') {
         this.$.itemArray[this.$.itemArray.length-1].item.addClass('smooth-transition')
       }
     })
+  }
+
+
+  normalizeDistance(n) {
+    let _n = n
+
+    if(_n < 0 ) _n = .1
+    if(_n > 10 ) _n = 10
+
+    return 10 -_n
   }
 
   updateArray() {
