@@ -40,14 +40,20 @@ class parallaxClass {
       this.item = item
       this.container = item.closest('.parallax__container')
       this.offset = 0
-      this.diff = 0
+      this.endValue = 0
       this.startValue = 0
       this.height = 0
+      // 1 - 10 , 1 = more distance,  10 = less distance
       this.distance = (this.item.attr('data-distance') || 2 )
-      this.jsVelocity = (this.item.attr('data-jsVelocity') || 20 )
+      // 1 - 10,  1 = quick, 10 = slow
+      this.jsVelocity = (this.item.attr('data-jsVelocity') || 2 )
+      // true - false
       this.reverse = (this.item.attr('data-reverse') || false )
+      // start - top -center - bottom - end
       this.align = (this.item.attr('data-align') || 'top' )
+      // linear - smooth
       this.ease = (this.item.attr('data-ease') || 'linear' )
+      // vertical - horizontal - rotate
       this.propierties = (this.item.attr('data-propierties') || 'vertical' )
       this.calcOffset = () => {
         this.offset = parseInt(this.container.offset().top)
@@ -62,6 +68,8 @@ class parallaxClass {
       this.$.itemArray.push(new obj(item));
       this.$.itemArray[this.$.itemArray.length-1].calcOffset()
       this.$.itemArray[this.$.itemArray.length-1].calcHeight()
+      this.$.itemArray[this.$.itemArray.length-1].distance = this.normalizeDistance(  this.$.itemArray[this.$.itemArray.length-1].distance)
+      this.$.itemArray[this.$.itemArray.length-1].jsVelocity = this.normalizeVelocity(  this.$.itemArray[this.$.itemArray.length-1].jsVelocity)
 
       if(this.$.itemArray[this.$.itemArray.length-1].ease == 'smooth' &&  this.$.smoothType == this.$.smoothCss) {
           this.$.itemArray[this.$.itemArray.length-1].item.addClass('smooth-transition')
@@ -81,7 +89,23 @@ class parallaxClass {
   }
 
 
+  normalizeDistance(n) {
+    let _n = n
 
+    if(_n < 0 ) _n = .1
+    if(_n > 10 ) _n = 10
+
+    return _n
+  }
+
+  normalizeVelocity(n) {
+    let _n = n
+
+    if(_n < 1 ) _n = 1
+    if(_n > 10 ) _n = 10
+
+    return _n * 10
+  }
 
   updateArray() {
     for (let index = 0; index < this.$.itemArray.length; index++) {
@@ -155,9 +179,10 @@ class parallaxClass {
 
            if(element.ease != 'linear') {
              // partial: valore tra o e 1 per dare un minimo di easing
-             const partial = this.easing(((_timeStamp - start) / this.$.duration)),
-             x = parseInt((element.diff - element.startValue) / element.jsVelocity),
-             val = parseInt(element.startValue + (element.diff - element.startValue) / element.jsVelocity * partial) + Math.floor(x);
+             const ease = this.easing(((_timeStamp - start) / this.$.duration)),
+                   diffValue = (element.endValue - element.startValue),
+                   partial = parseInt(diffValue / element.jsVelocity),
+                   val = parseInt(element.startValue + diffValue / element.jsVelocity * ease) + Math.floor(partial);
 
              element.startValue = val;
              element.item.css(this.setStyle(element,val));
@@ -183,29 +208,29 @@ class parallaxClass {
 
       switch(element.align) {
         case 'start':
-          element.diff = Math.floor(eventManager.scrollTop() / element.distance);
+          element.endValue = Math.floor(eventManager.scrollTop() / element.distance);
           break;
 
         case 'top':
-          element.diff = Math.floor(((eventManager.scrollTop() - element.offset) / element.distance));
+          element.endValue = Math.floor(((eventManager.scrollTop() - element.offset) / element.distance));
           break;
 
         case 'center':
-          element.diff = Math.floor((((eventManager.scrollTop() + (eventManager.windowsHeight()/2 - element.height/2)) - element.offset) / element.distance));
+          element.endValue = Math.floor((((eventManager.scrollTop() + (eventManager.windowsHeight()/2 - element.height/2)) - element.offset) / element.distance));
           break;
 
         case 'bottom':
-          element.diff = Math.floor((((eventManager.scrollTop() + (eventManager.windowsHeight() - element.height)) - element.offset) / element.distance));
+          element.endValue = Math.floor((((eventManager.scrollTop() + (eventManager.windowsHeight() - element.height)) - element.offset) / element.distance));
           break;
 
         case 'end':
-          element.diff = -Math.floor((eventManager.documentHeight() - (eventManager.scrollTop() + eventManager.windowsHeight())) / element.distance);
+          element.endValue = -Math.floor((eventManager.documentHeight() - (eventManager.scrollTop() + eventManager.windowsHeight())) / element.distance);
           break;
       }
 
       if (!applyStyle) return;
 
-      element.item.css(this.setStyle(element,element.diff));
+      element.item.css(this.setStyle(element,element.endValue));
     }
   }
 
