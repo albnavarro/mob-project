@@ -43,10 +43,10 @@ class parallaxClass {
       this.endValue = 0
       this.startValue = 0
       this.height = 0
-      // 1 - 10 , 1 = more distance,  10 = less distance
-      this.distance = (this.item.attr('data-distance') || 2 )
-      // 1 - 10,  1 = quick, 10 = slow
-      this.jsVelocity = (this.item.attr('data-jsVelocity') || 2 )
+      // 1 - 10 , 10 = more distance,  1 = less distance
+      this.distance = (this.item.attr('data-distance') || 8 )
+      // 1 - 10,  10 = quick, 1 = slow
+      this.jsVelocity = (this.item.attr('data-jsVelocity') || 8 )
       // true - false
       this.reverse = (this.item.attr('data-reverse') || false )
       // start - top -center - bottom - end
@@ -95,7 +95,7 @@ class parallaxClass {
     if(_n < 0 ) _n = .1
     if(_n > 10 ) _n = 10
 
-    return _n
+    return 10 -_n
   }
 
   normalizeVelocity(n) {
@@ -104,7 +104,7 @@ class parallaxClass {
     if(_n < 1 ) _n = 1
     if(_n > 10 ) _n = 10
 
-    return _n * 10
+    return (10 - _n) * 10
   }
 
   updateArray() {
