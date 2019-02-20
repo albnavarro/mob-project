@@ -54,7 +54,9 @@ scssFiles            = `${scssPath}/**/*.scss`,
 componentscssFiles   = `${componentPath}/**/*.scss`,
 svgFiles             = `${svgPath}/*.svg`,
 pugFiles             = `${themePath}/*.pug`,
-allPugFiles          = `${themePath}/**/*.pug`
+allPugFiles          = `${themePath}/**/*.pug`,
+
+dataFile             = `${themePath}/data/data.json`
 
 
 gulp.task('browser-sync', function() {
@@ -164,8 +166,13 @@ gulp.task('css', ['sass'], () => {
 });
 
 gulp.task('html', function (e) {
+  const jsonData = JSON.parse(fs.readFileSync(dataFile))
+
   return gulp.src(pugFiles)
-      .pipe(pug())
+      .pipe(pug({
+            data: jsonData,
+            pretty: false
+        }))
       .pipe(gulp.dest(destPath));
 });
 
@@ -176,7 +183,7 @@ gulp.task('img', function (e) {
 });
 
 gulp.task('default', ['browser-sync', 'sass', 'js', 'html'], () => {
-  gulp.watch(allPugFiles, ['html-watch'])
+  gulp.watch([allPugFiles,dataFile], ['html-watch'])
   gulp.watch([scssFiles,componentscssFiles], ['sass'])
   gulp.watch([jsFiles,componentJsFiles], ['js-watch'])
 })
