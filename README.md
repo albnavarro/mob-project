@@ -9,17 +9,18 @@ Edit file config.json.dist in config.json, open files and enter your domain in l
 
 ### Type this command in terminal the first time:
 
-* gulp css ( for create critical.css and other css assets)
-* gulp icons ( for svg )
-* gulp img ( for img )
-* gulp minifyAssetsLoading ( for create async-assets-loading.min.js )
-* gulp html ( compile html )
-* gulp css ( recompile critical css )
-* gulp html ( recompile html with critical )
-
-* gulp ( watch pug,scss,js )
+* gulp init
 
 ### Type this command form minify css and js
 
-NODE_ENV=production gulp css
-NODE_ENV=production gulp js
+NODE_ENV=production gulp assets
+
+### Type this command form generate critical css
+
+* gulp criticalCss
+* gulp html
+
+
+### Type this command form use browserSync and liveReload
+
+* gulp watch

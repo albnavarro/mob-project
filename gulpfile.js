@@ -1,81 +1,79 @@
 "use strict"
 
 const
-isProd = process.env.NODE_ENV === 'production',
+  isProd = process.env.NODE_ENV === 'production',
 
-path         = require('path'),
-config       = require('./config.json'),
-concat       = require('gulp-concat'),
-filter       = require('gulp-filter'),
-gulp         = require('gulp'),
-sass         = require('gulp-sass'),
-sourcemaps   = require('gulp-sourcemaps'),
-watch        = require('gulp-watch'),
-wrap         = require('gulp-wrap'),
-critical     = require('critical'),
-gulpif       = require('gulp-if'),
-cssmin       = require('gulp-cssmin'),
-postcss      = require('gulp-postcss'),
-rename       = require('gulp-rename'),
-request      = require('request'),
-svgmin       = require('gulp-svgmin'),
-svgstore     = require('gulp-svgstore'),
-uglify       = require('gulp-uglify'),
-browserSync  = require('browser-sync'),
-fs           = require('fs'),
-replace      = require('gulp-replace'),
-specialHtml  = require('gulp-special-html'),
-htmlmin      = require('gulp-htmlmin'),
-imagemin     = require('gulp-imagemin'),
-pug          = require('gulp-pug'),
-babel        = require("gulp-babel"),
-reload       = browserSync.reload,
+  path = require('path'),
+  config = require('./config.json'),
+  concat = require('gulp-concat'),
+  gulp = require('gulp'),
+  sass = require('gulp-sass'),
+  sourcemaps = require('gulp-sourcemaps'),
+  watch = require('gulp-watch'),
+  wrap = require('gulp-wrap'),
+  critical = require('critical'),
+  gulpif = require('gulp-if'),
+  cssmin = require('gulp-cssmin'),
+  postcss = require('gulp-postcss'),
+  rename = require('gulp-rename'),
+  request = require('request'),
+  svgmin = require('gulp-svgmin'),
+  svgstore = require('gulp-svgstore'),
+  uglify = require('gulp-uglify'),
+  browserSync = require('browser-sync').create(),
+  fs = require('fs'),
+  specialHtml = require('gulp-special-html'),
+  htmlmin = require('gulp-htmlmin'),
+  imagemin = require('gulp-imagemin'),
+  pug = require('gulp-pug'),
+  babel = require("gulp-babel"),
+  reload = browserSync.reload,
 
-themePath = path.resolve('src'),
-destPath = path.resolve('www'),
+  themePath = path.resolve('src'),
+  destPath = path.resolve('www'),
 
-imgPath  = path.join(themePath, 'img'),
-jsPath   = path.join(themePath, 'js'),
-componentPath   = path.join(themePath, 'component'),
-scssPath = path.join(themePath, 'scss'),
-svgPath  = path.join(themePath, 'svg'),
+  imgPath = path.join(themePath, 'img'),
+  jsPath = path.join(themePath, 'js'),
+  componentPath = path.join(themePath, 'component'),
+  scssPath = path.join(themePath, 'scss'),
+  svgPath = path.join(themePath, 'svg'),
 
-cssPath  = path.join(destPath, 'assets/css'),
-jsDest   = path.join(destPath, 'assets/js'),
-svgDest  = path.join(destPath, 'assets/svg'),
-imgDest  = path.join(destPath, 'assets/img'),
+  cssPath = path.join(destPath, 'assets/css'),
+  jsDest = path.join(destPath, 'assets/js'),
+  svgDest = path.join(destPath, 'assets/svg'),
+  imgDest = path.join(destPath, 'assets/img'),
 
-cssFile              = `${cssPath}/main.css`,
-cssCritical          = `${cssPath}/critical.css`,
-imgFiles             = `${imgPath}/*`,
-jsFiles              = `${jsPath}/**/*.js`,
-componentJsFiles     = `${componentPath}/**/*.js`,
-scssFiles            = `${scssPath}/**/*.scss`,
-componentscssFiles   = `${componentPath}/**/*.scss`,
-svgFiles             = `${svgPath}/*.svg`,
-pugFiles             = `${themePath}/*.pug`,
-allPugFiles          = `${themePath}/**/*.pug`,
+  cssFile = `${cssPath}/main.css`,
+  cssCritical = `${cssPath}/critical.css`,
+  imgFiles = `${imgPath}/*`,
+  jsFiles = `${jsPath}/**/*.js`,
+  componentJsFiles = `${componentPath}/**/*.js`,
+  scssFiles = `${scssPath}/**/*.scss`,
+  componentscssFiles = `${componentPath}/**/*.scss`,
+  svgFiles = `${svgPath}/*.svg`,
+  pugFiles = `${themePath}/*.pug`,
+  allPugFiles = `${themePath}/**/*.pug`,
 
-dataFile             = `${themePath}/data/data.json`
+  dataFile = `${themePath}/data/data.json`
 
 
-gulp.task('browser-sync', function() {
+
+function browser_sync() {
   browserSync.init({
     proxy: config.host,
-    open:  false
+    open: true
   })
-})
+};
 
-gulp.task('js-watch', ['js'], function() {
-	browserSync.reload()
-})
 
-gulp.task('html-watch', ['html'], function() {
-	browserSync.reload()
-})
+function reloadPage(done) {
+  browserSync.reload()
+  done();
+};
 
-gulp.task('sass', () => {
-  return gulp.src(path.join(scssPath, 'main.scss'))
+
+function style(done) {
+  gulp.src(path.join(scssPath, 'main.scss'))
     .pipe(sourcemaps.init())
     .pipe(sass({
       outputStyle: 'nested',
@@ -83,28 +81,36 @@ gulp.task('sass', () => {
     }).on('error', sass.logError))
     .pipe(postcss([
       require('autoprefixer')(),
-      require('css-mqpacker')({ sort: true }),
+      require('css-mqpacker')({
+        sort: true
+      }),
     ]))
     .pipe(gulpif(!isProd, sourcemaps.write('maps', {
       includeContent: false,
-      sourceRoot:     scssPath
+      sourceRoot: scssPath
     })))
     .pipe(gulpif(isProd, cssmin({
       keepSpecialComments: false,
     })))
     .pipe(gulp.dest(cssPath))
-    .pipe(browserSync.stream({ match: '**/*.css' }))
-})
+    .pipe(browserSync.stream({
+      match: '**/*.css'
+    }))
 
-gulp.task('minifyAssetsLoading', () => {
+  done();
+};
+
+
+function minifyAssetsLoading() {
   return gulp.src(path.join(jsPath, 'async-assets-loading.js'))
     .pipe(uglify())
     .pipe(rename('async-assets-loading.min.js'))
     .pipe(gulp.dest(jsDest))
-})
+};
 
-gulp.task('js', () => {
-  return gulp.src([
+
+function js(done) {
+  gulp.src([
       path.join(jsPath, 'base/debounce.js'),
       path.join(jsPath, 'base/raf.js'),
       path.join(jsPath, 'base/throttle.js'),
@@ -134,56 +140,87 @@ gulp.task('js', () => {
     .pipe(babel())
     .pipe(gulpif(isProd, uglify()))
     .pipe(gulp.dest(jsDest))
-})
 
-gulp.task('icons', () => {
-	return gulp.src(svgFiles)
-		.pipe(svgmin())
-		.pipe(svgstore({ inlineSvg: true }))
-		.pipe(gulp.dest(svgDest))
-})
+  done();
+};
 
-gulp.task('critical', function (e) {
-    fs.writeFile(cssCritical,'',e);
-});
 
-gulp.task('css', ['sass'], () => {
+function icons() {
+  return gulp.src(svgFiles)
+    .pipe(svgmin({
+        plugins: [{
+          removeViewBox: false
+        }]
+      }
+    ))
+    .pipe(svgstore({
+      inlineSvg: true
+    }))
+    .pipe(gulp.dest(svgDest))
+}
+
+function initializeCritical(done) {
+  fs.writeFile(cssCritical, '', done);
+};
+
+function criticalCss(done) {
   request(config.host, (err, response, body) => {
     if (err) return console.log(err)
 
     critical.generate({
-      base:    './',
-      html:    body,
-      css:     `${cssPath}/main.css`,
-      dest:    `${cssPath}/critical.css`,
-      extract: true,
-      minify:  true,
-      width:   1024,
-      height:  768,
-      include:['.lighbox','.parallax-container','.parallax-item'],
+      base: './',
+      html: body,
+      // base: destPath,
+      // src: 'index.html',
+      minify: true,
+      width: 1024,
+      height: 768,
+      css: `${cssPath}/main.css`,
+      dest: `${cssPath}/critical.css`,
+      include: ['.lighbox', '.parallax-container', '.parallax-item']
     });
-  })
-});
 
-gulp.task('html', function (e) {
+    done();
+  })
+};
+
+
+function html() {
   const jsonData = JSON.parse(fs.readFileSync(dataFile))
 
   return gulp.src(pugFiles)
-      .pipe(pug({
-            data: jsonData,
-            pretty: false
-        }))
-      .pipe(gulp.dest(destPath));
-});
+    .pipe(pug({
+      data: jsonData,
+      pretty: false
+    }))
+    .pipe(gulp.dest(destPath));
+};
 
-gulp.task('img', function (e) {
-    return gulp.src(imgFiles)
+
+function image() {
+  return gulp.src(imgFiles)
     .pipe(imagemin())
     .pipe(gulp.dest(imgDest));
-});
+};
 
-gulp.task('default', ['browser-sync', 'sass', 'js', 'html'], () => {
-  gulp.watch([allPugFiles,dataFile], ['html-watch'])
-  gulp.watch([scssFiles,componentscssFiles], ['sass'])
-  gulp.watch([jsFiles,componentJsFiles], ['js-watch'])
-})
+
+function watch_files() {
+  gulp.watch([scssFiles, componentscssFiles], style)
+  gulp.watch([jsFiles, componentJsFiles], gulp.series(js, reloadPage))
+  gulp.watch([allPugFiles, dataFile], gulp.series(html, reloadPage))
+}
+
+
+// TASK
+gulp.task("initializeCritical", initializeCritical)
+gulp.task("style", style)
+gulp.task("js", js)
+gulp.task("html", html)
+gulp.task("image", image)
+gulp.task("icons", icons)
+gulp.task("minifyAssetsLoading", minifyAssetsLoading)
+gulp.task("criticalCss", gulp.series(style, criticalCss))
+
+gulp.task("init", gulp.series(initializeCritical, icons, image, minifyAssetsLoading, style, js, html))
+gulp.task("assets", gulp.parallel(style, js));
+gulp.task('watch', gulp.parallel(browser_sync, watch_files))
