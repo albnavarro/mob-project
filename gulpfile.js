@@ -58,11 +58,13 @@ const
 
 
 
-function browser_sync() {
+function browser_sync(done) {
   browserSync.init({
     proxy: config.host,
     open: true
   })
+
+  done();
 };
 
 
@@ -204,10 +206,12 @@ function image() {
 };
 
 
-function watch_files() {
+function watch_files(done) {
   gulp.watch([scssFiles, componentscssFiles], style)
   gulp.watch([jsFiles, componentJsFiles], gulp.series(js, reloadPage))
   gulp.watch([allPugFiles, dataFile], gulp.series(html, reloadPage))
+
+  done();
 }
 
 
