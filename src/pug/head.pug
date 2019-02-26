@@ -9,7 +9,16 @@ meta(name="description" content="")
 
 style(type="text/css")
   include ../../www/assets/css/critical.css
+  
+if isProd
+  link(rel="preload" href="assets/dist/" + maincss as="style" onload="this.rel='stylesheet'")
+  noscript
+    link(rel="stylesheet" href="assets/dist/" + maincss media="all")
+      
+else if !isProd
+  link(rel="preload" href="assets/css/main.css" as="style" onload="this.rel='stylesheet'")
+  noscript
+    link(rel="stylesheet" href="assets/css/main.css" media="all")
+  
 script
-  include ../../www/assets/js/loadCSS.js
-noscript
-  link(rel="stylesheet" href="assets/css/main.css" media="all")
+  include ../../www/assets/js/cssPreload.js

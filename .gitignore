@@ -6,6 +6,9 @@ www/assets/css/main.css
 www/assets/js/main.js
 www/assets/svg/svg.svg
 www/assets/img/*.*
+www/assets/dist/*
+www/assets/dist/*.*
+www/assets/data/*.*
 www/assets/js/async-assets-loading.min.js
 www/**/*.html
-config.json
+/config.json
