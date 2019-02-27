@@ -11,9 +11,10 @@ Edit file config.json.dist in config.json, open files and enter your domain in l
 
 * gulp init
 
-### Type this command form minify css and js
+### Type this command form minify css/js and revisioning by appending content hash to filenames )
+### Set isProd -> true in src/data/config.json for use new distribution assets
 
-NODE_ENV=production gulp assets
+* gulp prod
 
 ### Type this command form generate critical css
 
@@ -24,3 +25,8 @@ NODE_ENV=production gulp assets
 ### Type this command form use browserSync and liveReload
 
 * gulp watch
+
+
+### Type this command form delete generated files
+
+* gulp cleanAll
