@@ -134,6 +134,7 @@ function minifyAssetsLoading() {
 
 function js() {
   return gulp.src([
+      path.join(jsPath, 'extra/SmoothScroll.js'),
       path.join(jsPath, 'base/debounce.js'),
       path.join(jsPath, 'base/raf.js'),
       path.join(jsPath, 'base/throttle.js'),
