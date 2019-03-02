@@ -1,29 +1,36 @@
-.img-responsive {
-  width: 100%;
+// .img-responsive {
+//   width: 100%;
+// }
+
+.transition {
+    &--opacity {
+      transition: opacity .5s;
+    }
+
+    &--translate {
+      transition: transform .5s;
+    }
 }
 
-.homebox {
-  transition: opacity .5s;
-}
+.toggleEl {
 
-.hideBox {
-  opacity: 0;
-}
+  &--opacity {
+    &--start {
+      opacity: 0;
+    }
 
-.showBox {
-  opacity: 1;
-}
+    &--end {
+      opacity: 1;
+    }
+  }
 
+  &--transform {
+    &--start {
+      transform: translateX(100%);
+    }
 
-.homebox-translate {
-  transition: transform .5s;
-  margin-bottom: .3rem;
-}
-
-.hideBox-translate {
-  transform: translateX(100%);
-}
-
-.showBox-translate {
-  transform: translateX(0);
+    &--end {
+      transform: translateX(0);
+    }
+  }
 }

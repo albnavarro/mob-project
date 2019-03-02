@@ -3,7 +3,7 @@ class parallaxBackgroundClass {
   constructor() {
     if(!parallaxBackgroundClass.instance){
       this.$ = {
-        $parallaxItem: $('.parallax-background__item'),
+        $parallaxItem: $("*[data-conponent='m-comp--parallax-bg']"),
         itemArray: [],
         transformProperty: Modernizr.prefixed('transform')
       }

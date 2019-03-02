@@ -3,7 +3,8 @@ class toolTipClass {
   constructor() {
     if(!toolTipClass.instance){
       this.$ = {
-        $bnt: $('.tooltip'),
+        // $bnt: $('.tooltip'),
+        $bnt: $("*[data-conponent='m-comp--tooltip']"),
         $body :$('body'),
         lastToolTip: {},
         overTool: false

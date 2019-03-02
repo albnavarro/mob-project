@@ -3,14 +3,15 @@ class tGalleryClass {
   constructor() {
     if(!tGalleryClass.instance){
       this.$ = {
-        $items: $('.tGallery__item'),
-        $containers: $('.tGallery'),
+        $containers: $("*[data-conponent='m-comp--tGallery']"),
+        $items: $("*[data-conponent='m-comp--tGallery'] .tGallery__item"),
         arrItem: []
       }
       tGalleryClass.instance = this;
     }
     return tGalleryClass.instance;
   }
+
 
   init(){
     this.$.$items.on('click', this.onCLick.bind(this))

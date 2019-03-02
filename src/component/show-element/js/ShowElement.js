@@ -2,9 +2,7 @@ class showElementClass {
 
   constructor(data) {
     this.$ = {
-      $box: data.item,
-      onClass:data.onClass,
-      offClass:data.offClass,
+      $item: $("*[data-conponent='m-comp--toggleEl']"),
       itemArray: [],
       entryGap: eventManager.windowsHeight()/6
     }
@@ -19,12 +17,14 @@ class showElementClass {
       this.item = item;
       this.pos = pos;
       this.hide = hide;
+      this.startClass = item.attr('data-startClass');
+      this.endClass = item.attr('data-endClass');
       this.calcPos = () => {
           this.pos=this.item.offset().top;
       }
     }
 
-    this.$.$box.each((index,element) => {
+    this.$.$item.each((index,element) => {
       const item = $(element);
       this.$.itemArray.push(new obj(item, item.offset().top, true));
     })
@@ -52,13 +52,14 @@ class showElementClass {
             postion = element.pos - eventManager.windowsHeight() + this.$.entryGap;
 
       if( postion < eventManager.scrollTop() && element.hide) {
-        element.item.removeClass(this.$.offClass).addClass(this.$.onClass);
+        element.item.removeClass(element.startClass).addClass(element.endClass);
         element.hide=false
       } else if( postion >= eventManager.scrollTop() && !element.hide) {
-        element.item.removeClass(this.$.onClass).addClass(this.$.offClass)
+        element.item.removeClass(element.endClass).addClass(element.startClass)
         element.hide = true
       }
     }
   }
-
 }
+
+const showElement = new showElementClass()

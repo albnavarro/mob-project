@@ -9,13 +9,6 @@ toolTip.init();
 totop.init();
 vh.init();
 
-
-const showElement = new showElementClass({
-       item:$('.homebox'),
-       offClass:'hideBox',
-       onClass:'showBox'
-    });
-
 const lightSimply = new lightBoxClass({
       openBtn:$('.btn-Lightbox1'),
       closeBtn:$('.lighbox__closeBtn'),

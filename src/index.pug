@@ -1,64 +1,126 @@
 <!doctype html>
 html
-	head
-		include pug/head.pug
-		
-	body
-		div(id="spriteSvg" data-svg="assets/svg/svg.svg")
-		
-		header
-			.container.menu-container
-				include component/navigation/pug/menu.pug
-		main
-			.container.clearfix
-				.sidebar.menu-container--sidebar
-					include component/navigation/pug/menu.pug
-				.content
-					h1
-						|!{title}
-						
-					.parallax__container
-						.parallax__item.parallax__item-test(data-distance='8', data-jsVelocity="8",  data-align='start', data-ease="smooth")
-					
-					include component/lightbox/pug/button.pug
-					include component/tooltip/pug/tooltip.pug
-					
-			.container
-				include component/threeGallery/pug/threeGallery.pug
-				include component/threeGallery/pug/threeGallery.pug
-									
-				section.overflow-hidden
-					
-					.parallax__container
-						.parallax__item.parallax__item-test(data-distance='2', data-align='top', data-ease="linear", data-propierties="horizontal")
-							
-					.parallax-background__container.homebox.hideBox(style="min-height:300px;")
-						.parallax-background__item(data-distance='4', data-height='1.5', data-align='center', data-ease="smooth")
-							img.parallax-background__img(src='assets/img/parallax.jpg')
-						|Lorem ipsuum
-						
-					.parallax__container.clearfix
-						.parallax__item.parallax__item-test.parallax__item-test--float(data-distance='8', data-jsVelocity="8", data-align='center', data-ease="smooth")
-						.parallax__item.parallax__item-test.parallax__item-test--float(data-distance='8', data-jsVelocity="8", data-align='center', data-ease="smooth", data-reverse="true")
+  head
+    include pug/head.pug
 
-					.parallax-background__container.homebox.hideBox(style="min-height:300px;")
-						.parallax-background__item(data-distance='6', data-ease="linear")
-							img.parallax-background__img(src='assets/img/parallax.jpg')
-						|Lorem ipsuum 
-						
-					.parallax__container
-						.parallax__item.parallax__item-test(data-distance='8', data-align='bottom', data-ease="smooth", data-propierties="rotate")
-						
-					.parallax-background__container.homebox.hideBox(style="min-height:300px;")
-						.parallax-background__item(data-distance='3', data-ease="linear")
-							img.parallax-background__img(src='assets/img/parallax.jpg')
-						|Lorem ipsuum
-						
-					.parallax__container
-						.parallax__item.parallax__item-test(data-distance='2', data-align='end', data-ease="linear", data-propierties="horizontal")
-					div(style="height:200px;")
-					
-		include component/lightbox/pug/lightbox-simple.pug
-		include component/lightbox/pug/lightbox-image.pug
-		include component/lightbox/pug/lightbox-video.pug
-		include pug/footer.pug
+  body
+    div(id="spriteSvg" data-svg="assets/svg/svg.svg")
+
+    header
+      .container.menu-container
+        include component/navigation/pug/menu.pug
+    main
+      .container.clearfix
+        .sidebar.menu-container--sidebar
+          include component/navigation/pug/menu.pug
+        .content
+          h1
+            |!{title}
+
+          .parallax__container
+            .parallax__item.parallax__item-test(
+              data-conponent='m-comp--parallax',
+              data-distance='8',
+              data-jsVelocity="8",
+              data-align='start',
+              data-ease="smooth")
+
+          include component/lightbox/pug/button.pug
+          include component/tooltip/pug/tooltip.pug
+
+      .container
+        include component/threeGallery/pug/threeGallery.pug
+        include component/threeGallery/pug/threeGallery.pug
+
+        section.overflow-hidden
+
+          .parallax__container
+            .parallax__item.parallax__item-test(
+              data-conponent='m-comp--parallax',
+              data-distance='2',
+              data-align='top',
+              data-ease="linear",
+              data-propierties="horizontal")
+
+          .parallax-background__container.transition--opacity.toggleEl--opacity--start(
+            data-conponent='m-comp--toggleEl',
+            data-startClass="toggleEl--opacity--start",
+            data-endClass="toggleEl--opacity--end",
+            style="min-height:300px;")
+
+            .parallax-background__item(
+              data-conponent='m-comp--parallax-bg',
+              data-distance='4',
+              data-height='1.5',
+              data-align='center',
+              data-ease="smooth")
+
+              img.parallax-background__img(src='assets/img/parallax.jpg')
+            |Lorem ipsuum
+
+          .parallax__container.clearfix
+            .parallax__item.parallax__item-test.parallax__item-test--float(
+              data-conponent='m-comp--parallax',
+              data-distance='8',
+              data-jsVelocity="8",
+              data-align='center',
+              data-ease="smooth")
+
+            .parallax__item.parallax__item-test.parallax__item-test--float(
+              data-conponent='m-comp--parallax',
+              data-distance='8',
+              data-jsVelocity="8",
+              data-align='center',
+              data-ease="smooth",
+              data-reverse="true")
+
+          .parallax-background__container.transition--translate.toggleEl--transform--start(
+            data-conponent='m-comp--toggleEl',
+            data-startClass="toggleEl--transform--start",
+            data-endClass="toggleEl--transform--end",
+            style="min-height:300px;")
+
+            .parallax-background__item(
+              data-conponent='m-comp--parallax-bg',
+              data-distance='6',
+              data-ease="linear")
+
+              img.parallax-background__img(src='assets/img/parallax.jpg')
+            |Lorem ipsuum 
+
+          .parallax__container
+            .parallax__item.parallax__item-test(
+              data-conponent='m-comp--parallax',
+              data-distance='8',
+              data-align='bottom',
+              data-ease="smooth",
+              data-propierties="rotate")
+
+          .parallax-background__container.transition--opacity.toggleEl--opacity--start(
+            data-conponent='m-comp--toggleEl',
+            data-startClass="toggleEl--opacity--start",
+            data-endClass="toggleEl--opacity--end",
+            style="min-height:300px;")
+
+            .parallax-background__item(
+              data-conponent='m-comp--parallax-bg',
+              data-distance='3',
+              data-ease="linear")
+
+              img.parallax-background__img(src='assets/img/parallax.jpg')
+            |Lorem ipsuum
+
+          .parallax__container
+            .parallax__item.parallax__item-test(
+              data-conponent='m-comp--parallax',
+              data-distance='2',
+              data-align='end',
+              data-ease="linear",
+              data-propierties="horizontal")
+
+          div(style="height:200px;")
+
+    include component/lightbox/pug/lightbox-simple.pug
+    include component/lightbox/pug/lightbox-image.pug
+    include component/lightbox/pug/lightbox-video.pug
+    include pug/footer.pug
