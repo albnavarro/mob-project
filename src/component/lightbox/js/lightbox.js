@@ -35,24 +35,24 @@ class lightBoxClass {
 
         case 'normal':
           lightImageDescription.init({
-              title: $btn.data('title') || '',
-              description: $btn.data('description') || '',
+              title: $btn.attr('data-title') || '',
+              description: $btn.attr('data-description') || '',
               $content: this.$.$staticContent
           })
           break;
 
         case 'image':
           lightBoxImage.init({
-              url: $btn.data('url'),
-              title: $btn.data('title') || '',
-              description: $btn.data('description') || '',
+              url: $btn.attr('data-url'),
+              title: $btn.attr('data-title') || '',
+              description: $btn.attr('data-description') || '',
               $content: this.$.$dynamicContent
           })
           break;
 
         case 'image-slide':
           lightBoxImageSlide.init({
-            group: $btn.data('imagegroup'),
+            group: $btn.attr('data-imagegroup'),
             $allItem: this.$.$OpenBtn,
             $item: $btn,
             $content: this.$.$dynamicContent
@@ -61,9 +61,11 @@ class lightBoxClass {
 
         case 'video':
           lightBoxVideo.init({
-            url: $btn.data('url'),
-            title: $btn.data('title') || '',
-            description: $btn.data('description') || '',
+            url: $btn.attr('data-url'),
+            title: $btn.attr('data-title') || '',
+            description: $btn.attr('data-description') || '',
+            ratioW: $btn.attr('data-ratioW') || '16',
+            ratioH: $btn.attr('data-ratioH') || '9',
             $content: this.$.$dynamicContent
           })
           break;

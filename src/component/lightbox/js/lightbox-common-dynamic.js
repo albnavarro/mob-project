@@ -49,6 +49,11 @@ class lightboxCommonDynamicClass {
     lightboxCommonDynamic.resetDescriptionBoxHideShow(_data);
   }
 
+  calculateAspectRatioFit(srcWidth, srcHeight, maxWidth, maxHeight) {
+    const ratio = Math.min(maxWidth / srcWidth, maxHeight / srcHeight);
+    return { width: srcWidth*ratio, height: srcHeight*ratio };
+  }
+
 }
 
 const lightboxCommonDynamic = new lightboxCommonDynamicClass()

@@ -45,18 +45,13 @@ class lightBoxImageClass {
     }
   }
 
-  calculateAspectRatioFit(srcWidth, srcHeight, maxWidth, maxHeight) {
-    const ratio = Math.min(maxWidth / srcWidth, maxHeight / srcHeight);
-    return { width: srcWidth*ratio, height: srcHeight*ratio };
-  }
-
   displayImage() {
     const height = this.$.$img.get(0).naturalHeight,
           width = this.$.$img.get(0).naturalWidth,
           maxHeight = eventManager.windowsHeight() - eventManager.windowsHeight()/3,
           maxWidth = eventManager.windowsWidth() - eventManager.windowsWidth()/3;
 
-    const ratio = this.calculateAspectRatioFit(width,height,maxWidth,maxHeight);
+    const ratio = lightboxCommonDynamic.calculateAspectRatioFit(width,height,maxWidth,maxHeight);
     this.$._data.$content.css("width", ratio.width);
     this.$._data.$content.css("height", ratio.height);
 
