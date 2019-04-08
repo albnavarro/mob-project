@@ -11,29 +11,29 @@ vh.init();
 
 const lightSimply = new lightBoxClass({
       openBtn:$('.btn-Lightbox1'),
-      closeBtn:$('.lighbox__closeBtn'),
-      lighbox:$('.lighbox--static'),
+      closeBtn:$('.lightbox__closeBtn'),
+      lightbox:$('.lightbox--static'),
       type:'normal'
     });
 
 const lightImage = new lightBoxClass({
       openBtn:$('.btn-LightboxImage'),
-      closeBtn:$('.lighbox__closeBtn'),
-      lighbox:$('.lighbox--image'),
+      closeBtn:$('.lightbox__closeBtn'),
+      lightbox:$('.lightbox--image'),
       type:'image'
     });
 
 const lightSlide = new lightBoxClass({
       openBtn:$('.btn-LightboxImageSlide'),
-      closeBtn:$('.lighbox__closeBtn'),
-      lighbox:$('.lighbox--image'),
+      closeBtn:$('.lightbox__closeBtn'),
+      lightbox:$('.lightbox--image'),
       type:'image-slide'
     });
 
 const lightVideo = new lightBoxClass({
       openBtn:$('.btn-LightboxVideo'),
-      closeBtn:$('.lighbox__closeBtn'),
-      lighbox:$('.lighbox--video'),
+      closeBtn:$('.lightbox__closeBtn'),
+      lightbox:$('.lightbox--video'),
       type:'video'
     });
 

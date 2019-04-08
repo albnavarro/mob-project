@@ -21,10 +21,10 @@ class lightBoxImageSlideClass {
     this.$.opened = true;
     this.$.$content = _data.$content;
     // add navigation btn
-    this.$.$contentContainer = this.$.$content.closest('.lighbox__container');
-    const StringToAppend = `<div class='lighbox-image-slide__nav clearfix'>\
-        <button type='button' class='lighbox-image-slide__prev'>Prev</button>\
-        <button type='button' class='lighbox-image-slide__next'>Next</button>\
+    this.$.$contentContainer = this.$.$content.closest('.lightbox__container');
+    const StringToAppend = `<div class='lightbox-image-slide__nav clearfix'>\
+        <button type='button' class='lightbox-image-slide__prev'>Prev</button>\
+        <button type='button' class='lightbox-image-slide__next'>Next</button>\
         </div>`
     this.$.$contentContainer.append(StringToAppend);
 
@@ -43,10 +43,10 @@ class lightBoxImageSlideClass {
 
     // Carico la prima immagine
     this.loadImage();
-    $('.lighbox-image-slide__next').off('click');
-    $('.lighbox-image-slide__next').on('click', this.next.bind(this));
-    $('.lighbox-image-slide__prev').off('click');
-    $('.lighbox-image-slide__prev').on('click', this.prev.bind(this));
+    $('.lightbox-image-slide__next').off('click');
+    $('.lightbox-image-slide__next').on('click', this.next.bind(this));
+    $('.lightbox-image-slide__prev').off('click');
+    $('.lightbox-image-slide__prev').on('click', this.prev.bind(this));
   }
 
   setitem($item) {
@@ -108,9 +108,9 @@ class lightBoxImageSlideClass {
       this.$.itemArray = [];
       this.$.index = 0;
       // remove navigation btn
-      $('.lighbox-image-slide__next').off('click');
-      $('.lighbox-image-slide__prev').off('click');
-      $('.lighbox-image-slide__nav').remove();
+      $('.lightbox-image-slide__next').off('click');
+      $('.lightbox-image-slide__prev').off('click');
+      $('.lightbox-image-slide__nav').remove();
     }
   }
 

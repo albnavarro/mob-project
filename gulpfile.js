@@ -209,7 +209,7 @@ function criticalCss(done) {
       height: 768,
       css: `${cssDest}/main.css`,
       dest: `${cssDest}/critical.css`,
-      include: ['.lighbox', '.parallax-container', '.parallax-item']
+      include: ['.lightbox', '.parallax-container', '.parallax-item']
     });
 
     done();

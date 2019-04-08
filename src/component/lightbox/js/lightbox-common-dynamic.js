@@ -8,15 +8,15 @@ class lightboxCommonDynamicClass {
   }
 
   // RESETTO IL CONTENUTO DELLA DESCRIZIONE LIGHTBOX SE TALE ELEMENTO ESISTE
-  // ALLA CHIUSURA DELLA LIGHBOX O AL CAMBIO LIOGHTBOX
+  // ALLA CHIUSURA DELLA LIGHTBOX O AL CAMBIO LIOGHTBOX
   resetDescriptionBox(data) {
     const _data = data,
-          $descriptionBox = _data.$content.closest('.lighbox').find('.lighbox_description');
+          $descriptionBox = _data.$content.closest('.lightbox').find('.lightbox__description');
 
     if( $descriptionBox.length ) {
-      const $title = $descriptionBox.find('.lighbox_title'),
-            $description = $descriptionBox.find('.lighbox_paragraph'),
-            $HideDescriptionLightbox = $descriptionBox.find('.lighbox_description__btn');
+      const $title = $descriptionBox.find('.lightbox__title'),
+            $description = $descriptionBox.find('.lightbox__paragraph'),
+            $HideDescriptionLightbox = $descriptionBox.find('.lightbox__description__btn');
 
       $title.html('');
       $description.html('');
@@ -25,10 +25,10 @@ class lightboxCommonDynamicClass {
     }
   }
 
-  // CAMBIO LO STATO HIDE SHOW DELLA DESCRIZIONE SOLO SE CHIUDO LA LIGHBOX
+  // CAMBIO LO STATO HIDE SHOW DELLA DESCRIZIONE SOLO SE CHIUDO LA LIGHTBOX
   resetDescriptionBoxHideShow(data) {
     const _data = data,
-          $descriptionBox = _data.$content.closest('.lighbox').find('.lighbox_description');
+          $descriptionBox = _data.$content.closest('.lightbox').find('.lightbox__description');
 
     if( $descriptionBox.length ) {
       $descriptionBox.removeClass('hide');

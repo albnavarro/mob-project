@@ -32,7 +32,7 @@ class lightBoxImageClass {
     this.$.loadimage = new loadImages( this.$.$img , callback.bind(this) );
 
     function callback(){
-      // Aggiungo l'immagine solo se la lighbox è ancora aperta.
+      // Aggiungo l'immagine solo se la lightbox è ancora aperta.
       if(!this.$.isOpen) return;
 
       this.$._data.$content.html(stringToAppend);

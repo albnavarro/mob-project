@@ -14,12 +14,12 @@ class lightBoxVideoClass {
   init(data) {
     this.$._data = data;
     eventManager.remove('resize', this.$.onResizeId)
-    const $videoContainer = '<div class="video-container"></div>';
+    const $videoContainer = '<div class="lightbox__video"></div>';
 
     this.setVideoSize()
 
     this.$._data.$content.html($videoContainer);
-    const $video = $('.video-container');
+    const $video = $('.lightbox__video');
 
     setTimeout(() => {
       $video.html(`<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${this.$._data.url }" frameborder="0" allowfullscreen></iframe>`)

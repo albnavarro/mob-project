@@ -5,7 +5,7 @@ class lightBoxClass {
       $body: $('body'),
       $OpenBtn: data.openBtn || [],
       $closeBtn: data.closeBtn || [],
-      $lightBox:  data.lighbox || [],
+      $lightBox:  data.lightbox || [],
       $dynamicContent: [], // Elemento vuoto se apro una lightbox semplice
       $staticContent: [],
       dataType: data.type || 'normal'
@@ -16,8 +16,8 @@ class lightBoxClass {
 
 
   init(){
-    this.$.$dynamicContent = this.$.$lightBox.find('.lighbox__dinamic-content') || []; // Elemento vuoto se apro una lightbox semplice
-    this.$.$staticContent  = this.$.$lightBox.find('.lighbox__static-content') || [];
+    this.$.$dynamicContent = this.$.$lightBox.find('.lightbox__dinamic-content') || []; // Elemento vuoto se apro una lightbox semplice
+    this.$.$staticContent  = this.$.$lightBox.find('.lightbox__static-content') || [];
     this.$.$OpenBtn.on('click' , this.openBtnOnClick.bind(this));
     this.$.$closeBtn.on('click', this.closeBtnOnClick.bind(this));
     this.$.$lightBox.on('click', this.lightBoxOnClick.bind(this));
