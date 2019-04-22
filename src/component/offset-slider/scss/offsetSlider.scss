@@ -1,0 +1,43 @@
+.offset-slider {
+
+  &__container {
+    position: relative;
+    min-height: 400px;
+    overflow: hidden;
+  }
+
+  &__item {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%; // to be replaced via js
+    transition: transform .35s;
+
+    &.no-transition {
+      transition: none;
+    }
+
+    // TEST css
+    p {
+      pointer-events: none;
+      user-select: none;
+    }
+
+    &:nth-of-type(1) {
+      height: 300px;
+      background-color: #ccc;
+    }
+
+    &:nth-of-type(2) {
+      height: 200px;
+      background-color: #eee;
+    }
+
+    &:nth-of-type(3) {
+      height: 100px;
+      background-color: #666;
+    }
+
+
+  }
+}

@@ -157,6 +157,7 @@ function js() {
       path.join(componentPath, 'lightbox/js/lightbox-video.js'),
       path.join(componentPath, 'show-element/js/ShowElement.js'),
       path.join(componentPath, 'threeGallery/js/threeGallery.js'),
+      path.join(componentPath, 'offset-slider/js/offsetSlider.js'),
       path.join(jsPath, 'index.js'),
     ])
     .pipe(concat('main.js'))

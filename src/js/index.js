@@ -49,6 +49,12 @@ const sidebarMenu = new menuClass({
       sideDirection: 'left'
     });
 
+const offsetSlider = new offsetSliderClass({
+    container: '.offset-slider',
+    step: 8
+})
+
+
 // Provvisorio
 const forceResize = () => {
   setTimeout(() => {
