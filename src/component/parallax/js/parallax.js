@@ -159,12 +159,6 @@ class parallaxClass {
   }
 
 
-  easing (n){
-    n *= 2;
-    if (n < 1) return 0.5 * n * n;
-    return - 0.5 * (--n * (n - 2) - 1);
-  }
-
   // RAF
   onReuqestAnim(timeStamp) {
     const _timeStamp = parseInt(timeStamp),
@@ -178,17 +172,21 @@ class parallaxClass {
         const element = this.s.itemArray[index];
 
            if(element.ease != 'linear') {
-             // partial: valore tra o e 1 per dare un minimo di easing
-             const ease = this.easing(((_timeStamp - start) / this.s.duration)),
-                   diffValue = (element.endValue - element.startValue),
-                   partial = parseInt(diffValue / element.jsVelocity),
-                   val = parseInt(element.startValue + diffValue / element.jsVelocity * ease) + Math.floor(partial);
+             const t = ((_timeStamp - start) / this.s.duration),
+                   s = element.startValue,
+                   f = element.endValue,
+                   v = element.jsVelocity,
+                   // val = (s + (f - s) / v * t) + ((f - s) / v);
+                   // Use parseInt for pixel precision
+                   val = ((( t + 1 ) * ( f - s )) / v) + s;
 
              element.startValue = val;
              element.item.css(this.setStyle(element,val));
            }
       }
 
+      // La RAF viene "rigenerata" fino a quando il gap temporale definito
+      // in this.s.duration esaurisce
       if(_timeStamp > end) return;
 
       if( this.s.req ) cancelAnimationFrame(this.s.req);
