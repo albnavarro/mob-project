@@ -2,7 +2,7 @@ class parallaxBackgroundClass {
 
   constructor() {
     if(!parallaxBackgroundClass.instance){
-      this.$ = {
+      this.s = {
         $parallaxItem: $("*[data-conponent='m-comp--parallax-bg']"),
         itemArray: [],
         transformProperty: Modernizr.prefixed('transform')
@@ -46,17 +46,17 @@ class parallaxBackgroundClass {
       }
     }
 
-    this.$.$parallaxItem.each((index,element) => {
+    this.s.$parallaxItem.each((index,element) => {
       const item=$(element)
-      this.$.itemArray.push(new obj(item));
-      this.$.itemArray[this.$.itemArray.length-1].calcParentHeight()
-      this.$.itemArray[this.$.itemArray.length-1].calcHeight()
-      this.$.itemArray[this.$.itemArray.length-1].calcParentOffset();
-      this.$.itemArray[this.$.itemArray.length-1].item.css('height',this.$.itemArray[this.$.itemArray.length-1].height);
-      this.$.itemArray[this.$.itemArray.length-1].distance = this.normalizeDistance(  this.$.itemArray[this.$.itemArray.length-1].distance)
+      this.s.itemArray.push(new obj(item));
+      this.s.itemArray[this.s.itemArray.length-1].calcParentHeight()
+      this.s.itemArray[this.s.itemArray.length-1].calcHeight()
+      this.s.itemArray[this.s.itemArray.length-1].calcParentOffset();
+      this.s.itemArray[this.s.itemArray.length-1].item.css('height',this.s.itemArray[this.s.itemArray.length-1].height);
+      this.s.itemArray[this.s.itemArray.length-1].distance = this.normalizeDistance(  this.s.itemArray[this.s.itemArray.length-1].distance)
 
-      if(this.$.itemArray[this.$.itemArray.length-1].ease == 'smooth') {
-        this.$.itemArray[this.$.itemArray.length-1].item.addClass('smooth-transition')
+      if(this.s.itemArray[this.s.itemArray.length-1].ease == 'smooth') {
+        this.s.itemArray[this.s.itemArray.length-1].item.addClass('smooth-transition')
       }
     })
   }
@@ -72,8 +72,8 @@ class parallaxBackgroundClass {
   }
 
   updateArray() {
-    for (let index = 0; index < this.$.itemArray.length; index++) {
-      const item = this.$.itemArray[index];
+    for (let index = 0; index < this.s.itemArray.length; index++) {
+      const item = this.s.itemArray[index];
 
       item.calcParentHeight()
       item.calcHeight()
@@ -84,16 +84,16 @@ class parallaxBackgroundClass {
   }
 
   linearParallax() {
-    for (let index = 0; index < this.$.itemArray.length; index++) {
-      const element = this.$.itemArray[index];
+    for (let index = 0; index < this.s.itemArray.length; index++) {
+      const element = this.s.itemArray[index];
 
       if(element.ease == 'linear') this.executeParallax(element)
     }
   }
 
   smoothParallax() {
-    for (let index = 0; index < this.$.itemArray.length; index++) {
-      const element = this.$.itemArray[index];
+    for (let index = 0; index < this.s.itemArray.length; index++) {
+      const element = this.s.itemArray[index];
 
       if(element.ease == 'smooth') this.executeParallax(element)
     }
@@ -121,7 +121,7 @@ class parallaxBackgroundClass {
       }
 
       let style = {};
-      style[this.$.transformProperty] = `translate3d(0,0,0) translateY(${element.yPos}px)`;
+      style[this.s.transformProperty] = `translate3d(0,0,0) translateY(${element.yPos}px)`;
       element.item.css(style);
     }
   }

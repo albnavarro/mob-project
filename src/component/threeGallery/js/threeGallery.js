@@ -2,7 +2,7 @@ class tGalleryClass {
 
   constructor() {
     if(!tGalleryClass.instance){
-      this.$ = {
+      this.s = {
         $containers: $("*[data-conponent='m-comp--tGallery']"),
         $items: $("*[data-conponent='m-comp--tGallery'] .tGallery__item"),
         arrItem: []
@@ -14,7 +14,7 @@ class tGalleryClass {
 
 
   init(){
-    this.$.$items.on('click', this.onCLick.bind(this))
+    this.s.$items.on('click', this.onCLick.bind(this))
     eventManager.push('load', this.buildData.bind(this))
     eventManager.push('load', this.setWidth.bind(this))
     eventManager.push('resize', this.setWidth.bind(this))
@@ -32,9 +32,9 @@ class tGalleryClass {
       }
     }
 
-    this.$.$containers.each((i,el) => {
-      this.$.arrItem.push(new obj($(el)));
-      this.$.arrItem[i].item.attr('data-id', i)
+    this.s.$containers.each((i,el) => {
+      this.s.arrItem.push(new obj($(el)));
+      this.s.arrItem[i].item.attr('data-id', i)
     })
   }
 
@@ -44,12 +44,12 @@ class tGalleryClass {
 
       if(!$item.hasClass('tGallery__item--active')) {
         const id = $item.attr('data-id'),
-              $container = this.$.arrItem[id].container,
-              $scopeItem = this.$.arrItem[id].item,
+              $container = this.s.arrItem[id].container,
+              $scopeItem = this.s.arrItem[id].item,
               $innerElement = $scopeItem.not($item).find('.tGallery__item__wrap'),
               $currentInnerElement = $item.find('.tGallery__item__wrap'),
               itemPosX = $item.offset().left,
-              center = this.$.arrItem[id].center,
+              center = this.s.arrItem[id].center,
               width = $container.outerWidth();
 
         let  direction = $container.attr('data-diretction'),
@@ -57,22 +57,22 @@ class tGalleryClass {
 
         // Posizione il precendete elemento attivo a dx o sx
         $scopeItem.css('order', 2)
-        if (this.$.arrItem[id].activeDirection == 'sx') {
-          this.$.arrItem[id].activeItem .css('order', 3)
+        if (this.s.arrItem[id].activeDirection == 'sx') {
+          this.s.arrItem[id].activeItem .css('order', 3)
         } else {
-          this.$.arrItem[id].activeItem .css('order', 1)
+          this.s.arrItem[id].activeItem .css('order', 1)
         }
 
 
         // Posiziono l'attuale elemento attivo
         if(itemPosX > center - 20) {
             $currentInnerElement.addClass('tg-form-right').removeClass('tg-form-left')
-            this.$.arrItem[id].activeDirection = 'sx'
+            this.s.arrItem[id].activeDirection = 'sx'
           } else {
             $currentInnerElement.addClass('tg-form-left').removeClass('tg-form-right')
-            this.$.arrItem[id].activeDirection = 'dx'
+            this.s.arrItem[id].activeDirection = 'dx'
           }
-          this.$.arrItem[id].activeItem = $item
+          this.s.arrItem[id].activeItem = $item
 
         // Setto l'altrnanza top/bottom
         if (direction == 'up') {
@@ -96,7 +96,7 @@ class tGalleryClass {
   }
 
   setWidth() {
-    this.$.$items.each((i, el) => {
+    this.s.$items.each((i, el) => {
       const $item = $(el),
             $innerElement = $item.find('.tGallery__item__wrap');
 
@@ -104,8 +104,8 @@ class tGalleryClass {
       $innerElement.css('width', width);
     })
 
-    for (let index = 0; index < this.$.arrItem.length; index++) {
-      const item = this.$.arrItem[index];
+    for (let index = 0; index < this.s.arrItem.length; index++) {
+      const item = this.s.arrItem[index];
       item.calcCenter()
     }
   }

@@ -1,7 +1,7 @@
 class lightBoxClass {
 
   constructor(data) {
-    this.$ = {
+    this.s = {
       $body: $('body'),
       $OpenBtn: data.openBtn || [],
       $closeBtn: data.closeBtn || [],
@@ -16,28 +16,28 @@ class lightBoxClass {
 
 
   init(){
-    this.$.$dynamicContent = this.$.$lightBox.find('.lightbox__dinamic-content') || []; // Elemento vuoto se apro una lightbox semplice
-    this.$.$staticContent  = this.$.$lightBox.find('.lightbox__static-content') || [];
-    this.$.$OpenBtn.on('click' , this.openBtnOnClick.bind(this));
-    this.$.$closeBtn.on('click', this.closeBtnOnClick.bind(this));
-    this.$.$lightBox.on('click', this.lightBoxOnClick.bind(this));
+    this.s.$dynamicContent = this.s.$lightBox.find('.lightbox__dinamic-content') || []; // Elemento vuoto se apro una lightbox semplice
+    this.s.$staticContent  = this.s.$lightBox.find('.lightbox__static-content') || [];
+    this.s.$OpenBtn.on('click' , this.openBtnOnClick.bind(this));
+    this.s.$closeBtn.on('click', this.closeBtnOnClick.bind(this));
+    this.s.$lightBox.on('click', this.lightBoxOnClick.bind(this));
   }
 
   openBtnOnClick(event) {
     event.preventDefault();
     const $btn = $(event.target);
 
-    if(!this.$.$lightBox.hasClass('active')){
-      this.$.$lightBox.addClass('active');
-      this.$.$body.css('overflow' , 'hidden');
+    if(!this.s.$lightBox.hasClass('active')){
+      this.s.$lightBox.addClass('active');
+      this.s.$body.css('overflow' , 'hidden');
 
-      switch(this.$.dataType) {
+      switch(this.s.dataType) {
 
         case 'normal':
           lightImageDescription.init({
               title: $btn.attr('data-title') || '',
               description: $btn.attr('data-description') || '',
-              $content: this.$.$staticContent
+              $content: this.s.$staticContent
           })
           break;
 
@@ -46,16 +46,16 @@ class lightBoxClass {
               url: $btn.attr('data-url'),
               title: $btn.attr('data-title') || '',
               description: $btn.attr('data-description') || '',
-              $content: this.$.$dynamicContent
+              $content: this.s.$dynamicContent
           })
           break;
 
         case 'image-slide':
           lightBoxImageSlide.init({
             group: $btn.attr('data-imagegroup'),
-            $allItem: this.$.$OpenBtn,
+            $allItem: this.s.$OpenBtn,
             $item: $btn,
-            $content: this.$.$dynamicContent
+            $content: this.s.$dynamicContent
           })
           break;
 
@@ -66,7 +66,7 @@ class lightBoxClass {
             description: $btn.attr('data-description') || '',
             ratioW: $btn.attr('data-ratioW') || '16',
             ratioH: $btn.attr('data-ratioH') || '9',
-            $content: this.$.$dynamicContent
+            $content: this.s.$dynamicContent
           })
           break;
       }
@@ -79,38 +79,38 @@ class lightBoxClass {
   }
 
   lightBoxOnClick(event) {
-    if( $(event.target).is(this.$.$lightBox)){
+    if( $(event.target).is(this.s.$lightBox)){
        this.closeLightBox(event);
     }
   }
 
   closeLightBox(event) {
-    if( this.$.$lightBox.hasClass('active')){
-      this.$.$lightBox.removeClass('active');
-      this.$.$body.css('overflow-y' , 'visible');
-      this.$.$body.css('overflow-x' , 'hidden');
+    if( this.s.$lightBox.hasClass('active')){
+      this.s.$lightBox.removeClass('active');
+      this.s.$body.css('overflow-y' , 'visible');
+      this.s.$body.css('overflow-x' , 'hidden');
 
-      if ( this.$.dataType == 'image' || this.$.dataType == 'image-slide' || this.$.dataType == 'video' ) {
+      if ( this.s.dataType == 'image' || this.s.dataType == 'image-slide' || this.s.dataType == 'video' ) {
 
         lightBoxImage.onCloseLightbox({
-          $content: this.$.$dynamicContent,
+          $content: this.s.$dynamicContent,
           type: 'dynamic'
         })
 
         lightBoxImageSlide.onCloseLightbox({
-          $content: this.$.$dynamicContent,
+          $content: this.s.$dynamicContent,
           type: 'dynamic'
         })
 
         lightboxCommonDynamic.onCloseLightbox({
-          $content: this.$.$dynamicContent,
+          $content: this.s.$dynamicContent,
           type: 'dynamic'
         })
 
       } else {
 
         lightboxCommonDynamic.onCloseLightbox({
-          $content: this.$.$staticContent,
+          $content: this.s.$staticContent,
           type: 'normal'
         })
       }

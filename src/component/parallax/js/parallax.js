@@ -2,7 +2,7 @@ class parallaxClass {
 
   constructor() {
     if(!parallaxClass.instance){
-      this.$ = {
+      this.s = {
         $parallaxItem: $("*[data-conponent='m-comp--parallax']"),
         itemArray: [],
         transformProperty: Modernizr.prefixed('transform'),
@@ -22,10 +22,10 @@ class parallaxClass {
 
 
 
-  init(smoothType = this.$.smoothCss){
+  init(smoothType = this.s.smoothCss){
     let _smoothType = smoothType
 
-    this.$.smoothType = _smoothType
+    this.s.smoothType = _smoothType
     eventManager.push('scroll', this.linearParallax.bind(this));
     eventManager.push('scrollThrottle', this.smoothParallax.bind(this));
     eventManager.push('resize', this.updateArray.bind(this));
@@ -63,28 +63,28 @@ class parallaxClass {
       }
     }
 
-    this.$.$parallaxItem.each((index,element) => {
+    this.s.$parallaxItem.each((index,element) => {
       const item=$(element)
-      this.$.itemArray.push(new obj(item));
-      this.$.itemArray[this.$.itemArray.length-1].calcOffset()
-      this.$.itemArray[this.$.itemArray.length-1].calcHeight()
-      this.$.itemArray[this.$.itemArray.length-1].distance = this.normalizeDistance(  this.$.itemArray[this.$.itemArray.length-1].distance)
-      this.$.itemArray[this.$.itemArray.length-1].jsVelocity = this.normalizeVelocity(  this.$.itemArray[this.$.itemArray.length-1].jsVelocity)
+      this.s.itemArray.push(new obj(item));
+      this.s.itemArray[this.s.itemArray.length-1].calcOffset()
+      this.s.itemArray[this.s.itemArray.length-1].calcHeight()
+      this.s.itemArray[this.s.itemArray.length-1].distance = this.normalizeDistance(  this.s.itemArray[this.s.itemArray.length-1].distance)
+      this.s.itemArray[this.s.itemArray.length-1].jsVelocity = this.normalizeVelocity(  this.s.itemArray[this.s.itemArray.length-1].jsVelocity)
 
-      if(this.$.itemArray[this.$.itemArray.length-1].ease == 'smooth' &&  this.$.smoothType == this.$.smoothCss) {
-          this.$.itemArray[this.$.itemArray.length-1].item.addClass('smooth-transition')
+      if(this.s.itemArray[this.s.itemArray.length-1].ease == 'smooth' &&  this.s.smoothType == this.s.smoothCss) {
+          this.s.itemArray[this.s.itemArray.length-1].item.addClass('smooth-transition')
       }
     })
 
-    for (let index = 0; index < this.$.itemArray.length; index++) {
-      const element = this.$.itemArray[index];
+    for (let index = 0; index < this.s.itemArray.length; index++) {
+      const element = this.s.itemArray[index];
 
       this.executeParallax(element)
     }
 
-    if (this.$.smoothType == this.$.smoothJs) {
-      if( this.$.req ) cancelAnimationFrame(this.$.req);
-      this.$.req = requestAnimationFrame(this.onReuqestAnim.bind(this))
+    if (this.s.smoothType == this.s.smoothJs) {
+      if( this.s.req ) cancelAnimationFrame(this.s.req);
+      this.s.req = requestAnimationFrame(this.onReuqestAnim.bind(this))
     }
   }
 
@@ -108,17 +108,17 @@ class parallaxClass {
   }
 
   updateArray() {
-    for (let index = 0; index < this.$.itemArray.length; index++) {
-      const element = this.$.itemArray[index];
+    for (let index = 0; index < this.s.itemArray.length; index++) {
+      const element = this.s.itemArray[index];
 
       element.calcOffset()
       element.calcHeight();
       this.executeParallax(element)
     }
 
-    if (this.$.smoothType == this.$.smoothJs) {
-      if( this.$.req ) cancelAnimationFrame(this.$.req);
-      this.$.req = requestAnimationFrame(this.onReuqestAnim.bind(this))
+    if (this.s.smoothType == this.s.smoothJs) {
+      if( this.s.req ) cancelAnimationFrame(this.s.req);
+      this.s.req = requestAnimationFrame(this.onReuqestAnim.bind(this))
     }
   }
 
@@ -126,8 +126,8 @@ class parallaxClass {
 
 
   linearParallax() {
-    for (let index = 0; index < this.$.itemArray.length; index++) {
-      const element = this.$.itemArray[index];
+    for (let index = 0; index < this.s.itemArray.length; index++) {
+      const element = this.s.itemArray[index];
       if(element.ease == 'linear') this.executeParallax(element)
     }
   }
@@ -136,25 +136,25 @@ class parallaxClass {
 
 
   smoothParallax() {
-    for (let index = 0; index < this.$.itemArray.length; index++) {
-      const element = this.$.itemArray[index];
+    for (let index = 0; index < this.s.itemArray.length; index++) {
+      const element = this.s.itemArray[index];
 
       // Se è un item con ease smooth in css calcolo ivalori e li applico
-      if(element.ease == 'smooth' && this.$.smoothType == this.$.smoothCss) {
+      if(element.ease == 'smooth' && this.s.smoothType == this.s.smoothCss) {
         this.executeParallax(element)
       }
 
       // Se è un item con ease smotth in js calcolo ivalori e non li applico
-      if (element.ease == 'smooth' && this.$.smoothType == this.$.smoothJs) {
+      if (element.ease == 'smooth' && this.s.smoothType == this.s.smoothJs) {
         this.executeParallax(element,false)
       }
     }
 
     // Se uso lo smooth js faccio partire il loop di RAF
     // Al suo interno verranno filtrati tutti gli elementi senza easing
-    if (this.$.smoothType == this.$.smoothJs) {
-      if( this.$.req ) cancelAnimationFrame(this.$.req);
-      this.$.req = requestAnimationFrame(this.onReuqestAnim.bind(this))
+    if (this.s.smoothType == this.s.smoothJs) {
+      if( this.s.req ) cancelAnimationFrame(this.s.req);
+      this.s.req = requestAnimationFrame(this.onReuqestAnim.bind(this))
     }
   }
 
@@ -169,17 +169,17 @@ class parallaxClass {
   onReuqestAnim(timeStamp) {
     const _timeStamp = parseInt(timeStamp),
         start = _timeStamp,
-        end = start + this.$.duration
+        end = start + this.s.duration
 
     const draw = (timeStamp) => {
       const _timeStamp = parseInt(timeStamp)
 
-      for (let index = 0; index < this.$.itemArray.length; index++) {
-        const element = this.$.itemArray[index];
+      for (let index = 0; index < this.s.itemArray.length; index++) {
+        const element = this.s.itemArray[index];
 
            if(element.ease != 'linear') {
              // partial: valore tra o e 1 per dare un minimo di easing
-             const ease = this.easing(((_timeStamp - start) / this.$.duration)),
+             const ease = this.easing(((_timeStamp - start) / this.s.duration)),
                    diffValue = (element.endValue - element.startValue),
                    partial = parseInt(diffValue / element.jsVelocity),
                    val = parseInt(element.startValue + diffValue / element.jsVelocity * ease) + Math.floor(partial);
@@ -191,8 +191,8 @@ class parallaxClass {
 
       if(_timeStamp > end) return;
 
-      if( this.$.req ) cancelAnimationFrame(this.$.req);
-      this.$.req = requestAnimationFrame(draw)
+      if( this.s.req ) cancelAnimationFrame(this.s.req);
+      this.s.req = requestAnimationFrame(draw)
     }
 
     draw(timeStamp)
@@ -243,15 +243,15 @@ class parallaxClass {
 
     switch(element.propierties ) {
       case 'vertical':
-        style[this.$.transformProperty] = `translate3d(0,0,0) translateY(${val}px)`;
+        style[this.s.transformProperty] = `translate3d(0,0,0) translateY(${val}px)`;
         break;
 
       case 'horizontal':
-        style[this.$.transformProperty] = `translate3d(0,0,0) translateX(${val}px)`;
+        style[this.s.transformProperty] = `translate3d(0,0,0) translateX(${val}px)`;
         break;
 
       case 'rotate':
-        style[this.$.transformProperty] = `translate3d(0,0,0) rotate(${val}deg)`;
+        style[this.s.transformProperty] = `translate3d(0,0,0) rotate(${val}deg)`;
         break;
     }
 

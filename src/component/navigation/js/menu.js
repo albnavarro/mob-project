@@ -1,7 +1,7 @@
 class menuClass {
 
   constructor(data) {
-    this.$ = {
+    this.s = {
       $menu: $(`${data.menu}`),
       $toggle: $(`${data.toggle}`),
       direction: data.direction || 'horizontal',
@@ -19,23 +19,23 @@ class menuClass {
   }
 
   init() {
-    this.$.$itemHasChildren = this.$.$menu.find('.menu-item-has-children')
-    this.$.$firstLevelItem = this.$.$menu.find('.main-menu > .menu-item-has-children > .sub-menu')
-    this.$.$allSubmenu = this.$.$menu.find('.sub-menu')
+    this.s.$itemHasChildren = this.s.$menu.find('.menu-item-has-children')
+    this.s.$firstLevelItem = this.s.$menu.find('.main-menu > .menu-item-has-children > .sub-menu')
+    this.s.$allSubmenu = this.s.$menu.find('.sub-menu')
 
-    if (this.$.direction == 'vertical') {
-      this.$.$menu.addClass('nav--vertical')
+    if (this.s.direction == 'vertical') {
+      this.s.$menu.addClass('nav--vertical')
 
-      if(this.$.sideDirection == 'left') {
-        this.$.$menu.addClass('nav--vertical--left')
+      if(this.s.sideDirection == 'left') {
+        this.s.$menu.addClass('nav--vertical--left')
       } else {
-        this.$.$menu.addClass('nav--vertical--right')
+        this.s.$menu.addClass('nav--vertical--right')
       }
     } else {
-      this.$.$menu.addClass('nav--horizontal')
+      this.s.$menu.addClass('nav--horizontal')
     }
 
-    this.$.lastWindowsWidth = eventManager.windowsWidth();
+    this.s.lastWindowsWidth = eventManager.windowsWidth();
     this.getSubmenuWidth();
     this.addArrow();
     this.setData();
@@ -44,14 +44,14 @@ class menuClass {
     eventManager.push('resize', this.getSubmenuWidth.bind(this));
     eventManager.push('resize', this.resizeMenu.bind(this));
 
-    if (this.$.direction == 'horizontal') {
+    if (this.s.direction == 'horizontal') {
       this.SetPosition();
       eventManager.push('resize', this.SetPosition.bind(this));
     }
   }
 
   getSubmenuWidth(){
-    this.$.subMenuWidth = this.$.$allSubmenu.outerWidth();
+    this.s.subMenuWidth = this.s.$allSubmenu.outerWidth();
   }
 
   setData() {
@@ -72,21 +72,21 @@ class menuClass {
       this.totalWidth = 0;
     }
 
-    this.$.$firstLevelItem.each((index,element) => {
-      this.$.menuArr.push(new obj($(element)));
+    this.s.$firstLevelItem.each((index,element) => {
+      this.s.menuArr.push(new obj($(element)));
     });
   }
 
   addArrow() {
     // DESKTOP TOUCH SHOW SUBMENU
     const $arrow=$("<div class='arrow-submenu'></div>");
-    this.$.$itemHasChildren.prepend($arrow);
+    this.s.$itemHasChildren.prepend($arrow);
   }
 
   addHandler() {
-   this.$.$body.on('click' , this.bodyOnCLick.bind(this));
-   this.$.$itemHasChildren.find('.arrow-submenu').on('click', this.arrowOnClick.bind(this));
-   this.$.$toggle.on('click', this.toggleOnCLick.bind(this));
+   this.s.$body.on('click' , this.bodyOnCLick.bind(this));
+   this.s.$itemHasChildren.find('.arrow-submenu').on('click', this.arrowOnClick.bind(this));
+   this.s.$toggle.on('click', this.toggleOnCLick.bind(this));
   }
 
   bodyOnCLick(evt) {
@@ -99,7 +99,7 @@ class menuClass {
   }
 
   toggleOnCLick() {
-    if (this.$.$menu.hasClass('menu-on')){
+    if (this.s.$menu.hasClass('menu-on')){
       this.closeMainMenu();
     } else {
       this.openMainMenu();
@@ -114,11 +114,11 @@ class menuClass {
           $parentsArrow = $parentsSubmenu.siblings('.arrow-submenu');
 
     if( Modernizr.touchevents || mq.max('tablet')) {
-     this.$.$allSubmenu.not($parentsSubmenu).not($submenu).removeClass('active');
-     this.$.$itemHasChildren.find('.arrow-submenu').not($target).not($parentsArrow).removeClass('arrow-selected');
+     this.s.$allSubmenu.not($parentsSubmenu).not($submenu).removeClass('active');
+     this.s.$itemHasChildren.find('.arrow-submenu').not($target).not($parentsArrow).removeClass('arrow-selected');
 
      if( mq.max('tablet') ) {
-       this.$.$allSubmenu.not($parentsSubmenu).not($submenu).slideUp();
+       this.s.$allSubmenu.not($parentsSubmenu).not($submenu).slideUp();
      }
 
      if( $submenu.hasClass('active') ) {
@@ -139,12 +139,12 @@ class menuClass {
 
   SetPosition(){
     if( mq.min('tablet') ) {
-      for (let index = 0; index < this.$.menuArr.length; index++) {
-        const item = this.$.menuArr[index];
+      for (let index = 0; index < this.s.menuArr.length; index++) {
+        const item = this.s.menuArr[index];
 
         item.parentItemPos = item.parentItem.position().left;
         item.parentItemWidth = item.parentItem.outerWidth();
-        item.totalWidth = item.parentItemPos + item.parentItemWidth + (item.maxLevel * this.$.subMenuWidth);
+        item.totalWidth = item.parentItemPos + item.parentItemWidth + (item.maxLevel * this.s.subMenuWidth);
 
         if( item.totalWidth > eventManager.windowsWidth() ) {
           item.item.css('right' , 0).css('left' , 'auto');
@@ -160,43 +160,43 @@ class menuClass {
 
   closeMainMenu(immediate) {
     if( immediate ){
-      this.$.$menu.slideUp(0,() => {$(window).resize()})
+      this.s.$menu.slideUp(0,() => {$(window).resize()})
     } else {
-      this.$.$menu.slideUp(() => {$(window).resize()})
+      this.s.$menu.slideUp(() => {$(window).resize()})
     }
-    this.$.$menu.removeClass('menu-on')
-    this.$.$toggle.removeClass('open')
-    this.$.menuIsOpen = false
+    this.s.$menu.removeClass('menu-on')
+    this.s.$toggle.removeClass('open')
+    this.s.menuIsOpen = false
   }
 
   openMainMenu() {
-    this.$.$menu.slideDown(() => {$(window).resize()})
-    this.$.$menu.addClass('menu-on')
-    this.$.$toggle.addClass('open')
-    this.$.menuIsOpen = true
+    this.s.$menu.slideDown(() => {$(window).resize()})
+    this.s.$menu.addClass('menu-on')
+    this.s.$toggle.addClass('open')
+    this.s.menuIsOpen = true
   }
 
   closeSubmenu() {
-    this.$.$allSubmenu.removeClass('active');
-    this.$.$itemHasChildren.find('.arrow-submenu').removeClass('arrow-selected');
+    this.s.$allSubmenu.removeClass('active');
+    this.s.$itemHasChildren.find('.arrow-submenu').removeClass('arrow-selected');
 
     if( mq.min('tablet') ) {
-      this.$.$allSubmenu.css('display' , '');
+      this.s.$allSubmenu.css('display' , '');
     } else {
-      this.$.$allSubmenu.slideUp(() => {$(window).resize()});
+      this.s.$allSubmenu.slideUp(() => {$(window).resize()});
     }
   }
 
   resizeMenu() {
-    if( this.$.lastWindowsWidth != eventManager.windowsWidth() ) {
+    if( this.s.lastWindowsWidth != eventManager.windowsWidth() ) {
       this.closeSubmenu();
       this.closeMainMenu(true);
     }
-    this.$.lastWindowsWidth = eventManager.windowsWidth();
+    this.s.lastWindowsWidth = eventManager.windowsWidth();
   }
 
   CloseOnScroll() {
-    if( mq.max('tablet') && this.$.menuIsOpen) {
+    if( mq.max('tablet') && this.s.menuIsOpen) {
       this.closeSubmenu();
       this.closeMainMenu();
     }

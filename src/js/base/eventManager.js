@@ -2,7 +2,7 @@ class eventManagerClass {
 
   constructor() {
     if(!eventManagerClass.instance){
-      this.$ = {
+      this.s = {
         data: {
           'scroll': [],
           'scrollThrottle': [],
@@ -32,29 +32,29 @@ class eventManagerClass {
   }
 
   init(scrollUtility = false, useThrottle = true){
-    this.$.scrollDirection = this.$.scrollDown
+    this.s.scrollDirection = this.s.scrollDown
 
 
-    this.$._scrollUtility = scrollUtility
-    this.$._throttle = useThrottle
+    this.s._scrollUtility = scrollUtility
+    this.s._throttle = useThrottle
 
     window.addEventListener('scroll', this.onScroll.bind(this), false);
     window.onresize = debounce(this.resize.bind(this), 200);
 
-    if(this.$._throttle) {
+    if(this.s._throttle) {
       window.addEventListener('scroll', throttle(this.onThrottle.bind(this), 60), false);
     }
 
-    if(this.$._scrollUtility) {
+    if(this.s._scrollUtility) {
       window.onscroll = debounce(this.detectScrollEnd.bind(this), 200);
     }
 
     document.onreadystatechange = () => {
       if (document.readyState === "complete") {
-        this.$.windowsWidth = window.innerWidth
-        this.$.windowsHeight = window.innerHeight
-        this.$.scrollTop =  window.pageYOffset
-        this.$.documentHeight = document.documentElement.scrollHeight
+        this.s.windowsWidth = window.innerWidth
+        this.s.windowsHeight = window.innerHeight
+        this.s.scrollTop =  window.pageYOffset
+        this.s.documentHeight = document.documentElement.scrollHeight
         this.execute('load')
       }
     }
@@ -65,53 +65,53 @@ class eventManagerClass {
   }
 
   onScroll() {
-    this.$.scrollTop = window.pageYOffset
+    this.s.scrollTop = window.pageYOffset
 
-    if (this.$.lastScrollTop > this.$.scrollTop ) {
-      this.$.scrollDirection = this.$.scrollUp
+    if (this.s.lastScrollTop > this.s.scrollTop ) {
+      this.s.scrollDirection = this.s.scrollUp
     } else {
-      this.$.scrollDirection = this.$.scrollDown
+      this.s.scrollDirection = this.s.scrollDown
     }
 
-    this.$.lastScrollTop = this.$.scrollTop
+    this.s.lastScrollTop = this.s.scrollTop
 
     this.requestTick()
 
-    if (!this.$.isScrolling && this.$._scrollUtility) {
-      this.$.isScrolling = true;
+    if (!this.s.isScrolling && this.s._scrollUtility) {
+      this.s.isScrolling = true;
       this.execute('scrollStart')
     }
   }
 
   resize(e) {
-    this.$.windowsWidth = window.innerWidth
-    this.$.windowsHeight = window.innerHeight
-    this.$.scrollTop =  window.pageYOffset
-    this.$.documentHeight = document.documentElement.scrollHeight
+    this.s.windowsWidth = window.innerWidth
+    this.s.windowsHeight = window.innerHeight
+    this.s.scrollTop =  window.pageYOffset
+    this.s.documentHeight = document.documentElement.scrollHeight
     this.execute('resize')
   }
 
   requestTick() {
-    if(!this.$.ticking) {
+    if(!this.s.ticking) {
       requestAnimationFrame(this.updateScroll.bind(this))
-      this.$.ticking = true
+      this.s.ticking = true
     }
   }
 
   updateScroll() {
     this.execute('scroll')
-    this.$.ticking = false;
+    this.s.ticking = false;
   }
 
   detectScrollEnd() {
-    this.$.isScrolling = false
+    this.s.isScrolling = false
     this.execute('scrollEnd')
   }
 
   execute(_properties) {
-    if(this.$.data.hasOwnProperty(_properties)) {
-      for (let index = 0; index < this.$.data[_properties].length; index++) {
-        const item = this.$.data[_properties][index];
+    if(this.s.data.hasOwnProperty(_properties)) {
+      for (let index = 0; index < this.s.data[_properties].length; index++) {
+        const item = this.s.data[_properties][index];
 
         item.func()
       }
@@ -119,43 +119,43 @@ class eventManagerClass {
   }
 
   push(_properties,_function) {
-    if(this.$.data.hasOwnProperty(_properties)) {
+    if(this.s.data.hasOwnProperty(_properties)) {
 
-      this.$.stackId++
+      this.s.stackId++
       let obj = {
-        id: this.$.stackId,
+        id: this.s.stackId,
         func: _function
       }
-      this.$.data[_properties].push(obj);
+      this.s.data[_properties].push(obj);
 
-      return this.$.stackId
+      return this.s.stackId
     }
   }
 
   remove(_properties, _id) {
-    this.$.data[_properties] =  this.$.data[_properties].filter(function(obj) {
+    this.s.data[_properties] =  this.s.data[_properties].filter(function(obj) {
     	return obj.id != _id;
     });
   }
 
   windowsHeight() {
-    return this.$.windowsHeight
+    return this.s.windowsHeight
   }
 
   windowsWidth() {
-    return this.$.windowsWidth
+    return this.s.windowsWidth
   }
 
   scrollTop() {
-    return this.$.scrollTop
+    return this.s.scrollTop
   }
 
   documentHeight() {
-    return this.$.documentHeight
+    return this.s.documentHeight
   }
 
   scrollDirection() {
-    return this.$.scrollDirection
+    return this.s.scrollDirection
   }
 }
 

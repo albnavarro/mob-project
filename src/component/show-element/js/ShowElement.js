@@ -1,7 +1,7 @@
 class showElementClass {
 
   constructor(data) {
-    this.$ = {
+    this.s = {
       $item: $("*[data-conponent='m-comp--toggleEl']"),
       itemArray: [],
       entryGap: eventManager.windowsHeight()/6
@@ -24,9 +24,9 @@ class showElementClass {
       }
     }
 
-    this.$.$item.each((index,element) => {
+    this.s.$item.each((index,element) => {
       const item = $(element);
-      this.$.itemArray.push(new obj(item, item.offset().top, true));
+      this.s.itemArray.push(new obj(item, item.offset().top, true));
     })
   }
 
@@ -37,19 +37,19 @@ class showElementClass {
   }
 
   updateArray() {
-    for (let index = 0; index < this.$.itemArray.length; index++) {
-      const item = this.$.itemArray[index];
+    for (let index = 0; index < this.s.itemArray.length; index++) {
+      const item = this.s.itemArray[index];
 
       item.calcPos();
     }
-    this.$.entryGap = eventManager.windowsHeight()/6
+    this.s.entryGap = eventManager.windowsHeight()/6
     this.checkPosition()
   }
 
   checkPosition() {
-    for (let index = 0; index < this.$.itemArray.length; index++) {
-      const element = this.$.itemArray[index],
-            postion = element.pos - eventManager.windowsHeight() + this.$.entryGap;
+    for (let index = 0; index < this.s.itemArray.length; index++) {
+      const element = this.s.itemArray[index],
+            postion = element.pos - eventManager.windowsHeight() + this.s.entryGap;
 
       if( postion < eventManager.scrollTop() && element.hide) {
         element.item.removeClass(element.startClass).addClass(element.endClass);

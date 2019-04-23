@@ -2,7 +2,7 @@ class lightBoxImageSlideClass {
 
   constructor() {
     if(!lightBoxImageSlideClass.instance){
-      this.$ = {
+      this.s = {
         $el: [],
         itemArray: [],
         index: 0,
@@ -18,26 +18,26 @@ class lightBoxImageSlideClass {
   init(data) {
     const _data = data
 
-    this.$.opened = true;
-    this.$.$content = _data.$content;
+    this.s.opened = true;
+    this.s.$content = _data.$content;
     // add navigation btn
-    this.$.$contentContainer = this.$.$content.closest('.lightbox__container');
+    this.s.$contentContainer = this.s.$content.closest('.lightbox__container');
     const StringToAppend = `<div class='lightbox-image-slide__nav clearfix'>\
         <button type='button' class='lightbox-image-slide__prev'>Prev</button>\
         <button type='button' class='lightbox-image-slide__next'>Next</button>\
         </div>`
-    this.$.$contentContainer.append(StringToAppend);
+    this.s.$contentContainer.append(StringToAppend);
 
-    this.$.$el = _data.$allItem.filter((index, element) => {
+    this.s.$el = _data.$allItem.filter((index, element) => {
       return ($(element).data("imagegroup") == _data.group)
     });
 
-    this.$.$el.each((index, element) => {
+    this.s.$el.each((index, element) => {
       const item=$(element);
 
-      this.$.itemArray.push(new this.setitem(item));
+      this.s.itemArray.push(new this.setitem(item));
       if (item.is(_data.$item) ) {
-        this.$.index = index;
+        this.s.index = index;
       }
     });
 
@@ -69,10 +69,10 @@ class lightBoxImageSlideClass {
 
   loadImage() {
     this.showImage(
-      this.$.itemArray[this.$.index].url,
-      this.$.itemArray[this.$.index].$item.data('title'),
-      this.$.itemArray[this.$.index].$item.data('description'),
-      this.$.$content
+      this.s.itemArray[this.s.index].url,
+      this.s.itemArray[this.s.index].$item.data('title'),
+      this.s.itemArray[this.s.index].$item.data('description'),
+      this.s.$content
     );
   }
 
@@ -81,10 +81,10 @@ class lightBoxImageSlideClass {
     // di un'altra immagine per non creare sovrapposizione di loading
     if( lightBoxImage.isLoading()) return;
 
-    if( this.$.index > 0) {
-      this.$.index --;
+    if( this.s.index > 0) {
+      this.s.index --;
     } else {
-      this.$.index = this.$.itemArray.length-1;
+      this.s.index = this.s.itemArray.length-1;
     }
     this.loadImage();
   }
@@ -94,19 +94,19 @@ class lightBoxImageSlideClass {
     // di un'altra immagine per non creare sovrapposizione di loading
     if( lightBoxImage.isLoading()) return;
 
-    if( this.$.index < this.$.itemArray.length-1) {
-      this.$.index ++;
+    if( this.s.index < this.s.itemArray.length-1) {
+      this.s.index ++;
     } else {
-      this.$.index = 0;
+      this.s.index = 0;
     }
     this.loadImage();
   }
 
   onCloseLightbox() {
-    if(this.$.opened) {
-      this.$.$el = [];
-      this.$.itemArray = [];
-      this.$.index = 0;
+    if(this.s.opened) {
+      this.s.$el = [];
+      this.s.itemArray = [];
+      this.s.index = 0;
       // remove navigation btn
       $('.lightbox-image-slide__next').off('click');
       $('.lightbox-image-slide__prev').off('click');

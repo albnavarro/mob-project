@@ -2,7 +2,7 @@ class lightBoxImageClass {
 
   constructor() {
     if(!lightBoxImageClass.instance){
-      this.$ = {
+      this.s = {
         $image: [],
         $img: [],
         _data: {},
@@ -17,52 +17,52 @@ class lightBoxImageClass {
   }
 
   init(data) {
-    this.$.isOpen= true
-    eventManager.remove('resize', this.$.onResizeId)
-    this.$._data = data;
+    this.s.isOpen= true
+    eventManager.remove('resize', this.s.onResizeId)
+    this.s._data = data;
 
-    this.$.$img = $("<img>");
+    this.s.$img = $("<img>");
     const stringToAppend = `<div>\
-        <img class='lightbox__img' src='${this.$._data.url }'>\
+        <img class='lightbox__img' src='${this.s._data.url }'>\
         </div>`;
 
-    this.$.$img.attr('src', this.$._data.url);
-    this.$._data.$content.append("<div class='loader'>Loading...</div>");
-    this.$.isLoading = true
-    this.$.loadimage = new loadImages( this.$.$img , callback.bind(this) );
+    this.s.$img.attr('src', this.s._data.url);
+    this.s._data.$content.append("<div class='loader'>Loading...</div>");
+    this.s.isLoading = true
+    this.s.loadimage = new loadImages( this.s.$img , callback.bind(this) );
 
     function callback(){
       // Aggiungo l'immagine solo se la lightbox è ancora aperta.
-      if(!this.$.isOpen) return;
+      if(!this.s.isOpen) return;
 
-      this.$._data.$content.html(stringToAppend);
-      this.$.$image = $('.lightbox__img');
-      this.displayImage(this.$.$img , this.$.$image,  this.$._data);
-      this.displayDescription(this.$._data);
+      this.s._data.$content.html(stringToAppend);
+      this.s.$image = $('.lightbox__img');
+      this.displayImage(this.s.$img , this.s.$image,  this.s._data);
+      this.displayDescription(this.s._data);
 
-      this.$.onResizeId = eventManager.push('resize', this.onResizeLightboxImage.bind(this))
-      this.$.isLoading = false
+      this.s.onResizeId = eventManager.push('resize', this.onResizeLightboxImage.bind(this))
+      this.s.isLoading = false
     }
   }
 
   displayImage() {
-    const height = this.$.$img.get(0).naturalHeight,
-          width = this.$.$img.get(0).naturalWidth,
+    const height = this.s.$img.get(0).naturalHeight,
+          width = this.s.$img.get(0).naturalWidth,
           maxHeight = eventManager.windowsHeight() - eventManager.windowsHeight()/3,
           maxWidth = eventManager.windowsWidth() - eventManager.windowsWidth()/3;
 
     const ratio = lightboxCommonDynamic.calculateAspectRatioFit(width,height,maxWidth,maxHeight);
-    this.$._data.$content.css("width", ratio.width);
-    this.$._data.$content.css("height", ratio.height);
+    this.s._data.$content.css("width", ratio.width);
+    this.s._data.$content.css("height", ratio.height);
 
     setTimeout(() => {
-      this.$.$image.addClass('visible');
+      this.s.$image.addClass('visible');
     }, 400);
   }
 
   onResizeLightboxImage() {
-    this.$.$image.removeClass('visible');
-    this.displayImage(this.$.$img , this.$.$image , this.$._data);
+    this.s.$image.removeClass('visible');
+    this.displayImage(this.s.$img , this.s.$image , this.s._data);
   }
 
   displayDescription(data) {
@@ -79,22 +79,22 @@ class lightBoxImageClass {
     // Potrebbe caricare involontariamente la lightbox di un'immagine indesiderata
     // Posso arrivare da lignbox che non usano loadimge
     // In questo caso si presuppone sia null, utilizziamo anche un try catch per maggiore sicurezza.
-    if (this.$.loadimage != null) {
+    if (this.s.loadimage != null) {
       try {
-        this.$.loadimage.stop()
+        this.s.loadimage.stop()
       }
       catch(err) {
         // console.log(err)
       }
     }
-    this.$.loadimage = null;
-    this.$.isOpen= false
-    this.$.isLoading = false
-    eventManager.remove('resize', this.$.onResizeId)
+    this.s.loadimage = null;
+    this.s.isOpen= false
+    this.s.isLoading = false
+    eventManager.remove('resize', this.s.onResizeId)
   }
 
   isLoading() {
-    return this.$.isLoading
+    return this.s.isLoading
   }
 
 }

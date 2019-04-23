@@ -1,7 +1,7 @@
 class offsetSliderClass {
 
   constructor(data) {
-    this.$ = {
+    this.s = {
       $container: $(`${data.container}`),
       containerWidth: 0,
       $el: $(`${data.container}`).find('.offset-slider__item'),
@@ -25,8 +25,8 @@ class offsetSliderClass {
     this.setContainerWidth();
     this.setAdvancement();
     this.initSwipe();
-    this.$.$prevBtn.on('click', this.prevStep.bind(this))
-    this.$.$nextBtn.on('click', this.nextStep.bind(this))
+    this.s.$prevBtn.on('click', this.prevStep.bind(this))
+    this.s.$nextBtn.on('click', this.nextStep.bind(this))
 
     eventManager.push('resize', this.setAdvancement.bind(this));
     eventManager.push('resize', this.setContainerWidth.bind(this));
@@ -44,17 +44,17 @@ class offsetSliderClass {
       this.advancement = 0;
       this.driven = (item.attr('data-driven') === 'true') || false;
       this.calcAdvancement = () => {
-        this.advancement = (this.width - this.$.containerWidth) / parseInt(_this.$.step)
+        this.advancement = (this.width - this.s.containerWidth) / parseInt(_this.s.step)
       }
     }
 
-    this.$.$el.each((index, element) => {
-      this.$.elArray.push(new obj($(element)));
+    this.s.$el.each((index, element) => {
+      this.s.elArray.push(new obj($(element)));
     });
   }
 
   initSwipe() {
-    const $cont = this.$.elArray[this.$.drivenElIndex].item;
+    const $cont = this.s.elArray[this.s.drivenElIndex].item;
 
     let isDown = false,
       startX = 0,
@@ -62,9 +62,9 @@ class offsetSliderClass {
       val = 0,
       walk = 0;
 
-    this.$.$container.on('mousedown touchstart', (e) => {
-      this.$.$el.addClass('no-transition ');
-      val = this.$.drivenTranslatePosition;
+    this.s.$container.on('mousedown touchstart', (e) => {
+      this.s.$el.addClass('no-transition ');
+      val = this.s.drivenTranslatePosition;
 
       if (e.type == 'mousedown') {
         startX = e.pageX;
@@ -75,19 +75,19 @@ class offsetSliderClass {
       isDown = true;
     });
 
-    this.$.$container.on('mouseleave', () => {
-      this.$.drivenTranslatePosition = val;
+    this.s.$container.on('mouseleave', () => {
+      this.s.drivenTranslatePosition = val;
       isDown = false;
       this.updateIndex();
     });
 
-    this.$.$container.on('mouseup touchend', () => {
-      this.$.drivenTranslatePosition = val;
+    this.s.$container.on('mouseup touchend', () => {
+      this.s.drivenTranslatePosition = val;
       isDown = false;
       this.updateIndex();
     });
 
-    this.$.$container.on('mousemove touchmove', (e) => {
+    this.s.$container.on('mousemove touchmove', (e) => {
       if (!isDown) return;
       // e.preventDefault();
 
@@ -99,10 +99,10 @@ class offsetSliderClass {
       }
 
       walk = startX - endX;
-      val = this.$.drivenTranslatePosition - walk;
+      val = this.s.drivenTranslatePosition - walk;
 
       let style = {};
-      style[this.$.transformProperty] = `translate3d(0,0,0) translateX(${val}px)`;
+      style[this.s.transformProperty] = `translate3d(0,0,0) translateX(${val}px)`;
       $cont.css(style);
 
       this.setOtherElPosition(val);
@@ -111,38 +111,38 @@ class offsetSliderClass {
   }
 
   setContainerWidth() {
-    this.$.containerWidth = this.$.$container.outerWidth();
+    this.s.containerWidth = this.s.$container.outerWidth();
   }
 
   updateIndex() {
 
-    for (let index = 0; index < this.$.step; index++) {
-      let min = index * this.$.advancement,
-        max = (index + 1) * this.$.advancement;
+    for (let index = 0; index < this.s.step; index++) {
+      let min = index * this.s.advancement,
+        max = (index + 1) * this.s.advancement;
 
-      this.$.$el.removeClass('no-transition ');
+      this.s.$el.removeClass('no-transition ');
 
-      if (-this.$.drivenTranslatePosition > min && -this.$.drivenTranslatePosition < max) {
-        let half = min + (this.$.advancement/2);
+      if (-this.s.drivenTranslatePosition > min && -this.s.drivenTranslatePosition < max) {
+        let half = min + (this.s.advancement/2);
 
-        if (-this.$.drivenTranslatePosition >= half ) {
-          this.$.activeStep = -(index + 1);
+        if (-this.s.drivenTranslatePosition >= half ) {
+          this.s.activeStep = -(index + 1);
         } else {
-          this.$.activeStep = -index;
+          this.s.activeStep = -index;
         }
 
         this.setDriveElPosition();
         this.setOtherElPosition();
         break;
 
-      } else if (this.$.drivenTranslatePosition > 0) {
-        this.$.activeStep = 0;
+      } else if (this.s.drivenTranslatePosition > 0) {
+        this.s.activeStep = 0;
         this.setDriveElPosition();
         this.setOtherElPosition();
         break;
 
-      } else if (-this.$.drivenTranslatePosition > (this.$.step * this.$.advancement)) {
-        this.$.activeStep = -this.$.step;
+      } else if (-this.s.drivenTranslatePosition > (this.s.step * this.s.advancement)) {
+        this.s.activeStep = -this.s.step;
         this.setDriveElPosition();
         this.setOtherElPosition();
         break;
@@ -151,54 +151,54 @@ class offsetSliderClass {
   }
 
   getDrivenIndex() {
-    for (let index = 0; index < this.$.elArray.length; index++) {
-      const el = this.$.elArray[index];
+    for (let index = 0; index < this.s.elArray.length; index++) {
+      const el = this.s.elArray[index];
 
       if (el.driven) {
-        this.$.drivenElIndex = index;
+        this.s.drivenElIndex = index;
       }
     }
   }
 
   setWidth() {
-    for (let index = 0; index < this.$.elArray.length; index++) {
-      const el = this.$.elArray[index];
+    for (let index = 0; index < this.s.elArray.length; index++) {
+      const el = this.s.elArray[index];
       el.item.css('width', `${el.width}px`);
     }
   }
 
   setAdvancement() {
-    const el = this.$.elArray[this.$.drivenElIndex];
-    this.$.advancement = (el.width - this.$.containerWidth) / parseInt(this.$.step);
+    const el = this.s.elArray[this.s.drivenElIndex];
+    this.s.advancement = (el.width - this.s.containerWidth) / parseInt(this.s.step);
   }
 
   prevStep() {
-    if(this.$.activeStep >= 0)  return;
+    if(this.s.activeStep >= 0)  return;
 
-    this.$.activeStep++;
-    this.$.$el.removeClass('no-transition ');
+    this.s.activeStep++;
+    this.s.$el.removeClass('no-transition ');
     this.setDriveElPosition();
     this.setOtherElPosition();
   }
 
   nextStep() {
-    if(this.$.activeStep <= -this.$.step)  return;
+    if(this.s.activeStep <= -this.s.step)  return;
 
-    this.$.activeStep--;
-    this.$.$el.removeClass('no-transition ');
+    this.s.activeStep--;
+    this.s.$el.removeClass('no-transition ');
     this.setDriveElPosition();
     this.setOtherElPosition();
   }
 
   setDriveElPosition() {
-    const el = this.$.elArray[this.$.drivenElIndex],
-      val = this.$.activeStep * this.$.advancement;
+    const el = this.s.elArray[this.s.drivenElIndex],
+      val = this.s.activeStep * this.s.advancement;
 
     let style = {};
-    style[this.$.transformProperty] = `translate3d(0,0,0) translateX(${val}px)`;
+    style[this.s.transformProperty] = `translate3d(0,0,0) translateX(${val}px)`;
     el.item.css(style);
 
-    this.$.drivenTranslatePosition = val;
+    this.s.drivenTranslatePosition = val;
   }
 
   setOtherElPosition(val = null) {
@@ -207,17 +207,17 @@ class offsetSliderClass {
     if (val) {
       walk = val;
     } else {
-      walk = this.$.drivenTranslatePosition;
+      walk = this.s.drivenTranslatePosition;
     }
 
-    for (let index = 0; index < this.$.elArray.length; index++) {
-      const el = this.$.elArray[index],
-        drivenEl = this.$.elArray[this.$.drivenElIndex];
+    for (let index = 0; index < this.s.elArray.length; index++) {
+      const el = this.s.elArray[index],
+        drivenEl = this.s.elArray[this.s.drivenElIndex];
 
       if (!el.driven) {
-        const val = ((el.width - this.$.containerWidth) * walk) / (drivenEl.width - this.$.containerWidth);
+        const val = ((el.width - this.s.containerWidth) * walk) / (drivenEl.width - this.s.containerWidth);
         let style = {};
-        style[this.$.transformProperty] = `translate3d(0,0,0) translateX(${val}px)`;
+        style[this.s.transformProperty] = `translate3d(0,0,0) translateX(${val}px)`;
         el.item.css(style);
       }
     }

@@ -2,7 +2,7 @@ class fitImagesClass {
 
   constructor() {
     if(!fitImagesClass.instance){
-      this.$ = {
+      this.s = {
         $imgContainers: $('.fit-img-container')
       }
       fitImagesClass.instance = this;
@@ -17,7 +17,7 @@ class fitImagesClass {
   }
 
   fitImages() {
-    this.$.$imgContainers.each((i, el) => {
+    this.s.$imgContainers.each((i, el) => {
       const
       $imgContainer = $(el),
       $img          = $imgContainer.children('.fit-img');

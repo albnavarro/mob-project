@@ -1,7 +1,7 @@
 class loadImages {
 
   constructor(images,callback) {
-    this.$ = {
+    this.s = {
       $images: images,
       cont: 0,
       callback: callback,
@@ -14,22 +14,22 @@ class loadImages {
 
   init(){
 
-    this.$.$images.each((i, el) => {
+    this.s.$images.each((i, el) => {
       let $img = $(el);
 
       if ($img.prop('complete')) {
-        this.$.cont++;
-        if( this.$.cont == this.$.$images.length ){
-           this.$.callback();
+        this.s.cont++;
+        if( this.s.cont == this.s.$images.length ){
+           this.s.callback();
         }
       }
 
       else {
         $img.on('load', () => {
-          this.$.cont++;
-          if( this.$.cont == this.$.$images.length ){
-             if(this.$.active) {
-               this.$.callback();
+          this.s.cont++;
+          if( this.s.cont == this.s.$images.length ){
+             if(this.s.active) {
+               this.s.callback();
              }
           };
         });
@@ -39,7 +39,7 @@ class loadImages {
   }
 
   stop() {
-    this.$.active = false
+    this.s.active = false
   }
 
 }

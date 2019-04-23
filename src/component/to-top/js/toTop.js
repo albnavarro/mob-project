@@ -2,7 +2,7 @@ class totopClass {
 
   constructor() {
     if(!totopClass.instance){
-      this.$ = {
+      this.s = {
         $totop: $('.to-top'),
         hide: true
       }
@@ -18,7 +18,7 @@ class totopClass {
   }
 
   addHandler() {
-    this.$.$totop.on('click' , this.onClick.bind(this));
+    this.s.$totop.on('click' , this.onClick.bind(this));
   }
 
   onClick(event) {
@@ -27,12 +27,12 @@ class totopClass {
   }
 
   showArrow() {
-    if (eventManager.scrollTop() >=  eventManager.windowsWidth() && this.$.hide) {
-        this.$.$totop.addClass('visible');
-        this.$.hide=false;
-    } else if( eventManager.scrollTop() <  eventManager.windowsWidth() && !this.$.hide ) {
-        this.$.$totop.removeClass('visible');
-        this.$.hide=true;
+    if (eventManager.scrollTop() >=  eventManager.windowsWidth() && this.s.hide) {
+        this.s.$totop.addClass('visible');
+        this.s.hide=false;
+    } else if( eventManager.scrollTop() <  eventManager.windowsWidth() && !this.s.hide ) {
+        this.s.$totop.removeClass('visible');
+        this.s.hide=true;
     }
   }
 
