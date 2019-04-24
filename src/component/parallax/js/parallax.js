@@ -11,8 +11,8 @@ class parallaxClass {
         smoothCss: 'CSS',
         smoothJs: 'JS',
         smoothType: '',
-        duration: 1000,
-        req: null
+        req: null,
+        toFixedValue: 1
       }
       parallaxClass.instance = this;
     }
@@ -42,6 +42,7 @@ class parallaxClass {
       this.offset = 0
       this.endValue = 0
       this.startValue = 0
+      this.prevValue = 0
       this.height = 0
       // 1 - 10 , 10 = more distance,  1 = less distance
       this.distance = (this.item.attr('data-distance') || 8 )
@@ -161,30 +162,30 @@ class parallaxClass {
 
   // RAF
   onReuqestAnim(timeStamp) {
-    const _timeStamp = parseInt(timeStamp),
-        start = _timeStamp,
-        end = start + this.s.duration
 
     const draw = (timeStamp) => {
-      const _timeStamp = parseInt(timeStamp)
+      let isCompleted = true;
 
       for (let index = 0; index < this.s.itemArray.length; index++) {
         const element = this.s.itemArray[index];
 
            if(element.ease != 'linear') {
+            element.prevValue = element.startValue
+
              const s = element.startValue,
                    f = element.endValue,
                    v = element.jsVelocity,
-                   val = (( f - s ) / v) + s;
+                   val =  (( f - s ) / v) + s * 1;
 
-             element.startValue = val;
-             element.item.css(this.setStyle(element,val));
+             element.startValue = val.toFixed(this.s.toFixedValue);
+             element.item.css(this.setStyle(element,element.startValue));
+
+             if( element.prevValue != element.startValue) isCompleted = false;
            }
       }
 
-      // La RAF viene "rigenerata" fino a quando il gap temporale definito
-      // in this.s.duration esaurisce
-      if(_timeStamp > end) return;
+      // La RAF viene "rigenerata" fino a quando tutti gli elementi rimangono fermi
+      if(isCompleted) return;
 
       if( this.s.req ) cancelAnimationFrame(this.s.req);
       this.s.req = requestAnimationFrame(draw)
@@ -203,25 +204,27 @@ class parallaxClass {
 
       switch(element.align) {
         case 'start':
-          element.endValue = Math.floor(eventManager.scrollTop() / element.distance);
+          element.endValue =(eventManager.scrollTop() / element.distance);
           break;
 
         case 'top':
-          element.endValue = Math.floor(((eventManager.scrollTop() - element.offset) / element.distance));
+          element.endValue =(((eventManager.scrollTop() - element.offset) / element.distance));
           break;
 
         case 'center':
-          element.endValue = Math.floor((((eventManager.scrollTop() + (eventManager.windowsHeight()/2 - element.height/2)) - element.offset) / element.distance));
+          element.endValue =((((eventManager.scrollTop() + (eventManager.windowsHeight()/2 - element.height/2)) - element.offset) / element.distance));
           break;
 
         case 'bottom':
-          element.endValue = Math.floor((((eventManager.scrollTop() + (eventManager.windowsHeight() - element.height)) - element.offset) / element.distance));
+          element.endValue =((((eventManager.scrollTop() + (eventManager.windowsHeight() - element.height)) - element.offset) / element.distance));
           break;
 
         case 'end':
-          element.endValue = -Math.floor((eventManager.documentHeight() - (eventManager.scrollTop() + eventManager.windowsHeight())) / element.distance);
+          element.endValue = -((eventManager.documentHeight() - (eventManager.scrollTop() + eventManager.windowsHeight())) / element.distance);
           break;
       }
+
+      element.endValue = element.endValue.toFixed(this.s.toFixedValue);
 
       if (!applyStyle) return;
 
