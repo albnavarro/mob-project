@@ -172,13 +172,10 @@ class parallaxClass {
         const element = this.s.itemArray[index];
 
            if(element.ease != 'linear') {
-             const t = ((_timeStamp - start) / this.s.duration),
-                   s = element.startValue,
+             const s = element.startValue,
                    f = element.endValue,
                    v = element.jsVelocity,
-                   // val = (s + (f - s) / v * t) + ((f - s) / v);
-                   // Use parseInt for pixel precision
-                   val = ((( t + 1 ) * ( f - s )) / v) + s;
+                   val = (( f - s ) / v) + s;
 
              element.startValue = val;
              element.item.css(this.setStyle(element,val));
