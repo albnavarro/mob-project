@@ -2,6 +2,10 @@
 
   @include _mq('max','tablet') {
     display: none;
+
+    &.nav--offCanvas {
+      display: block;
+    }
   }
 
   @include _mq('tablet') {
@@ -19,6 +23,27 @@
 
     @include when-inside('.nav--vertical') {
       flex-direction: column;
+    }
+  }
+
+  @include _mq('max', 'tablet') {
+    @include when-inside('.nav--offCanvas') {
+      position: fixed;
+      top: 0;
+      height: 100vh;
+      height: calc(var(--vh, 1vh) * 100);
+      right: 0;
+      left: 0;
+      background-color: $black;
+      transform: translateX(100%);
+      transition: transform .35s;
+      z-index: 10;
+      padding: 30px;
+      overflow-y: auto;
+    }
+
+    @include when-inside('.nav--offCanvas.menu-on') {
+      transform: translateX(0);
     }
   }
 }
@@ -78,6 +103,28 @@
   margin: 0;
   padding: 0;
 
+  @include _mq('max', 'tablet') {
+    @include when-inside('.nav--offCanvas') {
+      position: fixed;
+      top: 0;
+      height: 100vh;
+      height: calc(var(--vh, 1vh) * 100);
+      right: 0;
+      left: 0;
+      background-color: $black;
+      transform: translateX(100%);
+      transition: transform .35s;
+      z-index: 11;
+      display: block;
+      padding: 30px;
+      overflow-y: auto;
+
+      &.active {
+        transform: translateX(0);
+      }
+    }
+  }
+
   @include  _mq('tablet') {
     position: absolute;
     top: 100%;
@@ -121,6 +168,19 @@
   }
 }
 
+
+.main-arrow-back {
+  display: none;
+  width: 50px;
+  height: 50px;
+
+  @include when-inside('.nav--offCanvas') {
+    @include _mq('max', 'tablet') {
+      display: block;
+    }
+  }
+}
+
 // ARROW AGGIUNTA DA JS
 .arrow-submenu{
   cursor: pointer;
@@ -131,7 +191,7 @@
   transform: rotate(0);
   transition: transform .35s, top .35s;
   width: 20px;
-  z-index: 10;
+  z-index: 9;
 
   @include when-inside('.nav--vertical--right') {
     left: 8px;
@@ -148,6 +208,12 @@
     top: 5px;
     transform: rotate(-135deg);
     width: 7px;
+
+    @include when-inside('.nav--offCanvas') {
+      @include _mq('max', 'tablet') {
+        transform: rotate(135deg);
+      }
+    }
   }
 
   &.arrow-selected {

@@ -6,6 +6,9 @@ class menuClass {
       $toggle: $(`${data.toggle}`),
       direction: data.direction || 'horizontal',
       sideDirection: data.sideDirection || 'left',
+      offCanvas: data.offCanvas || 'true',
+      $offCanvasBack: {},
+      $mainMenu: {},
       $itemHasChildren: {},
       $firstLevelItem: {},
       $allSubmenu: {},
@@ -19,9 +22,13 @@ class menuClass {
   }
 
   init() {
-    this.s.$itemHasChildren = this.s.$menu.find('.menu-item-has-children')
-    this.s.$firstLevelItem = this.s.$menu.find('.main-menu > .menu-item-has-children > .sub-menu')
-    this.s.$allSubmenu = this.s.$menu.find('.sub-menu')
+    // Convert to boolean
+    this.s.offCanvas = (this.s.offCanvas == 'true');
+    this.s.$mainMenu = this.s.$menu.find('.main-menu');
+    this.s.$offCanvasBack = this.s.$menu.find('.main-arrow-back');
+    this.s.$itemHasChildren = this.s.$menu.find('.menu-item-has-children');
+    this.s.$firstLevelItem = this.s.$menu.find('.main-menu > .menu-item-has-children > .sub-menu');
+    this.s.$allSubmenu = this.s.$menu.find('.sub-menu');
 
     if (this.s.direction == 'vertical') {
       this.s.$menu.addClass('nav--vertical')
@@ -34,6 +41,9 @@ class menuClass {
     } else {
       this.s.$menu.addClass('nav--horizontal')
     }
+
+
+    if (this.s.offCanvas) this.s.$menu.addClass('nav--offCanvas');
 
     this.s.lastWindowsWidth = eventManager.windowsWidth();
     this.getSubmenuWidth();
@@ -87,6 +97,21 @@ class menuClass {
    this.s.$body.on('click' , this.bodyOnCLick.bind(this));
    this.s.$itemHasChildren.find('.arrow-submenu').on('click', this.arrowOnClick.bind(this));
    this.s.$toggle.on('click', this.toggleOnCLick.bind(this));
+   this.s.$offCanvasBack.on('click', this.offCanvasBack.bind(this));
+  }
+
+  offCanvasBack(evt) {
+    if( mq.min('tablet') ) return;
+
+    const $target = $(event.target);
+    let $menu = $target.closest('.sub-menu');
+
+    // Controllo se devo chiudere un submenu o il menu principale
+    if ($menu.length > 0) {
+      $menu.removeClass('active');
+    } else {
+      this.closeMainMenu();
+    }
   }
 
   bodyOnCLick(evt) {
@@ -118,20 +143,27 @@ class menuClass {
      this.s.$itemHasChildren.find('.arrow-submenu').not($target).not($parentsArrow).removeClass('arrow-selected');
 
      if( mq.max('tablet') ) {
-       this.s.$allSubmenu.not($parentsSubmenu).not($submenu).slideUp();
+       if(!this.s.offCanvas) this.s.$allSubmenu.not($parentsSubmenu).not($submenu).slideUp();
      }
 
      if( $submenu.hasClass('active') ) {
        $submenu.removeClass('active')
        $target.removeClass('arrow-selected')
        if( mq.max('tablet') ) {
-         $submenu.slideUp(() => {$(window).resize()})
+         if(!this.s.offCanvas) $submenu.slideUp(() => {$(window).resize()})
        }
      } else {
        $submenu.addClass('active')
-       $target.addClass('arrow-selected')
+       if(!this.s.offCanvas) {
+         $target.addClass('arrow-selected')
+       } else {
+         // Azzero lo scroll top dei menu di livello superiore per avere il menu aperto
+         // al top 0 quando uso il menu Offcanvas
+          this.s.$mainMenu.scrollTop(0);
+          this.s.$allSubmenu.not($submenu).scrollTop(0);
+       }
        if( mq.max('tablet') ) {
-         $submenu.slideDown(() => {$(window).resize()})
+         if(!this.s.offCanvas) $submenu.slideDown(() => {$(window).resize()})
        }
      }
     }
@@ -160,17 +192,22 @@ class menuClass {
 
   closeMainMenu(immediate) {
     if( immediate ){
-      this.s.$menu.slideUp(0,() => {$(window).resize()})
+      if(!this.s.offCanvas) this.s.$menu.slideUp(0,() => {$(window).resize()})
     } else {
-      this.s.$menu.slideUp(() => {$(window).resize()})
+      if(!this.s.offCanvas) this.s.$menu.slideUp(() => {$(window).resize()})
     }
     this.s.$menu.removeClass('menu-on')
     this.s.$toggle.removeClass('open')
     this.s.menuIsOpen = false
+    this.s.$body.css('overflow','');
   }
 
   openMainMenu() {
-    this.s.$menu.slideDown(() => {$(window).resize()})
+    if(!this.s.offCanvas) {
+      this.s.$menu.slideDown(() => {$(window).resize()})
+    } else {
+      this.s.$body.css('overflow','hidden');
+    }
     this.s.$menu.addClass('menu-on')
     this.s.$toggle.addClass('open')
     this.s.menuIsOpen = true
@@ -183,7 +220,7 @@ class menuClass {
     if( mq.min('tablet') ) {
       this.s.$allSubmenu.css('display' , '');
     } else {
-      this.s.$allSubmenu.slideUp(() => {$(window).resize()});
+      if(!this.s.offCanvas) this.s.$allSubmenu.slideUp(() => {$(window).resize()});
     }
   }
 
@@ -193,6 +230,10 @@ class menuClass {
       this.closeMainMenu(true);
     }
     this.s.lastWindowsWidth = eventManager.windowsWidth();
+
+    if( mq.max('tablet')) {
+      this.s.$allSubmenu.css({'left':'','right': ''})
+    }
   }
 
   CloseOnScroll() {

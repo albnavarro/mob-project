@@ -46,7 +46,8 @@ const sidebarMenu = new menuClass({
       menu:'.menu-container--sidebar nav.nav',
       toggle:'.menu-container--sidebar .toggle-element',
       direction: 'vertical',
-      sideDirection: 'left'
+      sideDirection: 'left',
+      offCanvas: 'false'
     });
 
 const offsetSlider = new offsetSliderClass({
