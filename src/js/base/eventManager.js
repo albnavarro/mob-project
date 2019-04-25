@@ -118,13 +118,14 @@ class eventManagerClass {
     }
   }
 
-  push(_properties,_function) {
+  push(_properties,_function,_order = 100) {
     if(this.s.data.hasOwnProperty(_properties)) {
 
       this.s.stackId++
       let obj = {
         id: this.s.stackId,
-        func: _function
+        func: _function,
+        order: _order
       }
       this.s.data[_properties].push(obj);
 
@@ -133,9 +134,19 @@ class eventManagerClass {
   }
 
   remove(_properties, _id) {
-    this.s.data[_properties] =  this.s.data[_properties].filter(function(obj) {
-    	return obj.id != _id;
-    });
+    this.s.data[_properties] =  this.s.data[_properties].filter((obj) => obj.id != _id );
+  }
+
+  updateItemOrder(_properties, _id, _order) {
+    const index = this.s.data[_properties].findIndex((obj) =>  obj.id == _id );
+    this.s.data[_properties][index].order = _order;
+    this.updateOrder(_properties);
+  }
+
+  updateOrder(_properties) {
+    if(this.s.data.hasOwnProperty(_properties)) {
+      this.s.data[_properties].sort((obj1, obj2) => obj1.order - obj2.order);
+    }
   }
 
   windowsHeight() {
