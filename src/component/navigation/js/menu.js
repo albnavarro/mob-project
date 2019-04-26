@@ -182,18 +182,24 @@ class menuClass {
        }
      } else {
        $submenu.addClass('active')
+
        if(!this.s.offCanvas) {
          $target.addClass('arrow-selected')
        } else {
-          // Azzero lo scroll top dei menu di livello superiore per avere il menu aperto
-          // al top 0 quando uso il menu Offcanvas
-          // Rimuovo la propietà overflow-y: auto; dai menu non visibili
-          this.s.$mainMenu.scrollTop(0).removeClass('is-selected');
-          this.s.$allSubmenu.not($submenu).scrollTop(0).removeClass('is-selected');
+          this.s.$mainMenu.removeClass('is-selected');
+          this.s.$allSubmenu.not($submenu).removeClass('is-selected');
+
           // Attivo la propietà overflow-y: auto; nel menu selezionato
           $submenu.addClass('is-selected');
 
+          // Posiziono il menu in verticale rispetto al menu parente;
+          let gap = this.s.$mainMenu.scrollTop();
+          if($parentsSubmenu.length) {
+            gap = $parentsSubmenu.scrollTop();
+          }
+          $submenu.css('top', gap  + 'px');
        }
+
        if( mq.max('tablet') ) {
          if(!this.s.offCanvas) $submenu.slideDown(() => {$(window).resize()})
        }
@@ -218,7 +224,6 @@ class menuClass {
           item.submenu.css('left' , '100%').css('right' , 'auto');
         }
       }
-
     }
   }
 
@@ -232,6 +237,10 @@ class menuClass {
     this.s.$toggle.removeClass('open')
     this.s.menuIsOpen = false
     this.s.$body.css('overflow','');
+
+    // Azzero lo scroll top di tutti i menu
+    this.s.$mainMenu.scrollTop(0).removeClass('is-selected');
+    this.s.$allSubmenu.scrollTop(0);
   }
 
   openMainMenu() {

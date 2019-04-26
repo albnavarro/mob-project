@@ -63,6 +63,7 @@
 }
 
 .menu-item {
+  // padding: 100px 0;
 
   @include when-inside('.nav--dropDown') {
     position: relative;
@@ -111,12 +112,12 @@
       overflow: hidden;
 
       .arrow-submenu {
-        width: 10%;
+        width: 20px;
         float: right;
       }
 
       > a {
-        width: 90%;
+        width: calc(100% - 20px);
         float: left;
       }
     }
@@ -124,10 +125,11 @@
 
   &:hover {
     > .arrow-submenu {
-      @include when-inside('.no-touchevents') {
-        @include _mq('tablet') {
-          transform: rotate(-180deg);
-          right: 11px;
+      &:after {
+        @include when-inside('.no-touchevents') {
+          @include _mq('tablet') {
+            content: '-';
+          }
         }
       }
     }
@@ -226,22 +228,43 @@
 .arrow-submenu{
   cursor: pointer;
   height: 20px;
-  transform: rotate(0);
-  transition: transform .35s, top .35s;
   width: 20px;
-  z-index: 9;
+  background-color: rgba($white, .1);
+  position: relative;
+
+  &:after {
+    color: $white;
+    content: '+';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    vertical-align: middle;
+    line-height: 20px;
+    text-align: center;
+
+    @include when-inside('.nav--offCanvas') {
+      @include _mq('max', 'tablet') {
+        content: '+';
+      }
+    }
+  }
+
 
   @include when-inside('.nav--dropDown') {
     @include _mq('max', 'tablet') {
       position: absolute;
       right: 8px;
       top: 0;
+      z-index: 9;
     }
   }
 
   @include _mq('tablet') {
     position: absolute;
     right: 8px;
+    z-index: 9;
     top: 0;
   }
 
@@ -250,27 +273,11 @@
     right: auto;
   }
 
-  &:after{
-    border-left: 1px $white solid;
-    border-top: 1px $white solid;
-    content: '';
-    height: 7px;
-    left: 5px;
-    position: absolute;
-    top: 5px;
-    transform: rotate(-135deg);
-    width: 7px;
-
-    @include when-inside('.nav--offCanvas') {
-      @include _mq('max', 'tablet') {
-        transform: rotate(135deg);
-      }
-    }
-  }
 
   &.arrow-selected {
-    transform: rotate(-180deg);
-    right: 11px;
+    &:after {
+      content: '-';
+    }
   }
 }
 
