@@ -5,6 +5,16 @@
 
     &.nav--offCanvas {
       display: block;
+
+      &.menu-on {
+        position: fixed;
+        top: 0;
+        height: 100vh;
+        height: calc(var(--vh, 1vh) * 100);
+        right: 0;
+        left: 0;
+        z-index: 100;
+      }
     }
   }
 
@@ -28,7 +38,7 @@
 
   @include _mq('max', 'tablet') {
     @include when-inside('.nav--offCanvas') {
-      position: fixed;
+      position: absolute;
       top: 0;
       height: 100vh;
       height: calc(var(--vh, 1vh) * 100);
@@ -39,7 +49,11 @@
       transition: transform .35s;
       z-index: 10;
       padding: 30px;
-      overflow-y: auto;
+      overflow: hidden;
+
+      &.is-selected {
+        overflow-y: auto;
+      }
     }
 
     @include when-inside('.nav--offCanvas.menu-on') {
@@ -49,7 +63,14 @@
 }
 
 .menu-item {
-  position: relative;
+
+  @include when-inside('.nav--dropDown') {
+    position: relative;
+  }
+
+  @include _mq('tablet') {
+    position: relative;
+  }
 
   @include on-event() {
     @include _mq('tablet') {
@@ -85,6 +106,22 @@
 
 .menu-item-has-children {
 
+  @include _mq('max', 'tablet') {
+    @include when-inside('.nav--offCanvas') {
+      overflow: hidden;
+
+      .arrow-submenu {
+        width: 10%;
+        float: right;
+      }
+
+      > a {
+        width: 90%;
+        float: left;
+      }
+    }
+  }
+
   &:hover {
     > .arrow-submenu {
       @include when-inside('.no-touchevents') {
@@ -105,7 +142,7 @@
 
   @include _mq('max', 'tablet') {
     @include when-inside('.nav--offCanvas') {
-      position: fixed;
+      position: absolute;
       top: 0;
       height: 100vh;
       height: calc(var(--vh, 1vh) * 100);
@@ -117,7 +154,11 @@
       z-index: 11;
       display: block;
       padding: 30px;
-      overflow-y: auto;
+      overflow: hidden;
+
+      &.is-selected {
+        overflow-y: auto;
+      }
 
       &.active {
         transform: translateX(0);
@@ -185,13 +226,24 @@
 .arrow-submenu{
   cursor: pointer;
   height: 20px;
-  position: absolute;
-  right: 8px;
-  top: 0;
   transform: rotate(0);
   transition: transform .35s, top .35s;
   width: 20px;
   z-index: 9;
+
+  @include when-inside('.nav--dropDown') {
+    @include _mq('max', 'tablet') {
+      position: absolute;
+      right: 8px;
+      top: 0;
+    }
+  }
+
+  @include _mq('tablet') {
+    position: absolute;
+    right: 8px;
+    top: 0;
+  }
 
   @include when-inside('.nav--vertical--right') {
     left: 8px;

@@ -43,11 +43,16 @@ class menuClass {
     }
 
 
-    if (this.s.offCanvas) this.s.$menu.addClass('nav--offCanvas');
+    if (this.s.offCanvas) {
+      this.s.$menu.addClass('nav--offCanvas');
+    } else {
+      this.s.$menu.addClass('nav--dropDown');
+    }
 
     this.s.lastWindowsWidth = eventManager.windowsWidth();
     this.getSubmenuWidth();
     this.addArrow();
+    if (this.s.offCanvas) this.addOffCanvasBtn();
     this.setData();
     this.resizeMenu();
     this.addHandler();
@@ -93,24 +98,47 @@ class menuClass {
     this.s.$itemHasChildren.prepend($arrow);
   }
 
+  addOffCanvasBtn() {
+    // DESKTOP TOUCH SHOW SUBMENU
+    const $offCanvasArrow1=$("<button class='main-arrow-back'>back</button>");
+    const $offCanvasArrow2=$("<button class='main-arrow-back'>back</button>");
+
+    this.s.$mainMenu.prepend($offCanvasArrow1);
+    this.s.$allSubmenu.prepend($offCanvasArrow2);
+  }
+
   addHandler() {
    this.s.$body.on('click' , this.bodyOnCLick.bind(this));
    this.s.$itemHasChildren.find('.arrow-submenu').on('click', this.arrowOnClick.bind(this));
    this.s.$toggle.on('click', this.toggleOnCLick.bind(this));
-   this.s.$offCanvasBack.on('click', this.offCanvasBack.bind(this));
+   this.s.$mainMenu.find('.main-arrow-back').on('click', this.offCanvasBack.bind(this));
   }
 
   offCanvasBack(evt) {
     if( mq.min('tablet') ) return;
 
-    const $target = $(event.target);
+    const $target = $(evt.target);
     let $menu = $target.closest('.sub-menu');
 
     // Controllo se devo chiudere un submenu o il menu principale
     if ($menu.length > 0) {
       $menu.removeClass('active');
+      // Rimuovo la propietà overflow-y dal menu che vado a chiudere
+      $menu.removeClass('is-selected');
+
+      // Constrollo a quel Submenu/menu attivare la propietà overflow-y: auto;
+      // Solo il menu/submenu selezionato può scrollare
+      const $parentMenu = $menu.closest('.sub-menu.active');
+      if ($parentMenu.length > 0) {
+        $parentMenu.addClass('is-selected');
+      } else {
+        this.s.$mainMenu.addClass('is-selected');
+      }
+      ///////////
+
     } else {
       this.closeMainMenu();
+
     }
   }
 
@@ -157,10 +185,14 @@ class menuClass {
        if(!this.s.offCanvas) {
          $target.addClass('arrow-selected')
        } else {
-         // Azzero lo scroll top dei menu di livello superiore per avere il menu aperto
-         // al top 0 quando uso il menu Offcanvas
-          this.s.$mainMenu.scrollTop(0);
-          this.s.$allSubmenu.not($submenu).scrollTop(0);
+          // Azzero lo scroll top dei menu di livello superiore per avere il menu aperto
+          // al top 0 quando uso il menu Offcanvas
+          // Rimuovo la propietà overflow-y: auto; dai menu non visibili
+          this.s.$mainMenu.scrollTop(0).removeClass('is-selected');
+          this.s.$allSubmenu.not($submenu).scrollTop(0).removeClass('is-selected');
+          // Attivo la propietà overflow-y: auto; nel menu selezionato
+          $submenu.addClass('is-selected');
+
        }
        if( mq.max('tablet') ) {
          if(!this.s.offCanvas) $submenu.slideDown(() => {$(window).resize()})
@@ -206,6 +238,8 @@ class menuClass {
     if(!this.s.offCanvas) {
       this.s.$menu.slideDown(() => {$(window).resize()})
     } else {
+      // Attivo la propietà overflow-y: auto; nel menu principale
+      this.s.$mainMenu.addClass('is-selected');
       this.s.$body.css('overflow','hidden');
     }
     this.s.$menu.addClass('menu-on')
