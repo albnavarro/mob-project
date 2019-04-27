@@ -241,8 +241,10 @@
     left: 0;
     right: 0;
     vertical-align: middle;
-    line-height: 20px;
+    line-height: 1;
+    height: 20px;
     text-align: center;
+    display: block;
 
     @include when-inside('.nav--offCanvas') {
       @include _mq('max', 'tablet') {

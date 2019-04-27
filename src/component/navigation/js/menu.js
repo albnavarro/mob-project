@@ -166,42 +166,50 @@ class menuClass {
           $parentsSubmenu = $item.parents('.sub-menu'),
           $parentsArrow = $parentsSubmenu.siblings('.arrow-submenu');
 
+    // Attivo il click sull'arrow solo per monitor touch e mobile
     if( Modernizr.touchevents || mq.max('tablet')) {
+
+      // Chiudo tutti i submenu non necessari ( non parenti del selezionato).
      this.s.$allSubmenu.not($parentsSubmenu).not($submenu).removeClass('active');
      this.s.$itemHasChildren.find('.arrow-submenu').not($target).not($parentsArrow).removeClass('arrow-selected');
 
-     if( mq.max('tablet') ) {
-       if(!this.s.offCanvas) this.s.$allSubmenu.not($parentsSubmenu).not($submenu).slideUp();
+     if( mq.max('tablet') && !this.s.offCanvas) {
+       this.s.$allSubmenu.not($parentsSubmenu).not($submenu).slideUp();
      }
 
      if( $submenu.hasClass('active') ) {
+       // Chiudo il menu
        $submenu.removeClass('active')
        $target.removeClass('arrow-selected')
-       if( mq.max('tablet') ) {
-         if(!this.s.offCanvas) $submenu.slideUp(() => {$(window).resize()})
+       if( mq.max('tablet') && !this.s.offCanvas) {
+         $submenu.slideUp(() => {$(window).resize()})
        }
      } else {
+       // Apro il menu
        $submenu.addClass('active')
-
        if(!this.s.offCanvas) {
+         // Logica DropDOwn
          $target.addClass('arrow-selected')
        } else {
+         // Logica offCanvas
           this.s.$mainMenu.removeClass('is-selected');
           this.s.$allSubmenu.not($submenu).removeClass('is-selected');
 
-          // Attivo la propietà overflow-y: auto; nel menu selezionato
-          $submenu.addClass('is-selected');
+          if( mq.max('tablet') ) {
+            // Attivo la propietà overflow-y: auto; nel menu selezionato
+            $submenu.addClass('is-selected');
 
-          // Posiziono il menu in verticale rispetto al menu parente;
-          let gap = this.s.$mainMenu.scrollTop();
-          if($parentsSubmenu.length) {
-            gap = $parentsSubmenu.scrollTop();
+            // Posiziono il menu in verticale rispetto al menu parente;
+            let gap = this.s.$mainMenu.scrollTop();
+            if($parentsSubmenu.length) {
+              gap = $parentsSubmenu.scrollTop();
+            }
+            $submenu.css('top', gap  + 'px');
           }
-          $submenu.css('top', gap  + 'px');
        }
 
-       if( mq.max('tablet') ) {
-         if(!this.s.offCanvas) $submenu.slideDown(() => {$(window).resize()})
+       if( mq.max('tablet') && !this.s.offCanvas) {
+         $submenu.slideDown(() => {$(window).resize()})
        }
      }
     }
@@ -273,6 +281,8 @@ class menuClass {
       this.closeMainMenu(true);
     }
     this.s.lastWindowsWidth = eventManager.windowsWidth();
+
+    this.s.$allSubmenu.css('top','');
 
     if( mq.max('tablet')) {
       this.s.$allSubmenu.css({'left':'','right': ''})
