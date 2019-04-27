@@ -16,7 +16,31 @@ class menuClass {
       subMenuWidth: 0,
       menuArr: [],
       menuIsOpen: false,
-      lastWindowsWidth: 0
+      lastWindowsWidth: 0,
+
+      // CONSTANTI
+      // ( CLASSI DOM FOR QUERY )
+      NAV_WRAP: 'nav-wrap', // WRAPPER OF TOGGLE AND MENU
+      MAIN_MENU: 'main-menu', // MAIN UL
+      MENU_ITEM: 'menu-item', // LI LEMENT
+      MENU_ITEM_HAS_CHILDREN: 'menu-item-has-children', // LI WITH SUBMENU INSIDE
+      SUB_MENU: 'sub-menu', // ALL SUBMENU
+      // ADDED ELEMENT
+      ARROW_SUBMENU: 'arrow-submenu', // LI ARROW
+      OFFCANVAS_ARROW_BACK: 'main-arrow-back', // OFF CANVAS ARROW
+      // ADDED CLASS
+      NAV_VERTICAL: 'nav--vertical',
+      NAV_VERTICAL_LEFT: 'nav--vertical--left',
+      NAV_VERTICAL_RIGHT: 'nav--vertical--right',
+      NAV_HORIZONTAL: 'nav--horizontal',
+      NAV_OFFCANVAS: 'nav--offCanvas',
+      NAV_DROPDOWN: 'nav--dropDown',
+      IS_SELECTED: 'is-selected', // SUBMENU VISIBLE SCROLABLE
+      ARROW_SELECTED: 'arrow-selected', // ITEM ARROW ACTIVE ( AND PARENTS ARROW )
+      ACTIVE: 'active', // OPENED MENU VISIBLE AND PARENTS
+      OPEN: 'open', // TOGGLE OPENED
+      MENU_ON: 'menu-on' // MAIN MENU ACTIVE
+
     }
     this.init()
   }
@@ -24,29 +48,29 @@ class menuClass {
   init() {
     // Convert to boolean
     this.s.offCanvas = (this.s.offCanvas == 'true');
-    this.s.$mainMenu = this.s.$menu.find('.main-menu');
-    this.s.$offCanvasBack = this.s.$menu.find('.main-arrow-back');
-    this.s.$itemHasChildren = this.s.$menu.find('.menu-item-has-children');
-    this.s.$firstLevelItem = this.s.$menu.find('.main-menu > .menu-item-has-children > .sub-menu');
-    this.s.$allSubmenu = this.s.$menu.find('.sub-menu');
+    this.s.$mainMenu = this.s.$menu.find(`.${this.s.MAIN_MENU}`);
+    this.s.$offCanvasBack = this.s.$menu.find(`.${this.s.OFFCANVAS_ARROW_BACK}`);
+    this.s.$itemHasChildren = this.s.$menu.find(`.${this.s.MENU_ITEM_HAS_CHILDREN}`);
+    this.s.$firstLevelItem = this.s.$menu.find(`.${this.s.MAIN_MENU} > .${this.s.MENU_ITEM_HAS_CHILDREN} > .${this.s.SUB_MENU}`);
+    this.s.$allSubmenu = this.s.$menu.find(`.${this.s.SUB_MENU}`);
 
     if (this.s.direction == 'vertical') {
-      this.s.$menu.addClass('nav--vertical')
+      this.s.$menu.addClass(this.s.NAV_VERTICAL)
 
       if(this.s.sideDirection == 'left') {
-        this.s.$menu.addClass('nav--vertical--left')
+        this.s.$menu.addClass(this.s.NAV_VERTICAL_LEFT)
       } else {
-        this.s.$menu.addClass('nav--vertical--right')
+        this.s.$menu.addClass(this.s.NAV_VERTICAL_RIGHT)
       }
     } else {
-      this.s.$menu.addClass('nav--horizontal')
+      this.s.$menu.addClass(this.s.NAV_HORIZONTAL)
     }
 
 
     if (this.s.offCanvas) {
-      this.s.$menu.addClass('nav--offCanvas');
+      this.s.$menu.addClass(this.s.NAV_OFFCANVAS);
     } else {
-      this.s.$menu.addClass('nav--dropDown');
+      this.s.$menu.addClass(this.s.NAV_DROPDOWN);
     }
 
     this.s.lastWindowsWidth = eventManager.windowsWidth();
@@ -70,15 +94,17 @@ class menuClass {
   }
 
   setData() {
+    const _that = this;
+
     function obj(item) {
       let maxLevel = 0;
       this.item = item;
-      this.submenu = this.item.find('.sub-menu');
-      this.parentItem = this.item.parents('.menu-item-has-children');
+      this.submenu = this.item.find(`.${_that.s.SUB_MENU}`);
+      this.parentItem = this.item.parents(`.${_that.s.MENU_ITEM_HAS_CHILDREN}`);
       this.parentItemPos = 0;
       this.parentItemWidth = 0;
       this.submenu.each((index,element) => {
-        const numSubmenuParents = $(element).parents('.sub-menu').length;
+        const numSubmenuParents = $(element).parents(`.${_that.s.SUB_MENU}`).length;
         if( numSubmenuParents > maxLevel) {
           maxLevel = numSubmenuParents;
         }
@@ -94,14 +120,14 @@ class menuClass {
 
   addArrow() {
     // DESKTOP TOUCH SHOW SUBMENU
-    const $arrow=$("<div class='arrow-submenu'></div>");
+    const $arrow=$(`<div class='${this.s.ARROW_SUBMENU}'></div>`);
     this.s.$itemHasChildren.prepend($arrow);
   }
 
   addOffCanvasBtn() {
     // DESKTOP TOUCH SHOW SUBMENU
-    const $offCanvasArrow1=$("<button class='main-arrow-back'>back</button>");
-    const $offCanvasArrow2=$("<button class='main-arrow-back'>back</button>");
+    const $offCanvasArrow1=$(`<button class='${this.s.OFFCANVAS_ARROW_BACK}'>back</button>`);
+    const $offCanvasArrow2=$(`<button class='${this.s.OFFCANVAS_ARROW_BACK}'>back</button>`);
 
     this.s.$mainMenu.prepend($offCanvasArrow1);
     this.s.$allSubmenu.prepend($offCanvasArrow2);
@@ -109,30 +135,35 @@ class menuClass {
 
   addHandler() {
    this.s.$body.on('click' , this.bodyOnCLick.bind(this));
-   this.s.$itemHasChildren.find('.arrow-submenu').on('click', this.arrowOnClick.bind(this));
+   this.s.$itemHasChildren.find(`.${this.s.ARROW_SUBMENU}`).on('click', this.arrowOnClick.bind(this));
    this.s.$toggle.on('click', this.toggleOnCLick.bind(this));
-   this.s.$mainMenu.find('.main-arrow-back').on('click', this.offCanvasBack.bind(this));
+   this.s.$mainMenu.find(`.${this.s.OFFCANVAS_ARROW_BACK}`).on('click', this.offCanvasBack.bind(this));
   }
 
   offCanvasBack(evt) {
     if( mq.min('tablet') ) return;
 
     const $target = $(evt.target);
-    let $menu = $target.closest('.sub-menu');
+    let $menu = $target.closest(`.${this.s.SUB_MENU}`);
 
     // Controllo se devo chiudere un submenu o il menu principale
     if ($menu.length > 0) {
-      $menu.removeClass('active');
+      $menu.removeClass(this.s.ACTIVE);
       // Rimuovo la propietà overflow-y dal menu che vado a chiudere
-      $menu.removeClass('is-selected');
+      $menu.removeClass(this.s.IS_SELECTED);
+      // Resetto un eventuale scroll nel menu un attimo dopo.
+      // Il setTimeout viene usato per estetica, resetto lo scroll topo solo a menu chiuso
+      setTimeout(() => {
+        $menu.scrollTop(0);
+      }, 350);
 
-      // Constrollo a quel Submenu/menu attivare la propietà overflow-y: auto;
+      // Constrollo a quale Submenu/menu (parente) attivare la propietà overflow-y: auto;
       // Solo il menu/submenu selezionato può scrollare
-      const $parentMenu = $menu.closest('.sub-menu.active');
+      const $parentMenu = $menu.closest(`.${this.s.SUB_MENU}.${this.s.ACTIVE}`);
       if ($parentMenu.length > 0) {
-        $parentMenu.addClass('is-selected');
+        $parentMenu.addClass(this.s.IS_SELECTED);
       } else {
-        this.s.$mainMenu.addClass('is-selected');
+        this.s.$mainMenu.addClass(this.s.IS_SELECTED);
       }
       ///////////
 
@@ -143,7 +174,7 @@ class menuClass {
   }
 
   bodyOnCLick(evt) {
-    if ( !$(evt.target).parents('.nav-wrap').length ) {
+    if ( !$(evt.target).parents(`.${this.s.NAV_WRAP}`).length ) {
       this.closeSubmenu();
       if( mq.max('tablet') ) {
         this.closeMainMenu();
@@ -152,7 +183,7 @@ class menuClass {
   }
 
   toggleOnCLick() {
-    if (this.s.$menu.hasClass('menu-on')){
+    if (this.s.$menu.hasClass(this.s.MENU_ON)){
       this.closeMainMenu();
     } else {
       this.openMainMenu();
@@ -161,43 +192,42 @@ class menuClass {
 
   arrowOnClick(event) {
     const $target = $(event.target),
-          $submenu=$target.siblings('.sub-menu'),
-          $item = $target.parent('.menu-item'),
-          $parentsSubmenu = $item.parents('.sub-menu'),
-          $parentsArrow = $parentsSubmenu.siblings('.arrow-submenu');
+          $submenu=$target.siblings(`.${this.s.SUB_MENU}`),
+          $item = $target.parent(`.${this.s.MENU_ITEM}`),
+          $parentsSubmenu = $item.parents(`.${this.s.SUB_MENU}`),
+          $parentsArrow = $parentsSubmenu.siblings(`.${this.s.ARROW_SUBMENU}`);
 
     // Attivo il click sull'arrow solo per monitor touch e mobile
     if( Modernizr.touchevents || mq.max('tablet')) {
 
       // Chiudo tutti i submenu non necessari ( non parenti del selezionato).
-     this.s.$allSubmenu.not($parentsSubmenu).not($submenu).removeClass('active');
-     this.s.$itemHasChildren.find('.arrow-submenu').not($target).not($parentsArrow).removeClass('arrow-selected');
+     this.s.$allSubmenu.not($parentsSubmenu).not($submenu).removeClass(this.s.ACTIVE);
+     this.s.$itemHasChildren.find(`.${this.s.ARROW_SUBMENU}`).not($target).not($parentsArrow).removeClass(this.s.ARROW_SELECTED);
 
      if( mq.max('tablet') && !this.s.offCanvas) {
        this.s.$allSubmenu.not($parentsSubmenu).not($submenu).slideUp();
      }
 
-     if( $submenu.hasClass('active') ) {
+     if( $submenu.hasClass(this.s.ACTIVE) ) {
        // Chiudo il menu
-       $submenu.removeClass('active')
-       $target.removeClass('arrow-selected')
+       $submenu.removeClass(this.s.ACTIVE)
+       $target.removeClass(this.s.ARROW_SELECTED)
        if( mq.max('tablet') && !this.s.offCanvas) {
          $submenu.slideUp(() => {$(window).resize()})
        }
      } else {
        // Apro il menu
-       $submenu.addClass('active')
-       if(!this.s.offCanvas) {
-         // Logica DropDOwn
-         $target.addClass('arrow-selected')
-       } else {
-         // Logica offCanvas
-          this.s.$mainMenu.removeClass('is-selected');
-          this.s.$allSubmenu.not($submenu).removeClass('is-selected');
+       $submenu.addClass(this.s.ACTIVE)
+       $target.addClass(this.s.ARROW_SELECTED)
+
+       // Logica offCanvas
+       if(this.s.offCanvas) {
+          this.s.$mainMenu.removeClass(this.s.IS_SELECTED);
+          this.s.$allSubmenu.not($submenu).removeClass(this.s.IS_SELECTED);
 
           if( mq.max('tablet') ) {
             // Attivo la propietà overflow-y: auto; nel menu selezionato
-            $submenu.addClass('is-selected');
+            $submenu.addClass(this.s.IS_SELECTED);
 
             // Posiziono il menu in verticale rispetto al menu parente;
             let gap = this.s.$mainMenu.scrollTop();
@@ -211,6 +241,7 @@ class menuClass {
        if( mq.max('tablet') && !this.s.offCanvas) {
          $submenu.slideDown(() => {$(window).resize()})
        }
+
      }
     }
   }
@@ -241,13 +272,13 @@ class menuClass {
     } else {
       if(!this.s.offCanvas) this.s.$menu.slideUp(() => {$(window).resize()})
     }
-    this.s.$menu.removeClass('menu-on')
-    this.s.$toggle.removeClass('open')
+    this.s.$menu.removeClass(this.s.MENU_ON)
+    this.s.$toggle.removeClass(this.s.OPEN)
     this.s.menuIsOpen = false
     this.s.$body.css('overflow','');
 
     // Azzero lo scroll top di tutti i menu
-    this.s.$mainMenu.scrollTop(0).removeClass('is-selected');
+    this.s.$mainMenu.scrollTop(0).removeClass(this.s.IS_SELECTED);
     this.s.$allSubmenu.scrollTop(0);
   }
 
@@ -256,17 +287,17 @@ class menuClass {
       this.s.$menu.slideDown(() => {$(window).resize()})
     } else {
       // Attivo la propietà overflow-y: auto; nel menu principale
-      this.s.$mainMenu.addClass('is-selected');
+      this.s.$mainMenu.addClass(this.s.IS_SELECTED);
       this.s.$body.css('overflow','hidden');
     }
-    this.s.$menu.addClass('menu-on')
-    this.s.$toggle.addClass('open')
+    this.s.$menu.addClass(this.s.MENU_ON)
+    this.s.$toggle.addClass(this.s.OPEN)
     this.s.menuIsOpen = true
   }
 
   closeSubmenu() {
-    this.s.$allSubmenu.removeClass('active');
-    this.s.$itemHasChildren.find('.arrow-submenu').removeClass('arrow-selected');
+    this.s.$allSubmenu.removeClass(this.s.ACTIVE);
+    this.s.$itemHasChildren.find(`.${this.s.ARROW_SUBMENU}`).removeClass(this.s.ARROW_SELECTED);
 
     if( mq.min('tablet') ) {
       this.s.$allSubmenu.css('display' , '');
