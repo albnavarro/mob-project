@@ -1,20 +1,23 @@
+.nav-wrap {
+
+  &.menu-on.nav--offCanvas {
+    position: fixed;
+    top: 0;
+    height: 100vh;
+    height: calc((var(--vh, 1vh) * 100) - var(--toggle-h));
+    right: 0;
+    left: 0;
+    z-index: 15;
+  }
+}
+
 .nav{
 
   @include _mq('max','tablet') {
     display: none;
 
-    &.nav--offCanvas {
+    @include when-inside('.nav--offCanvas') {
       display: block;
-
-      &.menu-on {
-        position: fixed;
-        top: 0;
-        height: 100vh;
-        height: calc(var(--vh, 1vh) * 100);
-        right: 0;
-        left: 0;
-        z-index: 100;
-      }
     }
   }
 
@@ -39,9 +42,9 @@
   @include _mq('max', 'tablet') {
     @include when-inside('.nav--offCanvas') {
       position: absolute;
-      top: 0;
+      top: var(--toggle-h);
       height: 100vh;
-      height: calc(var(--vh, 1vh) * 100);
+      height: calc((var(--vh, 1vh) * 100) - var(--toggle-h));
       right: 0;
       left: 0;
       background-color: $black;
@@ -56,7 +59,7 @@
       }
     }
 
-    @include when-inside('.nav--offCanvas.menu-on') {
+    @include when-inside('.nav-wrap.menu-on') {
       transform: translateX(0);
     }
   }
@@ -147,7 +150,7 @@
       position: absolute;
       top: 0;
       height: 100vh;
-      height: calc(var(--vh, 1vh) * 100);
+      height: calc((var(--vh, 1vh) * 100) - var(--toggle-h));
       right: 0;
       left: 0;
       background-color: $black;
@@ -214,10 +217,11 @@
 
 .main-arrow-back {
   display: none;
-  width: 50px;
-  height: 50px;
+  width: 30px;
+  height: 30px;
+  float: left;
 
-  @include when-inside('.nav--offCanvas') {
+  @include when-inside('.nav--offCanvas.menu-on') {
     @include _mq('max', 'tablet') {
       display: block;
     }
@@ -288,6 +292,12 @@
   padding: 1rem;
   position: relative;
 
+  @include when-inside('.nav--offCanvas.menu-on') {
+    position: relative;
+    z-index: 20;
+    background-color: $white;
+  }
+
   @include _mq('tablet') {
     display: none;
   }
@@ -328,25 +338,30 @@
     }
   }
 
-  &.open > span {
-    &:nth-child(1) {
-      left: 50%;
-      top: 18px;
-      width: 0%;
+  @include when-inside('.menu-on') {
+
+    > span {
+
+      &:nth-child(1) {
+        left: 50%;
+        top: 18px;
+        width: 0%;
+      }
+
+      &:nth-child(2) {
+        transform: rotate(45deg);
+      }
+
+      &:nth-child(3) {
+        transform: rotate(-45deg);
+      }
+
+      &:nth-child(4) {
+        left: 50%;
+        top: 18px;
+        width: 0%;
+      }
     }
 
-    &:nth-child(2) {
-      transform: rotate(45deg);
-    }
-
-    &:nth-child(3) {
-      transform: rotate(-45deg);
-    }
-
-    &:nth-child(4) {
-      left: 50%;
-      top: 18px;
-      width: 0%;
-    }
   }
 }

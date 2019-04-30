@@ -8,12 +8,15 @@ class menuClass {
       sideDirection: data.sideDirection || 'left',
       offCanvas: data.offCanvas || 'true',
       $offCanvasBack: {},
+      $mainWrap: {},
       $mainMenu: {},
       $itemHasChildren: {},
       $firstLevelItem: {},
       $allSubmenu: {},
+      $toggleContainer: {},
       $body: $('body'),
       subMenuWidth: 0,
+      toggleWrapHeight: 0,
       menuArr: [],
       menuIsOpen: false,
       lastWindowsWidth: 0,
@@ -25,6 +28,7 @@ class menuClass {
       MENU_ITEM: 'menu-item', // LI LEMENT
       MENU_ITEM_HAS_CHILDREN: 'menu-item-has-children', // LI WITH SUBMENU INSIDE
       SUB_MENU: 'sub-menu', // ALL SUBMENU
+      TOGGLE_CONTAINER: 'toggle-wrap', // ALL SUBMENU
       // ADDED ELEMENT
       ARROW_SUBMENU: 'arrow-submenu', // LI ARROW
       OFFCANVAS_ARROW_BACK: 'main-arrow-back', // OFF CANVAS ARROW
@@ -49,44 +53,54 @@ class menuClass {
     // Convert to boolean
     this.s.offCanvas = (this.s.offCanvas == 'true');
     this.s.$mainMenu = this.s.$menu.find(`.${this.s.MAIN_MENU}`);
-    this.s.$offCanvasBack = this.s.$menu.find(`.${this.s.OFFCANVAS_ARROW_BACK}`);
+    this.s.$offCanvasBack = this.s.$toggle.siblings(`.${this.s.OFFCANVAS_ARROW_BACK}`);
     this.s.$itemHasChildren = this.s.$menu.find(`.${this.s.MENU_ITEM_HAS_CHILDREN}`);
     this.s.$firstLevelItem = this.s.$menu.find(`.${this.s.MAIN_MENU} > .${this.s.MENU_ITEM_HAS_CHILDREN} > .${this.s.SUB_MENU}`);
     this.s.$allSubmenu = this.s.$menu.find(`.${this.s.SUB_MENU}`);
+    this.s.$toggleContainer = this.s.$toggle.closest(`.${this.s.TOGGLE_CONTAINER}`);
+    this.s.$mainWrap = this.s.$menu.closest(`.${this.s.NAV_WRAP}`);
 
     if (this.s.direction == 'vertical') {
-      this.s.$menu.addClass(this.s.NAV_VERTICAL)
+      this.s.$mainWrap.addClass(this.s.NAV_VERTICAL)
 
       if(this.s.sideDirection == 'left') {
-        this.s.$menu.addClass(this.s.NAV_VERTICAL_LEFT)
+        this.s.$mainWrap.addClass(this.s.NAV_VERTICAL_LEFT)
       } else {
-        this.s.$menu.addClass(this.s.NAV_VERTICAL_RIGHT)
+        this.s.$mainWrap.addClass(this.s.NAV_VERTICAL_RIGHT)
       }
     } else {
-      this.s.$menu.addClass(this.s.NAV_HORIZONTAL)
+      this.s.$mainWrap.addClass(this.s.NAV_HORIZONTAL)
     }
 
 
     if (this.s.offCanvas) {
-      this.s.$menu.addClass(this.s.NAV_OFFCANVAS);
+      this.s.$mainWrap.addClass(this.s.NAV_OFFCANVAS);
     } else {
-      this.s.$menu.addClass(this.s.NAV_DROPDOWN);
+      this.s.$mainWrap.addClass(this.s.NAV_DROPDOWN);
     }
 
     this.s.lastWindowsWidth = eventManager.windowsWidth();
     this.getSubmenuWidth();
+    this.getToggleWrapHeight();
     this.addArrow();
-    if (this.s.offCanvas) this.addOffCanvasBtn();
     this.setData();
     this.resizeMenu();
     this.addHandler();
     eventManager.push('resize', this.getSubmenuWidth.bind(this));
+    eventManager.push('resize', this.getToggleWrapHeight.bind(this));
     eventManager.push('resize', this.resizeMenu.bind(this));
 
     if (this.s.direction == 'horizontal') {
       this.SetPosition();
       eventManager.push('resize', this.SetPosition.bind(this));
     }
+  }
+
+  getToggleWrapHeight() {
+    const root = document.documentElement;
+
+    this.s.toggleWrapHeight = this.s.$toggleContainer.outerHeight();
+    root.style.setProperty('--toggle-h', this.s.toggleWrapHeight + "px");
   }
 
   getSubmenuWidth(){
@@ -124,27 +138,19 @@ class menuClass {
     this.s.$itemHasChildren.prepend($arrow);
   }
 
-  addOffCanvasBtn() {
-    // DESKTOP TOUCH SHOW SUBMENU
-    const $offCanvasArrow1=$(`<button class='${this.s.OFFCANVAS_ARROW_BACK}'>back</button>`);
-    const $offCanvasArrow2=$(`<button class='${this.s.OFFCANVAS_ARROW_BACK}'>back</button>`);
-
-    this.s.$mainMenu.prepend($offCanvasArrow1);
-    this.s.$allSubmenu.prepend($offCanvasArrow2);
-  }
-
   addHandler() {
    this.s.$body.on('click' , this.bodyOnCLick.bind(this));
    this.s.$itemHasChildren.find(`.${this.s.ARROW_SUBMENU}`).on('click', this.arrowOnClick.bind(this));
    this.s.$toggle.on('click', this.toggleOnCLick.bind(this));
-   this.s.$mainMenu.find(`.${this.s.OFFCANVAS_ARROW_BACK}`).on('click', this.offCanvasBack.bind(this));
+   this.s.$offCanvasBack.on('click', this.offCanvasBack.bind(this));
   }
 
   offCanvasBack(evt) {
     if( mq.min('tablet') ) return;
 
-    const $target = $(evt.target);
-    let $menu = $target.closest(`.${this.s.SUB_MENU}`);
+    let $menu = this.s.$allSubmenu.filter((index, element) => {
+      return ($(element).hasClass('is-selected'))
+    });
 
     // Controllo se devo chiudere un submenu o il menu principale
     if ($menu.length > 0) {
@@ -169,7 +175,6 @@ class menuClass {
 
     } else {
       this.closeMainMenu();
-
     }
   }
 
@@ -183,7 +188,8 @@ class menuClass {
   }
 
   toggleOnCLick() {
-    if (this.s.$menu.hasClass(this.s.MENU_ON)){
+    if (this.s.$mainWrap.hasClass(this.s.MENU_ON)){
+      this.closeSubmenu();
       this.closeMainMenu();
     } else {
       this.openMainMenu();
@@ -234,6 +240,7 @@ class menuClass {
             if($parentsSubmenu.length) {
               gap = $parentsSubmenu.scrollTop();
             }
+
             $submenu.css('top', gap  + 'px');
           }
        }
@@ -272,14 +279,18 @@ class menuClass {
     } else {
       if(!this.s.offCanvas) this.s.$menu.slideUp(() => {$(window).resize()})
     }
-    this.s.$menu.removeClass(this.s.MENU_ON)
-    this.s.$toggle.removeClass(this.s.OPEN)
+
+    this.s.$mainWrap.removeClass(this.s.MENU_ON)
     this.s.menuIsOpen = false
     this.s.$body.css('overflow','');
 
     // Azzero lo scroll top di tutti i menu
     this.s.$mainMenu.scrollTop(0).removeClass(this.s.IS_SELECTED);
     this.s.$allSubmenu.scrollTop(0);
+
+    this.s.$allSubmenu.removeClass(this.s.ACTIVE);
+    // Rimuovo la propietà overflow-y dal menu che vado a chiudere
+    this.s.$allSubmenu.removeClass(this.s.IS_SELECTED);
   }
 
   openMainMenu() {
@@ -290,8 +301,7 @@ class menuClass {
       this.s.$mainMenu.addClass(this.s.IS_SELECTED);
       this.s.$body.css('overflow','hidden');
     }
-    this.s.$menu.addClass(this.s.MENU_ON)
-    this.s.$toggle.addClass(this.s.OPEN)
+    this.s.$mainWrap.addClass(this.s.MENU_ON)
     this.s.menuIsOpen = true
   }
 
