@@ -19,6 +19,8 @@ class offsetSliderClass {
   }
 
   init() {
+    if (this.s.$container.length == 0 ) return;
+
     this.setData();
     this.getDrivenIndex();
     this.setWidth();
