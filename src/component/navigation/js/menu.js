@@ -2,14 +2,13 @@ class menuClass {
 
   constructor(data) {
     this.s = {
-      $menu: $(`${data.menu}`),
-      $toggle: $(`${data.toggle}`),
+      $componentWrepper: $(`${data.componentWrepper}`),
       direction: data.direction || 'horizontal',
       sideDirection: data.sideDirection || 'left',
       offCanvas: data.offCanvas || 'true',
       $offCanvasBack: {},
-      $mainWrap: {},
       $mainMenu: {},
+      $$toggle: {},
       $itemHasChildren: {},
       $firstLevelItem: {},
       $allSubmenu: {},
@@ -24,11 +23,13 @@ class menuClass {
       // CONSTANTI
       // ( CLASSI DOM FOR QUERY )
       NAV_WRAP: 'nav-wrap', // WRAPPER OF TOGGLE AND MENU
+      NAV: 'nav.nav', // HTML5 nav element
       MAIN_MENU: 'main-menu', // MAIN UL
       MENU_ITEM: 'menu-item', // LI LEMENT
       MENU_ITEM_HAS_CHILDREN: 'menu-item-has-children', // LI WITH SUBMENU INSIDE
       SUB_MENU: 'sub-menu', // ALL SUBMENU
-      TOGGLE_CONTAINER: 'toggle-wrap', // ALL SUBMENU
+      TOGGLE_CONTAINER: 'toggle-wrap', // Toggle container
+      TOOGLE_BTN: 'toggle-element', // Toggle btn
       // ADDED ELEMENT
       ARROW_SUBMENU: 'arrow-submenu', // LI ARROW
       OFFCANVAS_ARROW_BACK: 'main-arrow-back', // OFF CANVAS ARROW
@@ -50,7 +51,11 @@ class menuClass {
   }
 
   init() {
-    // Convert to boolean
+    if (this.s.$componentWrepper.length == 0 ) return;
+
+    this.s.$mainWrap = this.s.$componentWrepper.find(`.${this.s.NAV_WRAP}`);
+    this.s.$menu = this.s.$componentWrepper.find(`.${this.s.NAV}`);
+    this.s.$toggle = this.s.$componentWrepper.find(`.${this.s.TOOGLE_BTN}`);
     this.s.offCanvas = (this.s.offCanvas == 'true');
     this.s.$mainMenu = this.s.$menu.find(`.${this.s.MAIN_MENU}`);
     this.s.$offCanvasBack = this.s.$toggle.siblings(`.${this.s.OFFCANVAS_ARROW_BACK}`);
@@ -58,7 +63,6 @@ class menuClass {
     this.s.$firstLevelItem = this.s.$menu.find(`.${this.s.MAIN_MENU} > .${this.s.MENU_ITEM_HAS_CHILDREN} > .${this.s.SUB_MENU}`);
     this.s.$allSubmenu = this.s.$menu.find(`.${this.s.SUB_MENU}`);
     this.s.$toggleContainer = this.s.$toggle.closest(`.${this.s.TOGGLE_CONTAINER}`);
-    this.s.$mainWrap = this.s.$menu.closest(`.${this.s.NAV_WRAP}`);
 
     if (this.s.direction == 'vertical') {
       this.s.$mainWrap.addClass(this.s.NAV_VERTICAL)

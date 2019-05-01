@@ -38,13 +38,11 @@ const lightVideo = new lightBoxClass({
     });
 
 const menu = new menuClass({
-      menu:'.menu-container nav.nav',
-      toggle:'.menu-container .toggle-element'
+      componentWrepper: '.menu-container--top'
     });
 
 const sidebarMenu = new menuClass({
-      menu:'.menu-container--sidebar nav.nav',
-      toggle:'.menu-container--sidebar .toggle-element',
+      componentWrepper: '.menu-container--sidebar',
       direction: 'vertical',
       sideDirection: 'left',
       offCanvas: 'false'
