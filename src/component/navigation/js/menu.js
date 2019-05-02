@@ -8,7 +8,7 @@ class menuClass {
       offCanvas: data.offCanvas || 'true',
       $offCanvasBack: {},
       $mainMenu: {},
-      $$toggle: {},
+      $toggle: {},
       $itemHasChildren: {},
       $firstLevelItem: {},
       $allSubmenu: {},
