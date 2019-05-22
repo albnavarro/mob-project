@@ -158,6 +158,9 @@ function js() {
       path.join(componentPath, 'show-element/js/ShowElement.js'),
       path.join(componentPath, 'threeGallery/js/threeGallery.js'),
       path.join(componentPath, 'offset-slider/js/offsetSlider.js'),
+      path.join(componentPath, 'popToggle/js/popToggle.js'),
+      path.join(componentPath, 'popToggle/js/popToggleManager.js'),
+      path.join(componentPath, 'overlay/js/overlay.js'),
       path.join(jsPath, 'index.js'),
     ])
     .pipe(concat('main.js'))
