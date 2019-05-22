@@ -55,6 +55,10 @@ class offsetSliderClass {
     });
   }
 
+  checkIfScrollable() {
+     return this.s.elArray[this.s.drivenElIndex].width > eventManager.windowsWidth();
+  }
+
   initSwipe() {
     const $cont = this.s.elArray[this.s.drivenElIndex].item;
 
@@ -65,6 +69,8 @@ class offsetSliderClass {
       walk = 0;
 
     this.s.$container.on('mousedown touchstart', (e) => {
+      if (!this.checkIfScrollable()) return;
+
       this.s.$el.addClass('no-transition ');
       val = this.s.drivenTranslatePosition;
 
@@ -78,19 +84,24 @@ class offsetSliderClass {
     });
 
     this.s.$container.on('mouseleave', () => {
+      if (!this.checkIfScrollable()) return;
+
       this.s.drivenTranslatePosition = val;
       isDown = false;
       this.updateIndex();
     });
 
     this.s.$container.on('mouseup touchend', () => {
+      if (!this.checkIfScrollable()) return;
+
       this.s.drivenTranslatePosition = val;
       isDown = false;
       this.updateIndex();
     });
 
     this.s.$container.on('mousemove touchmove', (e) => {
-      if (!isDown) return;
+
+      if (!isDown || !this.checkIfScrollable()) return;
       // e.preventDefault();
 
       if (e.type == 'mousemove') {
@@ -175,7 +186,7 @@ class offsetSliderClass {
   }
 
   prevStep() {
-    if(this.s.activeStep >= 0)  return;
+    if(this.s.activeStep >= 0 || !this.checkIfScrollable())  return;
 
     this.s.activeStep++;
     this.s.$el.removeClass('no-transition ');
@@ -184,7 +195,7 @@ class offsetSliderClass {
   }
 
   nextStep() {
-    if(this.s.activeStep <= -this.s.step)  return;
+    if(this.s.activeStep <= -this.s.step || !this.checkIfScrollable())  return;
 
     this.s.activeStep--;
     this.s.$el.removeClass('no-transition ');
