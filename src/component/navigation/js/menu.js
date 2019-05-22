@@ -143,7 +143,7 @@ class menuClass {
   }
 
   addHandler() {
-   this.s.$body.on('click' , this.bodyOnCLick.bind(this));
+   if (!this.s.offCanvas) this.s.$body.on('click' , this.bodyOnCLick.bind(this));
    this.s.$itemHasChildren.find(`.${this.s.ARROW_SUBMENU}`).on('click', this.arrowOnClick.bind(this));
    this.s.$toggle.on('click', this.toggleOnCLick.bind(this));
    this.s.$offCanvasBack.on('click', this.offCanvasBack.bind(this));
