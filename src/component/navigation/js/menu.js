@@ -185,7 +185,7 @@ class menuClass {
   bodyOnCLick(evt) {
     if ( !$(evt.target).parents(`.${this.s.NAV_WRAP}`).length ) {
       this.closeSubmenu();
-      if( mq.max('tablet') ) {
+      if( mq.max('tablet') && this.s.menuIsOpen) {
         this.closeMainMenu();
       }
     }
@@ -286,7 +286,7 @@ class menuClass {
 
     this.s.$mainWrap.removeClass(this.s.MENU_ON)
     this.s.menuIsOpen = false
-    this.s.$body.css('overflow','');
+    eventManager.removeBodyOverflow();
 
     // Azzero lo scroll top di tutti i menu
     this.s.$mainMenu.scrollTop(0).removeClass(this.s.IS_SELECTED);
@@ -303,7 +303,7 @@ class menuClass {
     } else {
       // Attivo la propietà overflow-y: auto; nel menu principale
       this.s.$mainMenu.addClass(this.s.IS_SELECTED);
-      this.s.$body.css('overflow','hidden');
+      eventManager.setBodyOverflow();
     }
     this.s.$mainWrap.addClass(this.s.MENU_ON)
     this.s.menuIsOpen = true
