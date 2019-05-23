@@ -1,16 +1,14 @@
 class overlayClass {
 
-  constructor() {
-    if(!overlayClass.instance){
+  constructor(data) {
       this.s = {
-          $overlay: $('#overlay--comp'),
+          $overlay: $(`${data.element}`),
+          delay: data.delay || 300,
           callBack: null,
           bodyOverflow: false,
-          $body: $('body')
+          $body: $('body'),
+
       }
-      overlayClass.instance = this;
-    }
-    return overlayClass.instance;
     this.init();
   }
 
@@ -36,7 +34,7 @@ class overlayClass {
 
       setTimeout(() => {
           this.s.bodyOverflow = data.bodyOverflow;
-          if( this.s.bodyOverflow && mq.min('tablet')) this.s.$body.css('overflow' , 'hidden');
+          if( this.s.bodyOverflow) eventManager.setBodyOverflow();
 
           if ( isNaN(data.top) ) {
               const $el = $(`${data.top}`);
@@ -71,14 +69,13 @@ class overlayClass {
           this.s.$overlay.css({'top': top, 'bottom': bottom, 'left': left, 'right': right});
           this.s.$overlay.addClass('active');
           this.s.$overlay.attr('data-name', dataName)
-      }, 300);
+      }, this.s.delay);
   }
 
   close() {
       this.s.$overlay.removeClass('active');
       this.s.$overlay.attr('data-name', '')
-      this.s.$overlay.css({'top': '', 'bottom': '', 'left': '', 'right': ''});
-      if( this.s.bodyOverflow && mq.min('tablet')) this.s.$body.css('overflow' , '');
+      if( this.s.bodyOverflow ) eventManager.removeBodyOverflow();
   }
 
   set callback(fn) {
@@ -86,5 +83,3 @@ class overlayClass {
   }
 
 }
-
-const overlay = new overlayClass()
