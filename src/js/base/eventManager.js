@@ -21,6 +21,7 @@ class eventManagerClass {
         scrollDirection: '',
         ticking : false,
         stackId : -1,
+        bodyOverflowStack : 0,
         timeout: null,
         isScrolling: false,
         _scrollUtility: false,
@@ -167,6 +168,16 @@ class eventManagerClass {
 
   scrollDirection() {
     return this.s.scrollDirection
+  }
+
+  setBodyOverflow() {
+      this.s.bodyOverflowStack ++;
+      document.body.style.overflow = 'hidden';
+  }
+
+  removeBodyOverflow() {
+      if(this.s.bodyOverflowStack > 0) this.s.bodyOverflowStack --;
+      if(this.s.bodyOverflowStack == 0) document.body.style.overflow = '';
   }
 }
 
