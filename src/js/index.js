@@ -8,7 +8,6 @@ fitImages.init();
 toolTip.init();
 totop.init();
 vh.init();
-overlay.init();
 
 
 // LIGHTBOX
@@ -62,6 +61,7 @@ const offsetSlider = new offsetSliderClass({
 
 
 // POPTOGGLE
+const overlay = new overlayClass({element: '#overlay--comp', delay: 300})
 overlay.callback = popToggleManager.closeAllPop.bind(popToggleManager);
 
 // POP 1
@@ -104,13 +104,11 @@ const popToggle3 = new popToggleClass({
     name: 'pop3',
     openButton: '.popTogglebtn-3',
     closeButton: '.popTarget-3 button',
-    target: '.popTarget-3'
+    target: '.popTarget-3',
+    isDropDown: true
 })
 
-// POP MANAGER
-popToggleManager.pushToggle(popToggle1)
-popToggleManager.pushToggle(popToggle2)
-popToggleManager.pushToggle(popToggle3)
+// POP MANAGER CALLBACK
 // popToggleManager.callBackFunction(sidebarMenu.openMainMenu.bind(sidebarMenu));
 
 

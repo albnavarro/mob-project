@@ -29,7 +29,7 @@ class lightBoxClass {
 
     if(!this.s.$lightBox.hasClass('active')){
       this.s.$lightBox.addClass('active');
-      this.s.$body.css('overflow' , 'hidden');
+      eventManager.setBodyOverflow();
 
       switch(this.s.dataType) {
 
@@ -87,8 +87,7 @@ class lightBoxClass {
   closeLightBox(event) {
     if( this.s.$lightBox.hasClass('active')){
       this.s.$lightBox.removeClass('active');
-      this.s.$body.css('overflow-y' , 'visible');
-      this.s.$body.css('overflow-x' , 'hidden');
+      eventManager.removeBodyOverflow();
 
       if ( this.s.dataType == 'image' || this.s.dataType == 'image-slide' || this.s.dataType == 'video' ) {
 

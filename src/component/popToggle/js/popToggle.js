@@ -7,12 +7,14 @@ class popToggleClass {
         $target: $(`${data.target}`),
         $closebtn: $(`${data.closeButton}`) || {},
         openCallBack: null, // funzione opzionale da eseguire all'apertura del sigolo PopUp
-        closeCallBack: null // funzione opzionale da eseguire alla chiusura del sigolo PopUp
+        closeCallBack: null, // funzione opzionale da eseguire alla chiusura del sigolo PopUp
+        isDropDown: data.isDropDown || false
       }
       this.init();
   }
 
   init() {
+      popToggleManager.pushToggle(this);
       this.s.$btn.on('click', (e) => this.openPop());
       this.s.$closebtn.on('click', (e) => this.closePop());
   }
@@ -22,15 +24,16 @@ class popToggleClass {
         this.closePop();
     } else {
         this.s.$target.addClass('active');
-         if(this.s.openCallBack != null) this.s.openCallBack();
+        if(this.s.isDropDown) this.s.$target.slideDown(300);
+        if(this.s.openCallBack != null) this.s.openCallBack();
       }
-
       popToggleManager.onOpenPop(this.s.name);
   }
 
   closePop() {
       if( this.s.$target.hasClass('active') ) {
           this.s.$target.removeClass('active');
+          if(this.s.isDropDown) this.s.$target.slideUp(300);
           if(this.s.closeCallBack != null) this.s.closeCallBack();
       }
   }
