@@ -161,6 +161,7 @@ function js() {
       path.join(componentPath, 'popToggle/js/popToggle.js'),
       path.join(componentPath, 'popToggle/js/popToggleManager.js'),
       path.join(componentPath, 'overlay/js/overlay.js'),
+      path.join(componentPath, 'accordion/js/accordion.js'),
       path.join(jsPath, 'index.js'),
     ])
     .pipe(concat('main.js'))
