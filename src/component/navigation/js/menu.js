@@ -5,7 +5,7 @@ class menuClass {
       $componentWrepper: $(`${data.componentWrepper}`),
       direction: data.direction || 'horizontal',
       sideDirection: data.sideDirection || 'left',
-      offCanvas: data.offCanvas || 'true',
+      offCanvas: typeof data.offCanvas === "undefined" ? true : data.offCanvas,
       $offCanvasBack: {},
       $mainMenu: {},
       $toggle: {},
@@ -56,7 +56,6 @@ class menuClass {
     this.s.$mainWrap = this.s.$componentWrepper.find(`.${this.s.NAV_WRAP}`);
     this.s.$menu = this.s.$componentWrepper.find(`.${this.s.NAV}`);
     this.s.$toggle = this.s.$componentWrepper.find(`.${this.s.TOOGLE_BTN}`);
-    this.s.offCanvas = (this.s.offCanvas == 'true');
     this.s.$mainMenu = this.s.$menu.find(`.${this.s.MAIN_MENU}`);
     this.s.$offCanvasBack = this.s.$toggle.siblings(`.${this.s.OFFCANVAS_ARROW_BACK}`);
     this.s.$itemHasChildren = this.s.$menu.find(`.${this.s.MENU_ITEM_HAS_CHILDREN}`);

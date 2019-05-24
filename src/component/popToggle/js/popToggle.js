@@ -8,7 +8,7 @@ class popToggleClass {
         $closebtn: $(`${data.closeButton}`) || {},
         openCallBack: null, // funzione opzionale da eseguire all'apertura del sigolo PopUp
         closeCallBack: null, // funzione opzionale da eseguire alla chiusura del sigolo PopUp
-        isDropDown: data.isDropDown || false
+        isDropDown: typeof data.isDropDown === "undefined" ? false : data.isDropDown
       }
       this.init();
   }

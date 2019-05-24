@@ -49,7 +49,7 @@ const sidebarMenu = new menuClass({
       componentWrepper: '.menu-container--sidebar',
       direction: 'vertical',
       sideDirection: 'left',
-      offCanvas: 'false'
+      offCanvas: false
     });
 
 
@@ -110,6 +110,20 @@ const popToggle3 = new popToggleClass({
 
 // POP MANAGER CALLBACK
 // popToggleManager.callBackFunction(sidebarMenu.openMainMenu.bind(sidebarMenu));
+
+
+
+// ACCORDION
+const accordion = new accordionClass({
+    item: '.accrdion-item',
+    button: '.accrdion-item__btn',
+    target: '.accrdion-item__content',
+    breackpoint: 'desktop',
+    queryType: 'max'
+    // multiple: true
+
+});
+// ACCORDION
 
 
 // Provvisorio
