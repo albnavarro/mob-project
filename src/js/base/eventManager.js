@@ -129,6 +129,7 @@ class eventManagerClass {
         order: _order
       }
       this.s.data[_properties].push(obj);
+      this.updateOrder(_properties);
 
       return this.s.stackId
     }
