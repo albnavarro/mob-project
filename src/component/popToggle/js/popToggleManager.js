@@ -1,14 +1,10 @@
 class popToggleManagerClass {
 
   constructor() {
-    if(!popToggleManagerClass.instance){
-      this.s = {
-          popArray: [],
-          functionArray: []
-      }
-      popToggleManagerClass.instance = this;
+    this.s = {
+        popArray: [],
+        functionArray: []
     }
-    return popToggleManagerClass.instance;
   }
 
   pushToggle(_fn) {
@@ -42,7 +38,4 @@ class popToggleManagerClass {
         item.closePop();
       }
   }
-  
 }
-
-const popToggleManager = new popToggleManagerClass()

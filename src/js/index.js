@@ -59,8 +59,8 @@ const offsetSlider = new offsetSliderClass({
     step: 8
 })
 
-
 // POPTOGGLE
+const popToggleManager = new popToggleManagerClass()
 const overlay = new overlayClass({element: '#overlay--comp', delay: 300})
 overlay.callback = popToggleManager.closeAllPop.bind(popToggleManager);
 
@@ -68,7 +68,8 @@ overlay.callback = popToggleManager.closeAllPop.bind(popToggleManager);
 const popToggle1 = new popToggleClass({
     name: 'pop1',
     openButton: '.popTogglebtn-1',
-    target: '.popTarget-1'
+    target: '.popTarget-1',
+    manager: popToggleManager
 })
 popToggle1.openCallBack = overlay.open.bind(overlay,
     {
@@ -86,7 +87,8 @@ const popToggle2 = new popToggleClass({
     name: 'pop2',
     openButton: '.popTogglebtn-2',
     closeButton: '.popTarget-2 button',
-    target: '.popTarget-2'
+    target: '.popTarget-2',
+    manager: popToggleManager
 })
 popToggle2.openCallBack = overlay.open.bind(overlay,
     {
@@ -105,7 +107,8 @@ const popToggle3 = new popToggleClass({
     openButton: '.popTogglebtn-3',
     closeButton: '.popTarget-3 button',
     target: '.popTarget-3',
-    isDropDown: true
+    isDropDown: true,
+    manager: popToggleManager
 })
 
 // POP MANAGER CALLBACK
