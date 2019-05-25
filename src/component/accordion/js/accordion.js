@@ -25,20 +25,28 @@ class accordionClass {
 
       if ( !this.s.multiple ) {
           this.s.$btn.not($btn).removeClass('active');
-          this.s.$target.not($target).slideUp();
+          this.s.$target.not($target).slideUp(() => {
+            eventManager.execute('resize');
+          });
       }
 
       if(!$btn.hasClass('active')) {
           $btn.addClass('active');
-          $target.slideDown();
+          $target.slideDown(() => {
+            eventManager.execute('resize');
+          });
       } else {
           $btn.removeClass('active');
-          $target.slideUp();
+          $target.slideUp(() => {
+            eventManager.execute('resize');
+          });
       }
   }
 
   closeAllItem() {
       this.s.$btn.removeClass('active');
-      this.s.$target.slideUp();
+      this.s.$target.slideUp(() => {
+        eventManager.execute('resize');
+      });
   }
 }

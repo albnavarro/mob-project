@@ -214,7 +214,9 @@ class menuClass {
      this.s.$itemHasChildren.find(`.${this.s.ARROW_SUBMENU}`).not($target).not($parentsArrow).removeClass(this.s.ARROW_SELECTED);
 
      if( mq.max('tablet') && !this.s.offCanvas) {
-       this.s.$allSubmenu.not($parentsSubmenu).not($submenu).slideUp();
+       this.s.$allSubmenu.not($parentsSubmenu).not($submenu).slideUp(() => {
+         eventManager.execute('resize');
+       });
      }
 
      if( $submenu.hasClass(this.s.ACTIVE) ) {
@@ -222,7 +224,9 @@ class menuClass {
        $submenu.removeClass(this.s.ACTIVE)
        $target.removeClass(this.s.ARROW_SELECTED)
        if( mq.max('tablet') && !this.s.offCanvas) {
-         $submenu.slideUp(() => {$(window).resize()})
+         $submenu.slideUp(() => {
+           eventManager.execute('resize');
+         })
        }
      } else {
        // Apro il menu
@@ -249,7 +253,9 @@ class menuClass {
        }
 
        if( mq.max('tablet') && !this.s.offCanvas) {
-         $submenu.slideDown(() => {$(window).resize()})
+         $submenu.slideDown(() => {
+           eventManager.execute('resize');
+         })
        }
 
      }
@@ -278,9 +284,13 @@ class menuClass {
 
   closeMainMenu(immediate) {
     if( immediate ){
-      if(!this.s.offCanvas) this.s.$menu.slideUp(0,() => {$(window).resize()})
+      if(!this.s.offCanvas) this.s.$menu.slideUp(0,() => {
+        eventManager.execute('resize');
+      })
     } else {
-      if(!this.s.offCanvas) this.s.$menu.slideUp(() => {$(window).resize()})
+      if(!this.s.offCanvas) this.s.$menu.slideUp(() => {
+        eventManager.execute('resize');
+      })
     }
 
     this.s.$mainWrap.removeClass(this.s.MENU_ON)
@@ -298,7 +308,9 @@ class menuClass {
 
   openMainMenu() {
     if(!this.s.offCanvas) {
-      this.s.$menu.slideDown(() => {$(window).resize()})
+      this.s.$menu.slideDown(() => {
+        eventManager.execute('resize');
+      })
     } else {
       // Attivo la propietà overflow-y: auto; nel menu principale
       this.s.$mainMenu.addClass(this.s.IS_SELECTED);
@@ -315,7 +327,9 @@ class menuClass {
     if( mq.min('tablet') ) {
       this.s.$allSubmenu.css('display' , '');
     } else {
-      if(!this.s.offCanvas) this.s.$allSubmenu.slideUp(() => {$(window).resize()});
+      if(!this.s.offCanvas) this.s.$allSubmenu.slideUp(() => {
+        eventManager.execute('resize');
+      });
     }
   }
 

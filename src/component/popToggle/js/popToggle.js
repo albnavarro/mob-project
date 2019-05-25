@@ -24,7 +24,9 @@ class popToggleClass {
         this.closePop();
     } else {
         this.s.$target.addClass('active');
-        if(this.s.isDropDown) this.s.$target.slideDown(300);
+        if(this.s.isDropDown) this.s.$target.slideDown(300, () => {
+          eventManager.execute('resize');
+        });
         if(this.s.openCallBack != null) this.s.openCallBack();
       }
       popToggleManager.onOpenPop(this.s.name);
@@ -33,7 +35,9 @@ class popToggleClass {
   closePop() {
       if( this.s.$target.hasClass('active') ) {
           this.s.$target.removeClass('active');
-          if(this.s.isDropDown) this.s.$target.slideUp(300);
+          if(this.s.isDropDown) this.s.$target.slideUp(300, () => {
+            eventManager.execute('resize');
+          });
           if(this.s.closeCallBack != null) this.s.closeCallBack();
       }
   }
