@@ -143,6 +143,7 @@ function js() {
       path.join(jsPath, 'base/mediaManager.js'),
       path.join(jsPath, 'utility/loadImages.js'),
       path.join(jsPath, 'utility/vh.js'),
+      path.join(jsPath, 'utility/series.js'),
       path.join(componentPath, 'tooltip/js/tooltip.js'),
       path.join(componentPath, 'to-top/js/toTop.js'),
       path.join(componentPath, 'fit-images/js/fitImage.js'),
