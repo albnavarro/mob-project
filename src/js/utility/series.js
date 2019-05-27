@@ -16,6 +16,7 @@ class seriesClass {
   }
 
   go() {
+    this.s.index = 0;
     const fn = this.s.arr[0]
     this.s.index ++;
     fn();
@@ -38,7 +39,7 @@ class seriesClass {
 
 // METHOD EXAMPLE:
 
-// test(callback) {
+// test(callback = null) {
 //   setTimeout(() => {
 //     console.log(this.s.name);
 //     if(callback) callback();
