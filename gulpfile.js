@@ -359,7 +359,7 @@ gulp.task("init", gulp.series(
   minifyAssetsLoading,
   style,
   js,
-  cleanDist,
+  // cleanDist,
   uglyfyCss,
   uglyfyJs,
   dist,
@@ -377,7 +377,7 @@ gulp.task("criticalCss", gulp.series(
   criticalCss))
 
 gulp.task('prod', gulp.series(
-  cleanDist,
+  // cleanDist,
   uglyfyCss,
   uglyfyJs,
   dist,
