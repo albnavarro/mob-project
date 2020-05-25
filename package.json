@@ -44,7 +44,7 @@
     "gulp-wrap": "^0.15.0",
     "imagemin-pngquant": "^8.0.0",
     "jquery": "^3.4.1",
-    "node-sass": "^4.13.0",
+    "node-sass": "^4.14.1",
     "npm-check-updates": "^4.0.1",
     "path": "^0.12.7",
     "request": "^2.88.0",
