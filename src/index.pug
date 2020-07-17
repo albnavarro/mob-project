@@ -74,13 +74,23 @@ html
         include component/threeGallery/pug/threeGallery.pug
 
         section.overflow-hidden
+            
+          .parallax__container
+            .parallax__item.parallax__item-test(
+              data-conponent='m-comp--parallax',
+              data-jsVelocity="8",
+              data-align='center',
+              data-ease="linear",
+              data-propierties="opacity")
 
           .parallax__container
             .parallax__item.parallax__item-test(
               data-conponent='m-comp--parallax',
               data-distance='2',
-              data-align='top',
+              data-align='center',
               data-ease="linear",
+              data-oneDirection="toBack",
+              data-reverse="true",
               data-propierties="horizontal")
 
           .parallax-background__container.transition--opacity.toggleEl--opacity--start(

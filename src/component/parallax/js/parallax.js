@@ -48,13 +48,17 @@ class parallaxClass {
       this.distance = (this.item.attr('data-distance') || 8 )
       // 1 - 10,  10 = quick, 1 = slow
       this.jsVelocity = (this.item.attr('data-jsVelocity') || 8 )
-      // true - false
+      // true - false: Bollean alla vuol make true response
       this.reverse = (this.item.attr('data-reverse') || false )
+      // toStop - toBack
+      this.oneDirection = (this.item.attr('data-oneDirection') || '' )
       // start - top -center - bottom - end
       this.align = (this.item.attr('data-align') || 'top' )
       // linear - smooth
       this.ease = (this.item.attr('data-ease') || 'linear' )
-      // vertical - horizontal - rotate
+      // vertical - horizontal - rotate - opacity
+      // with 'opacity' the align is always center and distance have no effect
+      // with 'opacity' in 'smooth mode' uggest to use jsVelocity hight like 8
       this.propierties = (this.item.attr('data-propierties') || 'vertical' )
       this.calcOffset = () => {
         this.offset = parseInt(this.container.offset().top)
@@ -177,8 +181,14 @@ class parallaxClass {
                    v = element.jsVelocity,
                    val =  (( f - s ) / v) + s * 1;
 
-             element.startValue = val.toFixed(this.s.toFixedValue);
+             if( element.propierties == 'opacity') {
+                 // in smooth mode use 4 value after comma so i can check very slow change
+                 element.startValue = val.toFixed(4);
+             } else {
+                 element.startValue = val.toFixed(this.s.toFixedValue);
+             }
              element.item.css(this.setStyle(element,element.startValue));
+
 
              if( element.prevValue != element.startValue) isCompleted = false;
            }
@@ -202,29 +212,45 @@ class parallaxClass {
     if( element.offset + element.height > eventManager.scrollTop()
       && element.offset < eventManager.scrollTop() + eventManager.windowsHeight()) {
 
-      switch(element.align) {
-        case 'start':
-          element.endValue =(eventManager.scrollTop() / element.distance);
-          break;
+      if( element.propierties == 'opacity') {
+          let opacityVal = (eventManager.scrollTop() + eventManager.windowsHeight()/2 - element.offset)
+          opacityVal = opacityVal * -1;
+          if (opacityVal < 0) {
+              opacityVal = 0;
+          }
+          if(opacityVal > eventManager.windowsHeight()/2) {
+              opacityVal = eventManager.windowsHeight()/2;
+          }
+          opacityVal = 1 - (opacityVal / (eventManager.windowsHeight()/2));
+          element.endValue = opacityVal.toFixed(2);
 
-        case 'top':
-          element.endValue =(((eventManager.scrollTop() - element.offset) / element.distance));
-          break;
+      } else {
 
-        case 'center':
-          element.endValue =((((eventManager.scrollTop() + (eventManager.windowsHeight()/2 - element.height/2)) - element.offset) / element.distance));
-          break;
+          switch(element.align) {
+              case 'start':
+              element.endValue =(eventManager.scrollTop() / element.distance);
+              break;
 
-        case 'bottom':
-          element.endValue =((((eventManager.scrollTop() + (eventManager.windowsHeight() - element.height)) - element.offset) / element.distance));
-          break;
+              case 'top':
+              element.endValue =(((eventManager.scrollTop() - element.offset) / element.distance));
+              break;
 
-        case 'end':
-          element.endValue = -((eventManager.documentHeight() - (eventManager.scrollTop() + eventManager.windowsHeight())) / element.distance);
-          break;
+              case 'center':
+              element.endValue =((((eventManager.scrollTop() + (eventManager.windowsHeight()/2 - element.height/2)) - element.offset) / element.distance));
+              break;
+
+              case 'bottom':
+              element.endValue =((((eventManager.scrollTop() + (eventManager.windowsHeight() - element.height)) - element.offset) / element.distance));
+              break;
+
+              case 'end':
+              element.endValue = -((eventManager.documentHeight() - (eventManager.scrollTop() + eventManager.windowsHeight())) / element.distance);
+              break;
+          }
+
+          element.endValue = element.endValue.toFixed(this.s.toFixedValue) / 2;
       }
 
-      element.endValue = element.endValue.toFixed(this.s.toFixedValue);
 
       if (!applyStyle) return;
 
@@ -239,6 +265,25 @@ class parallaxClass {
 
     if (element.reverse) val = -val;
 
+    switch(element.oneDirection) {
+        case 'toStop':
+          if(!element.reverse && val > 0) {
+            val = 0;
+          } else if (element.reverse && val < 0) {
+            val = 0;
+          }
+          break;
+
+        case 'toBack':
+        if(!element.reverse && val > 0) {
+          val = -val;
+        } else if (element.reverse && val < 0) {
+          val = -val;
+        }
+          break;
+
+    }
+
     switch(element.propierties ) {
       case 'vertical':
         style[this.s.transformProperty] = `translate3d(0,0,0) translateY(${val}px)`;
@@ -250,6 +295,10 @@ class parallaxClass {
 
       case 'rotate':
         style[this.s.transformProperty] = `translate3d(0,0,0) rotate(${val}deg)`;
+        break;
+
+      case 'opacity':
+        style['opacity'] = `${val}`;
         break;
     }
 

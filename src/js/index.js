@@ -59,8 +59,17 @@ const offsetSlider = new offsetSliderClass({
     step: 8
 })
 
+// TEST CALLBACK
+function callback1() {
+    console.log('callback open');
+}
+
+function callback2() {
+    console.log('callback close');
+}
+
 // POPTOGGLE
-const popToggleManager = new popToggleManagerClass()
+const popToggleManager = new popToggleManagerClass();
 const overlay = new overlayClass({element: '#overlay--comp', delay: 300})
 overlay.callback = popToggleManager.closeAllPop.bind(popToggleManager);
 
@@ -80,7 +89,9 @@ popToggle1.openCallBack = overlay.open.bind(overlay,
         name: 'pop1',
         bodyOverflow: true
     });
+popToggle1.openCallBack = callback1.bind(this);
 popToggle1.closeCallBack = overlay.close.bind(overlay);
+popToggle1.closeCallBack = callback2.bind(this);
 
 // POP 2
 const popToggle2 = new popToggleClass({
@@ -113,6 +124,7 @@ const popToggle3 = new popToggleClass({
 
 // POP MANAGER CALLBACK
 // popToggleManager.callBackFunction(sidebarMenu.openMainMenu.bind(sidebarMenu));
+// popToggleManager.callBackFunction(callback2.bind(this))
 
 
 
