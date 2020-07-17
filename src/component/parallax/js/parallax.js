@@ -275,11 +275,9 @@ class parallaxClass {
           break;
 
         case 'toBack':
-        if(!element.reverse && val > 0) {
-          val = -val;
-        } else if (element.reverse && val < 0) {
-          val = -val;
-        }
+          if((!element.reverse && val > 0 ) || (element.reverse && val < 0)) {
+            val = -val;
+          }
           break;
 
     }
