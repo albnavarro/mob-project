@@ -52,12 +52,13 @@ class parallaxClass {
       this.reverse = (this.item.attr('data-reverse') || false )
       // toStop - toBack
       this.oneDirection = (this.item.attr('data-oneDirection') || '' )
-      // start - top -center - bottom - end
+      // start - top -center - bottom - end - number 1-100 (vh postion)
       this.align = (this.item.attr('data-align') || 'top' )
       // linear - smooth
       this.ease = (this.item.attr('data-ease') || 'linear' )
       // vertical - horizontal - rotate - opacity
-      // with 'opacity' the align is always center and distance have no effect
+      // with 'opacity' the align is by deafult center of accept only number 1-100
+      // with 'opacity' distance have no effect
       // with 'opacity' in 'smooth mode' uggest to use jsVelocity hight like 8
       this.propierties = (this.item.attr('data-propierties') || 'vertical' )
       this.calcOffset = () => {
@@ -212,40 +213,57 @@ class parallaxClass {
     if( element.offset + element.height > eventManager.scrollTop()
       && element.offset < eventManager.scrollTop() + eventManager.windowsHeight()) {
 
+      // Check if top-bottom etc.. or custom numer
+      const alignIsNotaNumaber = isNaN(element.align) ;
+
       if( element.propierties == 'opacity') {
-          let opacityVal = (eventManager.scrollTop() + eventManager.windowsHeight()/2 - element.offset)
+          // 50vh align by default
+          let vhLimit = 0;
+          if (alignIsNotaNumaber) {
+              vhLimit = (eventManager.windowsHeight()/100 * 50);
+          } else {
+              vhLimit = (eventManager.windowsHeight()/100 * element.align);
+          }
+
+          let opacityVal = (((eventManager.scrollTop() + vhLimit) - element.offset));
           opacityVal = opacityVal * -1;
+
           if (opacityVal < 0) {
-              opacityVal = 0;
+            opacityVal = 0;
           }
-          if(opacityVal > eventManager.windowsHeight()/2) {
-              opacityVal = eventManager.windowsHeight()/2;
-          }
-          opacityVal = 1 - (opacityVal / (eventManager.windowsHeight()/2));
+
+          opacityVal = 1 - (opacityVal / (eventManager.windowsHeight() - vhLimit));
           element.endValue = opacityVal.toFixed(2);
+
 
       } else {
 
-          switch(element.align) {
-              case 'start':
-              element.endValue =(eventManager.scrollTop() / element.distance);
-              break;
+          if (alignIsNotaNumaber) {
+              // Prefixed align
+              switch(element.align) {
+                  case 'start':
+                  element.endValue =(eventManager.scrollTop() / element.distance);
+                  break;
 
-              case 'top':
-              element.endValue =(((eventManager.scrollTop() - element.offset) / element.distance));
-              break;
+                  case 'top':
+                  element.endValue =(((eventManager.scrollTop() - element.offset) / element.distance));
+                  break;
 
-              case 'center':
-              element.endValue =((((eventManager.scrollTop() + (eventManager.windowsHeight()/2 - element.height/2)) - element.offset) / element.distance));
-              break;
+                  case 'center':
+                  element.endValue =((((eventManager.scrollTop() + (eventManager.windowsHeight()/2 - element.height/2)) - element.offset) / element.distance));
+                  break;
 
-              case 'bottom':
-              element.endValue =((((eventManager.scrollTop() + (eventManager.windowsHeight() - element.height)) - element.offset) / element.distance));
-              break;
+                  case 'bottom':
+                  element.endValue =((((eventManager.scrollTop() + (eventManager.windowsHeight() - element.height)) - element.offset) / element.distance));
+                  break;
 
-              case 'end':
-              element.endValue = -((eventManager.documentHeight() - (eventManager.scrollTop() + eventManager.windowsHeight())) / element.distance);
-              break;
+                  case 'end':
+                  element.endValue = -((eventManager.documentHeight() - (eventManager.scrollTop() + eventManager.windowsHeight())) / element.distance);
+                  break;
+              }
+          } else {
+              // VH Align
+              element.endValue =((((eventManager.scrollTop() + (eventManager.windowsHeight()/100 * element.align)) - element.offset) / element.distance));
           }
 
           element.endValue = element.endValue.toFixed(this.s.toFixedValue) / 2;
