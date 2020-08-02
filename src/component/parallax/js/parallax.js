@@ -56,7 +56,7 @@ class parallaxClass {
       this.align = (this.item.attr('data-align') || 'top' )
       // linear - smooth
       this.ease = (this.item.attr('data-ease') || 'linear' )
-      // vertical - horizontal - rotate - opacity
+      // vertical - horizontal - rotate - opacity - scale
       // with 'opacity' the align is by deafult center of accept only number 1-100
       // with 'opacity' distance have no effect
       // with 'opacity' in 'smooth mode' uggest to use jsVelocity hight like 8
@@ -269,7 +269,6 @@ class parallaxClass {
           element.endValue = element.endValue.toFixed(this.s.toFixedValue) / 2;
       }
 
-
       if (!applyStyle) return;
 
       element.item.css(this.setStyle(element,element.endValue));
@@ -315,6 +314,12 @@ class parallaxClass {
 
       case 'opacity':
         style['opacity'] = `${val}`;
+        break;
+
+      case 'scale':
+        // NormalizeValue
+        const scaleVal = 1 + (val/1000);
+        style[this.s.transformProperty] = `translate3d(0,0,0) scale(${scaleVal})`;
         break;
     }
 
