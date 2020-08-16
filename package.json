@@ -1,15 +1,11 @@
 {
-  "name": "wp-skeleton",
+  "name": "mob project",
   "version": "1.0.0",
   "description": "Blank project",
   "main": "gulpfile.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://albertonav@bitbucket.org/albertonav/landing-mobbu.git"
-  },
+   },
   "author": "Mobbu",
   "license": "MIT",
   "homepage": "",
