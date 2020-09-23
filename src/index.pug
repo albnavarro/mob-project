@@ -19,11 +19,9 @@ html
 
           .parallax__container
             .parallax__item.parallax__item-test(
-              data-conponent='m-comp--parallax',
-              data-distance='8',
-              data-jsVelocity="8",
-              data-align='start',
-              data-ease="smooth")
+                data-conponent='m-comp--parallax',
+                data-align='start',
+                data-propierties="opacity")
 
           //- popToggle
           button.popTogglebtn.popTogglebtn-1
@@ -66,7 +64,23 @@ html
           //- FINE ACCORDION
           
           include component/lightbox/pug/button.pug
+          
+          .parallax__container
+            .parallax__item.parallax__item-test(
+              data-conponent='m-comp--parallax',
+              data-distance='8',
+              data-jsVelocity="8",
+              data-align='start',
+              data-ease="smooth")
+          .parallax__container
+            .parallax__item.parallax__item-test(
+              data-conponent='m-comp--parallax',
+              data-align='start',
+              data-propierties="opacity")
+              
           include component/tooltip/pug/tooltip.pug
+          
+          
       
       include component/offset-slider/pug/offsetSlider.pug
       .container
@@ -78,8 +92,10 @@ html
           .parallax__container
             .parallax__item.parallax__item-test(
               data-conponent='m-comp--parallax',
-              data-align='30',
-              data-propierties="opacity")
+              data-propierties="opacity"
+              data-opacityStart="70"
+              data-opacityEnd="10"
+              data-reverse= "true" )
               
           .parallax__container.clearfix
             .parallax__item.parallax__item-test.parallax__item-test--float(

@@ -53,11 +53,18 @@ class parallaxClass {
       // toStop - toBack
       this.oneDirection = (this.item.attr('data-oneDirection') || '' )
       // start - top -center - bottom - end - number 1-100 (vh postion)
+      // omn opacity work only start
       this.align = (this.item.attr('data-align') || 'top' )
+      // 100 = bottom , opacityStart must be grater then opacityEnd
+      // with 'align=start' opacityStart have no effect
+      this.opacityStart = (this.item.attr('data-opacityStart') || 100 )
+      // 0 = top
+      // with 'align=start' opacityStart have no effect
+      this.opacityEnd = (this.item.attr('data-opacityEnd') || 0 )
       // linear - smooth
       this.ease = (this.item.attr('data-ease') || 'linear' )
       // vertical - horizontal - rotate - opacity - scale
-      // with 'opacity' the align is by deafult center of accept only number 1-100
+      // with 'opacity' the align have no effect
       // with 'opacity' distance have no effect
       // with 'opacity' in 'smooth mode' uggest to use jsVelocity hight like 8
       this.propierties = (this.item.attr('data-propierties') || 'vertical' )
@@ -217,24 +224,25 @@ class parallaxClass {
       const alignIsNotaNumaber = isNaN(element.align) ;
 
       if( element.propierties == 'opacity') {
-          // 50vh align by default
-          let vhLimit = 0;
-          if (alignIsNotaNumaber) {
-              vhLimit = (eventManager.windowsHeight()/100 * 50);
+          const vhLimit = (eventManager.windowsHeight()/100 * element.opacityEnd);
+          const vhStart = eventManager.windowsHeight() - (eventManager.windowsHeight()/100 * element.opacityStart);
+
+          let opacityVal = 0;
+          if (element.align == 'start') {
+              opacityVal = - eventManager.scrollTop();
           } else {
-              vhLimit = (eventManager.windowsHeight()/100 * element.align);
+              opacityVal = (eventManager.scrollTop() + vhLimit - element.offset);
           }
 
-          let opacityVal = (((eventManager.scrollTop() + vhLimit) - element.offset));
           opacityVal = opacityVal * -1;
+          if (opacityVal < 0)  opacityVal = 0;
 
-          if (opacityVal < 0) {
-            opacityVal = 0;
+          if (element.align == 'start') {
+              opacityVal = 1 - opacityVal / element.offset;
+          } else {
+              opacityVal = 1 - opacityVal / (eventManager.windowsHeight() - vhStart - vhLimit);
           }
-
-          opacityVal = 1 - (opacityVal / (eventManager.windowsHeight() - vhLimit));
           element.endValue = opacityVal.toFixed(2);
-
 
       } else {
 
@@ -280,7 +288,17 @@ class parallaxClass {
   setStyle(element,val) {
     let style = {};
 
-    if (element.reverse) val = -val;
+    if (element.reverse) {
+        switch (element.propierties) {
+            case 'opacity':
+                val = 1 - val;
+                break;
+
+            default:
+                val = -val;
+
+        }
+    }
 
     switch(element.oneDirection) {
         case 'toStop':
