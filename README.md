@@ -5,11 +5,18 @@ Type this command in terminal
 
 NPM will install all the dependencies for the project's gulpfile
 
-Edit file config.json.dist in config.json, open files and enter your domain in localhost
+Copy file config.json.dist in config.json
+Open files and enter your serverName ( from your virtualhost ) in host propierties.
+the serverName is necessary for the tasks watch_files and criticalCss.
 
 ### Type this command in terminal the first time:
 
 * gulp init
+
+It may happen that by executing the gulp init task it is not possible to create the css folder automatically inside the compiled folder (probably for a permissions problem).
+
+In this case, just create the www/assets/css folder by hand.
+To be noticed.
 
 ### Type this command form minify css/js and revisioning by appending content hash to filenames )
 ### Set isProd -> true in src/data/config.json for use new distribution assets
