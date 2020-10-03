@@ -44,6 +44,9 @@ class parallaxClass {
       this.startValue = 0
       this.prevValue = 0
       this.height = 0
+      // Use other dome lement for cal height an position
+      // If you have a fixed position is udeful
+      this.useOtherPosition = (this.item.attr('data-otherPos') || null )
       // 1 - 10 , 10 = more distance,  1 = less distance
       this.distance = (this.item.attr('data-distance') || 8 )
       // 1 - 10,  10 = quick, 1 = slow
@@ -69,10 +72,18 @@ class parallaxClass {
       // with 'opacity' in 'smooth mode' uggest to use jsVelocity hight like 8
       this.propierties = (this.item.attr('data-propierties') || 'vertical' )
       this.calcOffset = () => {
-        this.offset = parseInt(this.container.offset().top)
+          if(this.useOtherPosition == null) {
+              this.offset = parseInt(this.container.offset().top)
+          } else {
+              this.offset = parseInt($(this.useOtherPosition).offset().top)
+          }
       }
       this.calcHeight = () => {
-        this.height = parseInt(this.container.outerHeight())
+        if(this.useOtherPosition == null) {
+            this.height = parseInt(this.container.outerHeight())
+        } else {
+            this.height = parseInt($(this.useOtherPosition).outerHeight())
+        }
       }
     }
 
