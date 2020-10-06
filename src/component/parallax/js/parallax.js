@@ -54,6 +54,8 @@ class parallaxClass {
       // true - false: Bollean alla vuol make true response
       this.reverse = (this.item.attr('data-reverse') || false )
       // toStop - toBack
+      // In case Opacity only toBack is acrtive ( default is toStop)
+      // In the case recommended start point at 100
       this.oneDirection = (this.item.attr('data-oneDirection') || '' )
       // start - top -center - bottom - end - number 1-100 (vh postion)
       // omn opacity work only start
@@ -246,13 +248,13 @@ class parallaxClass {
           }
 
           opacityVal = opacityVal * -1;
-          if (opacityVal < 0)  opacityVal = 0;
 
           if (element.align == 'start') {
               opacityVal = 1 - opacityVal / element.offset;
           } else {
               opacityVal = 1 - opacityVal / (eventManager.windowsHeight() - vhStart - vhLimit);
           }
+
           element.endValue = opacityVal.toFixed(2);
 
       } else {
@@ -299,6 +301,7 @@ class parallaxClass {
   setStyle(element,val) {
     let style = {};
 
+    // CHECK Reverse
     if (element.reverse) {
         switch (element.propierties) {
             case 'opacity':
@@ -311,21 +314,29 @@ class parallaxClass {
         }
     }
 
-    switch(element.oneDirection) {
-        case 'toStop':
-          if(!element.reverse && val > 0) {
-            val = 0;
-          } else if (element.reverse && val < 0) {
-            val = 0;
-          }
-          break;
+    // CHECK ONE DIRECTION ToStop/ToBack
+    if(element.propierties != 'opacity') {
+        switch(element.oneDirection) {
+            case 'toStop':
+            if(!element.reverse && val > 0 ||
+                element.reverse && val < 0) {
+                val = 0;
+            }
+            break;
 
-        case 'toBack':
-          if((!element.reverse && val > 0 ) || (element.reverse && val < 0)) {
-            val = -val;
-          }
-          break;
-
+            case 'toBack':
+            if(!element.reverse && val > 0 ||
+                element.reverse && val < 0) {
+                val = -val;
+            }
+            break;
+        }
+    } else {
+        if(element.oneDirection == 'toBack') {
+            if( val > 1.999) val = 1.999
+            if( val < 0)  val = - val;
+            if( val > 1) val = 1 - (val % 1);
+        }
     }
 
     switch(element.propierties ) {
