@@ -39,9 +39,11 @@
   '../component/to-top/scss/toTop',
   '../component/threeGallery/scss/threeGallery',
   '../component/offset-slider/scss/offsetSlider.scss',
-  '../component/overlay/sass/_overlay.scss';
+  '../component/overlay/sass/_overlay.scss',
+  '../component/section/scss/section';
 
 // layout
 @import
   'layout/index',
+  'layout/footer',
   'layout/susy';

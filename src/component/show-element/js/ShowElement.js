@@ -17,6 +17,8 @@ class showElementClass {
       this.item = item;
       this.pos = pos;
       this.hide = hide;
+      this.firstActive = false;
+      this.onlyOnce = item.attr('data-onlyOnce') || false;
       this.startClass = item.attr('data-startClass');
       this.endClass = item.attr('data-endClass');
       this.calcPos = () => {
@@ -48,13 +50,18 @@ class showElementClass {
 
   checkPosition() {
     for (let index = 0; index < this.s.itemArray.length; index++) {
+
       const element = this.s.itemArray[index],
             postion = element.pos - eventManager.windowsHeight() + this.s.entryGap;
 
-      if( postion < eventManager.scrollTop() && element.hide) {
+      let isAble = true;
+      if(element.onlyOnce && element.firstActive) isAble = false;
+
+      if( postion < eventManager.scrollTop() && element.hide && isAble) {
         element.item.removeClass(element.startClass).addClass(element.endClass);
-        element.hide=false
-      } else if( postion >= eventManager.scrollTop() && !element.hide) {
+        element.hide=false;
+        element.firstActive = true;
+      } else if( postion >= eventManager.scrollTop() && !element.hide && isAble) {
         element.item.removeClass(element.endClass).addClass(element.startClass)
         element.hide = true
       }

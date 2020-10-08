@@ -1,0 +1,14 @@
+<!doctype html>
+html
+    head
+        include pug/head.pug
+
+    body
+        div(id="spriteSvg" data-svg="assets/svg/svg.svg")
+        header
+          .container.menu-container.menu-container--top
+            include component/navigation/pug/menu.pug
+        main
+            include component/section/pug/section.pug
+        
+    include pug/footer.pug

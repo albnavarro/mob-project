@@ -1,6 +1,6 @@
 "use strict";
 
-eventManager.init(false,true);
+eventManager.init(true,true);
 tGallery.init();
 parallaxBackground.init();
 parallax.init('JS');
@@ -8,6 +8,7 @@ fitImages.init();
 toolTip.init();
 totop.init();
 vh.init();
+section.init();
 
 
 // LIGHTBOX
