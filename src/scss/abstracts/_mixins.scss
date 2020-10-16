@@ -165,3 +165,106 @@
      @content;
   }
 }
+
+
+@mixin vwHeight() {
+    height: calc(100vh - 80px);
+    height: calc((var(--vh, 1vh) * 100) - 80px);
+
+    @include _mq('tablet') {
+        height: calc(100vh - 145px);
+        height: calc((var(--vh, 1vh) * 100) - 145px);
+    }
+}
+
+@function strip-unit($value) {
+    @return $value / ($value * 0 + 1);
+}
+
+@mixin fluid-type($min-vw, $max-vw, $min-font-size, $max-font-size) {
+    $u1: unit($min-vw);
+    $u2: unit($max-vw);
+    $u3: unit($min-font-size);
+    $u4: unit($max-font-size);
+
+    @if $u1 == $u2 and $u1 == $u3 and $u1 == $u4 {
+        & {
+            font-size: $min-font-size;
+            @media screen and (min-width: $min-vw) {
+                font-size: -webkit-calc(#{$min-font-size} + #{strip-unit($max-font-size - $min-font-size)} * ((100vw - #{$min-vw}) / #{strip-unit($max-vw - $min-vw)}));
+                font-size: calc(#{$min-font-size} + #{strip-unit($max-font-size - $min-font-size)} * ((100vw - #{$min-vw}) / #{strip-unit($max-vw - $min-vw)}));
+            }
+            @media screen and (min-width: $max-vw) {
+                font-size: $max-font-size;
+            }
+        }
+    }
+}
+
+// Read the article: http://sassbreak.com/viewport-relative-headings-with-sass
+
+// Function
+@function get-vw($target, $max-breakpoint-fluid) {
+  // 1 vw is equal to 1% of the viewport width
+  $vw-context: ($max-breakpoint-fluid * .01) * 1px; // 1% viewport width
+  @return ($target/$vw-context) * 1vw;
+}
+
+// Mixin
+@mixin vw($size, $max-breakpoint-fluid, $use-breakpoint: true) {
+  font-size: get-vw($size,$max-breakpoint-fluid);
+  // Prevent font-size from getting too big
+
+  @if $use-breakpoint {
+      @media (min-width: #{$max-breakpoint-fluid}px) {
+          font-size: $size;
+      }
+  }
+}
+
+@mixin fluidElementWH($imgW , $imgH, $max-breakpoint-fluid,  $use-breakpoint: true) {
+    $widthW: (100 * $imgW) / $max-breakpoint-fluid;
+    $heightH: (( $widthW * $imgH ) / $imgW );
+
+    height: $heightH * 1vw;
+    width: $widthW * 1vw;
+
+    @if $use-breakpoint {
+        @media (min-width: #{$max-breakpoint-fluid}px) {
+            width: $imgW * 1px;
+            height: $imgH * 1px;
+        }
+    }
+
+}
+
+@mixin fluidElementW($imgW, $max-breakpoint-fluid,  $use-breakpoint: true) {
+    $widthW: (100 * $imgW) / $max-breakpoint-fluid;
+    width: $widthW * 1vw;
+
+    @if $use-breakpoint {
+        @media (min-width: #{$max-breakpoint-fluid}px) {
+            width: $imgW * 1px;
+        }
+    }
+}
+
+@mixin resetBtn {
+    border: none;
+    margin: 0;
+    padding: 0;
+    width: auto;
+    overflow: visible;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    line-height: normal;
+    -webkit-font-smoothing: inherit;
+    -moz-osx-font-smoothing: inherit;
+    -webkit-appearance: none;
+
+    &::-moz-focus-inner {
+        border: 0;
+        padding: 0;
+    }
+}
