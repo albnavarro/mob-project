@@ -1,47 +1,51 @@
 class seriesClass {
 
-  constructor() {
-    this.s = {
-      arr: [],
-      index: 0
+    constructor() {
+        this.s = {
+            arr: [],
+            index: 0
+        }
     }
-  }
 
-  push(fn, context, last = false) {
-    if(!last) {
-      this.s.arr.push(fn.bind(context, this.next.bind(this)))
-    } else {
-      this.s.arr.push(fn.bind(context))
+    push(fn) {
+        this.s.arr.push(fn)
     }
-  }
 
-  go() {
-    this.s.index = 0;
-    const fn = this.s.arr[0]
-    this.s.index ++;
-    fn();
-  }
+    go() {
+        this.s.index = 0;
+        const fn = this.s.arr[0]
+        this.s.index++;
+        fn().then(() => {
+            this.next();
+        });
+    }
 
-  next() {
-    const fn = this.s.arr[this.s.index]
-    this.s.index ++;
-    fn();
-  }
+    next() {
+        const fn = this.s.arr[this.s.index]
+        if(this.s.index == this.s.arr.length) return;
+
+        this.s.index++;
+        fn().then(() => {
+            this.next();
+        });
+    }
 }
 
 // ISTANCE EXAMPLE:
 // const serie = new seriesClass();
-// serie.push(popToggle1.test, popToggle1);
-// serie.push(popToggle2.test, popToggle2);
-// serie.push(popToggle3.test, popToggle3, true);
+// serie.push(popToggle1.test.bind(popToggle1));
+// serie.push(popToggle2.test.bind(popToggle2));
+// serie.push(popToggle3.test.bind(popToggle3));
 // serie.go();
 
 
 // METHOD EXAMPLE:
 
-// test(callback = null) {
-//   setTimeout(() => {
-//     console.log(this.s.name);
-//     if(callback) callback();
-//   }, 1000)
+// test() {
+//     return new Promise((res) => {
+//         setTimeout(() => {
+//             console.log(this.s.name);
+//             res();
+//         }, 1000)
+//     });
 // }
