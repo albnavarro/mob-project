@@ -1,5 +1,3 @@
-import { eventManager } from "../base/eventManager.js";
-
 class vhClass {
 
   constructor(images,callback) {
@@ -30,7 +28,7 @@ class vhClass {
 
 }
 
-export const vh = new vhClass()
+const vh = new vhClass()
 
 // USAGE
 // .my-element {

@@ -13,7 +13,7 @@
  * @api public
  */
 
-export function debounce(func, wait, immediate){
+function debounce(func, wait, immediate){
   var timeout, args, context, timestamp, result;
   if (null == wait) wait = 100;
 

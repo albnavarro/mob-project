@@ -1,7 +1,3 @@
-import { eventManager } from "../../../js/base/eventManager.js";
-import { lightboxCommonDynamic } from "./lightbox-common-dynamic.js";
-import { lightBoxImage } from "./lightbox-image.js";
-
 class lightBoxImageSlideClass {
 
   constructor() {
@@ -120,4 +116,4 @@ class lightBoxImageSlideClass {
 
 }
 
-export const lightBoxImageSlide = new lightBoxImageSlideClass()
+const lightBoxImageSlide = new lightBoxImageSlideClass()

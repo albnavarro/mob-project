@@ -1,4 +1,4 @@
-export function findElement(el, callback) {
+function findElement(el, callback) {
     let start = null;
     const step = (timestamp) => {
         if (!start) start = timestamp;

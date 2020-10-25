@@ -1,4 +1,4 @@
-export class popToggleManagerClass {
+class popToggleManagerClass {
 
   constructor() {
     this.s = {

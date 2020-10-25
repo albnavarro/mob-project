@@ -1,37 +1,14 @@
-import { eventManager } from "./base/eventManager.js";
-import { vh } from "./utility/vh.js"
-import { parallax } from "../component/parallax/js/parallax.js";
-import { parallaxBackground } from "../component/parallax/js/parallaxBackground.js";
-import { tGallery } from "../component/threeGallery/js/threeGallery.js";
-import { showElement } from "../component/show-element/js/ShowElement.js"
-import { fitImages } from "../component/fit-images/js/fitImage.js"
-import { toolTip } from "../component/tooltip/js/tooltip.js"
-import { totop } from "../component/to-top/js/toTop.js"
-import { section } from "../component/section/js/section.js"
-import { offsetSliderClass } from "../component/offset-slider/js/offsetSlider.js"
-import { menuClass } from "../component/navigation/js/menu.js"
-import { accordionClass } from "../component/accordion/js/accordion.js"
-import { popToggleClass } from "../component/popToggle/js/popToggle.js"
-import { popToggleManagerClass } from "../component/popToggle/js/popToggleManager.js"
-import { overlayClass } from "../component/overlay/js/overlay.js"
-import { lightBoxClass } from "../component/lightbox/js/lightbox.js"
-
+"use strict";
 
 eventManager.init(true,true);
-parallax.init('JS');
 tGallery.init();
 parallaxBackground.init();
-showElement.init();
+parallax.init('JS');
 fitImages.init();
 toolTip.init();
 totop.init();
 vh.init();
 section.init();
-
-const offsetSlider = new offsetSliderClass({
-    container: '.offset-slider',
-    step: 8
-})
 
 
 // LIGHTBOX
@@ -64,8 +41,6 @@ const lightVideo = new lightBoxClass({
     });
 
 
-
-
 // MENU
 const menu = new menuClass({
       componentWrepper: '.menu-container--top'
@@ -79,7 +54,12 @@ const sidebarMenu = new menuClass({
     });
 
 
-// POPTOGGLE
+// OFFSETSLIDER
+const offsetSlider = new offsetSliderClass({
+    container: '.offset-slider',
+    step: 8
+})
+
 // TEST CALLBACK
 function callback1() {
     console.log('callback open');
@@ -89,6 +69,7 @@ function callback2() {
     console.log('callback close');
 }
 
+// POPTOGGLE
 const popToggleManager = new popToggleManagerClass();
 const overlay = new overlayClass({element: '#overlay--comp', delay: 300})
 overlay.callback = popToggleManager.closeAllPop.bind(popToggleManager);
@@ -148,7 +129,6 @@ const popToggle3 = new popToggleClass({
 
 
 
-
 // ACCORDION
 const accordion = new accordionClass({
     item: '.accrdion-item',
@@ -160,6 +140,7 @@ const accordion = new accordionClass({
 
 });
 // ACCORDION
+
 
 // Provvisorio
 const forceResize = () => {

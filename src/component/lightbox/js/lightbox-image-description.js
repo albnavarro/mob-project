@@ -1,5 +1,3 @@
-import { eventManager } from "../../../js/base/eventManager.js";
-
 class lightImageDescriptionClass {
 
   constructor() {
@@ -48,4 +46,4 @@ class lightImageDescriptionClass {
 
 }
 
-export const lightImageDescription = new lightImageDescriptionClass()
+const lightImageDescription = new lightImageDescriptionClass()

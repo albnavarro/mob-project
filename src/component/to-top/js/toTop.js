@@ -1,5 +1,3 @@
-import { eventManager } from "../../../js/base/eventManager.js";
-
 class totopClass {
 
   constructor() {
@@ -40,4 +38,4 @@ class totopClass {
 
 }
 
-export const totop = new totopClass()
+const totop = new totopClass()

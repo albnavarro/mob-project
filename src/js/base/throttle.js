@@ -1,4 +1,4 @@
-export function throttle(fn, threshhold, scope){
+function throttle(fn, threshhold, scope){
   threshhold || (threshhold = 250);
     var last,
         deferTimer;

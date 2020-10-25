@@ -1,7 +1,3 @@
-import { eventManager } from "../../../js/base/eventManager.js";
-import { lightImageDescription } from "./lightbox-image-description.js";
-import { lightboxCommonDynamic } from "./lightbox-common-dynamic.js";
-
 class lightBoxVideoClass {
 
   constructor() {
@@ -57,4 +53,4 @@ class lightBoxVideoClass {
 
 }
 
-export const lightBoxVideo = new lightBoxVideoClass()
+const lightBoxVideo = new lightBoxVideoClass()

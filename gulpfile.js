@@ -27,19 +27,13 @@ const
   htmlmin = require('gulp-htmlmin'),
   imagemin = require('gulp-imagemin'),
   pug = require('gulp-pug'),
-  // babel = require("gulp-babel"),
+  babel = require("gulp-babel"),
   rev = require('gulp-rev'),
   revdel = require('rev-del'),
   del = require('del'),
   merge = require('gulp-merge-json'),
   replace = require('gulp-string-replace'),
   reload = browserSync.reload,
-
-
-  rollup = require('gulp-better-rollup'),
-  babel = require('rollup-plugin-babel'),
-  resolve = require('rollup-plugin-node-resolve'),
-  commonjs = require('rollup-plugin-commonjs'),
 
   themePath = path.resolve('src'),
   destPath = path.resolve('www'),
@@ -139,16 +133,47 @@ function minifyAssetsLoading() {
 
 
 function js() {
-    return gulp.src([
-          path.join(`src/library/js/modernizr.js`),
-          path.join(jsFiles),
-          path.join(`!src/js/async-assets-loading.js`),
-          path.join(componentJsFiles)
-      ])
-      .pipe(rollup({ plugins: [babel(), resolve(), commonjs()] }, 'umd'))
-      .pipe(concat('main.js'))
-      .pipe(gulp.dest(jsDest));
+  return gulp.src([
+      path.join(jsPath, 'extra/SmoothScroll.js'),
+      path.join(jsPath, 'base/debounce.js'),
+      path.join(jsPath, 'base/raf.js'),
+      path.join(jsPath, 'base/throttle.js'),
+      path.join(jsPath, 'base/modernizr.js'),
+      path.join(jsPath, 'base/eventManager.js'),
+      path.join(jsPath, 'base/mediaManager.js'),
+      path.join(jsPath, 'utility/loadImages.js'),
+      path.join(jsPath, 'utility/vh.js'),
+      path.join(jsPath, 'utility/series.js'),
+      path.join(jsPath, 'utility/findElement.js'),
+      path.join(componentPath, 'tooltip/js/tooltip.js'),
+      path.join(componentPath, 'to-top/js/toTop.js'),
+      path.join(componentPath, 'fit-images/js/fitImage.js'),
+      path.join(componentPath, 'parallax/js/parallaxBackground.js'),
+      path.join(componentPath, 'parallax/js/parallax.js'),
+      path.join(componentPath, 'navigation/js/menu.js'),
+      path.join(componentPath, 'lightbox/js/lightbox.js'),
+      path.join(componentPath, 'lightbox/js/lightbox-image.js'),
+      path.join(componentPath, 'lightbox/js/lightbox-image-slide.js'),
+      path.join(componentPath, 'lightbox/js/lightbox-image-description.js'),
+      path.join(componentPath, 'lightbox/js/lightbox-common-dynamic.js'),
+      path.join(componentPath, 'lightbox/js/lightbox-video.js'),
+      path.join(componentPath, 'show-element/js/ShowElement.js'),
+      path.join(componentPath, 'threeGallery/js/threeGallery.js'),
+      path.join(componentPath, 'offset-slider/js/offsetSlider.js'),
+      path.join(componentPath, 'popToggle/js/popToggle.js'),
+      path.join(componentPath, 'popToggle/js/popToggleManager.js'),
+      path.join(componentPath, 'overlay/js/overlay.js'),
+      path.join(componentPath, 'accordion/js/accordion.js'),
+      path.join(componentPath, 'section/js/section.js'),
+      path.join(jsPath, 'index.js'),
+    ])
+    .pipe(concat('main.js'))
+    .pipe(wrap('(function($){<%= contents %>})(jQuery)'))
+    .pipe(babel())
+    .pipe(gulp.dest(jsDest))
+
 };
+
 
 
 

@@ -1,5 +1,3 @@
-import { eventManager } from "../../../js/base/eventManager.js";
-
 class showElementClass {
 
   constructor(data) {
@@ -71,4 +69,4 @@ class showElementClass {
   }
 }
 
-export const showElement = new showElementClass()
+const showElement = new showElementClass()

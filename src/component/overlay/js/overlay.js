@@ -1,6 +1,4 @@
-import { eventManager } from "../../../js/base/eventManager.js";
-
-export class overlayClass {
+class overlayClass {
 
   constructor(data) {
       this.s = {

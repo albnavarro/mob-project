@@ -1,5 +1,3 @@
-import { eventManager } from "../../../js/base/eventManager.js";
-
 class toolTipClass {
 
   constructor() {
@@ -146,4 +144,4 @@ class toolTipClass {
 
 }
 
-export const toolTip = new toolTipClass()
+const toolTip = new toolTipClass()
