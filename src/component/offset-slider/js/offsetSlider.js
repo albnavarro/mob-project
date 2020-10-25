@@ -1,4 +1,6 @@
-class offsetSliderClass {
+import { eventManager } from "../../../js/base/eventManager.js";
+
+export class offsetSliderClass {
 
   constructor(data) {
     this.s = {

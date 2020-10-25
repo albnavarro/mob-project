@@ -1,4 +1,7 @@
-class accordionClass {
+import { eventManager } from "../../../js/base/eventManager.js";
+import { mq } from "../../../js/base/mediaManager.js";
+
+export class accordionClass {
 
   constructor(data) {
 

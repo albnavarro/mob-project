@@ -1,4 +1,6 @@
-class popToggleClass {
+import { eventManager } from "../../../js/base/eventManager.js";
+
+export class popToggleClass {
 
   constructor(data) {
       this.s = {

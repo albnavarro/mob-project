@@ -1,4 +1,4 @@
-class seriesClass {
+export class seriesClass {
 
     constructor() {
         this.s = {

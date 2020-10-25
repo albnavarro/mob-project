@@ -1,3 +1,5 @@
+import { eventManager } from "../../../js/base/eventManager.js";
+
 class parallaxClass {
 
   constructor() {
@@ -373,4 +375,4 @@ class parallaxClass {
   }
 }
 
-const parallax = new parallaxClass()
+export const parallax = new parallaxClass()

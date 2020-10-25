@@ -1,4 +1,4 @@
-class loadImages {
+export class loadImages {
 
   constructor(images,callback) {
     this.s = {

@@ -1,11 +1,15 @@
 {
-  "name": "mob project",
+  "name": "wp-skeleton",
   "version": "1.0.0",
   "description": "Blank project",
   "main": "gulpfile.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
-   },
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://albertonav@bitbucket.org/albertonav/landing-mobbu.git"
+  },
   "author": "Mobbu",
   "license": "MIT",
   "homepage": "",
@@ -18,7 +22,6 @@
     "debounce": "^1.2.0",
     "del": "^5.1.0",
     "fontfaceobserver": "^2.1.0",
-    "gulp": "^4.0.2",
     "gulp-concat": "^2.6.1",
     "gulp-cssmin": "^0.2.0",
     "gulp-htmlmin": "^5.0.1",
@@ -49,10 +52,16 @@
     "susy": "^3.0.5"
   },
   "devDependencies": {
-    "@babel/core": "^7.7.5",
+    "@babel/core": "^7.12.3",
     "@babel/preset-env": "^7.7.6",
     "fs": "0.0.1-security",
+    "gulp": "^4.0.2",
     "gulp-babel": "^8.0.0",
-    "gulp-notify": "^3.2.0"
+    "gulp-better-rollup": "^4.0.1",
+    "gulp-notify": "^3.2.0",
+    "rollup": "^2.32.1",
+    "rollup-plugin-babel": "^4.4.0",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-node-resolve": "^5.2.0"
   }
 }

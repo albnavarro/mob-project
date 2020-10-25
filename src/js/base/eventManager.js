@@ -1,3 +1,6 @@
+import { debounce } from "./debounce.js";
+import { throttle } from "./throttle.js";
+
 class eventManagerClass {
 
   constructor() {
@@ -182,4 +185,4 @@ class eventManagerClass {
   }
 }
 
-const eventManager = new eventManagerClass()
+export const eventManager = new eventManagerClass();

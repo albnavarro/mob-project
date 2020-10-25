@@ -12,3 +12,4 @@ www/assets/data/*.*
 www/assets/js/async-assets-loading.min.js
 www/**/*.html
 /config.json
+.DS_Store
