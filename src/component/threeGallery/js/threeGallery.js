@@ -1,3 +1,5 @@
+import { eventManager } from "../../../js/base/eventManager.js";
+
 class tGalleryClass {
 
   constructor() {
@@ -111,4 +113,4 @@ class tGalleryClass {
   }
 }
 
-const tGallery = new tGalleryClass()
+export const tGallery = new tGalleryClass()

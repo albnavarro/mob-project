@@ -1,3 +1,5 @@
+import { eventManager } from "../../../js/base/eventManager.js";
+
 class fitImagesClass {
 
   constructor() {
@@ -52,4 +54,4 @@ class fitImagesClass {
 
 }
 
-const fitImages = new fitImagesClass()
+export const fitImages = new fitImagesClass()

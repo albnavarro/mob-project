@@ -1,3 +1,5 @@
+import { eventManager } from "../../../js/base/eventManager.js";
+
 class lightboxCommonDynamicClass {
 
   constructor() {
@@ -56,4 +58,4 @@ class lightboxCommonDynamicClass {
 
 }
 
-const lightboxCommonDynamic = new lightboxCommonDynamicClass()
+export const lightboxCommonDynamic = new lightboxCommonDynamicClass()

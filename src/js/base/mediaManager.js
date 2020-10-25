@@ -1,4 +1,6 @@
-var mq = {
+import { eventManager } from "./eventManager.js";
+
+export const mq = {
 
   $: {
     'x-small': '320',

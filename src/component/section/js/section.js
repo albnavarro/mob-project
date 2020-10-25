@@ -1,3 +1,5 @@
+import { eventManager } from "../../../js/base/eventManager.js";
+
 class sectionClass {
 
     constructor() {
@@ -127,4 +129,4 @@ class sectionClass {
 
 }
 
-const section = new sectionClass()
+export const section = new sectionClass()

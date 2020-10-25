@@ -1,3 +1,6 @@
+import { eventManager } from "../../../js/base/eventManager.js";
+import { modernzier } from "../../../js/utility/modernizr.js"
+
 class parallaxBackgroundClass {
 
   constructor() {
@@ -131,4 +134,4 @@ class parallaxBackgroundClass {
   }
 }
 
-const parallaxBackground = new parallaxBackgroundClass()
+export const parallaxBackground = new parallaxBackgroundClass()

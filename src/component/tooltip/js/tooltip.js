@@ -1,3 +1,6 @@
+import { eventManager } from "../../../js/base/eventManager.js";
+import { modernzier } from "../../../js/utility/modernizr.js"
+
 class toolTipClass {
 
   constructor() {
@@ -144,4 +147,4 @@ class toolTipClass {
 
 }
 
-const toolTip = new toolTipClass()
+export const toolTip = new toolTipClass()

@@ -1,4 +1,11 @@
-class lightBoxClass {
+import { eventManager } from "../../../js/base/eventManager.js";
+import { lightImageDescription } from "./lightbox-image-description.js";
+import { lightboxCommonDynamic } from "./lightbox-common-dynamic.js";
+import { lightBoxImage } from "./lightbox-image.js";
+import { lightBoxImageSlide } from "./lightbox-image-slide.js";
+import { lightBoxVideo } from "./lightbox-video.js";
+
+export class lightBoxClass {
 
   constructor(data) {
     this.s = {

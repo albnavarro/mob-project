@@ -1,4 +1,8 @@
-class menuClass {
+import { modernzier } from "../../../js/utility/modernizr.js"
+import { eventManager } from "../../../js/base/eventManager.js";
+import { mq } from "../../../js/base/mediaManager.js";
+
+export class menuClass {
 
   constructor(data) {
     this.s = {
