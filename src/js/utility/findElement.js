@@ -1,20 +1,28 @@
-export function findElement(el, callback) {
-    let start = null;
-    const step = (timestamp) => {
-        if (!start) start = timestamp;
-        const progress = timestamp - start;
-        const $el = $(`${el}`);
+export function findElement(el) {
+    return new Promise((res, reject) => {
+        let start = null;
+        const step = (timestamp) => {
+            if (!start) start = timestamp;
+            const progress = timestamp - start;
+            const $el = $(`${el}`);
 
-        if ($el.length) {
-            callback();
-        }
+            if ($el.length) {
+                res();
+            }
 
-        if (progress < 10000 && $el.length == 0) {
-            window.requestAnimationFrame(step);
+            if (progress < 3000 && $el.length == 0) {
+                window.requestAnimationFrame(step);
+            } else {
+                reject();
+            }
         }
-    }
-    window.requestAnimationFrame(step)
+        window.requestAnimationFrame(step)
+    });
 }
 
 // USAGE
-// findElement('.class', this.callback.bind(this))
+// findElement('.myclass').then(() => {
+//     console.log('founded')
+// }).catch(() => {
+//     console.log('not found');
+// });

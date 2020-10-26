@@ -16,6 +16,7 @@ import { popToggleClass } from "../component/popToggle/js/popToggle.js"
 import { popToggleManagerClass } from "../component/popToggle/js/popToggleManager.js"
 import { overlayClass } from "../component/overlay/js/overlay.js"
 import { lightBoxClass } from "../component/lightbox/js/lightbox.js"
+import { findElement } from "./utility/findElement.js"
 
 eventManager.init(true,true);
 parallax.init('JS');
@@ -32,6 +33,14 @@ const offsetSlider = new offsetSliderClass({
     container: '.offset-slider',
     step: 8
 })
+
+// FIND ELEMENT
+findElement('.offset-slider').then(() => {
+    console.log('founded')
+}).catch(() => {
+    console.log('not found');
+});
+
 
 
 // LIGHTBOX
