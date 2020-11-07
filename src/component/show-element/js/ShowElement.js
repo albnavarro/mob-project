@@ -5,8 +5,7 @@ class showElementClass {
   constructor(data) {
     this.s = {
       $item: $("*[data-conponent='m-comp--toggleEl']"),
-      itemArray: [],
-      entryGap: eventManager.windowsHeight()/6
+      itemArray: []
     }
 
     this.init();
@@ -20,11 +19,18 @@ class showElementClass {
       this.pos = pos;
       this.hide = hide;
       this.firstActive = false;
-      this.onlyOnce = item.attr('data-onlyOnce') || false;
+      this.useOtherPosition = (this.item.attr('data-otherPos') || null );
+      this.OtherPositionGap = (this.item.attr('data-otherPosGap') || 0 );
+      this.onlyOnce = item.attr('data-onlyOnce') || null;
       this.startClass = item.attr('data-startClass');
+      this.gap = (parseInt(this.item.attr('data-gap')) || 100 );
       this.endClass = item.attr('data-endClass');
       this.calcPos = () => {
-          this.pos=this.item.offset().top;
+          if(this.useOtherPosition == null) {
+            this.pos = parseInt(this.item.offset().top);
+          } else {
+            this.pos = parseInt($(this.useOtherPosition).offset().top) + parseInt(this.OtherPositionGap);
+          }
       }
     }
 
@@ -46,7 +52,6 @@ class showElementClass {
 
       item.calcPos();
     }
-    this.s.entryGap = eventManager.windowsHeight()/6
     this.checkPosition()
   }
 
@@ -54,10 +59,10 @@ class showElementClass {
     for (let index = 0; index < this.s.itemArray.length; index++) {
 
       const element = this.s.itemArray[index],
-            postion = element.pos - eventManager.windowsHeight() + this.s.entryGap;
+            postion = element.pos - eventManager.windowsHeight() + element.gap;
 
       let isAble = true;
-      if(element.onlyOnce && element.firstActive) isAble = false;
+      if(element.onlyOnce != null && element.firstActive) isAble = false;
 
       if( postion < eventManager.scrollTop() && element.hide && isAble) {
         element.item.removeClass(element.startClass).addClass(element.endClass);
