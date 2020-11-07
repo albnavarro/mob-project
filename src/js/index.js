@@ -1,4 +1,4 @@
-import { } from "./extra/SmoothScroll.js"
+// import { } from "./extra/SmoothScroll.js"
 import { eventManager } from "./base/eventManager.js";
 import { vh } from "./utility/vh.js"
 import { parallax } from "../component/parallax/js/parallax.js";
