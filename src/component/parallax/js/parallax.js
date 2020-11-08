@@ -258,14 +258,9 @@ class parallaxClass {
 
             if(element.fixedRange != null) {
 
-                let fullSize = eventManager.windowsHeight();
-                if(element.scalable != null && element.propierties == "horizontal") {
-                    const fullSize = eventManager.windowsWidth();
-                }
-
+                const fullSize = eventManager.windowsHeight();
                 const endPos = ((fullSize / 100) * element.fixedRange);
                 const inMotion = -((eventManager.scrollTop() - element.offset) * element.fixedRange) / 100;
-
 
                 if(eventManager.scrollTop() + eventManager.windowsHeight() < element.offset) {
                     element.endValue = (element.fromCalculatedValue) ? endPos : 0;
