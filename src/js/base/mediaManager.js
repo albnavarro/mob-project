@@ -2,7 +2,7 @@ import { eventManager } from "./eventManager.js";
 
 export const mq = {
 
-  $: {
+  s: {
     'x-small': '320',
     'small':   '360',
     'medium':  '600',
@@ -13,10 +13,10 @@ export const mq = {
   },
 
   max: function(breakpoint) {
-    return eventManager.windowsWidth() < mq.$[breakpoint];
+    return eventManager.windowsWidth() < mq.s[breakpoint];
   },
 
   min: function(breakpoint) {
-    return eventManager.windowsWidth() >= mq.$[breakpoint];
+    return eventManager.windowsWidth() >= mq.s[breakpoint];
   }
 }

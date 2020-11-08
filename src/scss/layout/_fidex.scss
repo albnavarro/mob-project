@@ -1,0 +1,22 @@
+.fixed {
+    &__content {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%
+    }
+
+    &__dummy {
+        height: 100vh;
+        border: 1px $black solid;
+    }
+}
+
+.test-item {
+    width: 200px;
+    height: 200px;
+    background-color: #ccc;
+}

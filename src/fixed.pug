@@ -1,0 +1,64 @@
+<!doctype html>
+html
+    head
+        include pug/head.pug
+
+    body
+        div(id="spriteSvg" data-svg="assets/svg/svg.svg")
+        header
+          .container.menu-container.menu-container--top
+            include component/navigation/pug/menu.pug
+        .fixed.container
+            .fixed__container
+                .fixed__content.container
+                    .parallax__container
+                        .parallax__item(
+                            data-conponent='m-comp--parallax',
+                            data-ease="linear",
+                            data-fixedRange="60",
+                            data-scalable="true",
+                            data-otherPos=".fixed__dummy--1",
+                            data-oneDirection="toStop",
+                            data-reverse="true",
+                            data-fromCalculatedValue="true"
+                            data-limiter="true",
+                            data-propierties="vertical")
+                            .parallax__item(
+                                data-conponent='m-comp--parallax',
+                                data-ease="linear",
+                                data-fixedRange="60",
+                                data-scalable="true",
+                                data-otherPos=".fixed__dummy--2",
+                                data-oneDirection="toStop",
+                                data-limiter="true",
+                                data-propierties="horizontal")
+                                .parallax__item(
+                                    data-conponent='m-comp--parallax',
+                                    data-ease="linear",
+                                    data-fixedRange="60",
+                                    data-scalable="true",
+                                    data-otherPos=".fixed__dummy--3",
+                                    data-oneDirection="toStop",
+                                    data-reverse="true",
+                                    data-limiter="true",
+                                    data-propierties="horizontal")
+                                    .parallax__item(
+                                        data-conponent='m-comp--parallax',
+                                        data-ease="linear",
+                                        data-fixedRange="280",
+                                        data-scalable="true",
+                                        data-otherPos=".fixed__dummy--4",
+                                        data-oneDirection="toStop",
+                                        data-limiter="true",
+                                        data-reverse="true",
+                                        data-propierties="scale")
+                                        .test-item
+                .fixed__dummy.fixed__dummy--1
+                .fixed__dummy.fixed__dummy--2
+                .fixed__dummy.fixed__dummy--3
+                .fixed__dummy.fixed__dummy--4
+                .fixed__dummy.fixed__dummy--5
+                .fixed__dummy.fixed__dummy--6
+                
+        include pug/footer.pug
+        

@@ -47,6 +47,16 @@ class parallaxClass {
             this.startValue = 0
             this.prevValue = 0
             this.height = 0
+            // used with fixed and data-otherPos element move object by value
+            // priority 1 with this data-atribute data-align is disabled
+            // data-otherPos must lined to element in 100vh
+            this.fixedRange = (this.item.attr('data-fixedRange') || null),
+            // use with data-fixedRange set value to vw and vh
+            this.scalable = (this.item.attr('data-scalable') || null),
+            // use with data-fixedRange revert end value and start value, and substrct end value to calculation
+            // useful to first item
+            this.fromCalculatedValue = (this.item.attr('data-fromCalculatedValue') || null),
+            // set breackpoint
             this.breackpoint = this.item.attr('data-breackpoint') || 'desktop',
             this.queryType = this.item.attr('data-queryType') || 'min',
             // Use other dome lement for cal height an position
@@ -245,65 +255,87 @@ class parallaxClass {
         // Esegui i colcoli solo se l'lemento è visibile nello schemro
         if( this.isInViewport(element) || element.limiter != null) {
 
-            // Check if top-bottom etc.. or custom numer
-            const alignIsNotaNumaber = isNaN(element.align);
 
-            if (element.propierties == 'opacity') {
-                const vhLimit = (eventManager.windowsHeight() / 100 * element.opacityEnd);
-                const vhStart = eventManager.windowsHeight() - (eventManager.windowsHeight() / 100 * element.opacityStart);
+            if(element.fixedRange != null) {
 
-                let opacityVal = 0;
-                if (element.align == 'start') {
-                    opacityVal = -eventManager.scrollTop();
-                } else {
-                    opacityVal = (eventManager.scrollTop() + vhLimit - element.offset);
+                let fullSize = eventManager.windowsHeight();
+                if(element.scalable != null && element.propierties == "horizontal") {
+                    const fullSize = eventManager.windowsWidth();
                 }
 
-                opacityVal = opacityVal * -1;
+                const endPos = ((fullSize / 100) * element.fixedRange);
+                const inMotion = -((eventManager.scrollTop() - element.offset) * element.fixedRange) / 100;
 
-                if (element.align == 'start') {
-                    opacityVal = 1 - opacityVal / element.offset;
+
+                if(eventManager.scrollTop() + eventManager.windowsHeight() < element.offset) {
+                    element.endValue = (element.fromCalculatedValue) ? endPos : 0;
+                }  else if (eventManager.scrollTop() + eventManager.windowsHeight() > element.offset + element.height) {
+                    element.endValue = (element.fromCalculatedValue) ? 0 : - endPos;
                 } else {
-                    opacityVal = 1 - opacityVal / (eventManager.windowsHeight() - vhStart - vhLimit);
+                    element.endValue = (element.fromCalculatedValue) ? inMotion : inMotion - endPos;
                 }
-
-                element.endValue = opacityVal.toFixed(2);
 
             } else {
 
-                if (alignIsNotaNumaber) {
-                    // Prefixed align
-                    switch (element.align) {
-                        case 'start':
+                // Check if top-bottom etc.. or custom numer
+                const alignIsNotaNumaber = isNaN(element.align);
+
+                if (element.propierties == 'opacity') {
+                    const vhLimit = (eventManager.windowsHeight() / 100 * element.opacityEnd);
+                    const vhStart = eventManager.windowsHeight() - (eventManager.windowsHeight() / 100 * element.opacityStart);
+
+                    let opacityVal = 0;
+                    if (element.align == 'start') {
+                        opacityVal = -eventManager.scrollTop();
+                    } else {
+                        opacityVal = (eventManager.scrollTop() + vhLimit - element.offset);
+                    }
+
+                    opacityVal = opacityVal * -1;
+
+                    if (element.align == 'start') {
+                        opacityVal = 1 - opacityVal / element.offset;
+                    } else {
+                        opacityVal = 1 - opacityVal / (eventManager.windowsHeight() - vhStart - vhLimit);
+                    }
+
+                    element.endValue = opacityVal.toFixed(2);
+
+                } else {
+
+                    if (alignIsNotaNumaber) {
+                        // Prefixed align
+                        switch (element.align) {
+                            case 'start':
                             element.endValue = (eventManager.scrollTop() / element.distance);
                             break;
 
-                        case 'top':
+                            case 'top':
                             element.endValue = (((eventManager.scrollTop() - element.offset) / element.distance));
                             break;
 
-                        case 'center':
+                            case 'center':
                             element.endValue = ((((eventManager.scrollTop() + (eventManager.windowsHeight() / 2 - element.height / 2)) - element.offset) / element.distance));
                             break;
 
-                        case 'bottom':
+                            case 'bottom':
                             element.endValue = ((((eventManager.scrollTop() + (eventManager.windowsHeight() - element.height)) - element.offset) / element.distance));
                             break;
 
-                        case 'end':
+                            case 'end':
                             element.endValue = -((eventManager.documentHeight() - (eventManager.scrollTop() + eventManager.windowsHeight())) / element.distance);
                             break;
+                        }
+                    } else {
+                        // VH Align
+                        element.endValue = ((((eventManager.scrollTop() + (eventManager.windowsHeight() / 100 * element.align)) - element.offset) / element.distance));
                     }
-                } else {
-                    // VH Align
-                    element.endValue = ((((eventManager.scrollTop() + (eventManager.windowsHeight() / 100 * element.align)) - element.offset) / element.distance));
-                }
 
-                element.endValue = element.endValue.toFixed(this.s.toFixedValue) / 2;
+                    element.endValue = element.endValue.toFixed(this.s.toFixedValue) / 2;
+                }
             }
 
             if (!applyStyle) return;
-
             element.item.css(this.setStyle(element, element.endValue));
         }
     }
@@ -326,38 +358,51 @@ class parallaxClass {
             }
         }
 
-        // CHECK ONE DIRECTION ToStop/ToBack
-        if (element.propierties != 'opacity') {
-            switch (element.oneDirection) {
-                case 'toStop':
-                    if (!element.reverse && val > 0 ||
-                        element.reverse && val < 0) {
-                        val = 0;
-                    }
-                    break;
 
-                case 'toBack':
+        // CHECK ONE DIRECTION ToStop/ToBack
+        if(element.fixedRange == null) {
+            if (element.propierties != 'opacity') {
+                switch (element.oneDirection) {
+                    case 'toStop':
                     if (!element.reverse && val > 0 ||
                         element.reverse && val < 0) {
-                        val = -val;
-                    }
-                    break;
-            }
-        } else {
-            if (element.oneDirection == 'toBack') {
-                if (val > 1.999) val = 1.999
-                if (val < 0) val = -val;
-                if (val > 1) val = 1 - (val % 1);
+                            val = 0;
+                        }
+                        break;
+
+                        case 'toBack':
+                        if (!element.reverse && val > 0 ||
+                            element.reverse && val < 0) {
+                                val = -val;
+                            }
+                            break;
+                        }
+            } else {
+                if (element.oneDirection == 'toBack') {
+                    if (val > 1.999) val = 1.999
+                    if (val < 0) val = -val;
+                    if (val > 1) val = 1 - (val % 1);
+                }
             }
         }
 
         switch (element.propierties) {
             case 'vertical':
-                style[this.s.transformProperty] = `translate3d(0,0,0) translateY(${val}px)`;
+                if(element.scalable != null && element.fixedRange != null) {
+                    const value = (val * element.fixedRange) / eventManager.windowsHeight();
+                    style[this.s.transformProperty] = `translate3d(0,0,0) translateY(${value}vh)`;
+                } else {
+                    style[this.s.transformProperty] = `translate3d(0,0,0) translateY(${val}px)`;
+                }
                 break;
 
             case 'horizontal':
-                style[this.s.transformProperty] = `translate3d(0,0,0) translateX(${val}px)`;
+                if(element.scalable != null && element.fixedRange != null) {
+                    const value = (val * element.fixedRange) / eventManager.windowsHeight();
+                    style[this.s.transformProperty] = `translate3d(0,0,0) translateX(${value}vw)`;
+                } else {
+                    style[this.s.transformProperty] = `translate3d(0,0,0) translateX(${val}px)`;
+                }
                 break;
 
             case 'rotate':
