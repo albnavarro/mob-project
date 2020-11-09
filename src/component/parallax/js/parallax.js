@@ -4,26 +4,19 @@ import { mq } from "../../../js/base/mediaManager.js";
 
 class parallaxClass {
     constructor() {
-        if (!parallaxClass.instance) {
-            this.s = {
-                $parallaxItem: $("*[data-conponent='m-comp--parallax']"),
-                itemArray: [],
-                transformProperty: Modernizr.prefixed('transform'),
+        this.s = {
+            $parallaxItem: $("*[data-conponent='m-comp--parallax']"),
+            itemArray: [],
+            transformProperty: Modernizr.prefixed('transform'),
 
-                // SMOOTH JS
-                smoothCss: 'CSS',
-                smoothJs: 'JS',
-                smoothType: '',
-                req: null,
-                toFixedValue: 1
-            }
-            parallaxClass.instance = this;
+            // SMOOTH JS
+            smoothCss: 'CSS',
+            smoothJs: 'JS',
+            smoothType: '',
+            req: null,
+            toFixedValue: 1
         }
-        return parallaxClass.instance;
     }
-
-
-
 
     init(smoothType = this.s.smoothCss) {
         let _smoothType = smoothType
@@ -47,50 +40,84 @@ class parallaxClass {
             this.startValue = 0
             this.prevValue = 0
             this.height = 0
-            // used with fixed and data-otherPos element move object by value
-            // priority 1 with this data-atribute data-align is disabled
-            // data-otherPos must lined to element in 100vh
+
+            // default: use distance ( 1 - 10 ) to compute value
+            // fixed: use fixedRange to compute value
+            this.computationType = (this.item.attr('data-computationType') || 'default'),
+
+
+            // FIXED STYLE propierties
+
+            // move element by percentage of item height 0 up to 100 ore more
+            // 100 is 100% of item height
+            // oneDirection ( toStop to back is disabled )
+            // ENABLE ONLY WITH COMPUTATIONTYPE SET TO FIXED
+            // MANDATORY limiterOff ENABLED
             this.fixedRange = (this.item.attr('data-fixedRange') || null),
-            // use with data-fixedRange set value to vw and vh
+
+            // use this attribute with data-fixedRange: convert value to vw and vh
+            // ENABLE ONLY WITH COMPUTATIONTYPE SET TO FIXED
             this.scalable = (this.item.attr('data-scalable') || null),
-            // use with data-fixedRange revert end value and start value, and substrct end value to calculation
-            // useful to first item
+
+            // use with data-fixedRange revert end value and start value, and substract end value to calculation
+            // useful to preserve layout align on first item
+            // ENABLE ONLY WITH COMPUTATIONTYPE SET TO FIXED
             this.fromCalculatedValue = (this.item.attr('data-fromCalculatedValue') || null),
+
+            // WE HAVE NO OPACITY WITH FIXED STYLE propierties, TO BE UPDATED
+
+
+            // DEFAULT propierties
+
             // set breackpoint
             this.breackpoint = this.item.attr('data-breackpoint') || 'desktop',
             this.queryType = this.item.attr('data-queryType') || 'min',
-            // Use other dome lement for cal height an position
-            // If you have a fixed position is udeful
+
+            // computation of element scrollTop and Height form other DOM element
             this.useOtherPosition = (this.item.attr('data-otherPos') || null)
+
             // updates the item even if it is out of the viewport
-            // usefull on lement in fixed/sticky positon and data-otherPos on.
-            this.limiter = (this.item.attr('data-limiter') || null)
+            // usefull on element in fixed/sticky positon and data-otherPos on.
+            // mandatory whith computationType set to fixed
+            this.limiterOff = (this.item.attr('data-limiterOff') || null)
+
             // 1 - 10 , 10 = more distance,  1 = less distance
             this.distance = (this.item.attr('data-distance') || 8)
+
             // 1 - 10,  10 = quick, 1 = slow
             this.jsVelocity = (this.item.attr('data-jsVelocity') || 8)
+
             // true - false: Bollean alla vuol make true response
             this.reverse = (this.item.attr('data-reverse') || false)
+
             // toStop - toBack
-            // In case Opacity only toBack is acrtive ( default is toStop)
-            // In the case recommended start point at 100
+            // In case Opacity only toBack is active ( default is toStop)
+            // In the case recomended start point at 100
             this.oneDirection = (this.item.attr('data-oneDirection') || '')
-            // start - top -center - bottom - end - number 1-100 (vh postion)
+
+            // start - top -center - bottom - end - number: 1-100 (vh postion respect windowsHeight)
             // omn opacity work only start
             this.align = (this.item.attr('data-align') || 'top')
+
             // 100 = bottom , opacityStart must be grater then opacityEnd
             // with 'align=start' opacityStart have no effect
             this.opacityStart = (this.item.attr('data-opacityStart') || 100)
+
             // 0 = top
             // with 'align=start' opacityStart have no effect
             this.opacityEnd = (this.item.attr('data-opacityEnd') || 0)
+
             // linear - smooth
+            // se instance smoothtype ( 'CSS' or 'JS')
+            // es: parallax.init('JS');
             this.ease = (this.item.attr('data-ease') || 'linear')
+
             // vertical - horizontal - rotate - opacity - scale
-            // with 'opacity' the align have no effect
+            // with 'opacity' the align have no effect, is enabled only "start' value for element in top of page
             // with 'opacity' distance have no effect
             // with 'opacity' in 'smooth mode' uggest to use jsVelocity hight like 8
             this.propierties = (this.item.attr('data-propierties') || 'vertical')
+
             this.calcOffset = () => {
                 if (this.useOtherPosition == null) {
                     this.offset = parseInt(this.container.offset().top)
@@ -98,6 +125,7 @@ class parallaxClass {
                     this.offset = parseInt($(this.useOtherPosition).offset().top)
                 }
             }
+
             this.calcHeight = () => {
                 if (this.useOtherPosition == null) {
                     this.height = parseInt(this.container.outerHeight())
@@ -242,97 +270,104 @@ class parallaxClass {
         draw(timeStamp)
     }
 
+
+
     isInViewport(element) {
         return element.offset + element.height > eventManager.scrollTop() &&
                element.offset < eventManager.scrollTop() + eventManager.windowsHeight();
     }
 
 
+
     executeParallax(element, applyStyle = true) {
-        //checkMediaQuery
         if(!mq[element.queryType](element.breackpoint)) return;
 
-        // Esegui i colcoli solo se l'lemento è visibile nello schemro
-        if( this.isInViewport(element) || element.limiter != null) {
+        // this.isInViewport(element) -> Esegui i colcoli solo se l'lemento è visibile nello schemro
+        // element.limiterOff ->  forzo il sempre il calcolo per lementi in postion fixed/sticky e otherPos attivo
+        if( !this.isInViewport(element) && element.limiterOff === null) return;
 
+        switch (element.computationType) {
+            case 'fixed':
+                const scrolTop = eventManager.scrollTop();
+                const winHeight = eventManager.windowsHeight();
+                const endPos = ((element.height / 100) * element.fixedRange);
+                const partials =  - ((scrolTop + winHeight) - (element.offset + element.height))
+                const inMotion = (partials / 100) * element.fixedRange;
 
-            if(element.fixedRange != null) {
-
-                const fullSize = eventManager.windowsHeight();
-                const endPos = ((fullSize / 100) * element.fixedRange);
-                const inMotion = -((eventManager.scrollTop() - element.offset) * element.fixedRange) / 100;
-
-                if(eventManager.scrollTop() + eventManager.windowsHeight() < element.offset) {
+                if(scrolTop + winHeight < element.offset) {
                     element.endValue = (element.fromCalculatedValue) ? endPos : 0;
-                }  else if (eventManager.scrollTop() + eventManager.windowsHeight() > element.offset + element.height) {
+
+                } else if (scrolTop + winHeight > element.offset + element.height) {
                     element.endValue = (element.fromCalculatedValue) ? 0 : - endPos;
+
                 } else {
                     element.endValue = (element.fromCalculatedValue) ? inMotion : inMotion - endPos;
                 }
+            break;
 
-            } else {
+            default:
+                switch (element.propierties) {
+                    case 'opacity':
+                        const vhLimit = (eventManager.windowsHeight() / 100 * element.opacityEnd);
+                        const vhStart = eventManager.windowsHeight() - (eventManager.windowsHeight() / 100 * element.opacityStart);
 
-                // Check if top-bottom etc.. or custom numer
-                const alignIsNotaNumaber = isNaN(element.align);
-
-                if (element.propierties == 'opacity') {
-                    const vhLimit = (eventManager.windowsHeight() / 100 * element.opacityEnd);
-                    const vhStart = eventManager.windowsHeight() - (eventManager.windowsHeight() / 100 * element.opacityStart);
-
-                    let opacityVal = 0;
-                    if (element.align == 'start') {
-                        opacityVal = -eventManager.scrollTop();
-                    } else {
-                        opacityVal = (eventManager.scrollTop() + vhLimit - element.offset);
-                    }
-
-                    opacityVal = opacityVal * -1;
-
-                    if (element.align == 'start') {
-                        opacityVal = 1 - opacityVal / element.offset;
-                    } else {
-                        opacityVal = 1 - opacityVal / (eventManager.windowsHeight() - vhStart - vhLimit);
-                    }
-
-                    element.endValue = opacityVal.toFixed(2);
-
-                } else {
-
-                    if (alignIsNotaNumaber) {
-                        // Prefixed align
-                        switch (element.align) {
-                            case 'start':
-                            element.endValue = (eventManager.scrollTop() / element.distance);
-                            break;
-
-                            case 'top':
-                            element.endValue = (((eventManager.scrollTop() - element.offset) / element.distance));
-                            break;
-
-                            case 'center':
-                            element.endValue = ((((eventManager.scrollTop() + (eventManager.windowsHeight() / 2 - element.height / 2)) - element.offset) / element.distance));
-                            break;
-
-                            case 'bottom':
-                            element.endValue = ((((eventManager.scrollTop() + (eventManager.windowsHeight() - element.height)) - element.offset) / element.distance));
-                            break;
-
-                            case 'end':
-                            element.endValue = -((eventManager.documentHeight() - (eventManager.scrollTop() + eventManager.windowsHeight())) / element.distance);
-                            break;
+                        let opacityVal = 0;
+                        if (element.align == 'start') {
+                            opacityVal = -eventManager.scrollTop();
+                        } else {
+                            opacityVal = (eventManager.scrollTop() + vhLimit - element.offset);
                         }
-                    } else {
-                        // VH Align
-                        element.endValue = ((((eventManager.scrollTop() + (eventManager.windowsHeight() / 100 * element.align)) - element.offset) / element.distance));
-                    }
 
-                    element.endValue = element.endValue.toFixed(this.s.toFixedValue) / 2;
+                        opacityVal = opacityVal * -1;
+
+                        if (element.align == 'start') {
+                            opacityVal = 1 - opacityVal / element.offset;
+                        } else {
+                            opacityVal = 1 - opacityVal / (eventManager.windowsHeight() - vhStart - vhLimit);
+                        }
+
+                        element.endValue = opacityVal.toFixed(2);
+                    break;
+
+                    default:
+                        if (isNaN(element.align)) {
+
+                            // Prefixed align
+                            switch (element.align) {
+                                case 'start':
+                                element.endValue = (eventManager.scrollTop() / element.distance);
+                                break;
+
+                                case 'top':
+                                element.endValue = (((eventManager.scrollTop() - element.offset) / element.distance));
+                                break;
+
+                                case 'center':
+                                element.endValue = ((((eventManager.scrollTop() + (eventManager.windowsHeight() / 2 - element.height / 2)) - element.offset) / element.distance));
+                                break;
+
+                                case 'bottom':
+                                element.endValue = ((((eventManager.scrollTop() + (eventManager.windowsHeight() - element.height)) - element.offset) / element.distance));
+                                break;
+
+                                case 'end':
+                                element.endValue = -((eventManager.documentHeight() - (eventManager.scrollTop() + eventManager.windowsHeight())) / element.distance);
+                                break;
+                            }
+                        } else {
+
+                            // VH Align
+                            element.endValue = ((((eventManager.scrollTop() + (eventManager.windowsHeight() / 100 * element.align)) - element.offset) / element.distance));
+                        }
+
+                        element.endValue = element.endValue.toFixed(this.s.toFixedValue) / 2;
+
                 }
-            }
 
-            if (!applyStyle) return;
-            element.item.css(this.setStyle(element, element.endValue));
         }
+
+        if (!applyStyle) return;
+        element.item.css(this.setStyle(element, element.endValue));
     }
 
 
@@ -384,7 +419,7 @@ class parallaxClass {
         switch (element.propierties) {
             case 'vertical':
                 if(element.scalable != null && element.fixedRange != null) {
-                    const value = (val * element.fixedRange) / eventManager.windowsHeight();
+                    const value = (val * element.fixedRange) / element.height;
                     style[this.s.transformProperty] = `translate3d(0,0,0) translateY(${value}vh)`;
                 } else {
                     style[this.s.transformProperty] = `translate3d(0,0,0) translateY(${val}px)`;
@@ -393,7 +428,7 @@ class parallaxClass {
 
             case 'horizontal':
                 if(element.scalable != null && element.fixedRange != null) {
-                    const value = (val * element.fixedRange) / eventManager.windowsHeight();
+                    const value = (val * element.fixedRange) / element.height;
                     style[this.s.transformProperty] = `translate3d(0,0,0) translateX(${value}vw)`;
                 } else {
                     style[this.s.transformProperty] = `translate3d(0,0,0) translateX(${val}px)`;

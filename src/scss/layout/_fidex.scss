@@ -10,8 +10,16 @@
     }
 
     &__dummy {
-        height: 100vh;
+        height: 60vh;
         border: 1px $black solid;
+
+        &--3 {
+            height: 30vh;
+        }
+
+        &--3 {
+            height: 20vh;
+        }
     }
 }
 
