@@ -262,12 +262,17 @@ class parallaxClass {
                         v = element.jsVelocity,
                         val = ((f - s) / v) + s * 1;
 
-                    if (element.propierties == 'opacity') {
-                        // in smooth mode use 4 value after comma so i can check very slow change
-                        element.startValue = val.toFixed(4);
-                    } else {
-                        element.startValue = val.toFixed(this.s.toFixedValue);
+
+                    switch (element.propierties) {
+                        case 'opacity':
+                        case 'rotate':
+                            element.startValue = val.toFixed(4);
+                        break;
+
+                        default:
+                            element.startValue = val.toFixed(this.s.toFixedValue);
                     }
+
                     element.item.css(this.setStyle(element, element.startValue));
 
 
@@ -305,8 +310,8 @@ class parallaxClass {
             case 'fixed':
                 const scrolTop = eventManager.scrollTop();
                 const winHeight = eventManager.windowsHeight();
+                const partials =  - ((scrolTop + winHeight) - (element.offset + element.height));
                 const endPos = ((element.height / 100) * element.fixedRange);
-                const partials =  - ((scrolTop + winHeight) - (element.offset + element.height))
                 const inMotion = (partials / 100) * element.fixedRange;
 
                 if(scrolTop + winHeight < element.offset) {
@@ -319,11 +324,19 @@ class parallaxClass {
                     element.endValue = (element.fromCalculatedValue) ? inMotion : inMotion - endPos;
                 }
 
-                // Proportion respect windows width for horizontal movement
+                const percent = (Math.abs(element.endValue) * 100) / element.height;
                 switch (element.propierties) {
                     case 'horizontal':
-                        const percent = (Math.abs(element.endValue) * 100) / element.height;
                         element.endValue = -(( element.width / 100 ) * percent);
+                    break;
+
+                    case 'scale':
+                        element.endValue = percent * 10;
+                        console.log(element.endValue)
+                    break;
+
+                    case 'rotate':
+                        element.endValue = percent;
                     break;
                 }
             break;
@@ -468,6 +481,7 @@ class parallaxClass {
 
             case 'scale':
                 // NormalizeValue
+
                 const scaleVal = 1 + (val / 1000);
                 style[this.s.transformProperty] = `translate3d(0,0,0) scale(${scaleVal})`;
                 break;
