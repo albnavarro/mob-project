@@ -40,6 +40,7 @@ class parallaxClass {
             this.startValue = 0
             this.prevValue = 0
             this.height = 0
+            this.width = 0
 
             // default: use distance ( 1 - 10 ) to compute value
             // fixed: use fixedRange to compute value
@@ -58,6 +59,10 @@ class parallaxClass {
             // use this attribute with data-fixedRange: convert value to vw and vh
             // ENABLE ONLY WITH COMPUTATIONTYPE SET TO FIXED
             this.scalable = (this.item.attr('data-scalable') || null),
+
+            // up to this brack pront switch to px otherwise use wv and vh
+            // very usefull in real world
+            this.scalableBreackpoint = (this.item.attr('data-scalableBreackpoint') || 'x-large'),
 
             // use with data-fixedRange revert end value and start value, and substract end value to calculation
             // useful to preserve layout align on first item
@@ -133,6 +138,14 @@ class parallaxClass {
                     this.height = parseInt($(this.useOtherPosition).outerHeight())
                 }
             }
+
+            this.calcWidth = () => {
+                if (this.useOtherPosition == null) {
+                    this.width = parseInt(this.container.outerWidth())
+                } else {
+                    this.width = parseInt($(this.useOtherPosition).outerWidth())
+                }
+            }
         }
 
         this.s.$parallaxItem.each((index, element) => {
@@ -140,6 +153,7 @@ class parallaxClass {
             this.s.itemArray.push(new obj(item));
             this.s.itemArray[this.s.itemArray.length - 1].calcOffset()
             this.s.itemArray[this.s.itemArray.length - 1].calcHeight()
+            this.s.itemArray[this.s.itemArray.length - 1].calcWidth()
             this.s.itemArray[this.s.itemArray.length - 1].distance = this.normalizeDistance(this.s.itemArray[this.s.itemArray.length - 1].distance)
             this.s.itemArray[this.s.itemArray.length - 1].jsVelocity = this.normalizeVelocity(this.s.itemArray[this.s.itemArray.length - 1].jsVelocity)
 
@@ -184,7 +198,8 @@ class parallaxClass {
             const element = this.s.itemArray[index];
 
             element.calcOffset()
-            element.calcHeight();
+            element.calcHeight()
+            element.calcWidth()
             this.executeParallax(element)
         }
 
@@ -303,6 +318,14 @@ class parallaxClass {
                 } else {
                     element.endValue = (element.fromCalculatedValue) ? inMotion : inMotion - endPos;
                 }
+
+                // Proportion respect windows width for horizontal movement
+                switch (element.propierties) {
+                    case 'horizontal':
+                        const percent = (Math.abs(element.endValue) * 100) / element.height;
+                        element.endValue = -(( element.width / 100 ) * percent);
+                    break;
+                }
             break;
 
             default:
@@ -398,15 +421,15 @@ class parallaxClass {
                         element.reverse && val < 0) {
                             val = 0;
                         }
-                        break;
+                    break;
 
-                        case 'toBack':
+                    case 'toBack':
                         if (!element.reverse && val > 0 ||
                             element.reverse && val < 0) {
                                 val = -val;
                             }
-                            break;
-                        }
+                    break;
+                }
             } else {
                 if (element.oneDirection == 'toBack') {
                     if (val > 1.999) val = 1.999
@@ -418,8 +441,8 @@ class parallaxClass {
 
         switch (element.propierties) {
             case 'vertical':
-                if(element.scalable != null && element.fixedRange != null) {
-                    const value = (val * element.fixedRange) / element.height;
+                if(element.scalable != null  && element.fixedRange != null && !mq.min(element.scalableBreackpoint)) {
+                    const value = (val * 100) / element.height;
                     style[this.s.transformProperty] = `translate3d(0,0,0) translateY(${value}vh)`;
                 } else {
                     style[this.s.transformProperty] = `translate3d(0,0,0) translateY(${val}px)`;
@@ -427,8 +450,8 @@ class parallaxClass {
                 break;
 
             case 'horizontal':
-                if(element.scalable != null && element.fixedRange != null) {
-                    const value = (val * element.fixedRange) / element.height;
+                if(element.scalable != null && element.fixedRange != null && !mq.min(element.scalableBreackpoint)) {
+                    const value = (val * 100) / element.width;
                     style[this.s.transformProperty] = `translate3d(0,0,0) translateX(${value}vw)`;
                 } else {
                     style[this.s.transformProperty] = `translate3d(0,0,0) translateX(${val}px)`;
