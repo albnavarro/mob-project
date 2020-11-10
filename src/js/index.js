@@ -8,7 +8,6 @@ import { showElement } from "../component/show-element/js/ShowElement.js"
 import { fitImages } from "../component/fit-images/js/fitImage.js"
 import { toolTip } from "../component/tooltip/js/tooltip.js"
 import { totop } from "../component/to-top/js/toTop.js"
-import { section } from "../component/section/js/section.js"
 import { offsetSliderClass } from "../component/offset-slider/js/offsetSlider.js"
 import { menuClass } from "../component/navigation/js/menu.js"
 import { accordionClass } from "../component/accordion/js/accordion.js"
@@ -27,7 +26,6 @@ fitImages.init();
 toolTip.init();
 totop.init();
 vh.init();
-section.init();
 
 const offsetSlider = new offsetSliderClass({
     container: '.offset-slider',
