@@ -52,19 +52,41 @@ html
                                         data-propierties="scale")
                                         .parallax__item(
                                             data-conponent='m-comp--parallax',
-                                            data-ease="linear",
+                                            data-ease="smooth",
                                             data-computationType = "fixed",
                                             data-fixedRange="90",
                                             data-otherPos=".fixed__dummy--5",
                                             data-limiterOff="true",
                                             data-propierties="rotate")
-                                            .test-item
+                                            .parallax__item(
+                                                data-conponent='m-comp--parallax',
+                                                data-ease="linear",
+                                                data-computationType = "fixed",
+                                                data-fixedRange="90",
+                                                data-applyOn=".test-item",
+                                                data-limiterOff="true",
+                                                data-otherPos=".fixed__dummy--5",
+                                                data-propierties="borderWidth")
+                                                .parallax__item(
+                                                    data-conponent='m-comp--parallax',
+                                                    data-ease="linear",
+                                                    data-computationType = "fixed",
+                                                    data-fixedRange="90",
+                                                    data-applyOn=".test-item",
+                                                    data-applyStartOff = "true",
+                                                    data-limiterOff="true",
+                                                    data-otherPos=".fixed__dummy--7",
+                                                    data-fromCalculatedValue="true"
+                                                    data-propierties="borderWidth")
+                                                    .test-item
+                                                    
                 .fixed__dummy.fixed__dummy--1
                 .fixed__dummy.fixed__dummy--2
                 .fixed__dummy.fixed__dummy--3
                 .fixed__dummy.fixed__dummy--4
                 .fixed__dummy.fixed__dummy--5
                 .fixed__dummy.fixed__dummy--6
+                .fixed__dummy.fixed__dummy--7
                 
         include pug/footer.pug
         

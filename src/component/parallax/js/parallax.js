@@ -69,7 +69,17 @@ class parallaxClass {
             // ENABLE ONLY WITH COMPUTATIONTYPE SET TO FIXED
             this.fromCalculatedValue = (this.item.attr('data-fromCalculatedValue') || null),
 
-            // WE HAVE NO OPACITY WITH FIXED STYLE propierties, TO BE UPDATED
+            // Apply transformation on other element
+            this.applyOn = ($(`${this.item.attr('data-applyOn')}`) || {}),
+
+            // check if element above is valid
+            this.applyOnIsValid = false,
+
+            // with fixedRange and limiterOff active disable fixed transformation when element id off monitor ( Up )
+            this.applyEndOff = this.item.attr('data-applyEndOff') || null,
+
+            // with fixedRange and limiterOff active disable fixed trandformation when element id off monitor ( Up )
+            this.applyStartOff = this.item.attr('data-applyStartOff') || null,
 
 
             // DEFAULT propierties
@@ -146,6 +156,10 @@ class parallaxClass {
                     this.width = parseInt($(this.useOtherPosition).outerWidth())
                 }
             }
+
+            this.checkApplyOnIsValid = () => {
+                 (this.applyOn.length) ? this.applyOnIsValid = true : this.applyOnIsValid = false;
+            }
         }
 
         this.s.$parallaxItem.each((index, element) => {
@@ -154,6 +168,7 @@ class parallaxClass {
             this.s.itemArray[this.s.itemArray.length - 1].calcOffset()
             this.s.itemArray[this.s.itemArray.length - 1].calcHeight()
             this.s.itemArray[this.s.itemArray.length - 1].calcWidth()
+            this.s.itemArray[this.s.itemArray.length - 1].checkApplyOnIsValid()
             this.s.itemArray[this.s.itemArray.length - 1].distance = this.normalizeDistance(this.s.itemArray[this.s.itemArray.length - 1].distance)
             this.s.itemArray[this.s.itemArray.length - 1].jsVelocity = this.normalizeVelocity(this.s.itemArray[this.s.itemArray.length - 1].jsVelocity)
 
@@ -266,6 +281,7 @@ class parallaxClass {
                     switch (element.propierties) {
                         case 'opacity':
                         case 'rotate':
+                        case 'borderWidth':
                             element.startValue = val.toFixed(4);
                         break;
 
@@ -273,7 +289,12 @@ class parallaxClass {
                             element.startValue = val.toFixed(this.s.toFixedValue);
                     }
 
-                    element.item.css(this.setStyle(element, element.startValue));
+                    if(element.applyOnIsValid) {
+                        element.applyOn.css(this.setStyle(element, element.startValue));
+                    } else {
+                        element.item.css(this.setStyle(element, element.startValue));
+                    }
+
 
 
                     if (element.prevValue != element.startValue) isCompleted = false;
@@ -316,9 +337,11 @@ class parallaxClass {
 
                 if(scrolTop + winHeight < element.offset) {
                     element.endValue = (element.fromCalculatedValue) ? endPos : 0;
+                    if(element.applyStartOff != null ) applyStyle = false;
 
                 } else if (scrolTop + winHeight > element.offset + element.height) {
                     element.endValue = (element.fromCalculatedValue) ? 0 : - endPos;
+                    if(element.applyEndOff != null ) applyStyle = false;
 
                 } else {
                     element.endValue = (element.fromCalculatedValue) ? inMotion : inMotion - endPos;
@@ -332,10 +355,14 @@ class parallaxClass {
 
                     case 'scale':
                         element.endValue = percent * 10;
-                        console.log(element.endValue)
+                    break;
+
+                    case 'opacity':
+                        element.endValue = percent / 100;
                     break;
 
                     case 'rotate':
+                    case 'borderWidth':
                         element.endValue = percent;
                     break;
                 }
@@ -403,7 +430,12 @@ class parallaxClass {
         }
 
         if (!applyStyle) return;
-        element.item.css(this.setStyle(element, element.endValue));
+
+        if(element.applyOnIsValid) {
+            element.applyOn.css(this.setStyle(element, element.endValue));
+        } else {
+            element.item.css(this.setStyle(element, element.endValue));
+        }
     }
 
 
@@ -473,6 +505,10 @@ class parallaxClass {
 
             case 'rotate':
                 style[this.s.transformProperty] = `translate3d(0,0,0) rotate(${val}deg)`;
+                break;
+
+            case 'borderWidth':
+                style['border-width'] = `${val}`;
                 break;
 
             case 'opacity':
