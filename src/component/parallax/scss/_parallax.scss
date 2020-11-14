@@ -6,8 +6,7 @@
 
 
     &.smooth-transition {
-      transition: transform .5s;
-      transition-timing-function: ease-out;
+      transition: transform 1s cubic-bezier(0.305, 0.550, 0.470, 1.015);
     }
   }
 }

@@ -2,7 +2,6 @@
 import { eventManager } from "./base/eventManager.js";
 import { vh } from "./utility/vh.js"
 import { parallax } from "../component/parallax/js/parallax.js";
-import { parallaxBackground } from "../component/parallax/js/parallaxBackground.js";
 import { tGallery } from "../component/threeGallery/js/threeGallery.js";
 import { showElement } from "../component/show-element/js/ShowElement.js"
 import { fitImages } from "../component/fit-images/js/fitImage.js"
@@ -18,9 +17,8 @@ import { lightBoxClass } from "../component/lightbox/js/lightbox.js"
 import { findElement } from "./utility/findElement.js"
 
 eventManager.init(true,true);
-parallax.init('JS');
+parallax.init();
 tGallery.init();
-parallaxBackground.init();
 showElement.init();
 fitImages.init();
 toolTip.init();
@@ -38,7 +36,6 @@ findElement('.offset-slider').then(() => {
 }).catch(() => {
     console.log('not found');
 });
-
 
 
 // LIGHTBOX
