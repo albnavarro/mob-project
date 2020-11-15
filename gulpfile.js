@@ -47,6 +47,7 @@ const
   imgPath = path.join(themePath, 'img'),
   jsPath = path.join(themePath, 'js'),
   componentPath = path.join(themePath, 'component'),
+  componentPathVanilla = path.join(themePath, 'component-vanilla'),
   scssPath = path.join(themePath, 'scss'),
   svgPath = path.join(themePath, 'svg'),
 
@@ -64,8 +65,10 @@ const
   imgFiles = `${imgPath}/*`,
   jsFiles = `${jsPath}/**/*.js`,
   componentJsFiles = `${componentPath}/**/*.js`,
+  componentJsFilesVanilla = `${componentPathVanilla}/**/*.js`,
   scssFiles = `${scssPath}/**/*.scss`,
   componentscssFiles = `${componentPath}/**/*.scss`,
+  componentscssFilesVanilla = `${componentPathVanilla}/**/*.scss`,
   svgFiles = `${svgPath}/*.svg`,
   pugFiles = `${themePath}/*.pug`,
   allPugFiles = `${themePath}/**/*.pug`,
@@ -300,8 +303,8 @@ function cleanAll() {
 // LIVE RELOAD
 
 function watch_files(done) {
-  gulp.watch([scssFiles, componentscssFiles], style)
-  gulp.watch([jsFiles, componentJsFiles], gulp.series(js, reloadPage))
+  gulp.watch([scssFiles, componentscssFiles, componentscssFilesVanilla], style)
+  gulp.watch([jsFiles, componentJsFiles, componentJsFilesVanilla], gulp.series(js, reloadPage))
   gulp.watch([allPugFiles, dataFiles], gulp.series(mergeJson, html, reloadPage))
 
   done();
