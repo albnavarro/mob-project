@@ -19,8 +19,8 @@ export function outerWidth(el) {
 export function offset(el) {
     const rect = el.getBoundingClientRect();
     const offset = {
-            top: rect.top + eventManager.scrollTop(),
-            left: rect.left + window.scrollX,
-        };
+        top: rect.top + eventManager.scrollTop(),
+        left: rect.left + window.scrollX,
+    };
     return offset;
 }

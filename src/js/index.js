@@ -1,26 +1,29 @@
 // import { } from "./extra/SmoothScroll.js"
+// BASE MODULE
 import { eventManager } from "./base/eventManager.js";
 import { vh } from "./utility/vh.js"
-import { parallax } from "../component/parallax/js/parallax.js";
+import { findElement } from "./utility/findElement.js"
+
+// COMPONENT MODULE
 import { tGallery } from "../component/threeGallery/js/threeGallery.js";
-import { showElement } from "../component/show-element/js/ShowElement.js"
-import { fitImages } from "../component/fit-images/js/fitImage.js"
 import { toolTip } from "../component/tooltip/js/tooltip.js"
 import { totop } from "../component/to-top/js/toTop.js"
 import { offsetSliderClass } from "../component/offset-slider/js/offsetSlider.js"
 import { menuClass } from "../component/navigation/js/menu.js"
-import { accordionClass } from "../component/accordion/js/accordion.js"
 import { popToggleClass } from "../component/popToggle/js/popToggle.js"
 import { popToggleManagerClass } from "../component/popToggle/js/popToggleManager.js"
 import { overlayClass } from "../component/overlay/js/overlay.js"
 import { lightBoxClass } from "../component/lightbox/js/lightbox.js"
-import { findElement } from "./utility/findElement.js"
+
+// NEW VANILLA COMPONENT MODULE
+import { parallax } from "../component-vanilla/parallax/js/parallax.js";
+import { accordionClass } from "../component-vanilla/accordion/js/accordion.js"
+import { showElement } from "../component-vanilla/show-element/js/ShowElement.js"
 
 eventManager.init(true,true);
 parallax.init();
 tGallery.init();
 showElement.init();
-fitImages.init();
 toolTip.init();
 totop.init();
 vh.init();

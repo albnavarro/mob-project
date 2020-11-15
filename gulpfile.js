@@ -37,7 +37,7 @@ const
 
   rollup = require('rollup'),
   babel = require('@rollup/plugin-babel'),
-  // nodeResolve = require('@rollup/plugin-node-resolve'),
+  nodeResolve = require('@rollup/plugin-node-resolve'),
   commonjs = require('@rollup/plugin-commonjs'),
 
 
@@ -137,7 +137,7 @@ function js() {
     return rollup.rollup({
       input: './src/js/index.js',
       plugins: [
-          // nodeResolve.nodeResolve(),
+          nodeResolve.nodeResolve(),
           commonjs(),
           babel.babel({ babelHelpers: 'bundled' })
       ]

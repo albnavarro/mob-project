@@ -19,6 +19,7 @@
     "debounce": "^1.2.0",
     "del": "^6.0.0",
     "fontfaceobserver": "^2.1.0",
+    "gsap": "^3.5.1",
     "gulp-concat": "^2.6.1",
     "gulp-cssmin": "^0.2.0",
     "gulp-htmlmin": "^5.0.1",

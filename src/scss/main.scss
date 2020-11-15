@@ -29,16 +29,20 @@
 
 // component
 @import
-  '../component/fit-images/scss/fitimage',
-  '../component/parallax/scss/parallax',
   '../component/navigation/scss/menu',
   '../component/tooltip/scss/tooltip',
-  '../component/show-element/scss/ShowElement',
   '../component/lightbox/scss/lightbox',
   '../component/to-top/scss/toTop',
   '../component/threeGallery/scss/threeGallery',
   '../component/offset-slider/scss/offsetSlider.scss',
   '../component/overlay/sass/_overlay.scss';
+
+
+// component vanilla
+@import
+  '../component-vanilla/show-element/scss/ShowElement',
+  '../component-vanilla/parallax/scss/parallax';
+
 
 // layout
 @import
