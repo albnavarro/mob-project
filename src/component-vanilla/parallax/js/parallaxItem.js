@@ -52,15 +52,27 @@ export class parallaxItemClass {
         this.distance = this.normalizeDistance(this.distance)
         this.jsVelocity = this.normalizeVelocity(this.jsVelocity)
 
-        if (this.ease == 'smooth' && this.smoothType == 'css') {
-            this.item.classList.add('smooth-transition')
+        switch (this.ease) {
+            case 'linear':
+                eventManager.push('scroll', this.executeParallax.bind(this));
+                this.executeParallax()
+            break;
+
+            case 'smooth':
+                switch (this.smoothType) {
+                    case 'css':
+                        this.item.classList.add('smooth-transition')
+                        eventManager.push('scrollThrottle', this.executeParallax.bind(this));
+                        this.executeParallax()
+                    break;
+                    case 'js':
+                        eventManager.push('scrollThrottle', this.smoothParallaxJs.bind(this));
+                        this.smoothParallaxJs()
+                    break;
+                }
+            break;
         }
 
-        this.linearParallax()
-        this.smoothParallax()
-
-        eventManager.push('scroll', this.linearParallax.bind(this));
-        eventManager.push('scrollThrottle', this.smoothParallax.bind(this));
         eventManager.push('resize', this.refresh.bind(this));
     }
 
@@ -68,7 +80,7 @@ export class parallaxItemClass {
         let _n = n
 
         if (_n < 0) _n = .1
-        if (_n > 10) _n = 10
+        if (_n >= 10) _n = 9.9
 
         return 10 - _n
     }
@@ -77,7 +89,7 @@ export class parallaxItemClass {
         let _n = n
 
         if (_n < 1) _n = 1
-        if (_n > 10) _n = 10
+        if (_n >= 10) _n = 9.9
 
         return (10 - _n) * 10
     }
@@ -121,27 +133,29 @@ export class parallaxItemClass {
         this.calcOffset()
         this.calcHeight()
         this.calcWidth()
-        this.linearParallax()
-        this.smoothParallax()
+
+        switch (this.ease) {
+            case 'linear':
+                this.executeParallax()
+            break;
+
+            case 'smooth':
+                switch (this.smoothType) {
+                    case 'css':
+                        this.executeParallax()
+                    break;
+                    case 'js':
+                        this.smoothParallaxJs()
+                    break;
+                }
+            break;
+        }
     }
 
-    linearParallax() {
-        if (this.ease == 'linear') this.executeParallax()
-    }
-
-    smoothParallax() {
-        // Se è un item con ease smooth in css calcolo ivalori e li applico
-        if (this.ease == 'smooth' && this.smoothType == 'css') {
-            this.executeParallax()
-        }
-
-        // Se è un item con ease smotth in js calcolo ivalori e non li applico
-        if (this.ease == 'smooth' && this.smoothType == 'js') {
-            this.executeParallax(false)
-
-            if (this.req) cancelAnimationFrame(this.req);
-            this.req = requestAnimationFrame(this.onReuqestAnim.bind(this))
-        }
+    smoothParallaxJs() {
+        this.executeParallax(false)
+        if (this.req) cancelAnimationFrame(this.req);
+        this.req = requestAnimationFrame(this.onReuqestAnim.bind(this))
     }
 
     onReuqestAnim(timeStamp) {
@@ -314,7 +328,6 @@ export class parallaxItemClass {
 
                 default:
                     val = -val;
-
             }
         }
 
@@ -324,8 +337,8 @@ export class parallaxItemClass {
             if (this.propierties != 'opacity') {
                 switch (this.oneDirection) {
                     case 'toStop':
-                    if (!this.reverse && val > 0 ||
-                        this.reverse && val < 0) {
+                        if (!this.reverse && val > 0 ||
+                            this.reverse && val < 0) {
                             val = 0;
                         }
                     break;
@@ -333,8 +346,8 @@ export class parallaxItemClass {
                     case 'toBack':
                         if (!this.reverse && val > 0 ||
                             this.reverse && val < 0) {
-                                val = -val;
-                            }
+                            val = -val;
+                        }
                     break;
                 }
             } else {
@@ -354,7 +367,7 @@ export class parallaxItemClass {
                 } else {
                     style[this.transformProperty] = `translate3d(0,0,0) translateY(${val}px)`;
                 }
-                break;
+            break;
 
             case 'horizontal':
                 if(this.scalable && this.fixedRange != null && !mq.min(this.scalableBreackpoint)) {
@@ -363,24 +376,24 @@ export class parallaxItemClass {
                 } else {
                     style[this.transformProperty] = `translate3d(0,0,0) translateX(${val}px)`;
                 }
-                break;
+            break;
 
             case 'rotate':
                 style[this.transformProperty] = `translate3d(0,0,0) rotate(${val}deg)`;
-                break;
+            break;
 
             case 'border-width':
                 style['border-width'] = `${val}px`;
-                break;
+            break;
 
             case 'opacity':
                 style['opacity'] = `${val}`;
-                break;
+            break;
 
             case 'scale':
                 const scaleVal = 1 + (val / 1000);
                 style[this.transformProperty] = `translate3d(0,0,0) scale(${scaleVal})`;
-                break;
+            break;
         }
 
         return style
