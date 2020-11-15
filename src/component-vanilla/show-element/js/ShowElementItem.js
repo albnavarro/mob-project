@@ -17,6 +17,7 @@ export class showElementItemClass {
 
     init() {
         this.calcOffset()
+        this.checkPosition()
         eventManager.push('scroll', this.checkPosition.bind(this))
         eventManager.push('resize', this.refresh.bind(this))
     }
