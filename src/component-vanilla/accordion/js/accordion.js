@@ -1,6 +1,5 @@
 import { eventManager } from "../../../js/base/eventManager.js";
 import { mq } from "../../../js/base/mediaManager.js";
-import {} from "../../../js/polyfill/closest.js";
 import { slideUp, slideDown } from "../../../js/utility/animation.js";
 
 export class accordionClass {
@@ -16,15 +15,15 @@ export class accordionClass {
     }
 
     init() {
-        [...this.btn].forEach((button) => {
+        for (const button of  Array.from(this.btn)) {
             button.addEventListener('click', this.openItem.bind(this))
-        });
+        };
 
         /// GASP INITIAL STATE
         const target = document.querySelectorAll(this.target);
-        [...target].forEach((el) => {
+        for (const el of  Array.from(target)) {
             el.style.height = 0;
-        });
+        };
     }
 
     openItem(e) {
@@ -35,18 +34,18 @@ export class accordionClass {
         const target = item.querySelector(this.target)
 
         if (!this.multiple) {
-            [...this.btn].forEach((el) => {
+            for (const el of  Array.from(this.btn)) {
                 if(el !== btn) el.classList.remove('active')
-            });
+            };
 
             const targets = document.querySelectorAll(this.target);
-            [...targets].forEach((el) => {
+            for (const el of  Array.from(targets)) {
                 if(el !== target) {
                     slideUp(el).then(() => {
                         eventManager.execute('resize');
                     });
                 }
-            });
+            };
         }
 
         if (!btn.classList.contains('active')) {

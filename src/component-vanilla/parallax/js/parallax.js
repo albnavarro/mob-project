@@ -12,7 +12,7 @@ class parallaxClass {
     }
 
     inzializeData() {
-        const dataArray = [...this.parallaxItem].map(item => {
+        const dataArray = Array.from(this.parallaxItem).map(item => {
             return this.getItemData(item);
         })
 

@@ -1,4 +1,8 @@
-// import { } from "./extra/SmoothScroll.js"
+// POLYFILL
+import { } from "./polyfill/arrayForm.js"
+import { } from "./polyfill/objAssign.js"
+import {} from "./polyfill/closest.js";
+
 // BASE MODULE
 import { eventManager } from "./base/eventManager.js";
 import { vh } from "./utility/vh.js"
@@ -19,6 +23,7 @@ import { lightBoxClass } from "../component/lightbox/js/lightbox.js"
 import { parallax } from "../component-vanilla/parallax/js/parallax.js";
 import { accordionClass } from "../component-vanilla/accordion/js/accordion.js"
 import { showElement } from "../component-vanilla/show-element/js/ShowElement.js"
+
 
 eventManager.init(true,true);
 parallax.init();
