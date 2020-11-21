@@ -5,8 +5,11 @@ import { slideUp, slideDown } from "../../../js/utility/animation.js";
 export class accordionClass {
     constructor(data) {
         this.item = data.item;
-        this.btn = document.querySelectorAll(`${data.button}`);
-        this.target = data.target;
+        this.btn = document.querySelectorAll(data.button);
+        this.target = {
+            className: data.target,
+            domEl: document.querySelectorAll(data.target)
+         };
         this.breackpoint = data.breackpoint || 'x-small';
         this.queryType = data.queryType || 'min';
         this.multiple = typeof data.multiple === "undefined" ? false : data.multiple
@@ -15,13 +18,14 @@ export class accordionClass {
     }
 
     init() {
-        for (const button of  Array.from(this.btn)) {
+        const buttonArray = Array.from(this.btn);
+        for (const button of  buttonArray) {
             button.addEventListener('click', this.openItem.bind(this))
         };
 
         /// GASP INITIAL STATE
-        const target = document.querySelectorAll(this.target);
-        for (const el of  Array.from(target)) {
+        const targetArray = Array.from(this.target.domEl);
+        for (const el of targetArray) {
             el.style.height = 0;
         };
     }
@@ -31,16 +35,17 @@ export class accordionClass {
 
         const btn = e.currentTarget;
         const item = btn.closest(this.item);
-        const target = item.querySelector(this.target)
+        const target = item.querySelector(this.target.className)
 
         if (!this.multiple) {
-            for (const el of  Array.from(this.btn)) {
+            const buttonArray = Array.from(this.btn);
+            for (const el of  buttonArray) {
                 if(el !== btn) el.classList.remove('active')
             };
 
-            const targets = document.querySelectorAll(this.target);
-            for (const el of  Array.from(targets)) {
-                if(el !== target) {
+            const targetArray = Array.from(this.target.domEl);
+            for (const el of  targetArray) {
+                if(el !== target.item) {
                     slideUp(el).then(() => {
                         eventManager.execute('resize');
                     });

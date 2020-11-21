@@ -12,7 +12,8 @@ class parallaxClass {
     }
 
     inzializeData() {
-        const dataArray = Array.from(this.parallaxItem).map(item => {
+        const itemArray = Array.from(this.parallaxItem);
+        const dataArray = itemArray.map(item => {
             return this.getItemData(item);
         })
 

@@ -36,11 +36,11 @@ html
                         |popTarget 2
                         button
                             |close
-                    .popTargetDrop.popTarget-3(style="display:none")
+                    .popTargetDrop.popTarget-3
                         |popTarget 3
                         button
                             |close
-                    include component/overlay/pug/overlay.pug
+                    include component-vanilla/overlay/pug/overlay.pug
                     //- Fine pop toggle
 
 
@@ -63,7 +63,7 @@ html
 
                     //- FINE ACCORDION
 
-                    include component/lightbox/pug/button.pug
+                    include component-vanilla/lightbox/pug/button.pug
 
                     .parallax__container
                         .parallax__item.parallax__item-test.pipp(
@@ -172,7 +172,7 @@ html
         
                     div(style="height:200px;")
         
-        include component/lightbox/pug/lightbox-simple.pug
-        include component/lightbox/pug/lightbox-image.pug
-        include component/lightbox/pug/lightbox-video.pug
+        include component-vanilla/lightbox/pug/lightbox-simple.pug
+        include component-vanilla/lightbox/pug/lightbox-image.pug
+        include component-vanilla/lightbox/pug/lightbox-video.pug
         include pug/footer.pug

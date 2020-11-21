@@ -13,7 +13,8 @@ class showElementClass {
   }
 
   inzializeData() {
-      const dataArray = Array.from(this.item).map(item => {
+      const itemArray = Array.from(this.item);
+      const dataArray = itemArray.map(item => {
           return this.getItemData(item);
       })
 

@@ -31,16 +31,16 @@
 @import
   '../component/navigation/scss/menu',
   '../component/tooltip/scss/tooltip',
-  '../component/lightbox/scss/lightbox',
   '../component/to-top/scss/toTop',
   '../component/threeGallery/scss/threeGallery',
-  '../component/offset-slider/scss/offsetSlider.scss',
-  '../component/overlay/sass/_overlay.scss';
+  '../component/offset-slider/scss/offsetSlider.scss';
 
 
 // component vanilla
 @import
+  '../component-vanilla/lightbox/scss/lightbox',
   '../component-vanilla/show-element/scss/ShowElement',
+  '../component-vanilla/overlay/sass/overlay.scss',
   '../component-vanilla/parallax/scss/parallax';
 
 
