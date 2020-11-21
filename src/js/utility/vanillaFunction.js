@@ -20,7 +20,14 @@ export function offset(el) {
     const rect = el.getBoundingClientRect();
     const offset = {
         top: rect.top + eventManager.scrollTop(),
-        left: rect.left + window.scrollX,
+        left: rect.left + window.pageXOffset,
     };
+
     return offset;
+}
+
+export function position(el) {
+    const rect = el.getBoundingClientRect();
+
+    return rect;
 }
