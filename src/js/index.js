@@ -15,6 +15,7 @@ import { toolTip } from "../component/tooltip/js/tooltip.js"
 import { totop } from "../component/to-top/js/toTop.js"
 import { offsetSliderClass } from "../component/offset-slider/js/offsetSlider.js"
 import { menuClass } from "../component/navigation/js/menu.js"
+// import { menuClass } from "../component/navigation/js/menuVanilla.js"
 
 // NEW VANILLA COMPONENT MODULE
 import { parallax } from "../component-vanilla/parallax/js/parallax.js";
