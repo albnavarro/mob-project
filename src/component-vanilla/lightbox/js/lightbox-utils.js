@@ -1,6 +1,6 @@
 import { eventManager } from "../../../js/base/eventManager.js";
 
-class lightboxCommonDynamicClass {
+class lightboxUtilsClass {
 
     constructor() {
 
@@ -46,8 +46,8 @@ class lightboxCommonDynamicClass {
             Object.assign(data.content.style, style);
         }
 
-        lightboxCommonDynamic.resetDescriptionBox(data);
-        lightboxCommonDynamic.resetDescriptionBoxHideShow(data);
+        lightboxUtils.resetDescriptionBox(data);
+        lightboxUtils.resetDescriptionBoxHideShow(data);
     }
 
     calculateAspectRatioFit(srcWidth, srcHeight, maxWidth, maxHeight) {
@@ -60,4 +60,4 @@ class lightboxCommonDynamicClass {
 
 }
 
-export const lightboxCommonDynamic = new lightboxCommonDynamicClass()
+export const lightboxUtils = new lightboxUtilsClass()

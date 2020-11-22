@@ -1,11 +1,11 @@
 import { eventManager } from "../../../js/base/eventManager.js";
-import { lightboxCommonDynamic } from "./lightbox-common-dynamic.js";
+import { lightboxUtils } from "./lightbox-utils.js";
 import { lightBoxImage } from "./lightbox-image.js";
 
 class lightBoxImageSlideClass {
 
     constructor() {
-        this.$el = [];
+        this.buttons = [];
         this.itemArray = [];
         this.index = 0;
         this.opened = false;
@@ -24,48 +24,51 @@ class lightBoxImageSlideClass {
         const prevbtn = document.createElement('button')
         const nextbtn = document.createElement('button')
 
-        navEl.classList.add('lightbox-image-slide__nav')
-        navEl.classList.add('clearfix')
-        prevbtn.classList.add('lightbox-image-slide__prev')
+        navEl.classList.add('lightbox__nav')
+        prevbtn.classList.add('lightbox__nav__prev')
         prevbtn.innerHTML = 'prev';
-        nextbtn.classList.add('lightbox-image-slide__next')
+        nextbtn.classList.add('lightbox__nav__next')
         nextbtn.innerHTML = 'next';
 
         this.contentContainer.appendChild(navEl);
-        const nav = this.contentContainer.querySelector('.lightbox-image-slide__nav')
+        const nav = this.contentContainer.querySelector('.lightbox__nav')
         nav.appendChild(prevbtn)
         nav.appendChild(nextbtn)
 
-        const elArray = Array.from(data.$allItem);
-        this.$el = elArray.filter((element) => {
+        const buttonsArray = Array.from(data.allItem);
+        this.buttons = buttonsArray.filter((element) => {
             return (element.getAttribute("data-imagegroup") == data.group)
         });
 
-        this.$el.forEach((element, index) => {
+        let index = 0;
+        for (const element of this.buttons) {
             this.itemArray.push(new this.setitem(element));
 
-            if (element === data.$item) {
+            if (element === data.item) {
                 this.index = index;
+                console.log('found', index)
             }
-        });
+
+            index++
+        };
 
         // Carico la prima immagine
         this.loadImage();
 
-        const nextBtn = document.querySelector('.lightbox-image-slide__next');
+        const nextBtn = document.querySelector('.lightbox__nav__next');
         nextBtn.addEventListener('click', this.next.bind(this))
 
-        const prevBtn = document.querySelector('.lightbox-image-slide__prev');
+        const prevBtn = document.querySelector('.lightbox__nav__prev');
         prevBtn.addEventListener('click', this.prev.bind(this))
     }
 
-    setitem($item) {
-        this.$item = $item;
-        this.url = $item.getAttribute('data-url');
+    setitem(item) {
+        this.item = item;
+        this.url = item.getAttribute('data-url');
     }
 
-    showImage(url, title, description, content) {
-        lightboxCommonDynamic.resetDescriptionBox({
+    showImage(url, title, description, content, Hgap, Wgap) {
+        lightboxUtils.resetDescriptionBox({
             content: content
         });
 
@@ -73,16 +76,21 @@ class lightBoxImageSlideClass {
             content: content,
             url: url || '',
             title: title || '',
-            description: description || ''
+            description: description || '',
+            Hgap: Hgap || '20',
+            Wgap : Wgap || '20'
         })
     }
 
     loadImage() {
+
         this.showImage(
             this.itemArray[this.index].url,
-            this.itemArray[this.index].$item.getAttribute('data-title'),
-            this.itemArray[this.index].$item.getAttribute('data-description'),
-            this.content
+            this.itemArray[this.index].item.getAttribute('data-title'),
+            this.itemArray[this.index].item.getAttribute('data-description'),
+            this.content,
+            this.itemArray[this.index].item.getAttribute('data-hgap'),
+            this.itemArray[this.index].item.getAttribute('data-wgap')
         );
     }
 
@@ -114,11 +122,11 @@ class lightBoxImageSlideClass {
 
     onCloseLightbox() {
         if (this.opened) {
-            this.$el = [];
+            this.buttons = [];
             this.itemArray = [];
             this.index = 0;
 
-            const nav = this.contentContainer.querySelector('.lightbox-image-slide__nav');
+            const nav = this.contentContainer.querySelector('.lightbox__nav');
             if (typeof(nav) != 'undefined' && nav != null) {
                 this.contentContainer.removeChild(nav)
             }

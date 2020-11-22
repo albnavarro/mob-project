@@ -1,6 +1,6 @@
 import { eventManager } from "../../../js/base/eventManager.js";
-import { lightImageDescription } from "./lightbox-image-description.js";
-import { lightboxCommonDynamic } from "./lightbox-common-dynamic.js";
+import { lightDescription } from "./lightbox-description.js";
+import { lightboxUtils } from "./lightbox-utils.js";
 import { lightBoxImage } from "./lightbox-image.js";
 import { lightBoxImageSlide } from "./lightbox-image-slide.js";
 import { lightBoxVideo } from "./lightbox-video.js";
@@ -46,7 +46,7 @@ export class lightBoxClass {
             switch (this.dataType) {
 
                 case 'normal':
-                    lightImageDescription.init({
+                    lightDescription.init({
                         title: $btn.getAttribute('data-title') || '',
                         description: $btn.getAttribute('data-description') || '',
                         content: this.staticContent
@@ -58,27 +58,32 @@ export class lightBoxClass {
                         url: $btn.getAttribute('data-url'),
                         title: $btn.getAttribute('data-title') || '',
                         description: $btn.getAttribute('data-description') || '',
-                        content: this.dynamicContent
+                        content: this.dynamicContent,
+                        Hgap : $btn.getAttribute('data-hgap') || '20',
+                        Wgap : $btn.getAttribute('data-wgap') || '20'
                     })
                     break;
 
                 case 'image-slide':
                     lightBoxImageSlide.init({
                         group: $btn.getAttribute('data-imagegroup'),
-                        $allItem: this.openBtn,
-                        $item: $btn,
+                        allItem: this.openBtn,
+                        item: $btn,
                         content: this.dynamicContent
                     })
                     break;
 
                 case 'video':
                     lightBoxVideo.init({
+                        sourceType: $btn.getAttribute('data-sourceType') || 'youtube',
                         url: $btn.getAttribute('data-url'),
                         title: $btn.getAttribute('data-title') || '',
                         description: $btn.getAttribute('data-description') || '',
                         ratioW: $btn.getAttribute('data-ratioW') || '16',
                         ratioH: $btn.getAttribute('data-ratioH') || '9',
-                        content: this.dynamicContent
+                        content: this.dynamicContent,
+                        Hgap : $btn.getAttribute('data-hgap') || '20',
+                        Wgap : $btn.getAttribute('data-wgap') || '20'
                     })
                     break;
             }
@@ -115,14 +120,14 @@ export class lightBoxClass {
                     type: 'dynamic'
                 })
 
-                lightboxCommonDynamic.onCloseLightbox({
+                lightboxUtils.onCloseLightbox({
                     content: this.dynamicContent,
                     type: 'dynamic'
                 })
 
             } else {
 
-                lightboxCommonDynamic.onCloseLightbox({
+                lightboxUtils.onCloseLightbox({
                     content: this.staticContent,
                     type: 'normal'
                 })

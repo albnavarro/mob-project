@@ -1,41 +1,35 @@
 export class popToggleManagerClass {
 
-  constructor() {
-    this.s = {
-        popArray: [],
-        functionArray: []
+    constructor() {
+        this.popArray = [];
+        this.functionArray = [];
+
     }
-  }
 
-  pushToggle(_fn) {
-      this.s.popArray.push(_fn)
-  }
+    pushToggle(_fn) {
+        this.popArray.push(_fn)
+    }
 
-  // // funzione opzionale da eseguire all'apertura del sigolo PopUp
-  callBackFunction(_fn) {
-      this.s.functionArray.push(_fn)
-  }
+    // // funzione opzionale da eseguire all'apertura del sigolo PopUp
+    callBackFunction(_fn) {
+        this.functionArray.push(_fn)
+    }
 
-  onOpenPop(_name) {
+    onOpenPop(_name) {
+        for (const item of this.popArray) {
+            if (item.name != _name) {
+                item.closePop();
+            }
+        }
 
-      for (let index = 0; index < this.s.popArray.length; index++) {
-          const item = this.s.popArray[index];
+        for (const item of this.functionArray) {
+            item();
+        }
+    }
 
-          if(item.name != _name) {
+    closeAllPop() {
+        for (const item of this.popArray) {
             item.closePop();
         }
-      }
-
-      for (let index = 0; index < this.s.functionArray.length; index++) {
-          const item = this.s.functionArray[index];
-          item();
-      }
-  }
-
-  closeAllPop() {
-      for (let index = 0; index < this.s.popArray.length; index++) {
-        const item = this.s.popArray[index];
-        item.closePop();
-      }
-  }
+    }
 }

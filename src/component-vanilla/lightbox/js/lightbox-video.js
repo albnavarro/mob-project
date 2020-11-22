@@ -1,6 +1,6 @@
 import { eventManager } from "../../../js/base/eventManager.js";
-import { lightImageDescription } from "./lightbox-image-description.js";
-import { lightboxCommonDynamic } from "./lightbox-common-dynamic.js";
+import { lightDescription } from "./lightbox-description.js";
+import { lightboxUtils } from "./lightbox-utils.js";
 
 class lightBoxVideoClass {
 
@@ -19,15 +19,36 @@ class lightBoxVideoClass {
         this.setVideoSize()
 
         this.data.content.appendChild(videoEl);
-        const $video = this.data.content.querySelector('.lightbox__video');
+        const videoWrapper = this.data.content.querySelector('.lightbox__video');
 
         setTimeout(() => {
-            const iframe = document.createElement('iframe');
-            iframe.src = `https://www.youtube.com/embed/${this.data.url }`;
-            iframe.setAttribute('allowfullscreen', '');
-            iframe.setAttribute('frameborder', '0');
-            $video.appendChild(iframe);
-            $video.classList.add('visible');
+            switch (this.data.sourceType) {
+                case 'youtube':
+                    const iframe = document.createElement('iframe');
+                    iframe.src = `https://www.youtube.com/embed/${this.data.url }`;
+                    iframe.setAttribute('allowfullscreen', '');
+                    iframe.setAttribute('frameborder', '0');
+                    videoWrapper.appendChild(iframe);
+                break;
+
+                case 'local':
+                    const video = document.createElement('video');
+                    video.setAttribute('controls', '');
+                    video.setAttribute('autoplay', '');
+                    video.setAttribute('loop', '');
+
+                    const source = document.createElement('source');
+                    source.setAttribute('type', 'video/mp4');
+                    source.src = this.data.url;
+
+                    videoWrapper.appendChild(video);
+                    const videoEl = videoWrapper.querySelector('video');
+                    videoEl.appendChild(source);
+                break;
+
+            }
+
+            videoWrapper.classList.add('visible');
         }, 200);
 
         this.onResizeId = eventManager.push('resize', this.setVideoSize.bind(this))
@@ -35,11 +56,15 @@ class lightBoxVideoClass {
     }
 
     setVideoSize() {
-        const maxHeight = eventManager.windowsHeight() - eventManager.windowsHeight() / 3,
-            maxWidth = eventManager.windowsWidth() - eventManager.windowsWidth() / 3,
+        // WW and WH gap
+        const Hgap = (eventManager.windowsHeight() / 100) * parseInt(this.data.Hgap);
+        const Wgap = (eventManager.windowsWidth() / 100) * parseInt(this.data.Wgap);
+
+        const maxHeight = eventManager.windowsHeight() - Hgap,
+            maxWidth = eventManager.windowsWidth() - Wgap,
             width = this.data.ratioW,
             height = this.data.ratioH,
-            ratio = lightboxCommonDynamic.calculateAspectRatioFit(width, height, maxWidth, maxHeight);
+            ratio = lightboxUtils.calculateAspectRatioFit(width, height, maxWidth, maxHeight);
 
         const style = {
             'width': ratio.width + 'px',
@@ -49,7 +74,7 @@ class lightBoxVideoClass {
     }
 
     openDescription(data) {
-        lightImageDescription.init({
+        lightDescription.init({
             title: data.title,
             description: data.description,
             content: data.content
