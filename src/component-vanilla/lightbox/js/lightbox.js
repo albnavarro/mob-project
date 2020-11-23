@@ -8,9 +8,9 @@ import { lightBoxVideo } from "./lightbox-video.js";
 export class lightBoxClass {
 
     constructor(data) {
-        this.openBtn = document.querySelectorAll(data.openBtn) || [];
-        this.closeBtn = document.querySelectorAll(data.closeBtn) || [];
-        this.lightBox = document.querySelector(data.lightbox) || [];
+        this.openBtn = document.querySelectorAll(data.openBtn) || null;
+        this.closeBtn = document.querySelectorAll(data.closeBtn) || null;
+        this.lightBox = document.querySelector(data.lightbox) || null;
         this.dynamicContent = [], // Elemento vuoto se apro una lightbox semplic;
         this.staticContent = [];
         this.dataType = data.type || 'normal';
@@ -19,6 +19,8 @@ export class lightBoxClass {
     }
 
     init() {
+        if (typeof(this.lightBox) === 'undefined' || this.lightBox === null) return;
+
         this.dynamicContent = this.lightBox.querySelector('.lightbox__dinamic-content') || []; // Elemento vuoto se apro una lightbox semplice
         this.staticContent = this.lightBox.querySelector('.lightbox__static-content') || [];
 

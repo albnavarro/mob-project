@@ -14,6 +14,8 @@ export class overlayClass {
     }
 
     init() {
+        if (typeof(this.overlay) === 'undefined' || this.overlay === null) return;
+
         this.overlay.addEventListener('click', (e) => this.onClick())
     }
 

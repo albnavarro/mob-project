@@ -5,7 +5,7 @@ export function findElement(elClass) {
             if (!start) start = timestamp;
             const progress = timestamp - start;
             const el = document.querySelectorAll(elClass);
-            console.log(el)
+            // console.log(el)
 
             if (el.length) {
                 res();

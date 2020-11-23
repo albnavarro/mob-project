@@ -140,12 +140,13 @@
 }
 
 .sub-menu {
-  display: none;
   list-style-type: none;
   margin: 0;
   padding: 0;
 
   @include _mq('max', 'tablet') {
+    overflow: hidden;
+
     @include when-inside('.nav--offCanvas') {
       position: absolute;
       top: 0;
@@ -159,7 +160,6 @@
       z-index: 11;
       display: block;
       padding: 30px;
-      overflow: hidden;
 
       &.is-selected {
         overflow-y: auto;
@@ -177,6 +177,7 @@
     height: 100%;
     width: 200px;
     left: 0;
+    display: none;
 
     @include when-inside('.nav--vertical') {
       top: 0;

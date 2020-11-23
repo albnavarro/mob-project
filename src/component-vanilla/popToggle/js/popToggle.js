@@ -21,12 +21,16 @@ export class popToggleClass {
 
         /// GASP INITIAL STATE
         if (this.isDropDown) {
-            this.target.style.height = 0;
+            if (typeof(this.target) != 'undefined' && this.target != null) {
+                this.target.style.height = 0;
+            }
         }
 
-        this.btn.addEventListener('click', (e) => this.openPop());
+        if (typeof(this.btn) != 'undefined' && this.btn != null) {
+            this.btn.addEventListener('click', (e) => this.openPop());
+        }
 
-        if(this.closeBtn !== null) {
+        if (typeof(this.closeBtn) != 'undefined' && this.closeBtn != null) {
             this.closeBtn.addEventListener('click', (e) => this.closePop());
         }
     }

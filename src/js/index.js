@@ -1,7 +1,8 @@
 // POLYFILL
-import { } from "./polyfill/arrayForm.js"
+import { } from "./polyfill/arrayFrom.js"
 import { } from "./polyfill/objAssign.js"
 import {} from "./polyfill/closest.js";
+import {} from "./polyfill/matches.js";
 
 // BASE MODULE
 import { eventManager } from "./base/eventManager.js";
@@ -14,8 +15,6 @@ import { tGallery } from "../component/threeGallery/js/threeGallery.js";
 import { toolTip } from "../component/tooltip/js/tooltip.js"
 import { totop } from "../component/to-top/js/toTop.js"
 import { offsetSliderClass } from "../component/offset-slider/js/offsetSlider.js"
-import { menuClass } from "../component/navigation/js/menu.js"
-// import { menuClass } from "../component/navigation/js/menuVanilla.js"
 
 // NEW VANILLA COMPONENT MODULE
 import { parallax } from "../component-vanilla/parallax/js/parallax.js";
@@ -25,6 +24,7 @@ import { popToggleClass } from "../component-vanilla/popToggle/js/popToggle.js"
 import { popToggleManagerClass } from "../component-vanilla/popToggle/js/popToggleManager.js"
 import { overlayClass } from "../component-vanilla/overlay/js/overlay.js"
 import { lightBoxClass } from "../component-vanilla/lightbox/js/lightbox.js"
+import { menuClass } from "../component-vanilla/navigation/js/menu.js"
 
 eventManager.init(true,true);
 parallax.init();
