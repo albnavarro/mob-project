@@ -108,6 +108,8 @@ export class menuClass {
     // utils for mobile accordion menu slideUp/Down init
     resetSubmenuHeight() {
         if (mq.max('tablet') && !this.offCanvas) {
+            this.menu.style.height = 0
+
             const targetArray = Array.from(this.allSubmenu);
             let i = 0;
             for (const el of targetArray) {
@@ -265,15 +267,10 @@ export class menuClass {
         const submenuToClose = allSubmenuId.filter(x => !parentSubmenuId.includes(x)).concat(parentSubmenuId.filter(x=> !allSubmenuId.includes(x)))
         //////
 
-        let parentsArrow = []
-        if (parentsSubmenu.length) {
-            for (const item of parentsSubmenu) {
-                const siblings = getSiblings(item, this.ARROW_SUBMENU);
-                for (const siblingItem of siblings) {
-                    parentsArrow.push(siblingItem)
-                }
-            }
-        }
+        // PARENTS ARROW ACTIVE
+        const parentsArrow = parentsSubmenu.map(item => {
+            return getSiblings(item, this.ARROW_SUBMENU);
+        }).flat();
 
         ////////
         // MOBILE/DESKTOP TOUCH
@@ -436,19 +433,15 @@ export class menuClass {
         eventManager.removeBodyOverflow();
 
         if (mq.max('tablet') && !this.offCanvas) {
-            this.menu.style.display = 'none';
+            slideUp(this.menu);
         }
 
         // Azzero lo scroll top di tutti i menu
-        this.mainMenu.scrollTo({
-            top: 0
-        })
+        this.mainMenu.scrollTop = 0;
 
         const allSubmenuArray = Array.from(this.allSubmenu);
         for (const submenu of allSubmenuArray) {
-            submenu.scrollTo({
-                top: 0
-            })
+            submenu.scrollTop = 0;
             submenu.classList.remove(this.ACTIVE)
             // Rimuovo la propietà overflow-y dal menu che vado a chiudere
             submenu.classList.remove(this.IS_SELECTED)
@@ -457,7 +450,9 @@ export class menuClass {
 
     openMainMenu() {
         if (!this.offCanvas) {
-            this.menu.style.display = 'block';
+            slideDown(this.menu).then(() => {
+                this.menu.style.height = 'auto';
+            })
 
         } else {
             // Attivo la propietà overflow-y: auto; nel menu principale

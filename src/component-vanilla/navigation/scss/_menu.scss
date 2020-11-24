@@ -14,7 +14,8 @@
 .nav{
 
   @include _mq('max','tablet') {
-    display: none;
+    // display: none;
+    overflow: hidden;
 
     @include when-inside('.nav--offCanvas') {
       display: block;

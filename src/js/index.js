@@ -3,6 +3,8 @@ import { } from "./polyfill/arrayFrom.js"
 import { } from "./polyfill/objAssign.js"
 import {} from "./polyfill/closest.js";
 import {} from "./polyfill/matches.js";
+import {} from "./polyfill/flat.js";
+import {} from "./polyfill/includes.js";
 
 // BASE MODULE
 import { eventManager } from "./base/eventManager.js";
@@ -33,7 +35,6 @@ showElement.init();
 toolTip.init();
 totop.init();
 vh.init();
-
 
 // VANILLA LOADER
 const images = [
