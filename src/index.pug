@@ -37,9 +37,10 @@ html
                         button
                             |close
                     .popTargetDrop.popTarget-3
-                        |popTarget 3
-                        button
-                            |close
+                        span
+                            |popTarget 3
+                            button
+                                |close
                     include component-vanilla/overlay/pug/overlay.pug
                     //- Fine pop toggle
 
@@ -49,17 +50,21 @@ html
                         button.accrdion-item__btn
                             |item1
                         .accrdion-item__content
-                            |content
+                            span
+                                |content
+                    .accrdion-item 
+                        button.accrdion-item__btn
+                            span
+                                |item2
+                        .accrdion-item__content
+                            span
+                                |content
                     .accrdion-item 
                         button.accrdion-item__btn
                             |item2
                         .accrdion-item__content
-                            |content
-                    .accrdion-item 
-                        button.accrdion-item__btn
-                            |item2
-                        .accrdion-item__content
-                            |content
+                            span
+                                |content
 
                     //- FINE ACCORDION
 

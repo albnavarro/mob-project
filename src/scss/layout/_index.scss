@@ -36,9 +36,15 @@
 //Pop toggle test
 
 .popTargetDrop {
-    width: 200px;
-    height: 200px;
     overflow: hidden;
+
+    span {
+        width: 200px;
+        height: 200px;
+        display: block;
+        border: 1px black solid;
+    }
+
 }
 
 .popTarget {
@@ -66,5 +72,11 @@
 // ACCORDION TEST
 .accrdion-item__content {
     background-color: $black;
-    height: 100px;
+    overflow: hidden;
+
+    span {
+        height: 100px;
+        display: block;
+    }
+
 }

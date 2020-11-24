@@ -310,15 +310,9 @@ export class menuClass {
 
             if (!this.offCanvas) {
                 // Slide Down sui submenu non parenti del selezionato
-                // Prima setto height auto per permettere ai submneu vontainer di opstire i nuovi
                 // ACCORDION COMMON OPEN/CLOSE LOGIC SUI MENU NON SELEZIONATI
 
-                for (const parentSubmenu of parentSubmenuArray) {
-                    parentSubmenu.style.height = 'auto';
-                }
-
                 for (const item of submenuToClose) {
-                    // seleziono il submenu in mase all' id
                     const el = document.querySelector(`[node-id="${item}"]`)
                     if (typeof(el) != 'undefined' && el != null) {
                         slideUp(el);
@@ -450,9 +444,7 @@ export class menuClass {
 
     openMainMenu() {
         if (!this.offCanvas) {
-            slideDown(this.menu).then(() => {
-                this.menu.style.height = 'auto';
-            })
+            slideDown(this.menu)
 
         } else {
             // Attivo la propietà overflow-y: auto; nel menu principale

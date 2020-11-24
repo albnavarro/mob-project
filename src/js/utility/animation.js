@@ -11,6 +11,9 @@ export function slideDown(target, duration = .5, ease = 'Power4.easeOut') {
         target.style.height = null;
         const height = target.offsetHeight;
         target.style.height = 0;
-        gsap.to(target, {height: height, ease: ease, duration: duration, onComplete:res});
+        gsap.to(target, {height: height, ease: ease, duration: duration, onComplete:() => {
+            target.style.height = 'auto';
+            res();
+        }});
     });
 }
