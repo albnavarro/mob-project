@@ -1,5 +1,9 @@
 import {gsap} from "gsap";
 
+export function slideUpDownReset(target) {
+    target.style.height = 0;
+}
+
 export function slideUp(target, duration = .5, ease = 'Power4.easeOut') {
     return new Promise((res, reject) => {
         gsap.to(target, {height: 0, ease: ease, duration: duration, onComplete:res});

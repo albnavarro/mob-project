@@ -2,7 +2,7 @@ import { modernzier } from "../../../js/utility/modernizr.js"
 import { eventManager } from "../../../js/base/eventManager.js";
 import { mq } from "../../../js/base/mediaManager.js";
 import { outerHeight, outerWidth, offset, position, getParents, getSiblings } from "../../../js/utility/vanillaFunction.js";
-import { slideUp, slideDown } from "../../../js/utility/animation.js";
+import { slideUpDownReset, slideUp, slideDown } from "../../../js/utility/animation.js";
 
 export class menuClass {
 
@@ -108,12 +108,12 @@ export class menuClass {
     // utils for mobile accordion menu slideUp/Down init
     resetSubmenuHeight() {
         if (mq.max('tablet') && !this.offCanvas) {
-            this.menu.style.height = 0
+            slideUpDownReset(this.menu);
 
             const targetArray = Array.from(this.allSubmenu);
             let i = 0;
             for (const el of targetArray) {
-                el.style.height = 0;
+                slideUpDownReset(el);
                 el.setAttribute('node-id', i)
                 i++;
             };
@@ -174,7 +174,7 @@ export class menuClass {
     }
 
     addHandler() {
-        if (!this.offCanvas) {
+        if ((!this.offCanvas && mq.max('tablet')) || Modernizr.touchevents) {
             this.body.addEventListener('click', this.bodyOnCLick.bind(this));
         }
 
@@ -244,133 +244,120 @@ export class menuClass {
     }
 
     arrowOnClick(event) {
+        if (!Modernizr.touchevents && mq.min('tablet')) return;
+
         const target = event.target;
         const parent = target.parentNode;
         const activeSubmenu = parent.querySelector(`.${this.SUB_MENU}`);
         const submenuArray = Array.from(this.allSubmenu)
         const item = target.closest(`.${this.MENU_ITEM}`);
 
-        // POSSONO ESSERER PIU DI UNO
-        const parentsSubmenu = getParents(item, `.${this.SUB_MENU}`);
-        const parentSubmenuArray = Array.from(parentsSubmenu);
+        // i submenu parenti possono esserer piu di uno
+        const parentSubmenus = getParents(item, `.${this.SUB_MENU}`);
+        const parentSubmenusArray = Array.from(parentSubmenus);
 
-        /// FILTER SUBMENU NOT PARENT
-        const allSubmenuId = submenuArray.map(item => {
-            return item.getAttribute('node-id')
-        });
+        // chiudo tutti quelli diversi dall' attuale paerto
+        for (const item of submenuArray) {
+            if (item !== activeSubmenu) {
+                item.classList.remove(this.ACTIVE)
+            }
+        };
 
-        const parentSubmenuId = parentSubmenuArray.map(item => {
-            return item.getAttribute('node-id')
-        });
+        // apro i submenu parenti
+        for (const item of parentSubmenusArray) {
+            item.classList.add(this.ACTIVE)
+        }
 
-        // Array con gli ID dei menu non parenti, usato per loslideUp dei menu non necessari
-        const submenuToClose = allSubmenuId.filter(x => !parentSubmenuId.includes(x)).concat(parentSubmenuId.filter(x=> !allSubmenuId.includes(x)))
-        //////
-
-        // PARENTS ARROW ACTIVE
-        const parentsArrow = parentsSubmenu.map(item => {
+        // Faccio al stesa operazione per le arrow
+        const parentsArrow = parentSubmenus.map(item => {
             return getSiblings(item, this.ARROW_SUBMENU);
         }).flat();
 
-        ////////
-        // MOBILE/DESKTOP TOUCH
-        ///////
-        // Attivo il click sull'arrow solo per monitor touch e mobile
-        if (Modernizr.touchevents || mq.max('tablet')) {
-
-            // Chiudo tutti i submenu non necessari ( non parenti del selezionato).
-            // chiudo tutti quelli diversi dall' attuale paerto
-            for (const submenu of submenuArray) {
-                if (submenu !== activeSubmenu) {
-                    submenu.classList.remove(this.ACTIVE)
-                }
-            };
-
-            // apro i submenu parenti
-            for (const parentSubmenu of parentSubmenuArray) {
-                parentSubmenu.classList.add(this.ACTIVE)
+        const itemHasChildren = Array.from(this.itemHasChildren);
+        const arrowSubMenu = this.componentWrapper.querySelectorAll(`.${this.ARROW_SUBMENU}`);
+        const arrArrowSubmenu = Array.from(arrowSubMenu);
+        for (const item of arrArrowSubmenu) {
+            if (item !== target) {
+                item.classList.remove(this.ARROW_SELECTED)
             }
-            ///////
+        }
 
-            // Faccio al stesa operazione per le arrow
-            const itemHasChildren = Array.from(this.itemHasChildren);
-            const arrowSubMenu = this.componentWrapper.querySelectorAll(`.${this.ARROW_SUBMENU}`);
-            const arrArrowSubmenu = Array.from(arrowSubMenu);
-            for (const item of arrArrowSubmenu) {
-                if (item !== target) {
-                    item.classList.remove(this.ARROW_SELECTED)
-                }
-            }
+        for (const item of parentsArrow) {
+            item.classList.add(this.ARROW_SELECTED)
+        }
 
-            for (const item of parentsArrow) {
-                item.classList.add(this.ARROW_SELECTED)
-            }
+        if (!this.offCanvas) {
+            // Slide Down sui submenu non parenti del selezionato
+            // accordion common open/close logic sui menu non selezionati
+            const parentSubmenusId = parentSubmenusArray.map(item => {
+                return item.getAttribute('node-id')
+            });
 
-            ///////
+            const allSubmenuId = submenuArray.map(item => {
+                return item.getAttribute('node-id')
+            });
 
-            if (!this.offCanvas) {
-                // Slide Down sui submenu non parenti del selezionato
-                // ACCORDION COMMON OPEN/CLOSE LOGIC SUI MENU NON SELEZIONATI
+            // filtro i submenu non parenti dal node-id
+            const submenuToClose = allSubmenuId.filter(x => !parentSubmenusId.includes(x)).concat(parentSubmenusId.filter(x=> !allSubmenuId.includes(x)))
 
-                for (const item of submenuToClose) {
-                    const el = document.querySelector(`[node-id="${item}"]`)
-                    if (typeof(el) != 'undefined' && el != null) {
-                        slideUp(el);
-                    }
+            for (const item of submenuToClose) {
+                const el = document.querySelector(`[node-id="${item}"]`)
+                if (typeof(el) != 'undefined' && el != null) {
+                    slideUp(el);
                 }
             }
+        }
 
-            // OPEN/CLOSE
-            const isOpen = activeSubmenu.classList.contains(this.ACTIVE);
-            switch (isOpen) {
-                case true:
-                    activeSubmenu.classList.remove(this.ACTIVE)
-                    target.classList.remove(this.ARROW_SELECTED)
+        // OPEN/CLOSE
+        const isOpen = activeSubmenu.classList.contains(this.ACTIVE);
+        switch (isOpen) {
+            case true:
+                activeSubmenu.classList.remove(this.ACTIVE)
+                target.classList.remove(this.ARROW_SELECTED)
 
-                    switch (this.offCanvas) {
-                        case false:
-                            slideUp(activeSubmenu);
-                        break;
-                    }
+                switch (this.offCanvas) {
+                    case false:
+                        slideUp(activeSubmenu);
+                    break;
+                }
 
-                break;
+            break;
 
-                case false:
-                    activeSubmenu.classList.add(this.ACTIVE)
-                    target.classList.add(this.ARROW_SELECTED)
+            case false:
+                activeSubmenu.classList.add(this.ACTIVE)
+                target.classList.add(this.ARROW_SELECTED)
 
-                    switch (this.offCanvas) {
-                        case true:
-                            this.mainMenu.classList.remove(this.IS_SELECTED);
+                switch (this.offCanvas) {
+                    case true:
+                        this.mainMenu.classList.remove(this.IS_SELECTED);
 
-                            for (const submenu of submenuArray) {
-                                if (submenu !== activeSubmenu) {
-                                    submenu.classList.remove(this.IS_SELECTED);
-                                }
+                        for (const item of submenuArray) {
+                            if (item !== activeSubmenu) {
+                                item.classList.remove(this.IS_SELECTED);
                             }
+                        }
 
-                            // Attivo la propietà overflow-y: auto; nel menu selezionato
-                            activeSubmenu.classList.add(this.IS_SELECTED);
+                        // Attivo la propietà overflow-y: auto; nel menu selezionato
+                        activeSubmenu.classList.add(this.IS_SELECTED);
 
-                            // Posiziono il menu in verticale rispetto al menu parente;
-                            let gap = this.mainMenu.scrollTop;
-                            if (parentsSubmenu.length) {
-                                const parent = parentsSubmenu[parentsSubmenu.length-1]
-                                gap = parent.scrollTop;
-                            }
-                            const syle = { 'top': gap + 'px' }
+                        // Posiziono il menu in verticale rispetto al menu parente;
+                        let gap = this.mainMenu.scrollTop;
+                        if (parentSubmenus.length) {
+                            const parent = parentSubmenus[parentSubmenus.length-1]
+                            gap = parent.scrollTop;
+                        }
+                        const syle = { 'top': gap + 'px' }
 
-                            if(mq.max('tablet')) Object.assign(activeSubmenu.style, syle)
+                        if(mq.max('tablet')) Object.assign(activeSubmenu.style, syle)
 
-                        break;
+                    break;
 
-                        case false:
-                            slideDown(activeSubmenu);
+                    case false:
+                        slideDown(activeSubmenu);
 
-                        break;
-                    }
-                break;
-            }
+                    break;
+                }
+            break;
         }
     }
 
@@ -413,8 +400,8 @@ export class menuClass {
                     }
 
                     const submenuArray = Array.from(item.submenu);
-                    for (const el of submenuArray) {
-                        Object.assign(el.style, submenuStyle);
+                    for (const item of submenuArray) {
+                        Object.assign(item.style, submenuStyle);
                     }
                 }
             }

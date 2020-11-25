@@ -1,5 +1,5 @@
 import { eventManager } from "../../../js/base/eventManager.js";
-import { slideUp, slideDown } from "../../../js/utility/animation.js";
+import { slideUpDownReset, slideUp, slideDown } from "../../../js/utility/animation.js";
 
 export class popToggleClass {
 
@@ -22,7 +22,7 @@ export class popToggleClass {
         /// GASP INITIAL STATE
         if (this.isDropDown) {
             if (typeof(this.target) != 'undefined' && this.target != null) {
-                this.target.style.height = 0;
+                slideUpDownReset(this.target);
             }
         }
 

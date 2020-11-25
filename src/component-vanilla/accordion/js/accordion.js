@@ -1,6 +1,6 @@
 import { eventManager } from "../../../js/base/eventManager.js";
 import { mq } from "../../../js/base/mediaManager.js";
-import { slideUp, slideDown } from "../../../js/utility/animation.js";
+import { slideUpDownReset, slideUp, slideDown } from "../../../js/utility/animation.js";
 
 export class accordionClass {
     constructor(data) {
@@ -26,7 +26,7 @@ export class accordionClass {
         /// GASP INITIAL STATE
         const targetArray = Array.from(this.target.domEl);
         for (const el of targetArray) {
-            el.style.height = 0;
+            slideUpDownReset(el);
         };
     }
 
