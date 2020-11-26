@@ -7,9 +7,10 @@ import { slideUpDownReset, slideUp, slideDown } from "../../../js/utility/animat
 export class menuClass {
 
     constructor(data) {
-        this.componentWrapper = document.querySelector(data.componentWrepper);
+        this.componentWrapper = document.querySelector(data.componentWrapper);
         this.direction = data.direction || 'horizontal';
         this.sideDirection = data.sideDirection || 'left';
+        this.mediaQ = data.mediaQ || 'tablet';
         this.offCanvas = typeof data.offCanvas === "undefined" ? true : data.offCanvas;
         this.offCanvasBackButton = {};
         this.mainMenu = {};
@@ -107,7 +108,7 @@ export class menuClass {
 
     // utils for mobile accordion menu slideUp/Down init
     resetSubmenuHeight() {
-        if (mq.max('tablet') && !this.offCanvas) {
+        if (mq.max(this.mediaQ) && !this.offCanvas) {
             slideUpDownReset(this.menu);
 
             const targetArray = Array.from(this.allSubmenu);
@@ -174,7 +175,7 @@ export class menuClass {
     }
 
     addHandler() {
-        if ((!this.offCanvas && mq.max('tablet')) || Modernizr.touchevents) {
+        if ((!this.offCanvas && mq.max(this.mediaQ)) || Modernizr.touchevents) {
             this.body.addEventListener('click', this.bodyOnCLick.bind(this));
         }
 
@@ -188,7 +189,7 @@ export class menuClass {
     }
 
     offCanvasBack(evt) {
-        if (mq.min('tablet')) return;
+        if (mq.min(this.mediaQ)) return;
 
         const menuArray = Array.from(this.allSubmenu);
         const selectedMenu = menuArray.filter((element) => {
@@ -228,7 +229,7 @@ export class menuClass {
         const parents = getParents(e.target, `.${this.NAV_WRAP}`)
         if ( !parents.length ) {
             this.closeSubmenu();
-            if (mq.max('tablet') && this.menuIsOpen) {
+            if (mq.max(this.mediaQ) && this.menuIsOpen) {
                 this.closeMainMenu();
             }
         }
@@ -244,7 +245,7 @@ export class menuClass {
     }
 
     arrowOnClick(event) {
-        if (!Modernizr.touchevents && mq.min('tablet')) return;
+        if (!Modernizr.touchevents && mq.min(this.mediaQ)) return;
 
         const target = event.target;
         const parent = target.parentNode;
@@ -287,7 +288,7 @@ export class menuClass {
         }
 
         if (!this.offCanvas) {
-            // Slide Down sui submenu non parenti del selezionato
+            // Slide Up sui submenu non parenti del selezionato
             // accordion common open/close logic sui menu non selezionati
             const parentSubmenusId = parentSubmenusArray.map(item => {
                 return item.getAttribute('node-id')
@@ -348,7 +349,7 @@ export class menuClass {
                         }
                         const syle = { 'top': gap + 'px' }
 
-                        if(mq.max('tablet')) Object.assign(activeSubmenu.style, syle)
+                        if(mq.max(this.mediaQ)) Object.assign(activeSubmenu.style, syle)
 
                     break;
 
@@ -362,7 +363,7 @@ export class menuClass {
     }
 
     SetPosition() {
-        if (mq.min('tablet')) {
+        if (mq.min(this.mediaQ)) {
             for (let index = 0; index < this.menuArr.length; index++) {
                 const item = this.menuArr[index];
 
@@ -413,7 +414,7 @@ export class menuClass {
         this.menuIsOpen = false
         eventManager.removeBodyOverflow();
 
-        if (mq.max('tablet') && !this.offCanvas) {
+        if (mq.max(this.mediaQ) && !this.offCanvas) {
             slideUp(this.menu);
         }
 
@@ -454,7 +455,7 @@ export class menuClass {
             arrow.classList.remove(this.ARROW_SELECTED)
         };
 
-        if (mq.min('tablet')) {
+        if (mq.min(this.mediaQ)) {
             for (const submenu of submenuArray) {
                 const style = {
                     'display': ''
@@ -486,7 +487,7 @@ export class menuClass {
             Object.assign(submenu.style, style);
         };
 
-        if (mq.max('tablet')) {
+        if (mq.max(this.mediaQ)) {
             for (const submenu of allSubmenu) {
                 const style = {
                     'left': '',
@@ -498,7 +499,7 @@ export class menuClass {
     }
 
     CloseOnScroll() {
-        if (mq.max('tablet') && this.menuIsOpen) {
+        if (mq.max(this.mediaQ) && this.menuIsOpen) {
             this.closeSubmenu();
             this.closeMainMenu();
         }

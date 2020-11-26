@@ -1,3 +1,9 @@
+$mediaQ: 'tablet';
+
+// For different media query for each component at time duplicate code
+// in relation of each wrapper and modify $mediaQ
+// ToDo: find a solution, somethig like css propierties define by js instance
+
 .nav-wrap {
 
   &.menu-on.nav--offCanvas {
@@ -13,17 +19,15 @@
 
 .nav{
 
-  @include _mq('max','tablet') {
-    // display: none;
-    overflow: hidden;
-
+  @include _mq('max',$mediaQ) {
     @include when-inside('.nav--offCanvas') {
       display: block;
     }
   }
 
-  @include _mq('tablet') {
+  @include _mq($mediaQ) {
     display: block!important;
+    overflow: visible!important;
   }
 }
 
@@ -32,7 +36,7 @@
   margin: 0;
   padding: 0;
 
-  @include _mq('tablet') {
+  @include _mq($mediaQ) {
     display: flex;
 
     @include when-inside('.nav--vertical') {
@@ -40,7 +44,7 @@
     }
   }
 
-  @include _mq('max', 'tablet') {
+  @include _mq('max', $mediaQ) {
     @include when-inside('.nav--offCanvas') {
       position: absolute;
       top: var(--toggle-h);
@@ -73,12 +77,12 @@
     position: relative;
   }
 
-  @include _mq('tablet') {
+  @include _mq($mediaQ) {
     position: relative;
   }
 
   @include on-event() {
-    @include _mq('tablet') {
+    @include _mq($mediaQ) {
       @include when-inside('.no-touchevents'){
         > .sub-menu {
           display: block;
@@ -90,11 +94,11 @@
 
 .main-menu > .menu-item {
 
-  @include _mq('tablet') {
+  @include _mq($mediaQ) {
     flex: 1 auto;
   }
 
-  @include _mq('tablet') {
+  @include _mq($mediaQ) {
     display: inline-block;
     text-align: center;
   }
@@ -111,7 +115,7 @@
 
 .menu-item-has-children {
 
-  @include _mq('max', 'tablet') {
+  @include _mq('max', $mediaQ) {
     @include when-inside('.nav--offCanvas') {
       overflow: hidden;
 
@@ -131,7 +135,7 @@
     > .arrow-submenu {
       &:after {
         @include when-inside('.no-touchevents') {
-          @include _mq('tablet') {
+          @include _mq($mediaQ) {
             content: '-';
           }
         }
@@ -145,7 +149,7 @@
   margin: 0;
   padding: 0;
 
-  @include _mq('max', 'tablet') {
+  @include _mq('max', $mediaQ) {
     overflow: hidden;
 
     @include when-inside('.nav--offCanvas') {
@@ -172,7 +176,7 @@
     }
   }
 
-  @include  _mq('tablet') {
+  @include  _mq($mediaQ) {
     position: absolute;
     top: 100%;
     height: 100%;
@@ -203,15 +207,16 @@
 
   .sub-menu {
     @include when-inside('.nav--horizontal') {
-      @include _mq('tablet') {
+      @include _mq($mediaQ) {
         top: 0;
       }
     }
   }
 
   &.active {
-    @include _mq('tablet') {
+    @include _mq($mediaQ) {
       display: block;
+      overflow: visible!important;
     }
   }
 }
@@ -224,7 +229,7 @@
   float: left;
 
   @include when-inside('.nav--offCanvas.menu-on') {
-    @include _mq('max', 'tablet') {
+    @include _mq('max', $mediaQ) {
       display: block;
     }
   }
@@ -253,7 +258,7 @@
     display: block;
 
     @include when-inside('.nav--offCanvas') {
-      @include _mq('max', 'tablet') {
+      @include _mq('max', $mediaQ) {
         content: '+';
       }
     }
@@ -261,7 +266,7 @@
 
 
   @include when-inside('.nav--dropDown') {
-    @include _mq('max', 'tablet') {
+    @include _mq('max', $mediaQ) {
       position: absolute;
       right: 8px;
       top: 0;
@@ -269,7 +274,7 @@
     }
   }
 
-  @include _mq('tablet') {
+  @include _mq($mediaQ) {
     position: absolute;
     right: 8px;
     z-index: 9;
@@ -300,7 +305,7 @@
     background-color: $white;
   }
 
-  @include _mq('tablet') {
+  @include _mq($mediaQ) {
     display: none;
   }
 }

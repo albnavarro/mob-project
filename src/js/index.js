@@ -98,11 +98,11 @@ const lightVideo = new lightBoxClass({
 
 // MENU
 const menu = new menuClass({
-      componentWrepper: '.menu-container--top'
+      componentWrapper: '.menu-container--top'
     });
 
 const sidebarMenu = new menuClass({
-      componentWrepper: '.menu-container--sidebar',
+      componentWrapper: '.menu-container--sidebar',
       direction: 'vertical',
       sideDirection: 'left',
       offCanvas: false

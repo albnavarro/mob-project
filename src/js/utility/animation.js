@@ -2,6 +2,7 @@ import {gsap} from "gsap";
 
 export function slideUpDownReset(target) {
     target.style.height = 0;
+    target.style.overflow = 'hidden';
 }
 
 export function slideUp(target, duration = .5, ease = 'Power4.easeOut') {
