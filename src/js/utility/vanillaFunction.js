@@ -60,7 +60,7 @@ export function getParents (elem, selector) {
 	// Push each parent element to the array
 	for ( ; elem && elem !== document; elem = elem.parentNode ) {
 		if (selector) {
-			if (elem.matches(selector)) {
+			if (elem.classList.contains(selector)) {
 				parents.push(elem);
 			}
 			continue;

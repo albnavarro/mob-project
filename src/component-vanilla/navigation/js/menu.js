@@ -147,7 +147,8 @@ export class menuClass {
             this.submenuArray = Array.from(this.submenu);
 
             for (const element of this.submenuArray) {
-                const numSubmenuParents = getParents(element, `.${context.SUB_MENU}`).length - 1;
+                const numSubmenuParents = getParents(element, context.SUB_MENU).length - 1;
+
                 if (numSubmenuParents > maxLevel) {
                     maxLevel = numSubmenuParents;
                 }
@@ -226,7 +227,7 @@ export class menuClass {
     }
 
     bodyOnCLick(e) {
-        const parents = getParents(e.target, `.${this.NAV_WRAP}`)
+        const parents = getParents(e.target, this.NAV_WRAP)
         if ( !parents.length ) {
             this.closeSubmenu();
             if (mq.max(this.mediaQ) && this.menuIsOpen) {
@@ -254,7 +255,7 @@ export class menuClass {
         const item = target.closest(`.${this.MENU_ITEM}`);
 
         // i submenu parenti possono esserer piu di uno
-        const parentSubmenus = getParents(item, `.${this.SUB_MENU}`);
+        const parentSubmenus = getParents(item, this.SUB_MENU);
         const parentSubmenusArray = Array.from(parentSubmenus);
 
         // chiudo tutti quelli diversi dall' attuale paerto
@@ -367,7 +368,6 @@ export class menuClass {
             for (let index = 0; index < this.menuArr.length; index++) {
                 const item = this.menuArr[index];
 
-                // console.log(item.parentItem)
                 item.parentItemPos = parseInt(position(item.parentItem).left);
                 item.parentItemWidth = parseInt(outerWidth(item.parentItem));
                 item.totalWidth = item.parentItemPos + item.parentItemWidth + (item.maxLevel * this.subMenuWidth);

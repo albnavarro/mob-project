@@ -14,7 +14,6 @@ import { loadImagesVanilla } from "./utility/loadImagesVanilla.js"
 
 // COMPONENT MODULE
 import { tGallery } from "../component/threeGallery/js/threeGallery.js";
-import { toolTip } from "../component/tooltip/js/tooltip.js"
 import { totop } from "../component/to-top/js/toTop.js"
 import { offsetSliderClass } from "../component/offset-slider/js/offsetSlider.js"
 
@@ -27,6 +26,7 @@ import { popToggleManagerClass } from "../component-vanilla/popToggle/js/popTogg
 import { overlayClass } from "../component-vanilla/overlay/js/overlay.js"
 import { lightBoxClass } from "../component-vanilla/lightbox/js/lightbox.js"
 import { menuClass } from "../component-vanilla/navigation/js/menu.js"
+import { toolTip } from "../component-vanilla/tooltip/js/tooltip.js"
 
 eventManager.init(true,true);
 parallax.init();
