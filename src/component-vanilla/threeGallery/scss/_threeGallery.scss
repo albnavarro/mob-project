@@ -10,6 +10,7 @@ $activeHeight: calc(var(--vh, 1vh) * 75);
     height: $containerHeightFallback;
     height: $containerHeight;
     position: relative;
+    overflow: hidden;
 
     &[data-diretction="up"] {
         align-items: flex-end;
@@ -29,7 +30,6 @@ $activeHeight: calc(var(--vh, 1vh) * 75);
         flex: 0 0 auto;
         width: 50%;
         cursor: pointer;
-        overflow: hidden;
 
         * {
             pointer-events: none;
@@ -42,8 +42,15 @@ $activeHeight: calc(var(--vh, 1vh) * 75);
         }
 
         &.swap-item {
-            animation-duration: .8s;
-            animation-name: tGallerySwapAnimation;
+            animation-duration: 0.55s;
+
+            &--formLeft {
+                animation-name: swap-from-left;
+            }
+
+            &--formRight {
+                animation-name: swap-from-right;
+            }
         }
 
         &:nth-of-type(1) {
@@ -87,12 +94,26 @@ $activeHeight: calc(var(--vh, 1vh) * 75);
 }
 
 
-@keyframes tGallerySwapAnimation {
+@keyframes  swap-from-left {
     from {
         opacity: 0;
+        transform: translateX(-100%);
     }
 
     to {
         opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes  swap-from-right {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }

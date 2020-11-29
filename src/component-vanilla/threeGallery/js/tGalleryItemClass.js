@@ -42,6 +42,8 @@ export class tGalleryItemClass {
         const prevSwapItem = this.container.querySelector('.swap-item');
         if (typeof(prevSwapItem) != 'undefined' && prevSwapItem != null) {
             prevSwapItem.classList.remove('swap-item')
+            prevSwapItem.classList.remove('swap-item--formLeft')
+            prevSwapItem.classList.remove('swap-item--formRight')
         }
 
         const itemPosX = offset(item).left;
@@ -61,9 +63,16 @@ export class tGalleryItemClass {
         })
         swapItem.classList.add('swap-item');
 
+
         // Posizione il precendete elemento attivo a dx o sx
         const activerItem = this.container.querySelector('.tGallery__item--active');
-        (this.activeDirection == 'sx') ? activerItem.style.order = 3 : activerItem.style.order = 1;
+        if (this.activeDirection == 'sx') {
+            activerItem.style.order = 3;
+            swapItem.classList.add('swap-item--formLeft');
+        } else {
+            activerItem.style.order = 1;
+            swapItem.classList.add('swap-item--formRight');
+        }
 
         // Posiziono l'attuale elemento attivo
 
