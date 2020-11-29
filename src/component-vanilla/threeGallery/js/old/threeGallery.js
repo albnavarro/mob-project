@@ -1,4 +1,4 @@
-import { eventManager } from "../../../js/base/eventManager.js";
+import { eventManager } from "../../../../js/base/eventManager.js";
 
 class tGalleryClass {
 

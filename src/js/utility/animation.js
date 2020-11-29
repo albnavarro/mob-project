@@ -1,4 +1,6 @@
 import {gsap} from "gsap";
+import { ScrollToPlugin } from 'gsap/all'
+
 
 export function slideUpDownReset(target) {
     target.style.height = 0;
@@ -20,5 +22,13 @@ export function slideDown(target, duration = .5, ease = 'Power4.easeOut') {
             target.style.height = 'auto';
             res();
         }});
+    });
+}
+
+export function bodyScrollTo(value, duration = .5, ease = 'Power4.easeOut') {
+    gsap.registerPlugin(ScrollToPlugin)
+    
+    return new Promise((res, reject) => {
+        gsap.to(window, {scrollTo: value, ease: ease, duration: duration, onComplete:res});
     });
 }

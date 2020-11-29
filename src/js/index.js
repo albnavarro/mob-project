@@ -13,11 +13,11 @@ import { findElement } from "./utility/findElement.js"
 import { loadImagesVanilla } from "./utility/loadImagesVanilla.js"
 
 // COMPONENT MODULE
-import { tGallery } from "../component/threeGallery/js/threeGallery.js";
 import { totop } from "../component/to-top/js/toTop.js"
 import { offsetSliderClass } from "../component/offset-slider/js/offsetSlider.js"
 
 // NEW VANILLA COMPONENT MODULE
+import { tGallery } from "../component-vanilla/threeGallery/js/threeGallery.js";
 import { parallax } from "../component-vanilla/parallax/js/parallax.js";
 import { accordionClass } from "../component-vanilla/accordion/js/accordion.js"
 import { showElement } from "../component-vanilla/show-element/js/ShowElement.js"

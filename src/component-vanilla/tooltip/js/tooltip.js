@@ -38,10 +38,10 @@ class toolTipClass {
     onMouseOver(event) {
         if (!Modernizr.touchevents) {
             // Controllo che non passi sopra il toolotip per non chiuderlo
-            const target = event.target
+            const currentTarget = event.currentTarget
 
-            if (!target.classList.contains('tooltip-pop') && !this.overTool) {
-                this.addTollTip(target, event);
+            if (!currentTarget.classList.contains('tooltip-pop') && !this.overTool) {
+                this.addTollTip(currentTarget, event);
                 this.overTool = true;
             }
         }
@@ -51,11 +51,16 @@ class toolTipClass {
         // Controllo che non passi sopra il toolotip per non chiuderlo
         // event.relatedTarget = elemento di atterragio del mouseOut
         const realtedTarget = event.relatedTarget;
+        const parents = getParents(realtedTarget, 'tooltip-pop');
+
+        if (typeof(realtedTarget) === 'undefined' || realtedTarget === null) return;
 
         // Chiudo il PopUp solo se non passo dal btn al PopUp aperto
-        if (!Modernizr.touchevents && !realtedTarget.classList.contains('tooltip-pop')) {
-            this.resetTooltip();
-            this.overTool = false;
+        if (!Modernizr.touchevents
+            && !realtedTarget.classList.contains('tooltip-pop')
+            && parents.length == 0) {
+                this.resetTooltip();
+                this.overTool = false;
 
         } else if (!Modernizr.touchevents && realtedTarget.classList.contains('tooltip-pop')) {
 
@@ -73,7 +78,7 @@ class toolTipClass {
     }
 
     outOfPopUp(event) {
-        const target = event.target;
+        const target = event.currentTarget;
         const realtedTarget = event.relatedTarget;
 
         const parents = getParents(realtedTarget, 'tooltip-pop');
@@ -82,7 +87,7 @@ class toolTipClass {
         // Non chiudo il PopUp se:
         if (
             // Se entro dentro un sottoelemento del popUp ( es. un link )
-            parents.length == 1 ||
+            parents.length > 0 ||
 
             // Se da un sottoelemento del popUp torno nel popUp
             realtedTarget.classList.contains('tooltip-pop') ||
