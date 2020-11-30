@@ -41,31 +41,20 @@ $activeHeight: calc(var(--vh, 1vh) * 75);
             cursor: default;
         }
 
-        &.swap-item {
-            animation-duration: 0.55s;
 
-            &--formLeft {
-                animation-name: swap-from-left;
-            }
-
-            &--formRight {
-                animation-name: swap-from-right;
-            }
-        }
-
-        &:nth-of-type(1) {
+        &--1 {
             .tGallery__item__wrap {
                 background-color: #ccc;
             }
         }
 
-        &:nth-of-type(2) {
+        &--2 {
             .tGallery__item__wrap {
                 background-color: #eee;
             }
         }
 
-        &:nth-of-type(3) {
+        &--3 {
             .tGallery__item__wrap {
                 background-color: #ddd;
             }
@@ -93,27 +82,78 @@ $activeHeight: calc(var(--vh, 1vh) * 75);
     }
 }
 
+.t-swap-item {
+    animation-duration: 0.55s;
+
+    &--formLeft {
+        animation-name: swap-from-left;
+    }
+
+    &--formRight {
+        animation-name: swap-from-right;
+    }
+}
+
+
+.t-clone {
+    position: absolute;
+
+    &--up {
+        top: 0;
+    }
+
+    &--down {
+        bottom: 0;
+    }
+
+    &--sx {
+        left: 0;
+        animation: hideFromLeft 0.55s forwards;
+    }
+
+    &--dx {
+        right: 0;
+        animation: hideFromRight 0.55s forwards;
+    }
+}
+
+@keyframes  hideFromLeft{
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-100%);
+    }
+}
+
+@keyframes  hideFromRight{
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(100%);
+    }
+}
+
 
 @keyframes  swap-from-left {
     from {
-        opacity: 0;
         transform: translateX(-100%);
     }
 
     to {
-        opacity: 1;
         transform: translateY(0);
     }
 }
 
 @keyframes  swap-from-right {
     from {
-        opacity: 0;
         transform: translateX(100%);
     }
 
     to {
-        opacity: 1;
         transform: translateY(0);
     }
 }
