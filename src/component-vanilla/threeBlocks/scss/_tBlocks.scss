@@ -1,0 +1,227 @@
+$containerHeightFallback: 100vh;
+$containerHeight: calc(var(--vh, 1vh) * 100);
+$defaultHeightFallback: 40vh;
+$defaultHeight: calc(var(--vh, 1vh) * 40);
+$activeHeightFallback: 60vh;
+$activeHeight: calc(var(--vh, 1vh) * 60);
+
+.tGallery {
+    display: flex;
+    height: $containerHeightFallback;
+    height: $containerHeight;
+    position: relative;
+    overflow: hidden;
+
+    &[data-diretction="up"] {
+        align-items: flex-end;
+
+        .tGallery__item--active {
+            top: 0;
+        }
+    }
+
+    &[data-diretction="down"] {
+        .tGallery__item:not(.tGallery__item--active) {
+            align-self: start;
+        }
+
+        .tGallery__item--active {
+            bottom: 0;
+        }
+    }
+
+    &__item {
+        flex: 0 0 auto;
+        width: 50%;
+        cursor: pointer;
+        position: relative;
+
+        &--active {
+            height: $activeHeightFallback;
+            height: $activeHeight;
+            width: 100%;
+            position: absolute;
+            cursor: default;
+        }
+
+        &--1 {
+            .tGallery__item__wrap {
+                background-color: #e4e4e4;
+            }
+        }
+
+        &--2 {
+            .tGallery__item__wrap {
+                background-color: #d0caca;
+            }
+        }
+
+        &--3 {
+            .tGallery__item__wrap {
+                background-color: #bfb7b7;
+            }
+        }
+
+        &__wrap {
+            transition: transform .55s cubic-bezier(0.305, 0.550, 0.470, 1.015);
+            height: $defaultHeightFallback;
+            height: $defaultHeight;
+            overflow: hidden;
+            position: relative;
+
+            @include when-inside('[data-diretction="down"]') {
+                &.tg-form-right {
+                    transform-origin: right top;
+                }
+
+                &.tg-form-left {
+                    transform-origin: left top;
+                }
+            }
+
+            @include when-inside('[data-diretction="up"]') {
+                &.tg-form-right {
+                    transform-origin: right bottom;
+                }
+
+                &.tg-form-left {
+                    transform-origin: left bottom;
+                }
+            }
+
+            @include when-inside('.tGallery__item--active') {
+                position: absolute;
+
+                &.tg-form-right {
+                    right: 0;
+                }
+
+                &.tg-form-left {
+                    left: 0;
+                }
+
+                @include when-inside('[data-diretction="down"]') {
+                    bottom: 0;
+
+                    &.tg-form-right {
+                        transform-origin: right bottom;
+                    }
+
+                    &.tg-form-left {
+                        transform-origin: left bottom;
+                    }
+                }
+
+                @include when-inside('[data-diretction="up"]') {
+                    top: 0;
+
+                    &.tg-form-right {
+                        transform-origin: right top;
+                    }
+
+                    &.tg-form-left {
+                        transform-origin: left top;
+                    }
+                }
+            }
+        }
+
+        &__container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+
+        &__notScaled {
+            transition: transform .55s cubic-bezier(0.305, 0.550, 0.470, 1.015);
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            text-align: center;
+            // border: 1px #a5a58d solid;
+        }
+    }
+}
+
+.t-swap-item {
+    animation-duration: 0.55s;
+
+    &--formLeft {
+        animation-name: swap-from-left;
+    }
+
+    &--formRight {
+        animation-name: swap-from-right;
+    }
+}
+
+
+.t-clone {
+    position: absolute;
+
+    &--up {
+        top: 0;
+    }
+
+    &--down {
+        bottom: 0;
+    }
+
+    &--sx {
+        left: 0;
+        animation: hideFromLeft 0.55s forwards;
+    }
+
+    &--dx {
+        right: 0;
+        animation: hideFromRight 0.55s forwards;
+    }
+}
+
+@keyframes  hideFromLeft{
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-100%);
+    }
+}
+
+@keyframes  hideFromRight{
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(100%);
+    }
+}
+
+
+@keyframes  swap-from-left {
+    from {
+        transform: translateX(-100%);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}
+
+@keyframes  swap-from-right {
+    from {
+        transform: translateX(100%);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}

@@ -1,7 +1,7 @@
 import { eventManager } from "../../../js/base/eventManager.js";
-import {tGalleryItemClass} from "./tGalleryItemClass.js"
+import {tBlocksItemClass} from "./tBlocksItem.js"
 
-class tGalleryClass {
+class tBlocksClass {
 
   constructor(data) {
       this.item = document.querySelectorAll("*[data-conponent='m-comp--tGallery']"),
@@ -15,11 +15,11 @@ class tGalleryClass {
   inzializeData() {
       const itemArray = Array.from(this.item);
       for (const item of itemArray) {
-          const tGalleryItem = new tGalleryItemClass(item);
+          const tGalleryItem = new tBlocksItemClass(item);
           this.instances.push(tGalleryItem);
           tGalleryItem.init();
       }
   }
 }
 
-export const tGallery = new tGalleryClass()
+export const tBlocks = new tBlocksClass()

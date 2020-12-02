@@ -1,13 +1,15 @@
 import { eventManager } from "../../../js/base/eventManager.js";
 import { position, outerWidth, outerHeight, offset } from "../../../js/utility/vanillaFunction.js";
 import { bodyScrollTo } from "../../../js/utility/animation.js";
+import {modernzier} from "../../../js/utility/modernizr.js"
 
-export class tGalleryItemClass {
+export class tBlocksItemClass {
     constructor(container) {
         this.container = container;
         this.items = container.querySelectorAll('.tGallery__item');
         this.activeHDirection = 'dx';
         this.center = position(container).left + outerWidth(container) / 2;
+        this.transformProperty = Modernizr.prefixed('transform');
     }
 
     init() {
@@ -16,7 +18,10 @@ export class tGalleryItemClass {
             el.addEventListener('click', this.onClick.bind(this))
         }
         eventManager.push('load', this.setWidth.bind(this))
+        eventManager.push('load', this.setTransformOrigin.bind(this))
+        eventManager.push('load', this.setActiveTransform.bind(this))
         eventManager.push('resize', this.setWidth.bind(this))
+        eventManager.push('resize', this.removeSwapItem.bind(this))
     }
 
     calcCenter() {
@@ -25,12 +30,73 @@ export class tGalleryItemClass {
 
     setWidth() {
         const itemArray = Array.from(this.items);
+        const width = outerWidth(this.container);
         for (const el of itemArray) {
             const innerElement = el.querySelector('.tGallery__item__wrap');
-            const width = outerWidth(el);
-            innerElement.style.width = `${width}px`;
+            innerElement.style.width = `${width/2}px`;
         }
         this.calcCenter();
+    }
+
+    setActiveTransform(item = null, child = null) {
+        if (item == null) item = this.container.querySelector('.tGallery__item--active');
+        if (child == null) child = item.querySelector('.tGallery__item__wrap');
+
+        const childH = outerHeight(child);
+        const itemH = outerHeight(item);
+        const scaleYVal = itemH / childH;
+
+        let style = {}
+        style[this.transformProperty] = `translate3d(0,0,0) scale(2,${scaleYVal})`;
+        Object.assign(child.style, style);
+
+        const content = child.querySelector('.tGallery__item__notScaled');
+        style[this.transformProperty] = `translate3d(0,0,0) scale(.5,${1/scaleYVal})`;
+        Object.assign(content.style, style);
+    }
+
+    resetTransform(items) {
+        const style = {};
+        style[this.transformProperty] = `translate3d(0,0,0) scale(1,1)`;
+
+        for (const el of items) {
+            const innerEl = el.querySelector('.tGallery__item__wrap')
+            Object.assign(innerEl.style, style);
+
+            const content = el.querySelector('.tGallery__item__notScaled');
+            Object.assign(content.style, style);
+        }
+    }
+
+    setTransformOrigin(item = null, child = null, posX = null) {
+        if (item == null) item = this.container.querySelector('.tGallery__item--active');
+        if (child == null) child = item.querySelector('.tGallery__item__wrap');
+        if (posX == null) posX = offset(item).left;
+
+        if(posX > this.center - 20) {
+            child.classList.add('tg-form-right');
+            child.classList.remove('tg-form-left')
+            this.activeHDirection = 'sx'
+
+        } else {
+            child.classList.add('tg-form-left');
+            child.classList.remove('tg-form-right')
+            this.activeHDirection = 'dx'
+        }
+    }
+
+    removeSwapItem() {
+        const prevSwapItem = this.container.querySelector('.t-swap-item');
+        if (typeof(prevSwapItem) != 'undefined' && prevSwapItem != null) {
+            prevSwapItem.classList.remove('t-swap-item')
+            prevSwapItem.classList.remove('t-swap-item--formLeft')
+            prevSwapItem.classList.remove('t-swap-item--formRight')
+        }
+
+        const clonedSwap = this.container.querySelector('.t-clone');
+        if (typeof(prevSwapItem) != 'undefined' && prevSwapItem != null) {
+            clonedSwap.remove()
+        }
     }
 
     onClick(event) {
@@ -39,20 +105,9 @@ export class tGalleryItemClass {
         if (item.classList.contains('tGallery__item--active')) return;
 
         // reset lastSwapItem ( item that change layout position)
-        const prevSwapItem = this.container.querySelector('.t-swap-item');
-        if (typeof(prevSwapItem) != 'undefined' && prevSwapItem != null) {
-            prevSwapItem.classList.remove('t-swap-item')
-            prevSwapItem.classList.remove('t-swap-item--formLeft')
-            prevSwapItem.classList.remove('t-swap-item--formRight')
-        }
+        this.removeSwapItem();
 
-        // Remove swapCLone
-        const clonedSwap = this.container.querySelector('.t-clone');
-        if (typeof(prevSwapItem) != 'undefined' && prevSwapItem != null) {
-            clonedSwap.remove()
-        }
-
-        const itemPosX = offset(item).left;
+        const posX = offset(item).left;
         const width = outerWidth(this.container);
         const currentInnerElement = item.querySelector('.tGallery__item__wrap');
         let itemNotActive = this.container.querySelectorAll('.tGallery__item:not(.tGallery__item--active)');
@@ -80,17 +135,8 @@ export class tGalleryItemClass {
             swapItem.classList.add('t-swap-item--formRight');
         }
 
-        // Posiziono l'attuale elemento attivo
-        if(itemPosX > this.center - 20) {
-            currentInnerElement.classList.add('tg-form-right');
-            currentInnerElement.classList.remove('tg-form-left')
-            this.activeHDirection = 'sx'
-
-        } else {
-            currentInnerElement.classList.add('tg-form-left');
-            currentInnerElement.classList.remove('tg-form-right')
-            this.activeHDirection = 'dx'
-        }
+        // // Posiziono l'attuale elemento attivo
+        this.setTransformOrigin(item,currentInnerElement,posX);
 
         //CLONE
         const swapClone = swapItem.cloneNode(true);
@@ -112,17 +158,10 @@ export class tGalleryItemClass {
         // SET NEW ACTIVE ITEM
         item.classList.add('tGallery__item--active')
 
-        // REFRESH ITEM NEW NOT ACTIVE WIDTH
         itemNotActive = this.container.querySelectorAll('.tGallery__item:not(.tGallery__item--active)');
         itemNotActiveArray = Array.from(itemNotActive);
 
-        // Fix IE11 animationinto flex fail
-        for (const el of itemNotActiveArray) {
-            const innerEl = el.querySelector('.tGallery__item__wrap')
-            innerEl.style.width = `${width/2}px`;
-        }
-
-        // ACTIVE ITEM WIDTH
-        currentInnerElement.style.width = `${width}px`;
+        this.resetTransform(itemNotActiveArray)
+        this.setActiveTransform(item,currentInnerElement);
     }
 }

@@ -5,6 +5,8 @@ import {} from "./polyfill/closest.js";
 import {} from "./polyfill/matches.js";
 import {} from "./polyfill/flat.js";
 import {} from "./polyfill/includes.js";
+import {} from "./polyfill/find.js";
+import {} from "./polyfill/remove.js";
 
 // BASE MODULE
 import { eventManager } from "./base/eventManager.js";
@@ -17,7 +19,7 @@ import { totop } from "../component/to-top/js/toTop.js"
 import { offsetSliderClass } from "../component/offset-slider/js/offsetSlider.js"
 
 // NEW VANILLA COMPONENT MODULE
-import { tGallery } from "../component-vanilla/threeGallery/js/threeGallery.js";
+import { tBlocks } from "../component-vanilla/threeBlocks/js/tBlocks.js";
 import { parallax } from "../component-vanilla/parallax/js/parallax.js";
 import { accordionClass } from "../component-vanilla/accordion/js/accordion.js"
 import { showElement } from "../component-vanilla/show-element/js/ShowElement.js"
@@ -30,7 +32,7 @@ import { toolTip } from "../component-vanilla/tooltip/js/tooltip.js"
 
 eventManager.init(true,true);
 parallax.init();
-tGallery.init();
+tBlocks.init();
 showElement.init();
 toolTip.init();
 totop.init();
