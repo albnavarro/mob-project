@@ -6,8 +6,9 @@ import {modernzier} from "../../../js/utility/modernizr.js"
 export class tBlocksItemClass {
     constructor(container) {
         this.container = container;
-        this.items = container.querySelectorAll('.tGallery__item');
+        this.items = container.querySelectorAll('.tBlocks__item');
         this.activeHDirection = 'dx';
+        this.activeIndex = 0;
         this.center = position(container).left + outerWidth(container) / 2;
         this.transformProperty = Modernizr.prefixed('transform');
     }
@@ -32,15 +33,15 @@ export class tBlocksItemClass {
         const itemArray = Array.from(this.items);
         const width = outerWidth(this.container);
         for (const el of itemArray) {
-            const innerElement = el.querySelector('.tGallery__item__wrap');
+            const innerElement = el.querySelector('.tBlocks__item__wrap');
             innerElement.style.width = `${width/2}px`;
         }
         this.calcCenter();
     }
 
     setActiveTransform(item = null, child = null) {
-        if (item == null) item = this.container.querySelector('.tGallery__item--active');
-        if (child == null) child = item.querySelector('.tGallery__item__wrap');
+        if (item == null) item = this.container.querySelector('.tBlocks__item--active');
+        if (child == null) child = item.querySelector('.tBlocks__item__wrap');
 
         const childH = outerHeight(child);
         const itemH = outerHeight(item);
@@ -50,7 +51,7 @@ export class tBlocksItemClass {
         style[this.transformProperty] = `translate3d(0,0,0) scale(2,${scaleYVal})`;
         Object.assign(child.style, style);
 
-        const content = child.querySelector('.tGallery__item__notScaled');
+        const content = child.querySelector('.tBlocks__item__notScaled');
         style[this.transformProperty] = `translate3d(0,0,0) scale(.5,${1/scaleYVal})`;
         Object.assign(content.style, style);
     }
@@ -60,17 +61,17 @@ export class tBlocksItemClass {
         style[this.transformProperty] = `translate3d(0,0,0) scale(1,1)`;
 
         for (const el of items) {
-            const innerEl = el.querySelector('.tGallery__item__wrap')
+            const innerEl = el.querySelector('.tBlocks__item__wrap')
             Object.assign(innerEl.style, style);
 
-            const content = el.querySelector('.tGallery__item__notScaled');
+            const content = el.querySelector('.tBlocks__item__notScaled');
             Object.assign(content.style, style);
         }
     }
 
     setTransformOrigin(item = null, child = null, posX = null) {
-        if (item == null) item = this.container.querySelector('.tGallery__item--active');
-        if (child == null) child = item.querySelector('.tGallery__item__wrap');
+        if (item == null) item = this.container.querySelector('.tBlocks__item--active');
+        if (child == null) child = item.querySelector('.tBlocks__item__wrap');
         if (posX == null) posX = offset(item).left;
 
         if(posX > this.center - 20) {
@@ -102,15 +103,16 @@ export class tBlocksItemClass {
     onClick(event) {
         const item = event.currentTarget;
 
-        if (item.classList.contains('tGallery__item--active')) return;
+        if (item.classList.contains('tBlocks__item--active')) return;
 
         // reset lastSwapItem ( item that change layout position)
         this.removeSwapItem();
 
         const posX = offset(item).left;
         const width = outerWidth(this.container);
-        const currentInnerElement = item.querySelector('.tGallery__item__wrap');
-        let itemNotActive = this.container.querySelectorAll('.tGallery__item:not(.tGallery__item--active)');
+        const activeId = item.getAttribute('data-id');
+        const currentInnerElement = item.querySelector('.tBlocks__item__wrap');
+        let itemNotActive = this.container.querySelectorAll('.tBlocks__item:not(.tBlocks__item--active)');
         let itemNotActiveArray = Array.from(itemNotActive);
         let vDirection = this.container.getAttribute('data-diretction');
 
@@ -126,7 +128,7 @@ export class tBlocksItemClass {
         swapItem.classList.add('t-swap-item');
 
         // Posizione il precendete elemento attivo a dx o sx
-        const activerItem = this.container.querySelector('.tGallery__item--active');
+        const activerItem = this.container.querySelector('.tBlocks__item--active');
         if (this.activeHDirection == 'sx') {
             activerItem.style.order = 3;
             swapItem.classList.add('t-swap-item--formLeft');
@@ -148,20 +150,34 @@ export class tBlocksItemClass {
         // Setto l'altrnanza top/bottom
         (vDirection == 'up') ?  vDirection = 'down' :  vDirection = 'up';
         this.container.setAttribute('data-diretction', vDirection )
+        this.container.setAttribute('data-activeId', activeId )
+        this.activeIndex = activeId;
 
         const scrollDestination = offset(this.container).top;
         bodyScrollTo(scrollDestination);
 
         // RESET LAST ACTIVE ITEM
-        activerItem.classList.remove('tGallery__item--active')
+        activerItem.classList.remove('tBlocks__item--active')
 
         // SET NEW ACTIVE ITEM
-        item.classList.add('tGallery__item--active')
+        item.classList.add('tBlocks__item--active')
 
-        itemNotActive = this.container.querySelectorAll('.tGallery__item:not(.tGallery__item--active)');
+        itemNotActive = this.container.querySelectorAll('.tBlocks__item:not(.tBlocks__item--active)');
         itemNotActiveArray = Array.from(itemNotActive);
 
         this.resetTransform(itemNotActiveArray)
         this.setActiveTransform(item,currentInnerElement);
+
+        this.container.dispatchEvent(new CustomEvent("itemChange", {
+            detail: {
+                hDirection: vDirection,
+                index: this.activeIndex
+            }
+        }));
     }
 }
+
+// EVENT itemChange
+// < container ( this.container) >.addEventListener('itemChange', (e) => {
+//     console.log(e.detail)
+// }, false);

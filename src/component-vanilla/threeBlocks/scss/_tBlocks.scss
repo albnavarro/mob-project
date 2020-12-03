@@ -5,7 +5,7 @@ $defaultHeight: calc(var(--vh, 1vh) * 40);
 $activeHeightFallback: 60vh;
 $activeHeight: calc(var(--vh, 1vh) * 60);
 
-.tGallery {
+.tBlocks {
     display: flex;
     height: $containerHeightFallback;
     height: $containerHeight;
@@ -15,17 +15,17 @@ $activeHeight: calc(var(--vh, 1vh) * 60);
     &[data-diretction="up"] {
         align-items: flex-end;
 
-        .tGallery__item--active {
+        .tBlocks__item--active {
             top: 0;
         }
     }
 
     &[data-diretction="down"] {
-        .tGallery__item:not(.tGallery__item--active) {
+        .tBlocks__item:not(.tBlocks__item--active) {
             align-self: start;
         }
 
-        .tGallery__item--active {
+        .tBlocks__item--active {
             bottom: 0;
         }
     }
@@ -45,19 +45,19 @@ $activeHeight: calc(var(--vh, 1vh) * 60);
         }
 
         &--1 {
-            .tGallery__item__wrap {
+            .tBlocks__item__wrap {
                 background-color: #e4e4e4;
             }
         }
 
         &--2 {
-            .tGallery__item__wrap {
+            .tBlocks__item__wrap {
                 background-color: #d0caca;
             }
         }
 
         &--3 {
-            .tGallery__item__wrap {
+            .tBlocks__item__wrap {
                 background-color: #bfb7b7;
             }
         }
@@ -89,7 +89,7 @@ $activeHeight: calc(var(--vh, 1vh) * 60);
                 }
             }
 
-            @include when-inside('.tGallery__item--active') {
+            @include when-inside('.tBlocks__item--active') {
                 position: absolute;
 
                 &.tg-form-right {

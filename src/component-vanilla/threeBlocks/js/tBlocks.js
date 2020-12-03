@@ -4,7 +4,7 @@ import {tBlocksItemClass} from "./tBlocksItem.js"
 class tBlocksClass {
 
   constructor(data) {
-      this.item = document.querySelectorAll("*[data-conponent='m-comp--tGallery']"),
+      this.item = document.querySelectorAll("*[data-conponent='m-comp--tBlocks']"),
       this.instances = []
   }
 
@@ -15,9 +15,9 @@ class tBlocksClass {
   inzializeData() {
       const itemArray = Array.from(this.item);
       for (const item of itemArray) {
-          const tGalleryItem = new tBlocksItemClass(item);
-          this.instances.push(tGalleryItem);
-          tGalleryItem.init();
+          const tBlocksItem = new tBlocksItemClass(item);
+          this.instances.push(tBlocksItem);
+          tBlocksItem.init();
       }
   }
 }

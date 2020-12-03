@@ -38,6 +38,16 @@ toolTip.init();
 totop.init();
 vh.init();
 
+// TBlock custom event
+// L'evento su tBlocks è legato all'elemento container ( .tBlocks) che lo dispaccia
+// Sul cambio di item possiamo fare cose, arriva:
+// Direzione: up/down
+// Active Index
+const tBlockContaner1 = document.querySelector('.container-block-1 .tBlocks');
+tBlockContaner1.addEventListener('itemChange', (e) => {
+    console.log(e.detail)
+}, false);
+
 // VANILLA LOADER
 const images = [
     '/assets/img/pic1.jpg',
