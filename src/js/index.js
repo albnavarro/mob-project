@@ -7,6 +7,7 @@ import {} from "./polyfill/flat.js";
 import {} from "./polyfill/includes.js";
 import {} from "./polyfill/find.js";
 import {} from "./polyfill/remove.js";
+import {} from "./polyfill/customEvent.js";
 
 // BASE MODULE
 import { eventManager } from "./base/eventManager.js";
