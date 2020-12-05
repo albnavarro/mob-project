@@ -8,18 +8,17 @@ import {} from "./polyfill/includes.js";
 import {} from "./polyfill/find.js";
 import {} from "./polyfill/remove.js";
 import {} from "./polyfill/customEvent.js";
+import {} from "./polyfill/entries.js";
 
 // BASE MODULE
 import { eventManager } from "./base/eventManager.js";
 import { vh } from "./utility/vh.js"
 import { findElement } from "./utility/findElement.js"
-import { loadImagesVanilla } from "./utility/loadImagesVanilla.js"
-
-// COMPONENT MODULE
-import { totop } from "../component/to-top/js/toTop.js"
-import { offsetSliderClass } from "../component/offset-slider/js/offsetSlider.js"
+import { loadImages } from "./utility/loadImages.js"
 
 // NEW VANILLA COMPONENT MODULE
+import { totop } from "../component-vanilla/to-top/js/toTop.js"
+import { offsetSlider } from "../component-vanilla/offset-slider/js/offsetSlider.js"
 import { tBlocks } from "../component-vanilla/threeBlocks/js/tBlocks.js";
 import { parallax } from "../component-vanilla/parallax/js/parallax.js";
 import { accordionClass } from "../component-vanilla/accordion/js/accordion.js"
@@ -38,6 +37,7 @@ showElement.init();
 toolTip.init();
 totop.init();
 vh.init();
+offsetSlider.init();
 
 // TBlock custom event
 // L'evento su tBlocks è legato all'elemento container ( .tBlocks) che lo dispaccia
@@ -45,9 +45,23 @@ vh.init();
 // Direzione: up/down
 // Active Index
 const tBlockContaner1 = document.querySelector('.container-block-1 .tBlocks');
-tBlockContaner1.addEventListener('itemChange', (e) => {
-    console.log(e.detail)
-}, false);
+if (typeof(tBlockContaner1) != 'undefined' && tBlockContaner1 != null) {
+    tBlockContaner1.addEventListener('itemChange', (e) => {
+        console.log(e.detail)
+    }, false);
+}
+
+// Offset custom event
+// L'evento su OffsetSlider è legato all'elemento component ( .offset-slider ) che lo dispaccia
+// Sul cambio di step possiamo fare cose, arriva:
+// Active Index
+const offsetSliderTest = document.querySelector('.offset-slider');
+    if (typeof(offsetSliderTest) != 'undefined' && offsetSliderTest != null) {
+    offsetSliderTest.addEventListener('stepChange', (e) => {
+        console.log(e.detail)
+    }, false);
+}
+
 
 // VANILLA LOADER
 const images = [
@@ -56,7 +70,7 @@ const images = [
     '/assets/img/pic3.jpg',
     '/assets/img/flower3.jpg'
 ]
-const imageLoader = new loadImagesVanilla(images);
+const imageLoader = new loadImages(images);
 imageLoader.init()
 .then(() => console.log('image loaded'))
 .catch((e) => console.log(e));
@@ -64,10 +78,10 @@ imageLoader.init()
 //
 
 
-const offsetSlider = new offsetSliderClass({
-    container: '.offset-slider',
-    step: 8
-})
+// const offsetSlider = new offsetSliderClass({
+//     container: '.offset-slider',
+//     step: 8
+// })
 
 // FIND ELEMENT
 findElement('.offset-slider').then(() => {
@@ -207,7 +221,7 @@ const accordion = new accordionClass({
 // Provvisorio
 const forceResize = () => {
   setTimeout(() => {
-    $(window).resize()
+    window.dispatchEvent(new Event('resize'));
   }, 200);
 }
 eventManager.push('load', forceResize);

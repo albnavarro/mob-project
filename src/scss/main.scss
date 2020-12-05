@@ -27,14 +27,10 @@
 @import
   'utility/loader';
 
-// component
-@import
-  '../component/to-top/scss/toTop',
-  '../component/offset-slider/scss/offsetSlider.scss';
-
-
 // component vanilla
 @import
+  '../component-vanilla/to-top/scss/toTop',
+  '../component-vanilla/offset-slider/scss/offsetSlider.scss',
   '../component-vanilla/tooltip/scss/tooltip',
   '../component-vanilla/navigation/scss/menu',
   '../component-vanilla/lightbox/scss/lightbox',

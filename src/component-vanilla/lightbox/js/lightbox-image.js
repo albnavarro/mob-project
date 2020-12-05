@@ -1,6 +1,6 @@
 import { eventManager } from "../../../js/base/eventManager.js";
 import { lightDescription } from "./lightbox-description.js";
-import { loadImagesVanilla } from "../../../js/utility/loadImagesVanilla.js";
+import { loadImages } from "../../../js/utility/loadImages.js";
 import { lightboxUtils } from "./lightbox-utils.js";
 
 
@@ -31,7 +31,7 @@ class lightBoxImageClass {
 
         this.isLoading = true
 
-        this.loadimage = new loadImagesVanilla([this.data.url])
+        this.loadimage = new loadImages([this.data.url])
         this.loadimage.init().then(() => {
             // Aggiungo l'immagine solo se la lightbox è ancora aperta.
             if (!this.isOpen) return;

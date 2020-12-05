@@ -98,7 +98,7 @@ export class lightBoxClass {
     }
 
     lightBoxOnClick(event) {
-        if ($(event.target).is(this.lightBox)) {
+        if (event.target === this.lightBox) {
             this.closeLightBox(event);
         }
     }

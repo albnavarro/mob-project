@@ -1,13 +1,11 @@
 footer
-  include ../component/to-top/pug/toTop.pug
+  include ../component-vanilla/to-top/pug/toTop.pug
 
 script
   include ../../www/assets/js/fontfaceobserver.js
   
 script
   include ../../www/assets/js/async-assets-loading.min.js
-
-script(src="assets/js/vendor/jquery.min.js")
 
 if isProd
   script(src="assets/dist/" + mainjs)

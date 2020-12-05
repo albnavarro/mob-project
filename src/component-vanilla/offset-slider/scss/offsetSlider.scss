@@ -30,13 +30,18 @@
     }
 
     &:nth-of-type(2) {
-      height: 200px;
+      height: 400px;
       background-color: #eee;
     }
 
     &:nth-of-type(3) {
-      height: 100px;
+      height: 200px;
       background-color: #666;
+    }
+
+    &:nth-of-type(4) {
+      height: 100px;
+      background-color: #999;
     }
 
 
