@@ -5,15 +5,15 @@ Type this command in terminal
 
 NPM will install all the dependencies for the project's gulpfile
 
-Copy file config.json.dist in config.json
+Copy file **config.json.dist** in **config.json**
 
 PROXY WITH HOST:
-Open the new file config.json and enter your serverName ( from your virtualhost ) in host propierties.
-the serverName is necessary for the tasks watch_files and criticalCss.
-set useHost to true
+Open the new file **config.json** and enter your serverName ( from your virtualhost ) in host propierties.<br/>
+the serverName is necessary for the tasks watch_files and criticalCss.<br/>
+set **useHost** to true
 
 PROXY WITHOUT HOST:
-set useHost to false in config.json
+set **useHost** to false in config.json
 
 NOTE:
 The project use XMLHttpRequest fot load font, svg and so on.
@@ -32,7 +32,7 @@ Sorry, to do.
 
 ### Type this command form minify css/js and revisioning by appending content hash to filenames )
 
-* Set isProd -> true in src/data/config.json for use new distribution assets
+* Set **isProd** -> true in src/data/config.json for use new distribution assets
 * gulp prod
 
 ### Type this command form generate critical css
