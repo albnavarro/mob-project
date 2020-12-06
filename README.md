@@ -23,10 +23,10 @@ So use a localhost or browserSync to open project.
 
 * gulp init
 
-It may happen that by executing the task initializeCritical inside init flow is generates an error like:
-Error: ENOENT: no such file or directory, open ' ..... /www/assets/css/critical.css'
-This becoust is not possible to create the css folder automatically inside the compiled folder (probably for a permissions problem).
-In this case, just create the www/assets/**css** folder by hand.
+It may happen that by executing the task initializeCritical inside init flow is generates an error like:<br/>
+Error: ENOENT: no such file or directory, open ' ..... /www/assets/css/critical.css'<br/>
+This becoust is not possible to create the css folder automatically inside the compiled folder (probably for a permissions problem).<br/>
+In this case, just create the www/assets/**css** folder by hand.<br/>
 Sorry, to do.
 
 
