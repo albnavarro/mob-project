@@ -23,10 +23,12 @@ So use a localhost or browserSync to open project.
 
 * gulp init
 
-It may happen that by executing the gulp init task it is not possible to create the css folder automatically inside the compiled folder (probably for a permissions problem).
+It may happen that by executing the task initializeCritical inside init flow is generates an error like:
+Error: ENOENT: no such file or directory, open ' ..... /www/assets/css/critical.css'
+This becoust is not possible to create the css folder automatically inside the compiled folder (probably for a permissions problem).
+In this case, just create the www/assets/**css** folder by hand.
+Sorry, to do.
 
-In this case, just create the www/assets/css folder by hand.
-To be noticed.
 
 ### Type this command form minify css/js and revisioning by appending content hash to filenames )
 
