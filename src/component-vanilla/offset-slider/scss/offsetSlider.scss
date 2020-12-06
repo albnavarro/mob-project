@@ -13,6 +13,7 @@
     width: 100%; // to be replaced via js
     transition: transform .35s;
     cursor: pointer;
+    user-select: none;
 
     &.no-transition {
       transition: none;
