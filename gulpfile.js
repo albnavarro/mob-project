@@ -83,10 +83,19 @@ const
 // BROWSER SYNC
 
 function browser_sync(done) {
-  browserSync.init({
-    proxy: config.host,
-    open: false
-  })
+    if(config.useHost) {
+        browserSync.init({
+            proxy: config.host,
+            open: true
+        })
+    } else {
+        browserSync.init({
+            server: {
+                baseDir: "./www/"
+            },
+            open: true
+        })
+    }
 
   done();
 };
@@ -179,25 +188,38 @@ function initializeCritical(done) {
   fs.writeFile(cssCritical, '', done);
 };
 
+
 function criticalCss(done) {
-  request(config.host, (err, response, body) => {
-    if (err) return console.log(err)
+    if(config.useHost) {
+        request(config.host, (err, response, body) => {
+          if (err) return console.log(err)
 
-    critical.generate({
-      base: './',
-      html: body,
-      // base: destPath,
-      // src: 'index.html',
-      minify: true,
-      width: 1024,
-      height: 768,
-      css: `${cssDest}/main.css`,
-      dest: `${cssDest}/critical.css`,
-      include: ['.lightbox', '.parallax-container', '.parallax-item']
-    });
+          critical.generate({
+            base: './',
+            html: body,
+            minify: true,
+            width: 1024,
+            height: 768,
+            css: `${cssDest}/main.css`,
+            target: `${cssDest}/critical.css`,
+            include: ['.lightbox', '.parallax-container', '.parallax-item']
+          });
 
-    done();
-  })
+          done();
+        })
+    } else {
+        critical.generate({
+            base: './www/',
+            src: 'index.html',
+            minify: true,
+            width: 1024,
+            height: 768,
+            css: `${cssDest}/main.css`,
+            target: `${cssDest}/critical.css`,
+            include: ['.lightbox', '.parallax-container', '.parallax-item']
+        });
+        done();
+    }
 };
 
 

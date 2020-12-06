@@ -6,8 +6,18 @@ Type this command in terminal
 NPM will install all the dependencies for the project's gulpfile
 
 Copy file config.json.dist in config.json
+
+PROXY WITH HOST:
 Open files and enter your serverName ( from your virtualhost ) in host propierties.
 the serverName is necessary for the tasks watch_files and criticalCss.
+set useHost to true
+
+PROXY WITHOUT HOST:
+set useHost to false
+
+NOTE:
+The project use XMLHttpRequest fot load font, svg and so on.
+So use a localhost or browserSync.
 
 ### Type this command in terminal the first time:
 
