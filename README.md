@@ -29,8 +29,8 @@ In this case, just create the www/assets/css folder by hand.
 To be noticed.
 
 ### Type this command form minify css/js and revisioning by appending content hash to filenames )
-### Set isProd -> true in src/data/config.json for use new distribution assets
 
+* Set isProd -> true in src/data/config.json for use new distribution assets
 * gulp prod
 
 ### Type this command form generate critical css
