@@ -185,6 +185,10 @@ function icons() {
 // CRITICAL CSS
 
 function initializeCritical(done) {
+  const dir = cssDest;
+  if (!fs.existsSync(dir)){
+    fs.mkdirSync(dir);
+  }
   fs.writeFile(cssCritical, '', done);
 };
 

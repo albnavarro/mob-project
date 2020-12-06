@@ -19,15 +19,13 @@ NOTE:<br/>
 The project use XMLHttpRequest fot load font, svg and so on.
 So use a localhost or browserSync to open project.
 
-### Type this command in terminal the first time:
+### Type this command in terminal the first time for inizialize all asset:
 
 * gulp init
 
-It may happen that by executing the task initializeCritical inside init flow is generates an error like:<br/>
-Error: ENOENT: no such file or directory, open ' ..... /www/assets/css/critical.css'<br/>
-This becoust is not possible to create the css folder automatically inside the compiled folder (probably for a permissions problem).<br/>
-In this case, just create the www/assets/**css** folder by hand.<br/>
-Sorry, to do.
+NOTE:<br/>
+In case of problem with www/assets/css/critical.css create the www/assets/**css** folder by hand.
+( i think not, now the folder css is created by initializeCritical task )
 
 
 ### Type this command form minify css/js and revisioning by appending content hash to filenames )
