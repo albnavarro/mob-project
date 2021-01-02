@@ -41,76 +41,44 @@ class parallaxClass {
         // String: fixed || default
         data.computationType = item.getAttribute('data-computationType') || 'default';
 
+
+
+        // FIXED PROPS
         // String: 0 to infinite
         // Mandatory computationType = 'fixed'
         // Value calculated based on the height / width of the container
         data.fixedRange = item.getAttribute('data-fixedRange') || null;
 
-        // Boolean:
-        // Mandatory computationType = 'fixed'
-        // Get value in vh/vw
-        data.scalable = item.hasAttribute('data-scalable');
-
-        // String
-        // Mandatory scalable
-        // Width beyond which the calculated value will be in px
-        data.scalableBreackpoint = item.getAttribute('data-scalableBreackpoint') || 'x-large';
-
         // Boolean
         // Mandatory computationType = 'fixed'
         // Inverts the calculated minimum and maximum values
-        data.fromCalculatedValue = (item.hasAttribute('data-fromCalculatedValue'));
+        data.fixedInward = (item.hasAttribute('data-fixedInward'));
 
-        // String: DOM element
-        // Custom element on which to apply the calculated values
-        // Default itself
-        data.applyOn = document.querySelector(item.getAttribute('data-applyOn')) || null;
+        // String: 0 to infinite
+        // shilft animation start 0 - 100 -> vh value
+        data.fixedOffset = item.getAttribute('data-fixedOffset') || 0;
 
         // Boolean
         // Mandatory computationType = 'fixed'
         // Inhibits the application of the maximum value
-        data.applyEndOff = item.hasAttribute('data-applyEndOff');
+        data.fixedEndOff = item.hasAttribute('data-fixedEndOff');
 
         // Boolean
         // Mandatory computationType = 'fixed'
         // Inhibits the application of the minimum value
-        data.applyStartOff = item.hasAttribute('data-applyStartOff');
+        data.fixedStartOff = item.hasAttribute('data-fixedStartOff');
 
-        // String
-        data.breackpoint = item.getAttribute('data-breackpoint') || 'desktop';
-
-        // String
-        // refer to mediaManager obj
-        data.queryType = item.getAttribute('data-queryType') || 'min';
-
-        // String: DOM element
-        // Performs calculations based on another element of the DOM at your choice
-        data.useOtherPosition = item.getAttribute('data-otherPos') || null;
-
-        // Boolean
-        // By default the calculations are performed when the element is visible in the viewport,
-        // with this attribute they will always be performed
-        data.limiterOff = item.hasAttribute('data-limiterOff');
-
+        // LINEAR PROPS
         // String
         // Mandatory computationType = 'default'
         // 1 - 10
-        data.distance = item.getAttribute('data-distance') || 8;
+        data.range = item.getAttribute('data-range') || 8;
 
-        // String
-        // 1 - 10
-        data.jsVelocity = item.getAttribute('data-jsVelocity') || 8;
-
-        // Boolean
+        // String: stop - back
         // Mandatory computationType = 'default'
-        // inverts the calculated value
-        data.reverse = item.hasAttribute('data-reverse');
-
-        // String: toStop - toBack
-        // Mandatory computationType = 'default'
-        // toStop: stop the calculation reached zero
-        // toBack: revert the calculation reached zero
-        data.oneDirection = item.getAttribute('data-oneDirection') || '';
+        // stop: stop the calculation reached zero
+        // back: revert the calculation reached zero
+        data.onSwitch = item.getAttribute('data-onSwitch') || '';
 
         // String
         // Mandatory computationType = 'default'
@@ -131,6 +99,40 @@ class parallaxClass {
         // Mandatory propierties = 'opacity'
         // 1- 100: percentage of the viewport from which the opcity ends
         data.opacityEnd = item.getAttribute('data-opacityEnd') || 0;
+
+
+
+
+        // COMMON PROPS
+        // String: DOM element
+        // Custom element on which to apply the calculated values
+        // Default itself
+        data.applyEl = document.querySelector(item.getAttribute('data-applyEl')) || null;
+
+        // String: DOM element
+        // Performs calculations based on another element of the DOM at your choice
+        data.triggerEl = item.getAttribute('data-triggerEl') || null;
+
+        // String
+        data.breackpoint = item.getAttribute('data-breackpoint') || 'desktop';
+
+        // String
+        // refer to mediaManager obj
+        data.queryType = item.getAttribute('data-queryType') || 'min';
+
+        // Boolean
+        // By default the calculations are performed when the element is visible in the viewport,
+        // with this attribute they will always be performed
+        data.limiterOff = item.hasAttribute('data-limiterOff');
+
+        // String
+        // 1 - 10
+        data.jsDelta = item.getAttribute('data-jsDelta') || 8;
+
+        // Boolean
+        // Mandatory computationType = 'default'
+        // inverts the calculated value
+        data.reverse = item.hasAttribute('data-reverse');
 
         // String
         // Linear || smooth

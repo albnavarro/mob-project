@@ -12,45 +12,50 @@ export class parallaxItemClass {
         this.prevValue = 0
         this.height = 0
         this.width = 0
-        this.applyOnIsValid = false
+        this.applyElIsValid = false
+        this.transformProperty = Modernizr.prefixed('transform')
+        this.req = null
 
+        // 'PROPS'
         this.item = data.item
         this.container = data.container
-        this.computationType = data.computationType
+
+        //Fixed prop
         this.fixedRange = data.fixedRange
-        this.scalable = data.scalable
-        this.scalableBreackpoint = data.scalableBreackpoint
-        this.fromCalculatedValue = data.fromCalculatedValue
-        this.applyOn = data.applyOn
-        this.applyEndOff = data.applyEndOff
-        this.applyStartOff = data.applyStartOff
-        this.breackpoint = data.breackpoint
-        this.queryType = data.queryType
-        this.useOtherPosition = data.useOtherPosition
-        this.limiterOff = data.limiterOff
-        this.distance = data.distance
-        this.jsVelocity = data.jsVelocity
-        this.reverse = data.reverse
-        this.reverse = data.reverse
-        this.oneDirection = data.oneDirection
+        this.fixedInward = data.fixedInward
+        this.fixedOffset = data.fixedOffset
+        this.fixedEndOff = data.fixedEndOff
+        this.fixedStartOff = data.fixedStartOff
+
+        //Lienar prop
+        this.range = data.range
         this.align = data.align
         this.opacityStart = data.opacityStart
         this.opacityEnd = data.opacityEnd
+        this.onSwitch = data.onSwitch
+
+        // Common prop
+        this.computationType = data.computationType
+        this.applyEl = data.applyEl
+        this.triggerEl = data.triggerEl
+        this.breackpoint = data.breackpoint
+        this.queryType = data.queryType
+        this.limiterOff = data.limiterOff
+        this.jsDelta = data.jsDelta
+        this.reverse = data.reverse
         this.ease = data.ease
         this.propierties = data.propierties
         this.smoothType = data.smoothType
         //
-        this.transformProperty = Modernizr.prefixed('transform')
-        this.req = null
     }
 
     init() {
         this.calcOffset()
         this.calcHeight()
         this.calcWidth()
-        this.checkApplyOnIsValid()
-        this.distance = this.normalizeDistance(this.distance)
-        this.jsVelocity = this.normalizeVelocity(this.jsVelocity)
+        this.checkapplyElIsValid()
+        this.range = this.normalizeRange(this.range)
+        this.jsDelta = this.normalizeVelocity(this.jsDelta)
 
         switch (this.ease) {
             case 'linear':
@@ -76,7 +81,7 @@ export class parallaxItemClass {
         eventManager.push('resize', this.refresh.bind(this));
     }
 
-    normalizeDistance(n) {
+    normalizeRange(n) {
         let _n = n
 
         if (_n < 0) _n = .1
@@ -95,31 +100,33 @@ export class parallaxItemClass {
     }
 
     calcOffset() {
-        if (this.useOtherPosition == null) {
+        if (this.triggerEl == null) {
             this.offset = parseInt(offset(this.container).top)
         } else {
-            this.offset = parseInt(offset(document.querySelector(this.useOtherPosition)).top)
+            this.offset = parseInt(offset(document.querySelector(this.triggerEl)).top)
         }
     }
 
     calcHeight () {
-        if (this.useOtherPosition == null) {
+        if (this.triggerEl == null) {
             this.height = parseInt(outerHeight(this.container));
         } else {
-            this.height = parseInt(outerHeight(document.querySelector((this.useOtherPosition))))
+            this.height = parseInt(outerHeight(document.querySelector((this.triggerEl))))
         }
     }
 
     calcWidth () {
-        if (this.useOtherPosition == null) {
+        this.selfWidth = parseInt(outerWidth(this.item))
+
+        if (this.triggerEl == null) {
             this.width = parseInt(outerWidth(this.container))
         } else {
-            this.width = parseInt(outerWidth(document.querySelector(this.useOtherPosition)))
+            this.width = parseInt(outerWidth(document.querySelector(this.triggerEl)))
         }
     }
 
-    checkApplyOnIsValid () {
-        (this.applyOn !== null) ? this.applyOnIsValid = true : this.applyOnIsValid = false;
+    checkapplyElIsValid () {
+        (this.applyEl !== null) ? this.applyElIsValid = true : this.applyElIsValid = false;
     }
 
     isInViewport() {
@@ -164,7 +171,7 @@ export class parallaxItemClass {
 
             const s = this.startValue,
                 f = this.endValue,
-                v = this.jsVelocity,
+                v = this.jsDelta,
                 val = ((f - s) / v) + s * 1;
 
 
@@ -179,8 +186,8 @@ export class parallaxItemClass {
                     this.startValue = val.toFixed(1);
             }
 
-            if(this.applyOnIsValid) {
-                Object.assign(this.applyOn.style, this.setStyle(this.startValue))
+            if(this.applyElIsValid) {
+                Object.assign(this.applyEl.style, this.setStyle(this.startValue))
             } else {
                 Object.assign(this.item.style, this.setStyle(this.startValue))
             }
@@ -202,124 +209,231 @@ export class parallaxItemClass {
         // limiterOff ->  forzo il sempre il calcolo per lementi in postion fixed/sticky e otherPos attivo
         if( !this.isInViewport() && !this.limiterOff) return;
 
-        const scrolTop = eventManager.scrollTop();
-        const winHeight = eventManager.windowsHeight();
-        const documentHeight = eventManager.documentHeight();
-
         switch (this.computationType) {
             case 'fixed':
-                const partials =  - ((scrolTop + winHeight) - (this.offset + this.height));
-                const endPos = ((this.height / 100) * this.fixedRange);
-                const inMotion = (partials / 100) * this.fixedRange;
-
-                if(scrolTop + winHeight < this.offset) {
-                    this.endValue = (this.fromCalculatedValue) ? endPos : 0;
-                    if(this.applyStartOff) applyStyle = false;
-
-                } else if (scrolTop + winHeight > this.offset + this.height) {
-                    this.endValue = (this.fromCalculatedValue) ? 0 : - endPos;
-                    if(this.applyEndOff) applyStyle = false;
-
-                } else {
-                    this.endValue = (this.fromCalculatedValue) ? inMotion : inMotion - endPos;
-                }
-
-                const percent = (Math.abs(this.endValue) * 100) / this.height;
-                switch (this.propierties) {
-                    case 'horizontal':
-                        this.endValue = -(( this.width / 100 ) * percent);
-                    break;
-
-                    case 'scale':
-                        this.endValue = percent * 10;
-                    break;
-
-                    case 'opacity':
-                        this.endValue = percent / 100;
-                    break;
-
-                    case 'rotate':
-                    case 'border-width':
-                        this.endValue = percent;
-                    break;
-                }
+                const fixedResult = this.fixedValue(applyStyle)
+                applyStyle = fixedResult.applyStyle
+                this.endValue = fixedResult.val
             break;
 
             default:
                 switch (this.propierties) {
                     case 'opacity':
-                        const vhLimit = (winHeight / 100 * this.opacityEnd);
-                        const vhStart = winHeight - (winHeight / 100 * this.opacityStart);
-
-                        let opacityVal = 0;
-                        if (this.align == 'start') {
-                            opacityVal = - scrolTop;
-                        } else {
-                            opacityVal = (scrolTop + vhLimit - this.offset);
-                        }
-
-                        opacityVal = opacityVal * -1;
-
-                        if (this.align == 'start') {
-                            opacityVal = 1 - opacityVal / this.offset;
-                        } else {
-                            opacityVal = 1 - opacityVal / (winHeight - vhStart - vhLimit);
-                        }
-
-                        this.endValue = opacityVal.toFixed(2);
+                        this.endValue = this.opacityValue()
                     break;
 
                     default:
                         if (isNaN(this.align)) {
-
-                            // Prefixed align
-                            switch (this.align) {
-                                case 'start':
-                                this.endValue = (scrolTop / this.distance);
-                                break;
-
-                                case 'top':
-                                this.endValue = (((scrolTop - this.offset) / this.distance));
-                                break;
-
-                                case 'center':
-                                this.endValue = ((((scrolTop + (winHeight / 2 - this.height / 2)) - this.offset) / this.distance));
-                                break;
-
-                                case 'bottom':
-                                this.endValue = ((((scrolTop + (winHeight - this.height)) - this.offset) / this.distance));
-                                break;
-
-                                case 'end':
-                                this.endValue = -((documentHeight - (scrolTop + winHeight)) / this.distance);
-                                break;
-                            }
+                            this.endValue = this.isNaNValue().toFixed(1) / 2
                         } else {
-
-                            // VH Align
-                            this.endValue = ((((scrolTop + (winHeight / 100 * this.align)) - this.offset) / this.distance));
+                            this.endValue = this.isANumberValue().toFixed(1) / 2
                         }
-
-                        this.endValue = this.endValue.toFixed(1) / 2;
-
+                    break;
                 }
-
         }
 
         if (!applyStyle) return;
 
-        if(this.applyOnIsValid) {
-            Object.assign(this.applyOn.style, this.setStyle(this.endValue))
+        if(this.applyElIsValid) {
+            Object.assign(this.applyEl.style, this.setStyle(this.endValue))
         } else {
             Object.assign(this.item.style, this.setStyle(this.endValue))
         }
     }
 
+    fixedValue(applyStyle) {
+        let val = 0
+        const s = eventManager.scrollTop()
+        const wh = eventManager.windowsHeight()
+        const h = this.height
+        const w = this.width
+        const sw = this.selfWidth
+        const o = this.offset
+        const fc = this.fixedInward
+        const as = this.fixedStartOff
+        const ae = this.fixedEndOff
+        const fx = this.fixedRange
 
-    setStyle(val) {
-        let style = {};
+        /*
+        sp = Start point calculated in vh
+        */
+        const sp =  ((wh / 100) * this.fixedOffset)
+        const partials =  - ((s + wh - sp) - (o + h))
+        const ep = ((h / 100) * fx)
+        const m = (partials / 100) * fx
 
-        // CHECK Reverse
+        if(s + wh - sp < o) {
+            val = (fc) ? ep : 0;
+            if(as) applyStyle = false;
+
+        } else if (s + wh - sp > o + h) {
+            val = (fc) ? 0 : - ep;
+            if(ae) applyStyle = false;
+
+        } else {
+            val = (fc) ? m : m - ep;
+        }
+
+        /*
+        p = percent value
+        */
+        const p = (Math.abs(val) * 100) / h;
+        switch (this.propierties) {
+            case 'horizontal':
+                val = -(( w / 100 ) * p) - ((sw / 100) * p);
+            break;
+
+            case 'scale':
+                val = p * 10;
+            break;
+
+            case 'opacity':
+                val = p / 100;
+            break;
+
+            case 'rotate':
+            case 'border-width':
+                val = p;
+            break;
+        }
+
+        return {applyStyle, val}
+    }
+
+    opacityValue() {
+        let val = 0
+        const st = eventManager.scrollTop()
+        const wh = eventManager.windowsHeight()
+        const o = this.offset
+        const vhLimit = (wh / 100 * this.opacityEnd)
+        const vhStart = wh - (wh / 100 * this.opacityStart)
+
+        if (this.align == 'start') {
+            val = - st;
+        } else {
+            val = (st + vhLimit - o);
+        }
+
+        val = val * -1;
+
+        if (this.align == 'start') {
+            val = 1 - val / o;
+        } else {
+            val = 1 - val / (wh - vhStart - vhLimit);
+        }
+
+        return val.toFixed(2);
+    }
+
+    isNaNValue() {
+        let val = 0
+        const st = eventManager.scrollTop()
+        const wh = eventManager.windowsHeight()
+        const dh = eventManager.documentHeight()
+        const ds = this.range
+        const o = this.offset
+        const h = this.height
+
+        // Prefixed align
+        switch (this.align) {
+            case 'start':
+            val = (st / ds)
+            break;
+
+            case 'top':
+            val = (st - o) / ds;
+            break;
+
+            case 'center':
+            val = ((st + (wh / 2 - h / 2)) - o) / ds;
+            break;
+
+            case 'bottom':
+            val = ((st + (wh - h)) - o) / ds;
+            break;
+
+            case 'end':
+            val = -(dh - (st + wh)) / ds;
+            break;
+        }
+
+        return val
+    }
+
+    isANumberValue() {
+        const st = eventManager.scrollTop()
+        const wh = eventManager.windowsHeight()
+        const al = this.align
+        const of = this.offset
+        const ds = this.range
+
+        return (((st + (wh / 100 * al)) - of) / ds);
+    }
+
+    switchAfterZero(val) {
+        if (this.propierties != 'opacity') {
+            switch (this.onSwitch) {
+                case 'stop':
+                    if (!this.reverse && val > 0 ||
+                        this.reverse && val < 0) {
+                        val = 0;
+                    }
+                break;
+
+                case 'back':
+                    if (!this.reverse && val > 0 ||
+                        this.reverse && val < 0) {
+                        val = -val;
+                    }
+                break;
+            }
+        } else {
+            if (this.onSwitch == 'back') {
+                const wh = eventManager.windowsHeight()
+                const st = eventManager.scrollTop()
+                const oe = this.opacityEnd
+                const os = this.opacityStart
+                const of = this.offset
+
+                /*
+                start value in wh percent
+                */
+                const sv = (wh / 100 * os)
+
+                /*
+                end value in vh percent
+                */
+                const ev = (wh / 100 * oe)
+
+                /*
+                Are the upper and lower limits where opacity should be applied
+                */
+                const limitTop = ev - (sv  - ev)
+                const limitBottom = wh - (wh - sv)
+                /*
+                el relative offset in relation to the window
+                */
+                const relOffset = of - st
+
+                /*
+                Invert opacity if should be applied
+                */
+                if(relOffset >= limitTop && relOffset <= limitBottom) {
+                    if (val > 1.999) val = 1.999
+                    if (val < 0) val = - val;
+                    if (val > 1) val = 1 - (val % 1);
+                } else if ( relOffset < limitTop && !this.reverse) {
+                    val = 0
+                } else if ( relOffset < limitTop && this.reverse) {
+                    val = val = - val
+                }
+            }
+        }
+
+        return val
+    }
+
+    setReverse(val) {
         if (this.reverse) {
             switch (this.propierties) {
                 case 'opacity':
@@ -330,52 +444,25 @@ export class parallaxItemClass {
                     val = -val;
             }
         }
+        return val
+    }
 
 
-        // CHECK ONE DIRECTION ToStop/ToBack
-        if(this.fixedRange == null) {
-            if (this.propierties != 'opacity') {
-                switch (this.oneDirection) {
-                    case 'toStop':
-                        if (!this.reverse && val > 0 ||
-                            this.reverse && val < 0) {
-                            val = 0;
-                        }
-                    break;
+    setStyle(val) {
+        let style = {};
 
-                    case 'toBack':
-                        if (!this.reverse && val > 0 ||
-                            this.reverse && val < 0) {
-                            val = -val;
-                        }
-                    break;
-                }
-            } else {
-                if (this.oneDirection == 'toBack') {
-                    if (val > 1.999) val = 1.999
-                    if (val < 0) val = -val;
-                    if (val > 1) val = 1 - (val % 1);
-                }
-            }
-        }
+        // CHECK Reverse
+        val = this.setReverse(val)
+        if(this.fixedRange == null) val = this.switchAfterZero(val)
+
 
         switch (this.propierties) {
             case 'vertical':
-                if(this.scalable  && this.fixedRange != null && !mq.min(this.scalableBreackpoint)) {
-                    const value = (val * 100) / this.height;
-                    style[this.transformProperty] = `translate3d(0,0,0) translateY(${value}vh)`;
-                } else {
-                    style[this.transformProperty] = `translate3d(0,0,0) translateY(${val}px)`;
-                }
+                style[this.transformProperty] = `translate3d(0,0,0) translateY(${val}px)`;
             break;
 
             case 'horizontal':
-                if(this.scalable && this.fixedRange != null && !mq.min(this.scalableBreackpoint)) {
-                    const value = (val * 100) / this.width;
-                    style[this.transformProperty] = `translate3d(0,0,0) translateX(${value}vw)`;
-                } else {
-                    style[this.transformProperty] = `translate3d(0,0,0) translateX(${val}px)`;
-                }
+                style[this.transformProperty] = `translate3d(0,0,0) translateX(${val}px)`;
             break;
 
             case 'rotate':

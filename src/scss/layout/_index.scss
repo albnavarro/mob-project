@@ -77,3 +77,28 @@
     }
 
 }
+
+// fixed Parallax test
+.dummy-container {
+    position: relative;
+}
+
+.testFixed {
+    display: inline-block;
+    margin: auto;
+}
+
+.dummy-item {
+    width: 50vw;
+    height: 50vh;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 1px $black solid;
+
+    &-2 {
+        top: 50vh;
+        height: 30vh;
+    }
+}
