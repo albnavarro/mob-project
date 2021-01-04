@@ -102,3 +102,39 @@
         height: 30vh;
     }
 }
+
+.flex {
+    display: flex;
+}
+
+.justify-center {
+    justify-content: center;
+}
+
+.inlineBLock {
+    display: inline-block;
+}
+
+.index-timeline {
+    position: relative;
+    max-width: 600px;
+    margin: auto;
+    text-align: center;
+
+    &__dummy {
+        position: absolute;
+        left: 0;
+        right: 0;
+        border: 1px #ccc solid;
+
+        &--1 {
+            height: 400px;
+            top: 0;
+        }
+
+        &--2 {
+            height: 200px;
+            top: 400px;
+        }
+    }
+}

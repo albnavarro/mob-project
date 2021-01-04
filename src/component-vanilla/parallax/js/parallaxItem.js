@@ -21,21 +21,21 @@ export class parallaxItemClass {
         this.container = data.container
 
         //Fixed prop
-        this.fixedRange = data.fixedRange
         this.fixedInward = data.fixedInward
         this.fixedOffset = data.fixedOffset
         this.fixedEndOff = data.fixedEndOff
         this.fixedStartOff = data.fixedStartOff
 
         //Lienar prop
-        this.range = data.range
         this.align = data.align
         this.opacityStart = data.opacityStart
         this.opacityEnd = data.opacityEnd
         this.onSwitch = data.onSwitch
 
         // Common prop
+        this.range = data.range
         this.computationType = data.computationType
+        this.perspective = data.perspective
         this.applyEl = data.applyEl
         this.triggerEl = data.triggerEl
         this.breackpoint = data.breackpoint
@@ -54,8 +54,16 @@ export class parallaxItemClass {
         this.calcHeight()
         this.calcWidth()
         this.checkapplyElIsValid()
-        this.range = this.normalizeRange(this.range)
+        if(this.computationType != 'fixed') this.range = this.normalizeRange(this.range)
         this.jsDelta = this.normalizeVelocity(this.jsDelta)
+
+        if(this.perspective !== null) {
+            const style = {
+                'perspective': `${this.perspective}px`
+            }
+            Object.assign(this.container.style, style)
+            this.item.classList.add('parallax__item--3d')
+        }
 
         switch (this.ease) {
             case 'linear':
@@ -178,6 +186,9 @@ export class parallaxItemClass {
             switch (this.propierties) {
                 case 'opacity':
                 case 'rotate':
+                case 'rotateX':
+                case 'rotateY':
+                case 'rotateZ':
                 case 'border-width':
                     this.startValue = val.toFixed(4);
                 break;
@@ -252,7 +263,7 @@ export class parallaxItemClass {
         const fc = this.fixedInward
         const as = this.fixedStartOff
         const ae = this.fixedEndOff
-        const fx = this.fixedRange
+        const fx = this.range
 
         /*
         sp = Start point calculated in vh
@@ -292,6 +303,9 @@ export class parallaxItemClass {
             break;
 
             case 'rotate':
+            case 'rotateX':
+            case 'rotateY':
+            case 'rotateZ':
             case 'border-width':
                 val = p;
             break;
@@ -453,7 +467,7 @@ export class parallaxItemClass {
 
         // CHECK Reverse
         val = this.setReverse(val)
-        if(this.fixedRange == null) val = this.switchAfterZero(val)
+        if(this.computationType != 'fixed') val = this.switchAfterZero(val)
 
 
         switch (this.propierties) {
@@ -468,6 +482,18 @@ export class parallaxItemClass {
             case 'rotate':
                 style[this.transformProperty] = `translate3d(0,0,0) rotate(${val}deg)`;
             break;
+
+            case 'rotateY':
+                style[this.transformProperty] = `translate3d(0,0,0) rotateY(${val}deg)`;
+                break;
+
+            case 'rotateX':
+                style[this.transformProperty] = `translate3d(0,0,0) rotateX(${val}deg)`;
+                break;
+
+            case 'rotateZ':
+                style[this.transformProperty] = `translate3d(0,0,0) rotateZ(${val}deg)`;
+                break;
 
             case 'border-width':
                 style['border-width'] = `${val}px`;

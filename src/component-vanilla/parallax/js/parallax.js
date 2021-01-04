@@ -44,10 +44,6 @@ class parallaxClass {
 
 
         // FIXED PROPS
-        // String: 0 to infinite
-        // Mandatory computationType = 'fixed'
-        // Value calculated based on the height / width of the container
-        data.fixedRange = item.getAttribute('data-fixedRange') || null;
 
         // Boolean
         // Mandatory computationType = 'fixed'
@@ -88,7 +84,7 @@ class parallaxClass {
         // center = zero at middle of the viewport
         // bottom = zero at bottom of the viewport
         // end = zero at bottom of the document
-        data.align = item.getAttribute('data-align') || 'top';
+        data.align = item.getAttribute('data-align') || 'center';
 
         // String
         // Mandatory propierties = 'opacity'
@@ -104,6 +100,10 @@ class parallaxClass {
 
 
         // COMMON PROPS
+
+
+        data.perspective = item.getAttribute('data-perspective') || null;
+
         // String: DOM element
         // Custom element on which to apply the calculated values
         // Default itself

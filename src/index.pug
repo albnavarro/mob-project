@@ -18,10 +18,11 @@ html
                         |!{title}
 
                     .parallax__container
-                        .parallax__item.parallax__item-test(
+                        .parallax__item(
                             data-conponent='m-comp--parallax',
                             data-align='start',
                             data-propierties="opacity")
+                            .parallax__item-test
 
                     //- popToggle
                     button.popTogglebtn.popTogglebtn-1
@@ -73,18 +74,20 @@ html
                     include component-vanilla/tooltip/pug/tooltip.pug
                     
                     .parallax__container
-                        .parallax__item.parallax__item-test(
+                        .parallax__item(
                             data-conponent='m-comp--parallax',
                             data-range='8',
                             data-jsDelta="8",
                             data-align='start',
                             data-ease="smooth"
                             data-smoothType="css")
+                            .parallax__item-test
                     .parallax__container
-                        .parallax__item.parallax__item-test(
+                        .parallax__item(
                             data-conponent='m-comp--parallax',
                             data-align='start',
                             data-propierties="opacity")
+                            .parallax__item-test
 
 
 
@@ -96,27 +99,69 @@ html
                 include component-vanilla/threeBlocks/pug/tBlocks.pug
 
                 section.overflow-hidden
+                
+                    .index-timeline
+                        .index-timeline__dummy.index-timeline__dummy--1
+                        .index-timeline__dummy.index-timeline__dummy--2
+                        .parallax__container
+                            .parallax__item.inlineBLock(
+                                data-conponent='m-comp--parallax'
+                                data-computationType="fixed"
+                                data-propierties="horizontal"
+                                data-range="50"
+                                data-fixedOffset="20"
+                                data-triggerEl=".index-timeline__dummy--1")
+                                .parallax__item(
+                                    data-conponent='m-comp--parallax'
+                                    data-computationType="fixed"
+                                    data-propierties="horizontal"
+                                    data-reverse
+                                    data-range="50"
+                                    data-fixedOffset="20"
+                                    data-triggerEl=".index-timeline__dummy--2")
+                                    .parallax__item-test
+                                    
+                    .parallax__container
+                        .parallax__item.inlineBLock(
+                            data-conponent='m-comp--parallax'
+                            data-computationType="fixed"
+                            data-propierties="rotate"
+                            data-range="90"
+                            data-fixedOffset="20")
+                            .parallax__item-test
+                            
+                    .parallax__container.flex.justify-center
+                        .parallax__item(
+                            data-conponent='m-comp--parallax'
+                            data-perspective="400"
+                            data-propierties="rotateX"
+                            data-range="6")
+                            .parallax__item(
+                                data-conponent='m-comp--parallax'
+                                data-range="6")
+                                .parallax__item-test
 
                     .parallax__container
-                        .parallax__item.parallax__item-test(
+                        .parallax__item(
                             data-conponent='m-comp--parallax',
                             data-propierties="opacity"
                             data-opacityStart="80"
                             data-opacityEnd="45"
                             data-onSwitch="back")
+                            .parallax__item-test
 
                     .parallax__container.clearfix
-                        .parallax__item.parallax__item-test.parallax__item-test--float(
+                        .parallax__item.inlineBLock(
                             data-conponent='m-comp--parallax',
                             data-range='9.5',
                             data-jsDelta="8",
                             data-ease="smooth",
-                            data-align='center',
                             data-onSwitch="back",
                             data-propierties="scale")
+                            .parallax__item-test.parallax__item-test--float
 
                     .parallax__container
-                        .parallax__item.parallax__item-test(
+                        .parallax__item(
                             data-conponent='m-comp--parallax',
                             data-range='2',
                             data-align='90',
@@ -124,6 +169,7 @@ html
                             data-onSwitch="back",
                             data-reverse,
                             data-propierties="horizontal")
+                            .parallax__item-test
 
                     .transition--opacity.toggleEl--opacity--start(
                         data-conponent='m-comp--toggleEl',
@@ -131,36 +177,37 @@ html
                         data-endClass="toggleEl--opacity--end")
                             .trasition-item-test 
 
-                    .parallax__container.clearfix
-                        .parallax__item.parallax__item-test.parallax__item-test--float(
+                    .parallax__container.flex
+                        .parallax__item(
                             data-conponent='m-comp--parallax',
                             data-range='8',
                             data-jsDelta="8",
-                            data-align='center',
                             data-ease="smooth")
+                            .parallax__item-test.parallax__item-test--float
 
-                        .parallax__item.parallax__item-test.parallax__item-test--float(
+                        .parallax__item(
                             data-conponent='m-comp--parallax',
                             data-range='8',
                             data-jsDelta="8",
-                            data-align='center',
                             data-ease="smooth",
                             data-reverse)
+                            .parallax__item-test.parallax__item-test--float
         
                     .transition--translate.toggleEl--transform--start(
                         data-conponent='m-comp--toggleEl',
                         data-startClass="toggleEl--transform--start",
                         data-endClass="toggleEl--transform--end",
-                        data-onlyOnce="true")
+                        data-onlyOnce)
                             .trasition-item-test 
         
                     .parallax__container
-                        .parallax__item.parallax__item-test(
+                        .parallax__item.inlineBLock(
                             data-conponent='m-comp--parallax',
                             data-range='8',
                             data-align='bottom',
                             data-ease="smooth",
                             data-propierties="rotate")
+                            .parallax__item-test
         
                     .transition--opacity.toggleEl--opacity--start(
                         data-conponent='m-comp--toggleEl',
@@ -169,12 +216,13 @@ html
                             .trasition-item-test 
         
                     .parallax__container
-                        .parallax__item.parallax__item-test(
+                        .parallax__item(
                             data-conponent='m-comp--parallax',
                             data-range='2',
                             data-align='end',
                             data-ease="linear",
                             data-propierties="horizontal")
+                            .parallax__item-test
         
                     div(style="height:200px;")
         
