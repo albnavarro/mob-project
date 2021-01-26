@@ -38,7 +38,7 @@ class showElementClass {
       data.OtherPositionGap = item.getAttribute('data-otherPosGap') || 0 ;
       data.onlyOnce = item.hasAttribute('data-onlyOnce');
       data.startClass = item.getAttribute('data-startClass');
-      data.gap = parseInt(item.getAttribute('data-gap')) || 100 ;
+      data.gap = parseInt(item.getAttribute('data-gap')) || 0 ;
       data.endClass = item.getAttribute('data-endClass');
 
       return data;

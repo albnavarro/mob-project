@@ -1,11 +1,8 @@
 "use strict"
+let isProd = false
 
 const
-  isProd = process.env.NODE_ENV === 'production',
-
-  // manifest     = require('./dist/manifest.json'),
   path = require('path'),
-  config = require('./config.json'),
   concat = require('gulp-concat'),
   gulp = require('gulp'),
   sass = require('gulp-sass'),
@@ -33,13 +30,15 @@ const
   del = require('del'),
   merge = require('gulp-merge-json'),
   replace = require('gulp-string-replace'),
+  glob = require('glob'),
+  es = require('event-stream'),
   reload = browserSync.reload,
 
   rollup = require('rollup'),
   babel = require('@rollup/plugin-babel'),
   nodeResolve = require('@rollup/plugin-node-resolve'),
   commonjs = require('@rollup/plugin-commonjs'),
-
+  terser = require('rollup-plugin-terser'),
 
   themePath = path.resolve('src'),
   destPath = path.resolve('www'),
@@ -50,6 +49,7 @@ const
   componentPathVanilla = path.join(themePath, 'component-vanilla'),
   scssPath = path.join(themePath, 'scss'),
   svgPath = path.join(themePath, 'svg'),
+  dataPath = path.join(themePath, 'data'),
 
   cssDest = path.join(destPath, 'assets/css'),
   jsDest = path.join(destPath, 'assets/js'),
@@ -83,19 +83,12 @@ const
 // BROWSER SYNC
 
 function browser_sync(done) {
-    if(config.useHost) {
-        browserSync.init({
-            proxy: config.host,
-            open: true
-        })
-    } else {
-        browserSync.init({
-            server: {
-                baseDir: "./www/"
-            },
-            open: true
-        })
-    }
+    browserSync.init({
+        server: {
+            baseDir: "./www/"
+        },
+        open: true
+    })
 
   done();
 };
@@ -107,7 +100,15 @@ function reloadPage(done) {
 };
 
 
+function enableProd(done) {
+  isProd = true
+  done();
+};
 
+function disableProd(done) {
+  isProd = false
+  done();
+};
 
 
 // SASS
@@ -129,6 +130,9 @@ function style() {
       includeContent: false,
       sourceRoot: scssPath
     })))
+    .pipe(gulpif(isProd, cssmin({
+      keepSpecialComments: false,
+    })))
     .pipe(gulp.dest(cssDest))
     .pipe(browserSync.stream({
       match: '**/*.css'
@@ -146,21 +150,50 @@ function minifyAssetsLoading() {
 
 
 function js() {
-    return rollup.rollup({
-      input: './src/js/index.js',
-      plugins: [
-          nodeResolve.nodeResolve(),
-          commonjs(),
-          babel.babel({ babelHelpers: 'bundled' })
-      ]
-    }).then(bundle => {
-      return bundle.write({
-        file: jsFile,
-        format: 'umd',
-        name: 'library',
-        sourcemap: true
-      });
-    });
+    if(isProd) {
+        return rollup.rollup({
+            input: './src/js/index.js',
+            plugins: [
+                nodeResolve.nodeResolve(),
+                commonjs(),
+                babel.babel({
+                    babelHelpers: 'bundled',
+                    exclude: 'node_modules/**',
+                    babelrc: false,
+                    presets: ["@babel/preset-env"]
+                }),
+                terser.terser()
+            ]
+        }).then(bundle => {
+            return bundle.write({
+                file: jsFile,
+                format: 'umd',
+                name: 'library',
+                sourcemap: false
+            });
+        });
+    } else {
+        return rollup.rollup({
+            input: './src/js/index.js',
+            plugins: [
+                nodeResolve.nodeResolve(),
+                commonjs(),
+                babel.babel({
+                    babelHelpers: 'bundled',
+                    exclude: 'node_modules/**',
+                    babelrc: false,
+                    presets: ["@babel/preset-env"]
+                })
+            ]
+        }).then(bundle => {
+            return bundle.write({
+                file: jsFile,
+                format: 'umd',
+                name: 'library',
+                sourcemap: true
+            });
+        });
+    }
 };
 
 
@@ -194,61 +227,49 @@ function initializeCritical(done) {
 
 
 function criticalCss(done) {
-    if(config.useHost) {
-        request(config.host, (err, response, body) => {
-          if (err) return console.log(err)
-
-          critical.generate({
-            base: './',
-            html: body,
-            minify: true,
-            width: 1024,
-            height: 768,
-            css: `${cssDest}/main.css`,
-            target: `${cssDest}/critical.css`,
-            include: ['.lightbox', '.parallax-container', '.parallax-item']
-          });
-
-          done();
-        })
-    } else {
-        critical.generate({
-            base: './www/',
-            src: 'index.html',
-            minify: true,
-            width: 1024,
-            height: 768,
-            css: `${cssDest}/main.css`,
-            target: `${cssDest}/critical.css`,
-            include: ['.lightbox', '.parallax-container', '.parallax-item']
-        });
-        done();
-    }
+    critical.generate({
+        base: './www/',
+        src: 'index.html',
+        minify: true,
+        width: 1024,
+        height: 768,
+        css: `${cssDest}/main.css`,
+        target: `${cssDest}/critical.css`,
+        include: ['.lightbox', '.parallax-container', '.parallax-item']
+    });
+    done();
 };
 
 
-
-
 // PUG
+function html(done){
+    const streams = glob.sync(path.join(dataPath, '*.json'), {}).map((filepath) => {
+    const nameFile = filepath.split('/').pop().split('.').shift()
+    const data = JSON.parse(fs.readFileSync(filepath))
 
-function mergeJson() {
+    let prodData = {}
+    ;(isProd) ? prodData.isProd = true : prodData.isProd = false
+    const manifestData = JSON.parse(fs.readFileSync(manifestFile))
+    const dataMerged = Object.assign({}, data, manifestData, prodData);
 
-  return gulp.src([dataFiles, manifestFile])
-    .pipe(merge({
-      fileName: 'data.json'
-    }))
-    .pipe(gulp.dest(dataMerged));
-}
+    const templatePath = `${themePath}`;
+    let templateDefault = `${templatePath}/index.pug`;
 
-function html() {
-  const jsonData = JSON.parse(fs.readFileSync(dataDest))
+    if('template' in data) {
+        templateDefault = `${templatePath}/${data.template}.pug`
+    }
 
-  return gulp.src(pugFiles)
-    .pipe(pug({
-      data: jsonData,
-      pretty: false
-    }))
-    .pipe(gulp.dest(destPath));
+    return gulp.src(templateDefault)
+        .pipe(pug({
+            data: dataMerged
+        }))
+        .pipe(rename(nameFile + '.html'))
+        .pipe(gulp.dest(destPath))
+    })
+    return es.merge(streams)
+        .on('end', () => {
+            done()
+        })
 };
 
 
@@ -274,19 +295,6 @@ function cleanDist() {
   ]);
 }
 
-function uglyfyCss() {
-  return gulp.src(cssFile)
-    .pipe(cssmin({
-      keepSpecialComments: false,
-    }))
-    .pipe(gulp.dest(cssDest))
-}
-
-function uglyfyJs() {
-  return gulp.src(path.join(jsDest, 'main.js'))
-    .pipe(uglify())
-    .pipe(gulp.dest(jsDest))
-}
 
 function normalizeManifest() {
   return gulp.src(manifestFile)
@@ -331,7 +339,7 @@ function cleanAll() {
 function watch_files(done) {
   gulp.watch([scssFiles, componentscssFiles, componentscssFilesVanilla], style)
   gulp.watch([jsFiles, componentJsFiles, componentJsFilesVanilla], gulp.series(js, reloadPage))
-  gulp.watch([allPugFiles, dataFiles], gulp.series(mergeJson, html, reloadPage))
+  gulp.watch([allPugFiles, dataFiles], gulp.series(html, reloadPage))
 
   done();
 }
@@ -341,34 +349,31 @@ function watch_files(done) {
 gulp.task("initializeCritical", initializeCritical)
 gulp.task("style", style)
 gulp.task("js", js)
-gulp.task("mergeJson", mergeJson)
 gulp.task("html", html)
 gulp.task("image", image)
 gulp.task("icons", icons)
 gulp.task("minifyAssetsLoading", minifyAssetsLoading)
 gulp.task("cleanDist", cleanDist)
 gulp.task("dist", dist)
-gulp.task("uglyfyCss", uglyfyCss)
-gulp.task("uglyfyJs", uglyfyJs)
 gulp.task("normalizeManifest", normalizeManifest)
 gulp.task("cleanAll", cleanAll)
+gulp.task("enableProd", enableProd)
+gulp.task("disableProd", disableProd)
+
 
 
 // MAIN TASK
-
 gulp.task("init", gulp.series(
+  disableProd,
   initializeCritical,
   icons,
   image,
   minifyAssetsLoading,
   style,
   js,
-  // cleanDist,
-  uglyfyCss,
-  uglyfyJs,
+  cleanDist,
   dist,
   normalizeManifest,
-  mergeJson,
   html
 ))
 
@@ -381,10 +386,10 @@ gulp.task("criticalCss", gulp.series(
   criticalCss))
 
 gulp.task('prod', gulp.series(
-  // cleanDist,
-  uglyfyCss,
-  uglyfyJs,
+  enableProd,
+  cleanDist,
+  style,
+  js,
   dist,
   normalizeManifest,
-  mergeJson,
   html))
