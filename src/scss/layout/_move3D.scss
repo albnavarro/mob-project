@@ -1,0 +1,9 @@
+.move3D-wrap {
+    display: flex;
+    justify-content: center;
+    padding: 200px 0;
+
+    &--drag {
+        cursor: move;
+    }
+}

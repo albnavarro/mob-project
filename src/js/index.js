@@ -12,6 +12,7 @@ import {} from "./polyfill/entries.js";
 
 // BASE MODULE
 import { eventManager } from "./base/eventManager.js";
+import { mouseManager } from "./base/mouseManager.js";
 import { vh } from "./utility/vh.js"
 import { findElement } from "./utility/findElement.js"
 import { loadImages } from "./utility/loadImages.js"
@@ -29,8 +30,10 @@ import { overlayClass } from "../component-vanilla/overlay/js/overlay.js"
 import { lightBoxClass } from "../component-vanilla/lightbox/js/lightbox.js"
 import { menuClass } from "../component-vanilla/navigation/js/menu.js"
 import { toolTip } from "../component-vanilla/tooltip/js/tooltip.js"
+import { move3D } from "../component-vanilla/move3D/js/move3D.js"
 
 eventManager.init(true,true);
+mouseManager.init();
 parallax.init();
 tBlocks.init();
 showElement.init();
@@ -38,6 +41,7 @@ toolTip.init();
 totop.init();
 vh.init();
 offsetSlider.init();
+move3D.init();
 
 // TBlock custom event
 // L'evento su tBlocks è legato all'elemento container ( .tBlocks) che lo dispaccia

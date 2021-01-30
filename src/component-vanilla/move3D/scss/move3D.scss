@@ -1,0 +1,20 @@
+.move3D {
+    transform-style: preserve-3d;
+    user-select: none;
+
+    * {
+        transform-style: inherit;
+    }
+
+    &__container {
+        transform-style: preserve-3d;
+        backface-visibility: hidden;
+        user-select: none;
+        user-select: none;
+    }
+
+    &__item {
+        position: relative;
+        transform-style: preserve-3d;
+    }
+}

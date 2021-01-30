@@ -1,0 +1,42 @@
+<!doctype html>
+html
+    head
+        include pug/head.pug
+
+    body
+        div(id="spriteSvg" data-svg="assets/svg/svg.svg")
+        header
+          .container.menu-container.menu-container--top
+            include component-vanilla/navigation/pug/menu.pug
+        .move3D-wrap
+            .move3D(
+                data-conponent='m-comp--move3D'
+                data-perspective="1000")
+                .move3D__container
+                    .move3D__item(
+                        data-depth='200'
+                        data-animate)
+                        .parallax__item-test
+                    .move3D__item
+                        .parallax__item-test
+                    .move3D__item(
+                        data-depth='50')
+                        .parallax__item-test
+        .move3D-wrap.move3D-wrap--drag
+            .move3D(
+                data-conponent='m-comp--move3D'
+                data-drag)
+                .move3D__container
+                    .move3D__item(
+                        data-depth='200'
+                        data-animate)
+                        .parallax__item-test
+                    .move3D__item
+                        .parallax__item-test
+                    .move3D__item(
+                        data-depth='300'
+                        data-animate)
+                        .parallax__item-test
+                
+        include pug/footer.pug
+        
