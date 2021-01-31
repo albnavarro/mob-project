@@ -49,3 +49,10 @@
         right: calc(100% + 2px);
     }
 }
+
+.circle {
+    width: rem(140px);
+    height: rem(140px);
+    background-color: red;
+    border-radius: 100%;
+}
