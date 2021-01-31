@@ -11,6 +11,120 @@ html
         .move3D-wrap.move3D-wrap--drag
             .move3D(
                 data-conponent='m-comp--move3D'
+                data-perspective="1000")
+                .move3D__container
+                    .move3D__item.item-3d.item-3d--top(
+                        data-depth='200'
+                        data-rotate='x'
+                        data-range="20"
+                        data-direction='top'
+                        data-animate)
+                        .parallax__item-test
+                            .move3D__item.item-3d.item-3d--top(
+                                data-depth='0'
+                                data-rotate='x'
+                                data-range="20"
+                                data-direction='top'
+                                data-animate)
+                                .parallax__item-test
+                    .move3D__item(
+                        data-depth='200'
+                        data-animate)
+                        .parallax__item-test
+                    .move3D__item.item-3d.item-3d--bottom(
+                        data-depth='200'
+                        data-rotate='x'
+                        data-range="20"
+                        data-direction='bottom'
+                        data-animate)
+                        .parallax__item-test
+                            .move3D__item.item-3d.item-3d--bottom(
+                                data-depth='0'
+                                data-rotate='x'
+                                data-range="20"
+                                data-direction='bottom'
+                                data-animate)
+                                .parallax__item-test
+                    .move3D__item.item-3d.item-3d--right(
+                        data-depth='200'
+                        data-rotate='y'
+                        data-range="20"
+                        data-direction='right'
+                        data-animate)
+                        .parallax__item-test
+                            .move3D__item.item-3d.item-3d--right(
+                                data-depth='0'
+                                data-rotate='y'
+                                data-range="20"
+                                data-direction='right'
+                                data-animate)
+                                .parallax__item-test
+                                    .move3D__item.item-3d.item-3d--right(
+                                        data-depth='0'
+                                        data-rotate='y'
+                                        data-range="20"
+                                        data-direction='right'
+                                        data-animate)
+                                        .parallax__item-test
+                    .move3D__item.item-3d.item-3d--left(
+                        data-depth='200'
+                        data-rotate='y'
+                        data-range="20"
+                        data-direction='left'
+                        data-animate)
+                        .parallax__item-test
+                            .move3D__item.item-3d.item-3d--left(
+                                data-depth='0'
+                                data-rotate='y'
+                                data-range="20"
+                                data-direction='left'
+                                data-animate)
+                                .parallax__item-test
+                                    .move3D__item.item-3d.item-3d--left(
+                                        data-depth='0'
+                                        data-rotate='y'
+                                        data-range="20"
+                                        data-direction='left'
+                                        data-animate)
+                                        .parallax__item-test
+                    .move3D__item.item-3d.item-3d--top-right(
+                        data-depth='200'
+                        data-rotate='xy'
+                        data-range="20"
+                        data-direction='top-right'
+                        data-animate)
+                        .parallax__item-test
+                            .move3D__item.item-3d.item-3d--top-right(
+                                data-depth='0'
+                                data-rotate='xy'
+                                data-range="20"
+                                data-direction='top-right'
+                                data-animate)
+                                .parallax__item-test
+                    .move3D__item.item-3d.item-3d--top-left(
+                        data-depth='200'
+                        data-rotate='xy'
+                        data-range="20"
+                        data-direction='top-left'
+                        data-animate)
+                        .parallax__item-test
+                    .move3D__item.item-3d.item-3d--bottom-right(
+                        data-depth='200'
+                        data-rotate='xy'
+                        data-range="20"
+                        data-direction='bottom-right'
+                        data-animate)
+                        .parallax__item-test
+                    .move3D__item.item-3d.item-3d--bottom-left(
+                        data-depth='200'
+                        data-rotate='xy'
+                        data-range="20"
+                        data-direction='bottom-left'
+                        data-animate)
+                        .parallax__item-test
+        .move3D-wrap.move3D-wrap--drag
+            .move3D(
+                data-conponent='m-comp--move3D'
                 data-perspective="1000"
                 data-drag)
                 .move3D__container
@@ -20,9 +134,9 @@ html
                         data-range="20"
                         data-direction='top'
                         data-animate)
-                        .parallax__item-test.parallax__item-test--border
+                        .parallax__item-test
                     .move3D__item
-                        .parallax__item-test.parallax__item-test--border
+                        .parallax__item-test
                     .move3D__item.item-3d.item-3d--bottom(
                         data-depth='200'
                         data-rotate='x'
@@ -30,61 +144,67 @@ html
                         data-direction='bottom'
                         data-animate)
                         .parallax__item-test
+                            .move3D__item.item-3d.item-3d--bottom(
+                                data-depth='0'
+                                data-rotate='x'
+                                data-range="20"
+                                data-direction='bottom'
+                                data-animate)
+                                .parallax__item-test
                     .move3D__item.item-3d.item-3d--right(
                         data-depth='200'
                         data-rotate='y'
                         data-range="20"
                         data-direction='right'
                         data-animate)
-                        .parallax__item-test.parallax__item-test--border
+                        .parallax__item-test
+                            .move3D__item.item-3d.item-3d--right(
+                                data-depth='0'
+                                data-rotate='y'
+                                data-range="20"
+                                data-direction='right'
+                                data-animate)
+                                .parallax__item-test
                     .move3D__item.item-3d.item-3d--left(
                         data-depth='200'
                         data-rotate='y'
                         data-range="20"
                         data-direction='left'
                         data-animate)
-                        .parallax__item-test.parallax__item-test--border
+                        .parallax__item-test
+                            .move3D__item.item-3d.item-3d--left(
+                                data-depth='0'
+                                data-rotate='y'
+                                data-range="20"
+                                data-direction='left'
+                                data-animate)
+                                .parallax__item-test
                     .move3D__item.item-3d.item-3d--top-right(
                         data-depth='200'
                         data-rotate='xy'
                         data-range="20"
                         data-direction='top-right'
                         data-animate)
-                        .parallax__item-test.parallax__item-test--border
+                        .parallax__item-test
                     .move3D__item.item-3d.item-3d--top-left(
                         data-depth='200'
                         data-rotate='xy'
                         data-range="20"
                         data-direction='top-left'
                         data-animate)
-                        .parallax__item-test.parallax__item-test--border
+                        .parallax__item-test
                     .move3D__item.item-3d.item-3d--bottom-right(
                         data-depth='200'
                         data-rotate='xy'
                         data-range="20"
                         data-direction='bottom-right'
                         data-animate)
-                        .parallax__item-test.parallax__item-test--border
+                        .parallax__item-test
                     .move3D__item.item-3d.item-3d--bottom-left(
                         data-depth='200'
                         data-rotate='xy'
                         data-range="20"
                         data-direction='bottom-left'
-                        data-animate)
-                        .parallax__item-test.parallax__item-test--border
-        .move3D-wrap
-            .move3D(
-                data-conponent='m-comp--move3D'
-                data-perspective="1000")
-                .move3D__container
-                    .move3D__item(
-                        data-depth='200'
-                        data-animate)
-                        .parallax__item-test
-                    .move3D__item
-                        .parallax__item-test
-                    .move3D__item(
-                        data-depth='200'
                         data-animate)
                         .parallax__item-test
                 

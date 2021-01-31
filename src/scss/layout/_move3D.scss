@@ -1,7 +1,7 @@
 .move3D-wrap {
     display: flex;
     justify-content: center;
-    padding: 200px 0;
+    padding: 400px 0;
 
     &--drag {
         cursor: move;
@@ -12,40 +12,40 @@
     position: absolute;
 
     &--top {
-        bottom: 100%;
+        bottom: calc(100% + 2px);
     }
 
     &--bottom {
-        top: 100%;
+        top: calc(100% + 2px);
     }
 
     &--right {
         top: 0;
-        left: 100%;
+        left: calc(100% + 2px);
     }
 
     &--left {
         top: 0;
-        right: 100%;
+        right: calc(100% + 2px);
     }
 
     &--top-right {
-        bottom: 100%;
-        left: 100%;
+        bottom: calc(100% + 2px);
+        left: calc(100% + 2px);
     }
 
     &--top-left {
-        bottom: 100%;
-        right: 100%;
+        bottom: calc(100% + 2px);
+        right: calc(100% + 2px);
     }
 
     &--bottom-right {
-        top: 100%;
-        left: 100%;
+        top: calc(100% + 2px);
+        left: calc(100% + 2px);
     }
 
     &--bottom-left {
-        top: 100%;
-        right: 100%;
+        top: calc(100% + 2px);
+        right: calc(100% + 2px);
     }
 }
