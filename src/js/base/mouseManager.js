@@ -1,25 +1,47 @@
+import {eventManager} from "./eventManager.js";
+
 class mouseManagerClass {
 	constructor() {
 		this.data = {
-			'move': [],
-			'start': [],
-			'end': []
-		},
-		this.pointer = {
+			'mousemove': [],
+			'touchmove': [],
+			'mousedown': [],
+			'mouseup': [],
+			'touchend': [],
+			'scroll': []
+		}
+		this.page = {
 			x: 0,
 			y: 0
 		}
+		this.client = {
+			x: 0,
+			y: 0
+		}
+		this.target = null
+		this.stackId = -1,
+		this.lastScrolledTop = 0
 	}
 
 	init() {
 		window.addEventListener('mousemove', (e) => {
+			this.target = e.target
 			const {
 				pageX,
 				pageY
 			} = e;
-			this.pointer.x = pageX
-			this.pointer.y = pageY
-			this.execute('move')
+			this.page.x = pageX
+			this.page.y = pageY
+
+			const {
+				clientX,
+			    clientY
+			} = e;
+			this.client.x = clientX
+			this.client.y = clientY
+
+
+			this.execute('mousemove')
 		})
 
 		window.addEventListener('touchmove', (e) => {
@@ -27,30 +49,46 @@ class mouseManagerClass {
 				pageX,
 				pageY
 			} = e.touches[0]
-			this.pointer.x = pageX
-			this.pointer.y = pageY
-			this.execute('move')
+			this.page.x = pageX
+			this.page.y = pageY
+
+			this.execute('touchmove')
 		})
 
-		window.addEventListener('touchstart', () => {
-			this.execute('start')
-		});
-
 		window.addEventListener('mousedown', () => {
-			this.execute('start')
-		});
-
-		window.addEventListener('touchend', () => {
-			this.execute('end')
+			this.execute('mousedown')
 		});
 
 		window.addEventListener('mouseup', () => {
-			this.execute('end')
+			this.execute('mouseup')
 		});
 
 		window.addEventListener('mouseleave', () => {
-			this.execute('end')
+			this.execute('mouseup')
 		});
+
+		window.addEventListener('touchstart', () => {
+			this.execute('touchstart')
+		});
+
+		window.addEventListener('touchend', () => {
+			this.execute('touchend')
+		});
+
+		eventManager.push('scroll', this.onScroll.bind(this));
+
+	}
+
+	onScroll() {
+		const scrollTop = eventManager.scrollTop()
+
+        if(this.lastScrolledTop != scrollTop){
+			this.page.y -= this.lastScrolledTop
+            this.lastScrolledTop = scrollTop
+			this.page.y += this.lastScrolledTop
+        }
+
+		this.execute('scroll')
 	}
 
 	execute(_properties) {
@@ -95,12 +133,24 @@ class mouseManagerClass {
 		}
 	}
 
-	pointerX() {
-		return this.pointer.x
+	pageX() {
+		return this.page.x
 	}
 
-	pointerY() {
-		return this.pointer.y
+	pageY() {
+		return this.page.y
+	}
+
+	clientX() {
+		return this.client.x
+	}
+
+	clientY() {
+		return this.client.y
+	}
+
+	getTarget() {
+		return this.target
 	}
 }
 

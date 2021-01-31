@@ -26,7 +26,7 @@ export class move3DContainerClass {
     init() {
         const itemArray = Array.from(this.children);
         const dataArray = itemArray.map(item => {
-            return this.getItemData(item);
+            return this.getItemData(this.item, item);
         })
 
         for (const item of dataArray) {
@@ -37,28 +37,40 @@ export class move3DContainerClass {
 
         this.setDepth()
 
-        mouseManager.push('move', () => {
+        mouseManager.push('mousemove', () => {
             this.onMove()
         })
+
+        if(!this.drag) {
+            mouseManager.push('scroll', () => {
+                this.onMove()
+            })
+        }
 
         if(this.drag) {
             this.dragX = eventManager.windowsWidth()/2
             this.dragY = eventManager.windowsHeight()/2
 
-            mouseManager.push('start', () => {
-                this.onTouchStart()
+            mouseManager.push('mousedown', () => {
+                this.onMouseDown()
             })
 
-            mouseManager.push('end', () => {
-                this.onTouchEnd()
+            mouseManager.push('mouseup', () => {
+                this.onMouseUp()
             })
         }
     }
 
-    getItemData(item) {
+    getItemData(container, item) {
         const data = {};
         data.item = item
+        data.container = container
         data.depth = item.getAttribute('data-depth') || 0
+        // additional rotate
+        data.rotate = item.getAttribute('data-rotate') || null
+        data.direction = item.getAttribute('data-direction') || null
+        data.range = item.getAttribute('data-range') || 0
+        //
         data.animate = item.getAttribute('data-animate') || 0
         return data;
     }
@@ -73,8 +85,8 @@ export class move3DContainerClass {
     onMove() {
         const vw = eventManager.windowsWidth()
         const vh = eventManager.windowsHeight()
-        let x = mouseManager.pointerX()
-        let y = mouseManager.pointerY()
+        let x = mouseManager.clientX()
+        let y = mouseManager.clientY()
 
         let xgap = 0
         let ygap = 0
@@ -112,8 +124,8 @@ export class move3DContainerClass {
             this.dragY -= ygap
         }
 
-        this.lastX = mouseManager.pointerX()
-        this.lastY = mouseManager.pointerY()
+        this.lastX = mouseManager.clientX()
+        this.lastY = mouseManager.clientY()
 
         /*
         Calcolo il valore da passare ai componenti figli per animarre l'asse Z.
@@ -138,11 +150,11 @@ export class move3DContainerClass {
         }
     }
 
-    onTouchStart() {
+    onMouseDown() {
         this.onDrag = true
     }
 
-    onTouchEnd() {
+    onMouseUp() {
         this.onDrag = false
     }
 }

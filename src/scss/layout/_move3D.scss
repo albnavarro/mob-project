@@ -7,3 +7,45 @@
         cursor: move;
     }
 }
+
+.item-3d {
+    position: absolute;
+
+    &--top {
+        bottom: 100%;
+    }
+
+    &--bottom {
+        top: 100%;
+    }
+
+    &--right {
+        top: 0;
+        left: 100%;
+    }
+
+    &--left {
+        top: 0;
+        right: 100%;
+    }
+
+    &--top-right {
+        bottom: 100%;
+        left: 100%;
+    }
+
+    &--top-left {
+        bottom: 100%;
+        right: 100%;
+    }
+
+    &--bottom-right {
+        top: 100%;
+        left: 100%;
+    }
+
+    &--bottom-left {
+        top: 100%;
+        right: 100%;
+    }
+}

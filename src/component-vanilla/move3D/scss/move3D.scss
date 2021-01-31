@@ -1,6 +1,7 @@
 .move3D {
     transform-style: preserve-3d;
     user-select: none;
+    position: relative;
 
     * {
         transform-style: inherit;
@@ -16,5 +17,41 @@
     &__item {
         position: relative;
         transform-style: preserve-3d;
+
+        > * {
+            outline: 1px solid transparent;
+        }
+
+        &.origin-top {
+            transform-origin: top;
+        }
+
+        &.origin-bottom {
+            transform-origin: bottom;
+        }
+
+        &.origin-left {
+            transform-origin: left;
+        }
+
+        &.origin-right {
+            transform-origin: right;
+        }
+
+        &.origin-top-left {
+            transform-origin: bottom right;
+        }
+
+        &.origin-top-right {
+            transform-origin: bottom left;
+        }
+
+        &.origin-bottom-left {
+            transform-origin: top right;
+        }
+
+        &.origin-bottom-right {
+            transform-origin: top left;
+        }
     }
 }
