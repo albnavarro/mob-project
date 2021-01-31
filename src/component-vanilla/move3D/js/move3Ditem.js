@@ -21,6 +21,9 @@ export class move3DitemClass {
         }
     }
 
+    getRotate(range, delta, limit) {
+        return ((range * delta) / limit).toFixed(2)
+    }
 
     move(delta, limit) {
         let depth = this.depth
@@ -32,7 +35,7 @@ export class move3DitemClass {
         // X rotate
         switch (this.rotate) {
             case 'x':
-                rotateX = parseInt(Math.abs(( this.range * delta ) / limit))
+                rotateX = this.getRotate(this.range, delta, limit)
 
                 switch (this.direction) {
                     case 'bottom':
@@ -47,7 +50,7 @@ export class move3DitemClass {
             break;
 
             case 'y':
-                rotateY = parseInt(Math.abs(( this.range * delta ) / limit))
+                rotateY = this.getRotate(this.range, delta, limit)
 
                 switch (this.direction) {
                     case 'left':
@@ -63,8 +66,8 @@ export class move3DitemClass {
             break;
 
             case 'xy':
-                rotateY = parseInt(Math.abs(( this.range * delta ) / limit))
-                rotateX = parseInt(Math.abs(( this.range * delta ) / limit))
+                rotateY = this.getRotate(this.range, delta, limit)
+                rotateX = this.getRotate(this.range, delta, limit)
 
                 switch (this.direction) {
                     case 'top-left':
