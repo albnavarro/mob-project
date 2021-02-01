@@ -1,10 +1,16 @@
 .move3D {
-    transform-style: preserve-3d;
-    user-select: none;
-    position: relative;
-
     * {
         transform-style: inherit;
+    }
+
+    &--drag {
+        cursor: move;
+    }
+
+    &__scene {
+        transform-style: preserve-3d;
+        user-select: none;
+        position: relative;
     }
 
     &__container {

@@ -1,18 +1,24 @@
 import {mouseManager} from "../../../js/base/mouseManager.js";
 import {eventManager} from "../../../js/base/eventManager.js";
 import {move3DitemClass} from "./move3Ditem.js";
+import { outerHeight, outerWidth } from "../../../js/utility/vanillaFunction.js";
 
 export class move3DContainerClass {
     constructor(data) {
         this.item = data.item
+        this.scene = this.item.querySelector('.move3D__scene')
         this.container = this.item.querySelector('.move3D__container')
         this.children = this.item.querySelectorAll('.move3D__item')
+        this.centerToViewoport = data.centerToViewoport
+        this.pageY = data.pageY
         this.perspective = data.perspective
         this.xDepth = data.xDepth
         this.yDepth = data.yDepth
         this.xLimit = data.xLimit
         this.yLimit = data.yLimit
         this.drag = data.drag
+        this.height = 0
+        this.width = 0
         this.delta = 0
         this.limit = 0
         this.lastX = 0
@@ -20,10 +26,13 @@ export class move3DContainerClass {
         this.lastY = 0
         this.dragY = 0
         this.onDrag = false
+        this.firstDrag = false
         this.childrenInstances = []
     }
 
     init() {
+        if(Modernizr.touchevents && !this.drag) return
+
         const itemArray = Array.from(this.children);
         const dataArray = itemArray.map(item => {
             return this.getItemData(this.item, item);
@@ -36,29 +45,37 @@ export class move3DContainerClass {
         }
 
         this.setDepth()
+        this.getDimension()
 
-        mouseManager.push('mousemove', () => {
-            this.onMove()
-        })
+        mouseManager.push('mousemove', () => this.onMove())
+        eventManager.push('resize', () => this.getDimension())
 
         if(!this.drag) {
-            mouseManager.push('scroll', () => {
-                this.onMove()
-            })
+            mouseManager.push('scroll', () => this.onMove())
         }
 
         if(this.drag) {
-            this.dragX = eventManager.windowsWidth()/2
-            this.dragY = eventManager.windowsHeight()/2
+            if(this.centerToViewoport) {
+                this.dragX = eventManager.windowsWidth()/2
+                this.dragY = eventManager.windowsHeight()/2
+            } else {
+                this.dragX= this.width/2
+                this.dragY = this.height/2
+            }
+            this.item.classList.add('move3D--drag')
 
-            mouseManager.push('mousedown', () => {
-                this.onMouseDown()
-            })
+            mouseManager.push('mousedown', () => this.onMouseDown())
+            mouseManager.push('mouseup', () => this.onMouseUp())
 
-            mouseManager.push('mouseup', () => {
-                this.onMouseUp()
-            })
+            mouseManager.push('touchstart', () => this.onMouseDown())
+            mouseManager.push('touchend', () => this.onMouseUp())
+            mouseManager.push('touchmove', () => this.onMove())
         }
+    }
+
+    getDimension() {
+        this.height = outerHeight(this.item)
+        this.width = outerWidth(this.item)
     }
 
     getItemData(container, item) {
@@ -79,20 +96,41 @@ export class move3DContainerClass {
         const style = {
             'perspective': `${this.perspective}px`
         }
-        Object.assign(this.item.style, style)
+        Object.assign(this.scene.style, style)
     }
 
     onMove() {
-        const vw = eventManager.windowsWidth()
-        const vh = eventManager.windowsHeight()
+        let vw = 0
+        let vh = 0
+
+        if(this.centerToViewoport) {
+            vw = eventManager.windowsWidth()
+            vh = eventManager.windowsHeight()
+        } else {
+            vw = this.width
+            vh = this.height
+        }
+
         let x = mouseManager.clientX()
-        let y = mouseManager.clientY()
+        let y = 0
+        ;(this.pageY) ? y = mouseManager.pageY() : y = mouseManager.clientY()
+
+        if(Modernizr.touchevents) {
+            x = mouseManager.pageX()
+            y = mouseManager.pageY()
+        }
 
         let xgap = 0
         let ygap = 0
         if( this.drag && this.onDrag ) {
-            xgap = x - this.lastX
-            ygap = y - this.lastY;
+            if(this.firstDrag) {
+                xgap = 0
+                ygap = 0
+                this.firstDrag = false
+            } else {
+                xgap = x - this.lastX
+                ygap = y - this.lastY
+            }
 
             this.dragX += xgap
             x =  this.dragX;
@@ -125,7 +163,12 @@ export class move3DContainerClass {
         }
 
         this.lastX = mouseManager.clientX()
-        this.lastY = mouseManager.clientY()
+        ;(this.pageY) ? this.lastY = mouseManager.pageY() : this.lastY = mouseManager.clientY()
+
+        if(Modernizr.touchevents) {
+            this.lastX = mouseManager.pageX()
+            this.lastY =  mouseManager.pageY()
+        }
 
         /*
         Calcolo il valore da passare ai componenti figli per animarre l'asse Z.
@@ -152,6 +195,7 @@ export class move3DContainerClass {
 
     onMouseDown() {
         this.onDrag = true
+        this.firstDrag = true
     }
 
     onMouseUp() {

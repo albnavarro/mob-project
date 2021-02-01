@@ -33,12 +33,14 @@ class move3DClass {
     getItemData(item) {
         const data = {};
         data.item = item
+        data.centerToViewoport = item.hasAttribute('data-centerToViewoport');
+        data.pageY = item.hasAttribute('data-pageY');
         data.perspective = item.getAttribute('data-perspective') || 700
         data.xDepth = item.getAttribute('data-xDepth') || 20
         data.yDepth = item.getAttribute('data-yDepth') || 20
         data.xLimit = item.getAttribute('data-xLimit') || 35
         data.yLimit = item.getAttribute('data-yLimit') || 35
-        data.drag = item.hasAttribute('data-drag');
+        data.drag = item.hasAttribute('data-drag')
         return data;
     }
 

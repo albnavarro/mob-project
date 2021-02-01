@@ -7,6 +7,7 @@ class mouseManagerClass {
 			'touchmove': [],
 			'mousedown': [],
 			'mouseup': [],
+			'touchstart': [],
 			'touchend': [],
 			'scroll': []
 		}

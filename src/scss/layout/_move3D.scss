@@ -2,10 +2,6 @@
     display: flex;
     justify-content: center;
     padding: 400px 0;
-
-    &--drag {
-        cursor: move;
-    }
 }
 
 .item-3d {
@@ -55,4 +51,10 @@
     height: rem(140px);
     background-color: red;
     border-radius: 100%;
+    transition: background-color .35s;
+    cursor: pointer;
+
+    &:hover {
+        background-color: $black;
+    }
 }
