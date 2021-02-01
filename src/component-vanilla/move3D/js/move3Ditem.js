@@ -27,7 +27,7 @@ export class move3DitemClass {
 
     move(delta, limit) {
         let depth = this.depth
-        depth = parseInt(Math.abs(( this.depth * delta ) / limit))
+        depth = parseInt(( this.depth * delta ) / limit)
 
         let rotateX = 0
         let rotateY = 0
