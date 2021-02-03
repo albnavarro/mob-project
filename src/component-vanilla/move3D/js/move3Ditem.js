@@ -7,6 +7,7 @@ export class move3DitemClass {
         this.rotate = data.rotate
         this.direction = data.direction
         this.range = data.range
+        this.initialRotate = data.initialRotate
         //
         this.animate = data.animate
         this.width = 0
@@ -22,7 +23,7 @@ export class move3DitemClass {
     }
 
     getRotate(range, delta, limit) {
-        return ((range * delta) / limit).toFixed(2)
+        return (((range * delta) / limit) - this.initialRotate ).toFixed(2)
     }
 
     move(delta, limit) {

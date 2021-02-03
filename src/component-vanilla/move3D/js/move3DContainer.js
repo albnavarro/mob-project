@@ -87,6 +87,7 @@ export class move3DContainerClass {
         data.rotate = item.getAttribute('data-rotate') || null
         data.direction = item.getAttribute('data-direction') || null
         data.range = item.getAttribute('data-range') || 0
+        data.initialRotate = item.getAttribute('data-initialRotate') || 0
         //
         data.animate = item.getAttribute('data-animate') || 0
         return data;
