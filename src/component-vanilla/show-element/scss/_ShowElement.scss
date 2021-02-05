@@ -4,33 +4,50 @@
 
 .transition {
     &--opacity {
-      transition: opacity .5s .15s;
+        transition: opacity 0.5s 0.15s;
     }
 
     &--translate {
-      transition: transform .5s .15s;
+        transition: transform 0.5s 0.15s;
+    }
+
+    &--clipath {
+        transition: clip-path 1s cubic-bezier(0.305, 0.550, 0.470, 1.015) 0.15s;
     }
 }
 
 .toggleEl {
+    &--opacity {
+        &--start {
+            opacity: 0;
+        }
 
-  &--opacity {
-    &--start {
-      opacity: 0;
+        &--end {
+            opacity: 1;
+        }
     }
 
-    &--end {
-      opacity: 1;
-    }
-  }
+    &--transform {
+        &--start {
+            transform: translateX(100%);
+        }
 
-  &--transform {
-    &--start {
-      transform: translateX(100%);
+        &--end {
+            transform: translateX(0);
+        }
     }
 
-    &--end {
-      transform: translateX(0);
+    &--clipath {
+        &--start {
+            @include _mq('desktop') {
+                clip-path: polygon(0% 0%, 0% 0%, 0% 200%);
+            }
+        }
+
+        &--end {
+            @include _mq('desktop') {
+                clip-path: polygon(0% 0%, 200% 0%, 0% 200%);
+            }
+        }
     }
-  }
 }
