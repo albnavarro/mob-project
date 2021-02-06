@@ -34,7 +34,6 @@ class move3DClass {
         const data = {};
         data.item = item
         data.centerToViewoport = item.hasAttribute('data-centerToViewoport');
-        data.pageY = item.hasAttribute('data-pageY');
         data.perspective = item.getAttribute('data-perspective') || 700
         data.xDepth = item.getAttribute('data-xDepth') || 20
         data.yDepth = item.getAttribute('data-yDepth') || 20

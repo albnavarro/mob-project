@@ -10,7 +10,6 @@ export class move3DContainerClass {
         this.container = this.item.querySelector('.move3D__container')
         this.children = this.item.querySelectorAll('.move3D__item')
         this.centerToViewoport = data.centerToViewoport
-        this.pageY = data.pageY
         this.perspective = data.perspective
         this.xDepth = data.xDepth
         this.yDepth = data.yDepth
@@ -20,6 +19,7 @@ export class move3DContainerClass {
         this.height = 0
         this.width = 0
         this.offsetLeft = 0
+        this.offSetTop = 0
         this.delta = 0
         this.limit = 0
         this.lastX = 0
@@ -28,11 +28,14 @@ export class move3DContainerClass {
         this.dragY = 0
         this.onDrag = false
         this.firstDrag = false
+        this.pageY = false
         this.childrenInstances = []
     }
 
     init() {
         if(Modernizr.touchevents && !this.drag) return
+
+        if(!this.centerToViewoport && !this.drag) this.pageY = true
 
         const itemArray = Array.from(this.children);
         const dataArray = itemArray.map(item => {
@@ -51,18 +54,13 @@ export class move3DContainerClass {
         mouseManager.push('mousemove', () => this.onMove())
         eventManager.push('resize', () => this.getDimension())
 
-        if(!this.drag) {
+        if(this.pageY) {
             mouseManager.push('scroll', () => this.onMove())
         }
 
         if(this.drag) {
-            if(this.centerToViewoport) {
-                this.dragX = eventManager.windowsWidth()/2
-                this.dragY = eventManager.windowsHeight()/2
-            } else {
-                this.dragX= this.width/2 + this.offsetLeft
-                this.dragY = this.height/2
-            }
+            this.dragX = eventManager.windowsWidth()/2
+            this.dragY = eventManager.windowsHeight()/2
             this.item.classList.add('move3D--drag')
 
             mouseManager.push('mousedown', () => this.onMouseDown())
@@ -78,6 +76,7 @@ export class move3DContainerClass {
         this.height = outerHeight(this.item)
         this.width = outerWidth(this.item)
         this.offsetLeft = offset(this.item).left
+        this.offSetTop = offset(this.item).top
     }
 
     getItemData(container, item) {
@@ -106,7 +105,7 @@ export class move3DContainerClass {
         let vw = 0
         let vh = 0
 
-        if(this.centerToViewoport) {
+        if(this.centerToViewoport || this.drag) {
             vw = eventManager.windowsWidth()
             vh = eventManager.windowsHeight()
         } else {
@@ -147,12 +146,14 @@ export class move3DContainerClass {
         ay = grado di rotazione sull'asse Y
         */
         let ax = 0
-        let ay = ( (vh / 2) - (y) ) / this.yDepth;
+        let ay = 0
 
-        if(this.centerToViewoport) {
+        if(this.centerToViewoport || this.drag) {
             ax = - ( (vw / 2) - x ) / this.xDepth;
+            ay = ( (vh / 2) - y ) / this.yDepth;
         } else {
             ax = - ( (vw / 2) - (x - this.offsetLeft) ) / this.xDepth;
+            ay = ( (vh / 2) - (y - this.offSetTop) ) / this.yDepth;
         }
 
         if (Math.abs(ax) > this.xLimit) {
