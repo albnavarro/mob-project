@@ -1,7 +1,7 @@
 import {mouseManager} from "../../../js/base/mouseManager.js";
 import {eventManager} from "../../../js/base/eventManager.js";
 import {move3DitemClass} from "./move3Ditem.js";
-import { outerHeight, outerWidth } from "../../../js/utility/vanillaFunction.js";
+import { outerHeight, outerWidth, offset } from "../../../js/utility/vanillaFunction.js";
 
 export class move3DContainerClass {
     constructor(data) {
@@ -19,6 +19,7 @@ export class move3DContainerClass {
         this.drag = data.drag
         this.height = 0
         this.width = 0
+        this.offsetLeft = 0
         this.delta = 0
         this.limit = 0
         this.lastX = 0
@@ -59,7 +60,7 @@ export class move3DContainerClass {
                 this.dragX = eventManager.windowsWidth()/2
                 this.dragY = eventManager.windowsHeight()/2
             } else {
-                this.dragX= this.width/2
+                this.dragX= this.width/2 + this.offsetLeft
                 this.dragY = this.height/2
             }
             this.item.classList.add('move3D--drag')
@@ -76,6 +77,7 @@ export class move3DContainerClass {
     getDimension() {
         this.height = outerHeight(this.item)
         this.width = outerWidth(this.item)
+        this.offsetLeft = offset(this.item).left
     }
 
     getItemData(container, item) {
@@ -144,8 +146,14 @@ export class move3DContainerClass {
         ax = grado di rotazione sull'asse X
         ay = grado di rotazione sull'asse Y
         */
-        let ax = - ( (vw / 2) - x ) / this.xDepth;
-        let ay = ( (vh / 2) - y ) / this.yDepth;
+        let ax = 0
+        let ay = ( (vh / 2) - (y) ) / this.yDepth;
+
+        if(this.centerToViewoport) {
+            ax = - ( (vw / 2) - x ) / this.xDepth;
+        } else {
+            ax = - ( (vw / 2) - (x - this.offsetLeft) ) / this.xDepth;
+        }
 
         if (Math.abs(ax) > this.xLimit) {
             (ax > 0) ? ax = this.xLimit : ax = -this.xLimit
