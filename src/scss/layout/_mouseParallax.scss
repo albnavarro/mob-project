@@ -1,0 +1,22 @@
+.mouseParallax-wrap {
+    height: 100vh;
+    position: relative;
+}
+
+
+.m-test {
+    position: absolute;
+    border: 1px #000 solid;
+
+    &--1 {
+        top: 70%;
+        left: 60%;
+        transform: translate(-50%, -50%);
+    }
+
+    &--2 {
+        top: 20%;
+        left: 30%;
+        transform: translate(-50%, -50%);
+    }
+}

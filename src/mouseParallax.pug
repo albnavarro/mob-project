@@ -1,0 +1,31 @@
+<!doctype html>
+html
+    head
+        include pug/head.pug
+
+    body
+        div(id="spriteSvg" data-svg="assets/svg/svg.svg")
+        header
+          .container.menu-container.menu-container--top
+            include component-vanilla/navigation/pug/menu.pug
+        main
+            .mouseParallax-wrap
+                .m-test.m-test--1
+                    .mouseParallax__container
+                        .mouseParallax__item(data-conponent='m-comp--mouseParallax'
+                            data-range="10")
+                            .circle
+                .m-test.m-test--1
+                    .mouseParallax__container
+                        .mouseParallax__item(data-conponent='m-comp--mouseParallax'
+                            data-range="30")
+                            .circle
+                .m-test.m-test--2
+                    .mouseParallax__container
+                        .mouseParallax__item(data-conponent='m-comp--mouseParallax'
+                            data-range="20"
+                            data-centerToViewoport)
+                            .circle
+            
+        include pug/footer.pug
+        
