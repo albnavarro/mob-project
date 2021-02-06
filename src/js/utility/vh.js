@@ -2,31 +2,36 @@ import { eventManager } from "../base/eventManager.js";
 
 class vhClass {
 
-  constructor(images,callback) {
-    if(!vhClass.instance){
-      vhClass.instance = this;
-    }
-
-    return vhClass.instance;
-  }
+	constructor(images, callback) {
+		this.lastWw = 0
+	}
 
 
-  init(){
-    this.calcVh()
-    eventManager.push('resize', this.calcVh.bind(this))
-    eventManager.push('scroll', this.onScroll.bind(this))
-  }
+	init() {
+		this.lastWw = eventManager.windowsWidth()
+		this.calcVh()
+		eventManager.push('resize', this.onResize.bind(this))
+		eventManager.push('scroll', this.onScroll.bind(this))
+	}
 
-  calcVh() {
-    let vh = window.innerHeight * 0.01
-    document.documentElement.style.setProperty('--vh', `${vh}px`)
-  }
+	calcVh() {
+		let vh = window.innerHeight * 0.01
+		document.documentElement.style.setProperty('--vh', `${vh}px`)
+        console.log('calc vh')
+	}
 
-  onScroll() {
-    if(eventManager.scrollTop() == 0) {
-      this.calcVh();
-    }
-  }
+	onResize() {
+		if (eventManager.windowsWidth() != this.lastWw) {
+			this.calcVh()
+			this.lastWw = eventManager.windowsWidth();
+		}
+	}
+
+	onScroll() {
+		if (eventManager.scrollTop() == 0) {
+			this.calcVh();
+		}
+	}
 
 }
 
