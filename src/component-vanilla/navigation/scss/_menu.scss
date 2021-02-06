@@ -46,14 +46,14 @@ $mediaQ: 'tablet';
 
   @include _mq('max', $mediaQ) {
     @include when-inside('.nav--offCanvas') {
-      position: absolute;
+      position: fixed;
       top: var(--toggle-h);
       height: 100vh;
       height: calc((var(--vh, 1vh) * 100) - var(--toggle-h));
       right: 0;
       left: 0;
       background-color: $black;
-      transform: translateX(100%);
+      transform: translate3d(100%,0,0);
       transition: transform .35s;
       z-index: 10;
       padding: 30px;
@@ -65,7 +65,7 @@ $mediaQ: 'tablet';
     }
 
     @include when-inside('.nav-wrap.menu-on') {
-      transform: translateX(0);
+      transform: translate3d(0,0,0);
     }
   }
 }

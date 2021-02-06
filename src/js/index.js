@@ -31,6 +31,7 @@ import { lightBoxClass } from "../component-vanilla/lightbox/js/lightbox.js"
 import { menuClass } from "../component-vanilla/navigation/js/menu.js"
 import { toolTip } from "../component-vanilla/tooltip/js/tooltip.js"
 import { move3D } from "../component-vanilla/move3D/js/move3D.js"
+import { mouseParallax } from "../component-vanilla/mouseParallax/js/mouseParallax.js"
 
 eventManager.init(true,true);
 mouseManager.init();
@@ -42,6 +43,7 @@ totop.init();
 vh.init();
 offsetSlider.init();
 move3D.init();
+mouseParallax.init();
 
 // TBlock custom event
 // L'evento su tBlocks è legato all'elemento container ( .tBlocks) che lo dispaccia
