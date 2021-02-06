@@ -19,6 +19,7 @@ class mouseManagerClass {
 			x: 0,
 			y: 0
 		}
+		this.ticking = false,
 		this.target = null
 		this.stackId = -1,
 		this.lastScrolledTop = 0
@@ -26,34 +27,11 @@ class mouseManagerClass {
 
 	init() {
 		window.addEventListener('mousemove', (e) => {
-			this.target = e.target
-			const {
-				pageX,
-				pageY
-			} = e;
-			this.page.x = pageX
-			this.page.y = pageY
-
-			const {
-				clientX,
-			    clientY
-			} = e;
-			this.client.x = clientX
-			this.client.y = clientY
-
-
-			this.execute('mousemove')
+			this.onMove(e)
 		})
 
 		window.addEventListener('touchmove', (e) => {
-			const {
-				pageX,
-				pageY
-			} = e.touches[0]
-			this.page.x = pageX
-			this.page.y = pageY
-
-			this.execute('touchmove')
+			this.onMove(e)
 		})
 
 		window.addEventListener('mousedown', () => {
@@ -78,6 +56,46 @@ class mouseManagerClass {
 
 		eventManager.push('scroll', this.onScroll.bind(this));
 
+	}
+
+	onMove(e) {
+		if(Modernizr.touchevents) {
+			const {
+				pageX,
+				pageY
+			} = e.touches[0]
+			this.page.x = pageX
+			this.page.y = pageY
+		} else {
+			this.target = e.target
+			const {
+				pageX,
+				pageY
+			} = e;
+			this.page.x = pageX
+			this.page.y = pageY
+
+			const {
+				clientX,
+			    clientY
+			} = e;
+			this.client.x = clientX
+			this.client.y = clientY
+		}
+
+		this.requestTick()
+	}
+
+	requestTick() {
+		if(!this.ticking) {
+			requestAnimationFrame(this.updateMove.bind(this))
+			this.ticking = true
+		}
+	}
+
+	updateMove() {
+		this.execute('mousemove')
+		this.ticking = false;
 	}
 
 	onScroll() {
