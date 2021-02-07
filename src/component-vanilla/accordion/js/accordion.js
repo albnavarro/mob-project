@@ -1,77 +1,42 @@
-import { eventManager } from "../../../js/base/eventManager.js";
-import { mq } from "../../../js/base/mediaManager.js";
-import { slideUpDownReset, slideUp, slideDown } from "../../../js/utility/animation.js";
+import {eventManager} from "../../../js/base/eventManager.js";
+import {accordionItemClass} from "./accordionItem.js";
 
-export class accordionClass {
-    constructor(data) {
-        this.item = data.item;
-        this.btn = document.querySelectorAll(data.button);
-        this.target = {
-            className: data.target,
-            domEl: document.querySelectorAll(data.target)
-         };
-        this.breackpoint = data.breackpoint || 'x-small';
-        this.queryType = data.queryType || 'min';
-        this.multiple = typeof data.multiple === "undefined" ? false : data.multiple
-
-        this.init();
+class accordionClass {
+    constructor() {
+        this.accordionItem = document.querySelectorAll("*[data-conponent='m-comp--accordion']");
+        this.instances = [];
     }
 
     init() {
-        const buttonArray = Array.from(this.btn);
-        for (const button of  buttonArray) {
-            button.addEventListener('click', this.openItem.bind(this))
-        };
-
-        /// GASP INITIAL STATE
-        const targetArray = Array.from(this.target.domEl);
-        for (const el of targetArray) {
-            slideUpDownReset(el);
-        };
+        eventManager.push('load', this.inzializeData.bind(this));
     }
 
-    openItem(e) {
-        if (!mq[this.queryType](this.breackpoint)) return;
+    inzializeData() {
+        const itemArray = Array.from(this.accordionItem);
+        const dataArray = itemArray.map(item => {
+            return this.getItemData(item);
+        })
 
-        const btn = e.currentTarget;
-        const item = btn.closest(this.item);
-        const target = item.querySelector(this.target.className)
-
-        if (!this.multiple) {
-            const buttonArray = Array.from(this.btn);
-            for (const el of  buttonArray) {
-                if(el !== btn) el.classList.remove('active')
-            };
-
-            const targetArray = Array.from(this.target.domEl);
-            for (const el of  targetArray) {
-                if(el !== target.item) {
-                    slideUp(el).then(() => {
-                        eventManager.execute('resize');
-                    });
-                }
-            };
+        for (const item of dataArray) {
+            const accordionItem = new accordionItemClass(item);
+            this.instances.push(accordionItem);
+            accordionItem.init();
         }
 
-        if (!btn.classList.contains('active')) {
-            btn.classList.add('active');
-            slideDown(target).then(() => {
-                console.log('complete')
-                eventManager.execute('resize');
-            });
-        } else {
-            btn.classList.remove('active');
-            slideUp(target).then(() => {
-                console.log('complete')
-                eventManager.execute('resize');
-            });
-        }
     }
 
-    // closeAllItem() {
-    //     this.s.$btn.removeClass('active');
-    //     this.s.$target.slideUp(() => {
-    //         eventManager.execute('resize');
-    //     });
-    // }
+    getItemData(item) {
+        const data = {};
+        data.container = item;
+        data.breackpoint = item.getAttribute('data-breackpoint') || 'x-small';
+        data.queryType = item.getAttribute('data-queryType') || 'min';
+        data.multiple = item.hasAttribute('data-multiple')
+
+
+        return data;
+    }
+
+
 }
+
+export const accordion = new accordionClass()

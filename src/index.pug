@@ -47,27 +47,79 @@ html
 
 
                     //- ACCORDION
-                    .accrdion-item 
-                        button.accrdion-item__btn
-                            |item1
-                        .accrdion-item__content
-                            span
-                                |content
-                    .accrdion-item 
-                        button.accrdion-item__btn
-                            span
+                    h3
+                        |accordion default
+                    div(data-conponent='m-comp--accordion')
+                        .accrdion-item(data-item)
+                            button.accrdion-item__btn(data-toggle)
+                                |item1
+                            .accrdion-item__content(data-content)
+                                span
+                                    |content
+                        .accrdion-item(data-item)
+                            button.accrdion-item__btn(data-toggle)
+                                span
+                                    |item2
+                            .accrdion-item__content(data-content)
+                                span
+                                    |content
+                        .accrdion-item(data-item)
+                            button.accrdion-item__btn(data-toggle)
                                 |item2
-                        .accrdion-item__content
-                            span
-                                |content
-                    .accrdion-item 
-                        button.accrdion-item__btn
-                            |item2
-                        .accrdion-item__content
-                            span
-                                |content
+                            .accrdion-item__content(data-content)
+                                span
+                                    |content
 
-                    //- FINE ACCORDION
+                    //- ACCORDION
+                    h3
+                        |accordion multiple max desktop
+                    div(data-conponent='m-comp--accordion' 
+                        data-multiple
+                        data-queryType="max"
+                        data-breackpoint="desktop")
+                        .accrdion-item(data-item)
+                            button.accrdion-item__btn(data-toggle)
+                                |item1
+                            .accrdion-item__content(data-content)
+                                span
+                                    |content
+                        .accrdion-item(data-item)
+                            button.accrdion-item__btn(data-toggle)
+                                span
+                                    |item2
+                            .accrdion-item__content(data-content)
+                                span
+                                    |content
+                        .accrdion-item(data-item)
+                            button.accrdion-item__btn(data-toggle)
+                                |item2
+                            .accrdion-item__content(data-content)
+                                span
+                                    |content
+                                    
+                    //- ACCORDION
+                    h3
+                        |accordion via js
+                    .accordion-custom
+                        .accrdion-item
+                            button.accrdion-item__btn
+                                |item1
+                            .accrdion-item__content
+                                span
+                                    |content
+                        .accrdion-item
+                            button.accrdion-item__btn
+                                span
+                                    |item2
+                            .accrdion-item__content
+                                span
+                                    |content
+                        .accrdion-item
+                            button.accrdion-item__btn
+                                |item2
+                            .accrdion-item__content
+                                span
+                                    |content
 
                     include component-vanilla/lightbox/pug/button.pug
 

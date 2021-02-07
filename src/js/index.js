@@ -22,7 +22,8 @@ import { totop } from "../component-vanilla/to-top/js/toTop.js"
 import { offsetSlider } from "../component-vanilla/offset-slider/js/offsetSlider.js"
 import { tBlocks } from "../component-vanilla/threeBlocks/js/tBlocks.js";
 import { parallax } from "../component-vanilla/parallax/js/parallax.js";
-import { accordionClass } from "../component-vanilla/accordion/js/accordion.js"
+import { accordion } from "../component-vanilla/accordion/js/accordion.js"
+import { accordionItemClass } from "../component-vanilla/accordion/js/accordionItem.js"
 import { showElement } from "../component-vanilla/show-element/js/ShowElement.js"
 import { popToggleClass } from "../component-vanilla/popToggle/js/popToggle.js"
 import { popToggleManagerClass } from "../component-vanilla/popToggle/js/popToggleManager.js"
@@ -44,6 +45,18 @@ vh.init();
 offsetSlider.init();
 move3D.init();
 mouseParallax.init();
+accordion.init();
+
+
+// CUSTOM ACCORDION VIA JS
+const accordionCustom = new accordionItemClass({
+    container: document.querySelector('.accordion-custom'),
+    item: '.accrdion-item',
+    toggle: '.accrdion-item__btn',
+    content: '.accrdion-item__content',
+    multiple: true
+})
+accordionCustom.init();
 
 // TBlock custom event
 // L'evento su tBlocks è legato all'elemento container ( .tBlocks) che lo dispaccia
@@ -165,9 +178,9 @@ const popToggle1 = new popToggleClass({
 })
 popToggle1.openCallBack = overlay.open.bind(overlay,
     {
-        top: '.btn-LightboxImageSlide',
+        top: '.accordion-custom',
         right: '.popTarget-1',
-        bottom: '100',
+        bottom: '0',
         left: '0',
         name: 'pop1',
         bodyOverflow: true
@@ -209,20 +222,6 @@ const popToggle3 = new popToggleClass({
 // popToggleManager.callBackFunction(sidebarMenu.openMainMenu.bind(sidebarMenu));
 // popToggleManager.callBackFunction(callback2.bind(this))
 
-
-
-
-// ACCORDION
-const accordion = new accordionClass({
-    item: '.accrdion-item',
-    button: '.accrdion-item__btn',
-    target: '.accrdion-item__content',
-    breackpoint: 'desktop',
-    queryType: 'max'
-    // multiple: true
-
-});
-// ACCORDION
 
 // Provvisorio
 const forceResize = () => {
