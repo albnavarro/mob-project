@@ -16,9 +16,12 @@ export class mouseParallaxItemClass {
 
     init() {
         this.getDimension()
-        mouseManager.push('mousemove', () => this.onMove())
-        eventManager.push('resize', () => this.getDimension())
-        mouseManager.push('scroll', () => this.onMove())
+
+        if(!Modernizr.touchevents) {
+            mouseManager.push('mousemove', () => this.onMove())
+            eventManager.push('resize', () => this.getDimension())
+            mouseManager.push('scroll', () => this.onMove())
+        }
 
 
     }

@@ -18,7 +18,7 @@ export class move3DContainerClass {
         this.drag = data.drag
         this.height = 0
         this.width = 0
-        this.offsetLeft = 0
+        this.offSetLeft = 0
         this.offSetTop = 0
         this.delta = 0
         this.limit = 0
@@ -63,11 +63,14 @@ export class move3DContainerClass {
             this.dragY = eventManager.windowsHeight()/2
             this.item.classList.add('move3D--drag')
 
-            mouseManager.push('mousedown', () => this.onMouseDown())
-            mouseManager.push('mouseup', () => this.onMouseUp())
+            if(Modernizr.touchevents) {
+                mouseManager.push('touchstart', () => this.onMouseDown())
+                mouseManager.push('touchend', () => this.onMouseUp())
+            } else {
+                mouseManager.push('mousedown', () => this.onMouseDown())
+                mouseManager.push('mouseup', () => this.onMouseUp())
+            }
 
-            mouseManager.push('touchstart', () => this.onMouseDown())
-            mouseManager.push('touchend', () => this.onMouseUp())
             mouseManager.push('touchmove', () => this.onMove())
         }
     }
@@ -75,7 +78,7 @@ export class move3DContainerClass {
     getDimension() {
         this.height = outerHeight(this.item)
         this.width = outerWidth(this.item)
-        this.offsetLeft = offset(this.item).left
+        this.offSetLeft = offset(this.item).left
         this.offSetTop = offset(this.item).top
     }
 
@@ -152,7 +155,7 @@ export class move3DContainerClass {
             ax = - ( (vw / 2) - x ) / this.xDepth;
             ay = ( (vh / 2) - y ) / this.yDepth;
         } else {
-            ax = - ( (vw / 2) - (x - this.offsetLeft) ) / this.xDepth;
+            ax = - ( (vw / 2) - (x - this.offSetLeft) ) / this.xDepth;
             ay = ( (vh / 2) - (y - this.offSetTop) ) / this.yDepth;
         }
 
@@ -203,9 +206,18 @@ export class move3DContainerClass {
         }
     }
 
+    draggable() {
+        return mouseManager.pageY() > this.offSetTop  &&
+               mouseManager.pageY() < this.offSetTop + this.height &&
+               mouseManager.pageX() > this.offSetLeft &&
+               mouseManager.pageX() < this.offSetLeft +  this.width
+    }
+
     onMouseDown() {
-        this.onDrag = true
-        this.firstDrag = true
+        if(this.draggable()) {
+            this.onDrag = true
+            this.firstDrag = true
+        }
     }
 
     onMouseUp() {

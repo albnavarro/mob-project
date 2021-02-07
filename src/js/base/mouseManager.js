@@ -34,7 +34,8 @@ class mouseManagerClass {
 			this.onMove(e)
 		})
 
-		window.addEventListener('mousedown', () => {
+		window.addEventListener('mousedown', (e) => {
+			this.target = e.target
 			this.execute('mousedown')
 		});
 
@@ -46,7 +47,8 @@ class mouseManagerClass {
 			this.execute('mouseup')
 		});
 
-		window.addEventListener('touchstart', () => {
+		window.addEventListener('touchstart', (e) => {
+			this.onMove(e)
 			this.execute('touchstart')
 		});
 
@@ -59,15 +61,18 @@ class mouseManagerClass {
 	}
 
 	onMove(e) {
+		this.target = e.target
+
 		if(Modernizr.touchevents) {
-			const {
-				pageX,
-				pageY
-			} = e.touches[0]
-			this.page.x = pageX
-			this.page.y = pageY
+			if(e.touches) {
+				const {
+					pageX,
+					pageY
+				} = e.touches[0]
+				this.page.x = pageX
+				this.page.y = pageY
+			}
 		} else {
-			this.target = e.target
 			const {
 				pageX,
 				pageY
