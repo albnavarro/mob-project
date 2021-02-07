@@ -254,52 +254,53 @@ export class parallaxItemClass {
 
     fixedValue(applyStyle) {
         let val = 0
-        const s = eventManager.scrollTop()
-        const wh = eventManager.windowsHeight()
-        const h = this.height
-        const w = this.width
-        const sw = this.selfWidth
-        const o = this.offset
-        const fc = this.fixedInward
-        const as = this.fixedStartOff
-        const ae = this.fixedEndOff
-        const fx = this.range
+        const scrollTop = eventManager.scrollTop()
+        const windowsHeight = eventManager.windowsHeight()
+        const height = this.height
+        const width = this.width
+        const selfWidth = this.selfWidth
+        const offset = this.offset
+        const fixedInward = this.fixedInward
+        const fixedStartOff = this.fixedStartOff
+        const fixedEndOff = this.fixedEndOff
+        const range = this.range
+        const fixedOffset = this.fixedOffset
 
         /*
         sp = Start point calculated in vh
         */
-        const sp =  ((wh / 100) * this.fixedOffset)
-        const partials =  - ((s + wh - sp) - (o + h))
-        const ep = ((h / 100) * fx)
-        const m = (partials / 100) * fx
+        const startPoint =  ((windowsHeight / 100) * fixedOffset)
+        const partials =  - ((scrollTop + windowsHeight - startPoint) - (offset + height))
+        const maxVal = (height / 100) * range
+        const partialVal = (partials / 100) * range
 
-        if(s + wh - sp < o) {
-            val = (fc) ? ep : 0;
-            if(as) applyStyle = false;
+        if(scrollTop + windowsHeight - startPoint < offset) {
+            val = (fixedInward) ? maxVal : 0;
+            if(fixedStartOff) applyStyle = false;
 
-        } else if (s + wh - sp > o + h) {
-            val = (fc) ? 0 : - ep;
-            if(ae) applyStyle = false;
+        } else if (scrollTop + windowsHeight - startPoint > offset + height) {
+            val = (fixedInward) ? 0 : - maxVal;
+            if(fixedEndOff) applyStyle = false;
 
         } else {
-            val = (fc) ? m : m - ep;
+            val = (fixedInward) ? partialVal : partialVal - maxVal;
         }
 
         /*
-        p = percent value
+        percent = percent value
         */
-        const p = (Math.abs(val) * 100) / h;
+        const percent = (Math.abs(val) * 100) / height;
         switch (this.propierties) {
             case 'horizontal':
-                val = -(( w / 100 ) * p) - ((sw / 100) * p);
+                val = -(( width / 100 ) * percent) - ((selfWidth / 100) * percent);
             break;
 
             case 'scale':
-                val = p * 10;
+                val = percent * 10;
             break;
 
             case 'opacity':
-                val = p / 100;
+                val = percent / 100;
             break;
 
             case 'rotate':
@@ -307,7 +308,7 @@ export class parallaxItemClass {
             case 'rotateY':
             case 'rotateZ':
             case 'border-width':
-                val = p;
+                val = percent;
             break;
         }
 
@@ -316,24 +317,24 @@ export class parallaxItemClass {
 
     opacityValue() {
         let val = 0
-        const st = eventManager.scrollTop()
-        const wh = eventManager.windowsHeight()
-        const o = this.offset
-        const vhLimit = (wh / 100 * this.opacityEnd)
-        const vhStart = wh - (wh / 100 * this.opacityStart)
+        const scrollTop = eventManager.scrollTop()
+        const windowsheight = eventManager.windowsHeight()
+        const offset = this.offset
+        const vhLimit = (windowsheight / 100 * this.opacityEnd)
+        const vhStart = windowsheight - (windowsheight / 100 * this.opacityStart)
 
         if (this.align == 'start') {
-            val = - st;
+            val = - scrollTop;
         } else {
-            val = (st + vhLimit - o);
+            val = (scrollTop + vhLimit - offset);
         }
 
         val = val * -1;
 
         if (this.align == 'start') {
-            val = 1 - val / o;
+            val = 1 - val / offset;
         } else {
-            val = 1 - val / (wh - vhStart - vhLimit);
+            val = 1 - val / (windowsheight - vhStart - vhLimit);
         }
 
         return val.toFixed(2);
@@ -341,33 +342,33 @@ export class parallaxItemClass {
 
     isNaNValue() {
         let val = 0
-        const st = eventManager.scrollTop()
-        const wh = eventManager.windowsHeight()
-        const dh = eventManager.documentHeight()
-        const ds = this.range
-        const o = this.offset
-        const h = this.height
+        const scrollTop = eventManager.scrollTop()
+        const windowsheight = eventManager.windowsHeight()
+        const documentHeight = eventManager.documentHeight()
+        const range = this.range
+        const offset = this.offset
+        const height = this.height
 
         // Prefixed align
         switch (this.align) {
             case 'start':
-            val = (st / ds)
+            val = (scrollTop / range)
             break;
 
             case 'top':
-            val = (st - o) / ds;
+            val = (scrollTop - offset) / range;
             break;
 
             case 'center':
-            val = ((st + (wh / 2 - h / 2)) - o) / ds;
+            val = ((scrollTop + (windowsheight / 2 - height / 2)) - offset) / range;
             break;
 
             case 'bottom':
-            val = ((st + (wh - h)) - o) / ds;
+            val = ((scrollTop + (windowsheight - height)) - offset) / range;
             break;
 
             case 'end':
-            val = -(dh - (st + wh)) / ds;
+            val = -(documentHeight - (scrollTop + windowsheight)) / range;
             break;
         }
 
@@ -375,13 +376,13 @@ export class parallaxItemClass {
     }
 
     isANumberValue() {
-        const st = eventManager.scrollTop()
-        const wh = eventManager.windowsHeight()
-        const al = this.align
-        const of = this.offset
-        const ds = this.range
+        const scrollTop = eventManager.scrollTop()
+        const windowsHeight = eventManager.windowsHeight()
+        const align = this.align
+        const offset = this.offset
+        const range = this.range
 
-        return (((st + (wh / 100 * al)) - of) / ds);
+        return (((scrollTop + (windowsHeight / 100 * align)) - offset) / range);
     }
 
     switchAfterZero(val) {
@@ -403,31 +404,31 @@ export class parallaxItemClass {
             }
         } else {
             if (this.onSwitch == 'back') {
-                const wh = eventManager.windowsHeight()
-                const st = eventManager.scrollTop()
-                const oe = this.opacityEnd
-                const os = this.opacityStart
-                const of = this.offset
+                const windowsHeight = eventManager.windowsHeight()
+                const scrollTop = eventManager.scrollTop()
+                const opacityEnd = this.opacityEnd
+                const opacityStart = this.opacityStart
+                const offset = this.offset
 
                 /*
                 start value in wh percent
                 */
-                const sv = (wh / 100 * os)
+                const startValue = (windowsHeight / 100 * opacityStart)
 
                 /*
                 end value in vh percent
                 */
-                const ev = (wh / 100 * oe)
+                const endValue = (windowsHeight / 100 * opacityEnd)
 
                 /*
                 Are the upper and lower limits where opacity should be applied
                 */
-                const limitTop = ev - (sv  - ev)
-                const limitBottom = wh - (wh - sv)
+                const limitTop = endValue - (startValue  - endValue)
+                const limitBottom = windowsHeight - (windowsHeight - startValue)
                 /*
                 el relative offset in relation to the window
                 */
-                const relOffset = of - st
+                const relOffset = offset - scrollTop
 
                 /*
                 Invert opacity if should be applied
