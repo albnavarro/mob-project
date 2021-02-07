@@ -38,7 +38,7 @@ export class offsetSliderItemClass {
         eventManager.push('resize', this.setContainerWidth.bind(this));
         eventManager.push('resize', this.updateData.bind(this));
         eventManager.push('resize', this.setAdvancement.bind(this));
-        eventManager.push('resize', this.setDriveElPosition.bind(this));
+        eventManager.push('resize', this.setDriveElPosition.bind(this, {fireEvent: false}));
         eventManager.push('resize', this.setOtherElPosition.bind(this));
     }
 
@@ -262,7 +262,10 @@ export class offsetSliderItemClass {
         this.setOtherElPosition();
     }
 
-    setDriveElPosition() {
+    setDriveElPosition(data) {
+        let fireEvent = true
+        if(data && !data.fireEvent)  fireEvent = false
+
         const el = this.elArray[this.drivenElIndex];
         const val = this.activeStep * this.advancement;
 
@@ -272,11 +275,13 @@ export class offsetSliderItemClass {
 
         this.drivenTranslatePosition = val;
 
-        this.component.dispatchEvent(new CustomEvent("stepChange", {
-            detail: {
-                index: Math.abs(this.activeStep)
-            }
-        }));
+        if(fireEvent) {
+            this.component.dispatchEvent(new CustomEvent("stepChange", {
+                detail: {
+                    index: Math.abs(this.activeStep)
+                }
+            }));
+        }
     }
 
     setOtherElPosition(val = null) {
