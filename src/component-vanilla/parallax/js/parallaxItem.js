@@ -50,6 +50,8 @@ export class parallaxItemClass {
     }
 
     init() {
+        if(this.computationType == 'fixed') this.limiterOff = true
+
         this.calcOffset()
         this.calcHeight()
         this.calcWidth()
