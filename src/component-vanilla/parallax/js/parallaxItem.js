@@ -15,6 +15,7 @@ export class parallaxItemClass {
         this.applyElIsValid = false
         this.transformProperty = Modernizr.prefixed('transform')
         this.req = null
+        this.gap = 150
 
         // 'PROPS'
         this.item = data.item
@@ -140,8 +141,8 @@ export class parallaxItemClass {
     }
 
     isInViewport() {
-        return this.offset + this.height > eventManager.scrollTop() &&
-               this.offset < eventManager.scrollTop() + eventManager.windowsHeight();
+        return this.offset + this.height > eventManager.scrollTop() - (this.gap) &&
+               this.offset < eventManager.scrollTop() + (eventManager.windowsHeight() + (this.gap) );
     }
 
     /////

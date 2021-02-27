@@ -1,0 +1,18 @@
+.gaspT {
+    height: 3000px;
+    padding-top: 300px;
+
+    &__inner {
+        height: 500px;
+        border: 1px #000 solid;
+        width: 300px;
+        display: flex;
+        align-items: center;
+    }
+
+    &__pin {
+        width: 50px;
+        height: 50px;
+        background-color: red;
+    }
+}

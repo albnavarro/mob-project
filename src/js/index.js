@@ -34,6 +34,9 @@ import { toolTip } from "../component-vanilla/tooltip/js/tooltip.js"
 import { move3D } from "../component-vanilla/move3D/js/move3D.js"
 import { mouseParallax } from "../component-vanilla/mouseParallax/js/mouseParallax.js"
 
+//TEST
+import { gsapTest } from "./test/gsapTest.js"
+
 eventManager.init(true,true);
 mouseManager.init();
 parallax.init();
@@ -46,6 +49,7 @@ offsetSlider.init();
 move3D.init();
 mouseParallax.init();
 accordion.init();
+gsapTest.init();
 
 
 // CUSTOM ACCORDION VIA JS

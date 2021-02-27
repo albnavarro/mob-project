@@ -1,0 +1,25 @@
+<!doctype html>
+html
+    head
+        include pug/head.pug
+
+    body
+        div(id="spriteSvg" data-svg="assets/svg/svg.svg")
+        header
+          .container.menu-container.menu-container--top
+            include component-vanilla/navigation/pug/menu.pug
+            .gaspT
+                h2
+                    |animation
+                .gaspT__inner.gaspT__inner--1
+                    .gaspT__pin
+                    .gaspT__pin
+                    .gaspT__pin
+                h2
+                    |scroll
+                .gaspT__inner.gaspT__inner--2
+                    .gaspT__pin
+                    .gaspT__pin
+                    .gaspT__pin
+        include pug/footer.pug
+        
