@@ -16,3 +16,21 @@
         background-color: red;
     }
 }
+
+
+.gaspP {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px #000 solid;
+
+    &__inner {
+        border: 1px #000 solid;
+    }
+
+    h2 {
+        position: relative;
+        transform: translateY(calc(500px - (var(--progress) * 1000px)));
+    }
+}
