@@ -40,6 +40,8 @@ export class popToggleClass {
             this.closePop();
         } else {
             this.target.classList.add('active');
+            this.btn.classList.add('active');
+
             if (this.isDropDown) {
                 slideDown(this.target).then(() => {
                     eventManager.execute('resize');
@@ -59,6 +61,8 @@ export class popToggleClass {
     closePop() {
         if (this.target.classList.contains('active')) {
             this.target.classList.remove('active');
+            this.btn.classList.remove('active');
+
             if (this.isDropDown) {
                 slideUp(this.target).then(() => {
                     eventManager.execute('resize');
