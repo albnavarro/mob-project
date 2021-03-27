@@ -138,3 +138,26 @@
         }
     }
 }
+
+
+// animate
+.interceptObserver {
+    height: 100vh;
+    border: 1px $black solid;
+    transition: background .35s;
+
+    &.animate {
+        background: #ccc;
+    }
+}
+
+.interceptTrigger {
+    position: fixed;
+    top: 50%;
+    right: 0;
+    transition: background .35s;
+    
+    &.animate {
+        background: $black;
+    }
+}

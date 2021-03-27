@@ -33,9 +33,12 @@ import { menuClass } from "../component-vanilla/navigation/js/menu.js"
 import { toolTip } from "../component-vanilla/tooltip/js/tooltip.js"
 import { move3D } from "../component-vanilla/move3D/js/move3D.js"
 import { mouseParallax } from "../component-vanilla/mouseParallax/js/mouseParallax.js"
+import { animate } from "../component-vanilla/animate/js/animate.js"
 
 //TEST
 import { gsapTest } from "./test/gsapTest.js"
+
+const body = document.querySelector('body')
 
 eventManager.init(true,true);
 mouseManager.init();
@@ -49,7 +52,8 @@ offsetSlider.init();
 move3D.init();
 mouseParallax.init();
 accordion.init();
-gsapTest.init();
+if( body.classList.contains('gsap') ) gsapTest.init();
+animate.init();
 
 
 // CUSTOM ACCORDION VIA JS
