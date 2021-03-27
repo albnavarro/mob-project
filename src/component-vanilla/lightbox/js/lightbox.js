@@ -39,7 +39,7 @@ export class lightBoxClass {
 
     openBtnOnClick(event) {
         event.preventDefault();
-        const $btn = event.target;
+        const $btn = event.currentTarget;
 
         if (!this.lightBox.classList.contains('active')) {
             this.lightBox.classList.add('active');
