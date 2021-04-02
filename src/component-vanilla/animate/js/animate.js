@@ -30,6 +30,7 @@ class animateClass {
         data.rootMargin = item.getAttribute('data-rootMargin') || 0 ;
         data.threshold = item.getAttribute('data-threshold') || .15 ;
         data.triggerEl = item.getAttribute('data-triggerEl') || null;
+        data.noRepeat = item.hasAttribute('data-noRepeat');
 
         return data;
     }

@@ -4,6 +4,8 @@ export class animateItemClass {
         this.rootMargin = data.rootMargin;
         this.threshold = data.threshold;
         this.triggerEl = data.triggerEl;
+        this.noRepeat = data.noRepeat;
+        this.firstTime = false;
     }
 
     init() {
@@ -14,9 +16,12 @@ export class animateItemClass {
         }
 
         const callback = (entries, observer) => {
+
+            if(this.noRepeat && this.firstTime) return;
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     this.compRoot.classList.add('animate');
+                    this.firstTime = true;
 
                 } else if (!entry.isIntersecting) {
                     this.compRoot.classList.remove('animate');
