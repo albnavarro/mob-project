@@ -1,53 +1,32 @@
-// .img-responsive {
-//   width: 100%;
-// }
-
-.transition {
-    &--opacity {
-        transition: opacity 0.5s 0.15s;
+.transformY {
+    &-start {
+        transform: translateY(100%);
     }
 
-    &--translate {
+    &-end {
+        transform: translateY(0);
         transition: transform 0.5s 0.15s;
-    }
-
-    &--clipath {
-        transition: clip-path 1s cubic-bezier(0.305, 0.550, 0.470, 1.015) 0.15s;
     }
 }
 
-.toggleEl {
-    &--opacity {
-        &--start {
-            opacity: 0;
-        }
-
-        &--end {
-            opacity: 1;
-        }
+.opacity {
+    &-start {
+        opacity: 0;
     }
 
-    &--transform {
-        &--start {
-            transform: translateX(100%);
-        }
+    &-end {
+        opacity: 1;
+        transition: opacity 0.5s 0.15s;
+    }
+}
 
-        &--end {
-            transform: translateX(0);
-        }
+.clipath {
+    &-start {
+        clip-path: polygon(0% 0%, 0% 0%, 0% 200%);
     }
 
-    &--clipath {
-        &--start {
-            @include _mq('desktop') {
-                clip-path: polygon(0% 0%, 0% 0%, 0% 200%);
-            }
-        }
-
-        &--end {
-            @include _mq('desktop') {
-                clip-path: polygon(0% 0%, 200% 0%, 0% 200%);
-            }
-        }
+    &-end {
+        clip-path: polygon(0% 0%, 200% 0%, 0% 200%);
+        transition: clip-path 1.5s 0.15s;
     }
 }
