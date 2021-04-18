@@ -56,11 +56,13 @@ class lightPichZoomClass {
 
         this.touchmove = mouseManager.push('touchmove', () => this.onMove())
         this.mousemove = mouseManager.push('mousemove', () => this.onMove())
-        this.onresize = eventManager.push('resize', () => this.resetZoom())
+        this.onresize = eventManager.push('resizeW', () => this.resetZoom())
     }
 
     zoomIn() {
         if(this.scale > 1) this.scale -= .5;
+        if(this.scale == 1) this.image.classList.remove('drag-cursor')
+
         this.dragY = 0;
         this.dragX = 0;
 
@@ -79,6 +81,8 @@ class lightPichZoomClass {
             'transform': `translateX(${this.dragX}px) translateY(${this.dragY}px) scale(${this.scale})`
         }
         Object.assign(this.image.style, style)
+
+        this.image.classList.add('drag-cursor')
     }
 
     resetZoom() {
@@ -91,6 +95,8 @@ class lightPichZoomClass {
             'transform': `translateX(${this.dragX}px) translateY(${this.dragY}px) scale(${this.scale})`
         }
         Object.assign(this.image.style, style)
+
+        this.image.classList.remove('drag-cursor')
     }
 
     onMove() {
@@ -215,10 +221,13 @@ class lightPichZoomClass {
         mouseManager.remove('mousemove', this.mousemove)
         eventManager.remove('resize', this.onresize)
 
-        const contentContainer = this.content.closest('.lightbox');
-        const zoom = contentContainer.querySelector('.lightbox__zoom');
-        if (typeof(zoom) != 'undefined' && zoom != null) {
-            contentContainer.removeChild(zoom)
+        const contentContainer = this.content.closest('.lightbox')
+        if (typeof(contentContainer) != 'undefined' && contentContainer != null) {
+            const zoom = contentContainer.querySelector('.lightbox__zoom')
+
+            if (typeof(zoom) != 'undefined' && zoom != null) {
+                contentContainer.removeChild(zoom)
+            }
         }
     }
 

@@ -12,9 +12,11 @@ class eventManagerClass {
           'scrollStart': [],
           'scrollEnd': [],
           'resize': [],
+          'resizeW': [],
           'load': []
         },
         windowsHeight : window.innerHeight,
+        lastWindowsHeight : window.innerHeight,
         windowsWidth : window.innerWidth,
         scrollTop : window.pageYOffset,
         documentHeight: document.documentElement.scrollHeight,
@@ -88,11 +90,16 @@ class eventManagerClass {
   }
 
   resize(e) {
+    this.s.lastWindowsHeight = this.s.windowsHeight
     this.s.windowsWidth = window.innerWidth
     this.s.windowsHeight = window.innerHeight
     this.s.scrollTop =  window.pageYOffset
     this.s.documentHeight = document.documentElement.scrollHeight
     this.execute('resize')
+
+    if(this.s.lastWindowsHeight == this.s.windowsHeight ) {
+        this.execute('resizeW')
+    }
   }
 
   requestTick() {

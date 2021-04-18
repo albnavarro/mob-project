@@ -19,7 +19,7 @@ class lightBoxImageClass {
     init(data) {
         this.isOpen = true
         this.data = data;
-        eventManager.remove('resize', this.onResizeId)
+        eventManager.remove('resizeW', this.onResizeId)
 
         const image = new Image();
         image.classList.add('lightbox__img')
@@ -46,7 +46,7 @@ class lightBoxImageClass {
 
             this.removeLoder();
 
-            this.onResizeId = eventManager.push('resize', this.onResizeLightboxImage.bind(this))
+            this.onResizeId = eventManager.push('resizeW', this.onResizeLightboxImage.bind(this))
             this.isLoading = false
         }).catch((err) => console.log(err))
     }
@@ -135,7 +135,7 @@ class lightBoxImageClass {
         this.isOpen = false;
         this.isLoading = false;
         this.removeLoder();
-        eventManager.remove('resize', this.onResizeId)
+        eventManager.remove('resizeW', this.onResizeId)
     }
 
     imageIsLoading() {
