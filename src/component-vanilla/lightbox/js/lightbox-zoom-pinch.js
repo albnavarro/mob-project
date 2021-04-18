@@ -6,6 +6,7 @@ class lightPichZoomClass {
 
     constructor() {
         this.scale = 1;
+        this.maxZoom = 2;
         this.touchstart = null;
         this.touchend = null;
         this.mousedown = null;
@@ -46,6 +47,8 @@ class lightPichZoomClass {
         this.image.addEventListener('mousedown', e => e.preventDefault(), false);
         this.content.addEventListener('mousedown', e => e.preventDefault(), false);
 
+        this.image.addEventListener('wheel', (e) => this.onWeel(e));
+
         if(Modernizr.touchevents) {
             this.touchstart = mouseManager.push('touchstart', () => this.onMouseDown())
             this.touchend = mouseManager.push('touchend', () => this.onMouseUp())
@@ -74,7 +77,7 @@ class lightPichZoomClass {
     }
 
     zoomOut() {
-        if(this.scale < 2) this.scale += .5;
+        if(this.scale < this.maxZoom) this.scale += .5;
 
         this.image.classList.add('transition')
         const style = {
@@ -97,6 +100,34 @@ class lightPichZoomClass {
         Object.assign(this.image.style, style)
 
         this.image.classList.remove('drag-cursor')
+    }
+
+    onWeel(e) {
+        let delta = 0;
+        if(e.deltaY !== 0){
+            delta = (e.deltaY > 0) ? -.2 : .2;
+        }
+
+        this.scale += delta
+
+        if (this.scale < 1)  this.scale = 1
+
+        if (this.scale > this.maxZoom) this.scale = 2
+
+        if (this.scale > 1) {
+            this.image.classList.add('drag-cursor')
+        } else {
+            this.image.classList.remove('drag-cursor')
+        }
+
+        this.dragY = 0;
+        this.dragX = 0;
+
+        this.image.classList.add('transition')
+        const style = {
+            'transform': `translateX(${this.dragX}px) translateY(${this.dragY}px) scale(${this.scale})`
+        }
+        Object.assign(this.image.style, style)
     }
 
     onMove() {
