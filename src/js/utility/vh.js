@@ -21,10 +21,10 @@ class vhClass {
 	}
 
 	onResize() {
-		if (eventManager.windowsWidth() != this.lastWw) {
+		// if (eventManager.windowsWidth() != this.lastWw) {
 			this.calcVh()
 			this.lastWw = eventManager.windowsWidth();
-		}
+		// }
 	}
 
 	onScroll() {

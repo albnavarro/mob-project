@@ -18,7 +18,7 @@ class lightBoxImageSlideClass {
         this.content = data.content;
 
         // add navigation btn
-        this.contentContainer = this.content.closest('.lightbox__container');
+        const contentContainer = this.content.closest('.lightbox');
 
         const navEl = document.createElement('nav')
         const prevbtn = document.createElement('button')
@@ -30,8 +30,8 @@ class lightBoxImageSlideClass {
         nextbtn.classList.add('lightbox__nav__next')
         nextbtn.innerHTML = 'next';
 
-        this.contentContainer.appendChild(navEl);
-        const nav = this.contentContainer.querySelector('.lightbox__nav')
+        contentContainer.appendChild(navEl);
+        const nav = contentContainer.querySelector('.lightbox__nav')
         nav.appendChild(prevbtn)
         nav.appendChild(nextbtn)
 
@@ -67,7 +67,7 @@ class lightBoxImageSlideClass {
         this.url = item.getAttribute('data-url');
     }
 
-    showImage(url, title, description, content, Hgap, Wgap) {
+    showImage(url, title, description, content, Hgap, Wgap, zoom) {
         lightboxUtils.resetDescriptionBox({
             content: content
         });
@@ -78,7 +78,8 @@ class lightBoxImageSlideClass {
             title: title || '',
             description: description || '',
             Hgap: Hgap || '20',
-            Wgap : Wgap || '20'
+            Wgap : Wgap || '20',
+            zoom : zoom
         })
     }
 
@@ -90,7 +91,8 @@ class lightBoxImageSlideClass {
             this.itemArray[this.index].item.getAttribute('data-description'),
             this.content,
             this.itemArray[this.index].item.getAttribute('data-hgap'),
-            this.itemArray[this.index].item.getAttribute('data-wgap')
+            this.itemArray[this.index].item.getAttribute('data-wgap'),
+            this.itemArray[this.index].item.hasAttribute('data-zoom')
         );
     }
 
@@ -126,9 +128,10 @@ class lightBoxImageSlideClass {
             this.itemArray = [];
             this.index = 0;
 
-            const nav = this.contentContainer.querySelector('.lightbox__nav');
+            const contentContainer = this.content.closest('.lightbox');
+            const nav = contentContainer.querySelector('.lightbox__nav');
             if (typeof(nav) != 'undefined' && nav != null) {
-                this.contentContainer.removeChild(nav)
+                contentContainer.removeChild(nav)
             }
         }
     }

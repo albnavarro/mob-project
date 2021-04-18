@@ -2,6 +2,7 @@ import { eventManager } from "../../../js/base/eventManager.js";
 import { lightDescription } from "./lightbox-description.js";
 import { loadImages } from "../../../js/utility/loadImages.js";
 import { lightboxUtils } from "./lightbox-utils.js";
+import { lightPichZoom } from "./lightbox-zoom-pinch.js";
 
 
 class lightBoxImageClass {
@@ -62,7 +63,7 @@ class lightBoxImageClass {
     }
 
     showNav() {
-        const parent = this.data.content.closest('.lightbox__container');
+        const parent = this.data.content.closest('.lightbox');
         const nav = parent.querySelector('.lightbox__nav');
         if (typeof(nav) != 'undefined' && nav != null) {
             nav.classList.add('visible');
@@ -89,6 +90,15 @@ class lightBoxImageClass {
 
         setTimeout(() => {
             this.image.classList.add('visible');
+
+            if(this.data.zoom) {
+                lightPichZoom.init({
+                    content: this.data.content,
+                    image: this.image
+                });
+            } else {
+                lightPichZoom.resetData();
+            }
 
             // Shhow nav if exist only when image is loaded
             this.showNav()

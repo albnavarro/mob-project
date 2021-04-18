@@ -10,6 +10,10 @@
     visibility: hidden;
     transition: opacity 0.35s, visibility 0.35s;
 
+    &--image {
+        user-select: none;
+    }
+
     &.active {
         opacity: 1;
         visibility: visible;
@@ -62,6 +66,7 @@
         position: absolute;
         top: 20px;
         right: 20px;
+        z-index: 2;
     }
 
     &__img {
@@ -72,6 +77,14 @@
 
         &.visible {
             opacity: 1;
+        }
+
+        &.transition {
+            transition: transform .55s;
+        }
+
+        &.transitionSpeed {
+            transition: transform .15s;
         }
     }
 
@@ -170,6 +183,34 @@
         &__next,
         &__prev {
             flex: 0 0 auto;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        &__next {
+            right: 0;
+        }
+
+        &__prev {
+            left: 0;
+        }
+    }
+
+    &__zoom {
+        &__in,
+        &__out {
+            flex: 0 0 auto;
+            position: absolute;
+            bottom: 0;
+        }
+
+        &__in {
+            right: 0
+        }
+
+        &__out {
+            left: 0;
         }
     }
 }

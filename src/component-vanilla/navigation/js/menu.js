@@ -1,3 +1,4 @@
+import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
 import { modernzier } from "../../../js/utility/modernizr.js"
 import { eventManager } from "../../../js/base/eventManager.js";
 import { mq } from "../../../js/base/mediaManager.js";
@@ -412,7 +413,7 @@ export class menuClass {
     closeMainMenu(immediate) {
         this.mainWrap.classList.remove(this.MENU_ON)
         this.menuIsOpen = false
-        eventManager.removeBodyOverflow();
+        enableBodyScroll(this.mainWrap);
 
         if (mq.max(this.mediaQ) && !this.offCanvas) {
             slideUp(this.menu);
@@ -437,7 +438,7 @@ export class menuClass {
         } else {
             // Attivo la propietà overflow-y: auto; nel menu principale
             this.mainMenu.classList.add(this.IS_SELECTED);
-            eventManager.setBodyOverflow();
+            disableBodyScroll(this.mainWrap);
         }
         this.mainWrap.classList.add(this.MENU_ON)
         this.menuIsOpen = true

@@ -1,3 +1,4 @@
+import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
 import { eventManager } from "../../../js/base/eventManager.js";
 import { outerHeight, outerWidth, position } from "../../../js/utility/vanillaFunction.js";
 
@@ -45,7 +46,7 @@ export class overlayClass {
 
         setTimeout(() => {
             this.bodyOverflow = data.bodyOverflow;
-            if (this.bodyOverflow) eventManager.setBodyOverflow();
+            if (this.bodyOverflow) disableBodyScroll(this.overlay);
 
             if (isNaN(data.top)) {
                 const el = document.querySelector(data.top);
@@ -94,7 +95,7 @@ export class overlayClass {
     close() {
         this.overlay.classList.remove('active');
         this.overlay.setAttribute('data-name', '')
-        if (this.bodyOverflow) eventManager.removeBodyOverflow();
+        if (this.bodyOverflow) enableBodyScroll(this.overlay);
     }
 
     set callback(fn) {

@@ -1,9 +1,11 @@
+import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
 import { eventManager } from "../../../js/base/eventManager.js";
 import { lightDescription } from "./lightbox-description.js";
 import { lightboxUtils } from "./lightbox-utils.js";
 import { lightBoxImage } from "./lightbox-image.js";
 import { lightBoxImageSlide } from "./lightbox-image-slide.js";
 import { lightBoxVideo } from "./lightbox-video.js";
+import { lightPichZoom } from "./lightbox-zoom-pinch.js";
 
 export class lightBoxClass {
 
@@ -43,7 +45,7 @@ export class lightBoxClass {
 
         if (!this.lightBox.classList.contains('active')) {
             this.lightBox.classList.add('active');
-            eventManager.setBodyOverflow();
+            disableBodyScroll(this.lightBox);
 
             switch (this.dataType) {
 
@@ -62,7 +64,8 @@ export class lightBoxClass {
                         description: $btn.getAttribute('data-description') || '',
                         content: this.dynamicContent,
                         Hgap : $btn.getAttribute('data-hgap') || '20',
-                        Wgap : $btn.getAttribute('data-wgap') || '20'
+                        Wgap : $btn.getAttribute('data-wgap') || '20',
+                        zoom : $btn.hasAttribute('data-zoom'),
                     })
                     break;
 
@@ -106,7 +109,7 @@ export class lightBoxClass {
     closeLightBox(event) {
         if (this.lightBox.classList.contains('active')) {
             this.lightBox.classList.remove('active');
-            eventManager.removeBodyOverflow();
+            enableBodyScroll(this.lightBox);
 
             if (this.dataType == 'image' ||
                 this.dataType == 'image-slide' ||
@@ -116,6 +119,8 @@ export class lightBoxClass {
                     content: this.dynamicContent,
                     type: 'dynamic'
                 })
+
+                lightPichZoom.resetData();
 
                 lightBoxImageSlide.onCloseLightbox({
                     content: this.dynamicContent,
