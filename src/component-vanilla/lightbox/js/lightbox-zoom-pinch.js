@@ -221,8 +221,8 @@ class lightPichZoomClass {
         mouseManager.remove('mousemove', this.mousemove)
         eventManager.remove('resize', this.onresize)
 
-        const contentContainer = this.content.closest('.lightbox')
-        if (typeof(contentContainer) != 'undefined' && contentContainer != null) {
+        if (typeof(this.content) != 'undefined' && this.content != null) {
+            const contentContainer = this.content.closest('.lightbox')
             const zoom = contentContainer.querySelector('.lightbox__zoom')
 
             if (typeof(zoom) != 'undefined' && zoom != null) {
