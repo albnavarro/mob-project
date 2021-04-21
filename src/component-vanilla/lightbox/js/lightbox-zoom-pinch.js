@@ -172,11 +172,11 @@ class lightPichZoomClass {
         } else if(this.dragX <= -limitX && this.dragX <= limitX) {
             // RIGHT LIMIT
             x = -limitX;
-            this.dragX -= xgap
+            this.dragX -= this.dragX + limitX
         } else if (this.dragX > -limitX && this.dragX >= limitX) {
             // LEFT LIMIT
             x = limitX;
-            this.dragX -= xgap
+            this.dragX -= this.dragX - limitX
         }
         ////
 
@@ -192,11 +192,11 @@ class lightPichZoomClass {
         } else if(this.dragY <= -limitY && this.dragY <= limitY) {
             // BOTTOM LIMIT
             y = -limitY;
-            this.dragY -= ygap
+            this.dragY -= this.dragY + limitY
         } else if (this.dragY > -limitY && this.dragY >= limitY) {
             // TOP LIMIT
             y = limitY;
-            this.dragY -= ygap
+            this.dragY -= this.dragY - limitY
         }
         ////
 
