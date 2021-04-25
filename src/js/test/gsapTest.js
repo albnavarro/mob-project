@@ -121,7 +121,7 @@ class gsapTestClass {
         const container = document.querySelector(".gaspHorizontal__container--0")
 
         if (!container) return;
-        
+
         const itemToScroll = container.querySelector(".gaspHorizontal__item")
         const card = container.querySelectorAll(".gaspHorizontal__card")
         const windowsWidth = eventManager.windowsWidth()
@@ -152,6 +152,7 @@ class gsapTestClass {
         gsap.to(itemToScroll, {
             // x: () => `-${width - windowsWidth}px`, // pixel calc
             xPercent: -percentRange, // Percent calc
+            ease: 'none',
             scrollTrigger: {
                 trigger: container,
                 markers: true,
@@ -193,6 +194,7 @@ class gsapTestClass {
         gsap.to(card, {
             // x: () => `-${width - windowsWidth}px`, // pixel calc
             xPercent: -100 * (card.length - 1),
+            ease: 'none',
             scrollTrigger: {
                 trigger: container,
                 markers: true,
