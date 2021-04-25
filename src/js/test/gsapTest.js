@@ -11,12 +11,15 @@ class gsapTestClass {
 
     init() {
         gsap.registerPlugin(ScrollTrigger)
-        this.stikyNoPin()
-        this.triggerAnimation()
-        this.triggerScroll()
-        this.parallax()
-        this.horizontalScroll()
-        this.horizontalScrollSingleCard()
+
+        eventManager.push('load', () => {
+            this.stikyNoPin()
+            this.triggerAnimation()
+            this.triggerScroll()
+            this.parallax()
+            this.horizontalScroll()
+            this.horizontalScrollSingleCard()
+        })
     }
 
     stikyNoPin() {
@@ -117,20 +120,24 @@ class gsapTestClass {
 
     }
 
-    horizontalScroll() {
-        const container = document.querySelector(".gaspHorizontal__container--0")
+    /*
+    // HORIZONTAL
+    */
 
-        if (!container) return;
 
-        const itemToScroll = container.querySelector(".gaspHorizontal__item")
-        const card = container.querySelectorAll(".gaspHorizontal__card")
-        const windowsWidth = eventManager.windowsWidth()
-
-        // total with , sum of 4 card
-        const width = [...card].map(item => {
+    /*
+    get total width sum of all card
+    */
+    cardWidth(card) {
+        return [...card].map(item => {
             return outerWidth(item)
         }).reduce((a, b) => a + b, 0)
+    }
 
+    /*
+    Apply cardWidth to card container ( width ) and trigger ( height )
+    */
+    applyStyle(width, container, itemToScroll) {
         const styleW = {
             'width': `${width}px`
         }
@@ -142,14 +149,31 @@ class gsapTestClass {
         Object.assign(container.style, styleH)
         // Apply to itemContainer width
         Object.assign(itemToScroll.style, styleW)
+    }
 
-        // Now itemContainer with and trigger el height is equal so they can scroll in syncronus
-        // itemToScroll is in sticky position ( top 0 ) respect container
+    /*
+    get prcent total wodth minus windowsWidth
+    */
+    getPercentMaxScroll(width) {
+        return (100 * (width -  eventManager.windowsWidth())) / width
+    }
 
-        // Rage in vw total width - windowsWidth
-        const percentRange = (100 * (width - windowsWidth)) / width
+    /*
+    First horzontal scroll, all container scroll
+    */
+    horizontalScroll() {
+        const container = document.querySelector(".gaspHorizontal__container--0")
 
-        gsap.to(itemToScroll, {
+        if (!container) return;
+
+        const itemToScroll = container.querySelector(".gaspHorizontal__item")
+        const card = container.querySelectorAll(".gaspHorizontal__card")
+
+        let width = this.cardWidth(card)
+        this.applyStyle(width, container, itemToScroll)
+        let percentRange = this.getPercentMaxScroll(width)
+
+        const tl = gsap.to(itemToScroll, {
             // x: () => `-${width - windowsWidth}px`, // pixel calc
             xPercent: -percentRange, // Percent calc
             ease: 'none',
@@ -164,34 +188,32 @@ class gsapTestClass {
                 }
             }
         })
+
+        eventManager.push('resize', () => {
+            width = this.cardWidth(card)
+            this.applyStyle(width, container, itemToScroll)
+            percentRange = this.getPercentMaxScroll()
+            tl.scrollTrigger.refresh()
+        })
+
     }
 
 
+    /*
+    Second horzontal scroll, all card scroll individually
+    */
     horizontalScrollSingleCard() {
         const container = document.querySelector(".gaspHorizontal__container--1")
 
         if (!container) return;
 
-        const itemToScroll = container.querySelector(".gaspHorizontal__item")
+        const itemToScroll= container.querySelector(".gaspHorizontal__item")
         const card = gsap.utils.toArray(".gaspHorizontal__container--1 .gaspHorizontal__card")
-        const windowsWidth = eventManager.windowsWidth()
 
-        const width = [...card].map(item => {
-            return outerWidth(item)
-        }).reduce((a, b) => a + b, 0)
+        let width = this.cardWidth(card)
+        this.applyStyle(width, container, itemToScroll)
 
-        const styleW = {
-            'width': `${width}px`
-        }
-        const styleH = {
-            'height': `${width}px`
-        }
-        Object.assign(container.style, styleH)
-        Object.assign(itemToScroll.style, styleW)
-
-
-
-        gsap.to(card, {
+        const tl = gsap.to(card, {
             // x: () => `-${width - windowsWidth}px`, // pixel calc
             xPercent: -100 * (card.length - 1),
             ease: 'none',
@@ -205,6 +227,12 @@ class gsapTestClass {
                 // snap: 1 / (card.length - 1),
             }
         });
+
+        eventManager.push('resize', () => {
+            width = this.cardWidth(card)
+            this.applyStyle(width, container, itemToScroll)
+            tl.scrollTrigger.refresh()
+        })
     }
 
 }
