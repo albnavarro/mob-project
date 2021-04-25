@@ -73,6 +73,7 @@ const
   pugFiles = `${themePath}/*.pug`,
   allPugFiles = `${themePath}/**/*.pug`,
   dataFiles = `${themePath}/data/**/*.json`,
+  dataCommon = `${themePath}/data/common/common.json`,
   dataDest = `${dataMerged}/data.json`,
   manifestFile = `${distPath}/manifest.json`
 
@@ -250,7 +251,8 @@ function html(done){
     let prodData = {}
     ;(isProd) ? prodData.isProd = true : prodData.isProd = false
     const manifestData = JSON.parse(fs.readFileSync(manifestFile))
-    const dataMerged = Object.assign({}, data, manifestData, prodData);
+    const common = JSON.parse(fs.readFileSync(dataCommon))
+    const dataMerged = Object.assign({}, data, common, manifestData, prodData);
 
     const templatePath = `${themePath}`;
     let templateDefault = `${templatePath}/index.pug`;
