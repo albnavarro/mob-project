@@ -64,10 +64,8 @@
 
     &__card {
         padding: 100px;
-        flex: 1;
-        width: 100vw;
+        flex: 0 0 100vw;
         background: #ccc;
-        flex: 1;
         background-clip: content-box;
 
     }
