@@ -8,6 +8,6 @@ script
   include ../../www/assets/js/async-assets-loading.min.js
 
 if isProd
-  script(src="assets/dist/" + mainjs)
+  script(src="/assets/dist/" + mainjs)
 else if !isProd
-  script(src="assets/js/main.js")
+  script(src="/assets/js/main.js")

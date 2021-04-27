@@ -50,6 +50,7 @@ const
   scssPath = path.join(themePath, 'scss'),
   svgPath = path.join(themePath, 'svg'),
   dataPath = path.join(themePath, 'data'),
+  dataCommonPath = path.join(themePath, 'dataCommon'),
 
   cssDest = path.join(destPath, 'assets/css'),
   jsDest = path.join(destPath, 'assets/js'),
@@ -73,7 +74,7 @@ const
   pugFiles = `${themePath}/*.pug`,
   allPugFiles = `${themePath}/**/*.pug`,
   dataFiles = `${themePath}/data/**/*.json`,
-  dataCommon = `${themePath}/data/common/common.json`,
+  dataCommonFiles = `${themePath}/dataCommon/**/*.json`,
   dataDest = `${dataMerged}/data.json`,
   manifestFile = `${distPath}/manifest.json`
 
@@ -244,19 +245,40 @@ function criticalCss(done) {
 
 // PUG
 function html(done){
-    const streams = glob.sync(path.join(dataPath, '*.json'), {}).map((filepath) => {
+    const streams = glob.sync(path.join(dataPath, '/**/*.json'), {}).map((filepath) => {
+
+    // Subfolder
+    // get last subfolder name
+    const pattern = /.*\/([^/]+)\/[^/]+/;
+    const folder = filepath.match(pattern)
+    // if last subfolder is different form 'data' create folder
+    const subfolder = ( folder[1] != 'data') ? folder[1] : '';
+    if (!fs.existsSync(`${destPath}/${subfolder}`)){
+      fs.mkdirSync(`${destPath}/${subfolder}`);
+    }
+
+    // get name file
     const nameFile = filepath.split('/').pop().split('.').shift()
+
+    // main data for each json in data
     const data = JSON.parse(fs.readFileSync(filepath))
 
+    // get common file if exit for each subfolder
+    const commonFile = (fs.existsSync(`${dataCommonPath}/${subfolder}`))
+            ? `${dataCommonPath}/${subfolder}/common.json`
+            : `${dataCommonPath}/common.json`;
+
+    // merge alla data
     let prodData = {}
     ;(isProd) ? prodData.isProd = true : prodData.isProd = false
     const manifestData = JSON.parse(fs.readFileSync(manifestFile))
-    const common = JSON.parse(fs.readFileSync(dataCommon))
+    const common = JSON.parse(fs.readFileSync(commonFile))
     const dataMerged = Object.assign({}, data, common, manifestData, prodData);
 
     const templatePath = `${themePath}`;
     let templateDefault = `${templatePath}/index.pug`;
 
+    // Assign template
     if('template' in data) {
         templateDefault = `${templatePath}/${data.template}.pug`
     }
@@ -266,7 +288,7 @@ function html(done){
             data: dataMerged
         }))
         .pipe(rename(nameFile + '.html'))
-        .pipe(gulp.dest(destPath))
+        .pipe(gulp.dest(`${destPath}/${subfolder}`))
     })
     return es.merge(streams)
         .on('end', () => {
@@ -327,7 +349,7 @@ function cleanAll() {
     path.join(distPath, '*.*'),
     path.join(dataMerged, '*.*'),
     path.join(imgDest, '*.*'),
-    path.join(destPath, '*.html'),
+    path.join(destPath, '**/*.html'),
     path.join(svgDest, '*.*'),
     path.join(destPath, 'assets/js/async-assets-loading.min.js'),
     path.join(destPath, 'assets/js/main.js'),
@@ -341,7 +363,7 @@ function cleanAll() {
 function watch_files(done) {
   gulp.watch([scssFiles, componentscssFiles, componentscssFilesVanilla], style)
   gulp.watch([jsFiles, componentJsFiles, componentJsFilesVanilla], gulp.series(js, reloadPage))
-  gulp.watch([allPugFiles, dataFiles], gulp.series(html, reloadPage))
+  gulp.watch([allPugFiles, dataFiles, dataCommonFiles], gulp.series(html, reloadPage))
 
   done();
 }

@@ -4,7 +4,7 @@ html
         include pug/head.pug
 
     body
-        div(id="spriteSvg" data-svg="assets/svg/svg.svg")
+        div(id="spriteSvg" data-svg="/assets/svg/svg.svg")
 
         header
             .container.menu-container.menu-container--top
@@ -14,6 +14,8 @@ html
                 .sidebar.menu-container--sidebar
                     include component-vanilla/navigation/pug/menu.pug
                 .content
+                    h1
+                        |!{titlecommon}
                     h1
                         |!{title}
 
