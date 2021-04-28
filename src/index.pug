@@ -15,7 +15,11 @@ html
                     include component-vanilla/navigation/pug/menu.pug
                 .content
                     h1
-                        |!{titlecommon}
+                        |is prod: !{isProd}
+                    h1
+                        |!{testTitle}
+                    h1
+                        |!{additionalTitle}
                     h1
                         |!{title}
 

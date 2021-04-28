@@ -1,3 +1,6 @@
 {
-    "template": "gsap"
+    "template": "gsap",
+    "additionalData" : [
+        "en"
+    ]
 }

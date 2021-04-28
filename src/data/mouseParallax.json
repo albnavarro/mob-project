@@ -1,3 +1,6 @@
 {
-    "template": "mouseParallax"
+    "template": "mouseParallax",
+    "additionalData" : [
+        "en"
+    ]
 }

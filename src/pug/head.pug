@@ -8,7 +8,8 @@ meta(name="viewport" content="width=device-width, initial-scale=1.0, minimum-sca
 meta(name="description" content="")
 
 style(type="text/css")
-  include ../../www/assets/css/critical.css
+    if isProd
+        include ../../www/assets/css/critical.css
   
 if isProd
   link(rel="stylesheet" href="/assets/dist/" + maincss media="print" onload="this.media='all'; this.onload=null;  document.documentElement.classList.add('css-added');")
@@ -16,7 +17,7 @@ if isProd
     link(rel="stylesheet" href="/assets/dist/" + maincss media="all")
       
 else if !isProd
-  link(rel="stylesheet" href="/assets/css/main.css" media="print" onload="this.media='all'; this.onload=null;  document.documentElement.classList.add('css-added');")
+  link(rel="stylesheet" href="/assets/css/main.css")
   noscript
     link(rel="stylesheet" href="/assets/css/main.css" media="all")
   

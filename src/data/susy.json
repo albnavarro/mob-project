@@ -1,3 +1,6 @@
 {
-    "template": "susy"
+    "template": "susy",
+    "additionalData" : [
+        "en"
+    ]
 }

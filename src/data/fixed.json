@@ -1,3 +1,6 @@
 {
-    "template": "fixed"
+    "template": "fixed",
+    "additionalData" : [
+        "en"
+    ]
 }
