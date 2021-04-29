@@ -1,6 +1,8 @@
 {
     "template": "move3D",
     "additionalData" : [
+        "config",
         "en"
-    ]
+    ],
+    "univoqueId" : "move3D"
 }

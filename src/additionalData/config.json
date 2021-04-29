@@ -1,0 +1,15 @@
+{
+    "domain" : "http://localhost:3000/",
+    "locales" : {
+        "en": {
+            "name" : "English",
+            "nativeName" : "English",
+            "path" : "/"
+        },
+        "it": {
+            "name" : "Italian",
+            "nativeName" : "Italiano",
+            "path" : "/it"
+        }
+    }
+}

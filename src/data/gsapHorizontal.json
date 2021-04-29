@@ -1,6 +1,8 @@
 {
     "template": "gsapHorizontal",
     "additionalData" : [
+        "config",
         "en"
-    ]
+    ],
+    "univoqueId" : "gsapHorizontal"
 }

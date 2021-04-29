@@ -253,16 +253,27 @@ function html(done) {
         return the exact path of json file
         */
         const pattern = /data\/(.*\/).*$/;
-        const folder = filepath.match(pattern)
-        let subfolder = ''
-        // In case of subfolder create that if not exist and store subfolder path
-        if (folder !== null && !fs.existsSync(`${destPath}/${folder[1]}`)) {
-            fs.mkdirSync(`${destPath}/${folder[1]}`, {
+        const path = filepath.match(pattern);
+
+        /*
+        Return subfolder if match in regex or empty vaalue
+        */
+        const getSubfolder = (path) => {
+            try {
+                return path[1];
+            } catch (error) {
+                return '';
+            }
+        }
+        const subfolder = getSubfolder(path)
+
+        /*
+        Create subfolder if not exist
+        */
+        if(!fs.existsSync(`${destPath}/${subfolder}`)){
+            fs.mkdirSync(`${destPath}/${subfolder}`, {
                 recursive: true
-            });
-            subfolder = folder[1]
-        } else if (folder !== null) {
-            subfolder = folder[1]
+            })
         }
 
         /*
@@ -276,16 +287,17 @@ function html(done) {
         const data = JSON.parse(fs.readFileSync(filepath))
 
         /*
-        Get data from each json defined in additonalPata propierties [ array ]
+        Get data from each json defined in additonalPata propierties [ array ] if exist
+        map function return an array of Object
+        the reduce function retur an obj from the array
         */
-        const additionalDataFile = data.additionalData;
-        let additionalData = {}
-        if(additionalDataFile) {
-            // merge all additional data in one obj
-            for (const item of additionalDataFile) {
-                additionalData = Object.assign(additionalData, JSON.parse(fs.readFileSync(`${additionalDataPath}/${item}.json`)));
-            }
-        }
+        const getAdditionalData = (data) => ('additionalData' in data) ? data.additionalData : [];
+        const additionalDataFile = getAdditionalData(data);
+
+        const additionalData = additionalDataFile.map((item) => {
+                return JSON.parse(fs.readFileSync(`${additionalDataPath}/${item}.json`))
+            }).reduce((a, c) => a = {...a, ...c}, {})
+
 
         /*
         Get prod abient value
@@ -299,9 +311,20 @@ function html(done) {
         const manifestData = JSON.parse(fs.readFileSync(manifestFile))
 
         /*
+        Add permalink
+        */
+        const permalink = {}
+        permalink.permalink = `/${subfolder}${nameFile}.html`
+        permalink.staticPermalink = `${additionalData.domain}${subfolder}${nameFile}.html`
+        /*
+        remove propierties
+        */
+        delete data.additionalData;
+
+        /*
         merge all json
         */
-        const dataMerged = Object.assign({}, additionalData, prodData, data, manifestData);
+        const dataMerged = Object.assign({},prodData, additionalData, permalink, data, manifestData);
 
         // Debug
         // console.log(dataMerged)

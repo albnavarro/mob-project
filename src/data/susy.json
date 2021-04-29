@@ -1,6 +1,8 @@
 {
     "template": "susy",
     "additionalData" : [
+        "config",
         "en"
-    ]
+    ],
+    "univoqueId" : "susy"
 }

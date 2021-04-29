@@ -1,6 +1,8 @@
 {
     "template": "mouseParallax",
     "additionalData" : [
+        "config",
         "en"
-    ]
+    ],
+    "univoqueId" : "mouseParallax"
 }
