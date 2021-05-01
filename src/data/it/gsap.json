@@ -1,8 +1,7 @@
 {
     "template": "gsap",
     "additionalData" : [
-        "config",
-        "en"
+        "it"
     ],
     "univoqueId" : "gsap"
 }

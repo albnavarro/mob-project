@@ -9,12 +9,12 @@
   nav.nav(role='navigation')
     ul.main-menu
       li.menu-item
-        a(href='/') Home
+        a(href=permalinkMap.index[lang]) Home
       li.menu-item.menu-item-has-children
         a(href='#') parallax
         ul.sub-menu
           li.menu-item
-            a(href='/fixed.html') sticky test
+            a(href=permalinkMap.fixed[lang]) sticky test
           li.menu-item.menu-item-has-children
             a(href='#') second level
             ul.sub-menu  
@@ -44,11 +44,11 @@
         a(href='#') GSAP
         ul.sub-menu
           li.menu-item
-            a(href='/gsap.html') test 1
+            a(href=permalinkMap.gsap[lang]) test 1
           li.menu-item
-            a(href='/gsapHorizontal.html') horizontal
+            a(href=permalinkMap.gsapHorizontal[lang]) horizontal
       li.menu-item.menu-item-has-children
-        a(href='/move3D.html') move3D
+        a(href=permalinkMap.move3D[lang]) move3D
         ul.sub-menu
           li.menu-item
             a(href='#') second level
@@ -64,7 +64,7 @@
           li.menu-item
             a(href='#') second level
       li.menu-item.menu-item-has-children
-        a(href='/mouseParallax.html') mouseParallax
+        a(href=permalinkMap.mouseParallax[lang]) mouseParallax
         ul.sub-menu
           li.menu-item
             a(href='#') second level

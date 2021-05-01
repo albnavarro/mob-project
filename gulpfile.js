@@ -46,7 +46,6 @@ const
     imgPath = path.join(themePath, 'img'),
     jsPath = path.join(themePath, 'js'),
     componentPath = path.join(themePath, 'component'),
-    componentPathVanilla = path.join(themePath, 'component-vanilla'),
     scssPath = path.join(themePath, 'scss'),
     svgPath = path.join(themePath, 'svg'),
     dataPath = path.join(themePath, 'data'),
@@ -58,7 +57,7 @@ const
     imgDest = path.join(destPath, 'assets/img'),
 
     distPath = path.join(destPath, 'assets/dist'),
-    dataMerged = path.join(destPath, 'assets/data'),
+    dataDestFolder = path.join(destPath, 'assets/data'),
 
     cssFile = `${cssDest}/main.css`,
     jsFile = `${jsDest}/main.js`,
@@ -66,24 +65,116 @@ const
     imgFiles = `${imgPath}/*`,
     jsFiles = `${jsPath}/**/*.js`,
     componentJsFiles = `${componentPath}/**/*.js`,
-    componentJsFilesVanilla = `${componentPathVanilla}/**/*.js`,
     scssFiles = `${scssPath}/**/*.scss`,
     componentscssFiles = `${componentPath}/**/*.scss`,
-    componentscssFilesVanilla = `${componentPathVanilla}/**/*.scss`,
     svgFiles = `${svgPath}/*.svg`,
     pugFiles = `${themePath}/*.pug`,
     allPugFiles = `${themePath}/**/*.pug`,
     dataFiles = `${themePath}/data/**/*.json`,
     additionalDataFiles = `${themePath}/additionalData/**/*.json`,
-    dataDest = `${dataMerged}/data.json`,
-    manifestFile = `${distPath}/manifest.json`
+    dataDest = `${dataDestFolder}/data.json`,
+    manifestFile = `${distPath}/manifest.json`,
+    permalinkFile = `${dataDestFolder}/permalink.json`
+
+
+// fetch command line arguments
+const arg = (argList => {
+
+    let arg = {},
+        a, opt, thisOpt, curOpt;
+    for (a = 0; a < argList.length; a++) {
+
+        thisOpt = argList[a].trim();
+        opt = thisOpt.replace(/^\-+/, '');
+
+        if (opt === thisOpt) {
+
+            // argument value
+            if (curOpt) arg[curOpt] = opt;
+            curOpt = null;
+
+        } else {
+
+            // argument name
+            curOpt = opt;
+            arg[curOpt] = true;
+
+        }
+
+    }
+
+    return arg;
+
+})(process.argv);
+
+/*
+* HELPER FUNCTION
+*/
+
+/*
+* get json name from path
+* @param filepath - path of .json file
+*/
+function getNameFile(filepath) {
+    return filepath.split('/').pop().split('.').shift()
+}
 
 
 
+/*
+* get path where .html will be saved
+* @param filepath - {page}.json path
+* @param config - data extract from config.json
+* @param additionalData - all data extract from all json file associated to {page}.json
+* return '' id {page}.json is in root or path form root
+*/
+function extracSubFolder(filepath, config, additionalData) {
+    const pathRoot = ( config.defaultLocales == additionalData.lang) ? `data/${additionalData.lang}` : `data`
+    const pattern = new RegExp(`${pathRoot}\/(.*\/).*$`);
+    const path = filepath.match(pattern);
+
+    /*
+    * Return subfolder if match in regex or empty vaalue
+    */
+    const getSubfolder = (path) => {
+        try {
+            return path[1];
+        } catch (error) {
+            return '';
+        }
+    }
+    return getSubfolder(path)
+}
 
 
-// BROWSER SYNC
+/*
+* get an obj with all data in all json file associated to {page}.json
+* @param data - data extract from {page}.json
+* return an obj
+*/
+function extracAdditionalData(data) {
+    const getAdditionalData = (data) => ('additionalData' in data) ? data.additionalData : [];
+    const additionalDataFile = getAdditionalData(data);
 
+    /*
+    map function return an array of Object
+    the reduce function retur an obj from the array
+    */
+    const additionalData = additionalDataFile.map((item) => {
+            return JSON.parse(fs.readFileSync(`${additionalDataPath}/${item}.json`))
+        }).reduce((a, c) => a = {...a, ...c}, {})
+
+    return additionalData
+}
+
+/*
+* END HELPER FUNCTION
+*/
+
+
+/*
+* BROWSER SYNC
+*/
 function browser_sync(done) {
     browserSync.init({
         server: {
@@ -96,25 +187,36 @@ function browser_sync(done) {
 };
 
 
+/*
+* RELOAD PAGE
+*/
 function reloadPage(done) {
     browserSync.reload()
     done();
 };
 
 
+/*
+* SET prod to true
+*/
 function enableProd(done) {
     isProd = true
     done();
 };
 
+
+/*
+* SET prod to false
+*/
 function disableProd(done) {
     isProd = false
     done();
 };
 
 
-// SASS
-
+/*
+* SASS
+*/
 function style() {
     return gulp.src(path.join(scssPath, 'main.scss'))
         .pipe(sourcemaps.init())
@@ -142,7 +244,10 @@ function style() {
 };
 
 
-// JS
+
+/*
+* Minify async-assets-loading
+*/
 function minifyAssetsLoading() {
     return gulp.src(path.join(jsPath, 'async-assets-loading.js'))
         .pipe(uglify())
@@ -151,6 +256,9 @@ function minifyAssetsLoading() {
 };
 
 
+/*
+* ROLLUP
+*/
 function js() {
     if (isProd) {
         return rollup.rollup({
@@ -199,7 +307,9 @@ function js() {
 };
 
 
-// SVG
+/*
+* SVG
+*/
 function icons() {
     return gulp.src(svgFiles)
         .pipe(svgmin({
@@ -217,8 +327,9 @@ function icons() {
 
 
 
-// CRITICAL CSS
-
+/*
+* CREATE CRITICAL CSS FOLDER
+*/
 function initializeCritical(done) {
     const dir = cssDest;
     if (!fs.existsSync(dir)) {
@@ -228,6 +339,9 @@ function initializeCritical(done) {
 };
 
 
+/*
+* CRITICAL CSS
+*/
 function criticalCss(done) {
     critical.generate({
         base: './www/',
@@ -243,29 +357,126 @@ function criticalCss(done) {
 };
 
 
-// PUG
+/*
+* CREATE PERMALINKMAP
+* permalinkMap: {
+*     univoqueId: { en: '{pemalink}', it: '{pemalink}', ... },
+      ....
+ * }
+*/
+function permalink(done) {
+    /*
+    * Creat main obj
+    */
+    const peramlinkObj = {}
+
+    const config = JSON.parse(fs.readFileSync(`config.json`))
+    glob.sync(path.join(dataPath, '/**/*.json'), {}).map((filepath) => {
+
+        const data = JSON.parse(fs.readFileSync(filepath))
+
+        /*
+        Get file name
+        */
+        const nameFile = getNameFile(filepath)
+
+        /*
+        Get data from each json defined in additonalPata propierties [ array ] if exist
+        */
+        const additionalData = extracAdditionalData(data)
+
+        /*
+        * Get subfolder according to to default languages
+        */
+        const subfolder  = extracSubFolder(filepath,config,additionalData)
+
+        /*
+        * Get permalink
+        */
+        const permalink = `/${subfolder}${nameFile}.html`
+
+        /*
+        * Check if obj for each univoqueId exist
+        * Rutun a new empty obj or the obj if exist
+        */
+        const singleLocaleParmalinkObj = (data.univoqueId in peramlinkObj) ? peramlinkObj[data.univoqueId] : {}
+
+        /*
+        * Merge the new parmalinkObj with older one
+        */
+        peramlinkObj[data.univoqueId] = Object.assign( singleLocaleParmalinkObj, { [additionalData.lang] : permalink})
+
+
+    })
+
+    /*
+    * DEBUG
+    * gulp html -debug for debug
+    */
+    if(arg.debug) console.log(peramlinkObj)
+
+    /*
+    * Check if destination folder exist and save the file with permalink map
+    */
+    if(!fs.existsSync(dataDestFolder)){
+        fs.mkdirSync(dataDestFolder, {
+            recursive: true
+        })
+    }
+
+    fs.writeFileSync(permalinkFile, JSON.stringify(peramlinkObj));
+    done()
+
+}
+
+
+/*
+* CREATE PUG FILE
+*/
 function html(done) {
+    const config = JSON.parse(fs.readFileSync(`config.json`))
+
     const streams = glob.sync(path.join(dataPath, '/**/*.json'), {}).map((filepath) => {
+
+        /*
+        Get json data of each file
+        */
+        const data = JSON.parse(fs.readFileSync(filepath))
+
+
+        /*
+        Get file name
+        */
+        const nameFile = getNameFile(filepath)
+
+
+        /*
+        Get data from each json defined in additonalPata propierties [ array ] if exist
+        */
+        const additionalData = extracAdditionalData(data)
+
+
+        /*
+        Get prod abient value
+        */
+        const prodData = {}
+        prodData.isProd = isProd
+
+
+        /*
+        Get manifest.json for asset
+        */
+        const manifestData = JSON.parse(fs.readFileSync(manifestFile))
+
+
         /*
         Subfolder
         Create folder in accordion of json folder position
         regex form 'data/'' to last slash
         return the exact path of json file
         */
-        const pattern = /data\/(.*\/).*$/;
-        const path = filepath.match(pattern);
+        const subfolder = extracSubFolder(filepath,config,additionalData)
 
-        /*
-        Return subfolder if match in regex or empty vaalue
-        */
-        const getSubfolder = (path) => {
-            try {
-                return path[1];
-            } catch (error) {
-                return '';
-            }
-        }
-        const subfolder = getSubfolder(path)
 
         /*
         Create subfolder if not exist
@@ -276,58 +487,30 @@ function html(done) {
             })
         }
 
-        /*
-        Get name of json file
-        */
-        const nameFile = filepath.split('/').pop().split('.').shift()
 
         /*
-        Get json data of each file
+        Get relative path
         */
-        const data = JSON.parse(fs.readFileSync(filepath))
+        const relativePath = {}
+        relativePath.relativePath = ( config.defaultLocales == additionalData.lang) ? `` : `/${additionalData.lang}`;
 
-        /*
-        Get data from each json defined in additonalPata propierties [ array ] if exist
-        map function return an array of Object
-        the reduce function retur an obj from the array
-        */
-        const getAdditionalData = (data) => ('additionalData' in data) ? data.additionalData : [];
-        const additionalDataFile = getAdditionalData(data);
-
-        const additionalData = additionalDataFile.map((item) => {
-                return JSON.parse(fs.readFileSync(`${additionalDataPath}/${item}.json`))
-            }).reduce((a, c) => a = {...a, ...c}, {})
-
-
-        /*
-        Get prod abient value
-        */
-        const prodData = {}
-        prodData.isProd = isProd
-
-        /*
-        Get manifest.json for asset
-        */
-        const manifestData = JSON.parse(fs.readFileSync(manifestFile))
 
         /*
         Add permalink
         */
+        const permalinkMap = JSON.parse(fs.readFileSync(permalinkFile))
+
         const permalink = {}
         permalink.permalink = `/${subfolder}${nameFile}.html`
-        permalink.staticPermalink = `${additionalData.domain}${subfolder}${nameFile}.html`
-        /*
-        remove propierties
-        */
-        delete data.additionalData;
+        permalink.staticPermalink = `${config.domain}${subfolder}${nameFile}.html`
+        permalink.permalinkMap = permalinkMap
+
 
         /*
         merge all json
         */
-        const dataMerged = Object.assign({},prodData, additionalData, permalink, data, manifestData);
+        const allData = Object.assign({},prodData, config, additionalData, permalink, relativePath, data, manifestData);
 
-        // Debug
-        // console.log(dataMerged)
 
         /*
         get template
@@ -336,9 +519,23 @@ function html(done) {
             ? `${themePath}/${data.template}.pug`
             :`${themePath}/index.pug`;
 
+
+        /*
+        * remove propierties no more necessary
+        */
+        delete allData.additionalData;
+        delete allData.template;
+
+        /*
+        * DEBUG
+        * gulp html -debug for debug
+        */
+        if(arg.debug) console.log(allData)
+
+
         return gulp.src(templateDefault)
             .pipe(pug({
-                data: dataMerged
+                data: allData
             }))
             .pipe(rename(nameFile + '.html'))
             .pipe(gulp.dest(`${destPath}/${subfolder}`))
@@ -350,7 +547,9 @@ function html(done) {
 };
 
 
-// IMAGE
+/*
+* Image min
+*/
 function image() {
     return gulp.src(imgFiles)
         .pipe(imagemin())
@@ -358,7 +557,9 @@ function image() {
 };
 
 
-// PRODUCTION FUNCTION
+/*
+* Delete js and css and manifest file for production
+*/
 function cleanDist() {
     return del([
         path.join(distPath, '*'),
@@ -367,7 +568,7 @@ function cleanDist() {
 }
 
 /*
-Remove dot from manifest, so pug doasn't crash
+* Remove dot from manifest, so pug doasn't crash
 */
 function normalizeManifest() {
     return gulp.src(manifestFile)
@@ -376,6 +577,9 @@ function normalizeManifest() {
         .pipe(gulp.dest(distPath))
 }
 
+/*
+* Create css and js with hash
+*/
 function dist() {
     return gulp.src([cssFile, jsFile])
 
@@ -389,13 +593,15 @@ function dist() {
 }
 
 
-// REMOVE ALL GENERATED FILES
+/*
+* Remove all generated files
+*/
 function cleanAll() {
     return del([
         path.join(cssDest, '**/*.*'),
         path.join(distPath, '*'),
         path.join(distPath, '*.*'),
-        path.join(dataMerged, '*.*'),
+        path.join(dataDestFolder, '*.*'),
         path.join(imgDest, '*.*'),
         path.join(destPath, '**/*.html'),
         path.join(svgDest, '*.*'),
@@ -406,17 +612,21 @@ function cleanAll() {
 }
 
 
-// LIVE RELOAD
+/*
+* Live reload
+*/
 function watch_files(done) {
-    gulp.watch([scssFiles, componentscssFiles, componentscssFilesVanilla], style)
-    gulp.watch([jsFiles, componentJsFiles, componentJsFilesVanilla], gulp.series(js, reloadPage))
+    gulp.watch([scssFiles, componentscssFiles], style)
+    gulp.watch([jsFiles, componentJsFiles], gulp.series(js, reloadPage))
     gulp.watch([allPugFiles, dataFiles, additionalDataFiles], gulp.series(html, reloadPage))
 
     done();
 }
 
 
-// TASK
+/*
+* TASk
+*/
 gulp.task("initializeCritical", initializeCritical)
 gulp.task("style", style)
 gulp.task("js", js)
@@ -430,6 +640,7 @@ gulp.task("normalizeManifest", normalizeManifest)
 gulp.task("cleanAll", cleanAll)
 gulp.task("enableProd", enableProd)
 gulp.task("disableProd", disableProd)
+gulp.task("permalink", permalink)
 
 
 
@@ -445,6 +656,7 @@ gulp.task("init", gulp.series(
     cleanDist,
     dist,
     normalizeManifest,
+    permalink,
     html
 ))
 

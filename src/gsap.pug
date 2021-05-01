@@ -5,37 +5,42 @@ html
 
     body.gsap
         div(id="spriteSvg" data-svg="/assets/svg/svg.svg")
+            
         header
-          .container.menu-container.menu-container--top
-            include component-vanilla/navigation/pug/menu.pug
-        .container
-            .gaspT
-                h2
-                    |no pin sticky
-                .gaspT__inner.gaspT__inner--0
-                    .gaspT__inner__sticky
-                        .gaspT__pin
-                        .gaspT__pin
-                        .gaspT__pin
-                h2
-                    |animation
-                .gaspT__inner.gaspT__inner--1
-                    .gaspT__pin
-                    .gaspT__pin
-                    .gaspT__pin
-                h2
-                    |scroll
-                .gaspT__inner.gaspT__inner--2
-                    .gaspT__pin
-                    .gaspT__pin
-                    .gaspT__pin
-            .gaspP
-                .gaspP__inner
+            .container
+                include pug/langSelector.pug
+            .container.menu-container.menu-container--top
+                include component/navigation/pug/menu.pug
+                
+        main
+            .container
+                .gaspT
                     h2
-                        |title
-            .gaspP
-                .gaspP__inner
+                        |no pin sticky
+                    .gaspT__inner.gaspT__inner--0
+                        .gaspT__inner__sticky
+                            .gaspT__pin
+                            .gaspT__pin
+                            .gaspT__pin
                     h2
-                        |title
+                        |animation
+                    .gaspT__inner.gaspT__inner--1
+                        .gaspT__pin
+                        .gaspT__pin
+                        .gaspT__pin
+                    h2
+                        |scroll
+                    .gaspT__inner.gaspT__inner--2
+                        .gaspT__pin
+                        .gaspT__pin
+                        .gaspT__pin
+                .gaspP
+                    .gaspP__inner
+                        h2
+                            |title
+                .gaspP
+                    .gaspP__inner
+                        h2
+                            |title
         include pug/footer.pug
         

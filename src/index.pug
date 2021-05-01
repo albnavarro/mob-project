@@ -7,12 +7,14 @@ html
         div(id="spriteSvg" data-svg="/assets/svg/svg.svg")
 
         header
+            .container
+                include pug/langSelector.pug
             .container.menu-container.menu-container--top
-                include component-vanilla/navigation/pug/menu.pug
+                include component/navigation/pug/menu.pug
         main
             .container.clearfix
                 .sidebar.menu-container--sidebar
-                    include component-vanilla/navigation/pug/menu.pug
+                    include component/navigation/pug/menu.pug
                 .content
                     h1
                         |!{title}
@@ -42,7 +44,7 @@ html
                             |popTarget 3
                             button
                                 |close
-                    include component-vanilla/overlay/pug/overlay.pug
+                    include component/overlay/pug/overlay.pug
                     //- Fine pop toggle
 
 
@@ -121,9 +123,9 @@ html
                                 span
                                     |content
 
-                    include component-vanilla/lightbox/pug/button.pug
+                    include component/lightbox/pug/button.pug
 
-                    include component-vanilla/tooltip/pug/tooltip.pug
+                    include component/tooltip/pug/tooltip.pug
                     
                     .parallax__container
                         .parallax__item(
@@ -144,11 +146,11 @@ html
 
 
 
-            include component-vanilla/offset-slider/pug/offsetSlider.pug
+            include component/offset-slider/pug/offsetSlider.pug
             .container.container-block-1
-                include component-vanilla/threeBlocks/pug/tBlocks.pug
+                include component/threeBlocks/pug/tBlocks.pug
             .container.container-block-2
-                include component-vanilla/threeBlocks/pug/tBlocks.pug
+                include component/threeBlocks/pug/tBlocks.pug
 
             section.overflow-hidden
                 
@@ -286,7 +288,7 @@ html
     
                 div(style="height:200px;")
     
-    include component-vanilla/lightbox/pug/lightbox-simple.pug
-    include component-vanilla/lightbox/pug/lightbox-image.pug
-    include component-vanilla/lightbox/pug/lightbox-video.pug
-    include pug/footer.pug
+        include component/lightbox/pug/lightbox-simple.pug
+        include component/lightbox/pug/lightbox-image.pug
+        include component/lightbox/pug/lightbox-video.pug
+        include pug/footer.pug

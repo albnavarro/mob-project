@@ -3,13 +3,12 @@
     "locales" : {
         "en": {
             "name" : "English",
-            "nativeName" : "English",
-            "path" : "/"
+            "nativeName" : "English"
         },
         "it": {
             "name" : "Italian",
-            "nativeName" : "Italiano",
-            "path" : "/it"
+            "nativeName" : "Italiano"
         }
-    }
+    },
+    "defaultLocales" : "en"
 }

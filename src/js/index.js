@@ -18,22 +18,22 @@ import { findElement } from "./utility/findElement.js"
 import { loadImages } from "./utility/loadImages.js"
 
 // NEW VANILLA COMPONENT MODULE
-import { totop } from "../component-vanilla/to-top/js/toTop.js"
-import { offsetSlider } from "../component-vanilla/offset-slider/js/offsetSlider.js"
-import { tBlocks } from "../component-vanilla/threeBlocks/js/tBlocks.js";
-import { parallax } from "../component-vanilla/parallax/js/parallax.js";
-import { accordion } from "../component-vanilla/accordion/js/accordion.js"
-import { accordionItemClass } from "../component-vanilla/accordion/js/accordionItem.js"
-import { showElement } from "../component-vanilla/show-element/js/ShowElement.js"
-import { popToggleClass } from "../component-vanilla/popToggle/js/popToggle.js"
-import { popToggleManagerClass } from "../component-vanilla/popToggle/js/popToggleManager.js"
-import { overlayClass } from "../component-vanilla/overlay/js/overlay.js"
-import { lightBoxClass } from "../component-vanilla/lightbox/js/lightbox.js"
-import { menuClass } from "../component-vanilla/navigation/js/menu.js"
-import { toolTip } from "../component-vanilla/tooltip/js/tooltip.js"
-import { move3D } from "../component-vanilla/move3D/js/move3D.js"
-import { mouseParallax } from "../component-vanilla/mouseParallax/js/mouseParallax.js"
-import { animate } from "../component-vanilla/animate/js/animate.js"
+import { totop } from "../component/to-top/js/toTop.js"
+import { offsetSlider } from "../component/offset-slider/js/offsetSlider.js"
+import { tBlocks } from "../component/threeBlocks/js/tBlocks.js";
+import { parallax } from "../component/parallax/js/parallax.js";
+import { accordion } from "../component/accordion/js/accordion.js"
+import { accordionItemClass } from "../component/accordion/js/accordionItem.js"
+import { showElement } from "../component/show-element/js/ShowElement.js"
+import { popToggleClass } from "../component/popToggle/js/popToggle.js"
+import { popToggleManagerClass } from "../component/popToggle/js/popToggleManager.js"
+import { overlayClass } from "../component/overlay/js/overlay.js"
+import { lightBoxClass } from "../component/lightbox/js/lightbox.js"
+import { menuClass } from "../component/navigation/js/menu.js"
+import { toolTip } from "../component/tooltip/js/tooltip.js"
+import { move3D } from "../component/move3D/js/move3D.js"
+import { mouseParallax } from "../component/mouseParallax/js/mouseParallax.js"
+import { animate } from "../component/animate/js/animate.js"
 
 //TEST
 import { gsapTest } from "./test/gsapTest.js"

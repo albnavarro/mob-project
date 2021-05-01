@@ -1,7 +1,6 @@
 {
     "template": "fixed",
     "additionalData" : [
-        "config",
         "en"
     ],
     "univoqueId" : "fixed"

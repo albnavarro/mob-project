@@ -7,72 +7,75 @@ html
         div(id="spriteSvg" data-svg="/assets/svg/svg.svg")
             
         header
-          .container.menu-container.menu-container--top
-            include component-vanilla/navigation/pug/menu.pug
-        .fixed.container
-            .fixed__container
-                .fixed__content.container
-                    .parallax__container
-                        .parallax__item(
-                            data-conponent='m-comp--parallax',
-                            data-computationType = "fixed",
-                            data-range="50",
-                            data-triggerEl=".fixed__dummy--1",
-                            data-reverse,
-                            data-fixedInward)
+            .container
+                include pug/langSelector.pug
+            .container.menu-container.menu-container--top
+                include component/navigation/pug/menu.pug
+        main
+            .fixed.container
+                .fixed__container
+                    .fixed__content.container
+                        .parallax__container
                             .parallax__item(
                                 data-conponent='m-comp--parallax',
                                 data-computationType = "fixed",
                                 data-range="50",
-                                data-triggerEl=".fixed__dummy--2",
-                                data-propierties="horizontal")
+                                data-triggerEl=".fixed__dummy--1",
+                                data-reverse,
+                                data-fixedInward)
                                 .parallax__item(
                                     data-conponent='m-comp--parallax',
                                     data-computationType = "fixed",
                                     data-range="50",
-                                    data-triggerEl=".fixed__dummy--3",
-                                    data-reverse,
+                                    data-triggerEl=".fixed__dummy--2",
                                     data-propierties="horizontal")
                                     .parallax__item(
                                         data-conponent='m-comp--parallax',
                                         data-computationType = "fixed",
-                                        data-range="100",
-                                        data-triggerEl=".fixed__dummy--4",
-                                        data-propierties="scale")
+                                        data-range="50",
+                                        data-triggerEl=".fixed__dummy--3",
+                                        data-reverse,
+                                        data-propierties="horizontal")
                                         .parallax__item(
                                             data-conponent='m-comp--parallax',
-                                            data-ease="smooth",
                                             data-computationType = "fixed",
-                                            data-range="90",
-                                            data-triggerEl=".fixed__dummy--5",
-                                            data-propierties="rotate")
+                                            data-range="100",
+                                            data-triggerEl=".fixed__dummy--4",
+                                            data-propierties="scale")
                                             .parallax__item(
                                                 data-conponent='m-comp--parallax',
-                                                data-ease="linear",
+                                                data-ease="smooth",
                                                 data-computationType = "fixed",
                                                 data-range="90",
-                                                data-applyEl=".test-item",
                                                 data-triggerEl=".fixed__dummy--5",
-                                                data-propierties="border-width")
+                                                data-propierties="rotate")
                                                 .parallax__item(
                                                     data-conponent='m-comp--parallax',
                                                     data-ease="linear",
                                                     data-computationType = "fixed",
                                                     data-range="90",
                                                     data-applyEl=".test-item",
-                                                    data-fixedStartOff,
-                                                    data-triggerEl=".fixed__dummy--7",
-                                                    data-fixedInward
+                                                    data-triggerEl=".fixed__dummy--5",
                                                     data-propierties="border-width")
-                                                    .test-item
-                                                    
-                .fixed__dummy.fixed__dummy--1
-                .fixed__dummy.fixed__dummy--2
-                .fixed__dummy.fixed__dummy--3
-                .fixed__dummy.fixed__dummy--4
-                .fixed__dummy.fixed__dummy--5
-                .fixed__dummy.fixed__dummy--6
-                .fixed__dummy.fixed__dummy--7
+                                                    .parallax__item(
+                                                        data-conponent='m-comp--parallax',
+                                                        data-ease="linear",
+                                                        data-computationType = "fixed",
+                                                        data-range="90",
+                                                        data-applyEl=".test-item",
+                                                        data-fixedStartOff,
+                                                        data-triggerEl=".fixed__dummy--7",
+                                                        data-fixedInward
+                                                        data-propierties="border-width")
+                                                        .test-item
+                                                        
+                    .fixed__dummy.fixed__dummy--1
+                    .fixed__dummy.fixed__dummy--2
+                    .fixed__dummy.fixed__dummy--3
+                    .fixed__dummy.fixed__dummy--4
+                    .fixed__dummy.fixed__dummy--5
+                    .fixed__dummy.fixed__dummy--6
+                    .fixed__dummy.fixed__dummy--7
                 
         include pug/footer.pug
         

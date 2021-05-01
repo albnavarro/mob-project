@@ -5,22 +5,27 @@ html
 
     body.gsap
         div(id="spriteSvg" data-svg="/assets/svg/svg.svg")
+            
         header
+            .container
+                include pug/langSelector.pug
             .container.menu-container.menu-container--top
-                include component-vanilla/navigation/pug/menu.pug
-        .gaspHorizontal
-            .gaspHorizontal__container.gaspHorizontal__container--0
-                .gaspHorizontal__item
-                    .gaspHorizontal__card
-                    .gaspHorizontal__card
-                    .gaspHorizontal__card
-                    .gaspHorizontal__card
-                        
-            .gaspHorizontal__container.gaspHorizontal__container--1
-                .gaspHorizontal__item
-                    .gaspHorizontal__card
-                    .gaspHorizontal__card
-                    .gaspHorizontal__card
-                    .gaspHorizontal__card
+                include component/navigation/pug/menu.pug
+                
+        main
+            .gaspHorizontal
+                .gaspHorizontal__container.gaspHorizontal__container--0
+                    .gaspHorizontal__item
+                        .gaspHorizontal__card
+                        .gaspHorizontal__card
+                        .gaspHorizontal__card
+                        .gaspHorizontal__card
+                            
+                .gaspHorizontal__container.gaspHorizontal__container--1
+                    .gaspHorizontal__item
+                        .gaspHorizontal__card
+                        .gaspHorizontal__card
+                        .gaspHorizontal__card
+                        .gaspHorizontal__card
 
         include pug/footer.pug
