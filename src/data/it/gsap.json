@@ -1,7 +1,7 @@
 {
     "template": "gsap",
     "additionalData" : [
-        "it"
+        "locale/it"
     ],
     "univoqueId" : "gsap"
 }

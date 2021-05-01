@@ -1,7 +1,7 @@
 {
     "template": "gsapHorizontal",
     "additionalData" : [
-        "it"
+        "locale/it"
     ],
     "univoqueId" : "gsapHorizontal"
 }

@@ -1,7 +1,7 @@
 {
     "template": "move3D",
     "additionalData" : [
-        "it"
+        "locale/it"
     ],
     "univoqueId" : "move3D"
 }

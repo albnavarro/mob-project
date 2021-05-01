@@ -1,6 +1,7 @@
 {
     "additionalData": [
-        "it"
+        "locale/it",
+        "string/it"
     ],
     "univoqueId" : "index",
     "title": "title it",

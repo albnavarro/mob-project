@@ -1,7 +1,7 @@
 {
     "template": "mouseParallax",
     "additionalData" : [
-        "en"
+        "locale/en"
     ],
     "univoqueId" : "mouseParallax"
 }
