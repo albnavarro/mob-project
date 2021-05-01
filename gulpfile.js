@@ -9,7 +9,7 @@ const
     sourcemaps = require('gulp-sourcemaps'),
     watch = require('gulp-watch'),
     wrap = require('gulp-wrap'),
-    critical = require('critical'),
+    critical = require('critical').stream,
     gulpif = require('gulp-if'),
     cssmin = require('gulp-cssmin'),
     postcss = require('gulp-postcss'),
@@ -343,19 +343,30 @@ function initializeCritical(done) {
 * CRITICAL CSS
 */
 function criticalCss(done) {
-    critical.generate({
-        base: './www/',
-        src: 'index.html',
-        minify: true,
-        width: 1024,
-        height: 768,
-        css: `${cssDest}/main.css`,
-        target: `${cssDest}/critical.css`,
-        include: ['.lightbox', '.parallax-container', '.parallax-item', '.gaspHorizontal__card']
-    });
+    // critical.generate({
+    //     base: './www/',
+    //     src: 'index.html',
+    //     minify: true,
+    //     width: 1024,
+    //     height: 768,
+    //     css: `${cssDest}/main.css`,
+    //     target: `${cssDest}/critical.css`,
+    //     include: ['.lightbox', '.parallax-container', '.parallax-item', '.gaspHorizontal__card']
+    // });
+
+    return gulp.src('www/**/*.html')
+        .pipe(critical({
+            base: 'www/',
+            minify: true,
+            width: 1024,
+            height: 768,
+            css: `${cssDest}/main.css`,
+            include: ['.lightbox', '.parallax-container', '.parallax-item', '.gaspHorizontal__card']
+        }))
+        .pipe(gulp.dest(`${cssDest}/critical`))
+
     done();
 };
-
 
 /*
 * CREATE PERMALINKMAP
@@ -507,9 +518,20 @@ function html(done) {
 
 
         /*
+        criticalcss
+        */
+        const critical = {}
+        const criticalFile = `${cssDest}/critical/${subfolder}${nameFile}.css`
+        if (isProd && fs.existsSync(criticalFile)) {
+            const documentStyles = fs.readFileSync(criticalFile);
+            critical.documentStyles = documentStyles.toString()
+        }
+
+
+        /*
         merge all json
         */
-        const allData = Object.assign({},prodData, config, additionalData, permalink, relativePath, data, manifestData);
+        const allData = Object.assign({},critical, prodData, config, additionalData, permalink, relativePath, data, manifestData);
 
 
         /*
@@ -531,6 +553,8 @@ function html(done) {
         * gulp html -debug for debug
         */
         if(arg.debug) console.log(allData)
+
+
 
 
         return gulp.src(templateDefault)

@@ -1,8 +1,7 @@
 node_modules
 bower_components
-www/assets/css/maps
-www/assets/css/critical.css
-www/assets/css/main.css
+www/assets/css/**/*.css
+www/assets/css/**/*.css.map
 www/assets/js/main.js
 www/assets/js/main.js.map
 www/assets/svg/svg.svg

@@ -7,9 +7,13 @@ meta(http-equiv="Cache-control" content="public")
 meta(name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable = no")
 meta(name="description" content="")
 
-style(type="text/css")
-    if isProd
-        include ../../www/assets/css/critical.css
+//- style(type="text/css")
+//-     if isProd
+//-         include ../../www/assets/css/critical.css
+            
+if isProd
+    style(type="text/css")
+        |!{documentStyles}
   
 if isProd
   link(rel="stylesheet" href="/assets/dist/" + maincss media="print" onload="this.media='all'; this.onload=null;  document.documentElement.classList.add('css-added');")
