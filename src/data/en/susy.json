@@ -1,7 +1,8 @@
 {
     "template": "susy",
     "additionalData" : [
-        "locale/en"
+        "locale/en",
+        "nav"
     ],
     "univoqueId" : "susy"
 }

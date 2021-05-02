@@ -1,3 +1,23 @@
+mixin list(item)
+    each val, index in item
+        - const heaveChildrenClass = (val.children) ? 'menu-item menu-item-has-children' : 'menu-item'
+        
+        li(class=heaveChildrenClass)
+            - const isValidLink = (val.id !== '#') ? true : false;
+            
+            if isValidLink
+                a(href=permalinkMap[val.id][lang])
+                    |!{val.label}
+            else
+                a(href='#')
+                    |!{val.label}
+                    
+            if val.children
+                ul.sub-menu
+                    +list(val.children)
+
+
+
 .nav-wrap
   .toggle-wrap.clearfix
     .toggle-element
@@ -7,89 +27,5 @@
       span
     button.main-arrow-back
   nav.nav(role='navigation')
-    ul.main-menu
-      li.menu-item
-        a(href=permalinkMap.index[lang]) Home
-      li.menu-item.menu-item-has-children
-        a(href='#') parallax
-        ul.sub-menu
-          li.menu-item
-            a(href=permalinkMap.fixed[lang]) sticky test
-          li.menu-item.menu-item-has-children
-            a(href='#') second level
-            ul.sub-menu  
-              li.menu-item
-                a(href='#') third level
-              li.menu-item.menu-item-has-children
-                a(href='#') third level
-                ul.sub-menu        
-                  li.menu-item
-                    a(href='#') fourth level
-                  li.menu-item
-                    a(href='#') fourth level
-                  li.menu-item
-                    a(href='#') fourth level
-              li.menu-item
-                a(href='#') third level
-          li.menu-item.menu-item-has-children
-            a(href='#') second level
-            ul.sub-menu    
-              li.menu-item
-                a(href='#') third level
-              li.menu-item
-                a(href='#') third level
-              li.menu-item
-                a(href='#') third level
-      li.menu-item.menu-item-has-children
-        a(href='#') GSAP
-        ul.sub-menu
-          li.menu-item
-            a(href=permalinkMap.gsap[lang]) test 1
-          li.menu-item
-            a(href=permalinkMap.gsapHorizontal[lang]) horizontal
-      li.menu-item.menu-item-has-children
-        a(href=permalinkMap.move3D[lang]) move3D
-        ul.sub-menu
-          li.menu-item
-            a(href='#') second level
-          li.menu-item.menu-item-has-children
-            a(href='#') second level
-            ul.sub-menu    
-              li.menu-item
-                a(href='#') third level
-              li.menu-item
-                a(href='#') third level
-              li.menu-item
-                a(href='#') third level
-          li.menu-item
-            a(href='#') second level
-      li.menu-item.menu-item-has-children
-        a(href=permalinkMap.mouseParallax[lang]) mouseParallax
-        ul.sub-menu
-          li.menu-item
-            a(href='#') second level
-          li.menu-item.menu-item-has-children
-            a(href='#') second level
-            ul.sub-menu    
-              li.menu-item
-                a(href='#') third level
-              li.menu-item.menu-item-has-children
-                a(href='#') third level
-                ul.sub-menu        
-                  li.menu-item
-                    a(href='#') fourth level
-                  li.menu-item
-                    a(href='#') fourth level
-                  li.menu-item
-                    a(href='#') fourth level
-              li.menu-item
-                a(href='#') third level
-          li.menu-item.menu-item-has-children
-            a(href='#') second level
-            ul.sub-menu    
-              li.menu-item
-                a(href='#') third level
-              li.menu-item
-                a(href='#') third level
-              li.menu-item
-                a(href='#') third level
+      ul.main-menu
+          +list(navigation)

@@ -1,7 +1,8 @@
 {
     "template": "fixed",
     "additionalData" : [
-        "locale/it"
+        "locale/it",
+        "nav"
     ],
     "univoqueId" : "fixed"
 }
