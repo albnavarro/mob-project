@@ -193,9 +193,9 @@ popToggle1.openCallBack = overlay.open.bind(overlay,
         name: 'pop1',
         bodyOverflow: true
     });
-popToggle1.openCallBack = callback1.bind(this);
+popToggle1.openCallBack = callback1.bind(window);
 popToggle1.closeCallBack = overlay.close.bind(overlay);
-popToggle1.closeCallBack = callback2.bind(this);
+popToggle1.closeCallBack = callback2.bind(window);
 
 // POP 2
 const popToggle2 = new popToggleClass({

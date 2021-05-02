@@ -19,6 +19,7 @@
     "css-mqpacker": "^7.0.0",
     "debounce": "^1.2.0",
     "del": "^6.0.0",
+    "delete-empty": "^3.0.0",
     "event-stream": "^4.0.1",
     "fontfaceobserver": "^2.1.0",
     "glob": "^7.1.6",

@@ -1,5 +1,4 @@
 "use strict"
-let isProd = false
 
 const
     path = require('path'),
@@ -32,6 +31,7 @@ const
     replace = require('gulp-string-replace'),
     glob = require('glob'),
     es = require('event-stream'),
+    deleteEmpty = require('delete-empty'),
     reload = browserSync.reload,
 
     rollup = require('rollup'),
@@ -197,24 +197,6 @@ function reloadPage(done) {
 
 
 /*
-* SET prod to true
-*/
-function enableProd(done) {
-    isProd = true
-    done();
-};
-
-
-/*
-* SET prod to false
-*/
-function disableProd(done) {
-    isProd = false
-    done();
-};
-
-
-/*
 * SASS
 */
 function style() {
@@ -230,11 +212,11 @@ function style() {
                 sort: true
             }),
         ]))
-        .pipe(gulpif(!isProd, sourcemaps.write('maps', {
+        .pipe(gulpif(!arg.prod, sourcemaps.write('maps', {
             includeContent: false,
             sourceRoot: scssPath
         })))
-        .pipe(gulpif(isProd, cssmin({
+        .pipe(gulpif(arg.prod, cssmin({
             keepSpecialComments: false,
         })))
         .pipe(gulp.dest(cssDest))
@@ -260,7 +242,7 @@ function minifyAssetsLoading() {
 * ROLLUP
 */
 function js() {
-    if (isProd) {
+    if (arg.prod) {
         return rollup.rollup({
             input: './src/js/index.js',
             plugins: [
@@ -471,7 +453,7 @@ function html(done) {
         Get prod abient value
         */
         const prodData = {}
-        prodData.isProd = isProd
+        prodData.isProd = arg.prod
 
 
         /*
@@ -522,7 +504,7 @@ function html(done) {
         */
         const critical = {}
         const criticalFile = `${cssDest}/critical/${subfolder}${nameFile}.css`
-        if (isProd && fs.existsSync(criticalFile)) {
+        if (arg.prod && fs.existsSync(criticalFile)) {
             const documentStyles = fs.readFileSync(criticalFile);
             critical.documentStyles = documentStyles.toString()
         }
@@ -622,7 +604,7 @@ function dist() {
 */
 function cleanAll() {
     return del([
-        path.join(cssDest, '**/*.*'),
+        path.join(cssDest, '**'),
         path.join(distPath, '*'),
         path.join(distPath, '*.*'),
         path.join(dataDestFolder, '*.*'),
@@ -632,7 +614,12 @@ function cleanAll() {
         path.join(destPath, 'assets/js/async-assets-loading.min.js'),
         path.join(destPath, 'assets/js/main.js'),
         jsFile
-    ]);
+    ], {force:true});
+}
+
+function deleteEmptyDirectories(done) {
+    deleteEmpty.sync(destPath)
+    done()
 }
 
 
@@ -662,15 +649,13 @@ gulp.task("cleanDist", cleanDist)
 gulp.task("dist", dist)
 gulp.task("normalizeManifest", normalizeManifest)
 gulp.task("cleanAll", cleanAll)
-gulp.task("enableProd", enableProd)
-gulp.task("disableProd", disableProd)
+gulp.task("deleteEmptyDirectories", deleteEmptyDirectories)
 gulp.task("permalink", permalink)
 
 
 
 // MAIN TASK
-gulp.task("init", gulp.series(
-    disableProd,
+gulp.task("build", gulp.series(
     initializeCritical,
     icons,
     image,
@@ -681,22 +666,18 @@ gulp.task("init", gulp.series(
     dist,
     normalizeManifest,
     permalink,
+    html,
+    criticalCss,
+    dist,
+    normalizeManifest,
     html
+))
+
+gulp.task("reset", gulp.series(
+    cleanAll,
+    deleteEmptyDirectories
 ))
 
 gulp.task('watch', gulp.parallel(
     browser_sync,
     watch_files))
-
-gulp.task("criticalCss", gulp.series(
-    style,
-    criticalCss))
-
-gulp.task('prod', gulp.series(
-    enableProd,
-    cleanDist,
-    style,
-    js,
-    dist,
-    normalizeManifest,
-    html))
