@@ -2,8 +2,8 @@ node_modules
 bower_components
 www/assets/css/**/*.css
 www/assets/css/**/*.css.map
-www/assets/js/main.js
-www/assets/js/main.js.map
+www/assets/js/script.js
+www/assets/js/script.js.map
 www/assets/svg/svg.svg
 www/assets/img/*.*
 www/assets/dist/*

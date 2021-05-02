@@ -1,6 +1,7 @@
 "use strict"
 
 const
+    util = require('util'),
     path = require('path'),
     concat = require('gulp-concat'),
     gulp = require('gulp'),
@@ -59,8 +60,8 @@ const
     distPath = path.join(destPath, 'assets/dist'),
     dataDestFolder = path.join(destPath, 'assets/data'),
 
-    cssFile = `${cssDest}/main.css`,
-    jsFile = `${jsDest}/main.js`,
+    cssFile = `${cssDest}/style.css`,
+    jsFile = `${jsDest}/script.js`,
     cssCritical = `${cssDest}/critical.css`,
     imgFiles = `${imgPath}/*`,
     jsFiles = `${jsPath}/**/*.js`,
@@ -200,7 +201,7 @@ function reloadPage(done) {
 * SASS
 */
 function style() {
-    return gulp.src(path.join(scssPath, 'main.scss'))
+    return gulp.src(path.join(scssPath, 'style.scss'))
         .pipe(sourcemaps.init())
         .pipe(sass({
             outputStyle: 'nested',
@@ -244,7 +245,7 @@ function minifyAssetsLoading() {
 function js() {
     if (arg.prod) {
         return rollup.rollup({
-            input: './src/js/index.js',
+            input: './src/js/script.js',
             plugins: [
                 nodeResolve.nodeResolve(),
                 commonjs(),
@@ -266,7 +267,7 @@ function js() {
         });
     } else {
         return rollup.rollup({
-            input: './src/js/index.js',
+            input: './src/js/script.js',
             plugins: [
                 nodeResolve.nodeResolve(),
                 commonjs(),
@@ -325,24 +326,13 @@ function initializeCritical(done) {
 * CRITICAL CSS
 */
 function criticalCss(done) {
-    // critical.generate({
-    //     base: './www/',
-    //     src: 'index.html',
-    //     minify: true,
-    //     width: 1024,
-    //     height: 768,
-    //     css: `${cssDest}/main.css`,
-    //     target: `${cssDest}/critical.css`,
-    //     include: ['.lightbox', '.parallax-container', '.parallax-item', '.gaspHorizontal__card']
-    // });
-
     return gulp.src('www/**/*.html')
         .pipe(critical({
             base: 'www/',
             minify: true,
             width: 1024,
             height: 768,
-            css: `${cssDest}/main.css`,
+            css: `${cssDest}/style.css`,
             include: ['.lightbox', '.parallax-container', '.parallax-item', '.gaspHorizontal__card']
         }))
         .pipe(gulp.dest(`${cssDest}/critical`))
@@ -428,8 +418,9 @@ function permalink(done) {
 */
 function html(done) {
     const config = JSON.parse(fs.readFileSync(`config.json`))
+    const sourcePath =  (!arg.page) ? path.join(dataPath, '/**/*.json') :  path.join(dataPath, arg.page)
 
-    const streams = glob.sync(path.join(dataPath, '/**/*.json'), {}).map((filepath) => {
+    const streams = glob.sync(sourcePath, {}).map((filepath) => {
 
         /*
         Get json data of each file
@@ -453,14 +444,15 @@ function html(done) {
         Get prod abient value
         */
         const prodData = {}
-        prodData.isProd = arg.prod
+        prodData.isProd = (arg.prod) ? true : false;
 
 
         /*
         Get manifest.json for asset
         */
+        const manifest = {}
         const manifestData = JSON.parse(fs.readFileSync(manifestFile))
-
+        manifest.manifest = manifestData
 
         /*
         Subfolder
@@ -497,6 +489,7 @@ function html(done) {
         permalink.permalink = `/${subfolder}${nameFile}.html`
         permalink.staticPermalink = `${config.domain}${subfolder}${nameFile}.html`
         permalink.permalinkMap = permalinkMap
+        permalink.slug = nameFile
 
 
         /*
@@ -513,7 +506,7 @@ function html(done) {
         /*
         merge all json
         */
-        const allData = Object.assign({},critical, prodData, config, additionalData, permalink, relativePath, data, manifestData);
+        const allData = Object.assign({},critical, prodData, config, additionalData, permalink, relativePath, data, manifest);
 
 
         /*
@@ -533,8 +526,21 @@ function html(done) {
         /*
         * DEBUG
         * gulp html -debug for debug
+
+        es:
+        gulp html -prod
+        gulp html -debug -page "it/index.json"
+        gulp html -prod -page "it/index.json"
+
         */
-        if(arg.debug) console.log(allData)
+        if(arg.debug) {
+            console.log()
+            console.log('***************')
+            console.log(nameFile)
+            console.log('***************')
+            console.log(util.inspect(allData, {showHidden: false, depth: null}))
+            console.log()
+        }
 
 
 
@@ -573,21 +579,12 @@ function cleanDist() {
     ]);
 }
 
-/*
-* Remove dot from manifest, so pug doasn't crash
-*/
-function normalizeManifest() {
-    return gulp.src(manifestFile)
-        .pipe(replace('main.css', 'maincss'))
-        .pipe(replace('main.js', 'mainjs'))
-        .pipe(gulp.dest(distPath))
-}
 
 /*
 * Create css and js with hash
 */
 function dist() {
-    return gulp.src([cssFile, jsFile])
+    return gulp.src([cssFile, jsFile, imgFiles])
 
         .pipe(rev())
         .pipe(gulp.dest(distPath))
@@ -612,7 +609,8 @@ function cleanAll() {
         path.join(destPath, '**/*.html'),
         path.join(svgDest, '*.*'),
         path.join(destPath, 'assets/js/async-assets-loading.min.js'),
-        path.join(destPath, 'assets/js/main.js'),
+        path.join(destPath, 'assets/js/script.js'),
+        path.join(destPath, 'assets/js/script.js.map'),
         jsFile
     ], {force:true});
 }
@@ -647,14 +645,20 @@ gulp.task("icons", icons)
 gulp.task("minifyAssetsLoading", minifyAssetsLoading)
 gulp.task("cleanDist", cleanDist)
 gulp.task("dist", dist)
-gulp.task("normalizeManifest", normalizeManifest)
 gulp.task("cleanAll", cleanAll)
 gulp.task("deleteEmptyDirectories", deleteEmptyDirectories)
 gulp.task("permalink", permalink)
 
 
+/*
+* BUILD TASK
 
-// MAIN TASK
+* gulp build
+* gulp build -debug -page "it/index.json"
+* ....
+* gulp build -prod -page "it/index.json"
+*/
+
 gulp.task("build", gulp.series(
     initializeCritical,
     icons,
@@ -664,19 +668,27 @@ gulp.task("build", gulp.series(
     js,
     cleanDist,
     dist,
-    normalizeManifest,
     permalink,
     html,
     criticalCss,
     dist,
-    normalizeManifest,
     html
 ))
+
+
+/*
+* RESET BUILD
+*/
 
 gulp.task("reset", gulp.series(
     cleanAll,
     deleteEmptyDirectories
 ))
+
+
+/*
+* WATCH
+*/
 
 gulp.task('watch', gulp.parallel(
     browser_sync,
