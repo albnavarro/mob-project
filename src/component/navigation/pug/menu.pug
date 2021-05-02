@@ -7,7 +7,7 @@ mixin list(item)
             
             if isValidLink
                 a(href=permalinkMap[val.id][lang])
-                    |!{val.label}
+                    |!{slugMap[val.id][lang]}
             else
                 a(href='#')
                     |!{val.label}

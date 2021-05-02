@@ -75,7 +75,8 @@ const
     additionalDataFiles = `${themePath}/additionalData/**/*.json`,
     dataDest = `${dataDestFolder}/data.json`,
     manifestFile = `${distPath}/manifest.json`,
-    permalinkFile = `${dataDestFolder}/permalink.json`
+    permalinkFile = `${dataDestFolder}/permalink.json`,
+    slugFile = `${dataDestFolder}/slug.json`
 
 
 // fetch command line arguments
@@ -352,6 +353,7 @@ function permalink(done) {
     * Creat main obj
     */
     const peramlinkObj = {}
+    const slugObj = {}
 
     const config = JSON.parse(fs.readFileSync(`config.json`))
     glob.sync(path.join(dataPath, '/**/*.json'), {}).map((filepath) => {
@@ -377,6 +379,7 @@ function permalink(done) {
         * Get permalink
         */
         const permalink = `/${subfolder}${nameFile}.html`
+        const slug = nameFile
 
         /*
         * Check if obj for each univoqueId exist
@@ -385,9 +388,17 @@ function permalink(done) {
         const singleLocaleParmalinkObj = (data.univoqueId in peramlinkObj) ? peramlinkObj[data.univoqueId] : {}
 
         /*
+        * Check if obj for each univoqueId exist
+        * Rutun a new empty obj or the obj if exist
+        */
+        const singleSlugObj = (data.univoqueId in slugObj) ? slugObj[data.univoqueId] : {}
+
+        /*
         * Merge the new parmalinkObj with older one
+        * Merge the new slugObj with older one
         */
         peramlinkObj[data.univoqueId] = Object.assign( singleLocaleParmalinkObj, { [additionalData.lang] : permalink})
+        slugObj[data.univoqueId]= Object.assign( singleSlugObj, { [additionalData.lang] : slug})
 
 
     })
@@ -396,7 +407,10 @@ function permalink(done) {
     * DEBUG
     * gulp html -debug for debug
     */
-    if(arg.debug) console.log(peramlinkObj)
+    if(arg.debug) {
+        console.log(peramlinkObj)
+        console.log(slugObj)
+    }
 
     /*
     * Check if destination folder exist and save the file with permalink map
@@ -408,6 +422,7 @@ function permalink(done) {
     }
 
     fs.writeFileSync(permalinkFile, JSON.stringify(peramlinkObj));
+    fs.writeFileSync(slugFile, JSON.stringify(slugObj));
     done()
 
 }
@@ -491,6 +506,13 @@ function html(done) {
         permalink.permalinkMap = permalinkMap
         permalink.slug = nameFile
 
+        /*
+        Add slug map
+        */
+        const slugMap = JSON.parse(fs.readFileSync(slugFile))
+        const slugMapObj = {}
+        slugMapObj.slugMap = slugMap
+
 
         /*
         criticalcss
@@ -506,7 +528,7 @@ function html(done) {
         /*
         merge all json
         */
-        const allData = Object.assign({},critical, prodData, config, additionalData, permalink, relativePath, data, manifest);
+        const allData = Object.assign({},critical, prodData, config, additionalData, permalink, slugMapObj, relativePath, data, manifest);
 
 
         /*
