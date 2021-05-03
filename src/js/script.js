@@ -37,6 +37,7 @@ import { animate } from "../component/animate/js/animate.js"
 
 //TEST
 import { gsapTest } from "./test/gsapTest.js"
+import { axiosTest } from "./test/axiosTest.js"
 
 const body = document.querySelector('body')
 
@@ -54,6 +55,7 @@ mouseParallax.init();
 accordion.init();
 if( body.classList.contains('gsap') ) gsapTest.init();
 animate.init();
+axiosTest.init();
 
 
 // CUSTOM ACCORDION VIA JS

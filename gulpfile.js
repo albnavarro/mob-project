@@ -248,7 +248,9 @@ function js() {
         return rollup.rollup({
             input: './src/js/script.js',
             plugins: [
-                nodeResolve.nodeResolve(),
+                nodeResolve.nodeResolve({
+                    browser: true,
+                }),
                 commonjs(),
                 babel.babel({
                     babelHelpers: 'bundled',
@@ -270,7 +272,9 @@ function js() {
         return rollup.rollup({
             input: './src/js/script.js',
             plugins: [
-                nodeResolve.nodeResolve(),
+                nodeResolve.nodeResolve({
+                    browser: true,
+                }),
                 commonjs(),
                 babel.babel({
                     babelHelpers: 'bundled',
