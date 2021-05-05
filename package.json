@@ -4,7 +4,11 @@
   "description": "Blank project",
   "main": "gulpfile.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "gulp dev",
+    "build": "gulp build -prod",
+    "image": "gulp image",
+    "icons": "gulp icons",
+    "permalink": "gulp permalink"
   },
   "author": "Mobbu",
   "license": "MIT",

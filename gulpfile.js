@@ -660,32 +660,12 @@ function watch_files(done) {
 
 
 /*
-* TASk
-*/
-gulp.task("initializeCritical", initializeCritical)
-gulp.task("style", style)
-gulp.task("js", js)
-gulp.task("html", html)
-gulp.task("image", image)
-gulp.task("icons", icons)
-gulp.task("minifyAssetsLoading", minifyAssetsLoading)
-gulp.task("cleanDist", cleanDist)
-gulp.task("dist", dist)
-gulp.task("cleanAll", cleanAll)
-gulp.task("deleteEmptyDirectories", deleteEmptyDirectories)
-gulp.task("permalink", permalink)
-
-
-/*
 * BUILD TASK
-
-* gulp build
-* gulp build -debug -page "it/index.json"
-* ....
-* gulp build -prod -page "it/index.json"
 */
 
-gulp.task("build", gulp.series(
+const build = gulp.series(
+    cleanAll,
+    deleteEmptyDirectories,
     initializeCritical,
     icons,
     image,
@@ -699,23 +679,61 @@ gulp.task("build", gulp.series(
     criticalCss,
     dist,
     html
-))
-
+)
 
 /*
 * RESET BUILD
 */
 
-gulp.task("reset", gulp.series(
+const reset = gulp.series(
     cleanAll,
     deleteEmptyDirectories
-))
-
+)
 
 /*
 * WATCH
 */
-
-gulp.task('watch', gulp.parallel(
+const dev = gulp.series(build, gulp.parallel(
     browser_sync,
     watch_files))
+
+
+/*
+* TASk
+*/
+exports.initializeCritical = initializeCritical
+exports.style = style
+exports.js = js
+exports.html = html
+exports.image = image
+exports.icons = icons
+exports.cleanDist = cleanDist
+exports.dist = dist
+exports.cleanAll = cleanAll
+exports.deleteEmptyDirectories = deleteEmptyDirectories
+exports.permalink = permalink
+
+/*
+* MAIN TASK
+*/
+exports.build = build
+exports.reset = reset
+exports.dev = dev
+
+
+
+/*
+* gulp build
+* gulp build -debug -page "it/index.json"
+* ....
+* gulp build -prod -page "it/index.json"
+*/
+
+
+/*
+* npm run dev
+* npm run dev -- --debug
+* npm run build
+* npm run build -- --debug
+* .....
+*/
