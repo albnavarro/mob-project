@@ -360,8 +360,9 @@ function permalink(done) {
     const slugObj = {}
 
     const config = JSON.parse(fs.readFileSync(`config.json`))
-    glob.sync(path.join(dataPath, '/**/*.json'), {}).map((filepath) => {
+    const allPath = glob.sync(path.join(dataPath, '/**/*.json'))
 
+    allPath.forEach((filepath) => {
         const data = JSON.parse(fs.readFileSync(filepath))
 
         /*
@@ -403,9 +404,7 @@ function permalink(done) {
         */
         peramlinkObj[data.univoqueId] = Object.assign( singleLocaleParmalinkObj, { [additionalData.lang] : permalink})
         slugObj[data.univoqueId]= Object.assign( singleSlugObj, { [additionalData.lang] : slug})
-
-
-    })
+    });
 
     /*
     * DEBUG
@@ -569,17 +568,26 @@ function html(done) {
         }
 
 
-
-
         return gulp.src(templateDefault)
             .pipe(pug({
                 data: allData
             }))
             .pipe(rename(nameFile + '.html'))
             .pipe(gulp.dest(`${destPath}/${subfolder}`))
+            .on("end", function () {
+                if(arg.debug) {
+                    console.log('***************')
+                    console.log(`${nameFile} processed`)
+                }
+            });
     })
     return es.merge(streams)
         .on('end', () => {
+            if(arg.debug) {
+                console.log('***************')
+                console.log(`all pug processed`)
+                console.log('***************')
+            }
             done()
         })
 };
