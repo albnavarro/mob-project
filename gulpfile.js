@@ -431,166 +431,170 @@ function permalink(done) {
 }
 
 
+
 /*
 * CREATE PUG FILE
 */
+
 function html(done) {
     const config = JSON.parse(fs.readFileSync(`config.json`))
     const sourcePath =  (!arg.page) ? path.join(dataPath, '/**/*.json') :  path.join(dataPath, arg.page)
+    const streams = glob.sync(sourcePath)
 
-    const streams = glob.sync(sourcePath, {}).map((filepath) => {
+    const tasks = streams.map(filepath => {
+        return taskDone => {
 
-        /*
-        Get json data of each file
-        */
-        const data = JSON.parse(fs.readFileSync(filepath))
-
-
-        /*
-        Get file name
-        */
-        const nameFile = getNameFile(filepath)
+            /*
+            Get json data of each file
+            */
+            const data = JSON.parse(fs.readFileSync(filepath))
 
 
-        /*
-        Get data from each json defined in additonalPata propierties [ array ] if exist
-        */
-        const additionalData = extracAdditionalData(data)
+            /*
+            Get file name
+            */
+            const nameFile = getNameFile(filepath)
 
 
-        /*
-        Get prod abient value
-        */
-        const prodData = {}
-        prodData.isProd = (arg.prod) ? true : false;
+            /*
+            Get data from each json defined in additonalPata propierties [ array ] if exist
+            */
+            const additionalData = extracAdditionalData(data)
 
 
-        /*
-        Get manifest.json for asset
-        */
-        const manifest = {}
-        const manifestData = JSON.parse(fs.readFileSync(manifestFile))
-        manifest.manifest = manifestData
-
-        /*
-        Subfolder
-        Create folder in accordion of json folder position
-        regex form 'data/'' to last slash
-        return the exact path of json file
-        */
-        const subfolder = extracSubFolder(filepath,config,additionalData)
+            /*
+            Get prod abient value
+            */
+            const prodData = {}
+            prodData.isProd = (arg.prod) ? true : false;
 
 
-        /*
-        Create subfolder if not exist
-        */
-        if(!fs.existsSync(`${destPath}/${subfolder}`)){
-            fs.mkdirSync(`${destPath}/${subfolder}`, {
-                recursive: true
-            })
-        }
+            /*
+            Get manifest.json for asset
+            */
+            const manifest = {}
+            const manifestData = JSON.parse(fs.readFileSync(manifestFile))
+            manifest.manifest = manifestData
+
+            /*
+            Subfolder
+            Create folder in accordion of json folder position
+            regex form 'data/'' to last slash
+            return the exact path of json file
+            */
+            const subfolder = extracSubFolder(filepath,config,additionalData)
 
 
-        /*
-        Get relative path
-        */
-        const relativePath = {}
-        relativePath.relativePath = ( config.defaultLocales == additionalData.lang) ? `` : `/${additionalData.lang}`;
-
-
-        /*
-        Add permalink
-        */
-        const permalinkMap = JSON.parse(fs.readFileSync(permalinkFile))
-
-        const permalink = {}
-        permalink.permalink = `/${subfolder}${nameFile}.html`
-        permalink.staticPermalink = `${config.domain}${subfolder}${nameFile}.html`
-        permalink.permalinkMap = permalinkMap
-        permalink.slug = nameFile
-
-        /*
-        Add slug map
-        */
-        const slugMap = JSON.parse(fs.readFileSync(slugFile))
-        const slugMapObj = {}
-        slugMapObj.slugMap = slugMap
-
-
-        /*
-        criticalcss
-        */
-        const critical = {}
-        const criticalFile = `${cssDest}/critical/${subfolder}${nameFile}.css`
-        if (arg.prod && fs.existsSync(criticalFile)) {
-            const documentStyles = fs.readFileSync(criticalFile);
-            critical.documentStyles = documentStyles.toString()
-        }
-
-
-        /*
-        merge all json
-        */
-        const allData = Object.assign({},critical, prodData, config, additionalData, permalink, slugMapObj, relativePath, data, manifest);
-
-
-        /*
-        get template
-        */
-        const  templateDefault = ('template' in data)
-            ? `${themePath}/${data.template}.pug`
-            :`${themePath}/index.pug`;
-
-
-        /*
-        * remove propierties no more necessary
-        */
-        delete allData.additionalData;
-        delete allData.template;
-
-        /*
-        * DEBUG
-        * gulp html -debug for debug
-
-        es:
-        gulp html -prod
-        gulp html -debug -page "it/index.json"
-        gulp html -prod -page "it/index.json"
-
-        */
-        if(arg.debug) {
-            console.log()
-            console.log('***************')
-            console.log(nameFile)
-            console.log('***************')
-            console.log(util.inspect(allData, {showHidden: false, depth: null}))
-            console.log()
-        }
-
-
-        return gulp.src(templateDefault)
-            .pipe(pug({
-                data: allData
-            }))
-            .pipe(rename(nameFile + '.html'))
-            .pipe(gulp.dest(`${destPath}/${subfolder}`))
-            .on("end", function () {
-                if(arg.debug) {
-                    console.log('***************')
-                    console.log(`${nameFile} processed`)
-                }
-            });
-    })
-    return es.merge(streams)
-        .on('end', () => {
-            if(arg.debug) {
-                console.log('***************')
-                console.log(`all pug processed`)
-                console.log('***************')
+            /*
+            Create subfolder if not exist
+            */
+            if(!fs.existsSync(`${destPath}/${subfolder}`)){
+                fs.mkdirSync(`${destPath}/${subfolder}`, {
+                    recursive: true
+                })
             }
-            done()
-        })
-};
+
+
+            /*
+            Get relative path
+            */
+            const relativePath = {}
+            relativePath.relativePath = ( config.defaultLocales == additionalData.lang) ? `` : `/${additionalData.lang}`;
+
+
+            /*
+            Add permalink
+            */
+            const permalinkMap = JSON.parse(fs.readFileSync(permalinkFile))
+
+            const permalink = {}
+            permalink.permalink = `/${subfolder}${nameFile}.html`
+            permalink.staticPermalink = `${config.domain}${subfolder}${nameFile}.html`
+            permalink.permalinkMap = permalinkMap
+            permalink.slug = nameFile
+
+            /*
+            Add slug map
+            */
+            const slugMap = JSON.parse(fs.readFileSync(slugFile))
+            const slugMapObj = {}
+            slugMapObj.slugMap = slugMap
+
+
+            /*
+            criticalcss
+            */
+            const critical = {}
+            const criticalFile = `${cssDest}/critical/${subfolder}${nameFile}.css`
+            if (arg.prod && fs.existsSync(criticalFile)) {
+                const documentStyles = fs.readFileSync(criticalFile);
+                critical.documentStyles = documentStyles.toString()
+            }
+
+
+            /*
+            merge all json
+            */
+            const allData = Object.assign({},critical, prodData, config, additionalData, permalink, slugMapObj, relativePath, data, manifest);
+
+
+            /*
+            get template
+            */
+            const  templateDefault = ('template' in data)
+                ? `${themePath}/${data.template}.pug`
+                :`${themePath}/index.pug`;
+
+
+            /*
+            * remove propierties no more necessary
+            */
+            delete allData.additionalData;
+            delete allData.template;
+
+            /*
+            * DEBUG
+            * gulp html -debug for debug
+
+            es:
+            gulp html -prod
+            gulp html -debug -page "it/index.json"
+            gulp html -prod -page "it/index.json"
+
+            */
+            if(arg.debug) {
+                console.log()
+                console.log('***************')
+                console.log(nameFile)
+                console.log('***************')
+                console.log(util.inspect(allData, {showHidden: false, depth: null}))
+                console.log()
+            }
+
+            return gulp.src(templateDefault)
+                .pipe(pug({
+                    data: allData
+                }))
+                .pipe(rename(nameFile + '.html'))
+                .pipe(gulp.dest(`${destPath}/${subfolder}`))
+                .on("end", function () {
+                    if(arg.debug) {
+                        console.log('***************')
+                        console.log(`${nameFile} processed`)
+                    }
+                    taskDone()
+                });
+
+
+        }
+    })
+
+    return gulp.series(...tasks, seriesDone => {
+        seriesDone()
+        done()
+    })()
+}
+
 
 
 /*
