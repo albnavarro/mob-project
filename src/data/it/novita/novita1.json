@@ -1,0 +1,17 @@
+{
+    "template": "post",
+    "additionalData" : [
+        "locale/it",
+        "nav"
+    ],
+    "title" : "novitá 1",
+    "univoqueId" : "news1",
+    "parentUniqueId" : "news",
+    "export" : {
+        "category" : "novita",
+        "data" : {
+            "title" : "novitá 1",
+            "description" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus diam urna, sagittis sed diam vitae, aliquet ultricies sem. Quisque quam nibh, aliquet at cursus id, commodo vel urna."
+        }
+    }
+}

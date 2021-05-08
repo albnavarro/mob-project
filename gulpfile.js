@@ -76,7 +76,8 @@ const
     dataDest = `${dataDestFolder}/data.json`,
     manifestFile = `${distPath}/manifest.json`,
     permalinkFile = `${dataDestFolder}/permalink.json`,
-    slugFile = `${dataDestFolder}/slug.json`
+    slugFile = `${dataDestFolder}/slug.json`,
+    categoryFile = `${dataDestFolder}/category.json`
 
 
 // fetch command line arguments
@@ -331,7 +332,8 @@ function initializeCritical(done) {
 * CRITICAL CSS
 */
 function criticalCss(done) {
-    return gulp.src('www/**/*.html')
+    if (arg.prod) {
+        return gulp.src('www/**/*.html')
         .pipe(critical({
             base: 'www/',
             minify: true,
@@ -341,6 +343,7 @@ function criticalCss(done) {
             include: ['.lightbox', '.parallax-container', '.parallax-item', '.gaspHorizontal__card']
         }))
         .pipe(gulp.dest(`${cssDest}/critical`))
+    }
 
     done();
 };
@@ -429,6 +432,110 @@ function permalink(done) {
     done()
 
 }
+
+
+
+/*
+* CREATE CATEGORYMAP
+* it: {
+*     "articles": [
+*         { permalink: '....', data: '....', ... },
+*         { permalink: '....', data: '....', ... },
+ * }
+*/
+function category(done) {
+    /*
+    * Creat main obj
+    */
+    const categoryObj = {}
+
+    const config = JSON.parse(fs.readFileSync(`config.json`))
+    const allPath = glob.sync(path.join(dataPath, '/**/*.json'))
+
+    allPath.forEach((filepath) => {
+        const data = JSON.parse(fs.readFileSync(filepath))
+
+        /*
+        Get file name
+        */
+        const nameFile = getNameFile(filepath)
+
+        /*
+        Get data from each json defined in additonalPata propierties [ array ] if exist
+        */
+        const additionalData = extracAdditionalData(data)
+
+        /*
+        * Get subfolder according to to default languages
+        */
+        const subfolder  = extracSubFolder(filepath,config,additionalData)
+
+        /*
+        * Get permalink
+        */
+        const permalink = `/${subfolder}${nameFile}.html`
+        const slug = nameFile
+
+        /*
+        * Inizialize lang obj if not exixst
+        */
+        if (!(additionalData.lang in categoryObj)) categoryObj[additionalData.lang] = {}
+
+
+        /*
+        *  If there is data to eport
+        */
+        if (data.export && data.export.category) {
+
+            /*
+            *  create post obj
+            */
+            const post = {
+                "permalink" : permalink,
+                "data" : data.export.data
+            }
+
+            /*
+            *  get category in categoryObj[additionalData.lang] if exist or a ampty array
+            */
+            const categorySingleObj = (data.export.category in categoryObj[additionalData.lang]) ? categoryObj[additionalData.lang][data.export.category] : []
+
+            /*
+            *  Copy the array, and push in new post
+            */
+            const postArray = [ ... categorySingleObj ]
+            postArray.push(post)
+
+            /*
+            *  Assign the final array
+            */
+            categoryObj[additionalData.lang][data.export.category] = postArray
+        }
+
+    });
+
+    /*
+    * DEBUG
+    * gulp html -debug for debug
+    */
+    if(arg.debug) {
+        console.log(util.inspect(categoryObj, {showHidden: false, depth: null}))
+    }
+
+    /*
+    * Check if destination folder exist and save the file with permalink map
+    */
+    if(!fs.existsSync(dataDestFolder)){
+        fs.mkdirSync(dataDestFolder, {
+            recursive: true
+        })
+    }
+
+    fs.writeFileSync(categoryFile, JSON.stringify(categoryObj));
+    done()
+}
+
+
 
 
 
@@ -522,6 +629,44 @@ function html(done) {
 
 
             /*
+            Add categry post map
+            */
+            const categoryObj = {}
+            if(data.import) {
+                const categoryMap = JSON.parse(fs.readFileSync(categoryFile))
+                categoryObj.posts = {}
+
+                /*
+                loop thru all catogory defined in {page}.json import propierties
+                */
+                for (const posts of data.import) {
+                    /*
+                    Check if category {posts} defined in {page}.json exist in categoryMap[lang] json file
+                    if not, return an empty obj to avoid error
+                    */
+                    const postsObj = ( categoryMap[additionalData.lang][posts] ) ? categoryMap[additionalData.lang][posts] : {}
+
+                    /*
+                    Assign catogory post list
+                    */
+                    categoryObj.posts[posts] = postsObj
+                }
+
+                /*
+                Clean final data obj
+                */
+                delete data.import;
+            }
+
+
+            /*
+            Clean final data obj if is post
+            */
+            if(data.export) {
+                delete data.export;
+            }
+
+            /*
             criticalcss
             */
             const critical = {}
@@ -535,7 +680,7 @@ function html(done) {
             /*
             merge all json
             */
-            const allData = Object.assign({},critical, prodData, config, additionalData, permalink, slugMapObj, relativePath, data, manifest);
+            const allData = Object.assign({},critical, prodData, config, additionalData, permalink, slugMapObj, categoryObj, relativePath, data, manifest);
 
 
             /*
@@ -686,6 +831,7 @@ const build = gulp.series(
     js,
     cleanDist,
     dist,
+    category,
     permalink,
     html,
     criticalCss,
@@ -724,6 +870,7 @@ exports.dist = dist
 exports.cleanAll = cleanAll
 exports.deleteEmptyDirectories = deleteEmptyDirectories
 exports.permalink = permalink
+exports.category = category
 
 /*
 * MAIN TASK

@@ -13,18 +13,8 @@
                     "id" : "fixed"
                 },
                 {
-                    "label" : "test",
-                    "id" : "#",
-                    "children" : [
-                        {
-                            "label" : "test",
-                            "id" : "#"
-                        },
-                        {
-                            "label" : "test",
-                            "id" : "#"
-                        }
-                    ]
+                    "label" : "mouseParallax",
+                    "id" : "mouseParallax"
                 }
             ]
         },
@@ -93,34 +83,16 @@
             ]
         },
         {
-            "label" : "mouseParallax",
-            "id" : "mouseParallax",
+            "label" : "archive",
+            "id" : "archive",
             "children" : [
                 {
-                    "label" : "test",
-                    "id" : "#"
+                    "label" : "articles",
+                    "id" : "articles"
                 },
                 {
-                    "label" : "test",
-                    "id" : "#",
-                    "children" : [
-                        {
-                            "label" : "test",
-                            "id" : "#"
-                        },
-                        {
-                            "label" : "test",
-                            "id" : "#"
-                        },
-                        {
-                            "label" : "test",
-                            "id" : "#"
-                        }
-                    ]
-                },
-                {
-                    "label" : "test",
-                    "id" : "#"
+                    "label" : "news",
+                    "id" : "news"
                 }
             ]
         }

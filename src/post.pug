@@ -1,0 +1,23 @@
+<!doctype html>
+html
+    head
+        include pug/head.pug
+
+    body
+        div(id="spriteSvg" data-svg="/assets/svg/svg.svg")
+            
+        header
+            .container
+                include pug/langSelector.pug
+            .container.menu-container.menu-container--top
+                include pug/navigation.pug
+        main
+            .container
+                div
+                    a(href=permalinkMap[parentUniqueId][lang])
+                        |back
+                div
+                    |!{title}
+                
+        include pug/footer.pug
+        

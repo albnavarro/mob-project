@@ -1,0 +1,13 @@
+{
+    "template": "archive",
+    "additionalData" : [
+        "locale/en",
+        "nav"
+    ],
+    "univoqueId" : "archive",
+    "import" : [
+        "news",
+        "articles",
+        "nonEsistenteCategoria"
+    ]
+}

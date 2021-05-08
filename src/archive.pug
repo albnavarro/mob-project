@@ -1,0 +1,26 @@
+<!doctype html>
+html
+    head
+        include pug/head.pug
+
+    body
+        div(id="spriteSvg" data-svg="/assets/svg/svg.svg")
+            
+        header
+            .container
+                include pug/langSelector.pug
+            .container.menu-container.menu-container--top
+                include pug/navigation.pug
+        main
+            .container
+                each category, key in posts
+                    each post, key in category
+                        div
+                            a(href=post.permalink)
+                                |!{post.data.title}
+                            p
+                                |!{post.data.description}
+                
+                
+        include pug/footer.pug
+        
