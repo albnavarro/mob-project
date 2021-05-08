@@ -485,8 +485,10 @@ function category(done) {
             */
             const post = {
                 "permalink" : permalink,
+                "date" : data.exportPost.date,
                 "data" : data.exportPost.data
             }
+
 
             /*
             *  get category in categoryObj[additionalData.lang] if exist or a ampty array
@@ -521,8 +523,8 @@ function category(done) {
             *  Order post by date
             */
             posts.sort(function compare(a, b) {
-              const dateA = new Date(a.data.date);
-              const dateB = new Date(b.data.date);
+              const dateA = new Date(a.date);
+              const dateB = new Date(b.date);
               return dateA - dateB;
             });
         }
