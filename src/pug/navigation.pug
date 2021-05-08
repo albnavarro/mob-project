@@ -3,7 +3,7 @@ mixin list(item)
         - const heaveChildrenClass = (val.children) ? 'menu-item menu-item-has-children' : 'menu-item'
         
         li(class=heaveChildrenClass)
-            - const isValidLink = (val.id !== '#') ? true : false;
+            - const isValidLink = (permalinkMap[val.id] && permalinkMap[val.id][lang]) ? true : false;
             
             if isValidLink
                 a(href=permalinkMap[val.id][lang])

@@ -16,10 +16,13 @@ html
                 each category, key in posts
                     each post, key in category
                         div
+                            p
+                                |!{post.data.date}
                             a(href=post.permalink)
                                 |!{post.data.title}
                             p
                                 |!{post.data.description}
+                            hr
                 
                 
         include pug/footer.pug

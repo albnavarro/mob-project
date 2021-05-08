@@ -1,4 +1,5 @@
 each val, key in locales
     span
-        a(href=permalinkMap[univoqueId][key])
-         |!{key}&nbsp-&nbsp
+        if key
+            a(href=permalinkMap[univoqueId][key])
+             |!{key}&nbsp-&nbsp

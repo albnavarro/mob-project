@@ -6,7 +6,7 @@
         },
         {
             "label" : "parallax",
-            "id" : "#",
+            "id" : "",
             "children" : [
                 {
                     "label" : "sticky test",
@@ -20,7 +20,7 @@
         },
         {
             "label" : "gsap",
-            "id" : "#",
+            "id" : "",
             "children" : [
                 {
                     "label" : "test",
@@ -32,7 +32,7 @@
                 },
                 {
                     "label" : "test",
-                    "id" : "#",
+                    "id" : "",
                     "children" : [
                         {
                             "label" : "test",
@@ -56,7 +56,7 @@
             "children" : [
                 {
                     "label" : "test",
-                    "id" : "#"
+                    "id" : ""
                 },
                 {
                     "label" : "test",
@@ -64,21 +64,21 @@
                     "children" : [
                         {
                             "label" : "test",
-                            "id" : "#"
+                            "id" : ""
                         },
                         {
                             "label" : "test",
-                            "id" : "#"
+                            "id" : ""
                         },
                         {
                             "label" : "test",
-                            "id" : "#"
+                            "id" : ""
                         }
                     ]
                 },
                 {
                     "label" : "test",
-                    "id" : "#"
+                    "id" : ""
                 }
             ]
         },

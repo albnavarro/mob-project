@@ -3,36 +3,30 @@
 const
     util = require('util'),
     path = require('path'),
+    fs = require('fs'),
+    del = require('del'),
+    glob = require('glob'),
+    deleteEmpty = require('delete-empty'),
     concat = require('gulp-concat'),
     gulp = require('gulp'),
     sass = require('gulp-sass'),
     sourcemaps = require('gulp-sourcemaps'),
     watch = require('gulp-watch'),
-    wrap = require('gulp-wrap'),
     critical = require('critical').stream,
     gulpif = require('gulp-if'),
     cssmin = require('gulp-cssmin'),
     postcss = require('gulp-postcss'),
     rename = require('gulp-rename'),
-    request = require('request'),
     svgmin = require('gulp-svgmin'),
     svgstore = require('gulp-svgstore'),
     uglify = require('gulp-uglify'),
     browserSync = require('browser-sync').create(),
-    fs = require('fs'),
-    specialHtml = require('gulp-special-html'),
-    htmlmin = require('gulp-htmlmin'),
     imagemin = require('gulp-imagemin'),
     pug = require('gulp-pug'),
-    // babel = require("gulp-babel"),
     rev = require('gulp-rev'),
     revdel = require('rev-del'),
-    del = require('del'),
     merge = require('gulp-merge-json'),
     replace = require('gulp-string-replace'),
-    glob = require('glob'),
-    es = require('event-stream'),
-    deleteEmpty = require('delete-empty'),
     reload = browserSync.reload,
 
     rollup = require('rollup'),
@@ -73,7 +67,6 @@ const
     allPugFiles = `${themePath}/**/*.pug`,
     dataFiles = `${themePath}/data/**/*.json`,
     additionalDataFiles = `${themePath}/additionalData/**/*.json`,
-    dataDest = `${dataDestFolder}/data.json`,
     manifestFile = `${distPath}/manifest.json`,
     permalinkFile = `${dataDestFolder}/permalink.json`,
     slugFile = `${dataDestFolder}/slug.json`,
@@ -485,20 +478,20 @@ function category(done) {
         /*
         *  If there is data to eport
         */
-        if (data.export && data.export.category) {
+        if (data.exportPost && data.exportPost.category) {
 
             /*
             *  create post obj
             */
             const post = {
                 "permalink" : permalink,
-                "data" : data.export.data
+                "data" : data.exportPost.data
             }
 
             /*
             *  get category in categoryObj[additionalData.lang] if exist or a ampty array
             */
-            const categorySingleObj = (data.export.category in categoryObj[additionalData.lang]) ? categoryObj[additionalData.lang][data.export.category] : []
+            const categorySingleObj = (data.exportPost.category in categoryObj[additionalData.lang]) ? categoryObj[additionalData.lang][data.exportPost.category] : []
 
             /*
             *  Copy the array, and push in new post
@@ -509,10 +502,31 @@ function category(done) {
             /*
             *  Assign the final array
             */
-            categoryObj[additionalData.lang][data.export.category] = postArray
+            categoryObj[additionalData.lang][data.exportPost.category] = postArray
         }
 
     });
+
+    /*
+    *  For each lanugages
+    */
+    for (const [key, lang] of Object.entries(categoryObj)) {
+
+        /*
+        *  For each category
+        */
+        for (const [key, posts] of Object.entries(lang)) {
+
+            /*
+            *  Order post by date
+            */
+            posts.sort(function compare(a, b) {
+              const dateA = new Date(a.data.date);
+              const dateB = new Date(b.data.date);
+              return dateA - dateB;
+            });
+        }
+    }
 
     /*
     * DEBUG
@@ -660,13 +674,6 @@ function html(done) {
 
 
             /*
-            Clean final data obj if is post
-            */
-            if(data.export) {
-                delete data.export;
-            }
-
-            /*
             criticalcss
             */
             const critical = {}
@@ -810,7 +817,7 @@ function deleteEmptyDirectories(done) {
 function watch_files(done) {
     gulp.watch([scssFiles, componentscssFiles], style)
     gulp.watch([jsFiles, componentJsFiles], gulp.series(js, reloadPage))
-    gulp.watch([allPugFiles, dataFiles, additionalDataFiles], gulp.series(html, reloadPage))
+    gulp.watch([allPugFiles, dataFiles, additionalDataFiles], gulp.series(category, permalink, html, reloadPage))
 
     done();
 }

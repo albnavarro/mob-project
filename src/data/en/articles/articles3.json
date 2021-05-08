@@ -1,17 +1,17 @@
 {
     "template": "post",
     "additionalData" : [
-        "locale/it",
+        "locale/en",
         "nav"
     ],
-    "title" : "novitá 1",
-    "univoqueId" : "news1",
-    "parentUniqueId" : "news",
+    "univoqueId" : "articles3",
+    "title" : "article 3",
+    "parentUniqueId" : "articles",
     "exportPost" : {
-        "category" : "novita",
+        "category" : "articles",
         "data" : {
-            "date" : "Mon Oct 28 2021 00:00:00 GMT",
-            "title" : "novitá 1",
+            "date" : "Mon Oct 10 2021 11:00:00 GMT",
+            "title" : "articles 3",
             "description" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus diam urna, sagittis sed diam vitae, aliquet ultricies sem. Quisque quam nibh, aliquet at cursus id, commodo vel urna."
         }
     }
