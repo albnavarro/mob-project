@@ -1,8 +1,8 @@
 {
     "template": "mouseParallax",
     "additionalData" : [
-        "locale/en",
-        "nav"
+        "locale/en.json",
+        "nav.json"
     ],
     "univoqueId" : "mouseParallax",
     "slug" : "mouse Parallax",

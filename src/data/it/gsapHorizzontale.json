@@ -1,8 +1,8 @@
 {
     "template": "gsapHorizontal",
     "additionalData" : [
-        "locale/it",
-        "nav"
+        "locale/it.json",
+        "nav.json"
     ],
     "univoqueId" : "gsapHorizontal",
     "slug" : "gsap horizzontale",

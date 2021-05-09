@@ -1,8 +1,8 @@
 {
     "template": "susy",
     "additionalData" : [
-        "locale/it",
-        "nav"
+        "locale/it.json",
+        "nav.json"
     ],
     "univoqueId" : "susy",
     "slug" : "susanna",

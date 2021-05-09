@@ -1,8 +1,8 @@
 {
     "template": "move3D",
     "additionalData" : [
-        "locale/en",
-        "nav"
+        "locale/en.json",
+        "nav.json"
     ],
     "univoqueId" : "move3D",
     "slug" : "move3D",

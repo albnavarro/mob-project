@@ -1,8 +1,8 @@
 {
     "template": "archive",
     "additionalData" : [
-        "locale/en",
-        "nav"
+        "locale/en.json",
+        "nav.json"
     ],
     "univoqueId" : "articles",
     "slug" : "articles",

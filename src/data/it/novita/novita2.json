@@ -1,8 +1,8 @@
 {
     "template": "post",
     "additionalData" : [
-        "locale/it",
-        "nav"
+        "locale/it.json",
+        "nav.json"
     ],
     "univoqueId" : "news2",
     "slug" : "novitá 2",

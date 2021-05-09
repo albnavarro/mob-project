@@ -1,8 +1,8 @@
 {
     "additionalData": [
-        "locale/it",
-        "string/it",
-        "nav"
+        "locale/it.json",
+        "string/it.json",
+        "nav.json"
     ],
     "univoqueId" : "index",
     "slug" : "home page",

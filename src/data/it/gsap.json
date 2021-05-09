@@ -1,8 +1,8 @@
 {
     "template": "gsap",
     "additionalData" : [
-        "locale/it",
-        "nav"
+        "locale/it.json",
+        "nav.json"
     ],
     "univoqueId" : "gsap",
     "slug" : "gsap",

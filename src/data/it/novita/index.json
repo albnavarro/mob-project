@@ -1,8 +1,8 @@
 {
     "template": "archive",
     "additionalData" : [
-        "locale/it",
-        "nav"
+        "locale/it.json",
+        "nav.json"
     ],
     "univoqueId" : "news",
     "slug" : "novitá",

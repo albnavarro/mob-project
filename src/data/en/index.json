@@ -1,9 +1,9 @@
 {
     "additionalData" : [
-        "locale/en",
-        "string/en",
-        "nav",
-        "nonEsistenteFile"
+        "locale/en.json",
+        "string/en.json",
+        "nav.json",
+        "nonEsistenteFile.json"
     ],
     "univoqueId" : "index",
     "slug" : "home page",

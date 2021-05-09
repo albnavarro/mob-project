@@ -1,8 +1,8 @@
 {
     "template": "post",
     "additionalData" : [
-        "locale/it",
-        "nav"
+        "locale/it.json",
+        "nav.json"
     ],
     "univoqueId" : "articles1",
     "slug" : "artocolo 1",
