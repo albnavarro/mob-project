@@ -4,7 +4,7 @@
         "locale/it.json",
         "nav.json"
     ],
-    "univoqueId" : "404",
+    "univoqueId" : "error404",
     "slug" : "404",
     "description" : "custom description"
 }

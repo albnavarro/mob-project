@@ -424,8 +424,12 @@ function permalink(done) {
         /*
         Get file name
         */
-        const nameFile = getNameFile(filepath)
+        const originalNameFile = getNameFile(filepath)
 
+        /*
+        In production mode 'index' is removed in permalink
+        */
+        const nameFile = (arg.prod && originalNameFile === 'index') ? '' : originalNameFile
         /*
         Get data from each json defined in additonalPata propierties [ array ] if exist
         */
