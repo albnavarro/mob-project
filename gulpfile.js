@@ -104,6 +104,7 @@ const arg = (argList => {
 })(process.argv);
 
 
+
 /*
 Check if mandatory propierties in {page}.joson is right
 */
@@ -168,6 +169,14 @@ function getNameFile(filepath) {
     return filepath.split('/').pop().split('.').shift()
 }
 
+
+/*
+* Usa permalink without .html on server in production mode
+* .htaccess riles RewriteCond %{REQUEST_FILENAME}\.html -f
+*/
+function getExtensionFile() {
+    return (arg.prod) ? "" :  ".html"
+}
 
 
 /*
@@ -431,7 +440,7 @@ function permalink(done) {
             /*
             * Get permalink
             */
-            const permalink = `/${subfolder}${nameFile}.html`
+            const permalink = `/${subfolder}${nameFile}${getExtensionFile()}`
             const slug = data.slug
 
             /*
@@ -520,7 +529,7 @@ function category(done) {
         /*
         * Get permalink
         */
-        const permalink = `/${subfolder}${nameFile}.html`
+        const permalink = `/${subfolder}${nameFile}${getExtensionFile()}`
         const slug = nameFile
 
         /*
@@ -685,8 +694,8 @@ function html(done) {
             const permalinkMap = JSON.parse(fs.readFileSync(permalinkFile))
 
             const permalink = {}
-            permalink.permalink = `/${subfolder}${nameFile}.html`
-            permalink.staticPermalink = `${config.domain}${subfolder}${nameFile}.html`
+            permalink.permalink = `/${subfolder}${nameFile}${getExtensionFile()}`
+            permalink.staticPermalink = `${config.domain}${subfolder}${nameFile}${getExtensionFile()}`
             permalink.permalinkMap = permalinkMap
             permalink.slug = data.slug
 
