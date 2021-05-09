@@ -157,7 +157,12 @@ function extracAdditionalData(data) {
     the reduce function retur an obj from the array
     */
     const additionalData = additionalDataFile.map((item) => {
-            return JSON.parse(fs.readFileSync(`${additionalDataPath}/${item}.json`))
+        const filepath = `${additionalDataPath}/${item}.json`
+            if(fs.existsSync(filepath)) {
+                return JSON.parse(fs.readFileSync(`${additionalDataPath}/${item}.json`))
+            } else {
+                return []
+            }
         }).reduce((a, c) => a = {...a, ...c}, {})
 
     return additionalData

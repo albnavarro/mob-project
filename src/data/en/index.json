@@ -2,7 +2,8 @@
     "additionalData" : [
         "locale/en",
         "string/en",
-        "nav"
+        "nav",
+        "nonEsistenteFile"
     ],
     "univoqueId" : "index",
     "slug" : "home page",
