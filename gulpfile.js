@@ -103,6 +103,52 @@ const arg = (argList => {
 
 })(process.argv);
 
+
+/*
+Check if mandatory propierties in {page}.joson is right
+*/
+function debugMandatoryPropierties(data) {
+    if(!('template' in data)) {
+        console.log('*****')
+        console.log(`template propierties is mandatory`)
+        console.log(`permalink: ${data.permalink}`)
+        console.log('*****')
+        process.exit(0);
+    }
+
+    if(data.lang === undefined) {
+        console.log('*****')
+        console.log(`lang propierties is mandatory`)
+        console.log(`permalink: ${data.permalink}`)
+        console.log('*****')
+        process.exit(0);
+    }
+
+    if(!('univoqueId' in data)) {
+        console.log('*****')
+        console.log(`univoqueId propierties is mandatory`)
+        console.log(`permalink: ${data.permalink}`)
+        console.log('*****')
+        process.exit(0);
+    }
+
+    if(!('description' in data)) {
+        console.log('*****')
+        console.log(`description propierties is mandatory`)
+        console.log(`permalink: ${data.permalink}`)
+        console.log('*****')
+        process.exit(0);
+    }
+
+    if(data.slug === undefined) {
+        console.log('*****')
+        console.log(`slug propierties is mandatory`)
+        console.log(`permalink: ${data.permalink}`)
+        console.log('*****')
+        process.exit(0);
+    }
+}
+
 /*
 * HELPER FUNCTION
 */
@@ -381,30 +427,33 @@ function permalink(done) {
         */
         const subfolder  = extracSubFolder(filepath,config,additionalData)
 
-        /*
-        * Get permalink
-        */
-        const permalink = `/${subfolder}${nameFile}.html`
-        const slug = data.slug
+        if (data.univoqueId && additionalData.lang) {
+            /*
+            * Get permalink
+            */
+            const permalink = `/${subfolder}${nameFile}.html`
+            const slug = data.slug
 
-        /*
-        * Check if obj for each univoqueId exist
-        * Rutun a new empty obj or the obj if exist
-        */
-        const singleLocaleParmalinkObj = (data.univoqueId in peramlinkObj) ? peramlinkObj[data.univoqueId] : {}
+            /*
+            * Check if obj for each univoqueId exist
+            * Rutun a new empty obj or the obj if exist
+            */
+            const singleLocaleParmalinkObj = (data.univoqueId in peramlinkObj) ? peramlinkObj[data.univoqueId] : {}
 
-        /*
-        * Check if obj for each univoqueId exist
-        * Rutun a new empty obj or the obj if exist
-        */
-        const singleSlugObj = (data.univoqueId in slugObj) ? slugObj[data.univoqueId] : {}
+            /*
+            * Check if obj for each univoqueId exist
+            * Rutun a new empty obj or the obj if exist
+            */
+            const singleSlugObj = (data.univoqueId in slugObj) ? slugObj[data.univoqueId] : {}
 
-        /*
-        * Merge the new parmalinkObj with older one
-        * Merge the new slugObj with older one
-        */
-        peramlinkObj[data.univoqueId] = Object.assign( singleLocaleParmalinkObj, { [additionalData.lang] : permalink})
-        slugObj[data.univoqueId]= Object.assign( singleSlugObj, { [additionalData.lang] : slug})
+            /*
+            * Merge the new parmalinkObj with older one
+            * Merge the new slugObj with older one
+            */
+            peramlinkObj[data.univoqueId] = Object.assign( singleLocaleParmalinkObj, { [additionalData.lang] : permalink})
+            slugObj[data.univoqueId]= Object.assign( singleSlugObj, { [additionalData.lang] : slug})
+        }
+
     });
 
     /*
@@ -483,7 +532,7 @@ function category(done) {
         /*
         *  If there is data to eport
         */
-        if (data.exportPost && data.exportPost.category) {
+        if (data.exportPost && data.exportPost.category && additionalData.lang) {
 
             /*
             *  create post obj
@@ -639,7 +688,7 @@ function html(done) {
             permalink.permalink = `/${subfolder}${nameFile}.html`
             permalink.staticPermalink = `${config.domain}${subfolder}${nameFile}.html`
             permalink.permalinkMap = permalinkMap
-            permalink.slug = nameFile
+            permalink.slug = data.slug
 
             /*
             Add slug map
@@ -653,7 +702,7 @@ function html(done) {
             Add categry post map
             */
             const categoryObj = {}
-            if(data.importPost) {
+            if(data.importPost && additionalData.lang) {
                 const categoryMap = JSON.parse(fs.readFileSync(categoryFile))
                 categoryObj.posts = {}
 
@@ -700,16 +749,19 @@ function html(done) {
             /*
             get template
             */
-            const  templateDefault = ('template' in data)
-                ? `${themePath}/${data.template}.pug`
-                :`${themePath}/index.pug`;
+            const template = `${themePath}/${data.template}.pug`
 
+            /*
+            Check if mandatory propierties in {page}.joson is right
+            */
+            debugMandatoryPropierties(allData);
 
             /*
             * remove propierties no more necessary
             */
             delete allData.additionalData;
             delete allData.template;
+
 
             /*
             * DEBUG
@@ -730,7 +782,7 @@ function html(done) {
                 console.log()
             }
 
-            return gulp.src(templateDefault)
+            return gulp.src(template)
                 .pipe(pug({
                     data: allData
                 }))

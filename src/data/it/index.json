@@ -1,4 +1,5 @@
 {
+    "template": "index",
     "additionalData": [
         "locale/it.json",
         "string/it.json",
