@@ -7,6 +7,7 @@
     "univoqueId" : "news1",
     "slug" : "news 1",
     "title" : "news 1",
+    "description" : "custom description",
     "parentUniqueId" : "news",
     "exportPost" : {
         "category" : "news",

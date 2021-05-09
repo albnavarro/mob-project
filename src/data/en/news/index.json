@@ -6,6 +6,7 @@
     ],
     "univoqueId" : "news",
     "slug" : "news",
+    "description" : "custom description",
     "importPost" : [
         "news"
     ]

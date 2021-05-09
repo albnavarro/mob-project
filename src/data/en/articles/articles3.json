@@ -6,6 +6,7 @@
     ],
     "univoqueId" : "articles3",
     "slug" : "article 3",
+    "description" : "custom description",
     "title" : "article 3",
     "parentUniqueId" : "articles",
     "exportPost" : {

@@ -1,5 +1,6 @@
 {
     "domain" : "http://localhost:3000/",
+    "siteName" : "Mob project",
     "locales" : {
         "en": {
             "name" : "English",

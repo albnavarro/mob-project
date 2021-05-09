@@ -6,6 +6,7 @@
     ],
     "univoqueId" : "news",
     "slug" : "novitá",
+    "description" : "custom description",
     "importPost" : [
         "novita"
     ]

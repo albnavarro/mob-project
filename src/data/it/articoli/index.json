@@ -6,6 +6,7 @@
     ],
     "univoqueId" : "articles",
     "slug" : "articoli",
+    "description" : "custom description",
     "importPost" : [
         "articoli"
     ]

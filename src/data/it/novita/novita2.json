@@ -6,6 +6,7 @@
     ],
     "univoqueId" : "news2",
     "slug" : "novitá 2",
+    "description" : "custom description",
     "title" : "novitá 2",
     "parentUniqueId" : "news",
     "exportPost" : {

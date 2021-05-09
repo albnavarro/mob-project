@@ -6,6 +6,7 @@
     ],
     "univoqueId" : "archive",
     "slug" : "archivio",
+    "description" : "custom description",
     "importPost" : [
         "novita",
         "articoli"
