@@ -1,98 +1,80 @@
 {
     "navigation": [
         {
-            "label" : "home",
-            "id" : "index"
+            "label" : "",
+            "univoqueId" : "index"
         },
         {
             "label" : "parallax",
-            "id" : "",
+            "univoqueId" : "",
             "children" : [
                 {
-                    "label" : "sticky test",
-                    "id" : "fixed"
+                    "label" : "",
+                    "univoqueId" : "fixed"
                 },
                 {
-                    "label" : "mouseParallax",
-                    "id" : "mouseParallax"
+                    "label" : "",
+                    "univoqueId" : "mouseParallax"
                 }
             ]
         },
         {
             "label" : "gsap",
-            "id" : "",
+            "univoqueId" : "",
             "children" : [
                 {
-                    "label" : "test",
-                    "id" : "gsap"
+                    "label" : "",
+                    "univoqueId" : "gsap"
                 },
                 {
-                    "label" : "horzontal",
-                    "id" : "gsapHorizontal"
-                },
-                {
-                    "label" : "test",
-                    "id" : "",
-                    "children" : [
-                        {
-                            "label" : "test",
-                            "id" : "#"
-                        },
-                        {
-                            "label" : "test",
-                            "id" : "#"
-                        },
-                        {
-                            "label" : "test",
-                            "id" : "#"
-                        }
-                    ]
+                    "label" : "",
+                    "univoqueId" : "gsapHorizontal"
                 }
             ]
         },
         {
-            "label" : "move3D",
-            "id" : "move3D",
+            "label" : "",
+            "univoqueId" : "move3D",
             "children" : [
                 {
                     "label" : "test",
-                    "id" : ""
+                    "univoqueId" : ""
                 },
                 {
                     "label" : "test",
-                    "id" : "#",
+                    "univoqueId" : "#",
                     "children" : [
                         {
                             "label" : "test",
-                            "id" : ""
+                            "univoqueId" : ""
                         },
                         {
                             "label" : "test",
-                            "id" : ""
+                            "univoqueId" : ""
                         },
                         {
                             "label" : "test",
-                            "id" : ""
+                            "univoqueId" : ""
                         }
                     ]
                 },
                 {
                     "label" : "test",
-                    "id" : ""
+                    "univoqueId" : ""
                 }
             ]
         },
         {
-            "label" : "archive",
-            "id" : "archive",
+            "label" : "",
+            "univoqueId" : "archive",
             "children" : [
                 {
-                    "label" : "articles",
-                    "id" : "articles"
+                    "label" : "",
+                    "univoqueId" : "articles"
                 },
                 {
-                    "label" : "news",
-                    "id" : "news"
+                    "label" : "",
+                    "univoqueId" : "news"
                 }
             ]
         }

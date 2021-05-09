@@ -4,5 +4,6 @@
         "locale/it",
         "nav"
     ],
-    "univoqueId" : "move3D"
+    "univoqueId" : "move3D",
+    "slug" : "muovi 3D"
 }

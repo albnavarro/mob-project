@@ -4,5 +4,6 @@
         "locale/en",
         "nav"
     ],
-    "univoqueId" : "susy"
+    "univoqueId" : "susy",
+    "slug" : "susy"
 }

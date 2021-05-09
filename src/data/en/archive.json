@@ -5,7 +5,8 @@
         "nav"
     ],
     "univoqueId" : "archive",
-    "import" : [
+    "slug" : "archive",
+    "importPost" : [
         "news",
         "articles",
         "nonEsistenteCategoria"

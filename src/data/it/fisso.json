@@ -4,5 +4,6 @@
         "locale/it",
         "nav"
     ],
-    "univoqueId" : "fixed"
+    "univoqueId" : "fixed",
+    "slug" : "fixed"
 }

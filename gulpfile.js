@@ -380,7 +380,7 @@ function permalink(done) {
         * Get permalink
         */
         const permalink = `/${subfolder}${nameFile}.html`
-        const slug = nameFile
+        const slug = data.slug
 
         /*
         * Check if obj for each univoqueId exist
@@ -648,14 +648,14 @@ function html(done) {
             Add categry post map
             */
             const categoryObj = {}
-            if(data.import) {
+            if(data.importPost) {
                 const categoryMap = JSON.parse(fs.readFileSync(categoryFile))
                 categoryObj.posts = {}
 
                 /*
                 loop thru all catogory defined in {page}.json import propierties
                 */
-                for (const posts of data.import) {
+                for (const posts of data.importPost) {
                     /*
                     Check if category {posts} defined in {page}.json exist in categoryMap[lang] json file
                     if not, return an empty obj to avoid error
@@ -671,7 +671,7 @@ function html(done) {
                 /*
                 Clean final data obj
                 */
-                delete data.import;
+                delete data.importPost;
             }
 
 

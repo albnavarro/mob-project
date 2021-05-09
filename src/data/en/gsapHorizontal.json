@@ -4,5 +4,6 @@
         "locale/en",
         "nav"
     ],
-    "univoqueId" : "gsapHorizontal"
+    "univoqueId" : "gsapHorizontal",
+    "slug" : "gsap Horizontal"
 }

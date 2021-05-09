@@ -5,6 +5,7 @@
         "nav"
     ],
     "univoqueId" : "articles3",
+    "slug" : "article 3",
     "title" : "article 3",
     "parentUniqueId" : "articles",
     "exportPost" : {

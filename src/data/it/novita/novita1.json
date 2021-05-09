@@ -4,9 +4,10 @@
         "locale/it",
         "nav"
     ],
-    "title" : "novitá 1",
     "univoqueId" : "news1",
+    "slug" : "novitá 1",
     "parentUniqueId" : "news",
+    "title" : "novitá 1",
     "exportPost" : {
         "category" : "novita",
         "date" : "Mon Oct 28 2021 00:00:00 GMT",

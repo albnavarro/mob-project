@@ -4,8 +4,9 @@
         "locale/it",
         "nav"
     ],
-    "title" : "novitá 2",
     "univoqueId" : "news2",
+    "slug" : "novitá 2",
+    "title" : "novitá 2",
     "parentUniqueId" : "news",
     "exportPost" : {
         "category" : "novita",
