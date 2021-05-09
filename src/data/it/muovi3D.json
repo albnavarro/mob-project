@@ -1,10 +1,10 @@
 {
     "template": "move3D",
-    "additionalData" : [
-        "locale/it.json",
-        "nav.json"
-    ],
+    "lang" : "it",
     "univoqueId" : "move3D",
     "slug" : "muovi 3D",
-    "description" : "custom description"
+    "description" : "custom description",
+    "additionalData" : [
+        "nav.json"
+    ]
 }

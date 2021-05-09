@@ -1,12 +1,12 @@
 {
     "template": "archive",
-    "additionalData" : [
-        "locale/it.json",
-        "nav.json"
-    ],
+    "lang" : "it",
     "univoqueId" : "news",
     "slug" : "novitá",
     "description" : "custom description",
+    "additionalData" : [
+        "nav.json"
+    ],
     "importPost" : [
         "novita"
     ]

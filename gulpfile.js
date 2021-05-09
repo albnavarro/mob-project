@@ -186,8 +186,8 @@ function getExtensionFile() {
 * @param additionalData - all data extract from all json file associated to {page}.json
 * return '' id {page}.json is in root or path form root
 */
-function extracSubFolder(filepath, config, additionalData) {
-    const pathRoot = ( config.defaultLocales == additionalData.lang) ? `data/${additionalData.lang}` : `data`
+function extracSubFolder(filepath, config, data) {
+    const pathRoot = ( config.defaultLocales == data.lang) ? `data/${data.lang}` : `data`
     const pattern = new RegExp(`${pathRoot}\/(.*\/).*$`);
     const path = filepath.match(pattern);
 
@@ -430,17 +430,13 @@ function permalink(done) {
         In production mode 'index' is removed in permalink
         */
         const nameFile = (arg.prod && originalNameFile === 'index') ? '' : originalNameFile
-        /*
-        Get data from each json defined in additonalPata propierties [ array ] if exist
-        */
-        const additionalData = extracAdditionalData(data)
 
         /*
         * Get subfolder according to to default languages
         */
-        const subfolder  = extracSubFolder(filepath,config,additionalData)
+        const subfolder  = extracSubFolder(filepath,config,data)
 
-        if (data.univoqueId && additionalData.lang) {
+        if (data.univoqueId && data.lang) {
             /*
             * Get permalink
             */
@@ -463,8 +459,8 @@ function permalink(done) {
             * Merge the new parmalinkObj with older one
             * Merge the new slugObj with older one
             */
-            peramlinkObj[data.univoqueId] = Object.assign( singleLocaleParmalinkObj, { [additionalData.lang] : permalink})
-            slugObj[data.univoqueId]= Object.assign( singleSlugObj, { [additionalData.lang] : slug})
+            peramlinkObj[data.univoqueId] = Object.assign( singleLocaleParmalinkObj, { [data.lang] : permalink})
+            slugObj[data.univoqueId]= Object.assign( singleSlugObj, { [data.lang] : slug})
         }
 
     });
@@ -521,14 +517,9 @@ function category(done) {
         const nameFile = getNameFile(filepath)
 
         /*
-        Get data from each json defined in additonalPata propierties [ array ] if exist
-        */
-        const additionalData = extracAdditionalData(data)
-
-        /*
         * Get subfolder according to to default languages
         */
-        const subfolder  = extracSubFolder(filepath,config,additionalData)
+        const subfolder  = extracSubFolder(filepath,config,data)
 
         /*
         * Get permalink
@@ -539,13 +530,13 @@ function category(done) {
         /*
         * Inizialize lang obj if not exixst
         */
-        if (!(additionalData.lang in categoryObj)) categoryObj[additionalData.lang] = {}
+        if (!(data.lang in categoryObj)) categoryObj[data.lang] = {}
 
 
         /*
         *  If there is data to eport
         */
-        if (data.exportPost && data.exportPost.category && additionalData.lang) {
+        if (data.exportPost && data.exportPost.category && data.lang) {
 
             /*
             *  create post obj
@@ -558,9 +549,9 @@ function category(done) {
 
 
             /*
-            *  get category in categoryObj[additionalData.lang] if exist or a ampty array
+            *  get category in categoryObj[data.lang] if exist or a ampty array
             */
-            const categorySingleObj = (data.exportPost.category in categoryObj[additionalData.lang]) ? categoryObj[additionalData.lang][data.exportPost.category] : []
+            const categorySingleObj = (data.exportPost.category in categoryObj[data.lang]) ? categoryObj[data.lang][data.exportPost.category] : []
 
             /*
             *  Copy the array, and push in new post
@@ -571,7 +562,7 @@ function category(done) {
             /*
             *  Assign the final array
             */
-            categoryObj[additionalData.lang][data.exportPost.category] = postArray
+            categoryObj[data.lang][data.exportPost.category] = postArray
         }
 
     });
@@ -672,7 +663,7 @@ function html(done) {
             regex form 'data/'' to last slash
             return the exact path of json file
             */
-            const subfolder = extracSubFolder(filepath,config,additionalData)
+            const subfolder = extracSubFolder(filepath,config,data)
 
 
             /*
@@ -689,7 +680,7 @@ function html(done) {
             Get relative path
             */
             const relativePath = {}
-            relativePath.relativePath = ( config.defaultLocales == additionalData.lang) ? `` : `/${additionalData.lang}`;
+            relativePath.relativePath = ( config.defaultLocales == data.lang) ? `` : `/${data.lang}`;
 
 
             /*
@@ -715,7 +706,7 @@ function html(done) {
             Add categry post map
             */
             const categoryObj = {}
-            if(data.importPost && additionalData.lang) {
+            if(data.importPost && data.lang) {
                 const categoryMap = JSON.parse(fs.readFileSync(categoryFile))
                 categoryObj.posts = {}
 
@@ -727,7 +718,7 @@ function html(done) {
                     Check if category {posts} defined in {page}.json exist in categoryMap[lang] json file
                     if not, return an empty obj to avoid error
                     */
-                    const postsObj = ( categoryMap[additionalData.lang][posts] ) ? categoryMap[additionalData.lang][posts] : {}
+                    const postsObj = ( categoryMap[data.lang][posts] ) ? categoryMap[data.lang][posts] : {}
 
                     /*
                     Assign catogory post list

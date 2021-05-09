@@ -1,10 +1,10 @@
 {
     "template": "mouseParallax",
-    "additionalData" : [
-        "locale/en.json",
-        "nav.json"
-    ],
+    "lang" : "en",
     "univoqueId" : "mouseParallax",
     "slug" : "mouse Parallax",
-    "description" : "custom description"
+    "description" : "custom description",
+    "additionalData" : [
+        "nav.json"
+    ]
 }

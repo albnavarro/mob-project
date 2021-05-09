@@ -1,12 +1,12 @@
 {
     "template": "archive",
-    "additionalData" : [
-        "locale/en.json",
-        "nav.json"
-    ],
+    "lang" : "en",
     "univoqueId" : "news",
     "slug" : "news",
     "description" : "custom description",
+    "additionalData" : [
+        "nav.json"
+    ],
     "importPost" : [
         "news"
     ]

@@ -1,10 +1,10 @@
 {
     "template": "gsapHorizontal",
-    "additionalData" : [
-        "locale/en.json",
-        "nav.json"
-    ],
+    "lang" : "en",
     "univoqueId" : "gsapHorizontal",
     "slug" : "gsap Horizontal",
-    "description" : "custom description"
+    "description" : "custom description",
+    "additionalData" : [
+        "nav.json"
+    ]
 }

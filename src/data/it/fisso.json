@@ -1,10 +1,10 @@
 {
     "template": "fixed",
-    "additionalData" : [
-        "locale/it.json",
-        "nav.json"
-    ],
+    "lang" : "it",
     "univoqueId" : "fixed",
     "slug" : "fixed",
-    "description" : "custom description"
+    "description" : "custom description",
+    "additionalData" : [
+        "nav.json"
+    ]
 }

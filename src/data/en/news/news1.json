@@ -1,13 +1,13 @@
 {
     "template": "post",
-    "additionalData" : [
-        "locale/en.json",
-        "nav.json"
-    ],
+    "lang" : "en",
     "univoqueId" : "news1",
     "slug" : "news 1",
     "title" : "news 1",
     "description" : "custom description",
+    "additionalData" : [
+        "nav.json"
+    ],
     "parentUniqueId" : "news",
     "exportPost" : {
         "category" : "news",

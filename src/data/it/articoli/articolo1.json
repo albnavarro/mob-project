@@ -1,12 +1,12 @@
 {
     "template": "post",
-    "additionalData" : [
-        "locale/it.json",
-        "nav.json"
-    ],
+    "lang" : "it",
     "univoqueId" : "articles1",
     "slug" : "artocolo 1",
     "description" : "custom description",
+    "additionalData" : [
+        "nav.json"
+    ],
     "title" : "artocolo 1",
     "parentUniqueId" : "articles",
     "exportPost" : {

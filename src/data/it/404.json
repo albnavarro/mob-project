@@ -1,10 +1,10 @@
 {
     "template": "404",
-    "additionalData" : [
-        "locale/it.json",
-        "nav.json"
-    ],
+    "lang" : "it",
     "univoqueId" : "error404",
     "slug" : "404",
-    "description" : "custom description"
+    "description" : "custom description",
+    "additionalData" : [
+        "nav.json"
+    ]
 }
