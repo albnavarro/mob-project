@@ -108,45 +108,52 @@ const arg = (argList => {
 Check if mandatory propierties in {page}.joson is right
 */
 function debugMandatoryPropierties(data) {
-    if(!('template' in data)) {
+    if(!('template' in data) || data.template === undefined) {
         console.log('*****')
+        console.log(`Error`)
         console.log(`template propierties is mandatory`)
-        console.log(`permalink: ${data.permalink}`)
+        console.log(`at: ${data.permalink}`)
         console.log('*****')
-        process.exit(0);
+        return true
     }
 
-    if(data.lang === undefined) {
+    if(!('lang' in data) || data.lang === undefined) {
         console.log('*****')
+        console.log(`Error`)
         console.log(`lang propierties is mandatory`)
-        console.log(`permalink: ${data.permalink}`)
+        console.log(`at: ${data.permalink}`)
         console.log('*****')
-        process.exit(0);
+        return true
     }
 
-    if(!('univoqueId' in data)) {
+    if(!('univoqueId' in data) || data.univoqueId === undefined) {
         console.log('*****')
+        console.log(`Error`)
         console.log(`univoqueId propierties is mandatory`)
-        console.log(`permalink: ${data.permalink}`)
+        console.log(`at: ${data.permalink}`)
         console.log('*****')
-        process.exit(0);
+        return true
     }
 
-    if(!('description' in data)) {
+    if(!('description' in data) || data.description === undefined) {
         console.log('*****')
+        console.log(`Error`)
         console.log(`description propierties is mandatory`)
-        console.log(`permalink: ${data.permalink}`)
+        console.log(`at: ${data.permalink}`)
         console.log('*****')
-        process.exit(0);
+        return true
     }
 
-    if(data.slug === undefined) {
+    if(!('slug' in data) || data.slug === undefined) {
         console.log('*****')
+        console.log(`Error`)
         console.log(`slug propierties is mandatory`)
         console.log(`permalink: ${data.permalink}`)
         console.log('*****')
-        process.exit(0);
+        return true
     }
+
+    return false
 }
 
 /*
@@ -178,14 +185,7 @@ function extracSubFolder(filepath, config, additionalData) {
     /*
     * Return subfolder if match in regex or empty vaalue
     */
-    const getSubfolder = (path) => {
-        try {
-            return path[1];
-        } catch (error) {
-            return '';
-        }
-    }
-    return getSubfolder(path)
+    return (!path) ? '' : path[1]
 }
 
 
@@ -753,8 +753,13 @@ function html(done) {
 
             /*
             Check if mandatory propierties in {page}.joson is right
+            If here is some error exit fomr gulp
             */
-            debugMandatoryPropierties(allData);
+            const error = debugMandatoryPropierties(allData);
+            if(error) {
+                process.exit(0);
+                taskDone()
+            }
 
             /*
             * remove propierties no more necessary
