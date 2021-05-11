@@ -1,8 +1,6 @@
-<!doctype html>
-html
-    head
-        include pug/head.pug
+extends _wrapper.pug
 
+block content
     body
         div(id="spriteSvg" data-svg="/assets/svg/svg.svg")
             
@@ -20,6 +18,4 @@ html
                     |!{exportPost.date}
                 div
                     |!{title}
-                
-        include pug/footer.pug
-        
+                    

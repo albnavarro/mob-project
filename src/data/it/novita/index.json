@@ -1,6 +1,5 @@
 {
     "template": "archive",
-    "lang" : "it",
     "univoqueId" : "news",
     "slug" : "novitá",
     "description" : "custom description",

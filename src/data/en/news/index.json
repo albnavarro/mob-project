@@ -1,6 +1,5 @@
 {
     "template": "archive",
-    "lang" : "en",
     "univoqueId" : "news",
     "slug" : "news",
     "description" : "custom description",

@@ -5,10 +5,12 @@
   "main": "gulpfile.js",
   "scripts": {
     "dev": "gulp dev",
+    "page": "gulp watch -page",
     "build": "gulp build -prod",
     "image": "gulp image",
     "icons": "gulp icons",
-    "permalink": "gulp permalink"
+    "permalink": "gulp permalink",
+    "category": "gulp category"
   },
   "author": "Mobbu",
   "license": "MIT",

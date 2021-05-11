@@ -1,8 +1,6 @@
-<!doctype html>
-html
-    head
-        include pug/head.pug
+extends _wrapper.pug
 
+block content
     body
         div(id="spriteSvg" data-svg="/assets/svg/svg.svg")
 
@@ -254,14 +252,14 @@ html
                         data-ease="smooth",
                         data-reverse)
                         .parallax__item-test.parallax__item-test--float
-    
+
                 .transformY-start(
                     data-conponent='m-comp--toggleEl',
                     data-startClass="transformY-start",
                     data-endClass="transformY-end",
                     data-onlyOnce)
                         .trasition-item-test 
-    
+
                 .parallax__container
                     .parallax__item.inlineBLock(
                         data-conponent='m-comp--parallax',
@@ -270,13 +268,13 @@ html
                         data-ease="smooth",
                         data-propierties="rotate")
                         .parallax__item-test
-    
+
                 .opacity-start(
                     data-conponent='m-comp--toggleEl',
                     data-startClass="opacity-start",
                     data-endClass="opacity-end")
                         .trasition-item-test 
-    
+
                 .parallax__container
                     .parallax__item(
                         data-conponent='m-comp--parallax',
@@ -285,10 +283,9 @@ html
                         data-ease="linear",
                         data-propierties="horizontal")
                         .parallax__item-test
-    
+
                 div(style="height:200px;")
-    
+
         include component/lightbox/pug/lightbox-simple.pug
         include component/lightbox/pug/lightbox-image.pug
         include component/lightbox/pug/lightbox-video.pug
-        include pug/footer.pug

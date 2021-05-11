@@ -1,6 +1,5 @@
 {
     "template": "post",
-    "lang" : "en",
     "univoqueId" : "articles2",
     "slug" : "article 2",
     "description" : "custom description",

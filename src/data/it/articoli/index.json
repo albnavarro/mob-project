@@ -1,6 +1,5 @@
 {
     "template": "archive",
-    "lang" : "it",
     "univoqueId" : "articles",
     "slug" : "articoli",
     "description" : "custom description",

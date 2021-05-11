@@ -1,8 +1,6 @@
-<!doctype html>
-html
-    head
-        include pug/head.pug
+extends _wrapper.pug
 
+block content
     body
         div(id="spriteSvg" data-svg="/assets/svg/svg.svg")
             
@@ -77,5 +75,3 @@ html
                     .fixed__dummy.fixed__dummy--6
                     .fixed__dummy.fixed__dummy--7
                 
-        include pug/footer.pug
-        

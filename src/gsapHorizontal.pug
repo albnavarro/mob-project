@@ -1,8 +1,6 @@
-<!doctype html>
-html
-    head
-        include pug/head.pug
+extends _wrapper.pug
 
+block content
     body.gsap
         div(id="spriteSvg" data-svg="/assets/svg/svg.svg")
             
@@ -27,5 +25,3 @@ html
                         .gaspHorizontal__card
                         .gaspHorizontal__card
                         .gaspHorizontal__card
-
-        include pug/footer.pug

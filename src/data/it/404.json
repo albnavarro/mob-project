@@ -1,6 +1,5 @@
 {
     "template": "404",
-    "lang" : "it",
     "univoqueId" : "error404",
     "slug" : "404",
     "description" : "custom description",

@@ -1,6 +1,5 @@
 {
     "template": "archive",
-    "lang" : "it",
     "univoqueId" : "archive",
     "slug" : "archivio",
     "description" : "custom description",

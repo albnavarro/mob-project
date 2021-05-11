@@ -118,15 +118,6 @@ function debugMandatoryPropierties(data) {
         return true
     }
 
-    if(!('lang' in data) || data.lang === undefined) {
-        console.log('*****')
-        console.log(`Error`)
-        console.log(`lang propierties is mandatory`)
-        console.log(`at: ${data.permalink}`)
-        console.log('*****')
-        return true
-    }
-
     if(!('univoqueId' in data) || data.univoqueId === undefined) {
         console.log('*****')
         console.log(`Error`)
@@ -186,8 +177,8 @@ function getExtensionFile() {
 * @param additionalData - all data extract from all json file associated to {page}.json
 * return '' id {page}.json is in root or path form root
 */
-function extracSubFolder(filepath, config, data) {
-    const pathRoot = ( config.defaultLocales == data.lang) ? `data/${data.lang}` : `data`
+function extracSubFolder(filepath, config, lang) {
+    const pathRoot = ( config.defaultLocales == lang) ? `${dataPath}/${lang}` : `${dataPath}`
     const pattern = new RegExp(`${pathRoot}\/(.*\/).*$`);
     const path = filepath.match(pattern);
 
@@ -195,6 +186,19 @@ function extracSubFolder(filepath, config, data) {
     * Return subfolder if match in regex or empty vaalue
     */
     return (!path) ? '' : path[1]
+}
+
+
+/*
+* get lang of single {page}.json
+* @param filepath - {page}.json path
+* return lang flder name
+*/
+function getLanguage(filepath) {
+    const pattern = new RegExp(`${dataPath}\/([^\/]*)`);
+    const lang = filepath.match(pattern);
+
+    return (!lang) ? '' : lang[1]
 }
 
 
@@ -422,6 +426,11 @@ function permalink(done) {
         const data = JSON.parse(fs.readFileSync(filepath))
 
         /*
+        Get language
+        */
+        const lang = getLanguage(filepath)
+
+        /*
         Get file name
         */
         const originalNameFile = getNameFile(filepath)
@@ -434,9 +443,9 @@ function permalink(done) {
         /*
         * Get subfolder according to to default languages
         */
-        const subfolder  = extracSubFolder(filepath,config,data)
+        const subfolder  = extracSubFolder(filepath,config,lang)
 
-        if (data.univoqueId && data.lang) {
+        if (data.univoqueId) {
             /*
             * Get permalink
             */
@@ -459,8 +468,8 @@ function permalink(done) {
             * Merge the new parmalinkObj with older one
             * Merge the new slugObj with older one
             */
-            peramlinkObj[data.univoqueId] = Object.assign( singleLocaleParmalinkObj, { [data.lang] : permalink})
-            slugObj[data.univoqueId]= Object.assign( singleSlugObj, { [data.lang] : slug})
+            peramlinkObj[data.univoqueId] = Object.assign( singleLocaleParmalinkObj, { [lang] : permalink})
+            slugObj[data.univoqueId]= Object.assign( singleSlugObj, { [lang] : slug})
         }
 
     });
@@ -512,6 +521,11 @@ function category(done) {
         const data = JSON.parse(fs.readFileSync(filepath))
 
         /*
+        Get language
+        */
+        const lang = getLanguage(filepath)
+
+        /*
         Get file name
         */
         const nameFile = getNameFile(filepath)
@@ -519,7 +533,7 @@ function category(done) {
         /*
         * Get subfolder according to to default languages
         */
-        const subfolder  = extracSubFolder(filepath,config,data)
+        const subfolder  = extracSubFolder(filepath,config,lang)
 
         /*
         * Get permalink
@@ -530,13 +544,13 @@ function category(done) {
         /*
         * Inizialize lang obj if not exixst
         */
-        if (!(data.lang in categoryObj)) categoryObj[data.lang] = {}
+        if (!(lang in categoryObj)) categoryObj[lang] = {}
 
 
         /*
         *  If there is data to eport
         */
-        if (data.exportPost && data.exportPost.category && data.lang) {
+        if (data.exportPost && data.exportPost.category && lang) {
 
             /*
             *  create post obj
@@ -549,9 +563,9 @@ function category(done) {
 
 
             /*
-            *  get category in categoryObj[data.lang] if exist or a ampty array
+            *  get category in categoryObj[lang] if exist or a ampty array
             */
-            const categorySingleObj = (data.exportPost.category in categoryObj[data.lang]) ? categoryObj[data.lang][data.exportPost.category] : []
+            const categorySingleObj = (data.exportPost.category in categoryObj[lang]) ? categoryObj[lang][data.exportPost.category] : []
 
             /*
             *  Copy the array, and push in new post
@@ -562,7 +576,7 @@ function category(done) {
             /*
             *  Assign the final array
             */
-            categoryObj[data.lang][data.exportPost.category] = postArray
+            categoryObj[lang][data.exportPost.category] = postArray
         }
 
     });
@@ -625,187 +639,189 @@ function html(done) {
     const tasks = streams.map(filepath => {
         return taskDone => {
 
+        /*
+        Get json data of each file
+        */
+        const data = JSON.parse(fs.readFileSync(filepath))
+
+
+        /*
+        Get language
+        */
+        data.lang = getLanguage(filepath)
+
+        /*
+        Get file name
+        */
+        const nameFile = getNameFile(filepath)
+
+
+        /*
+        Get data from each json defined in additonalPata propierties [ array ] if exist
+        */
+        const additionalData = extracAdditionalData(data)
+
+
+        /*
+        Get prod abient value
+        */
+        const prodData = {}
+        prodData.isProd = (arg.prod) ? true : false;
+
+
+        /*
+        Get manifest.json for asset
+        */
+        const manifest = {}
+        const manifestData = JSON.parse(fs.readFileSync(manifestFile))
+        manifest.manifest = manifestData
+
+        /*
+        Subfolder
+        Create folder in accordion of json folder position
+        regex form 'data/'' to last slash
+        return the exact path of json file
+        */
+        const subfolder = extracSubFolder(filepath,config,data.lang)
+
+
+        /*
+        Create subfolder if not exist
+        */
+        if(!fs.existsSync(`${destPath}/${subfolder}`)){
+            fs.mkdirSync(`${destPath}/${subfolder}`, {
+                recursive: true
+            })
+        }
+
+
+        /*
+        Get relative path
+        */
+        const relativePath = {}
+        relativePath.relativePath = ( config.defaultLocales == data.lang) ? `` : `/${data.lang}`;
+
+
+        /*
+        Add permalink
+        */
+        const permalinkMap = JSON.parse(fs.readFileSync(permalinkFile))
+
+        const permalink = {}
+        permalink.permalink = `/${subfolder}${nameFile}${getExtensionFile()}`
+        permalink.staticPermalink = `${config.domain}${subfolder}${nameFile}${getExtensionFile()}`
+        permalink.permalinkMap = permalinkMap
+        permalink.slug = data.slug
+
+        /*
+        Add slug map
+        */
+        const slugMap = JSON.parse(fs.readFileSync(slugFile))
+        const slugMapObj = {}
+        slugMapObj.slugMap = slugMap
+
+
+        /*
+        Add categry post map
+        */
+        const categoryObj = {}
+        if(data.importPost && data.lang) {
+            const categoryMap = JSON.parse(fs.readFileSync(categoryFile))
+            categoryObj.posts = {}
+
             /*
-            Get json data of each file
+            loop thru all catogory defined in {page}.json import propierties
             */
-            const data = JSON.parse(fs.readFileSync(filepath))
-
-
-            /*
-            Get file name
-            */
-            const nameFile = getNameFile(filepath)
-
-
-            /*
-            Get data from each json defined in additonalPata propierties [ array ] if exist
-            */
-            const additionalData = extracAdditionalData(data)
-
-
-            /*
-            Get prod abient value
-            */
-            const prodData = {}
-            prodData.isProd = (arg.prod) ? true : false;
-
-
-            /*
-            Get manifest.json for asset
-            */
-            const manifest = {}
-            const manifestData = JSON.parse(fs.readFileSync(manifestFile))
-            manifest.manifest = manifestData
-
-            /*
-            Subfolder
-            Create folder in accordion of json folder position
-            regex form 'data/'' to last slash
-            return the exact path of json file
-            */
-            const subfolder = extracSubFolder(filepath,config,data)
-
-
-            /*
-            Create subfolder if not exist
-            */
-            if(!fs.existsSync(`${destPath}/${subfolder}`)){
-                fs.mkdirSync(`${destPath}/${subfolder}`, {
-                    recursive: true
-                })
-            }
-
-
-            /*
-            Get relative path
-            */
-            const relativePath = {}
-            relativePath.relativePath = ( config.defaultLocales == data.lang) ? `` : `/${data.lang}`;
-
-
-            /*
-            Add permalink
-            */
-            const permalinkMap = JSON.parse(fs.readFileSync(permalinkFile))
-
-            const permalink = {}
-            permalink.permalink = `/${subfolder}${nameFile}${getExtensionFile()}`
-            permalink.staticPermalink = `${config.domain}${subfolder}${nameFile}${getExtensionFile()}`
-            permalink.permalinkMap = permalinkMap
-            permalink.slug = data.slug
-
-            /*
-            Add slug map
-            */
-            const slugMap = JSON.parse(fs.readFileSync(slugFile))
-            const slugMapObj = {}
-            slugMapObj.slugMap = slugMap
-
-
-            /*
-            Add categry post map
-            */
-            const categoryObj = {}
-            if(data.importPost && data.lang) {
-                const categoryMap = JSON.parse(fs.readFileSync(categoryFile))
-                categoryObj.posts = {}
+            for (const posts of data.importPost) {
+                /*
+                Check if category {posts} defined in {page}.json exist in categoryMap[lang] json file
+                if not, return an empty obj to avoid error
+                */
+                const postsObj = ( categoryMap[data.lang][posts] ) ? categoryMap[data.lang][posts] : {}
 
                 /*
-                loop thru all catogory defined in {page}.json import propierties
+                Assign catogory post list
                 */
-                for (const posts of data.importPost) {
-                    /*
-                    Check if category {posts} defined in {page}.json exist in categoryMap[lang] json file
-                    if not, return an empty obj to avoid error
-                    */
-                    const postsObj = ( categoryMap[data.lang][posts] ) ? categoryMap[data.lang][posts] : {}
+                categoryObj.posts[posts] = postsObj
+            }
 
-                    /*
-                    Assign catogory post list
-                    */
-                    categoryObj.posts[posts] = postsObj
+            /*
+            Clean final data obj
+            */
+            delete data.importPost;
+        }
+
+
+        /*
+        criticalcss
+        */
+        const critical = {}
+        const criticalFile = `${cssDest}/critical/${subfolder}${nameFile}.css`
+        if (arg.prod && fs.existsSync(criticalFile)) {
+            const documentStyles = fs.readFileSync(criticalFile);
+            critical.documentStyles = documentStyles.toString()
+        }
+
+
+        /*
+        merge all json
+        */
+        const allData = Object.assign({},critical, prodData, config, additionalData, permalink, slugMapObj, categoryObj, relativePath, data, manifest);
+
+
+        /*
+        get template
+        */
+        const template = `${themePath}/${data.template}.pug`
+
+        /*
+        Check if mandatory propierties in {page}.joson is right
+        If here is some error exit fomr gulp
+        */
+        const error = debugMandatoryPropierties(allData);
+        if(error) {
+            process.exit(0);
+            taskDone()
+        }
+
+        /*
+        * remove propierties no more necessary
+        */
+        delete allData.additionalData;
+        delete allData.template;
+
+
+        /*
+        * DEBUG
+        * gulp html -debug for debug
+
+        es:
+        gulp html -prod
+        gulp html -debug -page "it/index.json"
+        gulp html -prod -page "it/index.json"
+
+        */
+        if(arg.debug) {
+            console.log()
+            console.log('***************')
+            console.log(nameFile)
+            console.log('***************')
+            console.log(util.inspect(allData, {showHidden: false, depth: null}))
+            console.log()
+        }
+
+        return gulp.src(template)
+            .pipe(pug({
+                data: allData
+            }))
+            .pipe(rename(nameFile + '.html'))
+            .pipe(gulp.dest(`${destPath}/${subfolder}`))
+            .on('end', function () {
+                if(arg.debug) {
+                    console.log('***************')
+                    console.log(`${nameFile} processed`)
                 }
-
-                /*
-                Clean final data obj
-                */
-                delete data.importPost;
-            }
-
-
-            /*
-            criticalcss
-            */
-            const critical = {}
-            const criticalFile = `${cssDest}/critical/${subfolder}${nameFile}.css`
-            if (arg.prod && fs.existsSync(criticalFile)) {
-                const documentStyles = fs.readFileSync(criticalFile);
-                critical.documentStyles = documentStyles.toString()
-            }
-
-
-            /*
-            merge all json
-            */
-            const allData = Object.assign({},critical, prodData, config, additionalData, permalink, slugMapObj, categoryObj, relativePath, data, manifest);
-
-
-            /*
-            get template
-            */
-            const template = `${themePath}/${data.template}.pug`
-
-            /*
-            Check if mandatory propierties in {page}.joson is right
-            If here is some error exit fomr gulp
-            */
-            const error = debugMandatoryPropierties(allData);
-            if(error) {
-                process.exit(0);
-                taskDone()
-            }
-
-            /*
-            * remove propierties no more necessary
-            */
-            delete allData.additionalData;
-            delete allData.template;
-
-
-            /*
-            * DEBUG
-            * gulp html -debug for debug
-
-            es:
-            gulp html -prod
-            gulp html -debug -page "it/index.json"
-            gulp html -prod -page "it/index.json"
-
-            */
-            if(arg.debug) {
-                console.log()
-                console.log('***************')
-                console.log(nameFile)
-                console.log('***************')
-                console.log(util.inspect(allData, {showHidden: false, depth: null}))
-                console.log()
-            }
-
-            return gulp.src(template)
-                .pipe(pug({
-                    data: allData
-                }))
-                .pipe(rename(nameFile + '.html'))
-                .pipe(gulp.dest(`${destPath}/${subfolder}`))
-                .on("end", function () {
-                    if(arg.debug) {
-                        console.log('***************')
-                        console.log(`${nameFile} processed`)
-                    }
-                    taskDone()
-                });
-
-
+            })
         }
     })
 
@@ -815,6 +831,29 @@ function html(done) {
     })()
 }
 
+/*
+* Alternative pattern promise all
+*/
+// function html(done) {
+//     ...
+//
+//     const tasks = streams.map(filepath => {
+//         return new Promise((resolve, reject) => {
+//             ....
+//             return gulp.src(template)
+//                 ....
+//
+//                 .on('end', function () {
+//                     resolve()
+//
+//                 })
+//         })
+//     })
+//
+//     Promise.all([...tasks]).then(() => {
+//         done()
+//     })
+// }
 
 
 /*
@@ -924,11 +963,18 @@ const reset = gulp.series(
 )
 
 /*
-* WATCH
+* DEV
 */
 const dev = gulp.series(build, gulp.parallel(
     browser_sync,
     watch_files))
+
+/*
+* WATCH
+*/
+const watchTask = gulp.parallel(
+    browser_sync,
+    watch_files)
 
 
 /*
@@ -953,6 +999,7 @@ exports.category = category
 exports.build = build
 exports.reset = reset
 exports.dev = dev
+exports.watch = watchTask
 
 
 
@@ -966,8 +1013,10 @@ exports.dev = dev
 
 /*
 * npm run dev
-* npm run dev -- --debug
 * npm run build
 * npm run build -- --debug
+*
+* watch single page:
+* npm run page "en/index.json"
 * .....
 */
