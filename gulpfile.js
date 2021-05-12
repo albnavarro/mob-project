@@ -162,6 +162,18 @@ function getNameFile(filepath) {
 
 
 /*
+* get permalink
+* @param subfolder
+* @param namefile , form getNameFile function
+* @param firstSlash : bollean , prepend '/'
+*/
+function getPermalink(subfolder,nameFile,prependSlash = true) {
+    const slash = prependSlash ? '/' : ''
+    return `${slash}${subfolder}${nameFile}${getExtensionFile()}`
+}
+
+
+/*
 * Usa permalink without .html on server in production mode
 * .htaccess riles RewriteCond %{REQUEST_FILENAME}\.html -f
 */
@@ -405,81 +417,36 @@ function criticalCss(done) {
     done();
 };
 
+
+
 /*
-* CREATE PERMALINKMAP
-* permalinkMap: {
-*     univoqueId: { en: '{pemalink}', it: '{pemalink}', ... },
+* CREATE SLUG MAP
+* slugMap: {
+*     univoqueId: { en: '{slug}', it: '{slug}', ... },
       ....
  * }
 */
-function permalink(done) {
-    /*
-    * Creat main obj
-    */
-    const peramlinkObj = {}
-    const slugObj = {}
-
+function slug(done) {
     const config = JSON.parse(fs.readFileSync(`config.json`))
     const allPath = glob.sync(path.join(dataPath, '/**/*.json'))
 
-    allPath.forEach((filepath) => {
-        const data = JSON.parse(fs.readFileSync(filepath))
+    const slugObj = allPath.reduce((acc, curr) => {
+      const data = JSON.parse(fs.readFileSync(curr))
 
-        /*
-        Get language
-        */
-        const lang = getLanguage(filepath)
+      if(data.univoqueId) {
+          acc[data.univoqueId] = {...acc[data.univoqueId]}
+          acc[data.univoqueId][getLanguage(curr)] = data.slug
+      }
 
-        /*
-        Get file name
-        */
-        const originalNameFile = getNameFile(filepath)
+      return acc;
+    }, {});
 
-        /*
-        In production mode 'index' is removed in permalink
-        */
-        const nameFile = (arg.prod && originalNameFile === 'index') ? '' : originalNameFile
-
-        /*
-        * Get subfolder according to to default languages
-        */
-        const subfolder  = extracSubFolder(filepath,config,lang)
-
-        if (data.univoqueId) {
-            /*
-            * Get permalink
-            */
-            const permalink = `/${subfolder}${nameFile}${getExtensionFile()}`
-            const slug = data.slug
-
-            /*
-            * Check if obj for each univoqueId exist
-            * Rutun a new empty obj or the obj if exist
-            */
-            const singleLocaleParmalinkObj = (data.univoqueId in peramlinkObj) ? peramlinkObj[data.univoqueId] : {}
-
-            /*
-            * Check if obj for each univoqueId exist
-            * Rutun a new empty obj or the obj if exist
-            */
-            const singleSlugObj = (data.univoqueId in slugObj) ? slugObj[data.univoqueId] : {}
-
-            /*
-            * Merge the new parmalinkObj with older one
-            * Merge the new slugObj with older one
-            */
-            peramlinkObj[data.univoqueId] = Object.assign( singleLocaleParmalinkObj, { [lang] : permalink})
-            slugObj[data.univoqueId]= Object.assign( singleSlugObj, { [lang] : slug})
-        }
-
-    });
 
     /*
     * DEBUG
     * gulp html -debug for debug
     */
     if(arg.debug) {
-        console.log(peramlinkObj)
         console.log(slugObj)
     }
 
@@ -492,8 +459,57 @@ function permalink(done) {
         })
     }
 
-    fs.writeFileSync(permalinkFile, JSON.stringify(peramlinkObj));
     fs.writeFileSync(slugFile, JSON.stringify(slugObj));
+    done()
+
+}
+
+
+/*
+* CREATE PERMALINKMAP
+* permalinkMap: {
+*     univoqueId: { en: '{pemalink}', it: '{pemalink}', ... },
+      ....
+ * }
+*/
+function permalink(done) {
+    const config = JSON.parse(fs.readFileSync(`config.json`))
+    const allPath = glob.sync(path.join(dataPath, '/**/*.json'))
+
+    const peramlinkObj = allPath.reduce((acc, curr) => {
+      const data = JSON.parse(fs.readFileSync(curr))
+      const lang = getLanguage(curr)
+      const originalNameFile = getNameFile(curr)
+      const nameFile = (arg.prod && originalNameFile === 'index') ? '' : originalNameFile
+      const subfolder  = extracSubFolder(curr,config,lang)
+      const permalinkUrl = getPermalink(subfolder,nameFile)
+
+      if(data.univoqueId) {
+          acc[data.univoqueId] = {...acc[data.univoqueId]}
+          acc[data.univoqueId][getLanguage(curr)] = permalinkUrl
+      }
+
+      return acc;
+    }, {});
+
+    /*
+    * DEBUG
+    * gulp html -debug for debug
+    */
+    if(arg.debug) {
+        console.log(peramlinkObj)
+    }
+
+    /*
+    * Check if destination folder exist and save the file with permalink map
+    */
+    if(!fs.existsSync(dataDestFolder)){
+        fs.mkdirSync(dataDestFolder, {
+            recursive: true
+        })
+    }
+
+    fs.writeFileSync(permalinkFile, JSON.stringify(peramlinkObj));
     done()
 
 }
@@ -538,7 +554,7 @@ function category(done) {
         /*
         * Get permalink
         */
-        const permalink = `/${subfolder}${nameFile}${getExtensionFile()}`
+        const permalink = getPermalink(subfolder,nameFile)
         const slug = nameFile
 
         /*
@@ -708,8 +724,8 @@ function html(done) {
         const permalinkMap = JSON.parse(fs.readFileSync(permalinkFile))
 
         const permalink = {}
-        permalink.permalink = `/${subfolder}${nameFile}${getExtensionFile()}`
-        permalink.staticPermalink = `${config.domain}${subfolder}${nameFile}${getExtensionFile()}`
+        permalink.permalink = getPermalink(subfolder,nameFile)
+        permalink.staticPermalink = `${config.domain}${getPermalink(subfolder,nameFile,false)}`
         permalink.permalinkMap = permalinkMap
         permalink.slug = data.slug
 
@@ -924,7 +940,7 @@ function deleteEmptyDirectories(done) {
 function watch_files(done) {
     gulp.watch([scssFiles, componentscssFiles], style)
     gulp.watch([jsFiles, componentJsFiles], gulp.series(js, reloadPage))
-    gulp.watch([allPugFiles, dataFiles, additionalDataFiles], gulp.series(category, permalink, html, reloadPage))
+    gulp.watch([allPugFiles, dataFiles, additionalDataFiles], gulp.series(category, slug, permalink, html, reloadPage))
 
     done();
 }
@@ -946,6 +962,7 @@ const build = gulp.series(
     cleanDist,
     dist,
     category,
+    slug,
     permalink,
     html,
     criticalCss,
@@ -992,6 +1009,7 @@ exports.cleanAll = cleanAll
 exports.deleteEmptyDirectories = deleteEmptyDirectories
 exports.permalink = permalink
 exports.category = category
+exports.slug = slug
 
 /*
 * MAIN TASK
