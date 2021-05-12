@@ -50,7 +50,7 @@
     "node-sass": "^4.14.1",
     "npm-check-updates": "^9.2.2",
     "path": "^0.12.7",
-    "postcss": "^8.1.4",
+    "postcss": "^8.2.10",
     "request": "^2.88.0",
     "rev-del": "^2.0.0",
     "rollup-plugin-terser": "^7.0.2",
