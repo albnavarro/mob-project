@@ -186,9 +186,7 @@ function taskIsSkippable(filepath, data, template) {
         return Object.values(data.posts)
             .flat()
             .filter((item) => item.source !== undefined)
-            .map((item) => {
-                return fileIschanged(`${dataPath}/${item.source}`);
-            })
+            .map((item) => fileIschanged(`${dataPath}/${item.source}`))
             .some((item) =>  item === true)
     }
 
@@ -596,15 +594,10 @@ function permalink(done) {
 
 /*
 * CREATE CATEGORYMAP
-* it: {
-*     "articles": [
-*         { permalink: '....', data: '....', ... },
-*         { permalink: '....', data: '....', ... },
- * }
 */
 function category(done) {
     /*
-    * Creat main obj
+    * Create main obj
     */
     const config = JSON.parse(fs.readFileSync(`config.json`))
     const allPath = glob.sync(path.join(dataPath, '/**/*.json'))
@@ -626,8 +619,16 @@ function category(done) {
                 data: { ...parsed.exportPost.data }
             };
 
+            /*
+            * Merge lang obj with itself or crete a new obj if not exist,
+            * in the first cicle of each lang the attribute not exist
+            */
             acc[lang] = { ...acc[lang] };
-            acc[lang][category] = acc[lang][category] ? acc[lang][category] : (acc[lang][category] = []);
+
+            /*
+            * Add new post to category or inizialize category
+            */
+            acc[lang][category] = (category in acc[lang]) ? acc[lang][category] : [];
             acc[lang][category].push(obj);
         }
 
@@ -647,7 +648,7 @@ function category(done) {
             /*
             *  Order post by date
             */
-            posts.sort(function compare(a, b) {
+            posts.sort((a, b) => {
               const dateA = new Date(a.date);
               const dateB = new Date(b.date);
               return dateA - dateB;
@@ -777,34 +778,16 @@ function html(done) {
         /*
         Add categry post map
         */
-        const categoryObj = {}
-        if(data.importPost && data.lang) {
-            const categoryMap = JSON.parse(fs.readFileSync(categoryFile))
-            categoryObj.posts = {}
-
-            /*
-            loop thru all catogory defined in {page}.json import propierties
-            */
-            for (const posts of data.importPost) {
-                /*
-                Check if category {posts} defined in {page}.json exist in categoryMap[lang] json file
-                if not, return an empty obj to avoid error
-                */
-                const postsObj = ( categoryMap[data.lang][posts] ) ? categoryMap[data.lang][posts] : {}
-
-                /*
-                Assign catogory post list
-                */
-                categoryObj.posts[posts] = postsObj
-            }
-
-            /*
-            Clean final data obj
-            */
-            delete data.importPost;
+        const categoryMap = JSON.parse(fs.readFileSync(categoryFile))
+        const getPosts = (data) => {
+            return data.importPost.reduce((acc, curr) => {
+                if ((data.lang in categoryMap) && (curr in categoryMap[data.lang]))  acc[curr] = categoryMap[data.lang][curr]
+                return acc
+            }, {})
         }
 
-
+        const categoryObj = {}
+        categoryObj.posts = ('importPost' in data) ? getPosts(data) : {}
 
         /*
         criticalcss
@@ -820,7 +803,18 @@ function html(done) {
         /*
         merge all json
         */
-        const allData = Object.assign({},critical, prodData, config, additionalData, permalink, slugMapObj, categoryObj, relativePath, data, manifest);
+        const allData = Object.assign({},
+            critical,
+            prodData,
+            config,
+            additionalData,
+            permalink,
+            slugMapObj,
+            categoryObj,
+            relativePath,
+            data,
+            manifest
+        );
 
         /*
         Check if page is ready to render
