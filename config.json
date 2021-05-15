@@ -11,5 +11,8 @@
             "nativeName" : "Italiano"
         }
     },
-    "defaultLocales" : "en"
+    "defaultLocales" : "en",
+    "selectiveRefresh" : true,
+    "postPerPage" : "3",
+    "dinamicPageName" : "page-"
 }

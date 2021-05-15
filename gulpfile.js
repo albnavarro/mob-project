@@ -153,10 +153,39 @@ function debugMandatoryPropierties(data) {
 * HELPER FUNCTION
 */
 
+
+
+/*
+Debug file rendered
+*/
+function debugRenderHtml(nameFile, data) {
+    if(arg.debug) {
+        console.log()
+        console.log('***************')
+        console.log(nameFile)
+        console.log('***************')
+        console.log(util.inspect(data, {showHidden: false, depth: null}))
+        console.log()
+    }
+}
+
+
 /*
 * check if nested prop exist in obj
 */
 const propValidate = (p, o) => p.reduce((xs, x) => (xs && xs[x]) ? xs[x] : null, o)
+
+
+
+function chunk(array, size) {
+    const chunked_arr = [];
+    let index = 0;
+    while (index < array.length) {
+        chunked_arr.push(array.slice(index, size + index));
+        index += size;
+    }
+    return chunked_arr;
+}
 
 /*
 * check if fileis Changed
@@ -823,79 +852,138 @@ function html(done) {
         /*
         Check if page is ready to render
         */
-        const skipTask = taskIsSkippable(filepath, allData, template)
+        const skipTask = (config.selectiveRefresh) ? taskIsSkippable(filepath, allData, template) : false
 
-
-
-        function renderPage(taskDone) {
-
-            /*
-            if nothing changed return from task form the 3Th run
-            */
-            if(counterRun > 1 && skipTask) {
-                taskDone()
-                return
-            }
-
-            /*
-            Check if mandatory propierties in {page}.joson is right
-            If here is some error exit fomr gulp
-            */
-            const error = debugMandatoryPropierties(allData);
-            if(error) {
-                process.exit(0);
-                taskDone()
-            }
-
-            /*
-            * remove propierties no more necessary
-            */
-            delete allData.additionalData;
-            delete allData.template;
-
-
-            /*
-            * DEBUG
-            * gulp html -debug for debug
-
-            es:
-            gulp html -prod
-            gulp html -debug -page "it/index.json"
-            gulp html -prod -page "it/index.json"
-
-            */
-            if(arg.debug) {
-                console.log()
-                console.log('***************')
-                console.log(nameFile)
-                console.log('***************')
-                console.log(util.inspect(allData, {showHidden: false, depth: null}))
-                console.log()
-            }
-
-            return gulp.src(template)
-                .pipe(pug({
-                    data: allData
-                }))
-                .pipe(rename(nameFile + '.html'))
-                .pipe(gulp.dest(`${destPath}/${subfolder}`))
-                .on('end', function () {
-                    if(arg.debug) {
-                        console.log('***************')
-                        console.log(`${nameFile} processed`)
-                        console.log('***************')
-                    }
-                    taskDone()
-                })
+        /*
+        Check for mandatory propierties in json
+        */
+        const error = debugMandatoryPropierties(allData);
+        if(error) {
+            process.exit(0);
         }
 
-        renderPage.displayName = `${getPermalink(extracSubFolder(filepath,config, getLanguage(filepath)), getNameFile(filepath))}`;
-        return {'skipTask' : skipTask, 'fn': renderPage};
+        if(('isArchive' in allData)) {
+
+            /*
+            Get post per page, config si defulat otherwise is overrride form data josn
+            */
+            const postPerPage = ('postPerPage' in allData.isArchive)
+                ? parseInt(allData.isArchive.postPerPage)
+                : parseInt(config.postPerPage)
+
+            /*
+            Chunk array post for pagination
+            */
+            const pageData = chunk(Object.values(allData.posts).flat(), postPerPage)
+            const dinamicPageName = config.dinamicPageName
+
+            /*
+            Loop in chunked array to create each post page
+            */
+            const pages = pageData.map((item, index) => {
+                const newData = { ... allData}
+
+                /*
+                Reset post data and add the new data for specific page
+                */
+                newData.posts = {}
+                newData.posts.all = item
+
+                /*
+                Previous page link
+                */
+                const getPreviousPage = () => {
+                    if (index == 0) {
+                        return null
+                    } else if (index == 1) {
+                        return getPermalink(subfolder,nameFile)
+                    } else {
+                        return getPermalink(subfolder,`${dinamicPageName}${index - 1}`)
+                    }
+                }
+
+                /*
+                Next page link
+                */
+                const getNextPage = () => {
+                    if (index == pageData.length - 1) {
+                        return null
+                    } else {
+                        return getPermalink(subfolder,`${dinamicPageName}${index + 1}`)
+                    }
+                }
+
+                /*
+                Pagination data
+                */
+                newData.pagination = {
+                    'total' : pageData.length,
+                    'current' : index + 1,
+                    'previousPage' : getPreviousPage(),
+                    'nextPage' : getNextPage()
+                }
+                const newName = (index == 0) ? nameFile : `${dinamicPageName}${index}`
+
+                debugRenderHtml(newName, newData)
+
+                return (taskDone) =>
+                    gulp.src(template)
+                        .pipe(pug({
+                            data: newData
+                        }))
+                        .pipe(rename(newName + '.html'))
+                        .pipe(gulp.dest(`${destPath}/${subfolder}`))
+                        .on('end', function () {
+                            if(arg.debug) {
+                                console.log('***************')
+                                console.log(`${newName} processed`)
+                                console.log('***************')
+                            }
+
+                        })
+            })
+
+            const pagetask = pages.map((item, index) => {
+                const newName = (index == 0) ? nameFile : `page${index}`
+                item.displayName = `${getPermalink(extracSubFolder(filepath,config, getLanguage(filepath)), newName)}`;
+                return {'skipTask' : skipTask, 'fn': item};
+            })
+
+            return pagetask
+
+
+        } else {
+            function renderPage(taskDone) {
+
+                debugRenderHtml(nameFile, allData)
+
+                return gulp.src(template)
+                    .pipe(pug({
+                        data: allData
+                    }))
+                    .pipe(rename(nameFile + '.html'))
+                    .pipe(gulp.dest(`${destPath}/${subfolder}`))
+                    .on('end', function () {
+                        if(arg.debug) {
+                            console.log('***************')
+                            console.log(`${nameFile} processed`)
+                            console.log('***************')
+                        }
+                        taskDone()
+                    })
+            }
+
+            renderPage.displayName = `${getPermalink(extracSubFolder(filepath,config, getLanguage(filepath)), getNameFile(filepath))}`;
+            return {'skipTask' : skipTask, 'fn': renderPage};
+        }
+
     })
 
+    const flatTask = [ ... tasks].flat()
+
     const tasksToRender = (counterRun > 1 )
-        ? tasks.filter((item) => item.skipTask === false ).map((item) => item.fn)
-        : tasks.map((item) => item.fn);
+        ? flatTask.filter((item) => item.skipTask === false ).map((item) => item.fn)
+        : flatTask.map((item) => item.fn);
 
     return gulp.series(...tasksToRender, seriesDone => {
         seriesDone()

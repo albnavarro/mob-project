@@ -1,0 +1,9 @@
+if pagination
+    div
+        a(href=pagination.previousPage)
+            |prev
+    div
+        a(href=pagination.nextPage)
+            |next
+    div
+        |page !{pagination.current} of !{pagination.total}
