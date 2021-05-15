@@ -159,11 +159,15 @@ function debugMandatoryPropierties(data) {
 * @param file - path of file
 */
 function fileIschanged(file) {
-    const stats = fs.statSync(file)
-    const datetime = new Date()
-    const difference = datetime.getTime() - stats.mtime.getTime()
-    const seconds = Math.abs(difference / 1000)
-    return seconds < 2
+    if(fs.existsSync(file)) {
+        const stats = fs.statSync(file)
+        const datetime = new Date()
+        const difference = datetime.getTime() - stats.mtime.getTime()
+        const seconds = Math.abs(difference / 1000)
+        return seconds < 2
+    } else {
+        return false
+    }
 }
 
 
@@ -174,19 +178,28 @@ function fileIschanged(file) {
 * @param file - path of file
 */
 function taskIsSkippable(filepath, data, template) {
+
+    /*
+    track if post is changed in last 2 seonds
+    */
+    const postDataChecker = () => {
+        return Object.values(data.posts)
+            .flat()
+            .filter((item) => item.source !== undefined)
+            .map((item) => {
+                return fileIschanged(`${dataPath}/${item.source}`);
+            })
+            .some((item) =>  item === true)
+    }
+
+    const postDataIsChanged = (data.posts) ? postDataChecker() : false
+
+
     /*
     track if aditionalData is changed in last 2 seonds
     */
     const aditionDataIsChanged = glob.sync(additionalDataFiles).map((item) => {
-
-        /*
-        Get relative path and file name form /additionalData folder
-        */
         const fileName = `${extractAdditionlSubFolder(item)}${getNameFile(item)}.json`
-
-        /*
-        il file is in additionalData prop of json file che if changed
-        */
         return (data.additionalData.includes(fileName)) ? fileIschanged(item) : false ;
     }).some((item) =>  item === true)
 
@@ -201,7 +214,7 @@ function taskIsSkippable(filepath, data, template) {
     const templateIsChanged = fileIschanged(template)
 
 
-    return (!jsonIsChanged && !templateIsChanged && !aditionDataIsChanged)
+    return (!jsonIsChanged && !templateIsChanged && !aditionDataIsChanged && !postDataIsChanged)
 }
 
 
@@ -603,10 +616,12 @@ function category(done) {
             const nameFile = getNameFile(curr)
             const subfolder  = extracSubFolder(curr,config,lang)
             const permalink = getPermalink(subfolder,nameFile)
+            const sourceFilepath = (lang == config.defaultLocales) ? `${lang}/` : ''
 
             const category = parsed.exportPost.category;
             const obj = {
                 permalink: permalink,
+                source: `${sourceFilepath}${subfolder}${nameFile}.json`,
                 date: parsed.exportPost.date,
                 data: { ...parsed.exportPost.data }
             };
@@ -684,9 +699,133 @@ function html(done) {
         const template = `${themePath}/${data.template}.pug`
 
         /*
+        Get language
+        */
+        data.lang = getLanguage(filepath)
+
+        /*
+        Get file name
+        */
+        const nameFile = getNameFile(filepath)
+
+
+        /*
+        Get data from each json defined in additonalPata propierties [ array ] if exist
+        */
+        const additionalData = extracAdditionalData(data)
+
+
+        /*
+        Get prod abient value
+        */
+        const prodData = {}
+        prodData.isProd = (arg.prod) ? true : false;
+
+
+        /*
+        Get manifest.json for asset
+        */
+        const manifest = {}
+        const manifestData = JSON.parse(fs.readFileSync(manifestFile))
+        manifest.manifest = manifestData
+
+        /*
+        Subfolder
+        Create folder in accordion of json folder position
+        regex form 'data/'' to last slash
+        return the exact path of json file
+        */
+        const subfolder = extracSubFolder(filepath,config,data.lang)
+
+
+        /*
+        Create subfolder if not exist
+        */
+        if(!fs.existsSync(`${destPath}/${subfolder}`)){
+            fs.mkdirSync(`${destPath}/${subfolder}`, {
+                recursive: true
+            })
+        }
+
+
+        /*
+        Get relative path
+        */
+        const relativePath = {}
+        relativePath.relativePath = ( config.defaultLocales == data.lang) ? `` : `/${data.lang}`;
+
+
+        /*
+        Add permalink
+        */
+        const permalinkMap = JSON.parse(fs.readFileSync(permalinkFile))
+
+        const permalink = {}
+        permalink.permalink = getPermalink(subfolder,nameFile)
+        permalink.staticPermalink = `${config.domain}${getPermalink(subfolder,nameFile,false)}`
+        permalink.permalinkMap = permalinkMap
+        permalink.slug = data.slug
+
+        /*
+        Add slug map
+        */
+        const slugMap = JSON.parse(fs.readFileSync(slugFile))
+        const slugMapObj = {}
+        slugMapObj.slugMap = slugMap
+
+
+        /*
+        Add categry post map
+        */
+        const categoryObj = {}
+        if(data.importPost && data.lang) {
+            const categoryMap = JSON.parse(fs.readFileSync(categoryFile))
+            categoryObj.posts = {}
+
+            /*
+            loop thru all catogory defined in {page}.json import propierties
+            */
+            for (const posts of data.importPost) {
+                /*
+                Check if category {posts} defined in {page}.json exist in categoryMap[lang] json file
+                if not, return an empty obj to avoid error
+                */
+                const postsObj = ( categoryMap[data.lang][posts] ) ? categoryMap[data.lang][posts] : {}
+
+                /*
+                Assign catogory post list
+                */
+                categoryObj.posts[posts] = postsObj
+            }
+
+            /*
+            Clean final data obj
+            */
+            delete data.importPost;
+        }
+
+
+
+        /*
+        criticalcss
+        */
+        const critical = {}
+        const criticalFile = `${cssDest}/critical/${subfolder}${nameFile}.css`
+        if (arg.prod && fs.existsSync(criticalFile)) {
+            const documentStyles = fs.readFileSync(criticalFile);
+            critical.documentStyles = documentStyles.toString()
+        }
+
+
+        /*
+        merge all json
+        */
+        const allData = Object.assign({},critical, prodData, config, additionalData, permalink, slugMapObj, categoryObj, relativePath, data, manifest);
+
+        /*
         Check if page is ready to render
         */
-        const skipTask = taskIsSkippable(filepath, data, template)
+        const skipTask = taskIsSkippable(filepath, allData, template)
 
 
 
@@ -699,130 +838,6 @@ function html(done) {
                 taskDone()
                 return
             }
-
-            /*
-            Get file name
-            */
-            const nameFile = getNameFile(filepath)
-
-
-            /*
-            Get language
-            */
-            data.lang = getLanguage(filepath)
-
-            /*
-            Get data from each json defined in additonalPata propierties [ array ] if exist
-            */
-            const additionalData = extracAdditionalData(data)
-
-
-            /*
-            Get prod abient value
-            */
-            const prodData = {}
-            prodData.isProd = (arg.prod) ? true : false;
-
-
-            /*
-            Get manifest.json for asset
-            */
-            const manifest = {}
-            const manifestData = JSON.parse(fs.readFileSync(manifestFile))
-            manifest.manifest = manifestData
-
-            /*
-            Subfolder
-            Create folder in accordion of json folder position
-            regex form 'data/'' to last slash
-            return the exact path of json file
-            */
-            const subfolder = extracSubFolder(filepath,config,data.lang)
-
-
-            /*
-            Create subfolder if not exist
-            */
-            if(!fs.existsSync(`${destPath}/${subfolder}`)){
-                fs.mkdirSync(`${destPath}/${subfolder}`, {
-                    recursive: true
-                })
-            }
-
-
-            /*
-            Get relative path
-            */
-            const relativePath = {}
-            relativePath.relativePath = ( config.defaultLocales == data.lang) ? `` : `/${data.lang}`;
-
-
-            /*
-            Add permalink
-            */
-            const permalinkMap = JSON.parse(fs.readFileSync(permalinkFile))
-
-            const permalink = {}
-            permalink.permalink = getPermalink(subfolder,nameFile)
-            permalink.staticPermalink = `${config.domain}${getPermalink(subfolder,nameFile,false)}`
-            permalink.permalinkMap = permalinkMap
-            permalink.slug = data.slug
-
-            /*
-            Add slug map
-            */
-            const slugMap = JSON.parse(fs.readFileSync(slugFile))
-            const slugMapObj = {}
-            slugMapObj.slugMap = slugMap
-
-
-            /*
-            Add categry post map
-            */
-            const categoryObj = {}
-            if(data.importPost && data.lang) {
-                const categoryMap = JSON.parse(fs.readFileSync(categoryFile))
-                categoryObj.posts = {}
-
-                /*
-                loop thru all catogory defined in {page}.json import propierties
-                */
-                for (const posts of data.importPost) {
-                    /*
-                    Check if category {posts} defined in {page}.json exist in categoryMap[lang] json file
-                    if not, return an empty obj to avoid error
-                    */
-                    const postsObj = ( categoryMap[data.lang][posts] ) ? categoryMap[data.lang][posts] : {}
-
-                    /*
-                    Assign catogory post list
-                    */
-                    categoryObj.posts[posts] = postsObj
-                }
-
-                /*
-                Clean final data obj
-                */
-                delete data.importPost;
-            }
-
-
-            /*
-            criticalcss
-            */
-            const critical = {}
-            const criticalFile = `${cssDest}/critical/${subfolder}${nameFile}.css`
-            if (arg.prod && fs.existsSync(criticalFile)) {
-                const documentStyles = fs.readFileSync(criticalFile);
-                critical.documentStyles = documentStyles.toString()
-            }
-
-
-            /*
-            merge all json
-            */
-            const allData = Object.assign({},critical, prodData, config, additionalData, permalink, slugMapObj, categoryObj, relativePath, data, manifest);
-
 
             /*
             Check if mandatory propierties in {page}.joson is right
@@ -870,6 +885,7 @@ function html(done) {
                     if(arg.debug) {
                         console.log('***************')
                         console.log(`${nameFile} processed`)
+                        console.log('***************')
                     }
                     taskDone()
                 })
