@@ -28,4 +28,5 @@ mixin list(item)
     button.main-arrow-back
   nav.nav(role='navigation')
       ul.main-menu
-          +list(navigation)
+          if(navigation)
+              +list(navigation)

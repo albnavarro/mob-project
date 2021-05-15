@@ -153,6 +153,10 @@ function debugMandatoryPropierties(data) {
 * HELPER FUNCTION
 */
 
+/*
+* check if nested prop exist in obj
+*/
+const propValidate = (p, o) => p.reduce((xs, x) => (xs && xs[x]) ? xs[x] : null, o)
 
 /*
 * check if fileis Changed
@@ -190,7 +194,7 @@ function taskIsSkippable(filepath, data, template) {
             .some((item) =>  item === true)
     }
 
-    const postDataIsChanged = (data.posts) ? postDataChecker() : false
+    const postDataIsChanged = ('posts' in data) ? postDataChecker() : false
 
 
     /*
@@ -198,7 +202,7 @@ function taskIsSkippable(filepath, data, template) {
     */
     const aditionDataIsChanged = glob.sync(additionalDataFiles).map((item) => {
         const fileName = `${extractAdditionlSubFolder(item)}${getNameFile(item)}.json`
-        return (data.additionalData.includes(fileName)) ? fileIschanged(item) : false ;
+        return (('additionalData' in data) && data.additionalData.includes(fileName)) ? fileIschanged(item) : false ;
     }).some((item) =>  item === true)
 
     /*
@@ -509,7 +513,7 @@ function slug(done) {
     const slugObj = allPath.reduce((acc, curr) => {
       const data = JSON.parse(fs.readFileSync(curr))
 
-      if(data.univoqueId) {
+      if('univoqueId' in data) {
           acc[data.univoqueId] = {...acc[data.univoqueId]}
           acc[data.univoqueId][getLanguage(curr)] = data.slug
       }
@@ -560,7 +564,7 @@ function permalink(done) {
       const subfolder  = extracSubFolder(curr,config,lang)
       const permalinkUrl = getPermalink(subfolder,nameFile)
 
-      if(data.univoqueId) {
+      if('univoqueId' in data) {
           acc[data.univoqueId] = {...acc[data.univoqueId]}
           acc[data.univoqueId][getLanguage(curr)] = permalinkUrl
       }
@@ -604,7 +608,7 @@ function category(done) {
 
     const categoryObj = allPath.reduce((acc, curr, i) => {
         const parsed = JSON.parse(fs.readFileSync(curr));
-        if (parsed.exportPost) {
+        if ('exportPost' in parsed) {
             const lang = getLanguage(curr)
             const nameFile = getNameFile(curr)
             const subfolder  = extracSubFolder(curr,config,lang)
@@ -781,7 +785,7 @@ function html(done) {
         const categoryMap = JSON.parse(fs.readFileSync(categoryFile))
         const getPosts = (data) => {
             return data.importPost.reduce((acc, curr) => {
-                if ((data.lang in categoryMap) && (curr in categoryMap[data.lang]))  acc[curr] = categoryMap[data.lang][curr]
+                if (propValidate([data.lang, curr], categoryMap))  acc[curr] = categoryMap[data.lang][curr]
                 return acc
             }, {})
         }
