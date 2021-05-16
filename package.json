@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "gulp dev",
     "page": "gulp watch -page",
+    "debugpage" : "gulp html -debug -page",
     "build": "gulp build -prod",
     "image": "gulp image",
     "icons": "gulp icons",

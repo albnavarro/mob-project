@@ -160,20 +160,29 @@ Debug file rendered
 */
 function debugRenderHtml(nameFile, data) {
     if(arg.debug) {
-        console.log()
-        console.log('***************')
-        console.log(nameFile)
-        console.log('***************')
+        console.log(util.inspect('***************', { colors: true }))
+        console.log(util.inspect(nameFile, { colors: true }))
+        console.log(util.inspect('***************', { colors: true }))
         console.log(util.inspect(data, {showHidden: false, depth: null}))
-        console.log()
     }
 }
-
 
 /*
 * check if nested prop exist in obj
 */
 const propValidate = (p, o) => p.reduce((xs, x) => (xs && xs[x]) ? xs[x] : null, o)
+
+
+/*
+* Sort by date utility
+*/
+function sortbyDate(arr) {
+    return arr.sort((a, b) => {
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+      return dateA - dateB;
+    });
+}
 
 
 
@@ -185,6 +194,13 @@ function chunk(array, size) {
         index += size;
     }
     return chunked_arr;
+}
+
+
+/*
+*/
+function getArchivePageName(index, nameFile, dinamicPageName) {
+    return (index == 0) ? nameFile : `${dinamicPageName}${index}`
 }
 
 /*
@@ -668,24 +684,9 @@ function category(done) {
         return acc;
     }, {});
 
-    /*
-    *  For each lanugages
-    */
     for (const [key, lang] of Object.entries(categoryObj)) {
-
-        /*
-        *  For each category
-        */
-        for (const [key, posts] of Object.entries(lang)) {
-
-            /*
-            *  Order post by date
-            */
-            posts.sort((a, b) => {
-              const dateA = new Date(a.date);
-              const dateB = new Date(b.date);
-              return dateA - dateB;
-            });
+        for (let [key, posts] of Object.entries(lang)) {
+            posts = [ ... sortbyDate(posts) ]
         }
     }
 
@@ -872,10 +873,21 @@ function html(done) {
                 : parseInt(config.postPerPage)
 
             /*
-            Chunk array post for pagination
+            Get dynamic page name
             */
-            const pageData = chunk(Object.values(allData.posts).flat(), postPerPage)
-            const dinamicPageName = config.dinamicPageName
+            const dinamicPageName = ('dinamicPageName' in allData.isArchive)
+                ? allData.isArchive.dinamicPageName
+                : config.dinamicPageName
+
+
+            /*
+            Chunk array post for pagination
+            Flat all category post in one array
+            */
+            const flatData =  Object.values(allData.posts).flat()
+            const sortedData = sortbyDate(flatData)
+            const pageData = chunk(sortedData, postPerPage)
+
 
             /*
             Loop in chunked array to create each post page
@@ -887,7 +899,7 @@ function html(done) {
                 Reset post data and add the new data for specific page
                 */
                 newData.posts = {}
-                newData.posts.all = item
+                newData.posts.merged = item
 
                 /*
                 Previous page link
@@ -922,9 +934,12 @@ function html(done) {
                     'previousPage' : getPreviousPage(),
                     'nextPage' : getNextPage()
                 }
-                const newName = (index == 0) ? nameFile : `${dinamicPageName}${index}`
 
-                debugRenderHtml(newName, newData)
+                /*
+                Set specific name page
+                */
+                const newName = getArchivePageName(index, nameFile, dinamicPageName)
+
 
                 return (taskDone) =>
                     gulp.src(template)
@@ -935,16 +950,17 @@ function html(done) {
                         .pipe(gulp.dest(`${destPath}/${subfolder}`))
                         .on('end', function () {
                             if(arg.debug) {
-                                console.log('***************')
-                                console.log(`${newName} processed`)
-                                console.log('***************')
+                                debugRenderHtml(newName, newData)
+                                console.log(util.inspect('***************', { colors: true }))
+                                console.log(util.inspect(`${newName} processed`, { colors: true }))
+                                console.log(util.inspect('***************', { colors: true }))
                             }
 
                         })
             })
 
             const pagetask = pages.map((item, index) => {
-                const newName = (index == 0) ? nameFile : `page${index}`
+                const newName = getArchivePageName(index, nameFile, dinamicPageName)
                 item.displayName = `${getPermalink(extracSubFolder(filepath,config, getLanguage(filepath)), newName)}`;
                 return {'skipTask' : skipTask, 'fn': item};
             })
@@ -954,9 +970,6 @@ function html(done) {
 
         } else {
             function renderPage(taskDone) {
-
-                debugRenderHtml(nameFile, allData)
-
                 return gulp.src(template)
                     .pipe(pug({
                         data: allData
@@ -965,9 +978,10 @@ function html(done) {
                     .pipe(gulp.dest(`${destPath}/${subfolder}`))
                     .on('end', function () {
                         if(arg.debug) {
-                            console.log('***************')
-                            console.log(`${nameFile} processed`)
-                            console.log('***************')
+                            debugRenderHtml(nameFile, allData)
+                            console.log(util.inspect('***************', { colors: true }))
+                            console.log(util.inspect(`${nameFile} processed`, { colors: true }))
+                            console.log(util.inspect('***************', { colors: true }))
                         }
                         taskDone()
                     })
@@ -1158,5 +1172,8 @@ exports.watch = watchTask
 *
 * watch single page:
 * npm run page "en/index.json"
+*
+* debug single page:
+* npm run debugpage "en/articles/index.json"
 * .....
 */
