@@ -663,6 +663,7 @@ function category(done) {
             const category = parsed.exportPost.category;
             const obj = {
                 permalink: permalink,
+                category: category,
                 source: `${sourceFilepath}${subfolder}${nameFile}.json`,
                 date: parsed.exportPost.date,
                 data: { ...parsed.exportPost.data }
