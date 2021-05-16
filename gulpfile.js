@@ -1,6 +1,10 @@
 "use strict"
 
 const
+    // CONFIG
+    config = require('./config.json'),
+
+    // GULP /NODE
     util = require('util'),
     path = require('path'),
     fs = require('fs'),
@@ -29,15 +33,18 @@ const
     replace = require('gulp-string-replace'),
     reload = browserSync.reload,
 
+    // ROLLUP
     rollup = require('rollup'),
     babel = require('@rollup/plugin-babel'),
     nodeResolve = require('@rollup/plugin-node-resolve'),
     commonjs = require('@rollup/plugin-commonjs'),
     terser = require('rollup-plugin-terser'),
 
+    // BASE PATH
     themePath = path.resolve('src'),
     destPath = path.resolve('www'),
 
+    // PATH SOURCE
     imgPath = path.join(themePath, 'img'),
     jsPath = path.join(themePath, 'js'),
     componentPath = path.join(themePath, 'component'),
@@ -46,14 +53,15 @@ const
     dataPath = path.join(themePath, 'data'),
     additionalDataPath = path.join(themePath, 'additionalData'),
 
+    // PATH DEST
     cssDest = path.join(destPath, 'assets/css'),
     jsDest = path.join(destPath, 'assets/js'),
     svgDest = path.join(destPath, 'assets/svg'),
     imgDest = path.join(destPath, 'assets/img'),
-
     distPath = path.join(destPath, 'assets/dist'),
     dataDestFolder = path.join(destPath, 'assets/data'),
 
+    // FILES
     cssFile = `${cssDest}/style.css`,
     jsFile = `${jsDest}/script.js`,
     cssCritical = `${cssDest}/critical.css`,
@@ -63,8 +71,9 @@ const
     scssFiles = `${scssPath}/**/*.scss`,
     componentscssFiles = `${componentPath}/**/*.scss`,
     svgFiles = `${svgPath}/*.svg`,
-    pugFiles = `${themePath}/*.pug`,
     allPugFiles = `${themePath}/**/*.pug`,
+    includesPugFile = `${themePath}/includes/**/*.pug`,
+    componentPugFile = `${componentPath}/**/*.pug`,
     dataFiles = `${themePath}/data/**/*.json`,
     additionalDataFiles = `${themePath}/additionalData/**/*.json`,
     manifestFile = `${distPath}/manifest.json`,
@@ -72,7 +81,22 @@ const
     slugFile = `${dataDestFolder}/slug.json`,
     categoryFile = `${dataDestFolder}/category.json`
 
+/*
+How many time watch task is invoked
+*/
 let counterRun = 0
+
+/*
+last file saved
+*/
+let fileModified = ''
+
+/*
+Map of all includes file
+*/
+let includesFileMap = []
+
+
 
 // fetch command line arguments
 const arg = (argList => {
@@ -221,12 +245,41 @@ function fileIschanged(file) {
 
 
 
-
 /*
 * check if json or template is Changed
 * @param file - path of file
 */
 function taskIsSkippable(filepath, data, template) {
+
+    /*
+    track if specific of shared includes pug ( in includes thempath ) file is changed in last 2 seonds
+    */
+    const includesFileIsChanged = includesFileMap.map((item) => {
+        return item === fileModified;
+    }).some((item) =>  item === true)
+
+
+    /*
+    track if specific includes pug ( in component path ) file is changed in last 2 seonds
+    */
+    const componentFileIsChanged = ('registerComponent' in data)
+        ? data.registerComponent.map((item) => {
+                const filePath = `${componentPath}/${item}`
+                return filePath === fileModified
+            }).some((item) =>  item === true)
+        : false
+
+
+    /*
+    track if aditionalData is changed in last 2 seonds
+    */
+    const aditionDataIsChanged = ('additionalData' in data)
+        ? data.additionalData.map((item) => {
+                const filePath = `${additionalDataPath}/${item}`
+                return filePath === fileModified
+            }).some((item) =>  item === true)
+        : false
+
 
     /*
     track if post is changed in last 2 seonds
@@ -235,7 +288,7 @@ function taskIsSkippable(filepath, data, template) {
         return Object.values(data.posts)
             .flat()
             .filter((item) => item.source !== undefined)
-            .map((item) => fileIschanged(`${dataPath}/${item.source}`))
+            .map((item) => fileModified === `${dataPath}/${item.source}`)
             .some((item) =>  item === true)
     }
 
@@ -243,25 +296,23 @@ function taskIsSkippable(filepath, data, template) {
 
 
     /*
-    track if aditionalData is changed in last 2 seonds
-    */
-    const aditionDataIsChanged = glob.sync(additionalDataFiles).map((item) => {
-        const fileName = `${extractAdditionlSubFolder(item)}${getNameFile(item)}.json`
-        return (('additionalData' in data) && data.additionalData.includes(fileName)) ? fileIschanged(item) : false ;
-    }).some((item) =>  item === true)
-
-    /*
     track if json is changed in last 2 seonds
     */
-    const jsonIsChanged = fileIschanged(filepath)
+    const jsonIsChanged = filepath === fileModified
 
     /*
     track if template is changed in last 2 seonds
     */
-    const templateIsChanged = fileIschanged(template)
+    const templateIsChanged = template === fileModified
 
 
-    return (!jsonIsChanged && !templateIsChanged && !aditionDataIsChanged && !postDataIsChanged)
+    return (
+        !jsonIsChanged &&
+        !templateIsChanged &&
+        !aditionDataIsChanged &&
+        !postDataIsChanged &&
+        !componentFileIsChanged &&
+        !includesFileIsChanged)
 }
 
 
@@ -295,7 +346,15 @@ function getExtensionFile() {
 }
 
 
+function extractThemeSubFolder(filepath) {
+    const pattern = new RegExp(`${themePath}\/(.*\/).*$`);
+    const path = filepath.match(pattern);
 
+    /*
+    * Return subfolder if match in regex or empty vaalue
+    */
+    return (!path) ? '' : path[1]
+}
 
 function extractAdditionlSubFolder(filepath) {
     const pattern = new RegExp(`${additionalDataPath}\/(.*\/).*$`);
@@ -314,7 +373,7 @@ function extractAdditionlSubFolder(filepath) {
 * @param additionalData - all data extract from all json file associated to {page}.json
 * return '' id {page}.json is in root or path form root
 */
-function extracSubFolder(filepath, config, lang) {
+function extracSubFolder(filepath, lang) {
     const pathRoot = ( config.defaultLocales == lang) ? `${dataPath}/${lang}` : `${dataPath}`
     const pattern = new RegExp(`${pathRoot}\/(.*\/).*$`);
     const path = filepath.match(pattern);
@@ -543,6 +602,29 @@ function criticalCss(done) {
 };
 
 
+/*
+* Detect file saved, .pug or .json
+*/
+function detectModifiedFiles(done) {
+    // get list of includes file
+    includesFileMap = glob.sync(includesPugFile)
+
+    // get last file saved
+    const allFiles = glob.sync(`${themePath}/**/*.{json,pug}`)
+    const files = allFiles.map((item) => {
+        return {
+            'modifies' : fileIschanged(item),
+            'file': item
+        }
+    })
+    .find((item) => item.modifies === true)
+
+    fileModified = files.file
+    done()
+}
+
+
+
 
 /*
 * CREATE SLUG MAP
@@ -552,7 +634,6 @@ function criticalCss(done) {
  * }
 */
 function slug(done) {
-    const config = JSON.parse(fs.readFileSync(`config.json`))
     const allPath = glob.sync(path.join(dataPath, '/**/*.json'))
 
     const slugObj = allPath.reduce((acc, curr) => {
@@ -598,7 +679,6 @@ function slug(done) {
  * }
 */
 function permalink(done) {
-    const config = JSON.parse(fs.readFileSync(`config.json`))
     const allPath = glob.sync(path.join(dataPath, '/**/*.json'))
 
     const peramlinkObj = allPath.reduce((acc, curr) => {
@@ -606,7 +686,7 @@ function permalink(done) {
       const lang = getLanguage(curr)
       const originalNameFile = getNameFile(curr)
       const nameFile = (arg.prod && originalNameFile === 'index') ? '' : originalNameFile
-      const subfolder  = extracSubFolder(curr,config,lang)
+      const subfolder  = extracSubFolder(curr,lang)
       const permalinkUrl = getPermalink(subfolder,nameFile)
 
       if('univoqueId' in data) {
@@ -648,7 +728,6 @@ function category(done) {
     /*
     * Create main obj
     */
-    const config = JSON.parse(fs.readFileSync(`config.json`))
     const allPath = glob.sync(path.join(dataPath, '/**/*.json'))
 
     const categoryObj = allPath.reduce((acc, curr, i) => {
@@ -656,7 +735,7 @@ function category(done) {
         if ('exportPost' in parsed) {
             const lang = getLanguage(curr)
             const nameFile = getNameFile(curr)
-            const subfolder  = extracSubFolder(curr,config,lang)
+            const subfolder  = extracSubFolder(curr,lang)
             const permalink = getPermalink(subfolder,nameFile)
             const sourceFilepath = (lang == config.defaultLocales) ? `${lang}/` : ''
 
@@ -719,7 +798,6 @@ function category(done) {
 */
 
 function html(done) {
-    const config = JSON.parse(fs.readFileSync(`config.json`))
     const sourcePath =  (!arg.page) ? path.join(dataPath, '/**/*.json') :  path.join(dataPath, arg.page)
     const streams = glob.sync(sourcePath)
 
@@ -752,6 +830,13 @@ function html(done) {
 
 
         /*
+        List of pug include for track page refresh
+        */
+        const registerComponent = {}
+        registerComponent.registerComponent = ('registerComponent' in data) ? data.registerComponent : []
+
+
+        /*
         Get prod abient value
         */
         const prodData = {}
@@ -771,7 +856,7 @@ function html(done) {
         regex form 'data/'' to last slash
         return the exact path of json file
         */
-        const subfolder = extracSubFolder(filepath,config,data.lang)
+        const subfolder = extracSubFolder(filepath,data.lang)
 
 
         /*
@@ -962,7 +1047,7 @@ function html(done) {
 
             const pagetask = pages.map((item, index) => {
                 const newName = getArchivePageName(index, nameFile, dinamicPageName)
-                item.displayName = `${getPermalink(extracSubFolder(filepath,config, getLanguage(filepath)), newName)}`;
+                item.displayName = `${getPermalink(extracSubFolder(filepath, getLanguage(filepath)), newName)}`;
                 return {'skipTask' : skipTask, 'fn': item};
             })
 
@@ -988,7 +1073,7 @@ function html(done) {
                     })
             }
 
-            renderPage.displayName = `${getPermalink(extracSubFolder(filepath,config, getLanguage(filepath)), getNameFile(filepath))}`;
+            renderPage.displayName = `${getPermalink(extracSubFolder(filepath, getLanguage(filepath)), getNameFile(filepath))}`;
             return {'skipTask' : skipTask, 'fn': renderPage};
         }
 
@@ -1077,7 +1162,7 @@ function deleteEmptyDirectories(done) {
 function watch_files(done) {
     gulp.watch([scssFiles, componentscssFiles], style)
     gulp.watch([jsFiles, componentJsFiles], gulp.series(js, reloadPage))
-    gulp.watch([allPugFiles, dataFiles, additionalDataFiles], gulp.series(category, slug, permalink, html, reloadPage))
+    gulp.watch([allPugFiles, dataFiles, additionalDataFiles], gulp.series(detectModifiedFiles, category, slug, permalink, html, reloadPage))
 
     done();
 }
@@ -1147,6 +1232,7 @@ exports.deleteEmptyDirectories = deleteEmptyDirectories
 exports.permalink = permalink
 exports.category = category
 exports.slug = slug
+exports.detectModifiedFiles = detectModifiedFiles
 
 /*
 * MAIN TASK

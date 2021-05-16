@@ -6,6 +6,9 @@
     "additionalData" : [
         "nav.json"
     ],
+    "registerComponent" : [
+        "to-top/pug/toTop.pug"
+    ],
     "isArchive" : {
         "postPerPage" : "2",
         "dinamicPageName" : "archive-"

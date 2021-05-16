@@ -7,6 +7,9 @@
     "additionalData" : [
         "nav.json"
     ],
+    "registerComponent" : [
+        "to-top/pug/toTop.pug"
+    ],
     "parentUniqueId" : "news",
     "exportPost" : {
         "category" : "news",
