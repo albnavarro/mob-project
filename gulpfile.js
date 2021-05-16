@@ -96,6 +96,22 @@ Map of all includes file
 */
 let includesFileMap = []
 
+/*
+Map of all slug
+*/
+let permalinkMapData = {}
+
+/*
+Map of all slug
+*/
+let slugMapData = {}
+
+/*
+Map of all cateogry
+*/
+let categoryMapData = {}
+
+
 
 
 // fetch command line arguments
@@ -665,7 +681,8 @@ function slug(done) {
         })
     }
 
-    fs.writeFileSync(slugFile, JSON.stringify(slugObj));
+    slugMapData = slugObj
+    fs.writeFile(slugFile, JSON.stringify(slugObj), () => {})
     done()
 
 }
@@ -714,7 +731,8 @@ function permalink(done) {
         })
     }
 
-    fs.writeFileSync(permalinkFile, JSON.stringify(peramlinkObj));
+    permalinkMapData = peramlinkObj
+    fs.writeFile(permalinkFile, JSON.stringify(peramlinkObj), () => {})
     done()
 
 }
@@ -787,7 +805,8 @@ function category(done) {
         })
     }
 
-    fs.writeFileSync(categoryFile, JSON.stringify(categoryObj));
+    categoryMapData = categoryObj
+    fs.writeFile(categoryFile, JSON.stringify(categoryObj), () => {})
     done()
 }
 
@@ -879,29 +898,29 @@ function html(done) {
         /*
         Add permalink
         */
-        const permalinkMap = JSON.parse(fs.readFileSync(permalinkFile))
+        // const permalinkMap = JSON.parse(fs.readFileSync(permalinkFile))
 
         const permalink = {}
         permalink.permalink = getPermalink(subfolder,nameFile)
         permalink.staticPermalink = `${config.domain}${getPermalink(subfolder,nameFile,false)}`
-        permalink.permalinkMap = permalinkMap
+        permalink.permalinkMap = permalinkMapData
         permalink.slug = data.slug
 
         /*
         Add slug map
         */
-        const slugMap = JSON.parse(fs.readFileSync(slugFile))
+        // const slugMap = JSON.parse(fs.readFileSync(slugFile))
         const slugMapObj = {}
-        slugMapObj.slugMap = slugMap
+        slugMapObj.slugMap = slugMapData
 
 
         /*
         Add categry post map
         */
-        const categoryMap = JSON.parse(fs.readFileSync(categoryFile))
+        // const categoryMap = JSON.parse(fs.readFileSync(categoryFile))
         const getPosts = (data) => {
             return data.importPost.reduce((acc, curr) => {
-                if (propValidate([data.lang, curr], categoryMap))  acc[curr] = categoryMap[data.lang][curr]
+                if (propValidate([data.lang, curr], categoryMapData))  acc[curr] = categoryMapData[data.lang][curr]
                 return acc
             }, {})
         }
