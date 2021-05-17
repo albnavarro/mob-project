@@ -17,22 +17,23 @@ block content
                     each tag, key in importTag
                         |!{tag} | 
                 hr
-                each post, key in chunkedPost
-                    div
-                        p
-                            |!{post.date}
-                        a(href=post.permalink)
-                            |!{post.data.title}
-                        p
-                            |!{post.data.description}
-                        p
-                            |in !{post.category}
+                if chunkedPost
+                    each post, key in chunkedPost
                         div
-                            |tag:
-                        div
-                            each tag, key in post.tag
-                                |!{tag} |
-                        hr
+                            p
+                                |!{post.date}
+                            a(href=post.permalink)
+                                |!{post.data.title}
+                            p
+                                |!{post.data.description}
+                            p
+                                |in !{post.category}
+                            div
+                                |tag:
+                            div
+                                each tag, key in post.tag
+                                    |!{tag} |
+                            hr
                 
                 include includes/pagination.pug
         

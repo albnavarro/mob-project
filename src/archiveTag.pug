@@ -16,21 +16,22 @@ block content
                         |display tag:
                     each tag, key in importTag
                         |!{tag} | 
-                each post, key in tags
-                    div
-                        p
-                            |!{post.date}
-                        a(href=post.permalink)
-                            |!{post.data.title}
-                        p
-                            |!{post.data.description}
-                        p
-                            |in !{post.category}
+                if tags
+                    each post, key in tags
                         div
-                            |tag:
-                        div
-                            each tag, key in post.tag
-                                |!{tag} |
-                        hr
+                            p
+                                |!{post.date}
+                            a(href=post.permalink)
+                                |!{post.data.title}
+                            p
+                                |!{post.data.description}
+                            p
+                                |in !{post.category}
+                            div
+                                |tag:
+                            div
+                                each tag, key in post.tag
+                                    |!{tag} |
+                            hr
                                 
         
