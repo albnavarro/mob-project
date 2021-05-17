@@ -979,6 +979,12 @@ function html(done) {
 
 
         /*
+        Create empty chunkedAyrray ( pagination ) to avoid error
+        */
+        const chunkedPost = {}
+        chunkedPost.chunkedPost = []
+
+        /*
         merge all json
         */
         const allData = Object.assign({},
@@ -990,6 +996,7 @@ function html(done) {
             slugMapObj,
             categoryObj,
             tagObj,
+            chunkedPost,
             relativePath,
             data,
             manifest
