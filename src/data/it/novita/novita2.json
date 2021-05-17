@@ -3,14 +3,14 @@
     "univoqueId" : "news2",
     "slug" : "novitá 2",
     "description" : "custom description",
+    "title" : "novitá 2",
+    "parentUniqueId" : "news",
     "additionalData" : [
         "nav.json"
     ],
     "registerComponent" : [
         "to-top/pug/toTop.pug"
     ],
-    "title" : "novitá 2",
-    "parentUniqueId" : "news",
     "exportPost" : {
         "category" : "novita",
         "date" : "Mon Oct 28 2021 00:00:00 GMT",

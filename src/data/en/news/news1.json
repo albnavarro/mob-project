@@ -4,15 +4,19 @@
     "slug" : "news 1",
     "title" : "news 1",
     "description" : "custom description",
+    "parentUniqueId" : "news",
     "additionalData" : [
         "nav.json"
     ],
     "registerComponent" : [
         "to-top/pug/toTop.pug"
     ],
-    "parentUniqueId" : "news",
     "exportPost" : {
         "category" : "news",
+        "tag" : [
+            "tag2",
+            "tag5"
+        ],
         "date" : "Mon Oct 28 2021 00:00:00 GMT",
         "data" : {
             "title" : "news 1",

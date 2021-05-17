@@ -3,14 +3,14 @@
     "univoqueId" : "articles3",
     "slug" : "article 3",
     "description" : "custom description",
+    "title" : "article 3",
+    "parentUniqueId" : "articles",
     "additionalData" : [
         "nav.json"
     ],
     "registerComponent" : [
         "to-top/pug/toTop.pug"
     ],
-    "title" : "article 3",
-    "parentUniqueId" : "articles",
     "exportPost" : {
         "category" : "articles",
         "date" : "Mon Oct 10 2021 11:00:00 GMT",

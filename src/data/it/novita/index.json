@@ -1,5 +1,5 @@
 {
-    "template": "archive",
+    "template": "archivePost",
     "univoqueId" : "news",
     "slug" : "novitá",
     "description" : "custom description",

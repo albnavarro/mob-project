@@ -75,6 +75,10 @@
                 {
                     "label" : "",
                     "univoqueId" : "news"
+                },
+                {
+                    "label" : "",
+                    "univoqueId" : "tagArchive"
                 }
             ]
         }

@@ -1,0 +1,38 @@
+extends _wrapper.pug
+
+block content
+    body
+        div(id="spriteSvg" data-svg="/assets/svg/svg.svg")
+            
+        header
+            .container
+                include includes/langSelector.pug
+            .container.menu-container.menu-container--top
+                include includes/navigation.pug
+        main
+            .container
+                if importTag && importTag.length
+                    div
+                        |display tag:
+                    each tag, key in importTag
+                        |!{tag} | 
+                hr
+                each post, key in chunkedPost
+                    div
+                        p
+                            |!{post.date}
+                        a(href=post.permalink)
+                            |!{post.data.title}
+                        p
+                            |!{post.data.description}
+                        p
+                            |in !{post.category}
+                        div
+                            |tag:
+                        div
+                            each tag, key in post.tag
+                                |!{tag} |
+                        hr
+                
+                include includes/pagination.pug
+        

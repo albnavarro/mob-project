@@ -1,7 +1,7 @@
 {
-    "template": "archivePost",
-    "univoqueId" : "archive",
-    "slug" : "archivio",
+    "template": "archiveTag",
+    "univoqueId" : "tagArchive",
+    "slug" : "tag Archive",
     "description" : "custom description",
     "additionalData" : [
         "nav.json"
@@ -9,8 +9,8 @@
     "registerComponent" : [
         "to-top/pug/toTop.pug"
     ],
-    "importPost" : [
-        "novita",
-        "articoli"
+    "importTag" : [
+        "tag3",
+        "tag1"
     ]
 }

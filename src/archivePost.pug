@@ -22,7 +22,11 @@ block content
                                 |!{post.data.description}
                             p
                                 |in !{post.category}
+                            div
+                                |tag:
+                            div
+                                each tag, key in post.tag
+                                    |!{tag} |
                             hr
-                
-                include includes/pagination.pug
+                                
         

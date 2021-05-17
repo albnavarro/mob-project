@@ -311,6 +311,18 @@ function taskIsSkippable(filepath, data, template) {
     const postDataIsChanged = ('posts' in data) ? postDataChecker() : false
 
 
+
+    /*
+    track if tag is changed in last 2 seonds
+    */
+    const tagDataChecker = () => {
+        return data.tags
+                .map((item) => fileModified === `${dataPath}/${item.source}`)
+                .some((item) =>  item === true)
+    }
+    const tagDataIsChanged = ('tags' in data) ? tagDataChecker() : false
+
+
     /*
     track if json is changed in last 2 seonds
     */
@@ -328,7 +340,8 @@ function taskIsSkippable(filepath, data, template) {
         !aditionDataIsChanged &&
         !postDataIsChanged &&
         !componentFileIsChanged &&
-        !includesFileIsChanged)
+        !includesFileIsChanged &&
+        !tagDataIsChanged)
 }
 
 
@@ -761,6 +774,7 @@ function category(done) {
             const obj = {
                 permalink: permalink,
                 category: category,
+                tag: ( 'tag' in parsed.exportPost ) ? parsed.exportPost.tag : [],
                 source: `${sourceFilepath}${subfolder}${nameFile}.json`,
                 date: parsed.exportPost.date,
                 data: { ...parsed.exportPost.data }
@@ -897,8 +911,9 @@ function html(done) {
 
         /*
         Add permalink
+        if in debug mode golbal stored info is bypass anche the data il read form file
         */
-        // const permalinkMap = JSON.parse(fs.readFileSync(permalinkFile))
+        if(arg.debug) permalinkMapData = JSON.parse(fs.readFileSync(permalinkFile))
 
         const permalink = {}
         permalink.permalink = getPermalink(subfolder,nameFile)
@@ -908,16 +923,22 @@ function html(done) {
 
         /*
         Add slug map
+        if in debug mode golbal stored info is bypass anche the data il read form file
         */
-        // const slugMap = JSON.parse(fs.readFileSync(slugFile))
+        if(arg.debug) slugMapData = JSON.parse(fs.readFileSync(slugFile))
+
         const slugMapObj = {}
         slugMapObj.slugMap = slugMapData
 
 
+
+
         /*
-        Add categry post map
+        Add imported categories
+        if in debug mode golbal stored info is bypass anche the data il read form file
         */
-        // const categoryMap = JSON.parse(fs.readFileSync(categoryFile))
+        if(arg.debug) categoryMapData = JSON.parse(fs.readFileSync(categoryFile))
+
         const getPosts = (data) => {
             return data.importPost.reduce((acc, curr) => {
                 if (propValidate([data.lang, curr], categoryMapData))  acc[curr] = categoryMapData[data.lang][curr]
@@ -927,6 +948,24 @@ function html(done) {
 
         const categoryObj = {}
         categoryObj.posts = ('importPost' in data) ? getPosts(data) : {}
+
+
+        /*
+        Add imported tags
+        */
+        const getTags = (data) => {
+            const flatCategory = Object.values(categoryMapData[data.lang]).flat()
+            const result = flatCategory.reduce((acc, curr) => {
+                const post = data.importTag.some(item => curr.tag.includes(item))
+                if (post) acc.push(curr)
+                return acc
+            }, [])
+            return result
+        }
+
+        const tagObj = {}
+        tagObj.tags = ('importTag' in data) ? sortbyDate(getTags(data)) : []
+
 
         /*
         criticalcss
@@ -950,6 +989,7 @@ function html(done) {
             permalink,
             slugMapObj,
             categoryObj,
+            tagObj,
             relativePath,
             data,
             manifest
@@ -968,7 +1008,10 @@ function html(done) {
             process.exit(0);
         }
 
-        if(('isArchive' in allData)) {
+        /*
+        Same checkof tag and post pagination
+        */
+        if(('isArchive' in allData) && (allData.tags.length || Object.keys(allData.posts).length)) {
 
             /*
             Get post per page, config si defulat otherwise is overrride form data josn
@@ -988,11 +1031,11 @@ function html(done) {
             /*
             Chunk array post for pagination
             Flat all category post in one array
+            if there is importTag and importPost in smae file importTag win.
             */
-            const flatData =  Object.values(allData.posts).flat()
+            const flatData = (allData.tags.length) ? allData.tags : Object.values(allData.posts).flat()
             const sortedData = sortbyDate(flatData)
             const pageData = chunk(sortedData, postPerPage)
-
 
             /*
             Loop in chunked array to create each post page
@@ -1003,8 +1046,7 @@ function html(done) {
                 /*
                 Reset post data and add the new data for specific page
                 */
-                newData.posts = {}
-                newData.posts.merged = item
+                newData.chunkedPost = item
 
                 /*
                 Previous page link

@@ -1,5 +1,5 @@
 {
-    "template": "archive",
+    "template": "archivePost",
     "univoqueId" : "articles",
     "slug" : "articoli",
     "description" : "custom description",

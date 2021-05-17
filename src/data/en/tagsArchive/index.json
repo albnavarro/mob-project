@@ -1,7 +1,7 @@
 {
     "template": "archivePagination",
-    "univoqueId" : "articles",
-    "slug" : "articles",
+    "univoqueId" : "tagArchive",
+    "slug" : "tag Archive",
     "description" : "custom description",
     "additionalData" : [
         "nav.json"
@@ -11,9 +11,11 @@
     ],
     "isArchive" : {
         "postPerPage" : "2",
-        "dinamicPageName" : "archive-"
+        "dinamicPageName" : "tagArchive-"
     },
-    "importPost" : [
-        "articles"
+    "importTag" : [
+        "tag3",
+        "tag2",
+        "tag1"
     ]
 }
