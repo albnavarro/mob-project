@@ -15,23 +15,25 @@ block content
                     div
                         |display tag:
                     each tag, key in importTag
-                        |!{tag} | 
+                        +getTagName(tag,' | ')
+                hr
                 if tags
                     each post, key in tags
                         div
                             p
-                                |!{post.date}
+                                +getVal(post, 'date')
                             a(href=post.permalink)
-                                |!{post.data.title}
+                                +getVal(post, 'data', 'title')
                             p
-                                |!{post.data.description}
+                                +getVal(post, 'data', 'description')
                             p
-                                |in !{post.category}
+                                |in 
+                                +getCategoryName(post.category)
                             div
                                 |tag:
                             div
                                 each tag, key in post.tag
-                                    |!{tag} |
+                                    +getTagName(tag,' | ')
                             hr
                                 
         

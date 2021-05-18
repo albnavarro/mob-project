@@ -13,6 +13,12 @@
     ],
     "exportPost" : {
         "category" : "articles",
+        "tag" : [
+            "tag2",
+            "tag1",
+            "tag3",
+            "tag4"
+        ],
         "date" : "Mon Oct 10 2021 11:00:00 GMT",
         "data" : {
             "title" : "articles 3",

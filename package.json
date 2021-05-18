@@ -5,7 +5,7 @@
   "main": "gulpfile.js",
   "scripts": {
     "dev": "gulp dev",
-    "debugpage" : "gulp html -debug -page",
+    "debugpage": "gulp html -debug -page",
     "build": "gulp build -prod",
     "image": "gulp image",
     "icons": "gulp icons",

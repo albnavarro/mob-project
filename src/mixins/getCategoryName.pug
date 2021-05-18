@@ -1,0 +1,9 @@
+mixin getCategoryName(uniqueId, pre="", after="")
+    if categoryLocales[uniqueId] && categoryLocales[uniqueId][lang]
+        |!{pre}
+        |!{categoryLocales[uniqueId][lang]}
+        |!{after}
+    else 
+        |!{pre}
+        |not found
+        |!{after}

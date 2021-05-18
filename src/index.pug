@@ -15,7 +15,7 @@ block content
                     include includes/navigation.pug
                 .content
                     h1
-                        |!{title}
+                        +getVal(title) 
 
                     .parallax__container
                         .parallax__item(

@@ -1,0 +1,9 @@
+mixin getTagName(uniqueId, pre="", after="")
+    if tagLocales[uniqueId] && tagLocales[uniqueId][lang]
+        |!{pre}
+        |!{tagLocales[uniqueId][lang]}
+        |!{after}
+    else 
+        |!{pre}
+        |not found
+        |!{after}

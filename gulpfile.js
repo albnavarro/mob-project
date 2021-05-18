@@ -278,29 +278,33 @@ function taskIsSkippable(filepath, data, template) {
     /*
     track if specific includes pug ( in component path ) file is changed in last 2 seonds
     */
-    const componentFileIsChanged = ('registerComponent' in data)
-        ? data.registerComponent.map((item) => {
+    const componentFileChecker = (data) => {
+        return data.registerComponent.map((item) => {
                 const filePath = `${componentPath}/${item}`
                 return filePath === fileModified
             }).some((item) =>  item === true)
-        : false
+    }
+
+    const componentFileIsChanged = ('registerComponent' in data) ? componentFileChecker(data) : false
 
 
     /*
     track if aditionalData is changed in last 2 seonds
     */
-    const aditionDataIsChanged = ('additionalData' in data)
-        ? data.additionalData.map((item) => {
+    const aditionDataChecker = (data) => {
+        return data.additionalData.map((item) => {
                 const filePath = `${additionalDataPath}/${item}`
                 return filePath === fileModified
             }).some((item) =>  item === true)
-        : false
+    }
+
+    const aditionDataIsChanged = ('additionalData' in data) ? aditionDataChecker(data) : false
 
 
     /*
     track if post is changed in last 2 seonds
     */
-    const postDataChecker = () => {
+    const postDataChecker = (data) => {
         return Object.values(data.posts)
             .flat()
             .filter((item) => item.source !== undefined)
@@ -308,19 +312,19 @@ function taskIsSkippable(filepath, data, template) {
             .some((item) =>  item === true)
     }
 
-    const postDataIsChanged = ('posts' in data) ? postDataChecker() : false
+    const postDataIsChanged = ('posts' in data) ? postDataChecker(data) : false
 
 
 
     /*
     track if tag is changed in last 2 seonds
     */
-    const tagDataChecker = () => {
+    const tagDataChecker = (data) => {
         return data.tags
                 .map((item) => fileModified === `${dataPath}/${item.source}`)
                 .some((item) =>  item === true)
     }
-    const tagDataIsChanged = ('tags' in data) ? tagDataChecker() : false
+    const tagDataIsChanged = ('tags' in data) ? tagDataChecker(data) : false
 
 
     /*
@@ -952,11 +956,21 @@ function html(done) {
 
         /*
         Add imported tags
+        Check if filterType is registerd in congif
+        anche the switch to every or ome method
         */
+        const tagFilterType = (propValidate(['tagFilter', 'type'], data)
+            && config.tagFilterType.includes(data.tagFilter.type))
+            ? data.tagFilter.type
+            : 'some'
+
+
         const getTags = (data) => {
             const flatCategory = Object.values(categoryMapData[data.lang]).flat()
             const result = flatCategory.reduce((acc, curr) => {
-                const post = data.importTag.some(item => curr.tag.includes(item))
+                const post = (tagFilterType === 'some')
+                    ? data.importTag.some(item => curr.tag.includes(item))
+                    : data.importTag.every(item => curr.tag.includes(item))
                 if (post) acc.push(curr)
                 return acc
             }, [])

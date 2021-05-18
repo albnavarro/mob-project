@@ -1,0 +1,18 @@
+mixin getVal(obj, ...props)
+        
+    -  
+        let resultObj = obj    
+        let isvalid = (typeof resultObj === "undefined") ? false : true 
+        
+    if  isvalid   
+        each prop, key in props
+            if resultObj[prop]
+                - resultObj = resultObj[prop]
+                    
+            else
+                - isvalid = false
+            
+    if isvalid
+        |!{resultObj}
+    else 
+        |not found

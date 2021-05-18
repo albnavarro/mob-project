@@ -1,5 +1,5 @@
 {
-    "template": "archivePost",
+    "template": "archivePagination",
     "univoqueId" : "archive",
     "slug" : "archivio",
     "description" : "custom description",
@@ -9,8 +9,12 @@
     "registerComponent" : [
         "to-top/pug/toTop.pug"
     ],
+    "isArchive" : {
+        "postPerPage" : "2",
+        "dinamicPageName" : "archivio-"
+    },
     "importPost" : [
-        "novita",
-        "articoli"
+        "news",
+        "articles"
     ]
 }

@@ -12,7 +12,43 @@
         }
     },
     "defaultLocales" : "en",
-    "selectiveRefresh" : true,
     "postPerPage" : "3",
-    "dinamicPageName" : "page-"
+    "dinamicPageName" : "page-",
+    "categoryLocales" : {
+        "articles" : {
+            "en" : "articles",
+            "it" : "articoli"
+        },
+        "news" : {
+            "en" : "news",
+            "it" : "novitá"
+        }
+    },
+    "tagLocales" : {
+        "tag1" : {
+            "en" : "tag1 en",
+            "it" : "tag1 it"
+        },
+        "tag2" : {
+            "en" : "tag2 en",
+            "it" : "tag2 it"
+        },
+        "tag3" : {
+            "en" : "tag3 en",
+            "it" : "tag3 it"
+        },
+        "tag4" : {
+            "en" : "tag4 en",
+            "it" : "tag4 it"
+        },
+        "tag5" : {
+            "en" : "tag5 en",
+            "it" : "tag5 it"
+        }
+    },
+    "tagFilterType" : [
+        "some",
+        "every"
+    ],
+    "selectiveRefresh" : true
 }

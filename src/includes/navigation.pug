@@ -7,10 +7,10 @@ mixin list(item)
             
             if isValidLink
                 a(href=permalinkMap[val.univoqueId][lang])
-                    |!{slugMap[val.univoqueId][lang]}
+                    +getSlugName(val.univoqueId)
             else
                 a(href='#')
-                    |!{val.label}
+                    +getVal(val, 'label') 
                     
             if val.children
                 ul.sub-menu

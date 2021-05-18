@@ -10,6 +10,6 @@
         "to-top/pug/toTop.pug"
     ],
     "importPost" : [
-        "articoli"
+        "articles"
     ]
 }

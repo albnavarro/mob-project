@@ -16,18 +16,18 @@ block content
                         each post, key in category
                             div
                                 p
-                                    |!{post.date}
+                                    +getVal(post, 'date')
                                 a(href=post.permalink)
-                                    |!{post.data.title}
+                                    +getVal(post, 'data', 'title')
                                 p
-                                    |!{post.data.description}
+                                    +getVal(post, 'data', 'description')
                                 p
-                                    |in !{post.category}
+                                    |in
+                                    +getCategoryName(post.category)
                                 div
                                     |tag:
                                 div
                                     each tag, key in post.tag
-                                        |!{tag} |
+                                        +getTagName(tag,' | ')
                                 hr
                                     
-        

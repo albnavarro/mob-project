@@ -12,7 +12,7 @@
         "to-top/pug/toTop.pug"
     ],
     "exportPost" : {
-        "category" : "articoli",
+        "category" : "articles",
         "tag" : [
             "tag1",
             "tag4"
