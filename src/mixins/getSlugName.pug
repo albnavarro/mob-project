@@ -1,9 +1,0 @@
-mixin getSlugName(uniqueId, pre="", after="")
-    if slugMap[uniqueId] && slugMap[uniqueId][lang]
-        |!{pre}
-        |!{slugMap[uniqueId][lang]}
-        |!{after}
-    else 
-        |!{pre}
-        |not found
-        |!{after}

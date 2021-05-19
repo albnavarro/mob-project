@@ -406,7 +406,7 @@ function extractAdditionlSubFolder(filepath) {
 * @param additionalData - all data extract from all json file associated to {page}.json
 * return '' id {page}.json is in root or path form root
 */
-function extracSubFolder(filepath, lang) {
+function getPathByLocale(filepath, lang) {
     const pathRoot = ( config.defaultLocales == lang) ? `${dataPath}/${lang}` : `${dataPath}`
     const pattern = new RegExp(`${pathRoot}\/(.*\/).*$`);
     const path = filepath.match(pattern);
@@ -720,7 +720,7 @@ function permalink(done) {
       const lang = getLanguage(curr)
       const originalNameFile = getNameFile(curr)
       const nameFile = (arg.prod && originalNameFile === 'index') ? '' : originalNameFile
-      const subfolder  = extracSubFolder(curr,lang)
+      const subfolder  = getPathByLocale(curr,lang)
       const permalinkUrl = getPermalink(subfolder,nameFile)
 
       if('univoqueId' in data) {
@@ -770,7 +770,7 @@ function category(done) {
         if ('exportPost' in parsed) {
             const lang = getLanguage(curr)
             const nameFile = getNameFile(curr)
-            const subfolder  = extracSubFolder(curr,lang)
+            const subfolder  = getPathByLocale(curr,lang)
             const permalink = getPermalink(subfolder,nameFile)
             const sourceFilepath = (lang == config.defaultLocales) ? `${lang}/` : ''
 
@@ -893,7 +893,7 @@ function html(done) {
         regex form 'data/'' to last slash
         return the exact path of json file
         */
-        const subfolder = extracSubFolder(filepath,data.lang)
+        const subfolder = getPathByLocale(filepath,data.lang)
 
 
         /*
@@ -1129,7 +1129,7 @@ function html(done) {
 
             const pagetask = pages.map((item, index) => {
                 const newName = getArchivePageName(index, nameFile, dinamicPageName)
-                item.displayName = `${getPermalink(extracSubFolder(filepath, getLanguage(filepath)), newName)}`;
+                item.displayName = `${getPermalink(getPathByLocale(filepath, getLanguage(filepath)), newName)}`;
                 return {'skipTask' : skipTask, 'fn': item};
             })
 
@@ -1155,7 +1155,7 @@ function html(done) {
                     })
             }
 
-            renderPage.displayName = `${getPermalink(extracSubFolder(filepath, getLanguage(filepath)), getNameFile(filepath))}`;
+            renderPage.displayName = `${getPermalink(getPathByLocale(filepath, getLanguage(filepath)), getNameFile(filepath))}`;
             return {'skipTask' : skipTask, 'fn': renderPage};
         }
 

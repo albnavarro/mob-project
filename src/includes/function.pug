@@ -1,0 +1,57 @@
+-
+
+    const propValidate = (p, o) => p.reduce((xs, x) => (xs && xs[x]) ? xs[x] : null, o)
+    const notFound = 'not found'
+    
+    /*
+    * get obj nested value or 'not found string'
+    */
+    function getVal(obj, ...props) {  
+        const deepCheck = (props, obj) => {
+            return props.reduce((p, c) => {
+                p = (p[c]) ? p[c] : notFound
+                return p
+            }, obj)
+        }
+        
+        return (typeof obj !== "undefined") ? deepCheck(props, obj) : notFound
+    }
+    
+    /*
+    * get category name by unique id
+    */
+    function getCategoryName(uniqueId) {
+        return (propValidate([uniqueId, lang], categoryLocales)) 
+            ? categoryLocales[uniqueId][lang]
+            : notFound
+    }
+    
+    /*
+    * get tag name by unique id
+    */
+    function getTagName(uniqueId) {
+        return (propValidate([uniqueId, lang], tagLocales)) 
+            ? tagLocales[uniqueId][lang]
+            : notFound
+    }
+    
+    /*
+    * get slug name by unique id
+    */
+    function getSlugName(uniqueId) {
+        return (propValidate([uniqueId, lang], slugMap)) 
+            ? slugMap[uniqueId][lang]
+            : notFound
+    }
+    
+    /*
+    * get permalink by unique id
+    */
+    function getPermalink(uniqueId) {
+        return (propValidate([uniqueId, lang], permalinkMap)) 
+            ? permalinkMap[uniqueId][lang]
+            : notFound
+    }
+    
+    
+    
