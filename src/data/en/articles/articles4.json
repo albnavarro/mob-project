@@ -1,10 +1,8 @@
 {
     "template": "post",
     "univoqueId" : "articles4",
-    "slug" : "article 4",
     "description" : "custom description",
-    "title" : "article 4",
-    "parentUniqueId" : "articles",
+    "pageTitle" : "article 4",
     "additionalData" : [
         "nav.json"
     ],

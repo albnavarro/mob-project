@@ -1,7 +1,7 @@
 {
     "template": "gsap",
     "univoqueId" : "gsap",
-    "slug" : "gsap",
+    "pageTitle" : "gsap",
     "description" : "custom description",
     "additionalData" : [
         "nav.json"

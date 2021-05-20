@@ -16,34 +16,68 @@
     "dinamicPageName" : "page-",
     "categoryLocales" : {
         "articles" : {
-            "en" : "articles",
-            "it" : "articoli"
+            "en" : {
+                "name" : "articles",
+                "indexUnivoqueId" : "articles"
+            },
+            "it" : {
+                "name" : "articoli",
+                "indexUnivoqueId" : "articles"
+            }
         },
         "news" : {
-            "en" : "news",
-            "it" : "novitá"
+            "en" : {
+                "name" : "news",
+                "indexUnivoqueId" : "news"
+            },
+            "it" : {
+                "name" : "novitá",
+                "indexUnivoqueId" : "news"
+            }
         }
     },
     "tagLocales" : {
         "tag1" : {
-            "en" : "tag1 en",
-            "it" : "tag1 it"
+            "en" : {
+                "name" : "tag1 en",
+                "indexUnivoqueId" : "tag1"
+            },
+            "it" : {
+                "name" : "tag1 it",
+                "indexUnivoqueId" : "tag1"
+            }
         },
         "tag2" : {
-            "en" : "tag2 en",
-            "it" : "tag2 it"
+            "en" : {
+                "name" : "tag2 en"
+            },
+            "it" : {
+                "name" : "tag2 it"
+            }
         },
         "tag3" : {
-            "en" : "tag3 en",
-            "it" : "tag3 it"
+            "en" : {
+                "name" : "tag3 en"
+            },
+            "it" : {
+                "name" : "tag3 it"
+            }
         },
         "tag4" : {
-            "en" : "tag4 en",
-            "it" : "tag4 it"
+            "en" : {
+                "name" : "tag4 en"
+            },
+            "it" : {
+                "name" : "tag4 it"
+            }
         },
         "tag5" : {
-            "en" : "tag5 en",
-            "it" : "tag5 it"
+            "en" : {
+                "name" : "tag5 en"
+            },
+            "it" : {
+                "name" : "tag5 it"
+            }
         }
     },
     "tagFilterType" : [

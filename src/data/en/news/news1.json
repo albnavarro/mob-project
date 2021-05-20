@@ -1,10 +1,8 @@
 {
     "template": "post",
     "univoqueId" : "news1",
-    "slug" : "news 1",
-    "title" : "news 1",
+    "pageTitle" : "news 1",
     "description" : "custom description",
-    "parentUniqueId" : "news",
     "additionalData" : [
         "nav.json"
     ],
@@ -14,8 +12,9 @@
     "exportPost" : {
         "category" : "news",
         "tag" : [
+            "tag1",
             "tag2",
-            "tag5"
+            "tag3"
         ],
         "date" : "Mon Oct 28 2021 00:00:00 GMT",
         "data" : {

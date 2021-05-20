@@ -1,7 +1,7 @@
 {
     "template": "post",
     "univoqueId" : "articles6",
-    "slug" : "article 6",
+    "pageTitle" : "article 6",
     "description" : "custom description",
     "additionalData" : [
         "nav.json"
@@ -9,8 +9,7 @@
     "registerComponent" : [
         "to-top/pug/toTop.pug"
     ],
-    "title" : "article 6",
-    "parentUniqueId" : "articles",
+    "pageTitle" : "article 6",
     "exportPost" : {
         "category" : "articles",
         "tag" : [

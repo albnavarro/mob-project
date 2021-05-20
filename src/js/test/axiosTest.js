@@ -7,7 +7,7 @@ class axiosTestClass {
     }
 
     init() {
-        axios.get('/assets/data/permalink.json')
+        axios.get('/assets/data/permalinkMap.json')
             .then((response) => {
                 console.log(response.data);
             });

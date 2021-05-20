@@ -77,9 +77,9 @@ const
     dataFiles = `${themePath}/data/**/*.json`,
     additionalDataFiles = `${themePath}/additionalData/**/*.json`,
     manifestFile = `${distPath}/manifest.json`,
-    permalinkFile = `${dataDestFolder}/permalink.json`,
-    slugFile = `${dataDestFolder}/slug.json`,
-    categoryFile = `${dataDestFolder}/category.json`
+    permalinkFile = `${dataDestFolder}/permalinkMap.json`,
+    pageTitleFile = `${dataDestFolder}/pageTitleMap.json`,
+    categoryFile = `${dataDestFolder}/categoryMap.json`
 
 /*
 How many time watch task is invoked
@@ -97,14 +97,14 @@ Map of all includes file
 let includesFileMap = []
 
 /*
-Map of all slug
+Map of all pageTitle
 */
 let permalinkMapData = {}
 
 /*
-Map of all slug
+Map of all pageTitle
 */
-let slugMapData = {}
+let pageTitleMapData = {}
 
 /*
 Map of all cateogry
@@ -177,10 +177,10 @@ function debugMandatoryPropierties(data) {
         return true
     }
 
-    if(!('slug' in data) || data.slug === undefined) {
+    if(!('pageTitle' in data) || data.pageTitle === undefined) {
         console.log('*****')
         console.log(`Error`)
-        console.log(`slug propierties is mandatory`)
+        console.log(`pageTitle propierties is mandatory`)
         console.log(`permalink: ${data.permalink}`)
         console.log('*****')
         return true
@@ -660,21 +660,21 @@ function detectModifiedFiles(done) {
 
 
 /*
-* CREATE SLUG MAP
-* slugMap: {
-*     univoqueId: { en: '{slug}', it: '{slug}', ... },
+* CREATE pageTitle MAP
+* pageTitleMap: {
+*     univoqueId: { en: '{pageTitle}', it: '{pageTitle}', ... },
       ....
  * }
 */
-function slug(done) {
+function pageTitle(done) {
     const allPath = glob.sync(path.join(dataPath, '/**/*.json'))
 
-    const slugObj = allPath.reduce((acc, curr) => {
+    const pageTitleObj = allPath.reduce((acc, curr) => {
       const data = JSON.parse(fs.readFileSync(curr))
 
       if('univoqueId' in data) {
           acc[data.univoqueId] = {...acc[data.univoqueId]}
-          acc[data.univoqueId][getLanguage(curr)] = data.slug
+          acc[data.univoqueId][getLanguage(curr)] = data.pageTitle
       }
 
       return acc;
@@ -686,7 +686,7 @@ function slug(done) {
     * gulp html -debug for debug
     */
     if(arg.debug) {
-        console.log(slugObj)
+        console.log(pageTitleObj)
     }
 
     /*
@@ -698,8 +698,8 @@ function slug(done) {
         })
     }
 
-    slugMapData = slugObj
-    fs.writeFile(slugFile, JSON.stringify(slugObj), () => {})
+    pageTitleMapData = pageTitleObj
+    fs.writeFile(pageTitleFile, JSON.stringify(pageTitleObj), () => {})
     done()
 
 }
@@ -923,16 +923,16 @@ function html(done) {
         permalink.permalink = getPermalink(subfolder,nameFile)
         permalink.staticPermalink = `${config.domain}${getPermalink(subfolder,nameFile,false)}`
         permalink.permalinkMap = permalinkMapData
-        permalink.slug = data.slug
+        permalink.pageTitle = data.pageTitle
 
         /*
-        Add slug map
+        Add pageTitle map
         if in debug mode golbal stored info is bypass anche the data il read form file
         */
-        if(arg.debug) slugMapData = JSON.parse(fs.readFileSync(slugFile))
+        if(arg.debug) pageTitleMapData = JSON.parse(fs.readFileSync(pageTitleFile))
 
-        const slugMapObj = {}
-        slugMapObj.slugMap = slugMapData
+        const pageTitleMapObj = {}
+        pageTitleMapObj.pageTitleMap = pageTitleMapData
 
 
 
@@ -968,10 +968,18 @@ function html(done) {
         const getTags = (data) => {
             const flatCategory = Object.values(categoryMapData[data.lang]).flat()
             const result = flatCategory.reduce((acc, curr) => {
-                const post = (tagFilterType === 'some')
+
+                // Filter postMap by tag some|every
+                const postFilterByType = (tagFilterType === 'some')
                     ? data.importTag.some(item => curr.tag.includes(item))
                     : data.importTag.every(item => curr.tag.includes(item))
-                if (post) acc.push(curr)
+
+                // Filter postMap by category if required
+                const postFilterByCategory = (propValidate(['tagFilter', 'filterByCategory'], data))
+                    ? data.tagFilter.filterByCategory.some(item => item == curr.category)
+                    : true
+
+                if (postFilterByType && postFilterByCategory) acc.push(curr)
                 return acc
             }, [])
             return result
@@ -1007,7 +1015,7 @@ function html(done) {
             config,
             additionalData,
             permalink,
-            slugMapObj,
+            pageTitleMapObj,
             categoryObj,
             tagObj,
             chunkedPost,
@@ -1244,7 +1252,7 @@ function deleteEmptyDirectories(done) {
 function watch_files(done) {
     gulp.watch([scssFiles, componentscssFiles], style)
     gulp.watch([jsFiles, componentJsFiles], gulp.series(js, reloadPage))
-    gulp.watch([allPugFiles, dataFiles, additionalDataFiles], gulp.series(detectModifiedFiles, category, slug, permalink, html, reloadPage))
+    gulp.watch([allPugFiles, dataFiles, additionalDataFiles], gulp.series(detectModifiedFiles, category, pageTitle, permalink, html, reloadPage))
 
     done();
 }
@@ -1266,7 +1274,7 @@ const build = gulp.series(
     cleanDist,
     dist,
     category,
-    slug,
+    pageTitle,
     permalink,
     html,
     criticalCss,
@@ -1313,7 +1321,7 @@ exports.cleanAll = cleanAll
 exports.deleteEmptyDirectories = deleteEmptyDirectories
 exports.permalink = permalink
 exports.category = category
-exports.slug = slug
+exports.pageTitle = pageTitle
 exports.detectModifiedFiles = detectModifiedFiles
 
 /*

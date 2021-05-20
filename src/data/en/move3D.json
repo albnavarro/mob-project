@@ -1,7 +1,7 @@
 {
     "template": "move3D",
     "univoqueId" : "move3D",
-    "slug" : "move3D",
+    "pageTitle" : "move3D",
     "description" : "custom description",
     "additionalData" : [
         "nav.json"

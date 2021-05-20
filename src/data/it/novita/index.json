@@ -1,7 +1,7 @@
 {
     "template": "archivePost",
     "univoqueId" : "news",
-    "slug" : "novitá",
+    "pageTitle" : "novitá",
     "description" : "custom description",
     "additionalData" : [
         "nav.json"

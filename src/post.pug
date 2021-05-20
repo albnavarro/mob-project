@@ -12,10 +12,10 @@ block content
         main
             .container
                 div
-                    a(href=permalinkMap[parentUniqueId][lang])
+                    a(href=getCategoryPermalink(exportPost.category))
                         |back
                 div
-                    |!{exportPost.date}
+                    |#{getVal(exportPost, 'date')}
                 div
-                    |!{title}
+                    |#{getVal(pageTitle)}
                     

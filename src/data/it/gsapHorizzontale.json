@@ -1,7 +1,7 @@
 {
     "template": "gsapHorizontal",
     "univoqueId" : "gsapHorizontal",
-    "slug" : "gsap horizzontale",
+    "pageTitle" : "gsap horizzontale",
     "description" : "custom description",
     "additionalData" : [
         "nav.json"

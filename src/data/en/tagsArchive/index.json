@@ -1,7 +1,7 @@
 {
     "template": "archivePagination",
     "univoqueId" : "tagArchive",
-    "slug" : "tag Archive",
+    "pageTitle" : "tag Archive",
     "description" : "custom description",
     "additionalData" : [
         "nav.json"
@@ -19,6 +19,10 @@
         "tag1"
     ],
     "tagFilter" : {
-        "type" : "every"
+        "type" : "every",
+        "filterByCategory" : [
+            "articles",
+            "news"
+        ]
     }
 }

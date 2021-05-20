@@ -1,7 +1,7 @@
 {
     "template": "archivePagination",
     "univoqueId" : "archive",
-    "slug" : "archivio",
+    "pageTitle" : "archivio",
     "description" : "custom description",
     "additionalData" : [
         "nav.json"

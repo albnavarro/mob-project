@@ -79,6 +79,10 @@
                 {
                     "label" : "",
                     "univoqueId" : "tagArchive"
+                },
+                {
+                    "label" : "",
+                    "univoqueId" : "tag1"
                 }
             ]
         }

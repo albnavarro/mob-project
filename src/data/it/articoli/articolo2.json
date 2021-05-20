@@ -1,10 +1,8 @@
 {
     "template": "post",
     "univoqueId" : "articles2",
-    "slug" : "artocolo 2",
+    "pageTitle" : "artocolo 2",
     "description" : "custom description",
-    "title" : "artocolo 2",
-    "parentUniqueId" : "articles",
     "additionalData" : [
         "nav.json"
     ],
@@ -18,7 +16,7 @@
         ],
         "date" : "Mon Oct 28 2021 00:00:00 GMT",
         "data" : {
-            "title" : "articolo 2",
+            "pageTitle" : "articolo 2",
             "description" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus diam urna, sagittis sed diam vitae, aliquet ultricies sem. Quisque quam nibh, aliquet at cursus id, commodo vel urna."
         }
     }

@@ -1,7 +1,7 @@
 {
     "template": "archivePost",
     "univoqueId" : "news",
-    "slug" : "news",
+    "pageTitle" : "news",
     "description" : "custom description",
     "additionalData" : [
         "nav.json"

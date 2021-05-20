@@ -3,6 +3,8 @@
     const propValidate = (p, o) => p.reduce((xs, x) => (xs && xs[x]) ? xs[x] : null, o)
     const notFound = 'not found'
     
+    
+    
     /*
     * get obj nested value or 'not found string'
     */
@@ -17,40 +19,67 @@
         return (typeof obj !== "undefined") ? deepCheck(props, obj) : notFound
     }
     
+    
+    
     /*
     * get category name by unique id
     */
-    function getCategoryName(uniqueId) {
-        return (propValidate([uniqueId, lang], categoryLocales)) 
-            ? categoryLocales[uniqueId][lang]
+    function getCategoryName(univoqueId) {
+        return (propValidate([univoqueId, lang, 'name'], categoryLocales)) 
+            ? categoryLocales[univoqueId][lang].name
             : notFound
     }
+    
+    
     
     /*
     * get tag name by unique id
     */
-    function getTagName(uniqueId) {
-        return (propValidate([uniqueId, lang], tagLocales)) 
-            ? tagLocales[uniqueId][lang]
+    function getTagName(univoqueId) {
+        return (propValidate([univoqueId, lang, 'name'], tagLocales)) 
+            ? tagLocales[univoqueId][lang].name
             : notFound
     }
     
+    
+    
     /*
-    * get slug name by unique id
+    * get page name by unique id
     */
-    function getSlugName(uniqueId) {
-        return (propValidate([uniqueId, lang], slugMap)) 
-            ? slugMap[uniqueId][lang]
+    function getPageTitle(univoqueId) {
+        return (propValidate([univoqueId, lang], pageTitleMap)) 
+            ? pageTitleMap[univoqueId][lang]
             : notFound
     }
+    
+    
     
     /*
     * get permalink by unique id
     */
-    function getPermalink(uniqueId) {
-        return (propValidate([uniqueId, lang], permalinkMap)) 
-            ? permalinkMap[uniqueId][lang]
-            : notFound
+    function getPermalink(univoqueId) {
+        return (propValidate([univoqueId, lang], permalinkMap)) 
+            ? permalinkMap[univoqueId][lang]
+            : null
+    }
+    
+    
+    /*
+    * get category name by unique id
+    */
+    function getCategoryPermalink(univoqueId) {
+        return (univoqueId && propValidate([univoqueId, lang, 'indexUnivoqueId'], categoryLocales)) 
+            ? getPermalink(categoryLocales[univoqueId][lang].indexUnivoqueId)
+            : null
+    }
+    
+    /*
+    * get category name by unique id
+    */
+    function getTagPermalink(univoqueId) {
+        return (univoqueId && propValidate([univoqueId, lang, 'indexUnivoqueId'], tagLocales)) 
+            ? getPermalink(tagLocales[univoqueId][lang].indexUnivoqueId)
+            : null
     }
     
     

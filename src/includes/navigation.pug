@@ -3,14 +3,10 @@ mixin list(item)
         - const heaveChildrenClass = (val.children) ? 'menu-item menu-item-has-children' : 'menu-item'
         
         li(class=heaveChildrenClass)
-            - const isValidLink = propValidate([val.univoqueId, lang], permalinkMap) ? true : false;
+            -  const label = propValidate([val.univoqueId, lang], permalinkMap) ? getPageTitle(val.univoqueId) : getVal(val, 'label')
                     
-            if isValidLink
-                a(href=getPermalink(val.univoqueId))
-                    |#{getSlugName(val.univoqueId)}
-            else
-                a(href='#')
-                    |#{getVal(val, 'label')}
+            a(href=getPermalink(val.univoqueId))
+                |#{label}
                     
             if val.children
                 ul.sub-menu
