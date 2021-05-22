@@ -20,7 +20,7 @@
     ],
     "tagFilter" : {
         "type" : "every",
-        "filterByCategory" : [
+        "category" : [
             "articles",
             "news"
         ]

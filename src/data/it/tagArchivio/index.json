@@ -15,7 +15,7 @@
     ],
     "tagFilter" : {
         "type" : "some",
-        "filterByCategory" : [
+        "category" : [
             "articles",
             "news"
         ]

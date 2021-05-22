@@ -1,27 +1,25 @@
 extends _wrapper.pug
 
 block content
-    body.gsap
-        div(id="spriteSvg" data-svg="/assets/svg/svg.svg")
+        
+    header
+        .container
+            include includes/langSelector.pug
+        .container.menu-container.menu-container--top
+            include includes/navigation.pug
             
-        header
-            .container
-                include includes/langSelector.pug
-            .container.menu-container.menu-container--top
-                include includes/navigation.pug
-                
-        main
-            .gaspHorizontal
-                .gaspHorizontal__container.gaspHorizontal__container--0
-                    .gaspHorizontal__item
-                        .gaspHorizontal__card
-                        .gaspHorizontal__card
-                        .gaspHorizontal__card
-                        .gaspHorizontal__card
-                            
-                .gaspHorizontal__container.gaspHorizontal__container--1
-                    .gaspHorizontal__item
-                        .gaspHorizontal__card
-                        .gaspHorizontal__card
-                        .gaspHorizontal__card
-                        .gaspHorizontal__card
+    main
+        .gaspHorizontal
+            .gaspHorizontal__container.gaspHorizontal__container--0
+                .gaspHorizontal__item
+                    .gaspHorizontal__card
+                    .gaspHorizontal__card
+                    .gaspHorizontal__card
+                    .gaspHorizontal__card
+                        
+            .gaspHorizontal__container.gaspHorizontal__container--1
+                .gaspHorizontal__item
+                    .gaspHorizontal__card
+                    .gaspHorizontal__card
+                    .gaspHorizontal__card
+                    .gaspHorizontal__card

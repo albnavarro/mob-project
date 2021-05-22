@@ -5,6 +5,11 @@ include includes/function.pug
 html
     head
         include includes/head.pug
+    body(class=bodyClassPageId())
+        div(id="spriteSvg" data-svg="/assets/svg/svg.svg")
         block content    
         include includes/footer.pug
+        
+    
+
         

@@ -1,32 +1,30 @@
 extends _wrapper.pug
 
 block content
-    body
-        div(id="spriteSvg" data-svg="/assets/svg/svg.svg")
-            
-        header
-            .container
-                include includes/langSelector.pug
-            .container.menu-container.menu-container--top
-                include includes/navigation.pug
-        main
-            .mouseParallax-wrap
-                .m-test.m-test--1
-                    .mouseParallax__container
-                        .mouseParallax__item(data-conponent='m-comp--mouseParallax'
-                            data-range="10")
-                            .circle
-                .m-test.m-test--1
-                    .mouseParallax__container
-                        .mouseParallax__item(data-conponent='m-comp--mouseParallax'
-                            data-range="30")
-                            .circle
-                .m-test.m-test--2
-                    .mouseParallax__container
-                        .mouseParallax__item(data-conponent='m-comp--mouseParallax'
-                            data-range="20"
-                            data-centerToViewoport)
-                            .circle
-            
+        
+    header
+        .container
+            include includes/langSelector.pug
+        .container.menu-container.menu-container--top
+            include includes/navigation.pug
+    main
+        .mouseParallax-wrap
+            .m-test.m-test--1
+                .mouseParallax__container
+                    .mouseParallax__item(data-conponent='m-comp--mouseParallax'
+                        data-range="10")
+                        .circle
+            .m-test.m-test--1
+                .mouseParallax__container
+                    .mouseParallax__item(data-conponent='m-comp--mouseParallax'
+                        data-range="30")
+                        .circle
+            .m-test.m-test--2
+                .mouseParallax__container
+                    .mouseParallax__item(data-conponent='m-comp--mouseParallax'
+                        data-range="20"
+                        data-centerToViewoport)
+                        .circle
+        
 
         

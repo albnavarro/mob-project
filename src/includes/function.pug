@@ -2,6 +2,9 @@
 
     const propValidate = (p, o) => p.reduce((xs, x) => (xs && xs[x]) ? xs[x] : null, o)
     const notFound = 'not found'
+    const bodyClassPageId = () => {
+        return `page-${univoqueId} page-${pageType}`
+    }
     
     
     
@@ -82,5 +85,11 @@
             : null
     }
     
+    /*
+    * get image form manifest
+    */
+    function getImage(image) {
+        return `/assets/dist/${manifest[image]}`
+    }
     
     

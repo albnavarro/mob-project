@@ -1,44 +1,42 @@
 extends _wrapper.pug
 
 block content
-    body.gsap
-        div(id="spriteSvg" data-svg="/assets/svg/svg.svg")
             
-        header
-            .container
-                include includes/langSelector.pug
-            .container.menu-container.menu-container--top
-                include includes/navigation.pug
-                
-        main
-            .container
-                .gaspT
+    header
+        .container
+            include includes/langSelector.pug
+        .container.menu-container.menu-container--top
+            include includes/navigation.pug
+            
+    main
+        .container
+            .gaspT
+                h2
+                    |no pin sticky
+                .gaspT__inner.gaspT__inner--0
+                    .gaspT__inner__sticky
+                        .gaspT__pin
+                        .gaspT__pin
+                        .gaspT__pin
+                h2
+                    |animation
+                .gaspT__inner.gaspT__inner--1
+                    .gaspT__pin
+                    .gaspT__pin
+                    .gaspT__pin
+                h2
+                    |scroll
+                .gaspT__inner.gaspT__inner--2
+                    .gaspT__pin
+                    .gaspT__pin
+                    .gaspT__pin
+            .gaspP
+                .gaspP__inner
                     h2
-                        |no pin sticky
-                    .gaspT__inner.gaspT__inner--0
-                        .gaspT__inner__sticky
-                            .gaspT__pin
-                            .gaspT__pin
-                            .gaspT__pin
+                        |title
+            .gaspP
+                .gaspP__inner
                     h2
-                        |animation
-                    .gaspT__inner.gaspT__inner--1
-                        .gaspT__pin
-                        .gaspT__pin
-                        .gaspT__pin
-                    h2
-                        |scroll
-                    .gaspT__inner.gaspT__inner--2
-                        .gaspT__pin
-                        .gaspT__pin
-                        .gaspT__pin
-                .gaspP
-                    .gaspP__inner
-                        h2
-                            |title
-                .gaspP
-                    .gaspP__inner
-                        h2
-                            |title
+                        |title
 
-        
+    

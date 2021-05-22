@@ -1,21 +1,19 @@
 extends _wrapper.pug
 
 block content
-    body
-        div(id="spriteSvg" data-svg="/assets/svg/svg.svg")
-            
-        header
-            .container
-                include includes/langSelector.pug
-            .container.menu-container.menu-container--top
-                include includes/navigation.pug
-        main
-            .container
-                div
-                    a(href=getCategoryPermalink(exportPost.category))
-                        |back
-                div
-                    |#{getVal(exportPost, 'date')}
-                div
-                    |#{getVal(pageTitle)}
-                    
+        
+    header
+        .container
+            include includes/langSelector.pug
+        .container.menu-container.menu-container--top
+            include includes/navigation.pug
+    main
+        .container
+            div
+                a(href=getCategoryPermalink(exportPost.category))
+                    |back
+            div
+                |#{getVal(exportPost, 'date')}
+            div
+                |#{getVal(pageTitle)}
+                

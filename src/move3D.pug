@@ -1,276 +1,38 @@
 extends _wrapper.pug
 
 block content
-    body
-        div(id="spriteSvg" data-svg="/assets/svg/svg.svg")
             
-        header
-            .container
-                include includes/langSelector.pug
-            .container.menu-container.menu-container--top
-                include includes/navigation.pug
-        main
-            .move3D-wrap.move3D(
-                data-conponent='m-comp--move3D'
-                data-perspective="600")
-                .move3D__scene
-                    .move3D__container
-                        .move3D__item(
-                            data-depth='200'
-                            data-animate)
-                            .circle
-                            .move3D__item.item-3d.item-3d--top(
-                                data-depth='0'
-                                data-rotate='x'
-                                data-range="20"
-                                data-direction='top'
-                                data-animate)
-                                .circle
-                                .move3D__item.item-3d.item-3d--top(
-                                    data-depth='0'
-                                    data-rotate='x'
-                                    data-range="30"
-                                    data-direction='top'
-                                    data-animate)
-                                    .circle
-                            .move3D__item.item-3d.item-3d--bottom(
-                                data-depth='0'
-                                data-rotate='x'
-                                data-range="20"
-                                data-direction='bottom'
-                                data-animate)
-                                .circle
-                                .move3D__item.item-3d.item-3d--bottom(
-                                    data-depth='0'
-                                    data-rotate='x'
-                                    data-range="30"
-                                    data-direction='bottom'
-                                    data-animate)
-                                    .circle
-                            .move3D__item.item-3d.item-3d--right(
-                                data-depth='0'
-                                data-rotate='y'
-                                data-range="20"
-                                data-direction='right'
-                                data-animate)
-                                .circle
-                                .move3D__item.item-3d.item-3d--right(
-                                    data-depth='0'
-                                    data-rotate='y'
-                                    data-range="30"
-                                    data-direction='right'
-                                    data-animate)
-                                    .circle
-                                    .move3D__item.item-3d.item-3d--right(
-                                        data-depth='0'
-                                        data-rotate='y'
-                                        data-range="40"
-                                        data-direction='right'
-                                        data-animate)
-                                        .circle
-                            .move3D__item.item-3d.item-3d--left(
-                                data-depth='0'
-                                data-rotate='y'
-                                data-range="20"
-                                data-direction='left'
-                                data-animate)
-                                .circle
-                                .move3D__item.item-3d.item-3d--left(
-                                    data-depth='0'
-                                    data-rotate='y'
-                                    data-range="30"
-                                    data-direction='left'
-                                    data-animate)
-                                    .circle
-                                    .move3D__item.item-3d.item-3d--left(
-                                        data-depth='0'
-                                        data-rotate='y'
-                                        data-range="40"
-                                        data-direction='left'
-                                        data-animate)
-                                        .circle
-                            .move3D__item.item-3d.item-3d--top-right(
-                                data-depth='0'
-                                data-rotate='xy'
-                                data-range="20"
-                                data-direction='top-right'
-                                data-animate)
-                                .circle
-                                .move3D__item.item-3d.item-3d--top-right(
-                                    data-depth='0'
-                                    data-rotate='xy'
-                                    data-range="30"
-                                    data-direction='top-right'
-                                    data-animate)
-                                    .circle
-                            .move3D__item.item-3d.item-3d--top-left(
-                                data-depth='0'
-                                data-rotate='xy'
-                                data-range="20"
-                                data-direction='top-left'
-                                data-animate)
-                                .circle
-                            .move3D__item.item-3d.item-3d--bottom-right(
-                                data-depth='0'
-                                data-rotate='xy'
-                                data-range="20"
-                                data-direction='bottom-right'
-                                data-animate)
-                                .circle
-                            .move3D__item.item-3d.item-3d--bottom-left(
-                                data-depth='0'
-                                data-rotate='xy'
-                                data-range="20"
-                                data-direction='bottom-left'
-                                data-animate)
-                                .circle
-                                
-            
-            
-            .move3D-wrap.move3D(
-                data-conponent='m-comp--move3D'
-                data-perspective="600")
-                .move3D__scene
-                    .move3D__container
-                        .move3D__item(
-                            data-depth='-200'
-                            data-animate)
-                            .circle
-                            .move3D__item.item-3d.item-3d--top(
-                                data-depth='100'
-                                data-rotate='x'
-                                data-range="-20"
-                                data-direction='top'
-                                data-animate)
-                                .circle
-                                .move3D__item.item-3d.item-3d--top(
-                                    data-depth='0'
-                                    data-rotate='x'
-                                    data-range="-60"
-                                    data-direction='top'
-                                    data-animate)
-                                    .circle
-                            .move3D__item.item-3d.item-3d--bottom(
-                                data-depth='100'
-                                data-rotate='x'
-                                data-range="-20"
-                                data-direction='bottom'
-                                data-animate)
-                                .circle
-                                .move3D__item.item-3d.item-3d--bottom(
-                                    data-depth='0'
-                                    data-rotate='x'
-                                    data-range="-60"
-                                    data-direction='bottom'
-                                    data-animate)
-                                    .circle
-                            .move3D__item.item-3d.item-3d--right(
-                                data-depth='0'
-                                data-rotate='y'
-                                data-range="-20"
-                                data-initialRotate="-30"
-                                data-direction='right'
-                                data-animate)
-                                .circle
-                                .move3D__item.item-3d.item-3d--right(
-                                    data-depth='0'
-                                    data-rotate='x'
-                                    data-range="-30"
-                                    data-initialRotate="-30"
-                                    data-direction='top'
-                                    data-animate)
-                                    .circle
-                                    .move3D__item.item-3d.item-3d--right(
-                                        data-depth='0'
-                                        data-rotate='x'
-                                        data-range="-40"
-                                        data-initialRotate="-30"
-                                        data-direction='top'
-                                        data-animate)
-                                        .circle
-                            .move3D__item.item-3d.item-3d--left(
-                                data-depth='0'
-                                data-rotate='y'
-                                data-range="-20"
-                                data-direction='left'
-                                data-animate)
-                                .circle
-                                .move3D__item.item-3d.item-3d--left(
-                                    data-depth='0'
-                                    data-rotate='y'
-                                    data-range="-30"
-                                    data-direction='left'
-                                    data-animate)
-                                    .circle
-                                    .move3D__item.item-3d.item-3d--left(
-                                        data-depth='0'
-                                        data-rotate='y'
-                                        data-range="-40"
-                                        data-direction='left'
-                                        data-animate)
-                                        .circle
-                                        .move3D__item.item-3d.item-3d--top(
-                                            data-depth='0'
-                                            data-rotate='x'
-                                            data-initialRotate="0"
-                                            data-range="-60"
-                                            data-direction='top'
-                                            data-animate)
-                                            .circle
-                            .move3D__item.item-3d.item-3d--top-right(
-                                data-depth='0'
-                                data-rotate='xy'
-                                data-range="-20"
-                                data-direction='top-right'
-                                data-animate)
-                                .circle
-                                .move3D__item.item-3d.item-3d--top-right(
-                                    data-depth='0'
-                                    data-rotate='xy'
-                                    data-range="-30"
-                                    data-direction='top-right'
-                                    data-animate)
-                                    .circle
-                            .move3D__item.item-3d.item-3d--top-left(
-                                data-depth='0'
-                                data-rotate='xy'
-                                data-range="-20"
-                                data-direction='top-left'
-                                data-animate)
-                                .circle
-                            .move3D__item.item-3d.item-3d--bottom-right(
-                                data-depth='0'
-                                data-rotate='xy'
-                                data-range="-20"
-                                data-direction='bottom-right'
-                                data-animate)
-                                .circle
-                            .move3D__item.item-3d.item-3d--bottom-left(
-                                data-depth='0'
-                                data-rotate='xy'
-                                data-range="-20"
-                                data-direction='bottom-left'
-                                data-animate)
-                                .circle
-                                
-                                
-            .move3D-wrap.move3D(
-                data-conponent='m-comp--move3D'
-                data-perspective="1000"
-                data-drag)
-                .move3D__scene
-                    .move3D__container
+    header
+        .container
+            include includes/langSelector.pug
+        .container.menu-container.menu-container--top
+            include includes/navigation.pug
+    main
+        .move3D-wrap.move3D(
+            data-conponent='m-comp--move3D'
+            data-perspective="600")
+            .move3D__scene
+                .move3D__container
+                    .move3D__item(
+                        data-depth='200'
+                        data-animate)
+                        .circle
                         .move3D__item.item-3d.item-3d--top(
-                            data-depth='200'
+                            data-depth='0'
                             data-rotate='x'
                             data-range="20"
                             data-direction='top'
                             data-animate)
                             .circle
-                        .move3D__item
-                            .circle
+                            .move3D__item.item-3d.item-3d--top(
+                                data-depth='0'
+                                data-rotate='x'
+                                data-range="30"
+                                data-direction='top'
+                                data-animate)
+                                .circle
                         .move3D__item.item-3d.item-3d--bottom(
-                            data-depth='200'
+                            data-depth='0'
                             data-rotate='x'
                             data-range="20"
                             data-direction='bottom'
@@ -279,12 +41,12 @@ block content
                             .move3D__item.item-3d.item-3d--bottom(
                                 data-depth='0'
                                 data-rotate='x'
-                                data-range="20"
+                                data-range="30"
                                 data-direction='bottom'
                                 data-animate)
                                 .circle
                         .move3D__item.item-3d.item-3d--right(
-                            data-depth='200'
+                            data-depth='0'
                             data-rotate='y'
                             data-range="20"
                             data-direction='right'
@@ -293,12 +55,19 @@ block content
                             .move3D__item.item-3d.item-3d--right(
                                 data-depth='0'
                                 data-rotate='y'
-                                data-range="20"
+                                data-range="30"
                                 data-direction='right'
                                 data-animate)
                                 .circle
+                                .move3D__item.item-3d.item-3d--right(
+                                    data-depth='0'
+                                    data-rotate='y'
+                                    data-range="40"
+                                    data-direction='right'
+                                    data-animate)
+                                    .circle
                         .move3D__item.item-3d.item-3d--left(
-                            data-depth='200'
+                            data-depth='0'
                             data-rotate='y'
                             data-range="20"
                             data-direction='left'
@@ -307,38 +76,267 @@ block content
                             .move3D__item.item-3d.item-3d--left(
                                 data-depth='0'
                                 data-rotate='y'
-                                data-range="20"
+                                data-range="30"
                                 data-direction='left'
                                 data-animate)
                                 .circle
+                                .move3D__item.item-3d.item-3d--left(
+                                    data-depth='0'
+                                    data-rotate='y'
+                                    data-range="40"
+                                    data-direction='left'
+                                    data-animate)
+                                    .circle
                         .move3D__item.item-3d.item-3d--top-right(
-                            data-depth='200'
+                            data-depth='0'
                             data-rotate='xy'
                             data-range="20"
                             data-direction='top-right'
                             data-animate)
                             .circle
+                            .move3D__item.item-3d.item-3d--top-right(
+                                data-depth='0'
+                                data-rotate='xy'
+                                data-range="30"
+                                data-direction='top-right'
+                                data-animate)
+                                .circle
                         .move3D__item.item-3d.item-3d--top-left(
-                            data-depth='200'
+                            data-depth='0'
                             data-rotate='xy'
                             data-range="20"
                             data-direction='top-left'
                             data-animate)
                             .circle
                         .move3D__item.item-3d.item-3d--bottom-right(
-                            data-depth='200'
+                            data-depth='0'
                             data-rotate='xy'
                             data-range="20"
                             data-direction='bottom-right'
                             data-animate)
                             .circle
                         .move3D__item.item-3d.item-3d--bottom-left(
-                            data-depth='200'
+                            data-depth='0'
                             data-rotate='xy'
                             data-range="20"
                             data-direction='bottom-left'
                             data-animate)
                             .circle
+                            
+        
+        
+        .move3D-wrap.move3D(
+            data-conponent='m-comp--move3D'
+            data-perspective="600")
+            .move3D__scene
+                .move3D__container
+                    .move3D__item(
+                        data-depth='-200'
+                        data-animate)
+                        .circle
+                        .move3D__item.item-3d.item-3d--top(
+                            data-depth='100'
+                            data-rotate='x'
+                            data-range="-20"
+                            data-direction='top'
+                            data-animate)
+                            .circle
+                            .move3D__item.item-3d.item-3d--top(
+                                data-depth='0'
+                                data-rotate='x'
+                                data-range="-60"
+                                data-direction='top'
+                                data-animate)
+                                .circle
+                        .move3D__item.item-3d.item-3d--bottom(
+                            data-depth='100'
+                            data-rotate='x'
+                            data-range="-20"
+                            data-direction='bottom'
+                            data-animate)
+                            .circle
+                            .move3D__item.item-3d.item-3d--bottom(
+                                data-depth='0'
+                                data-rotate='x'
+                                data-range="-60"
+                                data-direction='bottom'
+                                data-animate)
+                                .circle
+                        .move3D__item.item-3d.item-3d--right(
+                            data-depth='0'
+                            data-rotate='y'
+                            data-range="-20"
+                            data-initialRotate="-30"
+                            data-direction='right'
+                            data-animate)
+                            .circle
+                            .move3D__item.item-3d.item-3d--right(
+                                data-depth='0'
+                                data-rotate='x'
+                                data-range="-30"
+                                data-initialRotate="-30"
+                                data-direction='top'
+                                data-animate)
+                                .circle
+                                .move3D__item.item-3d.item-3d--right(
+                                    data-depth='0'
+                                    data-rotate='x'
+                                    data-range="-40"
+                                    data-initialRotate="-30"
+                                    data-direction='top'
+                                    data-animate)
+                                    .circle
+                        .move3D__item.item-3d.item-3d--left(
+                            data-depth='0'
+                            data-rotate='y'
+                            data-range="-20"
+                            data-direction='left'
+                            data-animate)
+                            .circle
+                            .move3D__item.item-3d.item-3d--left(
+                                data-depth='0'
+                                data-rotate='y'
+                                data-range="-30"
+                                data-direction='left'
+                                data-animate)
+                                .circle
+                                .move3D__item.item-3d.item-3d--left(
+                                    data-depth='0'
+                                    data-rotate='y'
+                                    data-range="-40"
+                                    data-direction='left'
+                                    data-animate)
+                                    .circle
+                                    .move3D__item.item-3d.item-3d--top(
+                                        data-depth='0'
+                                        data-rotate='x'
+                                        data-initialRotate="0"
+                                        data-range="-60"
+                                        data-direction='top'
+                                        data-animate)
+                                        .circle
+                        .move3D__item.item-3d.item-3d--top-right(
+                            data-depth='0'
+                            data-rotate='xy'
+                            data-range="-20"
+                            data-direction='top-right'
+                            data-animate)
+                            .circle
+                            .move3D__item.item-3d.item-3d--top-right(
+                                data-depth='0'
+                                data-rotate='xy'
+                                data-range="-30"
+                                data-direction='top-right'
+                                data-animate)
+                                .circle
+                        .move3D__item.item-3d.item-3d--top-left(
+                            data-depth='0'
+                            data-rotate='xy'
+                            data-range="-20"
+                            data-direction='top-left'
+                            data-animate)
+                            .circle
+                        .move3D__item.item-3d.item-3d--bottom-right(
+                            data-depth='0'
+                            data-rotate='xy'
+                            data-range="-20"
+                            data-direction='bottom-right'
+                            data-animate)
+                            .circle
+                        .move3D__item.item-3d.item-3d--bottom-left(
+                            data-depth='0'
+                            data-rotate='xy'
+                            data-range="-20"
+                            data-direction='bottom-left'
+                            data-animate)
+                            .circle
+                            
+                            
+        .move3D-wrap.move3D(
+            data-conponent='m-comp--move3D'
+            data-perspective="1000"
+            data-drag)
+            .move3D__scene
+                .move3D__container
+                    .move3D__item.item-3d.item-3d--top(
+                        data-depth='200'
+                        data-rotate='x'
+                        data-range="20"
+                        data-direction='top'
+                        data-animate)
+                        .circle
+                    .move3D__item
+                        .circle
+                    .move3D__item.item-3d.item-3d--bottom(
+                        data-depth='200'
+                        data-rotate='x'
+                        data-range="20"
+                        data-direction='bottom'
+                        data-animate)
+                        .circle
+                        .move3D__item.item-3d.item-3d--bottom(
+                            data-depth='0'
+                            data-rotate='x'
+                            data-range="20"
+                            data-direction='bottom'
+                            data-animate)
+                            .circle
+                    .move3D__item.item-3d.item-3d--right(
+                        data-depth='200'
+                        data-rotate='y'
+                        data-range="20"
+                        data-direction='right'
+                        data-animate)
+                        .circle
+                        .move3D__item.item-3d.item-3d--right(
+                            data-depth='0'
+                            data-rotate='y'
+                            data-range="20"
+                            data-direction='right'
+                            data-animate)
+                            .circle
+                    .move3D__item.item-3d.item-3d--left(
+                        data-depth='200'
+                        data-rotate='y'
+                        data-range="20"
+                        data-direction='left'
+                        data-animate)
+                        .circle
+                        .move3D__item.item-3d.item-3d--left(
+                            data-depth='0'
+                            data-rotate='y'
+                            data-range="20"
+                            data-direction='left'
+                            data-animate)
+                            .circle
+                    .move3D__item.item-3d.item-3d--top-right(
+                        data-depth='200'
+                        data-rotate='xy'
+                        data-range="20"
+                        data-direction='top-right'
+                        data-animate)
+                        .circle
+                    .move3D__item.item-3d.item-3d--top-left(
+                        data-depth='200'
+                        data-rotate='xy'
+                        data-range="20"
+                        data-direction='top-left'
+                        data-animate)
+                        .circle
+                    .move3D__item.item-3d.item-3d--bottom-right(
+                        data-depth='200'
+                        data-rotate='xy'
+                        data-range="20"
+                        data-direction='bottom-right'
+                        data-animate)
+                        .circle
+                    .move3D__item.item-3d.item-3d--bottom-left(
+                        data-depth='200'
+                        data-rotate='xy'
+                        data-range="20"
+                        data-direction='bottom-left'
+                        data-animate)
+                        .circle
             
 
         

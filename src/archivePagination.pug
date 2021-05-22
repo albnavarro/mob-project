@@ -1,41 +1,39 @@
 extends _wrapper.pug
 
 block content
-    body
-        div(id="spriteSvg" data-svg="/assets/svg/svg.svg")
             
-        header
-            .container
-                include includes/langSelector.pug
-            .container.menu-container.menu-container--top
-                include includes/navigation.pug
-        main
-            .container
-                if importTag && importTag.length
+    header
+        .container
+            include includes/langSelector.pug
+        .container.menu-container.menu-container--top
+            include includes/navigation.pug
+    main
+        .container
+            if importTag && importTag.length
+                div
+                    |display tag:
+                each tag, key in importTag
+                    a(href=getTagPermalink(tag))
+                        | #{getTagName(tag)} |
+            hr
+            if chunkedPost
+                each post, key in chunkedPost
                     div
-                        |display tag:
-                    each tag, key in importTag
-                        a(href=getTagPermalink(tag))
-                            | #{getTagName(tag)} |
-                hr
-                if chunkedPost
-                    each post, key in chunkedPost
+                        p
+                            |#{getVal(post, 'date')}
+                        a(href=getVal(post, 'permalink'))
+                            |#{getVal(post, 'data', 'title')}
+                        p
+                            |#{getVal(post, 'data', 'description')}
+                        a(href=getCategoryPermalink(post.category))
+                            |in #{getCategoryName(post.category)}
                         div
-                            p
-                                |#{getVal(post, 'date')}
-                            a(href=getVal(post, 'permalink'))
-                                |#{getVal(post, 'data', 'title')}
-                            p
-                                |#{getVal(post, 'data', 'description')}
-                            a(href=getCategoryPermalink(post.category))
-                                |in #{getCategoryName(post.category)}
-                            div
-                                |tag:
-                            div
-                                each tag, key in post.tag
-                                    a(href=getTagPermalink(tag))
-                                        | #{getTagName(tag)} |
-                            hr
-                
-                include includes/pagination.pug
+                            |tag:
+                        div
+                            each tag, key in post.tag
+                                a(href=getTagPermalink(tag))
+                                    | #{getTagName(tag)} |
+                        hr
+            
+            include includes/pagination.pug
         

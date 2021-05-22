@@ -53,7 +53,7 @@ offsetSlider.init();
 move3D.init();
 mouseParallax.init();
 accordion.init();
-if( body.classList.contains('gsap') ) gsapTest.init();
+if( body.classList.contains('page-gsap') || body.classList.contains('page-gsapHorizontal') ) gsapTest.init();
 animate.init();
 axiosTest.init();
 
