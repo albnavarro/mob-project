@@ -1,5 +1,4 @@
 {
-    "template": "archivePagination",
     "univoqueId" : "archive",
     "pageTitle" : "archivio",
     "description" : "custom description",

@@ -1,12 +1,12 @@
-extends _wrapper.pug
+extends wrapper.pug
 
 block content
             
     header
         .container
-            include includes/langSelector.pug
+            include ../../includes/langSelector.pug
         .container.menu-container.menu-container--top
-            include includes/navigation.pug
+            include ../../includes/navigation.pug
     main
         .container
             if importTag && importTag.length
@@ -35,5 +35,5 @@ block content
                                     | #{getTagName(tag)} |
                         hr
             
-            include includes/pagination.pug
+            include ../../includes/pagination.pug
         

@@ -1,5 +1,4 @@
 {
-    "template": "archivePost",
     "univoqueId" : "news",
     "pageTitle" : "news",
     "description" : "custom description",
@@ -9,6 +8,9 @@
     "registerComponent" : [
         "to-top/pug/toTop.pug"
     ],
+    "isArchive" : {
+        "pagination" : false
+    },
     "importPost" : [
         "news"
     ]

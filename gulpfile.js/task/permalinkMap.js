@@ -31,7 +31,7 @@ function permalink(done) {
       const originalNameFile = getNameFile(curr)
       const nameFile = (store.arg.prod && originalNameFile === 'index') ? '' : originalNameFile
       const subfolder  = getPathByLocale(curr,lang)
-      const permalinkUrl = getPermalink(store.arg.prod,subfolder,nameFile)
+      const permalinkUrl = getPermalink(subfolder,nameFile)
 
       if('univoqueId' in data) {
           acc[data.univoqueId] = {...acc[data.univoqueId]}

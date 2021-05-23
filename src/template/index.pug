@@ -1,16 +1,16 @@
-extends _wrapper.pug
+extends default/wrapper.pug
 
 block content
 
     header
         .container
-            include includes/langSelector.pug
+            include ../includes/langSelector.pug
         .container.menu-container.menu-container--top
-            include includes/navigation.pug
+            include ../includes/navigation.pug
     main
         .container.clearfix
             .sidebar.menu-container--sidebar
-                include includes/navigation.pug
+                include ../includes/navigation.pug
             .content
                 h1
                     |#{getVal(pageTitle)}
@@ -40,7 +40,7 @@ block content
                         |popTarget 3
                         button
                             |close
-                include component/overlay/pug/overlay.pug
+                include ../component/overlay/pug/overlay.pug
                 //- Fine pop toggle
 
 
@@ -119,9 +119,9 @@ block content
                             span
                                 |content
 
-                include component/lightbox/pug/button.pug
+                include ../component/lightbox/pug/button.pug
 
-                include component/tooltip/pug/tooltip.pug
+                include ../component/tooltip/pug/tooltip.pug
                 
                 .parallax__container
                     .parallax__item(
@@ -142,11 +142,11 @@ block content
 
 
 
-        include component/offset-slider/pug/offsetSlider.pug
+        include ../component/offset-slider/pug/offsetSlider.pug
         .container.container-block-1
-            include component/threeBlocks/pug/tBlocks.pug
+            include ../component/threeBlocks/pug/tBlocks.pug
         .container.container-block-2
-            include component/threeBlocks/pug/tBlocks.pug
+            include ../component/threeBlocks/pug/tBlocks.pug
 
         section.overflow-hidden
             
@@ -284,6 +284,6 @@ block content
 
             div(style="height:200px;")
 
-    include component/lightbox/pug/lightbox-simple.pug
-    include component/lightbox/pug/lightbox-image.pug
-    include component/lightbox/pug/lightbox-video.pug
+    include ../component/lightbox/pug/lightbox-simple.pug
+    include ../component/lightbox/pug/lightbox-image.pug
+    include ../component/lightbox/pug/lightbox-video.pug

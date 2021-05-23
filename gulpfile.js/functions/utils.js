@@ -4,6 +4,9 @@ const path = require('path')
 const themePath = path.resolve('src')
 const additionalDataPath = path.join(themePath, 'additionalData')
 const dataPath = path.join(themePath, 'data')
+const templatePath = path.join(themePath, 'template')
+const { propValidate } = require('./helpers.js')
+const store = require('../store.js')
 
 /*
 * Get page tye
@@ -58,9 +61,9 @@ function getNameFile(filepath) {
 * @param namefile , form getNameFile function
 * @param firstSlash : bollean , prepend '/'
 */
-function getPermalink(argProd,subfolder,nameFile,prependSlash = true) {
+function getPermalink(subfolder,nameFile,prependSlash = true) {
     const slash = prependSlash ? '/' : ''
-    return `${slash}${subfolder}${nameFile}${getExtensionFile(argProd)}`
+    return `${slash}${subfolder}${nameFile}${getExtensionFile()}`
 }
 
 
@@ -68,8 +71,8 @@ function getPermalink(argProd,subfolder,nameFile,prependSlash = true) {
 * Usa permalink without .html on server in production mode
 * .htaccess riles RewriteCond %{REQUEST_FILENAME}\.html -f
 */
-function getExtensionFile(argProd) {
-    return (argProd) ? "" :  ".html"
+function getExtensionFile() {
+    return (store.arg.prod) ? "" :  ".html"
 }
 
 
@@ -151,6 +154,34 @@ function extracAdditionalData(data) {
 }
 
 
+/*
+* Return default template or specific
+*/
+function getTemplate(data) {
+    const getDefaultTemplate = (data) => {
+        if(propValidate(['isArchive', 'pagination'], data) && data.isArchive.pagination === true) {
+            return config.defaultTemplate.paginationArchive
+
+        } else if (('isArchive' in data) && ('importPost' in data)) {
+            return config.defaultTemplate.postArchive
+
+        } else if (('isArchive' in data) && ('importTag' in data)) {
+            return config.defaultTemplate.tagArchive
+
+        } else if('exportPost' in data) {
+            return config.defaultTemplate.post
+
+        } else {
+            return config.defaultTemplate.page
+        }
+    }
+
+    return ('template' in data) ?  `${templatePath}/${data.template}.pug` :  `${templatePath}/${getDefaultTemplate(data)}`
+}
+
+
+
+
 exports.getPageType = getPageType
 exports.getArchivePageName = getArchivePageName
 exports.fileIschanged = fileIschanged
@@ -162,3 +193,4 @@ exports.extractAdditionlSubFolder = extractAdditionlSubFolder
 exports.getPathByLocale = getPathByLocale
 exports.getLanguage = getLanguage
 exports.extracAdditionalData = extracAdditionalData
+exports.getTemplate = getTemplate

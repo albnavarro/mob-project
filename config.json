@@ -11,6 +11,13 @@
             "nativeName" : "Italiano"
         }
     },
+    "defaultTemplate" : {
+        "page" : "default/page.pug",
+        "postArchive" : "default/archivePost.pug",
+        "tagArchive" : "default/archiveTag.pug",
+        "paginationArchive" : "default/archivePagination.pug",
+        "post" : "default/post.pug"
+    },
     "defaultLocales" : "en",
     "postPerPage" : "3",
     "dinamicPageName" : "page-",

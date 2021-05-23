@@ -1,5 +1,4 @@
 {
-    "template": "archiveTag",
     "univoqueId" : "tag1",
     "pageTitle" : "tag1",
     "description" : "custom description",
@@ -9,6 +8,9 @@
     "registerComponent" : [
         "to-top/pug/toTop.pug"
     ],
+    "isArchive" : {
+        "pagination" : false
+    },
     "importTag" : [
         "tag1"
     ]

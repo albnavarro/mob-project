@@ -33,7 +33,7 @@ function category(done) {
             const lang = getLanguage(curr)
             const nameFile = getNameFile(curr)
             const subfolder  = getPathByLocale(curr,lang)
-            const permalink = getPermalink(store.arg.prod,subfolder,nameFile)
+            const permalink = getPermalink(subfolder,nameFile)
             const sourceFilepath = (lang == config.defaultLocales) ? `${lang}/` : ''
 
             const category = parsed.exportPost.category;

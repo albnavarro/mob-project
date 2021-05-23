@@ -8,6 +8,7 @@ const util = require('util')
 const path = require('path')
 const themePath = path.resolve('src')
 const destPath = path.resolve('www')
+const templatePath = path.join(themePath, 'template')
 const dataPath = path.join(themePath, 'data')
 const distPath = path.join(destPath, 'assets/dist')
 const dataDestFolder = path.join(destPath, 'assets/data')
@@ -36,7 +37,8 @@ const {
     getPermalink,
     getPathByLocale,
     getLanguage,
-    extracAdditionalData
+    extracAdditionalData,
+    getTemplate
 } = require('../functions/utils.js')
 
 
@@ -53,11 +55,6 @@ function html(done) {
         Get json data of each file
         */
         const data = JSON.parse(fs.readFileSync(filepath))
-
-        /*
-        get template
-        */
-        const template = `${themePath}/${data.template}.pug`
 
         /*
         Get language
@@ -130,8 +127,8 @@ function html(done) {
         if(store.arg.debug) store.permalinkMapData = JSON.parse(fs.readFileSync(permalinkFile))
 
         const permalink = {}
-        permalink.permalink = getPermalink(store.arg.prod,subfolder,nameFile)
-        permalink.staticPermalink = `${config.domain}${getPermalink(store.arg.prod,subfolder,nameFile,false)}`
+        permalink.permalink = getPermalink(subfolder,nameFile)
+        permalink.staticPermalink = `${config.domain}${getPermalink(subfolder,nameFile,false)}`
         permalink.permalinkMap = store.permalinkMapData
         permalink.pageTitle = data.pageTitle
 
@@ -211,6 +208,15 @@ function html(done) {
 
 
         /*
+        get template
+        */
+        // const template = `${templatePath}/${data.template}.pug`
+        const template = getTemplate(data)
+
+        const templatename = {}
+        templatename.templatename = getNameFile(template)
+
+        /*
         Add page type
         */
         const pageType = {}
@@ -238,6 +244,7 @@ function html(done) {
             chunkedPost,
             relativePath,
             data,
+            templatename,
             pageType,
             manifest
         );
@@ -258,7 +265,9 @@ function html(done) {
         /*
         Same checkof tag and post pagination
         */
-        if(('isArchive' in allData) && (allData.tags.length || Object.keys(allData.posts).length)) {
+        if((propValidate(['isArchive', 'pagination'], data))
+            && data.isArchive.pagination === true
+            && (allData.tags.length || Object.keys(allData.posts).length)) {
 
             /*
             Get post per page, config si defulat otherwise is overrride form data josn
@@ -302,9 +311,9 @@ function html(done) {
                     if (index == 0) {
                         return null
                     } else if (index == 1) {
-                        return getPermalink(store.arg.prod,subfolder,nameFile)
+                        return getPermalink(subfolder,nameFile)
                     } else {
-                        return getPermalink(store.arg.prod,subfolder,`${dinamicPageName}${index - 1}`)
+                        return getPermalink(subfolder,`${dinamicPageName}${index - 1}`)
                     }
                 }
 
@@ -315,7 +324,7 @@ function html(done) {
                     if (index == pageData.length - 1) {
                         return null
                     } else {
-                        return getPermalink(store.arg.prod,subfolder,`${dinamicPageName}${index + 1}`)
+                        return getPermalink(subfolder,`${dinamicPageName}${index + 1}`)
                     }
                 }
 
@@ -355,7 +364,7 @@ function html(done) {
 
             const pagetask = pages.map((item, index) => {
                 const newName = getArchivePageName(index, nameFile, dinamicPageName)
-                item.displayName = `${getPermalink(store.arg.prod,getPathByLocale(filepath, getLanguage(filepath)), newName)}`;
+                item.displayName = `${getPermalink(getPathByLocale(filepath, getLanguage(filepath)), newName)}`;
                 return {'skipTask' : skipTask, 'fn': item};
             })
 
@@ -381,7 +390,7 @@ function html(done) {
                     })
             }
 
-            renderPage.displayName = `${getPermalink(store.arg.prod,getPathByLocale(filepath, getLanguage(filepath)), getNameFile(filepath))}`;
+            renderPage.displayName = `${getPermalink(getPathByLocale(filepath, getLanguage(filepath)), getNameFile(filepath))}`;
             return {'skipTask' : skipTask, 'fn': renderPage};
         }
 

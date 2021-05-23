@@ -1,5 +1,4 @@
 {
-    "template": "archivePagination",
     "univoqueId" : "tagArchive",
     "pageTitle" : "tag Archive",
     "description" : "custom description",
@@ -10,6 +9,7 @@
         "to-top/pug/toTop.pug"
     ],
     "isArchive" : {
+        "pagination" : true,
         "postPerPage" : "1",
         "dinamicPageName" : "tagArchive-"
     },

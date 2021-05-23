@@ -1,5 +1,4 @@
 {
-    "template": "archivePagination",
     "univoqueId" : "archive",
     "pageTitle" : "archive",
     "description" : "custom description",
@@ -10,8 +9,9 @@
         "to-top/pug/toTop.pug"
     ],
     "isArchive" : {
+        "pagination" : true,
         "postPerPage" : "2",
-        "dinamicPageName" : "archive-"
+        "dinamicPageName" : "tagArchive-"
     },
     "importPost" : [
         "news",
