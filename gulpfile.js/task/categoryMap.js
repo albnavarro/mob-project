@@ -1,3 +1,4 @@
+const util = require('util')
 const glob = require('glob')
 const path = require('path')
 const fs = require('fs')
@@ -34,14 +35,13 @@ function category(done) {
             const nameFile = getNameFile(curr)
             const subfolder  = getPathByLocale(curr,lang)
             const permalink = getPermalink(subfolder,nameFile)
-            const sourceFilepath = (lang == config.defaultLocales) ? `${lang}/` : ''
 
             const category = parsed.exportPost.category;
             const obj = {
                 permalink: permalink,
                 category: category,
                 tag: ( 'tag' in parsed.exportPost ) ? parsed.exportPost.tag : [],
-                source: `${sourceFilepath}${subfolder}${nameFile}.json`,
+                source: curr,
                 date: parsed.exportPost.date,
                 data: { ...parsed.exportPost.data }
             };

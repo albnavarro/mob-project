@@ -53,7 +53,7 @@ function taskIsSkippable(filepath, data, template) {
         return Object.values(data.posts)
             .flat()
             .filter((item) => item.source !== undefined)
-            .map((item) => store.fileModified === `${dataPath}/${item.source}`)
+            .map((item) => store.fileModified === item.source)
             .some((item) =>  item === true)
     }
 
@@ -66,7 +66,7 @@ function taskIsSkippable(filepath, data, template) {
     */
     const tagDataChecker = (data) => {
         return data.tags
-                .map((item) => store.fileModified === `${dataPath}/${item.source}`)
+                .map((item) => store.fileModified === item.source)
                 .some((item) =>  item === true)
     }
     const tagDataIsChanged = ('tags' in data) ? tagDataChecker(data) : false
