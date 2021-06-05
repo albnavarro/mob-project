@@ -25,21 +25,21 @@
         "articles" : {
             "en" : {
                 "name" : "articles",
-                "indexUnivoqueId" : "articles"
+                "indexUnivoqueId" : "articles/index"
             },
             "it" : {
                 "name" : "articoli",
-                "indexUnivoqueId" : "articles"
+                "indexUnivoqueId" : "articles/index"
             }
         },
         "news" : {
             "en" : {
                 "name" : "news",
-                "indexUnivoqueId" : "news"
+                "indexUnivoqueId" : "news/index"
             },
             "it" : {
                 "name" : "novitá",
-                "indexUnivoqueId" : "news"
+                "indexUnivoqueId" : "news/index"
             }
         }
     },
@@ -47,11 +47,11 @@
         "tag1" : {
             "en" : {
                 "name" : "tag1 en",
-                "indexUnivoqueId" : "tag1"
+                "indexUnivoqueId" : "tag1/index"
             },
             "it" : {
                 "name" : "tag1 it",
-                "indexUnivoqueId" : "tag1"
+                "indexUnivoqueId" : "tag1/index"
             }
         },
         "tag2" : {

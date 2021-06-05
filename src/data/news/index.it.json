@@ -1,0 +1,17 @@
+{
+    "pageTitle" : "novitá",
+    "description" : "custom description",
+    "slug" : "novita",
+    "additionalData" : [
+        "nav.json"
+    ],
+    "registerComponent" : [
+        "to-top/pug/toTop.pug"
+    ],
+    "isArchive" : {
+        "pagination" : false
+    },
+    "importPost" : [
+        "news"
+    ]
+}

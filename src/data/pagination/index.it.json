@@ -1,0 +1,21 @@
+{
+    "pageTitle" : "paginazione",
+    "slug" : "paginazione",
+    "description" : "custom description",
+    "additionalData" : [
+        "nav.json"
+    ],
+    "registerComponent" : [
+        "to-top/pug/toTop.pug"
+    ],
+    "isArchive" : {
+        "pagination" : true,
+        "postPerPage" : "2",
+        "dinamicPageName" : "tagArchivio-"
+    },
+    "importPost" : [
+        "news",
+        "articles",
+        "nonEsistenteCategoria"
+    ]
+}

@@ -1,0 +1,12 @@
+{
+    "template": "susy",
+    "slug" : "susanna",
+    "pageTitle" : "susanna",
+    "description" : "custom description",
+    "additionalData" : [
+        "nav.json"
+    ],
+    "registerComponent" : [
+        "to-top/pug/toTop.pug"
+    ]
+}

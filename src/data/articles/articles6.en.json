@@ -1,0 +1,23 @@
+{
+    "pageTitle" : "article 6",
+    "description" : "custom description",
+    "additionalData" : [
+        "nav.json"
+    ],
+    "registerComponent" : [
+        "to-top/pug/toTop.pug"
+    ],
+    "pageTitle" : "article 6",
+    "exportPost" : {
+        "category" : "articles",
+        "tag" : [
+            "tag1",
+            "tag2"
+        ],
+        "date" : "Mon Oct 10 2021 11:00:00 GMT",
+        "data" : {
+            "title" : "articles 6",
+            "description" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus diam urna, sagittis sed diam vitae, aliquet ultricies sem. Quisque quam nibh, aliquet at cursus id, commodo vel urna."
+        }
+    }
+}

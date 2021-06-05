@@ -12,7 +12,8 @@ const {
     getPermalink,
     getPathByLocale,
     getLanguage,
-    extracAdditionalData
+    extracAdditionalData,
+    getUnivoqueId
 } = require('../functions/utils.js')
 const store = require('../store.js')
 
@@ -31,13 +32,14 @@ function permalink(done) {
       const lang = getLanguage(curr)
       const originalNameFile = getNameFile(curr)
       const nameFile = (store.arg.prod && originalNameFile === 'index') ? '' : originalNameFile
+      const slug = (('slug' in data) && originalNameFile !== 'index') ? data.slug : nameFile
       const subfolder  = getPathByLocale(curr,lang)
-      const permalinkUrl = getPermalink(subfolder,nameFile)
+      const permalinkUrl = getPermalink(subfolder,slug)
+      const univoqueId = getUnivoqueId(curr)
 
-      if('univoqueId' in data) {
-          acc[data.univoqueId] = {...acc[data.univoqueId]}
-          acc[data.univoqueId][getLanguage(curr)] = permalinkUrl
-      }
+      acc[univoqueId] = {...acc[univoqueId]}
+      acc[univoqueId][getLanguage(curr)] = permalinkUrl
+
 
       return acc;
     }, {});

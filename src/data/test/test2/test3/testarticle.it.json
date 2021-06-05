@@ -1,0 +1,11 @@
+{
+    "pageTitle" : "bu",
+    "description" : "custom description",
+    "slug" : "testArticolo",
+    "additionalData" : [
+        "nav.json"
+    ],
+    "registerComponent" : [
+        "to-top/pug/toTop.pug"
+    ]
+}

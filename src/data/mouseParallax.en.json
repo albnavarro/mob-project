@@ -1,0 +1,11 @@
+{
+    "template": "mouseParallax",
+    "pageTitle" : "mouse Parallax",
+    "description" : "custom description",
+    "additionalData" : [
+        "nav.json"
+    ],
+    "registerComponent" : [
+        "to-top/pug/toTop.pug"
+    ]
+}

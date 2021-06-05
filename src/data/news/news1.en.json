@@ -1,0 +1,23 @@
+{
+    "pageTitle" : "news 1",
+    "description" : "custom description",
+    "additionalData" : [
+        "nav.json"
+    ],
+    "registerComponent" : [
+        "to-top/pug/toTop.pug"
+    ],
+    "exportPost" : {
+        "category" : "news",
+        "tag" : [
+            "tag1",
+            "tag2",
+            "tag3"
+        ],
+        "date" : "Mon Oct 28 2021 00:00:00 GMT",
+        "data" : {
+            "title" : "news 1",
+            "description" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus diam urna, sagittis sed diam vitae, aliquet ultricies sem. Quisque quam nibh, aliquet at cursus id, commodo vel urna."
+        }
+    }
+}

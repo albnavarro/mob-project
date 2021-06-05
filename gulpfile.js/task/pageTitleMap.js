@@ -8,7 +8,10 @@ const dataPath = path.join(themePath, 'data')
 const dataDestFolder = path.join(destPath, 'assets/data')
 const pageTitleFile = `${dataDestFolder}/pageTitleMap.json`
 const store = require('../store.js')
-const { getLanguage } = require('../functions/utils.js')
+const {
+    getLanguage,
+    getUnivoqueId
+} = require('../functions/utils.js')
 
 
 /*
@@ -23,11 +26,10 @@ function pageTitle(done) {
 
     const pageTitleObj = allPath.reduce((acc, curr) => {
       const data = JSON.parse(fs.readFileSync(curr))
+      const univoqueId = getUnivoqueId(curr)
 
-      if('univoqueId' in data) {
-          acc[data.univoqueId] = {...acc[data.univoqueId]}
-          acc[data.univoqueId][getLanguage(curr)] = data.pageTitle
-      }
+      acc[univoqueId] = {...acc[univoqueId]}
+      acc[univoqueId][getLanguage(curr)] = data.pageTitle
 
       return acc;
     }, {});

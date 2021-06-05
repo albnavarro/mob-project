@@ -140,6 +140,6 @@ exports.watch = watchTask
 * npm run page "en/index.json"
 *
 * debug single page:
-* npm run debugpage "en/articles/index.json"
+* npm run debugpage "articles/index.it.json"
 * .....
 */

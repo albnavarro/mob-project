@@ -1,0 +1,17 @@
+{
+    "pageTitle" : "articoli",
+    "slug" :  "articoli",
+    "description" : "custom description",
+    "additionalData" : [
+        "nav.json"
+    ],
+    "registerComponent" : [
+        "to-top/pug/toTop.pug"
+    ],
+    "isArchive" : {
+        "pagination" : false
+    },
+    "importPost" : [
+        "articles"
+    ]
+}

@@ -38,7 +38,8 @@ const {
     getPathByLocale,
     getLanguage,
     extracAdditionalData,
-    getTemplate
+    getTemplate,
+    getUnivoqueId
 } = require('../functions/utils.js')
 
 
@@ -64,7 +65,8 @@ function html(done) {
         /*
         Get file name
         */
-        const nameFile = getNameFile(filepath)
+        const originalnameFile = getNameFile(filepath);
+        const nameFile = (('slug' in data) && originalnameFile !== 'index') ? data.slug : getNameFile(filepath)
 
 
         /*
@@ -200,7 +202,7 @@ function html(done) {
         criticalcss
         */
         const critical = {}
-        const criticalFile = `${cssDest}/critical/${subfolder}${nameFile}.css`
+        const criticalFile = `${cssDest}/critical${subfolder}/${nameFile}.css`
         if (store.arg.prod && fs.existsSync(criticalFile)) {
             const documentStyles = fs.readFileSync(criticalFile);
             critical.documentStyles = documentStyles.toString()
@@ -222,6 +224,9 @@ function html(done) {
         const pageType = {}
         pageType.pageType = getPageType(data)
 
+
+        const univoqueId = {}
+        univoqueId.univoqueId =  getUnivoqueId(filepath)
 
         /*
         Create empty chunkedAyrray ( pagination ) to avoid error
@@ -246,7 +251,8 @@ function html(done) {
             data,
             templatename,
             pageType,
-            manifest
+            manifest,
+            univoqueId
         );
 
         /*

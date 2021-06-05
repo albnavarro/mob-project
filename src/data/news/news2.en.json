@@ -1,0 +1,18 @@
+{
+    "description" : "custom description",
+    "pageTitle" : "news 2",
+    "additionalData" : [
+        "nav.json"
+    ],
+    "registerComponent" : [
+        "to-top/pug/toTop.pug"
+    ],
+    "exportPost" : {
+        "category" : "news",
+        "date" : "Mon Oct 28 2021 00:00:00 GMT",
+        "data" : {
+            "title" : "news 2",
+            "description" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus diam urna, sagittis sed diam vitae, aliquet ultricies sem. Quisque quam nibh, aliquet at cursus id, commodo vel urna."
+        }
+    }
+}

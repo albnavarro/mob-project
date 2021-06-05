@@ -66,23 +66,45 @@
         },
         {
             "label" : "",
-            "univoqueId" : "archive",
+            "univoqueId" : "pagination/index",
             "children" : [
                 {
                     "label" : "",
-                    "univoqueId" : "articles"
+                    "univoqueId" : "articles/index"
                 },
                 {
                     "label" : "",
-                    "univoqueId" : "news"
+                    "univoqueId" : "news/index"
                 },
                 {
                     "label" : "",
-                    "univoqueId" : "tagArchive"
+                    "univoqueId" : "tagsArchive/index"
                 },
                 {
                     "label" : "",
-                    "univoqueId" : "tag1"
+                    "univoqueId" : "tag1/index"
+                }
+            ]
+        },
+        {
+            "label" : "",
+            "univoqueId" : "test/index",
+            "children" : [
+                {
+                    "label" : "",
+                    "univoqueId" : "test/test2/index",
+                    "children" : [
+                        {
+                            "label" : "",
+                            "univoqueId" : "test/test2/test3/index",
+                            "children" : [
+                                {
+                                    "label" : "",
+                                    "univoqueId" : "test/test2/test3/testarticle"
+                                }
+                            ]
+                        }
+                    ]
                 }
             ]
         }

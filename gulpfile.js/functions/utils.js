@@ -61,9 +61,9 @@ function getNameFile(filepath) {
 * @param namefile , form getNameFile function
 * @param firstSlash : bollean , prepend '/'
 */
-function getPermalink(subfolder,nameFile,prependSlash = true) {
+function getPermalink(subfolder,nameFile,prependSlash = false) {
     const slash = prependSlash ? '/' : ''
-    return `${slash}${subfolder}${nameFile}${getExtensionFile()}`
+    return `${slash}${subfolder}/${nameFile}${getExtensionFile()}`
 }
 
 
@@ -96,6 +96,12 @@ function extractAdditionlSubFolder(filepath) {
     return (!path) ? '' : path[1]
 }
 
+function getOriginalPath(filepath) {
+    const pattern = new RegExp(`${dataPath}\/(.*\/).*$`);
+    const path = filepath.match(pattern);
+    return (!path) ? '' : path[1]
+}
+
 /*
 * get path where .html will be saved
 * @param filepath - {page}.json path
@@ -104,14 +110,29 @@ function extractAdditionlSubFolder(filepath) {
 * return '' id {page}.json is in root or path form root
 */
 function getPathByLocale(filepath, lang) {
-    const pathRoot = ( config.defaultLocales == lang) ? `${dataPath}/${lang}` : `${dataPath}`
-    const pattern = new RegExp(`${pathRoot}\/(.*\/).*$`);
+    const pattern = new RegExp(`${dataPath}\/(.*\/).*$`);
     const path = filepath.match(pattern);
+    const rootPath = (!path) ? '' : path[1]
+
+    const dirArr = rootPath.split('/');
+    dirArr.pop();
+
+    const pathBySlug = dirArr.reduce((p, c, i) => {
+        const parentData = JSON.parse(fs.readFileSync(`${dataPath}${p.original}/${c}/index.${lang}.json`))
+        const slug = (propValidate(['slug'], parentData)) ? parentData.slug : c
+        return { 'original':`${p.original}/${c}`, 'modified' : `${p.modified}/${slug}`}
+    }, { 'original':'', 'modified' : ''})
+
+    const pathBySlugAndLang = ( config.defaultLocales == lang) ? `${pathBySlug.modified}` : `/${lang}${pathBySlug.modified}`
 
     /*
     * Return subfolder if match in regex or empty vaalue
     */
-    return (!path) ? '' : path[1]
+    return pathBySlugAndLang;
+}
+
+function getUnivoqueId(filepath) {
+    return `${getOriginalPath(filepath)}${getNameFile(filepath)}`
 }
 
 
@@ -121,10 +142,8 @@ function getPathByLocale(filepath, lang) {
 * return lang flder name
 */
 function getLanguage(filepath) {
-    const pattern = new RegExp(`${dataPath}\/([^\/]*)`);
-    const lang = filepath.match(pattern);
-
-    return (!lang) ? '' : lang[1]
+    const nameFile = filepath.split('/').pop().split('.')
+    return (nameFile.length == 3) ? nameFile[1] : config.defaultLocales
 }
 
 
@@ -194,3 +213,5 @@ exports.getPathByLocale = getPathByLocale
 exports.getLanguage = getLanguage
 exports.extracAdditionalData = extracAdditionalData
 exports.getTemplate = getTemplate
+exports.getOriginalPath = getOriginalPath
+exports.getUnivoqueId = getUnivoqueId
