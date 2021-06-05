@@ -1,12 +1,4 @@
 {
-    "template": "mouseParallax",
     "pageTitle" : "topo Parallasse",
-    "slug" : "topo-parallasse",
-    "description" : "custom description",
-    "additionalData" : [
-        "nav.json"
-    ],
-    "registerComponent" : [
-        "to-top/pug/toTop.pug"
-    ]
+    "slug" : "topo-parallasse"
 }

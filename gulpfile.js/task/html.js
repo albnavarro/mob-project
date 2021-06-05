@@ -21,7 +21,7 @@ const cssDest = path.join(destPath, 'assets/css')
 const store = require('../store.js')
 
 // HELPERS
-const { propValidate, sortbyDate, chunk } = require('../functions/helpers.js')
+const { propValidate, sortbyDate, chunk, mergeDeep } = require('../functions/helpers.js')
 
 // SKIPPABLE
 const { taskIsSkippable  } = require('../functions/taskIsSkippable.js')
@@ -39,7 +39,9 @@ const {
     getLanguage,
     extracAdditionalData,
     getTemplate,
-    getUnivoqueId
+    getUnivoqueId,
+    getOriginalPath,
+    mergeData
 } = require('../functions/utils.js')
 
 
@@ -52,21 +54,25 @@ function html(done) {
     const streams = glob.sync(sourcePath)
 
     const tasks = streams.map(filepath => {
+
         /*
         Get json data of each file
         */
-        const data = JSON.parse(fs.readFileSync(filepath))
+        const initialData = JSON.parse(fs.readFileSync(filepath))
+        const lang = getLanguage(filepath)
+        const data = mergeData(filepath, initialData, lang)
+
 
         /*
         Get language
         */
-        data.lang = getLanguage(filepath)
+        data.lang = lang
 
         /*
         Get file name
         */
         const originalnameFile = getNameFile(filepath);
-        const nameFile = (('slug' in data) && originalnameFile !== 'index') ? data.slug : getNameFile(filepath)
+        const nameFile = (('slug' in data) && originalnameFile !== 'index') ? data.slug : originalnameFile
 
 
         /*
@@ -96,6 +102,7 @@ function html(done) {
         const manifestData = JSON.parse(fs.readFileSync(manifestFile))
         manifest.manifest = manifestData
 
+
         /*
         Subfolder
         Create folder in accordion of json folder position
@@ -103,7 +110,6 @@ function html(done) {
         return the exact path of json file
         */
         const subfolder = getPathByLocale(filepath,data.lang)
-
 
         /*
         Create subfolder if not exist
@@ -130,7 +136,8 @@ function html(done) {
 
         const permalink = {}
         permalink.permalink = getPermalink(subfolder,nameFile)
-        permalink.staticPermalink = `${config.domain}${getPermalink(subfolder,nameFile,false)}`
+        const validDomain = ( config.domain.substr(-1) == '/' ) ? config.domain.slice(0, -1) : config.domain
+        permalink.staticPermalink = `${validDomain}${getPermalink(subfolder,nameFile)}`
         permalink.permalinkMap = store.permalinkMapData
         permalink.pageTitle = data.pageTitle
 

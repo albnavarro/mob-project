@@ -5,15 +5,6 @@ const store = require('../store.js')
 Check if mandatory propierties in {page}.joson is right
 */
 function debugMandatoryPropierties(data) {
-    if(!('univoqueId' in data) || data.univoqueId === undefined) {
-        console.log('*****')
-        console.log(`Error`)
-        console.log(`univoqueId propierties is mandatory`)
-        console.log(`at: ${data.permalink}`)
-        console.log('*****')
-        return true
-    }
-
     if(!('description' in data) || data.description === undefined) {
         console.log('*****')
         console.log(`Error`)

@@ -1,12 +1,4 @@
 {
-    "template": "move3D",
     "slug" : "muovi3D",
-    "pageTitle" : "muovi 3D",
-    "description" : "custom description",
-    "additionalData" : [
-        "nav.json"
-    ],
-    "registerComponent" : [
-        "to-top/pug/toTop.pug"
-    ]
+    "pageTitle" : "muovi 3D"
 }

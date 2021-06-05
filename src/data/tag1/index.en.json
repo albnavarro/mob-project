@@ -1,6 +1,6 @@
 {
     "pageTitle" : "tag1",
-    "slug" : "tag1-en",
+    "slug" : "archive-tag-1",
     "description" : "custom description",
     "additionalData" : [
         "nav.json"

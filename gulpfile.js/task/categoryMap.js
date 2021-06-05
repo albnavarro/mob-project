@@ -13,7 +13,9 @@ const {
     getPermalink,
     getPathByLocale,
     getLanguage,
-    extracAdditionalData
+    extracAdditionalData,
+    getOriginalPath,
+    mergeData
 } = require('../functions/utils.js')
 const { sortbyDate } = require('../functions/helpers.js')
 const store = require('../store.js')
@@ -30,22 +32,24 @@ function category(done) {
 
     const categoryObj = allPath.reduce((acc, curr, i) => {
         const parsed = JSON.parse(fs.readFileSync(curr));
-        if ('exportPost' in parsed) {
-            const lang = getLanguage(curr)
+        const lang = getLanguage(curr)
+        const data = mergeData(curr, parsed, lang)
+        
+        if ('exportPost' in data) {
             const nameFile = getNameFile(curr)
-            const slug = ('slug' in parsed) ? parsed.slug : nameFile
+            const slug = ('slug' in data) ? data.slug : nameFile
             const subfolder  = getPathByLocale(curr,lang)
             const permalink = getPermalink(subfolder,slug)
             const sourceFilepath = (lang == config.defaultLocales) ? `${lang}/` : ''
 
-            const category = parsed.exportPost.category;
+            const category = data.exportPost.category;
             const obj = {
                 permalink: permalink,
                 category: category,
-                tag: ( 'tag' in parsed.exportPost ) ? parsed.exportPost.tag : [],
+                tag: ( 'tag' in data.exportPost ) ? data.exportPost.tag : [],
                 source: curr,
-                date: parsed.exportPost.date,
-                data: { ...parsed.exportPost.data }
+                date: data.exportPost.date,
+                data: { ...data.exportPost.data }
             };
 
             /*

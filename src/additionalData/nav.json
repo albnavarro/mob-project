@@ -66,45 +66,25 @@
         },
         {
             "label" : "",
-            "univoqueId" : "pagination/index",
+            "univoqueId" : "archive/index",
             "children" : [
                 {
                     "label" : "",
-                    "univoqueId" : "articles/index"
+                    "univoqueId" : "archive/articles/index"
                 },
                 {
                     "label" : "",
-                    "univoqueId" : "news/index"
-                },
-                {
-                    "label" : "",
-                    "univoqueId" : "tagsArchive/index"
-                },
-                {
-                    "label" : "",
-                    "univoqueId" : "tag1/index"
+                    "univoqueId" : "archive/news/index"
                 }
             ]
         },
         {
             "label" : "",
-            "univoqueId" : "test/index",
+            "univoqueId" : "filterPerTag/index",
             "children" : [
                 {
                     "label" : "",
-                    "univoqueId" : "test/test2/index",
-                    "children" : [
-                        {
-                            "label" : "",
-                            "univoqueId" : "test/test2/test3/index",
-                            "children" : [
-                                {
-                                    "label" : "",
-                                    "univoqueId" : "test/test2/test3/testarticle"
-                                }
-                            ]
-                        }
-                    ]
+                    "univoqueId" : "tag1/index"
                 }
             ]
         }

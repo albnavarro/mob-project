@@ -1,12 +1,3 @@
 {
-    "template": "fixed",
-    "pageTitle" : "fixed",
-    "slug" : "fisso",
-    "description" : "custom description",
-    "additionalData" : [
-        "nav.json"
-    ],
-    "registerComponent" : [
-        "to-top/pug/toTop.pug"
-    ]
+    "slug" : "fisso"
 }

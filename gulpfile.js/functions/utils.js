@@ -5,7 +5,7 @@ const themePath = path.resolve('src')
 const additionalDataPath = path.join(themePath, 'additionalData')
 const dataPath = path.join(themePath, 'data')
 const templatePath = path.join(themePath, 'template')
-const { propValidate } = require('./helpers.js')
+const { propValidate, mergeDeep } = require('./helpers.js')
 const store = require('../store.js')
 
 /*
@@ -201,6 +201,18 @@ function getTemplate(data) {
 
 
 
+
+function mergeData(filepath, parsed, lang) {
+    const defaultLangFilePath = `${dataPath}/${getOriginalPath(filepath)}${getNameFile(filepath)}.${config.defaultLocales}.json`
+    const defaultLangData = ( config.defaultLocales !== lang && fs.existsSync(defaultLangFilePath))
+        ? JSON.parse(fs.readFileSync(defaultLangFilePath))
+        : null
+
+    return ( defaultLangData === null) ? { ... parsed } : mergeDeep(defaultLangData, parsed)
+}
+
+
+
 exports.getPageType = getPageType
 exports.getArchivePageName = getArchivePageName
 exports.fileIschanged = fileIschanged
@@ -215,3 +227,4 @@ exports.extracAdditionalData = extracAdditionalData
 exports.getTemplate = getTemplate
 exports.getOriginalPath = getOriginalPath
 exports.getUnivoqueId = getUnivoqueId
+exports.mergeData = mergeData

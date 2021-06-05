@@ -10,7 +10,8 @@ const pageTitleFile = `${dataDestFolder}/pageTitleMap.json`
 const store = require('../store.js')
 const {
     getLanguage,
-    getUnivoqueId
+    getUnivoqueId,
+    mergeData
 } = require('../functions/utils.js')
 
 
@@ -25,11 +26,13 @@ function pageTitle(done) {
     const allPath = glob.sync(path.join(dataPath, '/**/*.json'))
 
     const pageTitleObj = allPath.reduce((acc, curr) => {
-      const data = JSON.parse(fs.readFileSync(curr))
+      const parsed = JSON.parse(fs.readFileSync(curr))
+      const lang = getLanguage(curr)
       const univoqueId = getUnivoqueId(curr)
+      const data = mergeData(curr, parsed, lang)
 
       acc[univoqueId] = {...acc[univoqueId]}
-      acc[univoqueId][getLanguage(curr)] = data.pageTitle
+      acc[univoqueId][lang] = data.pageTitle
 
       return acc;
     }, {});

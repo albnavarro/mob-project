@@ -25,21 +25,21 @@
         "articles" : {
             "en" : {
                 "name" : "articles",
-                "indexUnivoqueId" : "articles/index"
+                "indexUnivoqueId" : "archive/articles/index"
             },
             "it" : {
                 "name" : "articoli",
-                "indexUnivoqueId" : "articles/index"
+                "indexUnivoqueId" : "archive/articles/index"
             }
         },
         "news" : {
             "en" : {
                 "name" : "news",
-                "indexUnivoqueId" : "news/index"
+                "indexUnivoqueId" : "archive/news/index"
             },
             "it" : {
                 "name" : "novitá",
-                "indexUnivoqueId" : "news/index"
+                "indexUnivoqueId" : "archive/news/index"
             }
         }
     },
