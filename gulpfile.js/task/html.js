@@ -59,7 +59,22 @@ function html(done) {
         Get json data of each file
         */
         const initialData = JSON.parse(fs.readFileSync(filepath))
+
+        /*
+        Get languages
+        */
         const lang = getLanguage(filepath)
+
+        /*
+        Get file name and final slug before merge data
+        */
+        const originalnameFile = getNameFile(filepath);
+        const nameFile = (('slug' in initialData) && originalnameFile !== 'index') ? initialData.slug : originalnameFile
+
+
+        /*
+        Merge data
+        */
         const data = mergeData(filepath, initialData, lang)
 
 
@@ -67,12 +82,6 @@ function html(done) {
         Get language
         */
         data.lang = lang
-
-        /*
-        Get file name
-        */
-        const originalnameFile = getNameFile(filepath);
-        const nameFile = (('slug' in data) && originalnameFile !== 'index') ? data.slug : originalnameFile
 
 
         /*
