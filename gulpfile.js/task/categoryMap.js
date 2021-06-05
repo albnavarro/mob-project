@@ -32,12 +32,12 @@ function category(done) {
 
     const categoryObj = allPath.reduce((acc, curr, i) => {
         const parsed = JSON.parse(fs.readFileSync(curr));
+        const nameFile = getNameFile(curr)
+        const slug = ('slug' in parsed) ? parsed.slug : nameFile
         const lang = getLanguage(curr)
         const data = mergeData(curr, parsed, lang)
-        
+
         if ('exportPost' in data) {
-            const nameFile = getNameFile(curr)
-            const slug = ('slug' in data) ? data.slug : nameFile
             const subfolder  = getPathByLocale(curr,lang)
             const permalink = getPermalink(subfolder,slug)
             const sourceFilepath = (lang == config.defaultLocales) ? `${lang}/` : ''
