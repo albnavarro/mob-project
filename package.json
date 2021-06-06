@@ -65,6 +65,7 @@
     "gulp": "^4.0.2",
     "gulp-babel": "^8.0.0",
     "gulp-notify": "^4.0.0",
+    "gulp-pug-3": "^1.2.2",
     "postcss": "^8.3.0",
     "rollup": "^2.50.6"
   }

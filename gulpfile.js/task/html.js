@@ -1,6 +1,6 @@
 const gulp = require('gulp')
 const glob = require('glob')
-const pug = require('gulp-pug')
+const pug = require('gulp-pug-3')
 const rename = require('gulp-rename')
 const fs = require('fs')
 const config = require('../../config.json')
@@ -369,7 +369,7 @@ function html(done) {
                 return (taskDone) =>
                     gulp.src(template)
                         .pipe(pug({
-                            data: newData
+                            locals: newData
                         }))
                         .pipe(rename(newName + '.html'))
                         .pipe(gulp.dest(`${destPath}/${subfolder}`))
@@ -397,7 +397,7 @@ function html(done) {
             function renderPage(taskDone) {
                 return gulp.src(template)
                     .pipe(pug({
-                        data: allData
+                        locals: allData
                     }))
                     .pipe(rename(nameFile + '.html'))
                     .pipe(gulp.dest(`${destPath}/${subfolder}`))
