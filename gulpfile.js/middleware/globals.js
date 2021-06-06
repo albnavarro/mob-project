@@ -126,3 +126,27 @@ global.ssgDate = (date) => {
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     return newDate.toLocaleDateString(ssgLocales[ssgLang].code, options)
 }
+
+const allowedGlobalProp = [
+    'ssgSiteName',
+    'ssgLocales',
+    'ssgPrint',
+    'ssgBodyClass',
+    'ssgCategoryName',
+    'ssgCategoryPermalink',
+    'ssgTagName',
+    'ssgTagPermalink',
+    'ssgPageTitle',
+    'ssgPermalink',
+    'ssgPermalinkByLang',
+    'ssgImage',
+    'ssgScript',
+    'ssgStyle',
+    'ssgDate',
+    'ssgUnivoqueId',
+    'ssgTemplateName',
+    'ssgPageType',
+    'ssgLang'
+];
+
+exports.allowedGlobalProp = allowedGlobalProp

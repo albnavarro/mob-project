@@ -21,7 +21,7 @@ const cssDest = path.join(destPath, 'assets/css')
 const store = require('../store.js')
 
 // HELPERS
-const { propValidate, sortbyDate, chunk, mergeDeep } = require('../functions/helpers.js')
+const { propValidate, sortbyDate, chunk, mergeDeep, filterGlobals } = require('../functions/helpers.js')
 
 // SKIPPABLE
 const { taskIsSkippable } = require('../functions/taskIsSkippable.js')
@@ -361,13 +361,15 @@ function html(done) {
                         .pipe(pug({
                             locals: newData,
                             globals: [
-                                Object.keys(
-                                    Object.assign(global, {
-                                        ssgUnivoqueId: univoqueId,
-                                        ssgTemplateName: templatename,
-                                        ssgPageType: pageType,
-                                        ssgLang : lang
-                                    })
+                                ... filterGlobals(
+                                    Object.keys(
+                                        Object.assign(global, {
+                                            ssgUnivoqueId: univoqueId,
+                                            ssgTemplateName: templatename,
+                                            ssgPageType: pageType,
+                                            ssgLang : lang
+                                        })
+                                    )
                                 )
                             ]
                         }))
@@ -400,13 +402,15 @@ function html(done) {
                     .pipe(pug({
                         locals: allData,
                         globals: [
-                            Object.keys(
-                                Object.assign(global, {
-                                    ssgUnivoqueId: univoqueId,
-                                    ssgTemplateName: templatename,
-                                    ssgPageType: pageType,
-                                    ssgLang : lang
-                                })
+                            ... filterGlobals(
+                                Object.keys(
+                                    Object.assign(global, {
+                                        ssgUnivoqueId: univoqueId,
+                                        ssgTemplateName: templatename,
+                                        ssgPageType: pageType,
+                                        ssgLang : lang
+                                    })
+                                )
                             )
                         ]
                     }))
