@@ -203,8 +203,8 @@ function getTemplate(data) {
 
 
 function mergeData(filepath, parsed, lang) {
-    const defaultLangFilePath = `${dataPath}/${getOriginalPath(filepath)}${getNameFile(filepath)}.${config.defaultLocales}.json`
-    const defaultLangData = ( config.defaultLocales !== lang && fs.existsSync(defaultLangFilePath))
+    const defaultLangFilePath = `${dataPath}/${getOriginalPath(filepath)}${getNameFile(filepath)}.${config.mergeDataFrom}.json`
+    const defaultLangData = ( config.mergeDataFrom !== lang && fs.existsSync(defaultLangFilePath))
         ? JSON.parse(fs.readFileSync(defaultLangFilePath))
         : null
 

@@ -19,6 +19,7 @@
         "post" : "default/post.pug"
     },
     "defaultLocales" : "en",
+    "mergeDataFrom" : "en",
     "postPerPage" : "3",
     "dinamicPageName" : "page-",
     "categoryLocales" : {
