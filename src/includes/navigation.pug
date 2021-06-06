@@ -3,10 +3,10 @@ mixin list(item)
         - const heaveChildrenClass = (val.children) ? 'menu-item menu-item-has-children' : 'menu-item'
         
         li(class=heaveChildrenClass)
-            - const checkLabel = getPermalink(val.univoqueId)
-            - const label = checkLabel ? getPageTitle(val.univoqueId) : getVal(val, 'label')
+            - const checkLabel = ssgPermalink(val.univoqueId)
+            - const label = checkLabel ? ssgPageTitle(val.univoqueId) : ssgPrint(val, 'label')
                     
-            a(href=getPermalink(val.univoqueId))
+            a(href=ssgPermalink(val.univoqueId))
                 |#{label}
                     
             if val.children

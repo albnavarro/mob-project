@@ -9,7 +9,7 @@ const dataDestFolder = path.join(destPath, 'assets/data')
 const permalinkFile = `${dataDestFolder}/permalinkMap.json`
 const {
     getNameFile,
-    getPermalink,
+    ssgPermalink,
     getPathByLocale,
     getLanguage,
     extracAdditionalData,
@@ -34,7 +34,7 @@ function permalink(done) {
       const nameFile = (store.arg.prod && originalNameFile === 'index') ? '' : originalNameFile
       const slug = (('slug' in data) && originalNameFile !== 'index') ? data.slug : nameFile
       const subfolder  = getPathByLocale(curr,lang)
-      const permalinkUrl = getPermalink(subfolder,slug)
+      const permalinkUrl = ssgPermalink(subfolder,slug)
       const univoqueId = getUnivoqueId(curr)
 
       acc[univoqueId] = {...acc[univoqueId]}

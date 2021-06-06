@@ -1,15 +1,14 @@
 const config = require('../../config.json')
+const store = require('../store.js')
+const propValidate = (p, o) => p.reduce((xs, x) => (xs && xs[x]) ? xs[x] : null, o)
 
-global.propValidate = (p, o) => p.reduce((xs, x) => (xs && xs[x]) ? xs[x] : null, o)
-global.siteName = config.siteName
-global.locales = config.locales
-global.categoryLocales = config.categoryLocales
-global.tagLocales = config.tagLocales
+global.ssgSiteName = config.siteName
+global.ssgLocales = config.locales
 
 /*
 * get obj nested value or 'not found string'
 */
-global.getVal = (obj, ...props) => {
+global.ssgPrint = (obj, ...props) => {
     const deepCheck = (props, obj) => {
         return props.reduce((p, c) => {
             p = (p[c]) ? p[c] : 'not found'
@@ -22,26 +21,26 @@ global.getVal = (obj, ...props) => {
 
 
 
-global.bodyClassPageId = () => {
-    return `page-${univoqueId} page-${pageType} template-${templatename}`
+global.ssgBodyClass = () => {
+    return `page-${ssgUnivoqueId} page-${ssgPageType} template-${ssgTemplateName}`
 }
 
 
 /*
 * get category name by unique id
 */
-global.getCategoryName = (univoqueId) => {
-    return (propValidate([univoqueId, lang, 'name'], categoryLocales))
-        ? categoryLocales[univoqueId][lang].name
+global.ssgCategoryName = (univoqueId) => {
+    return (propValidate([univoqueId, ssgLang, 'name'], config.categoryLocales))
+        ? config.categoryLocales[univoqueId][ssgLang].name
         : 'not found'
 }
 
 /*
 * get category permalink by unique id
 */
-global.getCategoryPermalink = (univoqueId) => {
-    return (univoqueId && propValidate([univoqueId, lang, 'indexUnivoqueId'], categoryLocales))
-        ? getPermalink(categoryLocales[univoqueId][lang].indexUnivoqueId)
+global.ssgCategoryPermalink = (univoqueId) => {
+    return (univoqueId && propValidate([univoqueId, ssgLang, 'indexUnivoqueId'], config.categoryLocales))
+        ? ssgPermalink(config.categoryLocales[univoqueId][ssgLang].indexUnivoqueId)
         : null
 }
 
@@ -50,9 +49,9 @@ global.getCategoryPermalink = (univoqueId) => {
 /*
 * get tag name by unique id
 */
-global.getTagName = (univoqueId) => {
-    return (propValidate([univoqueId, lang, 'name'], tagLocales))
-        ? tagLocales[univoqueId][lang].name
+global.ssgTagName = (univoqueId) => {
+    return (propValidate([univoqueId, ssgLang, 'name'], config.tagLocales))
+        ? config.tagLocales[univoqueId][ssgLang].name
         : 'not found'
 }
 
@@ -60,9 +59,9 @@ global.getTagName = (univoqueId) => {
 /*
 * get tag permalink by unique id
 */
-global.getTagPermalink = (univoqueId) => {
-    return (univoqueId && propValidate([univoqueId, lang, 'indexUnivoqueId'], tagLocales))
-        ? getPermalink(tagLocales[univoqueId][lang].indexUnivoqueId)
+global.ssgTagPermalink = (univoqueId) => {
+    return (univoqueId && propValidate([univoqueId, ssgLang, 'indexUnivoqueId'], config.tagLocales))
+        ? ssgPermalink(config.tagLocales[univoqueId][ssgLang].indexUnivoqueId)
         : null
 }
 
@@ -70,9 +69,9 @@ global.getTagPermalink = (univoqueId) => {
 /*
 * get page name by unique id
 */
-global.getPageTitle = (univoqueId) => {
-    return (propValidate([univoqueId, lang], pageTitleMap))
-        ? pageTitleMap[univoqueId][lang]
+global.ssgPageTitle = (univoqueId) => {
+    return (propValidate([univoqueId, ssgLang], store.pageTitleMapData))
+        ? store.pageTitleMapData[univoqueId][ssgLang]
         : 'not found2'
 }
 
@@ -81,9 +80,9 @@ global.getPageTitle = (univoqueId) => {
 /*
 * get permalink by unique id
 */
-global.getPermalink = (univoqueId) => {
-    return (propValidate([univoqueId, lang], permalinkMap))
-        ? permalinkMap[univoqueId][lang]
+global.ssgPermalink = (univoqueId) => {
+    return (propValidate([univoqueId, ssgLang], store.permalinkMapData))
+        ? store.permalinkMapData[univoqueId][ssgLang]
         : null
 }
 
@@ -91,42 +90,39 @@ global.getPermalink = (univoqueId) => {
 /*
 * get permalink by unique id an lang
 */
-global.getPermalinkByLang = (univoqueId, _lang) => {
-    return (propValidate([univoqueId, _lang], permalinkMap))
-        ? permalinkMap[univoqueId][_lang]
+global.ssgPermalinkByLang = (univoqueId, _lang) => {
+    return (propValidate([univoqueId, _lang], store.permalinkMapData))
+        ? store.permalinkMapData[univoqueId][_lang]
         : null
 }
 
 
 /*
-* get image form manifest
+* get image form ssgManifest
 */
-global.getImage = (image) => {
-    return `/assets/dist/${manifest[image]}`
+global.ssgImage = (image) => {
+    return `/assets/dist/${store.manifest[image]}`
 }
 
 /*
-* get scropt form manifest
+* get scropt form ssgManifest
 */
-global.getScript = (image) => {
-    return manifest['script.js']
+global.ssgScript = () => {
+    return store.manifest['script.js']
 }
 
 /*
-* get scropt form manifest
+* get scropt form ssgManifest
 */
-global.getStyle = (image) => {
-    return manifest['style.css']
+global.ssgStyle = () => {
+    return store.manifest['style.css']
 }
 
 /*
 * get date by locale
 */
-global.getDate = (date) => {
+global.ssgDate = (date) => {
     const newDate = new Date(date);
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    return newDate.toLocaleDateString(locales[lang].code, options)
+    return newDate.toLocaleDateString(ssgLocales[ssgLang].code, options)
 }
-
-
-exports.global = global

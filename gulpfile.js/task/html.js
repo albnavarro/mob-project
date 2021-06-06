@@ -29,14 +29,14 @@ const { taskIsSkippable } = require('../functions/taskIsSkippable.js')
 // DEBUG
 const { debugMandatoryPropierties, debugRenderHtml } = require('../functions/debug.js')
 
-const { global } = require('../middleware/globals.js')
+const {} = require('../middleware/globals.js')
 
 // UTILS
 const {
     getPageType,
     getArchivePageName,
     getNameFile,
-    getPermalink,
+    ssgPermalink,
     getPathByLocale,
     getLanguage,
     extracAdditionalData,
@@ -52,6 +52,10 @@ const {
 */
 
 function html(done) {
+
+    const manifestData = JSON.parse(fs.readFileSync(manifestFile))
+    store.manifest = manifestData
+
     const sourcePath =  (!store.arg.page) ? path.join(dataPath, '/**/*.json') :  path.join(dataPath, store.arg.page)
     const streams = glob.sync(sourcePath)
 
@@ -106,13 +110,6 @@ function html(done) {
         prodData.isProd = (store.arg.prod) ? true : false;
 
 
-        /*
-        Get manifest.json for asset
-        */
-        const manifest = {}
-        const manifestData = JSON.parse(fs.readFileSync(manifestFile))
-        manifest.manifest = manifestData
-
 
         /*
         Subfolder
@@ -146,9 +143,9 @@ function html(done) {
         if(store.arg.debug) store.permalinkMapData = JSON.parse(fs.readFileSync(permalinkFile))
 
         const permalink = {}
-        permalink.permalink = getPermalink(subfolder,nameFile)
+        permalink.permalink = ssgPermalink(subfolder,nameFile)
         const validDomain = ( config.domain.substr(-1) == '/' ) ? config.domain.slice(0, -1) : config.domain
-        permalink.staticPermalink = `${validDomain}${getPermalink(subfolder,nameFile)}`
+        permalink.staticPermalink = `${validDomain}${ssgPermalink(subfolder,nameFile)}`
         permalink.pageTitle = data.pageTitle
 
 
@@ -243,12 +240,6 @@ function html(done) {
 
 
         /*
-        Remove no more necessary propierties
-        */
-        delete data.additionalData;
-        delete data.registerComponent;
-
-        /*
         merge all json
         */
         const allData = Object.assign({},
@@ -267,6 +258,13 @@ function html(done) {
         Check if page is ready to render
         */
         const skipTask = (config.selectiveRefresh) ? taskIsSkippable(filepath, allData, template) : false
+
+
+        /*
+        Remove no more necessary propierties
+        */
+        delete data.additionalData;
+        delete data.registerComponent;
 
         /*
         Check for mandatory propierties in json
@@ -325,9 +323,9 @@ function html(done) {
                     if (index == 0) {
                         return null
                     } else if (index == 1) {
-                        return getPermalink(subfolder,nameFile)
+                        return ssgPermalink(subfolder,nameFile)
                     } else {
-                        return getPermalink(subfolder,`${dinamicPageName}${index - 1}`)
+                        return ssgPermalink(subfolder,`${dinamicPageName}${index - 1}`)
                     }
                 }
 
@@ -338,7 +336,7 @@ function html(done) {
                     if (index == pageData.length - 1) {
                         return null
                     } else {
-                        return getPermalink(subfolder,`${dinamicPageName}${index + 1}`)
+                        return ssgPermalink(subfolder,`${dinamicPageName}${index + 1}`)
                     }
                 }
 
@@ -365,13 +363,10 @@ function html(done) {
                             globals: [
                                 Object.keys(
                                     Object.assign(global, {
-                                        univoqueId: univoqueId,
-                                        templatename: templatename,
-                                        pageType: pageType,
-                                        lang : lang,
-                                        manifest : manifestData,
-                                        pageTitleMap: store.pageTitleMapData,
-                                        permalinkMap: store.permalinkMapData
+                                        ssgUnivoqueId: univoqueId,
+                                        ssgTemplateName: templatename,
+                                        ssgPageType: pageType,
+                                        ssgLang : lang
                                     })
                                 )
                             ]
@@ -391,7 +386,7 @@ function html(done) {
 
             const pagetask = pages.map((item, index) => {
                 const newName = getArchivePageName(index, nameFile, dinamicPageName)
-                item.displayName = `${getPermalink(getPathByLocale(filepath, getLanguage(filepath)), newName)}`;
+                item.displayName = `${ssgPermalink(getPathByLocale(filepath, getLanguage(filepath)), newName)}`;
                 return {'skipTask' : skipTask, 'fn': item};
             })
 
@@ -407,13 +402,10 @@ function html(done) {
                         globals: [
                             Object.keys(
                                 Object.assign(global, {
-                                    univoqueId: univoqueId,
-                                    templatename: templatename,
-                                    pageType: pageType,
-                                    lang : lang,
-                                    manifest : manifestData,
-                                    pageTitleMap: store.pageTitleMapData,
-                                    permalinkMap: store.permalinkMapData
+                                    ssgUnivoqueId: univoqueId,
+                                    ssgTemplateName: templatename,
+                                    ssgPageType: pageType,
+                                    ssgLang : lang
                                 })
                             )
                         ]
@@ -431,7 +423,7 @@ function html(done) {
                     })
             }
 
-            renderPage.displayName = `${getPermalink(getPathByLocale(filepath, getLanguage(filepath)), getNameFile(filepath))}`;
+            renderPage.displayName = `${ssgPermalink(getPathByLocale(filepath, getLanguage(filepath)), getNameFile(filepath))}`;
             return {'skipTask' : skipTask, 'fn': renderPage};
         }
 

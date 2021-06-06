@@ -10,10 +10,10 @@ block content
     main
         .container
             div
-                a(href=getCategoryPermalink(exportPost.category))
+                a(href=ssgCategoryPermalink(exportPost.category))
                     |back
             div
-                |#{getDate(getVal(exportPost, 'date'))}
+                |#{ssgDate(ssgPrint(exportPost, 'date'))}
             div
-                |#{getVal(pageTitle)}
+                |#{ssgPrint(pageTitle)}
                 

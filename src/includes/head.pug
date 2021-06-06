@@ -1,5 +1,5 @@
 title
-  |#{getVal(siteName)} - #{getPageTitle(univoqueId)}
+  |#{ssgPrint(ssgSiteName)} - #{ssgPageTitle(ssgUnivoqueId)}
 
 meta(name="theme-color" content="#ffffff")
 meta(http-equiv="X-UA-Compatible" content="IE=edge,chrome=1")
@@ -15,9 +15,9 @@ if isProd
         |!{documentStyles}
   
 if isProd
-  link(rel="stylesheet" href="/assets/dist/" + getStyle() media="print" onload="this.media='all'; this.onload=null;  document.documentElement.classList.add('css-added');")
+  link(rel="stylesheet" href="/assets/dist/" + ssgStyle() media="print" onload="this.media='all'; this.onload=null;  document.documentElement.classList.add('css-added');")
   noscript
-    link(rel="stylesheet" href="/assets/dist/" + getStyle() media="all")
+    link(rel="stylesheet" href="/assets/dist/" + ssgStyle() media="all")
       
 else if !isProd
   link(rel="stylesheet" href="/assets/css/style.css")

@@ -33,6 +33,11 @@ class storeClass {
         this._categoryMapData = {}
 
         /*
+        Map of all asstes
+        */
+        this._manifest = {}
+
+        /*
         Argument
         */
         this._arg = {}
@@ -84,6 +89,14 @@ class storeClass {
 
     get categoryMapData() {
         return this._categoryMapData
+    }
+
+    set manifest(value) {
+        this._manifest = value
+    }
+
+    get manifest() {
+        return this._manifest
     }
 
     set arg(value) {
