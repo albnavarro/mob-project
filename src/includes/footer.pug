@@ -8,6 +8,6 @@ script
   include ../../www/assets/js/async-assets-loading.min.js
 
 if isProd
-  script(src="/assets/dist/" + manifest['script.js'] )
+  script(src="/assets/dist/" + getScript() )
 else if !isProd
   script(src="/assets/js/script.js")

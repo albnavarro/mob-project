@@ -20,7 +20,7 @@ block content
                 each post, key in chunkedPost
                     div
                         p
-                            |#{getVal(post, 'date')}
+                            |#{getDate(getVal(post, 'date'))}
                         a(href=getVal(post, 'permalink'))
                             |#{getVal(post, 'data', 'title')}
                         p

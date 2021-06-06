@@ -24,10 +24,12 @@ const store = require('../store.js')
 const { propValidate, sortbyDate, chunk, mergeDeep } = require('../functions/helpers.js')
 
 // SKIPPABLE
-const { taskIsSkippable  } = require('../functions/taskIsSkippable.js')
+const { taskIsSkippable } = require('../functions/taskIsSkippable.js')
 
 // DEBUG
-const { debugMandatoryPropierties, debugRenderHtml} = require('../functions/debug.js')
+const { debugMandatoryPropierties, debugRenderHtml } = require('../functions/debug.js')
+
+const { global } = require('../middleware/globals.js')
 
 // UTILS
 const {
@@ -147,19 +149,14 @@ function html(done) {
         permalink.permalink = getPermalink(subfolder,nameFile)
         const validDomain = ( config.domain.substr(-1) == '/' ) ? config.domain.slice(0, -1) : config.domain
         permalink.staticPermalink = `${validDomain}${getPermalink(subfolder,nameFile)}`
-        permalink.permalinkMap = store.permalinkMapData
         permalink.pageTitle = data.pageTitle
+
 
         /*
         Add pageTitle map
         if in debug mode golbal stored info is bypass anche the data il read form file
         */
         if(store.arg.debug) store.pageTitleMapData = JSON.parse(fs.readFileSync(pageTitleFile))
-
-        const pageTitleMapObj = {}
-        pageTitleMapObj.pageTitleMap = store.pageTitleMapData
-
-
 
 
         /*
@@ -230,19 +227,13 @@ function html(done) {
         */
         // const template = `${templatePath}/${data.template}.pug`
         const template = getTemplate(data)
-
-        const templatename = {}
-        templatename.templatename = getNameFile(template)
+        const templatename = getNameFile(template)
 
         /*
         Add page type
         */
-        const pageType = {}
-        pageType.pageType = getPageType(data)
-
-
-        const univoqueId = {}
-        univoqueId.univoqueId =  getUnivoqueId(filepath)
+        const pageType = getPageType(data)
+        const univoqueId = getUnivoqueId(filepath)
 
         /*
         Create empty chunkedAyrray ( pagination ) to avoid error
@@ -250,25 +241,26 @@ function html(done) {
         const chunkedPost = {}
         chunkedPost.chunkedPost = []
 
+
+        /*
+        Remove no more necessary propierties
+        */
+        delete data.additionalData;
+        delete data.registerComponent;
+
         /*
         merge all json
         */
         const allData = Object.assign({},
             critical,
             prodData,
-            config,
             additionalData,
             permalink,
-            pageTitleMapObj,
             categoryObj,
             tagObj,
             chunkedPost,
             relativePath,
-            data,
-            templatename,
-            pageType,
-            manifest,
-            univoqueId
+            data
         );
 
         /*
@@ -369,7 +361,20 @@ function html(done) {
                 return (taskDone) =>
                     gulp.src(template)
                         .pipe(pug({
-                            locals: newData
+                            locals: newData,
+                            globals: [
+                                Object.keys(
+                                    Object.assign(global, {
+                                        univoqueId: univoqueId,
+                                        templatename: templatename,
+                                        pageType: pageType,
+                                        lang : lang,
+                                        manifest : manifestData,
+                                        pageTitleMap: store.pageTitleMapData,
+                                        permalinkMap: store.permalinkMapData
+                                    })
+                                )
+                            ]
                         }))
                         .pipe(rename(newName + '.html'))
                         .pipe(gulp.dest(`${destPath}/${subfolder}`))
@@ -394,10 +399,24 @@ function html(done) {
 
 
         } else {
+
             function renderPage(taskDone) {
                 return gulp.src(template)
                     .pipe(pug({
-                        locals: allData
+                        locals: allData,
+                        globals: [
+                            Object.keys(
+                                Object.assign(global, {
+                                    univoqueId: univoqueId,
+                                    templatename: templatename,
+                                    pageType: pageType,
+                                    lang : lang,
+                                    manifest : manifestData,
+                                    pageTitleMap: store.pageTitleMapData,
+                                    permalinkMap: store.permalinkMapData
+                                })
+                            )
+                        ]
                     }))
                     .pipe(rename(nameFile + '.html'))
                     .pipe(gulp.dest(`${destPath}/${subfolder}`))

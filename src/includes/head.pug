@@ -15,9 +15,9 @@ if isProd
         |!{documentStyles}
   
 if isProd
-  link(rel="stylesheet" href="/assets/dist/" + manifest['style.css'] media="print" onload="this.media='all'; this.onload=null;  document.documentElement.classList.add('css-added');")
+  link(rel="stylesheet" href="/assets/dist/" + getStyle() media="print" onload="this.media='all'; this.onload=null;  document.documentElement.classList.add('css-added');")
   noscript
-    link(rel="stylesheet" href="/assets/dist/" + manifest['style.css'] media="all")
+    link(rel="stylesheet" href="/assets/dist/" + getStyle() media="all")
       
 else if !isProd
   link(rel="stylesheet" href="/assets/css/style.css")

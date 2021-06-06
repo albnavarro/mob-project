@@ -1,5 +1,5 @@
-each val, key in locales
+each val, languages in locales
     span
-        if key
-            a(href=permalinkMap[univoqueId][key])
-             |!{key} | 
+        if languages
+            a(href=getPermalinkByLang(univoqueId,languages))
+             |!{languages} | 

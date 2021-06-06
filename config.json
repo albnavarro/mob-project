@@ -4,11 +4,13 @@
     "locales" : {
         "en": {
             "name" : "English",
-            "nativeName" : "English"
+            "nativeName" : "English",
+            "code" : "en-US"
         },
         "it": {
             "name" : "Italian",
-            "nativeName" : "Italiano"
+            "nativeName" : "Italiano",
+            "code" : "it-IT"
         }
     },
     "defaultTemplate" : {
