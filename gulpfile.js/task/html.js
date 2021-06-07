@@ -21,7 +21,7 @@ const cssDest = path.join(destPath, 'assets/css')
 const store = require('../store.js')
 
 // HELPERS
-const { propValidate, sortbyDate, chunk, mergeDeep, filterGlobals } = require('../functions/helpers.js')
+const { propValidate, sortbyDate, chunk, mergeDeep } = require('../functions/helpers.js')
 
 // SKIPPABLE
 const { taskIsSkippable } = require('../functions/taskIsSkippable.js')
@@ -29,7 +29,7 @@ const { taskIsSkippable } = require('../functions/taskIsSkippable.js')
 // DEBUG
 const { debugMandatoryPropierties, debugRenderHtml } = require('../functions/debug.js')
 
-const {} = require('../middleware/globals.js')
+const { globalProp } = require('../middleware/globals.js')
 
 // UTILS
 const {
@@ -356,22 +356,18 @@ function html(done) {
                 const newName = getArchivePageName(index, nameFile, dinamicPageName)
 
 
-                return (taskDone) =>
-                    gulp.src(template)
+                return (taskDone) => {
+
+                    globalProp.ssgUnivoqueId = univoqueId,
+                    globalProp.ssgTemplateName = templatename,
+                    globalProp.ssgPageType = pageType
+                    globalProp.ssgLang = lang
+
+                    const mergedLocals = { ... newData, ... globalProp}
+
+                    return gulp.src(template)
                         .pipe(pug({
-                            locals: newData,
-                            globals: [
-                                ... filterGlobals(
-                                    Object.keys(
-                                        Object.assign(global, {
-                                            ssgUnivoqueId: univoqueId,
-                                            ssgTemplateName: templatename,
-                                            ssgPageType: pageType,
-                                            ssgLang : lang
-                                        })
-                                    )
-                                )
-                            ]
+                            locals: mergedLocals
                         }))
                         .pipe(rename(newName + '.html'))
                         .pipe(gulp.dest(`${destPath}/${subfolder}`))
@@ -384,6 +380,7 @@ function html(done) {
                             }
 
                         })
+                    }
             })
 
             const pagetask = pages.map((item, index) => {
@@ -397,22 +394,19 @@ function html(done) {
 
         } else {
 
+
             function renderPage(taskDone) {
+
+                globalProp.ssgUnivoqueId = univoqueId,
+                globalProp.ssgTemplateName = templatename,
+                globalProp.ssgPageType = pageType
+                globalProp.ssgLang = lang
+
+                const mergedLocals = { ... allData, ... globalProp}
+
                 return gulp.src(template)
                     .pipe(pug({
-                        locals: allData,
-                        globals: [
-                            ... filterGlobals(
-                                Object.keys(
-                                    Object.assign(global, {
-                                        ssgUnivoqueId: univoqueId,
-                                        ssgTemplateName: templatename,
-                                        ssgPageType: pageType,
-                                        ssgLang : lang
-                                    })
-                                )
-                            )
-                        ]
+                        locals: mergedLocals
                     }))
                     .pipe(rename(nameFile + '.html'))
                     .pipe(gulp.dest(`${destPath}/${subfolder}`))

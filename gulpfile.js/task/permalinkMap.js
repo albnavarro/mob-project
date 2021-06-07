@@ -62,7 +62,13 @@ function permalink(done) {
     }
 
     store.permalinkMapData = peramlinkObj
-    fs.writeFile(permalinkFile, JSON.stringify(peramlinkObj), () => {})
+
+    if(store.arg.debug) {
+        fs.writeFileSync(permalinkFile, JSON.stringify(peramlinkObj))
+    } else {
+        fs.writeFile(permalinkFile, JSON.stringify(peramlinkObj), () => {})
+    }
+
     done()
 
 }

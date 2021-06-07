@@ -56,7 +56,13 @@ function pageTitle(done) {
     }
 
     store.pageTitleMapData = pageTitleObj
-    fs.writeFile(pageTitleFile, JSON.stringify(pageTitleObj), () => {})
+
+    if(store.arg.debug) {
+        fs.writeFileSync(pageTitleFile, JSON.stringify(pageTitleObj))
+    } else {
+        fs.writeFile(pageTitleFile, JSON.stringify(pageTitleObj), () => {})
+    }
+
     done()
 
 }

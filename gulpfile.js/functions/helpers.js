@@ -1,5 +1,3 @@
-const { allowedGlobalProp } = require('../middleware/globals.js')
-
 /*
 * check if nested prop exist in obj
 */
@@ -58,17 +56,7 @@ function mergeDeep(target, source) {
 }
 
 
-const filterGlobals = (raw)  => {
-    const result = raw.reduce((p, c) => {
-        if (allowedGlobalProp.includes(c)) p.push(c)
-        return p
-    }, [])
-    return result
-}
-
-
 exports.propValidate = propValidate
 exports.sortbyDate = sortbyDate
 exports.chunk = chunk
 exports.mergeDeep = mergeDeep
-exports.filterGlobals = filterGlobals

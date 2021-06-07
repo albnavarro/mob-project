@@ -2,13 +2,15 @@ const config = require('../../config.json')
 const store = require('../store.js')
 const propValidate = (p, o) => p.reduce((xs, x) => (xs && xs[x]) ? xs[x] : null, o)
 
-global.ssgSiteName = config.siteName
-global.ssgLocales = config.locales
+const globalProp = {}
+globalProp.ssgSiteName = config.siteName
+globalProp.ssgLocales = config.locales
 
 /*
 * get obj nested value or 'not found string'
 */
-global.ssgPrint = (obj, ...props) => {
+globalProp.ssgPrint = (obj, ...props) => {
+
     const deepCheck = (props, obj) => {
         return props.reduce((p, c) => {
             p = (p[c]) ? p[c] : 'not found'
@@ -21,26 +23,26 @@ global.ssgPrint = (obj, ...props) => {
 
 
 
-global.ssgBodyClass = () => {
-    return `page-${ssgUnivoqueId} page-${ssgPageType} template-${ssgTemplateName}`
+globalProp.ssgBodyClass = () => {
+    return `page-${globalProp.ssgUnivoqueId} page-${globalProp.ssgPageType} template-${globalProp.ssgTemplateName}`
 }
 
 
 /*
 * get category name by unique id
 */
-global.ssgCategoryName = (univoqueId) => {
-    return (propValidate([univoqueId, ssgLang, 'name'], config.categoryLocales))
-        ? config.categoryLocales[univoqueId][ssgLang].name
+globalProp.ssgCategoryName = (univoqueId) => {
+    return (propValidate([univoqueId, globalProp.ssgLang, 'name'], config.categoryLocales))
+        ? config.categoryLocales[univoqueId][globalProp.ssgLang].name
         : 'not found'
 }
 
 /*
 * get category permalink by unique id
 */
-global.ssgCategoryPermalink = (univoqueId) => {
-    return (univoqueId && propValidate([univoqueId, ssgLang, 'indexUnivoqueId'], config.categoryLocales))
-        ? ssgPermalink(config.categoryLocales[univoqueId][ssgLang].indexUnivoqueId)
+globalProp.ssgCategoryPermalink = (univoqueId) => {
+    return (univoqueId && propValidate([univoqueId, globalProp.ssgLang, 'indexUnivoqueId'], config.categoryLocales))
+        ? globalProp.ssgPermalink(config.categoryLocales[univoqueId][globalProp.ssgLang].indexUnivoqueId)
         : null
 }
 
@@ -49,9 +51,9 @@ global.ssgCategoryPermalink = (univoqueId) => {
 /*
 * get tag name by unique id
 */
-global.ssgTagName = (univoqueId) => {
-    return (propValidate([univoqueId, ssgLang, 'name'], config.tagLocales))
-        ? config.tagLocales[univoqueId][ssgLang].name
+globalProp.ssgTagName = (univoqueId) => {
+    return (propValidate([univoqueId, globalProp.ssgLang, 'name'], config.tagLocales))
+        ? config.tagLocales[univoqueId][globalProp.ssgLang].name
         : 'not found'
 }
 
@@ -59,9 +61,9 @@ global.ssgTagName = (univoqueId) => {
 /*
 * get tag permalink by unique id
 */
-global.ssgTagPermalink = (univoqueId) => {
-    return (univoqueId && propValidate([univoqueId, ssgLang, 'indexUnivoqueId'], config.tagLocales))
-        ? ssgPermalink(config.tagLocales[univoqueId][ssgLang].indexUnivoqueId)
+globalProp.ssgTagPermalink = (univoqueId) => {
+    return (univoqueId && propValidate([univoqueId, globalProp.ssgLang, 'indexUnivoqueId'], config.tagLocales))
+        ? globalProp.ssgPermalink(config.tagLocales[univoqueId][globalProp.ssgLang].indexUnivoqueId)
         : null
 }
 
@@ -69,9 +71,9 @@ global.ssgTagPermalink = (univoqueId) => {
 /*
 * get page name by unique id
 */
-global.ssgPageTitle = (univoqueId) => {
-    return (propValidate([univoqueId, ssgLang], store.pageTitleMapData))
-        ? store.pageTitleMapData[univoqueId][ssgLang]
+globalProp.ssgPageTitle = (univoqueId) => {
+    return (propValidate([univoqueId, globalProp.ssgLang], store.pageTitleMapData))
+        ? store.pageTitleMapData[univoqueId][globalProp.ssgLang]
         : 'not found2'
 }
 
@@ -80,9 +82,9 @@ global.ssgPageTitle = (univoqueId) => {
 /*
 * get permalink by unique id
 */
-global.ssgPermalink = (univoqueId) => {
-    return (propValidate([univoqueId, ssgLang], store.permalinkMapData))
-        ? store.permalinkMapData[univoqueId][ssgLang]
+globalProp.ssgPermalink = (univoqueId) => {
+    return (propValidate([univoqueId, globalProp.ssgLang], store.permalinkMapData))
+        ? store.permalinkMapData[univoqueId][globalProp.ssgLang]
         : null
 }
 
@@ -90,7 +92,7 @@ global.ssgPermalink = (univoqueId) => {
 /*
 * get permalink by unique id an lang
 */
-global.ssgPermalinkByLang = (univoqueId, _lang) => {
+globalProp.ssgPermalinkByLang = (univoqueId, _lang) => {
     return (propValidate([univoqueId, _lang], store.permalinkMapData))
         ? store.permalinkMapData[univoqueId][_lang]
         : null
@@ -100,53 +102,36 @@ global.ssgPermalinkByLang = (univoqueId, _lang) => {
 /*
 * get image form ssgManifest
 */
-global.ssgImage = (image) => {
+globalProp.ssgImage = (image) => {
     return `/assets/dist/${store.manifest[image]}`
 }
 
 /*
 * get scropt form ssgManifest
 */
-global.ssgScript = () => {
+globalProp.ssgScript = () => {
     return store.manifest['script.js']
 }
 
 /*
 * get scropt form ssgManifest
 */
-global.ssgStyle = () => {
+globalProp.ssgStyle = () => {
     return store.manifest['style.css']
 }
 
 /*
 * get date by locale
 */
-global.ssgDate = (date) => {
+globalProp.ssgDate = (date) => {
     const newDate = new Date(date);
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    return newDate.toLocaleDateString(ssgLocales[ssgLang].code, options)
+    return newDate.toLocaleDateString(globalProp.ssgLocales[globalProp.ssgLang].code, options)
 }
 
-const allowedGlobalProp = [
-    'ssgSiteName',
-    'ssgLocales',
-    'ssgPrint',
-    'ssgBodyClass',
-    'ssgCategoryName',
-    'ssgCategoryPermalink',
-    'ssgTagName',
-    'ssgTagPermalink',
-    'ssgPageTitle',
-    'ssgPermalink',
-    'ssgPermalinkByLang',
-    'ssgImage',
-    'ssgScript',
-    'ssgStyle',
-    'ssgDate',
-    'ssgUnivoqueId',
-    'ssgTemplateName',
-    'ssgPageType',
-    'ssgLang'
-];
+globalProp.ssgUnivoqueId = null
+globalProp.ssgTemplateName = null
+globalProp.ssgPageType = null
+globalProp.ssgLang = null
 
-exports.allowedGlobalProp = allowedGlobalProp
+exports.globalProp = globalProp

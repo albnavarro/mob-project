@@ -92,7 +92,13 @@ function category(done) {
     }
 
     store.categoryMapData = categoryObj
-    fs.writeFile(categoryFile, JSON.stringify(categoryObj), () => {})
+
+    if(store.arg.debug) {
+        fs.writeFileSync(categoryFile, JSON.stringify(categoryObj))
+    } else {
+        fs.writeFile(categoryFile, JSON.stringify(categoryObj), () => {})
+    }
+
     done()
 }
 
