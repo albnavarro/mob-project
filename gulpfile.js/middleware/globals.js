@@ -24,7 +24,9 @@ globalProp.ssgPrint = (obj, ...props) => {
 
 
 globalProp.ssgBodyClass = () => {
-    return `page-${globalProp.ssgUnivoqueId} page-${globalProp.ssgPageType} template-${globalProp.ssgTemplateName}`
+    const univoqueIdnoSlash = globalProp.ssgUnivoqueId.replace(/\//g, '-');
+    const univoqueIdParsed = univoqueIdnoSlash.replace('-index', '');
+    return `page-${univoqueIdParsed} page-type-${globalProp.ssgPageType} template-${globalProp.ssgTemplateName}`
 }
 
 

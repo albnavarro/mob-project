@@ -1,9 +1,12 @@
 const path = require('path')
 const themePath = path.resolve('src')
+const templatePath = path.join(themePath, 'template')
 const dataPath = path.join(themePath, 'data')
 const componentPath = path.join(themePath, 'component')
 const additionalDataPath = path.join(themePath, 'additionalData')
 const store = require('../store.js')
+// UTILS
+const { getNameFile } = require('../functions/utils.js')
 
 
 /*
@@ -11,6 +14,11 @@ const store = require('../store.js')
 * @param file - path of file
 */
 function taskIsSkippable(filepath, data, template) {
+
+    /*
+    track if _wrapper is mofiled , in case render alla pages
+    */
+    const isWrapper = ( `${templatePath}/default/_wrapper.pug` === store.fileModified ) ? true : false
 
     /*
     track if specific of shared includes pug ( in includes thempath ) file is changed in last 2 seonds
@@ -90,7 +98,8 @@ function taskIsSkippable(filepath, data, template) {
         !postDataIsChanged &&
         !componentFileIsChanged &&
         !includesFileIsChanged &&
-        !tagDataIsChanged)
+        !tagDataIsChanged) &&
+        !isWrapper
 }
 
 exports.taskIsSkippable = taskIsSkippable
