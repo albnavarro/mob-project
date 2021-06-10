@@ -1,6 +1,7 @@
 {
     "description" : "custom description",
     "pageTitle" : "article 7",
+    "draft" : true,
     "additionalData" : [
         "nav.json"
     ],

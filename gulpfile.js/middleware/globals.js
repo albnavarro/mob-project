@@ -2,14 +2,14 @@ const config = require('../../config.json')
 const store = require('../store.js')
 const propValidate = (p, o) => p.reduce((xs, x) => (xs && xs[x]) ? xs[x] : null, o)
 
-const globalProp = {}
-globalProp.ssgSiteName = config.siteName
-globalProp.ssgLocales = config.locales
+const templateFunction = {}
+templateFunction.ssgSiteName = config.siteName
+templateFunction.ssgLocales = config.locales
 
 /*
 * get obj nested value or 'not found string'
 */
-globalProp.ssgPrint = (obj, ...props) => {
+templateFunction.ssgPrint = (obj, ...props) => {
 
     const deepCheck = (props, obj) => {
         return props.reduce((p, c) => {
@@ -23,28 +23,28 @@ globalProp.ssgPrint = (obj, ...props) => {
 
 
 
-globalProp.ssgBodyClass = () => {
-    const univoqueIdnoSlash = globalProp.ssgUnivoqueId.replace(/\//g, '-');
+templateFunction.ssgBodyClass = () => {
+    const univoqueIdnoSlash = templateFunction.ssgUnivoqueId.replace(/\//g, '-');
     const univoqueIdParsed = univoqueIdnoSlash.replace('-index', '');
-    return `page-${univoqueIdParsed} page-type-${globalProp.ssgPageType} template-${globalProp.ssgTemplateName}`
+    return `page-${univoqueIdParsed} page-type-${templateFunction.ssgPageType} template-${templateFunction.ssgTemplateName}`
 }
 
 
 /*
 * get category name by unique id
 */
-globalProp.ssgCategoryName = (univoqueId) => {
-    return (propValidate([univoqueId, globalProp.ssgLang, 'name'], config.categoryLocales))
-        ? config.categoryLocales[univoqueId][globalProp.ssgLang].name
+templateFunction.ssgCategoryName = (univoqueId) => {
+    return (propValidate([univoqueId, templateFunction.ssgLang, 'name'], config.categoryLocales))
+        ? config.categoryLocales[univoqueId][templateFunction.ssgLang].name
         : 'not found'
 }
 
 /*
 * get category permalink by unique id
 */
-globalProp.ssgCategoryPermalink = (univoqueId) => {
-    return (univoqueId && propValidate([univoqueId, globalProp.ssgLang, 'indexUnivoqueId'], config.categoryLocales))
-        ? globalProp.ssgPermalink(config.categoryLocales[univoqueId][globalProp.ssgLang].indexUnivoqueId)
+templateFunction.ssgCategoryPermalink = (univoqueId) => {
+    return (univoqueId && propValidate([univoqueId, templateFunction.ssgLang, 'indexUnivoqueId'], config.categoryLocales))
+        ? templateFunction.ssgPermalink(config.categoryLocales[univoqueId][templateFunction.ssgLang].indexUnivoqueId)
         : null
 }
 
@@ -53,9 +53,9 @@ globalProp.ssgCategoryPermalink = (univoqueId) => {
 /*
 * get tag name by unique id
 */
-globalProp.ssgTagName = (univoqueId) => {
-    return (propValidate([univoqueId, globalProp.ssgLang, 'name'], config.tagLocales))
-        ? config.tagLocales[univoqueId][globalProp.ssgLang].name
+templateFunction.ssgTagName = (univoqueId) => {
+    return (propValidate([univoqueId, templateFunction.ssgLang, 'name'], config.tagLocales))
+        ? config.tagLocales[univoqueId][templateFunction.ssgLang].name
         : 'not found'
 }
 
@@ -63,9 +63,9 @@ globalProp.ssgTagName = (univoqueId) => {
 /*
 * get tag permalink by unique id
 */
-globalProp.ssgTagPermalink = (univoqueId) => {
-    return (univoqueId && propValidate([univoqueId, globalProp.ssgLang, 'indexUnivoqueId'], config.tagLocales))
-        ? globalProp.ssgPermalink(config.tagLocales[univoqueId][globalProp.ssgLang].indexUnivoqueId)
+templateFunction.ssgTagPermalink = (univoqueId) => {
+    return (univoqueId && propValidate([univoqueId, templateFunction.ssgLang, 'indexUnivoqueId'], config.tagLocales))
+        ? templateFunction.ssgPermalink(config.tagLocales[univoqueId][templateFunction.ssgLang].indexUnivoqueId)
         : null
 }
 
@@ -73,9 +73,9 @@ globalProp.ssgTagPermalink = (univoqueId) => {
 /*
 * get page name by unique id
 */
-globalProp.ssgPageTitle = (univoqueId) => {
-    return (propValidate([univoqueId, globalProp.ssgLang], store.pageTitleMapData))
-        ? store.pageTitleMapData[univoqueId][globalProp.ssgLang]
+templateFunction.ssgPageTitle = (univoqueId) => {
+    return (propValidate([univoqueId, templateFunction.ssgLang], store.pageTitleMapData))
+        ? store.pageTitleMapData[univoqueId][templateFunction.ssgLang]
         : 'not found2'
 }
 
@@ -84,9 +84,9 @@ globalProp.ssgPageTitle = (univoqueId) => {
 /*
 * get permalink by unique id
 */
-globalProp.ssgPermalink = (univoqueId) => {
-    return (propValidate([univoqueId, globalProp.ssgLang], store.permalinkMapData))
-        ? store.permalinkMapData[univoqueId][globalProp.ssgLang]
+templateFunction.ssgPermalink = (univoqueId) => {
+    return (propValidate([univoqueId, templateFunction.ssgLang], store.permalinkMapData))
+        ? store.permalinkMapData[univoqueId][templateFunction.ssgLang]
         : null
 }
 
@@ -94,7 +94,7 @@ globalProp.ssgPermalink = (univoqueId) => {
 /*
 * get permalink by unique id an lang
 */
-globalProp.ssgPermalinkByLang = (univoqueId, _lang) => {
+templateFunction.ssgPermalinkByLang = (univoqueId, _lang) => {
     return (propValidate([univoqueId, _lang], store.permalinkMapData))
         ? store.permalinkMapData[univoqueId][_lang]
         : null
@@ -104,36 +104,36 @@ globalProp.ssgPermalinkByLang = (univoqueId, _lang) => {
 /*
 * get image form ssgManifest
 */
-globalProp.ssgImage = (image) => {
+templateFunction.ssgImage = (image) => {
     return `/assets/dist/${store.manifest[image]}`
 }
 
 /*
 * get scropt form ssgManifest
 */
-globalProp.ssgScript = () => {
+templateFunction.ssgScript = () => {
     return store.manifest['script.js']
 }
 
 /*
 * get scropt form ssgManifest
 */
-globalProp.ssgStyle = () => {
+templateFunction.ssgStyle = () => {
     return store.manifest['style.css']
 }
 
 /*
 * get date by locale
 */
-globalProp.ssgDate = (date) => {
+templateFunction.ssgDate = (date) => {
     const newDate = new Date(date);
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    return newDate.toLocaleDateString(globalProp.ssgLocales[globalProp.ssgLang].code, options)
+    return newDate.toLocaleDateString(templateFunction.ssgLocales[templateFunction.ssgLang].code, options)
 }
 
-globalProp.ssgUnivoqueId = null
-globalProp.ssgTemplateName = null
-globalProp.ssgPageType = null
-globalProp.ssgLang = null
+templateFunction.ssgUnivoqueId = null
+templateFunction.ssgTemplateName = null
+templateFunction.ssgPageType = null
+templateFunction.ssgLang = null
 
-exports.globalProp = globalProp
+exports.templateFunction = templateFunction

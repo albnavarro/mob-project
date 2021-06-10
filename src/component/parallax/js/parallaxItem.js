@@ -82,7 +82,7 @@ export class parallaxItemClass {
                         this.executeParallax()
                     break;
                     case 'js':
-                        eventManager.push('scrollThrottle', this.smoothParallaxJs.bind(this));
+                        eventManager.push('scroll', this.smoothParallaxJs.bind(this));
                         this.smoothParallaxJs()
                     break;
                 }
@@ -172,8 +172,7 @@ export class parallaxItemClass {
 
     smoothParallaxJs() {
         this.executeParallax(false)
-        if (this.req) cancelAnimationFrame(this.req);
-        this.req = requestAnimationFrame(this.onReuqestAnim.bind(this))
+        if(!this.req) this.req = requestAnimationFrame(this.onReuqestAnim.bind(this))
     }
 
     onReuqestAnim(timeStamp) {
@@ -207,9 +206,12 @@ export class parallaxItemClass {
             }
 
             // La RAF viene "rigenerata" fino a quando tutti gli elementi rimangono fermi
-            if (this.prevValue == this.startValue) return;
+            if (this.prevValue == this.startValue) {
+                 cancelAnimationFrame(this.req);
+                 this.req = null
+                 return;
+            }
 
-            if (this.req) cancelAnimationFrame(this.req);
             this.req = requestAnimationFrame(draw)
         }
 

@@ -61,7 +61,7 @@ function getNameFile(filepath) {
 * @param namefile , form getNameFile function
 * @param firstSlash : bollean , prepend '/'
 */
-function ssgPermalink(subfolder,nameFile,prependSlash = false) {
+function getPermalink(subfolder,nameFile,prependSlash = false) {
     const slash = prependSlash ? '/' : ''
     return `${slash}${subfolder}/${nameFile}${getExtensionFile()}`
 }
@@ -217,7 +217,7 @@ exports.getPageType = getPageType
 exports.getArchivePageName = getArchivePageName
 exports.fileIschanged = fileIschanged
 exports.getNameFile = getNameFile
-exports.ssgPermalink = ssgPermalink
+exports.getPermalink = getPermalink
 exports.getExtensionFile = getExtensionFile
 exports.extractThemeSubFolder = extractThemeSubFolder
 exports.extractAdditionlSubFolder = extractAdditionlSubFolder

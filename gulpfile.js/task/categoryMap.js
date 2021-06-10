@@ -10,7 +10,7 @@ const dataDestFolder = path.join(destPath, 'assets/data')
 const categoryFile = `${dataDestFolder}/categoryMap.json`
 const {
     getNameFile,
-    ssgPermalink,
+    getPermalink,
     getPathByLocale,
     getLanguage,
     extracAdditionalData,
@@ -36,10 +36,11 @@ function category(done) {
         const slug = ('slug' in parsed) ? parsed.slug : nameFile
         const lang = getLanguage(curr)
         const data = mergeData(curr, parsed, lang)
+        const publish = (( 'draft' in data ) && data.draft === true) ? false : true
 
-        if ('exportPost' in data) {
+        if (('exportPost' in data) && publish) {
             const subfolder  = getPathByLocale(curr,lang)
-            const permalink = ssgPermalink(subfolder,slug)
+            const permalink = getPermalink(subfolder,slug)
             const sourceFilepath = (lang == config.defaultLocales) ? `${lang}/` : ''
 
             const category = data.exportPost.category;

@@ -29,14 +29,14 @@ const { taskIsSkippable } = require('../functions/taskIsSkippable.js')
 // DEBUG
 const { debugMandatoryPropierties, debugRenderHtml } = require('../functions/debug.js')
 
-const { globalProp } = require('../middleware/globals.js')
+const { templateFunction } = require('../middleware/globals.js')
 
 // UTILS
 const {
     getPageType,
     getArchivePageName,
     getNameFile,
-    ssgPermalink,
+    getPermalink,
     getPathByLocale,
     getLanguage,
     extracAdditionalData,
@@ -57,14 +57,19 @@ function html(done) {
     store.manifest = manifestData
 
     const sourcePath =  (!store.arg.page) ? path.join(dataPath, '/**/*.json') :  path.join(dataPath, store.arg.page)
-    const streams = glob.sync(sourcePath)
+    const files = glob.sync(sourcePath)
 
-    const tasks = streams.map(filepath => {
+    const tasks = files.map(filepath => {
 
         /*
         Get json data of each file
         */
         const initialData = JSON.parse(fs.readFileSync(filepath))
+
+        /*
+        Check if draft
+        */
+        const publish = (( 'draft' in initialData ) && initialData.draft === true) ? false : true
 
         /*
         Get languages
@@ -143,9 +148,9 @@ function html(done) {
         if(store.arg.debug) store.permalinkMapData = JSON.parse(fs.readFileSync(permalinkFile))
 
         const permalink = {}
-        permalink.permalink = ssgPermalink(subfolder,nameFile)
+        permalink.permalink = getPermalink(subfolder,nameFile)
         const validDomain = ( config.domain.substr(-1) == '/' ) ? config.domain.slice(0, -1) : config.domain
-        permalink.staticPermalink = `${validDomain}${ssgPermalink(subfolder,nameFile)}`
+        permalink.staticPermalink = `${validDomain}${getPermalink(subfolder,nameFile)}`
         permalink.pageTitle = data.pageTitle
 
 
@@ -323,9 +328,9 @@ function html(done) {
                     if (index == 0) {
                         return null
                     } else if (index == 1) {
-                        return ssgPermalink(subfolder,nameFile)
+                        return getPermalink(subfolder,nameFile)
                     } else {
-                        return ssgPermalink(subfolder,`${dinamicPageName}${index - 1}`)
+                        return getPermalink(subfolder,`${dinamicPageName}${index - 1}`)
                     }
                 }
 
@@ -336,7 +341,7 @@ function html(done) {
                     if (index == pageData.length - 1) {
                         return null
                     } else {
-                        return ssgPermalink(subfolder,`${dinamicPageName}${index + 1}`)
+                        return getPermalink(subfolder,`${dinamicPageName}${index + 1}`)
                     }
                 }
 
@@ -358,12 +363,12 @@ function html(done) {
 
                 return (taskDone) => {
 
-                    globalProp.ssgUnivoqueId = univoqueId,
-                    globalProp.ssgTemplateName = templatename,
-                    globalProp.ssgPageType = pageType
-                    globalProp.ssgLang = lang
+                    templateFunction.ssgUnivoqueId = univoqueId,
+                    templateFunction.ssgTemplateName = templatename,
+                    templateFunction.ssgPageType = pageType
+                    templateFunction.ssgLang = lang
 
-                    const mergedLocals = { ... newData, ... globalProp}
+                    const mergedLocals = { ... newData, ... templateFunction}
 
                     return gulp.src(template)
                         .pipe(pug({
@@ -385,8 +390,8 @@ function html(done) {
 
             const pagetask = pages.map((item, index) => {
                 const newName = getArchivePageName(index, nameFile, dinamicPageName)
-                item.displayName = `${ssgPermalink(getPathByLocale(filepath, getLanguage(filepath)), newName)}`;
-                return {'skipTask' : skipTask, 'fn': item};
+                item.displayName = `${getPermalink(getPathByLocale(filepath, getLanguage(filepath)), newName)}`;
+                return {'skipTask' : skipTask, 'publish' : publish, 'fn': item};
             })
 
             return pagetask
@@ -397,12 +402,12 @@ function html(done) {
 
             function renderPage(taskDone) {
 
-                globalProp.ssgUnivoqueId = univoqueId,
-                globalProp.ssgTemplateName = templatename,
-                globalProp.ssgPageType = pageType
-                globalProp.ssgLang = lang
+                templateFunction.ssgUnivoqueId = univoqueId,
+                templateFunction.ssgTemplateName = templatename,
+                templateFunction.ssgPageType = pageType
+                templateFunction.ssgLang = lang
 
-                const mergedLocals = { ... allData, ... globalProp}
+                const mergedLocals = { ... allData, ... templateFunction}
 
                 return gulp.src(template)
                     .pipe(pug({
@@ -421,8 +426,8 @@ function html(done) {
                     })
             }
 
-            renderPage.displayName = `${ssgPermalink(getPathByLocale(filepath, getLanguage(filepath)), getNameFile(filepath))}`;
-            return {'skipTask' : skipTask, 'fn': renderPage};
+            renderPage.displayName = `${getPermalink(getPathByLocale(filepath, getLanguage(filepath)), getNameFile(filepath))}`;
+            return {'skipTask' : skipTask, 'publish' : publish, 'fn': renderPage};
         }
 
     })
@@ -430,8 +435,8 @@ function html(done) {
     const flatTask = [ ... tasks].flat()
 
     const tasksToRender = (store.counterRun > 1 )
-        ? flatTask.filter((item) => item.skipTask === false ).map((item) => item.fn)
-        : flatTask.map((item) => item.fn);
+        ? flatTask.filter((item) => (item.skipTask === false && item.publish === true) ).map((item) => item.fn)
+        : flatTask.filter((item) => item.publish === true ).map((item) => item.fn);
 
     return gulp.series(...tasksToRender, seriesDone => {
         seriesDone()
