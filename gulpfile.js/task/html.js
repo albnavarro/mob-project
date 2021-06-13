@@ -43,7 +43,8 @@ const {
     getTemplate,
     getUnivoqueId,
     getOriginalPath,
-    mergeData
+    mergeData,
+    langIsDisable
 } = require('../functions/utils.js')
 
 
@@ -67,14 +68,15 @@ function html(done) {
         const initialData = JSON.parse(fs.readFileSync(filepath))
 
         /*
-        Check if draft
-        */
-        const publish = (( 'draft' in initialData ) && initialData.draft === true) ? false : true
-
-        /*
         Get languages
         */
         const lang = getLanguage(filepath)
+
+        /*
+        Check if draft
+        */
+        const publish = (( 'draft' in initialData ) && initialData.draft === true || langIsDisable(lang)) ? false : true
+        if(!publish) return {'skipTask' : true, 'publish' : false, 'fn': null};
 
         /*
         Get file name and final slug before merge data
@@ -84,7 +86,7 @@ function html(done) {
 
 
         /*
-        Merge data
+        Merge data with defult lang dat
         */
         const data = mergeData(filepath, initialData, lang)
 
@@ -93,6 +95,19 @@ function html(done) {
         Get language
         */
         data.lang = lang
+
+        /*
+        get template
+        */
+        const template = getTemplate(data)
+        const templatename = getNameFile(template)
+
+
+        /*
+        Add page type
+        */
+        const pageType = getPageType(data)
+        const univoqueId = getUnivoqueId(filepath)
 
 
         /*
@@ -118,9 +133,7 @@ function html(done) {
 
         /*
         Subfolder
-        Create folder in accordion of json folder position
-        regex form 'data/'' to last slash
-        return the exact path of json file
+        Create folder in accordion of json lang
         */
         const subfolder = getPathByLocale(filepath,data.lang)
 
@@ -214,28 +227,31 @@ function html(done) {
 
 
         /*
-        criticalcss
+        Criticalcss
+        Create map of template with one page ( last ) for extract critical file
         */
-        const critical = {}
-        const criticalFile = `${cssDest}/critical${subfolder}/${nameFile}.css`
-        if (store.arg.prod && fs.existsSync(criticalFile)) {
-            const documentStyles = fs.readFileSync(criticalFile);
-            critical.documentStyles = documentStyles.toString()
+        if(store.counterRun == 0) {
+            const critcalCssByTemplate = {}
+            critcalCssByTemplate[templatename] = {
+                source : `${destPath}${subfolder}/${nameFile}.html`,
+                template : templatename
+            }
+            Object.assign(store.criticalCssMapData, critcalCssByTemplate)
         }
 
-
         /*
-        get template
+        Criticalcss
+        Load crircal file based on template
         */
-        // const template = `${templatePath}/${data.template}.pug`
-        const template = getTemplate(data)
-        const templatename = getNameFile(template)
+        const critical = {}
+        if(store.counterRun == 1) {
+            const criticalFile = `${cssDest}/critical/${templatename}.css`
 
-        /*
-        Add page type
-        */
-        const pageType = getPageType(data)
-        const univoqueId = getUnivoqueId(filepath)
+            if (store.arg.prod && fs.existsSync(criticalFile)) {
+                const documentStyles = fs.readFileSync(criticalFile);
+                critical.documentStyles = documentStyles.toString()
+            }
+        }
 
         /*
         Create empty chunkedAyrray ( pagination ) to avoid error

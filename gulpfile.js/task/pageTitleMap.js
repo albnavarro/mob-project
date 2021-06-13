@@ -11,7 +11,8 @@ const store = require('../store.js')
 const {
 	getLanguage,
 	getUnivoqueId,
-	mergeData
+	mergeData,
+	langIsDisable
 } = require('../functions/utils.js')
 
 
@@ -30,7 +31,7 @@ function pageTitle(done) {
 		const lang = getLanguage(curr)
 		const univoqueId = getUnivoqueId(curr)
 		const data = mergeData(curr, parsed, lang)
-		const publish = (('draft' in data) && data.draft === true) ? false : true
+		const publish = (('draft' in data) && data.draft === true || langIsDisable(lang)) ? false : true
 
 		if (publish) {
 			acc[univoqueId] = {

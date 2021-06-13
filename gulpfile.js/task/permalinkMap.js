@@ -14,7 +14,8 @@ const {
 	getLanguage,
 	extracAdditionalData,
 	getUnivoqueId,
-	mergeData
+	mergeData,
+	langIsDisable
 } = require('../functions/utils.js')
 const store = require('../store.js')
 
@@ -38,7 +39,7 @@ function permalink(done) {
 		const permalinkUrl = getPermalink(subfolder, slug)
 		const univoqueId = getUnivoqueId(curr)
 		const newData = mergeData(curr, data, lang)
-		const publish = (('draft' in newData) && newData.draft === true) ? false : true
+		const publish = (('draft' in newData) && newData.draft === true || langIsDisable(lang)) ? false : true
 
 		if (publish) {
 			acc[univoqueId] = {

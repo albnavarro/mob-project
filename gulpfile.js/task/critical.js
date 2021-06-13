@@ -1,10 +1,10 @@
 const gulp = require('gulp')
+const rename = require('gulp-rename')
 const fs = require('fs')
 const critical = require('critical').stream
 const path = require('path')
 const destPath = path.resolve('www')
 const cssDest = path.join(destPath, 'assets/css')
-const cssCritical = `${cssDest}/critical.css`
 const store = require('../store.js')
 
 /*
@@ -14,8 +14,10 @@ function initializeCritical(done) {
     const dir = cssDest;
     if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir);
+        done()
+    } else {
+        done()
     }
-    fs.writeFile(cssCritical, '', done);
 };
 
 
@@ -24,19 +26,34 @@ function initializeCritical(done) {
 */
 function criticalCss(done) {
     if (store.arg.prod) {
-        return gulp.src('www/**/*.html')
-        .pipe(critical({
-            base: 'www/',
-            minify: true,
-            width: 1024,
-            height: 768,
-            css: `${cssDest}/style.css`,
-            include: ['.lightbox', '.parallax-container', '.parallax-item', '.gaspHorizontal__card']
-        }))
-        .pipe(gulp.dest(`${cssDest}/critical`))
+        const criticalArr = Object.values(store.criticalCssMapData)
+        const tasks = criticalArr.map(item => {
+            function renderCritical(taskDone) {
+                return gulp.src(item.source)
+                .pipe(critical({
+                    base: 'www/',
+                    minify: true,
+                    width: 1024,
+                    height: 768,
+                    css: `${cssDest}/style.css`,
+                    include: ['.lightbox', '.parallax-container', '.parallax-item', '.gaspHorizontal__card']
+                }))
+                .pipe(rename(item.template + '.css'))
+                .pipe(gulp.dest(`${cssDest}/critical`))
+            }
+            renderCritical.displayName = item.template
+            return renderCritical
+        })
+
+        return gulp.series(...tasks, seriesDone => {
+            seriesDone()
+            done()
+        })()
+
+    } else {
+        done()
     }
 
-    done();
 };
 
 

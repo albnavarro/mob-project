@@ -15,7 +15,8 @@ const {
     getLanguage,
     extracAdditionalData,
     getOriginalPath,
-    mergeData
+    mergeData,
+    langIsDisable
 } = require('../functions/utils.js')
 const { sortbyDate } = require('../functions/helpers.js')
 const store = require('../store.js')
@@ -36,7 +37,7 @@ function category(done) {
         const slug = ('slug' in parsed) ? parsed.slug : nameFile
         const lang = getLanguage(curr)
         const data = mergeData(curr, parsed, lang)
-        const publish = (( 'draft' in data ) && data.draft === true) ? false : true
+        const publish = (( 'draft' in data ) && data.draft === true || langIsDisable(lang)) ? false : true
 
         if (('exportPost' in data) && publish) {
             const subfolder  = getPathByLocale(curr,lang)

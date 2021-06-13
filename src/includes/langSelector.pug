@@ -1,5 +1,5 @@
 each val, languages in ssgLocales
     span
-        if languages
+        if languages && !langIsDisabled(languages)
             a(href=ssgPermalinkByLang(ssgUnivoqueId,languages))
              |!{languages} | 

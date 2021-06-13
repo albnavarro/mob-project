@@ -1,10 +1,13 @@
 const config = require('../../config.json')
 const store = require('../store.js')
 const propValidate = (p, o) => p.reduce((xs, x) => (xs && xs[x]) ? xs[x] : null, o)
+const { langIsDisable } = require('../functions/utils.js')
 
 const templateFunction = {}
 templateFunction.ssgSiteName = config.siteName
 templateFunction.ssgLocales = config.locales
+
+
 
 /*
 * get obj nested value or 'not found string'
@@ -21,6 +24,10 @@ templateFunction.ssgPrint = (obj, ...props) => {
     return (typeof obj !== "undefined") ? deepCheck(props, obj) : 'not found'
 }
 
+
+templateFunction.langIsDisabled = (_lang) => {
+    return langIsDisable(_lang)
+}
 
 
 templateFunction.ssgBodyClass = () => {

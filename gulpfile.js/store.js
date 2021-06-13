@@ -33,6 +33,11 @@ class storeClass {
         this._categoryMapData = {}
 
         /*
+        Map of all crtial css by template
+        */
+        this._criticalCssMapData = {}
+
+        /*
         Map of all asstes
         */
         this._manifest = {}
@@ -89,6 +94,14 @@ class storeClass {
 
     get categoryMapData() {
         return this._categoryMapData
+    }
+
+    set criticalCssMapData(value) {
+        this._criticalCssMapData = value
+    }
+
+    get criticalCssMapData() {
+        return this._criticalCssMapData
     }
 
     set manifest(value) {

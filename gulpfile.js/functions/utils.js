@@ -212,6 +212,10 @@ function mergeData(filepath, parsed, lang) {
 }
 
 
+function langIsDisable(lang) {
+    return  ('disableLocales' in config ) ? config.disableLocales.includes(lang) : false
+}
+
 
 exports.getPageType = getPageType
 exports.getArchivePageName = getArchivePageName
@@ -228,3 +232,4 @@ exports.getTemplate = getTemplate
 exports.getOriginalPath = getOriginalPath
 exports.getUnivoqueId = getUnivoqueId
 exports.mergeData = mergeData
+exports.langIsDisable = langIsDisable
