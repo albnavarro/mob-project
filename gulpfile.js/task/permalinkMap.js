@@ -38,8 +38,7 @@ function permalink(done) {
 		const subfolder = getPathByLocale(curr, lang)
 		const permalinkUrl = getPermalink(subfolder, slug)
 		const univoqueId = getUnivoqueId(curr)
-		const newData = mergeData(curr, data, lang)
-		const publish = (('draft' in newData) && newData.draft === true || langIsDisable(lang)) ? false : true
+		const publish = (('draft' in data) && data.draft === true || langIsDisable(lang)) ? false : true
 
 		if (publish) {
 			acc[univoqueId] = {

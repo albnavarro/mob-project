@@ -2,10 +2,11 @@ ErrorDocument 404 /404.html
 
 RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_FILENAME}\.html -f
+RewriteCond %{REQUEST_FILENAME}.html -f
 RewriteRule ^(.*)$ $1.html
 
-<filesMatch "\.(html|htm)$">
+
+<filesMatch ".(html|htm)$">
   FileETag None
   <ifModule mod_headers.c>
      Header unset ETag
@@ -14,3 +15,4 @@ RewriteRule ^(.*)$ $1.html
      Header set Expires "Wed, 11 Jan 1984 05:00:00 GMT"
   </ifModule>
 </filesMatch>
+    

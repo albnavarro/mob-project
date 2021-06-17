@@ -1,13 +1,13 @@
 {
   "name": "mob-project",
   "version": "1.0.0",
-  "description": "Blank project",
+  "description": "gulp ssg",
   "main": "gulpfile.js",
   "scripts": {
     "dev": "gulp dev",
     "debugpage": "gulp html -debug -page",
     "build": "gulp build -prod",
-    "image": "gulp image",
+    "assets": "gulp assets",
     "icons": "gulp icons",
     "permalink": "gulp permalink",
     "category": "gulp category"
@@ -28,6 +28,7 @@
     "del": "^6.0.0",
     "delete-empty": "^3.0.0",
     "fontfaceobserver": "^2.1.0",
+    "fs-extra": "^10.0.0",
     "glob": "^7.1.7",
     "gsap": "^3.6.1",
     "gulp-concat": "^2.6.1",

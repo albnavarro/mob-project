@@ -111,8 +111,8 @@ templateFunction.ssgPermalinkByLang = (univoqueId, _lang) => {
 /*
 * get image form ssgManifest
 */
-templateFunction.ssgImage = (image) => {
-    return `/assets/dist/${store.manifest[image]}`
+templateFunction.ssgAsset = (el) => {
+    return `/assets/dist/${store.manifest[el]}`
 }
 
 /*

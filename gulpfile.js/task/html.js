@@ -42,7 +42,6 @@ const {
     extracAdditionalData,
     getTemplate,
     getUnivoqueId,
-    getOriginalPath,
     mergeData,
     langIsDisable
 } = require('../functions/utils.js')

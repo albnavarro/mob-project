@@ -4,7 +4,7 @@ const svgstore = require('gulp-svgstore')
 const path = require('path')
 const themePath = path.resolve('src')
 const destPath = path.resolve('www')
-const svgPath = path.join(themePath, 'svg')
+const svgPath = path.join(themePath, 'static/svg')
 const svgFiles = `${svgPath}/*.svg`
 const svgDest = path.join(destPath, 'assets/svg')
 

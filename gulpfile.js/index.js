@@ -31,8 +31,10 @@ const { js } = require('./task/script.js')
 const { icons } = require('./task/icons.js')
 const { initializeCritical, criticalCss } = require('./task/critical.js')
 const { image } = require('./task/image.js')
-const { dist } = require('./task/manifest.js')
-const { cleanDist, cleanAll, deleteEmptyDirectories } = require('./task/clean.js')
+const { assets } = require('./task/assets.js')
+const { htaccess } = require('./task/htaccess.js')
+const { createFolder } = require('./task/createFolder.js')
+const { cleanDist, cleanAll } = require('./task/clean.js')
 
 
 /*
@@ -53,7 +55,8 @@ function watch_files(done) {
 
 const build = gulp.series(
     cleanAll,
-    deleteEmptyDirectories,
+    createFolder,
+    htaccess,
     initializeCritical,
     icons,
     image,
@@ -61,13 +64,12 @@ const build = gulp.series(
     style,
     js,
     cleanDist,
-    dist,
+    assets,
     category,
     pageTitle,
     permalink,
     html,
     criticalCss,
-    dist,
     html
 )
 
@@ -76,8 +78,7 @@ const build = gulp.series(
 */
 
 const reset = gulp.series(
-    cleanAll,
-    deleteEmptyDirectories
+    cleanAll
 )
 
 /*
@@ -105,14 +106,14 @@ exports.html = html
 exports.image = image
 exports.icons = icons
 exports.cleanDist = cleanDist
-exports.dist = dist
+exports.assets = assets
 exports.cleanAll = cleanAll
-exports.deleteEmptyDirectories = deleteEmptyDirectories
 exports.permalink = permalink
 exports.category = category
 exports.pageTitle = pageTitle
 exports.detectModifiedFiles = detectModifiedFiles
-
+exports.htaccess = htaccess
+exports.createFolder = createFolder
 /*
 * MAIN TASK
 */
@@ -143,3 +144,7 @@ exports.watch = watchTask
 * npm run debugpage "index.it.json"
 * .....
 */
+
+
+// TO DO
+// Task to create alla ww folder in assets

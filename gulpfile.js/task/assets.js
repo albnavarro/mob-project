@@ -1,23 +1,33 @@
 const gulp = require('gulp')
+const fs = require('fs-extra')
 const rev = require('gulp-rev')
 const revdel = require('rev-del')
 const path = require('path')
 const themePath = path.resolve('src')
 const destPath = path.resolve('www')
+const imgPath = path.join(themePath, 'static/img')
+const videoPath = path.join(themePath, 'static/video')
+const jsPath = path.join(themePath, 'static/js')
+const fontPath = path.join(themePath, 'static/fonts')
+const fontDest = path.join(destPath, 'assets/fonts')
 const distPath = path.join(destPath, 'assets/dist')
-const imgPath = path.join(themePath, 'img')
 const cssDest = path.join(destPath, 'assets/css')
 const jsDest = path.join(destPath, 'assets/js')
 const imgDest = path.join(destPath, 'assets/img')
 const cssFile = `${cssDest}/style.css`
 const jsFile = `${jsDest}/script.js`
 const imgFiles = `${imgPath}/*`
+const videoFiles = `${videoPath}/*`
 
 /*
 * Create css and js with hash
 */
-function dist() {
-    return gulp.src([cssFile, jsFile, imgFiles])
+function assets() {
+    // Copy font
+    fs.copySync(fontPath, fontDest)
+    fs.copySync(jsPath, jsDest)
+
+    return gulp.src([cssFile, jsFile, imgFiles, videoFiles])
 
         .pipe(rev())
         .pipe(gulp.dest(distPath))
@@ -28,4 +38,4 @@ function dist() {
         .pipe(gulp.dest(distPath))
 }
 
-exports.dist = dist
+exports.assets = assets

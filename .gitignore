@@ -1,14 +1,4 @@
 node_modules
 bower_components
-www/assets/css/**/*.css
-www/assets/css/**/*.css.map
-www/assets/js/script.js
-www/assets/js/script.js.map
-www/assets/svg/svg.svg
-www/assets/img/*.*
-www/assets/dist/*
-www/assets/dist/*.*
-www/assets/data/*.*
-www/assets/js/async-assets-loading.min.js
-www/**/*.html
+www/
 .DS_Store

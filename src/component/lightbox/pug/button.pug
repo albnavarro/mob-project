@@ -7,33 +7,33 @@
   br
 
 .container
-  button.btn-LightboxImage(type='button' data-url=ssgImage('pic1.jpg') data-title='titolo 1' data-description='lorem ipsum single')
+  button.btn-LightboxImage(type='button' data-url=ssgAsset('pic1.jpg') data-title='titolo 1' data-description='lorem ipsum single')
     |lightbox image 1
-  button.btn-LightboxImage(type='button' data-url=ssgImage('pic2.jpg') data-hgap='10' data-wgap='10')  
+  button.btn-LightboxImage(type='button' data-url=ssgAsset('pic2.jpg') data-hgap='10' data-wgap='10')  
     |lightbox image 2
-  button.btn-LightboxImage(type='button' data-url=ssgImage('pic3.jpg'))  
+  button.btn-LightboxImage(type='button' data-url=ssgAsset('pic3.jpg'))  
     |lightbox image 3
   br
   br
     
 .container
-  button.btn-LightboxImageSlide(type='button' data-url=ssgImage('pic1.jpg') data-zoom data-title='titolo 1 landscape' data-description='lorem ipsum' data-imagegroup='landscape')  
+  button.btn-LightboxImageSlide(type='button' data-url=ssgAsset('pic1.jpg') data-zoom data-title='titolo 1 landscape' data-description='lorem ipsum' data-imagegroup='landscape')  
     |lightbox landscape 1
-  button.btn-LightboxImageSlide(type='button' data-title='titolo 2 landscape' data-zoom data-description='lorem ipsum 2' data-url=ssgImage('pic2.jpg') data-imagegroup='landscape')  
+  button.btn-LightboxImageSlide(type='button' data-title='titolo 2 landscape' data-zoom data-description='lorem ipsum 2' data-url=ssgAsset('pic2.jpg') data-imagegroup='landscape')  
     |lightbox landscape 2
-  button.btn-LightboxImageSlide(type='button' data-url=ssgImage('pic3.jpg') data-zoom data-imagegroup='landscape')  
+  button.btn-LightboxImageSlide(type='button' data-url=ssgAsset('pic3.jpg') data-zoom data-imagegroup='landscape')  
     |lightbox landscape 3
   br
   br
     
 .container
-  button.btn-LightboxImageSlide(type='button' data-url=ssgImage('flower1.jpg') data-imagegroup='flower')  
+  button.btn-LightboxImageSlide(type='button' data-url=ssgAsset('flower1.jpg') data-imagegroup='flower')  
     |lightbox flower 1
-  button.btn-LightboxImageSlide(type='button' data-url=ssgImage('flower2.jpg') data-title='titolo 2 flower' data-description='lorem ipsum 2' data-imagegroup='flower')  
+  button.btn-LightboxImageSlide(type='button' data-url=ssgAsset('flower2.jpg') data-title='titolo 2 flower' data-description='lorem ipsum 2' data-imagegroup='flower')  
     |lightbox flower 2
-  button.btn-LightboxImageSlide(type='button' data-url=ssgImage('flower3.jpg') data-imagegroup='flower' data-hgap='30' data-wgap='30')  
+  button.btn-LightboxImageSlide(type='button' data-url=ssgAsset('flower3.jpg') data-imagegroup='flower' data-hgap='30' data-wgap='30')  
     |lightbox flower 3
-  button.btn-LightboxImageSlide(type='button' data-url=ssgImage('flower4.jpg') data-imagegroup='flower')  
+  button.btn-LightboxImageSlide(type='button' data-url=ssgAsset('flower4.jpg') data-imagegroup='flower')  
     |lightbox flower 4
   br
   br
@@ -43,7 +43,7 @@
     |lightbox video
   button.btn-LightboxVideo(type='button' data-title='titolo 2 video' data-description='lorem ipsum video' data-url='SyeI43BeR54')  
     |lightbox video description
-  button.btn-LightboxVideo(type='button' data-title='titolo 3 video local' data-ratioW='2', data-ratioH='2' data-sourceType="local" data-url='assets/video/videotest.mp4')  
+  button.btn-LightboxVideo(type='button' data-title='titolo 3 video local' data-ratioW='2', data-ratioH='2' data-sourceType="local" data-url=ssgAsset('videotest.mp4'))  
      |lightbox video local
   br
   br

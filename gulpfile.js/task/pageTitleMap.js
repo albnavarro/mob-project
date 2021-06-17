@@ -31,7 +31,7 @@ function pageTitle(done) {
 		const lang = getLanguage(curr)
 		const univoqueId = getUnivoqueId(curr)
 		const data = mergeData(curr, parsed, lang)
-		const publish = (('draft' in data) && data.draft === true || langIsDisable(lang)) ? false : true
+		const publish = (('draft' in parsed) && parsed.draft === true || langIsDisable(lang)) ? false : true
 
 		if (publish) {
 			acc[univoqueId] = {

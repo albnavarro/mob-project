@@ -1,5 +1,5 @@
 {
-    "domain" : "http://localhost:3000/",
+    "domain" : "http://es6.lcl:8888/",
     "siteName" : "Mob project",
     "locales" : {
         "en": {
