@@ -30,10 +30,10 @@ const { minifyAssetsLoading } = require('./task/minifyAssetsLoading.js')
 const { js } = require('./task/script.js')
 const { icons } = require('./task/icons.js')
 const { initializeCritical, criticalCss } = require('./task/critical.js')
-const { image } = require('./task/image.js')
 const { assets } = require('./task/assets.js')
 const { htaccess } = require('./task/htaccess.js')
 const { createFolder } = require('./task/createFolder.js')
+const { draftMap } = require('./task/draftMap.js')
 const { cleanDist, cleanAll } = require('./task/clean.js')
 
 
@@ -59,7 +59,6 @@ const build = gulp.series(
     htaccess,
     initializeCritical,
     icons,
-    image,
     minifyAssetsLoading,
     style,
     js,
@@ -68,6 +67,7 @@ const build = gulp.series(
     category,
     pageTitle,
     permalink,
+    draftMap,
     html,
     criticalCss,
     html
@@ -103,7 +103,6 @@ exports.initializeCritical = initializeCritical
 exports.style = style
 exports.js = js
 exports.html = html
-exports.image = image
 exports.icons = icons
 exports.cleanDist = cleanDist
 exports.assets = assets
@@ -114,6 +113,7 @@ exports.pageTitle = pageTitle
 exports.detectModifiedFiles = detectModifiedFiles
 exports.htaccess = htaccess
 exports.createFolder = createFolder
+exports.draftMap = draftMap
 /*
 * MAIN TASK
 */

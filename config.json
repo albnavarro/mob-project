@@ -27,67 +27,50 @@
     "dinamicPageName" : "page-",
     "categoryLocales" : {
         "articles" : {
-            "en" : {
-                "name" : "articles",
-                "indexUnivoqueId" : "archive/articles/index"
+            "name" : {
+                "en" :  "articles",
+                "it" : "articoli"
             },
-            "it" : {
-                "name" : "articoli",
-                "indexUnivoqueId" : "archive/articles/index"
-            }
+            "indexUnivoqueId" : "archive/articles/index"
         },
         "news" : {
-            "en" : {
-                "name" : "news",
-                "indexUnivoqueId" : "archive/news/index"
+            "name" : {
+                "en" :  "news",
+                "it" : "novitá"
             },
-            "it" : {
-                "name" : "novitá",
-                "indexUnivoqueId" : "archive/news/index"
-            }
+            "indexUnivoqueId" : "archive/news/index"
         }
     },
     "tagLocales" : {
         "tag1" : {
-            "en" : {
-                "name" : "tag1 en",
-                "indexUnivoqueId" : "tag1/index"
+            "name" : {
+                "en" :  "tag1 en",
+                "it" : "tag1 it"
             },
-            "it" : {
-                "name" : "tag1 it",
-                "indexUnivoqueId" : "tag1/index"
-            }
+            "indexUnivoqueId" : "tag1/index"
         },
         "tag2" : {
-            "en" : {
-                "name" : "tag2 en"
-            },
-            "it" : {
-                "name" : "tag2 it"
+            "name" : {
+                "en" :  "tag2 en",
+                "it" : "tag2 it"
             }
         },
         "tag3" : {
-            "en" : {
-                "name" : "tag3 en"
-            },
-            "it" : {
-                "name" : "tag3 it"
+            "name" : {
+                "en" :  "tag3 en",
+                "it" : "tag3 it"
             }
         },
         "tag4" : {
-            "en" : {
-                "name" : "tag4 en"
-            },
-            "it" : {
-                "name" : "tag4 it"
+            "name" : {
+                "en" :  "tag4 en",
+                "it" : "tag4 it"
             }
         },
         "tag5" : {
-            "en" : {
-                "name" : "tag5 en"
-            },
-            "it" : {
-                "name" : "tag5 it"
+            "name" : {
+                "en" :  "tag5 en",
+                "it" : "tag5 it"
             }
         }
     },

@@ -25,8 +25,8 @@ function js() {
                 babel.babel({
                     babelHelpers: 'bundled',
                     exclude: 'node_modules/**',
-                    babelrc: false,
-                    presets: ["@babel/preset-env"]
+                    babelrc: true
+                    // presets: ["@babel/preset-env"]
                 }),
                 terser.terser()
             ]
@@ -49,8 +49,8 @@ function js() {
                 babel.babel({
                     babelHelpers: 'bundled',
                     exclude: 'node_modules/**',
-                    babelrc: false,
-                    presets: ["@babel/preset-env"]
+                    babelrc: true
+                    // presets: ["@babel/preset-env"]
                 })
             ]
         }).then(bundle => {

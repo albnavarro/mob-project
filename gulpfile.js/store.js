@@ -33,6 +33,11 @@ class storeClass {
         this._categoryMapData = {}
 
         /*
+        Map of all draft
+        */
+        this._draftMapData = {}
+
+        /*
         Map of all crtial css by template
         */
         this._criticalCssMapData = {}
@@ -94,6 +99,14 @@ class storeClass {
 
     get categoryMapData() {
         return this._categoryMapData
+    }
+
+    set draftMapData(value) {
+        this._draftMapData = value
+    }
+
+    get draftMapData() {
+        return this._draftMapData
     }
 
     set criticalCssMapData(value) {

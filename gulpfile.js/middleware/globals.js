@@ -40,18 +40,18 @@ templateFunction.ssgBodyClass = () => {
 /*
 * get category name by unique id
 */
-templateFunction.ssgCategoryName = (univoqueId) => {
-    return (propValidate([univoqueId, templateFunction.ssgLang, 'name'], config.categoryLocales))
-        ? config.categoryLocales[univoqueId][templateFunction.ssgLang].name
-        : 'not found'
+templateFunction.ssgCategoryName = (name) => {
+    return (propValidate([name, 'name', templateFunction.ssgLang], config.categoryLocales))
+        ? config.categoryLocales[name].name[templateFunction.ssgLang]
+        : name
 }
 
 /*
 * get category permalink by unique id
 */
-templateFunction.ssgCategoryPermalink = (univoqueId) => {
-    return (univoqueId && propValidate([univoqueId, templateFunction.ssgLang, 'indexUnivoqueId'], config.categoryLocales))
-        ? templateFunction.ssgPermalink(config.categoryLocales[univoqueId][templateFunction.ssgLang].indexUnivoqueId)
+templateFunction.ssgCategoryPermalink = (name) => {
+    return (name && propValidate([name, 'indexUnivoqueId'], config.categoryLocales))
+        ? templateFunction.ssgPermalink(config.categoryLocales[name].indexUnivoqueId)
         : null
 }
 
@@ -60,19 +60,19 @@ templateFunction.ssgCategoryPermalink = (univoqueId) => {
 /*
 * get tag name by unique id
 */
-templateFunction.ssgTagName = (univoqueId) => {
-    return (propValidate([univoqueId, templateFunction.ssgLang, 'name'], config.tagLocales))
-        ? config.tagLocales[univoqueId][templateFunction.ssgLang].name
-        : 'not found'
+templateFunction.ssgTagName = (name) => {
+    return (propValidate([name, 'name', templateFunction.ssgLang], config.tagLocales))
+        ? config.tagLocales[name].name[templateFunction.ssgLang]
+        : name
 }
 
 
 /*
 * get tag permalink by unique id
 */
-templateFunction.ssgTagPermalink = (univoqueId) => {
-    return (univoqueId && propValidate([univoqueId, templateFunction.ssgLang, 'indexUnivoqueId'], config.tagLocales))
-        ? templateFunction.ssgPermalink(config.tagLocales[univoqueId][templateFunction.ssgLang].indexUnivoqueId)
+templateFunction.ssgTagPermalink = (name) => {
+    return (name && propValidate([name, 'indexUnivoqueId'], config.tagLocales))
+        ? templateFunction.ssgPermalink(config.tagLocales[name].indexUnivoqueId)
         : null
 }
 
@@ -106,6 +106,18 @@ templateFunction.ssgPermalinkByLang = (univoqueId, _lang) => {
         ? store.permalinkMapData[univoqueId][_lang]
         : null
 }
+
+
+
+/*
+* get draft status by univoqueId
+*/
+templateFunction.ssgIsDraft = (univoqueId) => {
+    return (propValidate([univoqueId, templateFunction.ssgLang], store.draftMapData))
+        ? store.draftMapData[univoqueId][templateFunction.ssgLang]
+        : false
+}
+
 
 
 /*

@@ -6,4 +6,5 @@ if pagination
         a(href=pagination.nextPage)
             |next
     div
-        |page !{pagination.current} of !{pagination.total}
+        |page #{ssgPrint(pagination, 'current')} 
+        |of #{ssgPrint(pagination, 'total')}

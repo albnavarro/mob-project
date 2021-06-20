@@ -1,17 +1,19 @@
 mixin list(item)
     each val, index in item
         - const heaveChildrenClass = (val.children) ? 'menu-item menu-item-has-children' : 'menu-item'
+        - const isDraft = ssgIsDraft(val.univoqueId)
         
-        li(class=heaveChildrenClass)
-            - const checkLabel = ssgPermalink(val.univoqueId)
-            - const label = checkLabel ? ssgPageTitle(val.univoqueId) : ssgPrint(val, 'label')
-                    
-            a(href=ssgPermalink(val.univoqueId))
-                |#{label}
-                    
-            if val.children
-                ul.sub-menu
-                    +list(val.children)
+        if(!isDraft)
+            li(class=heaveChildrenClass)
+                - const checkLabel = ssgPermalink(val.univoqueId)
+                - const label = checkLabel ? ssgPageTitle(val.univoqueId) : ssgPrint(val, 'label')
+                        
+                a(href=ssgPermalink(val.univoqueId))
+                    |#{label}
+                        
+                if val.children
+                    ul.sub-menu
+                        +list(val.children)
 
 
 

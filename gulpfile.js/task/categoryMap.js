@@ -13,7 +13,7 @@ const {
     getPermalink,
     getPathByLocale,
     getLanguage,
-    extracAdditionalData,
+    getAdditionalData,
     getOriginalPath,
     mergeData,
     langIsDisable

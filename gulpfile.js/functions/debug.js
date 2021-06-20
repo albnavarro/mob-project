@@ -1,9 +1,13 @@
 const util = require('util')
 const store = require('../store.js')
 
-/*
-Check if mandatory propierties in {page}.joson is right
-*/
+
+/**
+ * debugMandatoryPropierties - check if mandatory attribute is finded
+ *
+ * @param  {object} data json data for each file
+ * @return {boolean}   true if pageTitle and description is finded
+ */
 function debugMandatoryPropierties(data) {
     if(!('description' in data) || data.description === undefined) {
         console.log('*****')
@@ -27,9 +31,13 @@ function debugMandatoryPropierties(data) {
 }
 
 
-/*
-Debug file rendered
-*/
+
+/**
+ *
+ * @param  {string} nameFile rendered file name
+ * @param  {type} data  json data for each file
+ * @return {void} log for debug
+ */
 function debugRenderHtml(nameFile, data) {
     if(store.arg.debug) {
         console.log(util.inspect('***************', { colors: true }))

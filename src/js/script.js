@@ -15,7 +15,6 @@ import { eventManager } from "./base/eventManager.js";
 import { mouseManager } from "./base/mouseManager.js";
 import { vh } from "./utility/vh.js"
 import { findElement } from "./utility/findElement.js"
-import { loadImages } from "./utility/loadImages.js"
 
 // NEW VANILLA COMPONENT MODULE
 import { totop } from "../component/to-top/js/toTop.js"
@@ -37,7 +36,7 @@ import { animate } from "../component/animate/js/animate.js"
 
 //TEST
 import { gsapTest } from "./test/gsapTest.js"
-import { axiosTest } from "./test/axiosTest.js"
+import { loadImageFromManifest } from "./test/loadImageFromManifest.js"
 
 const body = document.querySelector('body')
 
@@ -55,7 +54,7 @@ mouseParallax.init();
 accordion.init();
 if( body.classList.contains('page-gsap') || body.classList.contains('page-gsapHorizontal') ) gsapTest.init();
 animate.init();
-axiosTest.init();
+loadImageFromManifest.init();
 
 
 // CUSTOM ACCORDION VIA JS
@@ -92,19 +91,7 @@ const offsetSliderTest = document.querySelector('.offset-slider');
 }
 
 
-// VANILLA LOADER
-const images = [
-    '/assets/img/pic1.jpg',
-    '/assets/img/pic2.jpg',
-    '/assets/img/pic3.jpg',
-    '/assets/img/flower3.jpg'
-]
-const imageLoader = new loadImages(images);
-imageLoader.init()
-.then(() => console.log('image loaded'))
-.catch((e) => console.log(e));
-// imageLoader.stop()
-//
+
 
 
 // const offsetSlider = new offsetSliderClass({

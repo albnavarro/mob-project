@@ -12,7 +12,6 @@ const {
 	getPermalink,
 	getPathByLocale,
 	getLanguage,
-	extracAdditionalData,
 	getUnivoqueId,
 	mergeData,
 	langIsDisable

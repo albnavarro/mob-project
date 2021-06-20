@@ -39,11 +39,14 @@ const {
     getPermalink,
     getPathByLocale,
     getLanguage,
-    extracAdditionalData,
+    getAdditionalData,
     getTemplate,
     getUnivoqueId,
     mergeData,
-    langIsDisable
+    langIsDisable,
+    getPosts,
+    checkIfPostHaveTag,
+    getTags
 } = require('../functions/utils.js')
 
 
@@ -87,39 +90,39 @@ function html(done) {
         /*
         Merge data with defult lang dat
         */
-        const data = mergeData(filepath, initialData, lang)
+        const mergedData = mergeData(filepath, initialData, lang)
 
 
         /*
         Get language
         */
-        data.lang = lang
+        mergedData.lang = lang
 
         /*
         get template
         */
-        const template = getTemplate(data)
+        const template = getTemplate(mergedData)
         const templatename = getNameFile(template)
 
 
         /*
         Add page type
         */
-        const pageType = getPageType(data)
+        const pageType = getPageType(mergedData)
         const univoqueId = getUnivoqueId(filepath)
 
 
         /*
-        Get data from each json defined in additonalPata propierties [ array ] if exist
+        Get mergedData from each json defined in additonalPata propierties [ array ] if exist
         */
-        const additionalData = extracAdditionalData(data)
+        const additionalData = getAdditionalData(mergedData)
 
 
         /*
         List of pug include for track page refresh
         */
         const registerComponent = {}
-        registerComponent.registerComponent = ('registerComponent' in data) ? data.registerComponent : []
+        registerComponent.registerComponent = ('registerComponent' in mergedData) ? mergedData.registerComponent : []
 
 
         /*
@@ -131,16 +134,16 @@ function html(done) {
 
 
         /*
-        Subfolder
+        pathByLocale
         Create folder in accordion of json lang
         */
-        const subfolder = getPathByLocale(filepath,data.lang)
+        const pathByLocale = getPathByLocale(filepath,mergedData.lang)
 
         /*
-        Create subfolder if not exist
+        Create pathByLocale if not exist
         */
-        if(!fs.existsSync(`${destPath}/${subfolder}`)){
-            fs.mkdirSync(`${destPath}/${subfolder}`, {
+        if(!fs.existsSync(`${destPath}/${pathByLocale}`)){
+            fs.mkdirSync(`${destPath}/${pathByLocale}`, {
                 recursive: true
             })
         }
@@ -150,79 +153,43 @@ function html(done) {
         Get relative path
         */
         const relativePath = {}
-        relativePath.relativePath = ( config.defaultLocales == data.lang) ? `` : `/${data.lang}`;
+        relativePath.relativePath = ( config.defaultLocales == mergedData.lang) ? `` : `/${mergedData.lang}`;
 
 
         /*
         Add permalink
-        if in debug mode golbal stored info is bypass anche the data il read form file
+        if in debug mode golbal stored info is bypass anche the mergedData il read form file
         */
         if(store.arg.debug) store.permalinkMapData = JSON.parse(fs.readFileSync(permalinkFile))
 
         const permalink = {}
-        permalink.permalink = getPermalink(subfolder,nameFile)
+        permalink.permalink = getPermalink(pathByLocale,nameFile)
         const validDomain = ( config.domain.substr(-1) == '/' ) ? config.domain.slice(0, -1) : config.domain
-        permalink.staticPermalink = `${validDomain}${getPermalink(subfolder,nameFile)}`
-        permalink.pageTitle = data.pageTitle
+        permalink.staticPermalink = `${validDomain}${getPermalink(pathByLocale,nameFile)}`
+        permalink.pageTitle = mergedData.pageTitle
 
 
         /*
         Add pageTitle map
-        if in debug mode golbal stored info is bypass anche the data il read form file
+        if in debug mode golbal stored info is bypass anche the mergedData il read form file
         */
         if(store.arg.debug) store.pageTitleMapData = JSON.parse(fs.readFileSync(pageTitleFile))
 
 
         /*
         Add imported categories
-        if in debug mode golbal stored info is bypass anche the data il read form file
+        if in debug mode golbal stored info is bypass anche the mergedData il read form file
         */
         if(store.arg.debug) store.categoryMapData = JSON.parse(fs.readFileSync(categoryFile))
 
-        const getPosts = (data) => {
-            return data.importPost.reduce((acc, curr) => {
-                if (propValidate([data.lang, curr], store.categoryMapData))  acc[curr] = store.categoryMapData[data.lang][curr]
-                return acc
-            }, {})
-        }
 
         const categoryObj = {}
-        categoryObj.posts = ('importPost' in data) ? getPosts(data) : {}
+        categoryObj.posts = ('importPost' in mergedData) ? getPosts(mergedData) : {}
 
 
-        /*
-        Add imported tags
-        Check if filterType is registerd in congif
-        anche the switch to every or ome method
-        */
-        const tagFilterType = (propValidate(['tagFilter', 'type'], data)
-            && config.tagFilterType.includes(data.tagFilter.type))
-            ? data.tagFilter.type
-            : 'some'
-
-
-        const getTags = (data) => {
-            const flatCategory = Object.values(store.categoryMapData[data.lang]).flat()
-            const result = flatCategory.reduce((acc, curr) => {
-
-                // Filter postMap by tag some|every
-                const postFilterByType = (tagFilterType === 'some')
-                    ? data.importTag.some(item => curr.tag.includes(item))
-                    : data.importTag.every(item => curr.tag.includes(item))
-
-                // Filter postMap by category if required
-                const postFilterByCategory = (propValidate(['tagFilter', 'category'], data))
-                    ? data.tagFilter.category.some(item => item == curr.category)
-                    : true
-
-                if (postFilterByType && postFilterByCategory) acc.push(curr)
-                return acc
-            }, [])
-            return result
-        }
 
         const tagObj = {}
-        tagObj.tags = ('importTag' in data) ? sortbyDate(getTags(data)) : []
+        tagObj.tags = ('importTag' in mergedData) ? sortbyDate(getTags(mergedData)) : []
 
 
         /*
@@ -232,7 +199,7 @@ function html(done) {
         if(store.counterRun == 0) {
             const critcalCssByTemplate = {}
             critcalCssByTemplate[templatename] = {
-                source : `${destPath}${subfolder}/${nameFile}.html`,
+                source : `${destPath}${pathByLocale}/${nameFile}.html`,
                 template : templatename
             }
             Object.assign(store.criticalCssMapData, critcalCssByTemplate)
@@ -260,19 +227,19 @@ function html(done) {
 
 
         /*
-        merge all json
+        concatenate all json
         */
-        const allData = Object.assign({},
-            critical,
-            prodData,
-            additionalData,
-            permalink,
-            categoryObj,
-            tagObj,
-            chunkedPost,
-            relativePath,
-            data
-        );
+        const allData = {
+            ...critical,
+            ...prodData,
+            ...additionalData,
+            ...permalink,
+            ...categoryObj,
+            ...tagObj,
+            ...chunkedPost,
+            ...relativePath,
+            ...mergedData
+        }
 
         /*
         Check if page is ready to render
@@ -283,8 +250,8 @@ function html(done) {
         /*
         Remove no more necessary propierties
         */
-        delete data.additionalData;
-        delete data.registerComponent;
+        delete allData.additionalData;
+        delete allData.registerComponent;
 
         /*
         Check for mandatory propierties in json
@@ -297,8 +264,8 @@ function html(done) {
         /*
         Same checkof tag and post pagination
         */
-        if((propValidate(['isArchive', 'pagination'], data))
-            && data.isArchive.pagination === true
+        if((propValidate(['isArchive', 'pagination'], allData))
+            && allData.isArchive.pagination === true
             && (allData.tags.length || Object.keys(allData.posts).length)) {
 
             /*
@@ -343,9 +310,9 @@ function html(done) {
                     if (index == 0) {
                         return null
                     } else if (index == 1) {
-                        return getPermalink(subfolder,nameFile)
+                        return getPermalink(pathByLocale,nameFile)
                     } else {
-                        return getPermalink(subfolder,`${dinamicPageName}${index - 1}`)
+                        return getPermalink(pathByLocale,`${dinamicPageName}${index - 1}`)
                     }
                 }
 
@@ -356,7 +323,7 @@ function html(done) {
                     if (index == pageData.length - 1) {
                         return null
                     } else {
-                        return getPermalink(subfolder,`${dinamicPageName}${index + 1}`)
+                        return getPermalink(pathByLocale,`${dinamicPageName}${index + 1}`)
                     }
                 }
 
@@ -390,7 +357,7 @@ function html(done) {
                             locals: mergedLocals
                         }))
                         .pipe(rename(newName + '.html'))
-                        .pipe(gulp.dest(`${destPath}/${subfolder}`))
+                        .pipe(gulp.dest(`${destPath}/${pathByLocale}`))
                         .on('end', function () {
                             if(store.arg.debug) {
                                 debugRenderHtml(newName, newData)
@@ -429,7 +396,7 @@ function html(done) {
                         locals: mergedLocals
                     }))
                     .pipe(rename(nameFile + '.html'))
-                    .pipe(gulp.dest(`${destPath}/${subfolder}`))
+                    .pipe(gulp.dest(`${destPath}/${pathByLocale}`))
                     .on('end', function () {
                         if(store.arg.debug) {
                             debugRenderHtml(nameFile, allData)

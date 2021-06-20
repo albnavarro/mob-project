@@ -1,31 +1,43 @@
-/*
-* check if nested prop exist in obj
-*/
+/**
+ * check if nested prop exist in obj
+ */
 const propValidate = (p, o) => p.reduce((xs, x) => (xs && xs[x]) ? xs[x] : null, o)
 
 
-/*
-* Sort by date utility
-*/
+
+/**
+ * sortbyDate - sort array by datye
+ *
+ * @param  {Array} arr Array of obj with date propierties
+ * @return {Array}  ordered Array by date
+ */
 function sortbyDate(arr) {
-    return arr.sort((a, b) => {
-      const dateA = new Date(a.date);
-      const dateB = new Date(b.date);
-      return dateA - dateB;
-    });
+	return arr.sort((a, b) => {
+		const dateA = new Date(a.date);
+		const dateB = new Date(b.date);
+		return dateA - dateB;
+	});
 }
 
 
 
+/**
+ * chunk - create chunked array
+ *
+ * @param  {Array} array source Array
+ * @param  {number} size  chunk size
+ * @return {Array}  Chunked array
+ */
 function chunk(array, size) {
-    const chunked_arr = [];
-    let index = 0;
-    while (index < array.length) {
-        chunked_arr.push(array.slice(index, size + index));
-        index += size;
-    }
-    return chunked_arr;
+	const chunked_arr = [];
+	let index = 0;
+	while (index < array.length) {
+		chunked_arr.push(array.slice(index, size + index));
+		index += size;
+	}
+	return chunked_arr;
 }
+
 
 /**
  * Simple is object check.
@@ -33,8 +45,9 @@ function chunk(array, size) {
  * @returns {boolean}
  */
 function isObject(item) {
-  return (item && typeof item === 'object' && !Array.isArray(item));
+	return (item && typeof item === 'object' && !Array.isArray(item));
 }
+
 
 /**
  * Deep merge two objects.
@@ -42,17 +55,21 @@ function isObject(item) {
  * @param source
  */
 function mergeDeep(target, source) {
-  if (isObject(target) && isObject(source)) {
-    for (const key in source) {
-      if (isObject(source[key])) {
-        if (!target[key]) Object.assign(target, { [key]: {} });
-        mergeDeep(target[key], source[key]);
-      } else {
-        Object.assign(target, { [key]: source[key] });
-      }
-    }
-  }
-  return target;
+	if (isObject(target) && isObject(source)) {
+		for (const key in source) {
+			if (isObject(source[key])) {
+				if (!target[key]) Object.assign(target, {
+					[key]: {}
+				});
+				mergeDeep(target[key], source[key]);
+			} else {
+				Object.assign(target, {
+					[key]: source[key]
+				});
+			}
+		}
+	}
+	return target;
 }
 
 
