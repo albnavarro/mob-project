@@ -15,7 +15,7 @@ const {
 	getUnivoqueId,
 	mergeData,
 	langIsDisable
-} = require('../functions/utils.js')
+} = require('../functions/function.js')
 const store = require('../store.js')
 
 /*

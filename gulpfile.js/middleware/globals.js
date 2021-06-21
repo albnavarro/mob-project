@@ -1,7 +1,7 @@
 const config = require('../../config.json')
 const store = require('../store.js')
 const propValidate = (p, o) => p.reduce((xs, x) => (xs && xs[x]) ? xs[x] : null, o)
-const { langIsDisable } = require('../functions/utils.js')
+const { langIsDisable } = require('../functions/function.js')
 
 const templateFunction = {}
 templateFunction.ssgSiteName = config.siteName

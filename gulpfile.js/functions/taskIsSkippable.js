@@ -1,3 +1,4 @@
+const config = require('../../config.json')
 const path = require('path')
 const themePath = path.resolve('src')
 const templatePath = path.join(themePath, 'template')
@@ -6,7 +7,7 @@ const componentPath = path.join(themePath, 'component')
 const additionalDataPath = path.join(themePath, 'additionalData')
 const store = require('../store.js')
 // UTILS
-const { getNameFile } = require('../functions/utils.js')
+const { getNameFile, getTranslationFilesList } = require('../functions/function.js')
 
 
 /*
@@ -61,7 +62,11 @@ function taskIsSkippable(filepath, data, template) {
         return Object.values(data.posts)
             .flat()
             .filter((item) => item.source !== undefined)
-            .map((item) => store.fileModified === item.source)
+            .map((item) => {
+                // store.fileModified === item.source
+                const filePathMap = getTranslationFilesList(item.source)
+                return filePathMap.includes(store.fileModified)
+            })
             .some((item) =>  item === true)
     }
 
@@ -74,8 +79,12 @@ function taskIsSkippable(filepath, data, template) {
     */
     const tagDataChecker = (data) => {
         return data.tags
-                .map((item) => store.fileModified === item.source)
-                .some((item) =>  item === true)
+            .map((item) => {
+                // store.fileModified === item.source
+                const filePathMap = getTranslationFilesList(item.source)
+                return filePathMap.includes(store.fileModified)
+            })
+            .some((item) =>  item === true)
     }
     const tagDataIsChanged = ('tags' in data) ? tagDataChecker(data) : false
 
@@ -83,7 +92,9 @@ function taskIsSkippable(filepath, data, template) {
     /*
     track if json is changed in last 2 seonds
     */
-    const jsonIsChanged = filepath === store.fileModified
+    const filePathMap = getTranslationFilesList(filepath)
+    jsonIsChanged = filePathMap.includes(store.fileModified)
+
 
     /*
     track if template is changed in last 2 seonds

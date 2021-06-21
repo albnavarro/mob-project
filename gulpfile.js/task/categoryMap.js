@@ -17,7 +17,7 @@ const {
     getOriginalPath,
     mergeData,
     langIsDisable
-} = require('../functions/utils.js')
+} = require('../functions/function.js')
 const { sortbyDate } = require('../functions/helpers.js')
 const store = require('../store.js')
 

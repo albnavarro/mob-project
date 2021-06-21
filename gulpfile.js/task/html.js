@@ -47,7 +47,7 @@ const {
     getPosts,
     checkIfPostHaveTag,
     getTags
-} = require('../functions/utils.js')
+} = require('../functions/function.js')
 
 
 /*

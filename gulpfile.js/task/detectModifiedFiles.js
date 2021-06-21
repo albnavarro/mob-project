@@ -3,7 +3,7 @@ const path = require('path')
 const themePath = path.resolve('src')
 const includesPugFile = `${themePath}/includes/**/*.pug`
 const store = require('../store.js')
-const { fileIschanged} = require('../functions/utils.js')
+const { fileIschanged} = require('../functions/function.js')
 
 
 /*

@@ -162,7 +162,11 @@ function getPathByLocale(filepath, lang) {
     * Create path slug of parent
     */
     const pathBySlug = dirArr.reduce((p, c, i) => {
-        const parentData = JSON.parse(fs.readFileSync(`${dataPath}${p.original}/${c}/index.${lang}.json`))
+        const file = `${dataPath}${p.original}/${c}/index.${lang}.json`
+        const fileDefaultLang = `${dataPath}${p.original}/${c}/index.${config.defaultLocales}.json`
+
+        // parse index of current local if exist or default index lang
+        const parentData = (fs.existsSync(file)) ? JSON.parse(fs.readFileSync(file)) : JSON.parse(fs.readFileSync(fileDefaultLang))
         const slug = (propValidate(['slug'], parentData)) ? parentData.slug : c
         return { 'original':`${p.original}/${c}`, 'modified' : `${p.modified}/${slug}`}
     }, { 'original':'', 'modified' : ''})
@@ -341,8 +345,10 @@ function getTags(data) {
         ? data.tagFilter.type
         : 'some' // default value
 
+    const flatCategory = (data.lang in store.categoryMapData)
+        ? Object.values(store.categoryMapData[data.lang]).flat()
+        : []
 
-    const flatCategory = Object.values(store.categoryMapData[data.lang]).flat()
     const result = flatCategory.reduce((acc, curr) => {
 
         // Filter postMap by tag some|every
@@ -357,6 +363,28 @@ function getTags(data) {
         return acc
     }, [])
     return result
+}
+
+
+/**
+ * getTranslationFilesList - get an array of all path file for each language related to filepath info
+ *
+ * @param  {string} filepath - path of content file
+ * @return {<array[string]>} - Array of all path file for all languageses related to the input file path
+ */
+function getTranslationFilesList(filepath) {
+    // get path without file name
+    const contentPath = () => {
+        const pattern = new RegExp(`\/(.*\/).*$`);
+        const path = filepath.match(pattern);
+        return (!path) ? '' : path[1]
+    }
+
+    return Object.keys(config.locales).reduce((p, c) => {
+        const path = `/${contentPath(filepath)}${getNameFile(filepath)}.${c}.json`
+        p.push(path)
+        return p
+    }, [])
 }
 
 
@@ -380,3 +408,4 @@ exports.langIsDisable = langIsDisable
 exports.getPosts = getPosts
 exports.checkIfPostHaveTag = checkIfPostHaveTag
 exports.getTags = getTags
+exports.getTranslationFilesList = getTranslationFilesList
