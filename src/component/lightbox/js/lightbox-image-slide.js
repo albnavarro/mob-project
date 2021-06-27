@@ -8,18 +8,17 @@ class lightBoxImageSlideClass {
         this.buttons = [];
         this.itemArray = [];
         this.index = 0;
-        this.opened = false;
-        this.content = [];
-        this.contentContainer = [];
+        this.open = false;
+        this.wrapper = [];
+        this.lightbox = [];
     }
 
-    init(data) {
-        this.opened = true;
-        this.content = data.content;
+    init({wrapper, allItem, item, group}) {
+        this.open = true;
+        this.wrapper = wrapper;
 
         // add navigation btn
-        const contentContainer = this.content.closest('.lightbox');
-
+        const lightbox = this.wrapper.closest('.lightbox');
         const navEl = document.createElement('nav')
         const prevbtn = document.createElement('button')
         const nextbtn = document.createElement('button')
@@ -30,27 +29,18 @@ class lightBoxImageSlideClass {
         nextbtn.classList.add('lightbox__nav__next')
         nextbtn.innerHTML = 'next';
 
-        contentContainer.appendChild(navEl);
-        const nav = contentContainer.querySelector('.lightbox__nav')
+        lightbox.appendChild(navEl);
+        const nav = lightbox.querySelector('.lightbox__nav')
         nav.appendChild(prevbtn)
         nav.appendChild(nextbtn)
 
-        const buttonsArray = Array.from(data.allItem);
+        const buttonsArray = Array.from(allItem);
         this.buttons = buttonsArray.filter((element) => {
-            return (element.getAttribute("data-imagegroup") == data.group)
+            return (element.getAttribute("data-imagegroup") == group)
         });
 
-        let index = 0;
-        for (const element of this.buttons) {
-            this.itemArray.push(new this.setitem(element));
-
-            if (element === data.item) {
-                this.index = index;
-                console.log('found', index)
-            }
-
-            index++
-        };
+        this.itemArray = this.buttons.map((item) => new this.setitem(item))
+        this.index = this.buttons.findIndex((el, i) => (el === item))
 
         // Carico la prima immagine
         this.loadImage();
@@ -67,19 +57,17 @@ class lightBoxImageSlideClass {
         this.url = item.getAttribute('data-url');
     }
 
-    showImage(url, title, description, content, Hgap, Wgap, zoom) {
-        lightboxUtils.resetDescriptionBox({
-            content: content
-        });
+    showImage(url, title, description, wrapper, hGap, wGap, zoom) {
+        lightboxUtils.resetDescriptionBox(wrapper);
 
         lightBoxImage.init({
-            content: content,
+            wrapper,
             url: url || '',
             title: title || '',
             description: description || '',
-            Hgap: Hgap || '20',
-            Wgap : Wgap || '20',
-            zoom : zoom
+            hGap: hGap || '20',
+            wGap : wGap || '20',
+            zoom
         })
     }
 
@@ -89,9 +77,9 @@ class lightBoxImageSlideClass {
             this.itemArray[this.index].url,
             this.itemArray[this.index].item.getAttribute('data-title'),
             this.itemArray[this.index].item.getAttribute('data-description'),
-            this.content,
-            this.itemArray[this.index].item.getAttribute('data-hgap'),
-            this.itemArray[this.index].item.getAttribute('data-wgap'),
+            this.wrapper,
+            this.itemArray[this.index].item.getAttribute('data-hGap'),
+            this.itemArray[this.index].item.getAttribute('data-wGap'),
             this.itemArray[this.index].item.hasAttribute('data-zoom')
         );
     }
@@ -101,11 +89,8 @@ class lightBoxImageSlideClass {
         // di un'altra immagine per non creare sovrapposizione di loading
         if (lightBoxImage.imageIsLoading()) return;
 
-        if (this.index > 0) {
-            this.index--;
-        } else {
-            this.index = this.itemArray.length - 1;
-        }
+        (this.index > 0) ? this.index-- : this.index = this.itemArray.length - 1;
+
         this.loadImage();
     }
 
@@ -114,24 +99,21 @@ class lightBoxImageSlideClass {
         // di un'altra immagine per non creare sovrapposizione di loading
         if (lightBoxImage.imageIsLoading()) return;
 
-        if (this.index < this.itemArray.length - 1) {
-            this.index++;
-        } else {
-            this.index = 0;
-        }
+        (this.index < this.itemArray.length - 1) ? this.index++ : this.index = 0;
+
         this.loadImage();
     }
 
     onCloseLightbox() {
-        if (this.opened) {
+        if (this.open) {
             this.buttons = [];
             this.itemArray = [];
             this.index = 0;
 
-            const contentContainer = this.content.closest('.lightbox');
-            const nav = contentContainer.querySelector('.lightbox__nav');
+            const lightbox = this.wrapper.closest('.lightbox');
+            const nav = lightbox.querySelector('.lightbox__nav');
             if (typeof(nav) != 'undefined' && nav != null) {
-                contentContainer.removeChild(nav)
+                lightbox.removeChild(nav)
             }
         }
     }

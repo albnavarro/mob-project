@@ -2,22 +2,19 @@ import { eventManager } from "../../../js/base/eventManager.js";
 
 class lightDescriptionClass {
 
-  constructor() {
-
-  }
-
-  init(data) {
-    if( (data.title || data.description != '') ) {
-      const parent = data.content.closest('.lightbox');
+  init({title, description, wrapper}) {
+    if( (title || description != '') ) {
+      const parent = wrapper.closest('.lightbox');
       const container = parent.querySelector('.lightbox__description');
-      const title = container.querySelector('.lightbox__title');
-      const description = container.querySelector('.lightbox__paragraph');
+      const titleEl = container.querySelector('.lightbox__title');
+      const descriptionEl = container.querySelector('.lightbox__paragraph');
 
-      if( data.title != '' ) {
-        title.innerHTML = '<h2>' + data.title + '</h2>';
+      if( title != '' ) {
+        titleEl.innerHTML = '<h2>' + title + '</h2>';
       }
-      if( data.description != '' ) {
-        description.innerHTML = '<p>' + data.description + '</p>';
+
+      if( description != '' ) {
+        descriptionEl.innerHTML = '<p>' + description + '</p>';
       }
 
       let hideButton = container.querySelector('.lightbox__description__btn');
@@ -26,7 +23,6 @@ class lightDescriptionClass {
       const btn = hideButton.cloneNode(true);
       container.replaceChild(btn, hideButton);
       hideButton = container.querySelector('.lightbox__description__btn');
-      //
       hideButton.addEventListener('click', this.onClick.bind(this), false);
 
       container.classList.add('active');

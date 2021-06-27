@@ -139,23 +139,16 @@ export class menuClass {
 
     setData() {
         function obj(item, context) {
-            let maxLevel = 0;
             this.item = item;
             this.submenu = this.item.querySelectorAll(`.${context.SUB_MENU}`);
             this.parentItem = this.item.closest(`.${context.MENU_ITEM_HAS_CHILDREN}`);
             this.parentItemPos = 0;
             this.parentItemWidth = 0;
             this.submenuArray = Array.from(this.submenu);
-
-            for (const element of this.submenuArray) {
-                const numSubmenuParents = getParents(element, context.SUB_MENU).length - 1;
-
-                if (numSubmenuParents > maxLevel) {
-                    maxLevel = numSubmenuParents;
-                }
-            }
-
-            this.maxLevel = maxLevel;
+            this.maxLevel = this.submenuArray.reduce((p, c) => {
+                const numSubmenuParents = getParents(c, context.SUB_MENU).length - 1;
+                return (numSubmenuParents > p) ? numSubmenuParents : 0;
+            }, 0)
             this.totalWidth = 0;
         }
 
@@ -260,6 +253,7 @@ export class menuClass {
         const parentSubmenusArray = Array.from(parentSubmenus);
 
         // chiudo tutti quelli diversi dall' attuale paerto
+        // Resetto tutto tranne l'attuale aperto
         for (const item of submenuArray) {
             if (item !== activeSubmenu) {
                 item.classList.remove(this.ACTIVE)
@@ -276,7 +270,7 @@ export class menuClass {
             return getSiblings(item, this.ARROW_SUBMENU);
         }).flat();
 
-        const itemHasChildren = Array.from(this.itemHasChildren);
+        // Resetto tutto tranne l'attuale aperto
         const arrowSubMenu = this.componentWrapper.querySelectorAll(`.${this.ARROW_SUBMENU}`);
         const arrArrowSubmenu = Array.from(arrowSubMenu);
         for (const item of arrArrowSubmenu) {
@@ -285,6 +279,7 @@ export class menuClass {
             }
         }
 
+        // apro le arrow parenti
         for (const item of parentsArrow) {
             item.classList.add(this.ARROW_SELECTED)
         }
@@ -300,8 +295,7 @@ export class menuClass {
                 return item.getAttribute('node-id')
             });
 
-            // filtro i submenu non parenti dal node-id
-            const submenuToClose = allSubmenuId.filter(x => !parentSubmenusId.includes(x)).concat(parentSubmenusId.filter(x=> !allSubmenuId.includes(x)))
+            const submenuToClose = allSubmenuId.filter(item => !parentSubmenusId.includes(item))
 
             for (const item of submenuToClose) {
                 const el = document.querySelector(`[node-id="${item}"]`)

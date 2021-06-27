@@ -2,14 +2,10 @@ import { eventManager } from "../../../js/base/eventManager.js";
 
 class lightboxUtilsClass {
 
-    constructor() {
-
-    }
-
     // RESETTO IL CONTENUTO DELLA DESCRIZIONE LIGHTBOX SE TALE ELEMENTO ESISTE
     // ALLA CHIUSURA DELLA LIGHTBOX O AL CAMBIO LIOGHTBOX
-    resetDescriptionBox(data) {
-        const parent = data.content.closest('.lightbox');
+    resetDescriptionBox(wrapper) {
+        const parent = wrapper.closest('.lightbox');
         const descriptionBox = parent.querySelector('.lightbox__description');
 
         if (typeof(descriptionBox) != 'undefined' && descriptionBox != null) {
@@ -24,8 +20,8 @@ class lightboxUtilsClass {
     }
 
     // CAMBIO LO STATO HIDE SHOW DELLA DESCRIZIONE SOLO SE CHIUDO LA LIGHTBOX
-    resetDescriptionBoxHideShow(data) {
-        const parent = data.content.closest('.lightbox');
+    resetDescriptionBoxHideShow(wrapper) {
+        const parent = wrapper.closest('.lightbox');
         const descriptionBox = parent.querySelector('.lightbox__description');
 
         if (typeof(descriptionBox) != 'undefined' && descriptionBox != null) {
@@ -34,20 +30,20 @@ class lightboxUtilsClass {
         }
     }
 
-    // CANCELLO IL CONTENTO SOLO SE DINAMICO ( E' UN CONTENUTO DI TIPO IMMAGINE )
-    onCloseLightbox(data) {
-        if (typeof(data.content) != 'undefined' && data.content != null && data.type == 'dynamic') {
-            data.content.innerHTML = "";
+    // CANCELLO IL wrapperO SOLO SE DINAMICO ( E' UN CONTENUTO DI TIPO IMMAGINE )
+    onCloseLightbox({wrapper, type}) {
+        if (typeof(wrapper) != 'undefined' && wrapper != null && type == 'dynamic') {
+            wrapper.innerHTML = "";
             const style = {
                 'width': '200px',
                 'height': '200px'
             }
 
-            Object.assign(data.content.style, style);
+            Object.assign(wrapper.style, style);
         }
 
-        lightboxUtils.resetDescriptionBox(data);
-        lightboxUtils.resetDescriptionBoxHideShow(data);
+        lightboxUtils.resetDescriptionBox(wrapper);
+        lightboxUtils.resetDescriptionBoxHideShow(wrapper);
     }
 
     calculateAspectRatioFit(srcWidth, srcHeight, maxWidth, maxHeight) {

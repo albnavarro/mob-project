@@ -9,51 +9,49 @@ class lightBoxImageClass {
 
     constructor() {
         this.image = [];
-        this.data = {};
         this.onResizeId = -1;
         this.isLoading = false;
         this.isOpen = false;
         this.loadimage = null;
     }
 
-    init(data) {
+    init({wrapper, title, url, hGap, wGap, zoom, description}) {
         this.isOpen = true
-        this.data = data;
         eventManager.remove('resizeW', this.onResizeId)
 
         const image = new Image();
         image.classList.add('lightbox__img')
-        image.src = this.data.url
+        image.src = url
 
         const loader = document.createElement('div')
         loader.classList.add('loader')
-        const lightbox = this.data.content.closest('.lightbox')
+        const lightbox = wrapper.closest('.lightbox')
         lightbox.appendChild(loader);
 
         this.isLoading = true
 
-        this.loadimage = new loadImages([this.data.url])
+        this.loadimage = new loadImages([url])
         this.loadimage.init().then(() => {
             // Aggiungo l'immagine solo se la lightbox è ancora aperta.
             if (!this.isOpen) return;
 
-            this.data.content.innerHTML = '';
+            wrapper.innerHTML = '';
 
-            this.data.content.appendChild(image);
+            wrapper.appendChild(image);
             this.image = document.querySelector('.lightbox__img');
-            this.displayImage(this.image, this.data);
-            this.displayDescription(this.data);
+            this.displayImage(wrapper, hGap, wGap, zoom);
+            this.displayDescription(wrapper, title, description);
 
-            this.removeLoder();
+            this.removeLoder(wrapper);
 
-            this.onResizeId = eventManager.push('resizeW', this.onResizeLightboxImage.bind(this))
+            this.onResizeId = eventManager.push('resizeW', () => this.onResizeLightboxImage(wrapper, hGap, wGap, zoom))
             this.isLoading = false
         }).catch((err) => console.log(err))
     }
 
-    removeLoder() {
-        if (typeof(this.data.content) != 'undefined' && this.data.content != null) {
-            const lightbox = this.data.content.closest('.lightbox')
+    removeLoder(wrapper) {
+        if (typeof(wrapper) != 'undefined' && wrapper != null) {
+            const lightbox = wrapper.closest('.lightbox')
             const loader = lightbox.querySelector('.loader');
 
             if (typeof(loader) != 'undefined' && loader != null) {
@@ -62,23 +60,23 @@ class lightBoxImageClass {
         }
     }
 
-    showNav() {
-        const parent = this.data.content.closest('.lightbox');
+    showNav(wrapper) {
+        const parent = wrapper.closest('.lightbox');
         const nav = parent.querySelector('.lightbox__nav');
         if (typeof(nav) != 'undefined' && nav != null) {
             nav.classList.add('visible');
         }
     }
 
-    displayImage() {
+    displayImage(wrapper, hGap, wGap, zoom) {
         // WW and WH gap
-        const Hgap = (eventManager.windowsHeight() / 100) * parseInt(this.data.Hgap);
-        const Wgap = (eventManager.windowsWidth() / 100) * parseInt(this.data.Wgap);
+        const newHGap = (eventManager.windowsHeight() / 100) * parseInt(hGap);
+        const newWGap = (eventManager.windowsWidth() / 100) * parseInt(wGap);
 
         const height = this.image.naturalHeight,
             width = this.image.naturalWidth,
-            maxHeight = eventManager.windowsHeight() - Hgap,
-            maxWidth = eventManager.windowsWidth() - Wgap;
+            maxHeight = eventManager.windowsHeight() - newHGap,
+            maxWidth = eventManager.windowsWidth() - newWGap;
 
         const ratio = lightboxUtils.calculateAspectRatioFit(width, height, maxWidth, maxHeight);
 
@@ -86,14 +84,14 @@ class lightBoxImageClass {
             'width': ratio.width + 'px',
             'height': ratio.height + 'px'
         };
-        Object.assign(this.data.content.style, style);
+        Object.assign(wrapper.style, style);
 
         setTimeout(() => {
             this.image.classList.add('visible');
 
-            if(this.data.zoom) {
+            if(zoom) {
                 lightPichZoom.init({
-                    content: this.data.content,
+                    wrapper: wrapper,
                     image: this.image
                 });
             } else {
@@ -101,20 +99,20 @@ class lightBoxImageClass {
             }
 
             // Shhow nav if exist only when image is loaded
-            this.showNav()
+            this.showNav(wrapper)
         }, 400);
     }
 
-    onResizeLightboxImage() {
+    onResizeLightboxImage(wrapper, hGap, wGap, zoom) {
         this.image.classList.remove('visible');
-        this.displayImage(this.image, this.data);
+        this.displayImage(wrapper, hGap, wGap, zoom);
     }
 
-    displayDescription(data) {
+    displayDescription(wrapper, title, description) {
         lightDescription.init({
-            title: data.title,
-            description: data.description,
-            content: data.content
+            title,
+            description,
+            wrapper
         })
     }
 

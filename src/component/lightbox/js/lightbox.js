@@ -13,8 +13,8 @@ export class lightBoxClass {
         this.openBtn = document.querySelectorAll(data.openBtn) || null;
         this.closeBtn = document.querySelectorAll(data.closeBtn) || null;
         this.lightBox = document.querySelector(data.lightbox) || null;
-        this.dynamicContent = [], // Elemento vuoto se apro una lightbox semplic;
-        this.staticContent = [];
+        this.dynamicWrapper = [], // Elemento vuoto se apro una lightbox semplic;
+        this.staticWrapper = [];
         this.dataType = data.type || 'normal';
 
         this.init()
@@ -23,8 +23,8 @@ export class lightBoxClass {
     init() {
         if (typeof(this.lightBox) === 'undefined' || this.lightBox === null) return;
 
-        this.dynamicContent = this.lightBox.querySelector('.lightbox__dinamic-content') || []; // Elemento vuoto se apro una lightbox semplice
-        this.staticContent = this.lightBox.querySelector('.lightbox__static-content') || [];
+        this.dynamicWrapper = this.lightBox.querySelector('.lightbox__dinamic-content') || []; // Elemento vuoto se apro una lightbox semplice
+        this.staticWrapper = this.lightBox.querySelector('.lightbox__static-content') || [];
 
         const buttonArray = Array.from(this.openBtn);
         for (const button of buttonArray) {
@@ -53,7 +53,7 @@ export class lightBoxClass {
                     lightDescription.init({
                         title: $btn.getAttribute('data-title') || '',
                         description: $btn.getAttribute('data-description') || '',
-                        content: this.staticContent
+                        wrapper: this.staticWrapper
                     })
                     break;
 
@@ -62,9 +62,9 @@ export class lightBoxClass {
                         url: $btn.getAttribute('data-url'),
                         title: $btn.getAttribute('data-title') || '',
                         description: $btn.getAttribute('data-description') || '',
-                        content: this.dynamicContent,
-                        Hgap : $btn.getAttribute('data-hgap') || '20',
-                        Wgap : $btn.getAttribute('data-wgap') || '20',
+                        wrapper: this.dynamicWrapper,
+                        hGap : $btn.getAttribute('data-hGap') || '20',
+                        wGap : $btn.getAttribute('data-wGap') || '20',
                         zoom : $btn.hasAttribute('data-zoom'),
                     })
                     break;
@@ -74,7 +74,7 @@ export class lightBoxClass {
                         group: $btn.getAttribute('data-imagegroup'),
                         allItem: this.openBtn,
                         item: $btn,
-                        content: this.dynamicContent
+                        wrapper: this.dynamicWrapper
                     })
                     break;
 
@@ -86,9 +86,9 @@ export class lightBoxClass {
                         description: $btn.getAttribute('data-description') || '',
                         ratioW: $btn.getAttribute('data-ratioW') || '16',
                         ratioH: $btn.getAttribute('data-ratioH') || '9',
-                        content: this.dynamicContent,
-                        Hgap : $btn.getAttribute('data-hgap') || '20',
-                        Wgap : $btn.getAttribute('data-wgap') || '20'
+                        wrapper: this.dynamicWrapper,
+                        hGap : $btn.getAttribute('data-hGap') || '20',
+                        wGap : $btn.getAttribute('data-wGap') || '20'
                     })
                     break;
             }
@@ -116,26 +116,26 @@ export class lightBoxClass {
                 this.dataType == 'video') {
 
                 lightBoxImage.onCloseLightbox({
-                    content: this.dynamicContent,
+                    wrapper: this.dynamicWrapper,
                     type: 'dynamic'
                 })
 
                 lightPichZoom.resetData();
 
                 lightBoxImageSlide.onCloseLightbox({
-                    content: this.dynamicContent,
+                    wrapper: this.dynamicWrapper,
                     type: 'dynamic'
                 })
 
                 lightboxUtils.onCloseLightbox({
-                    content: this.dynamicContent,
+                    wrapper: this.dynamicWrapper,
                     type: 'dynamic'
                 })
 
             } else {
 
                 lightboxUtils.onCloseLightbox({
-                    content: this.staticContent,
+                    wrapper: this.staticWrapper,
                     type: 'normal'
                 })
             }

@@ -16,12 +16,12 @@ class lightPichZoomClass {
         this.onresize = null;
     }
 
-    init(data) {
-        this.image =  data.image;
-        this.content = data.content;
+    init({image, wrapper}) {
+        this.image = image;
+        this.wrapper = wrapper;
         this.resetData();
 
-        const contentContainer = data.content.closest('.lightbox');
+        const lightbox = wrapper.closest('.lightbox');
 
         const zoomEl = document.createElement('nav')
         const zoomIn = document.createElement('button')
@@ -33,8 +33,8 @@ class lightPichZoomClass {
         zoomOut.classList.add('lightbox__zoom__out')
         zoomOut.innerHTML = 'zoom out';
 
-        contentContainer.appendChild(zoomEl);
-        const zoom = contentContainer.querySelector('.lightbox__zoom')
+        lightbox.appendChild(zoomEl);
+        const zoom = lightbox.querySelector('.lightbox__zoom')
         zoom.appendChild(zoomIn)
         zoom.appendChild(zoomOut)
 
@@ -45,7 +45,7 @@ class lightPichZoomClass {
         zoomInBtn.addEventListener('click', ()  => this.zoomIn())
 
         this.image.addEventListener('mousedown', e => e.preventDefault(), false);
-        this.content.addEventListener('mousedown', e => e.preventDefault(), false);
+        this.wrapper.addEventListener('mousedown', e => e.preventDefault(), false);
 
         this.image.addEventListener('wheel', (e) => this.onWeel(e));
 
@@ -252,12 +252,12 @@ class lightPichZoomClass {
         mouseManager.remove('mousemove', this.mousemove)
         eventManager.remove('resize', this.onresize)
 
-        if (typeof(this.content) != 'undefined' && this.content != null) {
-            const contentContainer = this.content.closest('.lightbox')
-            const zoom = contentContainer.querySelector('.lightbox__zoom')
+        if (typeof(this.wrapper) != 'undefined' && this.wrapper != null) {
+            const lightbox = this.wrapper.closest('.lightbox')
+            const zoom = lightbox.querySelector('.lightbox__zoom')
 
             if (typeof(zoom) != 'undefined' && zoom != null) {
-                contentContainer.removeChild(zoom)
+                lightbox.removeChild(zoom)
             }
         }
     }

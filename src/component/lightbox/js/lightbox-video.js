@@ -5,27 +5,25 @@ import { lightboxUtils } from "./lightbox-utils.js";
 class lightBoxVideoClass {
 
     constructor() {
-        this.data = {};
         this.onResizeId = -1;
     }
 
-    init(data) {
-        this.data = data;
+    init({wrapper, title, description, sourceType, url, hGap, wGap, ratioW, ratioH}) {
         eventManager.remove('resize', this.onResizeId)
 
         const videoEl = document.createElement('div');
         videoEl.classList.add('lightbox__video');
 
-        this.setVideoSize()
+        this.setVideoSize(wrapper, hGap, wGap, ratioW, ratioH)
 
-        this.data.content.appendChild(videoEl);
-        const videoWrapper = this.data.content.querySelector('.lightbox__video');
+        wrapper.appendChild(videoEl);
+        const videoWrapper = wrapper.querySelector('.lightbox__video');
 
         setTimeout(() => {
-            switch (this.data.sourceType) {
+            switch (sourceType) {
                 case 'youtube':
                     const iframe = document.createElement('iframe');
-                    iframe.src = `https://www.youtube.com/embed/${this.data.url }`;
+                    iframe.src = `https://www.youtube.com/embed/${url }`;
                     iframe.setAttribute('allowfullscreen', '');
                     iframe.setAttribute('frameborder', '0');
                     videoWrapper.appendChild(iframe);
@@ -39,7 +37,7 @@ class lightBoxVideoClass {
 
                     const source = document.createElement('source');
                     source.setAttribute('type', 'video/mp4');
-                    source.src = this.data.url;
+                    source.src = url;
 
                     videoWrapper.appendChild(video);
                     const videoEl = videoWrapper.querySelector('video');
@@ -51,33 +49,33 @@ class lightBoxVideoClass {
             videoWrapper.classList.add('visible');
         }, 200);
 
-        this.onResizeId = eventManager.push('resize', this.setVideoSize.bind(this))
-        this.openDescription(this.data);
+        this.onResizeId = eventManager.push('resize', () => this.setVideoSize(wrapper, hGap, wGap, ratioW, ratioH))
+        this.openDescription(title, description, wrapper);
     }
 
-    setVideoSize() {
+    setVideoSize(wrapper, hGap, wGap, ratioW, ratioH) {
         // WW and WH gap
-        const Hgap = (eventManager.windowsHeight() / 100) * parseInt(this.data.Hgap);
-        const Wgap = (eventManager.windowsWidth() / 100) * parseInt(this.data.Wgap);
+        const newHGap = (eventManager.windowsHeight() / 100) * parseInt(hGap);
+        const newWGap = (eventManager.windowsWidth() / 100) * parseInt(wGap);
 
-        const maxHeight = eventManager.windowsHeight() - Hgap,
-            maxWidth = eventManager.windowsWidth() - Wgap,
-            width = this.data.ratioW,
-            height = this.data.ratioH,
+        const maxHeight = eventManager.windowsHeight() - newHGap,
+            maxWidth = eventManager.windowsWidth() - newWGap,
+            width = ratioW,
+            height = ratioH,
             ratio = lightboxUtils.calculateAspectRatioFit(width, height, maxWidth, maxHeight);
 
         const style = {
             'width': ratio.width + 'px',
             'height': ratio.height + 'px'
         };
-        Object.assign(this.data.content.style, style);
+        Object.assign(wrapper.style, style);
     }
 
-    openDescription(data) {
+    openDescription(title, description, wrapper) {
         lightDescription.init({
-            title: data.title,
-            description: data.description,
-            content: data.content
+            title,
+            description,
+            wrapper
         })
     }
 
