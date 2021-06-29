@@ -7,9 +7,12 @@ const destPath = path.resolve('www')
 const cssDest = path.join(destPath, 'assets/css')
 const store = require('../store.js')
 
-/*
-* CREATE CRITICAL CSS FOLDER
-*/
+/**
+ * Create critical css folder
+ *
+ * @param  {function} done - async completion function
+ * @return {function}
+ */
 function initializeCritical(done) {
     const dir = cssDest;
     if (!fs.existsSync(dir)) {
@@ -21,9 +24,12 @@ function initializeCritical(done) {
 };
 
 
-/*
-* CRITICAL CSS
-*/
+/**
+ * Create a crtical css file for each template
+ *
+ * @param  {function} done - async completion function
+ * @return {<Array[gulp stream]>}      description
+ */
 function criticalCss(done) {
     if (store.arg.prod) {
         const criticalArr = Object.values(store.criticalCssMapData)

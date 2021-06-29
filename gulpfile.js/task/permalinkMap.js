@@ -18,13 +18,13 @@ const {
 } = require('../functions/function.js')
 const store = require('../store.js')
 
-/*
-* CREATE PERMALINKMAP
-* permalinkMap: {
-*     univoqueId: { en: '{pemalink}', it: '{pemalink}', ... },
-      ....
- * }
-*/
+/**
+ * Create a mapping of all permalink
+ * The map is stored in store.js for runtime access locally in and in www/assets/data/permalinkMap.json
+ *
+ * @param  {function} done - async completion function
+ * @return {function}
+ */
 function permalink(done) {
 	const allPath = glob.sync(path.join(dataPath, '/**/*.json'))
 

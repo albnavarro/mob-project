@@ -73,7 +73,19 @@ function mergeDeep(target, source) {
 }
 
 
+/**
+ * isEmptyObject - description
+ *
+ * @param  {Object} obj
+ * @return {Boolean}
+ */
+function isEmptyObject(obj){
+    return JSON.stringify(obj) === '{}';
+}
+
+
 exports.propValidate = propValidate
 exports.sortbyDate = sortbyDate
 exports.chunk = chunk
 exports.mergeDeep = mergeDeep
+exports.isEmptyObject = isEmptyObject

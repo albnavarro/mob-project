@@ -11,9 +11,12 @@ function filterLangByDefault(lang) {
     return ( lang !== config.defaultLocales) ? lang : ''
 }
 
-/*
-* CREATE CATEGORYMAP
-*/
+/**
+ * Create htacess
+ *
+ * @param  {function} done - async completion function
+ * @return {function}
+ */
 function htaccess(done) {
     const langArr = Object.keys(config.locales)
 

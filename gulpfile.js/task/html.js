@@ -21,7 +21,7 @@ const cssDest = path.join(destPath, 'assets/css')
 const store = require('../store.js')
 
 // HELPERS
-const { propValidate, sortbyDate, chunk, mergeDeep } = require('../functions/helpers.js')
+const { propValidate, sortbyDate, chunk, mergeDeep, isEmptyObject } = require('../functions/helpers.js')
 
 // SKIPPABLE
 const { taskIsSkippable } = require('../functions/taskIsSkippable.js')
@@ -50,152 +50,115 @@ const {
 } = require('../functions/function.js')
 
 
-/*
-* CREATE PUG FILE
-*/
-
+/**
+ * Render html
+ *
+ * @param  {function}  done - async completion function
+ * @return {function}
+ */
 function html(done) {
 
+    // Get data from manifest.json
     const manifestData = JSON.parse(fs.readFileSync(manifestFile))
     store.manifest = manifestData
 
+    // Create a glob all json file in data folder or a specific file ( es: npm run debugpage "index.it.json" )
     const sourcePath =  (!store.arg.page) ? path.join(dataPath, '/**/*.json') :  path.join(dataPath, store.arg.page)
     const files = glob.sync(sourcePath)
 
     const tasks = files.map(filepath => {
 
-        /*
-        Get json data of each file
-        */
+        // Get json data
         const initialData = JSON.parse(fs.readFileSync(filepath))
 
-        /*
-        Get languages
-        */
+        // Get languages
         const lang = getLanguage(filepath)
 
-        /*
-        Check if draft
-        */
+        // Check if source data is in draft mode
         const publish = (( 'draft' in initialData ) && initialData.draft === true || langIsDisable(lang)) ? false : true
         if(!publish) return {'skipTask' : true, 'publish' : false, 'fn': null};
 
-        /*
-        Get file name and final slug before merge data
-        */
+        // Get final slug
         const originalnameFile = getNameFile(filepath);
         const nameFile = (('slug' in initialData) && originalnameFile !== 'index') ? initialData.slug : originalnameFile
 
-
-        /*
-        Merge data with defult lang dat
-        */
+        // Merge the data with the respective default language file
         const mergedData = mergeData(filepath, initialData, lang)
 
-
-        /*
-        Get language
-        */
+        // Add language to data object
         mergedData.lang = lang
 
-        /*
-        get template
-        */
+        // Get template
         const template = getTemplate(mergedData)
         const templatename = getNameFile(template)
 
-
-        /*
-        Add page type
-        */
+        // get page type
         const pageType = getPageType(mergedData)
+
+        // get univoqueId
         const univoqueId = getUnivoqueId(filepath)
 
-
-        /*
-        Get mergedData from each json defined in additonalPata propierties [ array ] if exist
-        */
+        // Get data from each json defined in additonalPata propierties [ array ] if exist
         const additionalData = getAdditionalData(mergedData)
 
-
-        /*
-        List of pug include for track page refresh
-        */
+        // Get list of pug include for track page refresh
         const registerComponent = {}
         registerComponent.registerComponent = ('registerComponent' in mergedData) ? mergedData.registerComponent : []
 
-
-        /*
-        Get prod abient value
-        */
+        // Get prod argument
         const prodData = {}
         prodData.isProd = (store.arg.prod) ? true : false;
 
-
-
-        /*
-        pathByLocale
-        Create folder in accordion of json lang
-        */
+        // Get folder destination of html page
         const pathByLocale = getPathByLocale(filepath,mergedData.lang)
 
-        /*
-        Create pathByLocale if not exist
-        */
+        // Create folder destination if not exist
         if(!fs.existsSync(`${destPath}/${pathByLocale}`)){
             fs.mkdirSync(`${destPath}/${pathByLocale}`, {
                 recursive: true
             })
         }
 
+        // merge og data defulat ( form config ) and specific from data
+        const ogObject = { ...config.ogDefault }
+        const ogData = ('og' in mergedData)
+            ? Object.assign(ogObject, mergedData.og)
+            : { ...ogObject }
 
-        /*
-        Get relative path
-        */
-        const relativePath = {}
-        relativePath.relativePath = ( config.defaultLocales == mergedData.lang) ? `` : `/${mergedData.lang}`;
+        mergedData.og = ogData
 
+        // Get language path
+        const languagePath = {
+            languagePath: ( config.defaultLocales == mergedData.lang) ? `` : `/${mergedData.lang}`
+        }
 
-        /*
-        Add permalink
-        if in debug mode golbal stored info is bypass anche the mergedData il read form file
-        */
+        // If run script debug mode there is no global stored data so data is directly read form file
         if(store.arg.debug) store.permalinkMapData = JSON.parse(fs.readFileSync(permalinkFile))
 
+        // Add permalink
         const permalink = {}
         permalink.permalink = getPermalink(pathByLocale,nameFile)
         const validDomain = ( config.domain.substr(-1) == '/' ) ? config.domain.slice(0, -1) : config.domain
         permalink.staticPermalink = `${validDomain}${getPermalink(pathByLocale,nameFile)}`
         permalink.pageTitle = mergedData.pageTitle
 
-
-        /*
-        Add pageTitle map
-        if in debug mode golbal stored info is bypass anche the mergedData il read form file
-        */
+        // If run script debug mode there is no global stored data so data is directly read form file
         if(store.arg.debug) store.pageTitleMapData = JSON.parse(fs.readFileSync(pageTitleFile))
 
-
-        /*
-        Add imported categories
-        if in debug mode golbal stored info is bypass anche the mergedData il read form file
-        */
+        // If run script debug mode there is no global stored data so data is directly read form file
         if(store.arg.debug) store.categoryMapData = JSON.parse(fs.readFileSync(categoryFile))
 
+        // Get post by category if 'importPost' propierties is declared
+        const categoryObj = {
+            posts: ('importPost' in mergedData) ? getPosts(mergedData) : {}
+        }
 
-        const categoryObj = {}
-        categoryObj.posts = ('importPost' in mergedData) ? getPosts(mergedData) : {}
+        // Get post by tag if 'importTag' propierties is declared
+        const tagObj = {
+            tags: ('importTag' in mergedData) ? sortbyDate(getTags(mergedData)) : []
+        }
 
-
-
-        const tagObj = {}
-        tagObj.tags = ('importTag' in mergedData) ? sortbyDate(getTags(mergedData)) : []
-
-
-        /*
-        Criticalcss
-        Create map of template with one page ( last ) for extract critical file
-        */
+        // Create critical css map where each template is associated to la st render file with that template
         if(store.counterRun == 0) {
             const critcalCssByTemplate = {}
             critcalCssByTemplate[templatename] = {
@@ -205,10 +168,7 @@ function html(done) {
             Object.assign(store.criticalCssMapData, critcalCssByTemplate)
         }
 
-        /*
-        Criticalcss
-        Load crircal file based on template
-        */
+        // Load crircal file based on template
         const critical = {}
         if(store.counterRun == 1) {
             const criticalFile = `${cssDest}/critical/${templatename}.css`
@@ -219,16 +179,11 @@ function html(done) {
             }
         }
 
-        /*
-        Create empty chunkedAyrray ( pagination ) to avoid error
-        */
+        // Create empty chunkedAyrray ( for archive pagination ) to avoid error
         const chunkedPost = {}
         chunkedPost.chunkedPost = []
 
-
-        /*
-        concatenate all json
-        */
+        // concatenate all json
         const allData = {
             ...critical,
             ...prodData,
@@ -237,75 +192,63 @@ function html(done) {
             ...categoryObj,
             ...tagObj,
             ...chunkedPost,
-            ...relativePath,
+            ...languagePath,
             ...mergedData
         }
 
-        /*
-        Check if page is ready to render
-        */
+        // Check if the page is renderable
         const skipTask = (config.selectiveRefresh) ? taskIsSkippable(filepath, allData, template) : false
 
-
-        /*
-        Remove no more necessary propierties
-        */
+        // Remove no more necessary propierties
         delete allData.additionalData;
         delete allData.registerComponent;
 
-        /*
-        Check for mandatory propierties in json
-        */
+        // Check for mandatory propierties in json
         const error = debugMandatoryPropierties(allData);
         if(error) {
             process.exit(0);
         }
 
         /*
-        Same checkof tag and post pagination
+        Create tasks for archive page with pagination
+        Check if there is a pagination attribute in isArchive
+        Check id there is some post or tag imported
         */
         if((propValidate(['isArchive', 'pagination'], allData))
             && allData.isArchive.pagination === true
             && (allData.tags.length || Object.keys(allData.posts).length)) {
 
             /*
-            Get post per page, config si defulat otherwise is overrride form data josn
+            Define number of post per page, config definition si defulat
+            otherwise is overrride from postPerPage attribute
             */
             const postPerPage = ('postPerPage' in allData.isArchive)
                 ? parseInt(allData.isArchive.postPerPage)
                 : parseInt(config.postPerPage)
 
-            /*
-            Get dynamic page name
-            */
+            // Get page name for page with index > 0
             const dinamicPageName = ('dinamicPageName' in allData.isArchive)
                 ? allData.isArchive.dinamicPageName
                 : config.dinamicPageName
 
-
             /*
-            Chunk array post for pagination
-            Flat all category post in one array
-            if there is importTag and importPost in smae file importTag win.
+            Create chunk array with all post
+            If there is importTag and importPost defined in same file importTag takes precedence.
             */
             const flatData = (allData.tags.length) ? allData.tags : Object.values(allData.posts).flat()
             const sortedData = sortbyDate(flatData)
             const pageData = chunk(sortedData, postPerPage)
 
-            /*
-            Loop in chunked array to create each post page
-            */
+            // Loop in chunked array to create each archive page
             const pages = pageData.map((item, index) => {
+
+                // Copy data in a new reference
                 const newData = { ... allData}
 
-                /*
-                Reset post data and add the new data for specific page
-                */
+                // Reset post data and add the new data for specific page
                 newData.chunkedPost = item
 
-                /*
-                Previous page link
-                */
+                // Get previous page link
                 const getPreviousPage = () => {
                     if (index == 0) {
                         return null
@@ -316,9 +259,7 @@ function html(done) {
                     }
                 }
 
-                /*
-                Next page link
-                */
+                // Get next page link
                 const getNextPage = () => {
                     if (index == pageData.length - 1) {
                         return null
@@ -327,9 +268,7 @@ function html(done) {
                     }
                 }
 
-                /*
-                Pagination data
-                */
+                // Define pagination data
                 newData.pagination = {
                     'total' : pageData.length,
                     'current' : index + 1,
@@ -337,14 +276,11 @@ function html(done) {
                     'nextPage' : getNextPage()
                 }
 
-                /*
-                Set specific name page
-                */
+                // Set specific pagination page name
                 const newName = getArchivePageName(index, nameFile, dinamicPageName)
 
-
+                // Render each pagination file
                 return (taskDone) => {
-
                     templateFunction.ssgUnivoqueId = univoqueId,
                     templateFunction.ssgTemplateName = templatename,
                     templateFunction.ssgPageType = pageType
@@ -370,6 +306,12 @@ function html(done) {
                     }
             })
 
+            /*
+            Return a array of object with some information:
+            skipTask: page is rendarable ( depend on which file is saved )
+            publish: page is not in draft mode
+            fn: gulp task for page render
+            */
             const pagetask = pages.map((item, index) => {
                 const newName = getArchivePageName(index, nameFile, dinamicPageName)
                 item.displayName = `${getPermalink(getPathByLocale(filepath, getLanguage(filepath)), newName)}`;
@@ -378,12 +320,10 @@ function html(done) {
 
             return pagetask
 
-
         } else {
 
-
+            // Render single page ( is not archive page )
             function renderPage(taskDone) {
-
                 templateFunction.ssgUnivoqueId = univoqueId,
                 templateFunction.ssgTemplateName = templatename,
                 templateFunction.ssgPageType = pageType
@@ -408,18 +348,31 @@ function html(done) {
                     })
             }
 
+            /*
+            Return an object with some information:
+            skipTask: page is rendarable ( depend on which file is saved )
+            publish: page is not in draft mode
+            fn: gulp task for page render
+            */
             renderPage.displayName = `${getPermalink(getPathByLocale(filepath, getLanguage(filepath)), getNameFile(filepath))}`;
             return {'skipTask' : skipTask, 'publish' : publish, 'fn': renderPage};
         }
 
     })
 
+    // Flat all task in a new array
     const flatTask = [ ... tasks].flat()
 
+    /*
+    Filter task to execute
+    In the first two laps alla fine not in draft is render ( it is used to create critical css )
+    Afterwards, only the tasks whose dependencies have changed are rendered
+    */
     const tasksToRender = (store.counterRun > 1 )
         ? flatTask.filter((item) => (item.skipTask === false && item.publish === true) ).map((item) => item.fn)
         : flatTask.filter((item) => item.publish === true ).map((item) => item.fn);
 
+    // Return task to execute
     return gulp.series(...tasksToRender, seriesDone => {
         seriesDone()
         done()

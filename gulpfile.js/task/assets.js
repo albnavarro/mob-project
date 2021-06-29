@@ -16,12 +16,15 @@ const jsDest = path.join(destPath, 'assets/js')
 const imgDest = path.join(destPath, 'assets/img')
 const cssFile = `${cssDest}/style.css`
 const jsFile = `${jsDest}/script.js`
-const imgFiles = `${imgPath}/*`
-const videoFiles = `${videoPath}/*`
+const imgFiles = `${imgPath}/**/*.*`
+const videoFiles = `${videoPath}/**/*.*`
 
-/*
-* Create css and js with hash
-*/
+/**
+ * Copy static file (font and ststic js) in build folder
+ * Parse css, js, img, video files with hash and generate manifest.json file
+ *
+ * @return {stream}
+ */
 function assets() {
     // Copy font
     fs.copySync(fontPath, fontDest)

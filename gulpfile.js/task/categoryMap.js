@@ -22,9 +22,14 @@ const { sortbyDate } = require('../functions/helpers.js')
 const store = require('../store.js')
 
 
-/*
-* CREATE CATEGORYMAP
-*/
+
+/**
+ * Create a mapping of all posts categorized by category
+ * The map is stored in store.js for runtime access locally in and in www/assets/data/categoryMap.json
+ *
+ * @param  {function} done - async completion function
+ * @return {function}
+ */
 function category(done) {
     /*
     * Create main obj
@@ -42,7 +47,6 @@ function category(done) {
         if (('exportPost' in data) && publish) {
             const subfolder  = getPathByLocale(curr,lang)
             const permalink = getPermalink(subfolder,slug)
-            const sourceFilepath = (lang == config.defaultLocales) ? `${lang}/` : ''
 
             const category = data.exportPost.category;
             const obj = {

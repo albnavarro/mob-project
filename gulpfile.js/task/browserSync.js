@@ -1,8 +1,12 @@
 const browserSync = require('browser-sync').create()
 
-/*
-* BROWSER SYNC
-*/
+
+/**
+ * Browser sync configuration
+ *
+ * @param  {function} done - async completion function
+ * @return {function}
+ */
 function browser_sync(done) {
     browserSync.init({
         server: {
@@ -14,9 +18,13 @@ function browser_sync(done) {
     done();
 };
 
-/*
-* RELOAD PAGE
-*/
+
+/**
+ * Reload page function configuration
+ *
+ * @param  {function}  done - async completion function
+ * @return {function}
+ */
 function reloadPage(done) {
     browserSync.reload()
     done();

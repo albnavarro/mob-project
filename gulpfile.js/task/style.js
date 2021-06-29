@@ -13,9 +13,11 @@ const { browserSync } = require('./browserSync.js')
 const store = require('../store.js')
 
 
-/*
-* SASS
-*/
+/**
+ * Process scss
+ *
+ * @return {stream}
+ */
 function style() {
     return gulp.src(path.join(scssPath, 'style.scss'))
         .pipe(sourcemaps.init())

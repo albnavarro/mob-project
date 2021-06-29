@@ -16,13 +16,13 @@ const {
 } = require('../functions/function.js')
 
 
-/*
-* CREATE draft MAP
-* draftMap: {
-*     univoqueId: { en: '{pageTitle}', it: '{pageTitle}', ... },
-      ....
- * }
-*/
+/**
+ * Create a mapping of all posts in draft mode
+ * The map is stored in store.js for runtime access locally in and in www/assets/data/draftMap.json
+ *
+ * @param  {function} done - async completion function
+ * @return {function}
+ */
 function draftMap(done) {
 	const allPath = glob.sync(path.join(dataPath, '/**/*.json'))
 

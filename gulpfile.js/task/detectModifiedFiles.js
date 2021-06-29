@@ -6,9 +6,12 @@ const store = require('../store.js')
 const { fileIschanged} = require('../functions/function.js')
 
 
-/*
-* Detect file saved, .pug or .json
-*/
+/**
+ * Detect file saved, .pug or .json
+ *
+ * @param  {function} done - async completion function
+ * @return {function}  
+ */
 function detectModifiedFiles(done) {
     // get list of includes file
     store.includesFileMap = glob.sync(includesPugFile)

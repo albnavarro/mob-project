@@ -5,9 +5,12 @@ const themePath = path.resolve('src')
 const destPath = path.resolve('www')
 const distPath = path.join(destPath, 'assets/dist')
 
-/*
-* Delete js and css and manifest file for production
-*/
+/**
+ * Delete all revision file
+ *
+ * @param  {function} done - async completion function
+ * @return {function}
+ */
 function cleanDist(done) {
     del.sync([
         path.join(distPath, '*'),
@@ -17,9 +20,13 @@ function cleanDist(done) {
 }
 
 
-/*
-* Remove all generated files
-*/
+
+/**
+ * Remove build folder
+ *
+ * @param  {function} done - async completion function
+ * @return {function}
+ */
 function cleanAll(done) {
     fs.rmdirSync(destPath, { recursive: true })
     done()

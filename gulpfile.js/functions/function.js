@@ -10,7 +10,7 @@ const store = require('../store.js')
 
 
 /**
- * getPageType - Detect if is Archive Post or Page
+ * Detect if is Archive Post or Page
  *
  * @param  {Object} data data obj from content
  * @return {string}
@@ -27,9 +27,9 @@ function getPageType(data) {
 
 
 /**
- * getArchivePageName - get pagination page name index and next page
+ * Get archive page name when pagination is active
  *
- * @param  {number} index Archive page postion
+ * @param  {number} index Archive page index
  * @param  {string} nameFile original name file
  * @param  {string} dinamicPageName dinamic page name for index > 0
  * @return {string}
@@ -40,7 +40,7 @@ function getArchivePageName(index, nameFile, dinamicPageName) {
 
 
 /**
- * fileIschanged - Detect if file is changed in last 2 seconds
+ * Detect if file is changed in last 2 seconds
  *
  * @param  {string} filepath file path
  * @return {Boolean}
@@ -59,7 +59,7 @@ function fileIschanged(filepath) {
 
 
 /**
- * getNameFile - file name without .lang and .json
+ * File name without .<lang> and .json
  *
  * @param  {string} filepath file path
  * @return {string}
@@ -70,68 +70,35 @@ function getNameFile(filepath) {
 
 
 /**
- * getPermalink - Get permalink
+ * Get permalink
  *
  * @param  {string} folder             destination folder wioth langh folder added
  * @param  {string} nameFile           slug ( file name or slug propierites from json)
  * @param  {bolean} prependSlash       prepend slash
  * @return {string}
  */
-function getPermalink(destFolder,nameFile,prependSlash = false) {
+function getPermalink(destFolder, nameFile, prependSlash = false) {
     const slash = prependSlash ? '/' : ''
     return `${slash}${destFolder}/${nameFile}${getExtensionFile()}`
 }
 
 
 /**
- * getExtensionFile
+ * Retutn html extension in dev mode, or no extesion for prod
  *
- * @return {string}  retutn html extension in dev mode
+ * @return {string}
  */
 function getExtensionFile() {
     return (store.arg.prod) ? "" :  ".html"
 }
 
 
-/**
- * getThemeSubFolder
- *
- * @param  {string} filepath source path file
- * @return {string}          source filepath without name file from the root of project
- */
-function getThemeSubFolder(filepath) {
-    const pattern = new RegExp(`${themePath}\/(.*\/).*$`);
-    const path = filepath.match(pattern);
-
-    /*
-    * Return subfolder if match in regex or empty vaalue
-    */
-    return (!path) ? '' : path[1]
-}
-
 
 /**
- * getThemeSubFolder - description
- *
- * @param  {string} filepath source additional data path file
- * @return {string}         additional data filepath without name file from the root of project
- */
-function getThemeSubFolder(filepath) {
-    const pattern = new RegExp(`${additionalDataPath}\/(.*\/).*$`);
-    const path = filepath.match(pattern);
-
-    /*
-    * Return subfolder if match in regex or empty vaalue
-    */
-    return (!path) ? '' : path[1]
-}
-
-
-/**
- * getOriginalPath
+ * Return filepath without name file from src/data folder
  *
  * @param  {string} filepath source file path
- * @return {string}          filepath without name file from the root of project
+ * @return {string}
  */
 function getOriginalPath(filepath) {
     const pattern = new RegExp(`${dataPath}\/(.*\/).*$`);
@@ -141,7 +108,6 @@ function getOriginalPath(filepath) {
 
 
 /**
- * getPathByLocale
  * Return destination folder where page will saved
  * Prepend lang if needed
  * Check parent slug ( every index in folder ) and self folder index to create final path ( used for permalink )
@@ -158,14 +124,12 @@ function getPathByLocale(filepath, lang) {
     const dirArr = rootPath.split('/');
     dirArr.pop();
 
-    /*
-    * Create path slug of parent
-    */
+    // Generate path based on the slug of all relatives
     const pathBySlug = dirArr.reduce((p, c, i) => {
         const file = `${dataPath}${p.original}/${c}/index.${lang}.json`
         const fileDefaultLang = `${dataPath}${p.original}/${c}/index.${config.defaultLocales}.json`
 
-        // parse index of current local if exist or default index lang
+        // parse index of current folder to get the slug if exist or get folder name
         const parentData = (fs.existsSync(file)) ? JSON.parse(fs.readFileSync(file)) : JSON.parse(fs.readFileSync(fileDefaultLang))
         const slug = (propValidate(['slug'], parentData)) ? parentData.slug : c
         return { 'original':`${p.original}/${c}`, 'modified' : `${p.modified}/${slug}`}
@@ -181,7 +145,7 @@ function getPathByLocale(filepath, lang) {
 
 
 /**
- * getUnivoqueId - get uniqueId for each type of content
+ * Get uniqueId for each type of content
  *
  * @param  {string} filepath source file path
  * @return {string}          source file path with name without lang and file extension
@@ -193,7 +157,7 @@ function getUnivoqueId(filepath) {
 
 
 /**
- * getLanguage - get language from file name
+ * Get language from file name
  *
  * @param  {string} filepath source file path
  * @return {string}          get language from file name
@@ -205,10 +169,10 @@ function getLanguage(filepath) {
 
 
 /**
- * getAdditionalData - get an obj with all data in all json file associated to {page}.json
+ * Get an obj with all data in all json file defined in additionalData propierites
  *
  * @param  {Array} data  data obj from content
- * @return {Object}      merged obj
+ * @return {Object}  merged obj
  */
 function getAdditionalData(data) {
     const additionalDataList = (data) => ('additionalData' in data) ? data.additionalData : [];
@@ -232,10 +196,10 @@ function getAdditionalData(data) {
 
 
  /**
-  * getTemplate - Detecty template for render
+  * Detecty template for render pug
   *
   * @param  {Object} data data obj from content
-  * @return {string}      Return default template or specific
+  * @return {string}
   */
 function getTemplate(data) {
     const getDefaultTemplate = (data) => {
@@ -262,7 +226,7 @@ function getTemplate(data) {
 
 
 /**
- * mergeData - merge content data with default lang content if content lang is not default
+ * Merge content data with default lang content ( only if lang of file is not default )
  *
  * @param  {string} filepath source file path of content
  * @param  {object} parsed   data of content
@@ -281,7 +245,7 @@ function mergeData(filepath, parsed, lang) {
 
 
 /**
- * langIsDisable - check if lang is disabled
+ * Check if lang is disabled
  *
  * @param  {string} lang description
  * @return {boolean}      description
@@ -293,10 +257,10 @@ function langIsDisable(lang) {
 
 
 /**
- * getPosts - gt post from array of Category
+ * Returns an object of array of posts divided into categories
  *
  * @param  {Object} data content
- * @return {Object}   Object of post
+ * @return {Object}
  */
 function getPosts (data) {
     return data.importPost.reduce((acc, curr) => {
@@ -308,11 +272,11 @@ function getPosts (data) {
 
 
 /**
- * checkIfPostHaveTag - detect if tag is defined in a post data with some or every method
+ * Detect if a post match with tag filter ( some or every )
  *
  * @param  {Object} data - content data
  * @param  {type} post - post target to serch tag
- * @return {Boleean} true if tag is finded finded
+ * @return {Boleean}
  */
 function checkIfPostHaveTag (filterType, data, post){
     let tagIsFinded = false
@@ -333,7 +297,7 @@ function checkIfPostHaveTag (filterType, data, post){
 
 
 /**
- * getTags - get all post filtered by tag
+ * Get all post filtered by tag
  *
  * @param  {Object} data content object
  * @return {<Array[Object]>}   Array of post
@@ -367,10 +331,10 @@ function getTags(data) {
 
 
 /**
- * getTranslationFilesList - get an array of all path file for each language related to filepath info
+ * Get an array of all path file for each language related to one data json
  *
  * @param  {string} filepath - path of content file
- * @return {<array[string]>} - Array of all path file for all languageses related to the input file path
+ * @return {<array[string]>}
  */
 function getTranslationFilesList(filepath) {
     // get path without file name
@@ -395,8 +359,6 @@ exports.fileIschanged = fileIschanged
 exports.getNameFile = getNameFile
 exports.getPermalink = getPermalink
 exports.getExtensionFile = getExtensionFile
-exports.getThemeSubFolder = getThemeSubFolder
-exports.getThemeSubFolder = getThemeSubFolder
 exports.getPathByLocale = getPathByLocale
 exports.getLanguage = getLanguage
 exports.getAdditionalData = getAdditionalData

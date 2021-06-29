@@ -10,9 +10,11 @@ const jsFile = `${jsDest}/script.js`
 const store = require('../store.js')
 
 
-/*
-* ROLLUP
-*/
+/**
+ * Process rollup
+ *
+ * @return {stream}
+ */
 function js() {
     if (store.arg.prod) {
         return rollup.rollup({

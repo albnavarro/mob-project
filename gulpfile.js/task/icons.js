@@ -8,9 +8,11 @@ const svgPath = path.join(themePath, 'static/svg')
 const svgFiles = `${svgPath}/*.svg`
 const svgDest = path.join(destPath, 'assets/svg')
 
-/*
-* SVG
-*/
+/**
+ * Generate svg sprite
+ *
+ * @return {stream}
+ */
 function icons() {
     return gulp.src(svgFiles)
         .pipe(svgmin({

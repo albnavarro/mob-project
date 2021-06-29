@@ -16,13 +16,13 @@ const {
 } = require('../functions/function.js')
 
 
-/*
-* CREATE pageTitle MAP
-* pageTitleMap: {
-*     univoqueId: { en: '{pageTitle}', it: '{pageTitle}', ... },
-      ....
- * }
-*/
+/**
+ * Create a mapping of all page title
+ * The map is stored in store.js for runtime access locally in and in www/assets/data/pageTitleMap.json
+ *
+ * @param  {function} done - async completion function
+ * @return {function}
+ */
 function pageTitle(done) {
 	const allPath = glob.sync(path.join(dataPath, '/**/*.json'))
 

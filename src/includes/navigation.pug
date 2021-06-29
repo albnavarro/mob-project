@@ -1,4 +1,4 @@
-mixin list(item)
+mixin list(item, level)
     each val, index in item
         - const heaveChildrenClass = (val.children) ? 'menu-item menu-item-has-children' : 'menu-item'
         - const isDraft = ssgIsDraft(val.univoqueId)
@@ -12,8 +12,9 @@ mixin list(item)
                     |#{label}
                         
                 if val.children
-                    ul.sub-menu
-                        +list(val.children)
+                    ul.sub-menu(data-level=level)
+                        - const nextLevel = level + 1;
+                        +list(val.children, nextLevel)
 
 
 
@@ -26,6 +27,6 @@ mixin list(item)
       span
     button.main-arrow-back
   nav.nav(role='navigation')
-      ul.main-menu
+      ul.main-menu(data-level='0')
           if(navigation)
-              +list(navigation)
+              +list(navigation, 1)

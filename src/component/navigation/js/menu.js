@@ -2,7 +2,7 @@ import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'bo
 import { modernzier } from "../../../js/utility/modernizr.js"
 import { eventManager } from "../../../js/base/eventManager.js";
 import { mq } from "../../../js/base/mediaManager.js";
-import { outerHeight, outerWidth, offset, position, getParents, getSiblings } from "../../../js/utility/vanillaFunction.js";
+import { outerHeight, outerWidth, offset, getParents, getSiblings } from "../../../js/utility/vanillaFunction.js";
 import { slideUpDownReset, slideUp, slideDown } from "../../../js/utility/animation.js";
 
 export class menuClass {
@@ -248,29 +248,28 @@ export class menuClass {
         const submenuArray = Array.from(this.allSubmenu)
         const item = target.closest(`.${this.MENU_ITEM}`);
 
-        // i submenu parenti possono esserer piu di uno
+        // get parents submenu
         const parentSubmenus = getParents(item, this.SUB_MENU);
         const parentSubmenusArray = Array.from(parentSubmenus);
 
-        // chiudo tutti quelli diversi dall' attuale paerto
-        // Resetto tutto tranne l'attuale aperto
+        // Remove active class form all submenu leaving out active
         for (const item of submenuArray) {
             if (item !== activeSubmenu) {
                 item.classList.remove(this.ACTIVE)
             }
         };
 
-        // apro i submenu parenti
+        // add active class on partents submenu
         for (const item of parentSubmenusArray) {
             item.classList.add(this.ACTIVE)
         }
 
-        // Faccio al stesa operazione per le arrow
+        // get parents arrow
         const parentsArrow = parentSubmenus.map(item => {
             return getSiblings(item, this.ARROW_SUBMENU);
         }).flat();
 
-        // Resetto tutto tranne l'attuale aperto
+        // Remove active class form all arrows leaving out active
         const arrowSubMenu = this.componentWrapper.querySelectorAll(`.${this.ARROW_SUBMENU}`);
         const arrArrowSubmenu = Array.from(arrowSubMenu);
         for (const item of arrArrowSubmenu) {
@@ -279,19 +278,18 @@ export class menuClass {
             }
         }
 
-        // apro le arrow parenti
+        // add active class on partents arrow
         for (const item of parentsArrow) {
             item.classList.add(this.ARROW_SELECTED)
         }
 
         if (!this.offCanvas) {
-            // Slide Up sui submenu non parenti del selezionato
-            // accordion common open/close logic sui menu non selezionati
-            const parentSubmenusId = parentSubmenusArray.map(item => {
+            // Slide Up submenu not active
+            const allSubmenuId = submenuArray.map(item => {
                 return item.getAttribute('node-id')
             });
 
-            const allSubmenuId = submenuArray.map(item => {
+            const parentSubmenusId = parentSubmenusArray.map(item => {
                 return item.getAttribute('node-id')
             });
 
@@ -363,7 +361,7 @@ export class menuClass {
             for (let index = 0; index < this.menuArr.length; index++) {
                 const item = this.menuArr[index];
 
-                item.parentItemPos = parseInt(position(item.parentItem).left);
+                item.parentItemPos = parseInt(offset(item.parentItem).left);
                 item.parentItemWidth = parseInt(outerWidth(item.parentItem));
                 item.totalWidth = item.parentItemPos + item.parentItemWidth + (item.maxLevel * this.subMenuWidth);
 

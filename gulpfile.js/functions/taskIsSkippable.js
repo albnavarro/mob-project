@@ -10,19 +10,24 @@ const store = require('../store.js')
 const { getNameFile, getTranslationFilesList } = require('../functions/function.js')
 
 
-/*
-* check if json or template is Changed
-* @param file - path of file
-*/
+/**
+ * Detect if json || template || any data/component associated is changed
+ *
+ * @param  {string} filepath - source data json path
+ * @param  {string} data     - source data merged with all map ...
+ * @param  {string} template - template used for pug render
+ * @return {boolean}
+ */
 function taskIsSkippable(filepath, data, template) {
 
     /*
-    track if _wrapper is mofiled , in case render alla pages
+    Detect if _wrapper is mofiled , in case render alla pages
     */
     const isWrapper = ( `${templatePath}/default/_wrapper.pug` === store.fileModified ) ? true : false
 
+
     /*
-    track if specific of shared includes pug ( in includes thempath ) file is changed in last 2 seonds
+    Detect if specific of shared includes pug ( in includes thempath ) file is changed in last 2 seonds
     */
     const includesFileIsChanged = store.includesFileMap.map((item) => {
         return item === store.fileModified;
@@ -30,7 +35,7 @@ function taskIsSkippable(filepath, data, template) {
 
 
     /*
-    track if specific includes pug ( in component path ) file is changed in last 2 seonds
+    Detect if includes pug ( from component path ) file is changed in last 2 seonds
     */
     const componentFileChecker = (data) => {
         return data.registerComponent.map((item) => {
@@ -43,7 +48,7 @@ function taskIsSkippable(filepath, data, template) {
 
 
     /*
-    track if aditionalData is changed in last 2 seonds
+    Detect if aditionalData is changed in last 2 seonds
     */
     const aditionDataChecker = (data) => {
         return data.additionalData.map((item) => {
@@ -56,7 +61,7 @@ function taskIsSkippable(filepath, data, template) {
 
 
     /*
-    track if post is changed in last 2 seonds
+    Detect if post is changed in last 2 seonds
     */
     const postDataChecker = (data) => {
         return Object.values(data.posts)
@@ -75,7 +80,7 @@ function taskIsSkippable(filepath, data, template) {
 
 
     /*
-    track if tag is changed in last 2 seonds
+    Detect if tag is changed in last 2 seonds
     */
     const tagDataChecker = (data) => {
         return data.tags
@@ -90,14 +95,14 @@ function taskIsSkippable(filepath, data, template) {
 
 
     /*
-    track if json is changed in last 2 seonds
+    Detect if json is changed in last 2 seonds
     */
     const filePathMap = getTranslationFilesList(filepath)
     jsonIsChanged = filePathMap.includes(store.fileModified)
 
 
     /*
-    track if template is changed in last 2 seonds
+    Detect if template is changed in last 2 seonds
     */
     const templateIsChanged = template === store.fileModified
 

@@ -10,9 +10,13 @@ const fontsPath = path.join(assetPath, 'fonts')
 const jsPath = path.join(assetPath, 'js')
 const svgPath = path.join(assetPath, 'svg')
 
-/*
-* Create css and js with hash
-*/
+
+/**
+ * Create all empty folder necessary in build main folder
+ *
+ * @param  {function} done - async completion function
+ * @return {function}
+ */
 function createFolder(done) {
     if (!fs.existsSync(destPath)) fs.mkdirSync(destPath);
     if (!fs.existsSync(assetPath)) fs.mkdirSync(assetPath);
