@@ -29,7 +29,9 @@ const { taskIsSkippable } = require('../functions/taskIsSkippable.js')
 // DEBUG
 const { debugMandatoryPropierties, debugRenderHtml } = require('../functions/debug.js')
 
+// CORE FUNCTION
 const { templateFunction } = require('../middleware/globals.js')
+
 
 // UTILS
 const {
@@ -57,6 +59,10 @@ const {
  * @return {function}
  */
 function html(done) {
+
+    // Custom function hot reload
+    delete require.cache[require.resolve('../../src/middleware/customFunction.js')]
+    const { customFunction } = require('../../src/middleware/customFunction.js')
 
     // Get data from manifest.json
     const manifestData = JSON.parse(fs.readFileSync(manifestFile))
@@ -89,8 +95,9 @@ function html(done) {
         mergedData.lang = lang
 
         // Get template
-        const template = getTemplate(mergedData)
+        const { template, isValid } = getTemplate(mergedData)
         const templatename = getNameFile(template)
+        if (!isValid) return {'skipTask' : true, 'publish' : false, 'fn': null}
 
         // get page type
         const pageType = getPageType(mergedData)
@@ -138,7 +145,8 @@ function html(done) {
         // Add permalink
         const permalink = {}
         permalink.permalink = getPermalink(pathByLocale,nameFile)
-        const validDomain = ( config.domain.substr(-1) == '/' ) ? config.domain.slice(0, -1) : config.domain
+        const domain = ('domain' in config) ? config.domain : ''
+        const validDomain = ( domain.substr(-1) == '/' ) ? domain.slice(0, -1) : domain
         permalink.staticPermalink = `${validDomain}${getPermalink(pathByLocale,nameFile)}`
         permalink.pageTitle = mergedData.pageTitle
 
@@ -204,10 +212,10 @@ function html(done) {
         delete allData.registerComponent;
 
         // Check for mandatory propierties in json
-        const error = debugMandatoryPropierties(allData);
-        if(error) {
-            process.exit(0);
-        }
+        // const error = debugMandatoryPropierties(allData);
+        // if(error) {
+        //     process.exit(0);
+        // }
 
         /*
         Create tasks for archive page with pagination
@@ -286,7 +294,11 @@ function html(done) {
                     templateFunction.ssgPageType = pageType
                     templateFunction.ssgLang = lang
 
-                    const mergedLocals = { ... newData, ... templateFunction}
+                    const mergedLocals = {
+                        ... newData,
+                        ... templateFunction,
+                        ...customFunction
+                      }
 
                     return gulp.src(template)
                         .pipe(pug({
@@ -329,7 +341,11 @@ function html(done) {
                 templateFunction.ssgPageType = pageType
                 templateFunction.ssgLang = lang
 
-                const mergedLocals = { ... allData, ... templateFunction}
+                const mergedLocals = {
+                    ...allData,
+                    ...templateFunction,
+                    ...customFunction
+                }
 
                 return gulp.src(template)
                     .pipe(pug({

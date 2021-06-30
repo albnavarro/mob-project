@@ -18,7 +18,8 @@ function filterLangByDefault(lang) {
  * @return {function}
  */
 function htaccess(done) {
-    const langArr = Object.keys(config.locales)
+    const locale = ('locales' in config) ? config.locales : []
+    const langArr = Object.keys(locale)
 
     const langRedirect = langArr.reduce((p, c) => {
         const langString = `

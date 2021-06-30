@@ -1,7 +1,6 @@
 extends default/_wrapper.pug
 
 block content
-
     header
         .container
             include ../includes/langSelector.pug
@@ -14,6 +13,8 @@ block content
             .content
                 h1
                     |#{ssgPrint(pageTitle)}
+                h2
+                    |#{hello()}
 
                 .parallax__container
                     .parallax__item(

@@ -10,14 +10,14 @@ const { fileIschanged} = require('../functions/function.js')
  * Detect file saved, .pug or .json
  *
  * @param  {function} done - async completion function
- * @return {function}  
+ * @return {function}
  */
 function detectModifiedFiles(done) {
     // get list of includes file
     store.includesFileMap = glob.sync(includesPugFile)
 
     // get last file saved
-    const allFiles = glob.sync(`${themePath}/**/*.{json,pug}`)
+    const allFiles = glob.sync(`${themePath}{/**/*.{json,pug},/middleware/customFunction.js}`)
     const files = allFiles.map((item) => {
         return {
             'modifies' : fileIschanged(item),

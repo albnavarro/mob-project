@@ -13,6 +13,7 @@ const jsFiles = `${jsPath}/**/*.js`
 const scssFiles = `${scssPath}/**/*.scss`
 const allPugFiles = `${themePath}/**/*.pug`
 const dataFiles = `${themePath}/data/**/*.json`
+const customFunctionFile = `${themePath}/middleware/customFunction.js`
 const additionalDataFiles = `${themePath}/additionalData/**/*.json`
 const componentscssFiles = `${componentPath}/**/*.scss`
 const componentJsFiles = `${componentPath}/**/*.js`
@@ -37,7 +38,6 @@ const { createFolder } = require('./task/createFolder.js')
 const { draftMap } = require('./task/draftMap.js')
 const { cleanDist, cleanAll } = require('./task/clean.js')
 
-
 /*
 * Live reload
 */
@@ -45,7 +45,7 @@ function watch_files(done) {
     gulp.watch([staticFiles], gulp.series(icons, assets))
     gulp.watch([scssFiles, componentscssFiles], style)
     gulp.watch([jsFiles, componentJsFiles], gulp.series(js, reloadPage))
-    gulp.watch([allPugFiles, dataFiles, additionalDataFiles], gulp.series(detectModifiedFiles, category, pageTitle, permalink, draftMap, html, reloadPage))
+    gulp.watch([customFunctionFile, allPugFiles, dataFiles, additionalDataFiles], gulp.series(detectModifiedFiles, category, pageTitle, permalink, draftMap, html, reloadPage))
 
     done();
 }

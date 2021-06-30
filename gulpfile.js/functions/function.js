@@ -204,23 +204,30 @@ function getAdditionalData(data) {
 function getTemplate(data) {
     const getDefaultTemplate = (data) => {
         if(propValidate(['isArchive', 'pagination'], data) && data.isArchive.pagination === true) {
-            return config.defaultTemplate.paginationArchive
+            return (propValidate(['defaultTemplate', 'paginationArchive'], config)) ? config.defaultTemplate.paginationArchive : null
 
         } else if (('isArchive' in data) && ('importPost' in data)) {
-            return config.defaultTemplate.postArchive
+            return (propValidate(['defaultTemplate', 'postArchive'], config)) ? config.defaultTemplate.postArchive : null
 
         } else if (('isArchive' in data) && ('importTag' in data)) {
-            return config.defaultTemplate.tagArchive
+            return (propValidate(['defaultTemplate', 'tagArchive'], config)) ? config.defaultTemplate.tagArchive : null
 
         } else if('exportPost' in data) {
-            return config.defaultTemplate.post
+            return (propValidate(['defaultTemplate', 'post'], config)) ? config.defaultTemplate.post : null
 
         } else {
-            return config.defaultTemplate.page
+            return (propValidate(['defaultTemplate', 'page'], config)) ? config.defaultTemplate.page : null
         }
     }
 
-    return ('template' in data) ?  `${templatePath}/${data.template}.pug` :  `${templatePath}/${getDefaultTemplate(data)}`
+    const template = getDefaultTemplate(data)
+
+    // Check if default template is defined in config.json
+    const isValid = (template !== null) ? true : false
+
+    return ('template' in data )
+        ?  { template: `${templatePath}/${data.template}.pug` , isValid: true }
+        :  { template: `${templatePath}/${template}`, isValid }
 }
 
 
@@ -234,8 +241,12 @@ function getTemplate(data) {
  * @return {type}            return merged object
  */
 function mergeData(filepath, parsed, lang) {
-    const defaultLangFilePath = `${dataPath}/${getOriginalPath(filepath)}${getNameFile(filepath)}.${config.mergeDataFrom}.json`
-    const defaultLangData = ( config.mergeDataFrom !== lang && fs.existsSync(defaultLangFilePath))
+    const defaultLocale = ('defaultLocales' in config) ? config.defaultLocales : null
+    const mergedDataForm = ('mergeDataFrom' in config) ? config.mergeDataFrom : null
+    const validateMergedData = (mergedDataForm !== null) ? mergedDataForm : defaultLocale
+
+    const defaultLangFilePath = `${dataPath}/${getOriginalPath(filepath)}${getNameFile(filepath)}.${validateMergedData}.json`
+    const defaultLangData = ( validateMergedData !== lang && fs.existsSync(defaultLangFilePath))
         ? JSON.parse(fs.readFileSync(defaultLangFilePath))
         : null
 
@@ -305,6 +316,7 @@ function checkIfPostHaveTag (filterType, data, post){
 function getTags(data) {
 
     const filterType = (propValidate(['tagFilter', 'type'], data)
+        && propValidate(['tagFilterType'], config)
         && config.tagFilterType.includes(data.tagFilter.type))
         ? data.tagFilter.type
         : 'some' // default value

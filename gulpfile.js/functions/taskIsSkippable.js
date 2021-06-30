@@ -21,6 +21,12 @@ const { getNameFile, getTranslationFilesList } = require('../functions/function.
 function taskIsSkippable(filepath, data, template) {
 
     /*
+    Detect if src/middleware/customFunction.js is mofiled , in case render alla pages
+    */
+    const isCustomFunction = ( `${themePath}/middleware/customFunction.js` === store.fileModified ) ? true : false
+
+
+    /*
     Detect if _wrapper is mofiled , in case render alla pages
     */
     const isWrapper = ( `${templatePath}/default/_wrapper.pug` === store.fileModified ) ? true : false
@@ -98,7 +104,7 @@ function taskIsSkippable(filepath, data, template) {
     Detect if json is changed in last 2 seonds
     */
     const filePathMap = getTranslationFilesList(filepath)
-    jsonIsChanged = filePathMap.includes(store.fileModified)
+    const jsonIsChanged = filePathMap.includes(store.fileModified)
 
 
     /*
@@ -115,7 +121,8 @@ function taskIsSkippable(filepath, data, template) {
         !componentFileIsChanged &&
         !includesFileIsChanged &&
         !tagDataIsChanged) &&
-        !isWrapper
+        !isWrapper &&
+        !isCustomFunction
 }
 
 exports.taskIsSkippable = taskIsSkippable

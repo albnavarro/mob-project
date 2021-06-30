@@ -11,9 +11,9 @@ const propValidate = (p, o) => p.reduce((xs, x) => (xs && xs[x]) ? xs[x] : null,
 const { langIsDisable } = require('../functions/function.js')
 
 const templateFunction = {}
-templateFunction.ssgSiteName = config.siteName
-templateFunction.ssgLocales = config.locales
-templateFunction.domain = config.domain
+templateFunction.ssgSiteName = ('siteName' in config) ? config.siteName : ''
+templateFunction.ssgLocales = ('locales' in config) ? config.locales : []
+templateFunction.domain =  ('domain' in config) ? config.domain : ''
 
 
 /**
@@ -225,7 +225,8 @@ const getlangCode = () => {
  * Get all alternate lang for the site ( specific for og:locale:alternate)
  */
 const getAlternateLangCode = () => {
-    return Object.entries(config.locales).reduce((p, c) => {
+    const locale = ('locales' in config) ? config.locales : []
+    return Object.entries(locale).reduce((p, c) => {
 
         // check if alternate exist ( check file in permalink map) file is in draft mode
         const isDraft = (propValidate([templateFunction.ssgUnivoqueId, c[0]], store.permalinkMapData))
