@@ -3,41 +3,39 @@
     z-index: 2;
 }
 
-
 .sidebar {
-  background-color: #bbb;
+    background-color: #bbb;
 
-  @include _mq('tablet') {
-    width: 30%;
-    float: left;
-    padding: 1rem;
-  }
+    @include _mq('tablet') {
+        width: 30%;
+        float: left;
+        padding: 1rem;
+    }
 }
 
 .content {
-  @include _mq('tablet') {
-    width: 70%;
-    float: right;
-    padding: 1rem;
-  }
+    @include _mq('tablet') {
+        width: 70%;
+        float: right;
+        padding: 1rem;
+    }
 }
 
 .parallax__item-test {
-  width: rem(140px);
-  height: rem(140px);
-  background-color: red;
-  z-index: 9;
+    width: rem(140px);
+    height: rem(140px);
+    background-color: red;
+    z-index: 9;
 
-  &--float {
-    float: left;
-  }
+    &--float {
+        float: left;
+    }
 }
 
 .trasition-item-test {
     height: 200px;
     background-color: $black;
 }
-
 
 //Pop toggle test
 
@@ -48,7 +46,6 @@
         display: block;
         border: 1px black solid;
     }
-
 }
 
 .popTarget {
@@ -62,7 +59,7 @@
     top: 0;
     bottom: 0;
     transform: translateX(100%);
-    transition: transform .35s;
+    transition: transform 0.35s;
     height: auto;
     background-color: $black;
     color: $white;
@@ -81,7 +78,6 @@
         height: 100px;
         display: block;
     }
-
 }
 
 // fixed Parallax test
@@ -145,12 +141,11 @@
     }
 }
 
-
 // animate
 .interceptObserver {
     height: 100vh;
     border: 1px $black solid;
-    transition: background .35s;
+    transition: background 0.35s;
 
     &.animate {
         background: #ccc;
@@ -161,7 +156,7 @@
     position: fixed;
     top: 50%;
     right: 0;
-    transition: background .35s;
+    transition: background 0.35s;
 
     &.animate {
         background: $black;

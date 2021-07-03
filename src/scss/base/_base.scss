@@ -6,19 +6,21 @@
  * Set up a decent box model on the root element
  */
 html {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 body {
-  background-color: $white;
-  overflow-x: hidden;
-  @include get-dot-bg(2, #ccc);
-  background-size: count-svg-item(50,50);
-  width: 100vw;
+    background-color: $white;
+    overflow-x: hidden;
+
+    @include get-dot-bg(2, #ccc);
+
+    background-size: count-svg-item(50, 50);
+    width: 100vw;
 }
 
 main {
-   // overflow: hidden;
+    // overflow: hidden;
 }
 
 /**
@@ -27,20 +29,22 @@ main {
  * making all elements inheriting from the root box-sizing value
  * See: https://css-tricks.com/inheriting-box-sizing-probably-slightly-better-best-practice/
  */
-*, *::before, *::after {
-  box-sizing: inherit;
+*,
+*::before,
+*::after {
+    box-sizing: inherit;
 }
 
 /**
  * Basic styles for links
  */
 
- img {
- 	max-width: 100%;
- 	height: auto;
- }
+img {
+    max-width: 100%;
+    height: auto;
+}
 
- .container {
-   margin: auto;
-   max-width: map-get($breakpoints, 'x-large');
- }
+.container {
+    margin: auto;
+    max-width: map-get($breakpoints, 'x-large');
+}

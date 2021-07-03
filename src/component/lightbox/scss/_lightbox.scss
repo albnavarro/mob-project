@@ -1,5 +1,5 @@
 .lightbox {
-    background-color: rgba($black , .8);
+    background-color: rgba($black, 0.8);
     position: fixed;
     top: 0;
     height: calc(var(--vh, 1vh) * 100);
@@ -23,7 +23,7 @@
         position: absolute;
         top: 50%;
         left: 50%;
-        transform: translate(-50% , -50%);
+        transform: translate(-50%, -50%);
         transition: width 0.35s, height 0.35s;
 
         @include when-inside('.lightbox--image') {
@@ -42,7 +42,6 @@
         padding: 20px;
     }
 
-
     &__dinamic-content {
         min-height: 8rem;
         transition: width 0.35s, height 0.35s;
@@ -51,6 +50,7 @@
             height: 200px;
             width: 200px;
         }
+
         @include when-inside('.lightbox--video') {
             height: 200px;
             width: 200px;
@@ -80,7 +80,7 @@
         }
 
         &.transition {
-            transition: transform .55s;
+            transition: transform 0.55s;
         }
 
         &.drag-cursor {
@@ -174,7 +174,7 @@
         opacity: 0;
         display: flex;
         justify-content: space-between;
-        transition: opacity .35s;
+        transition: opacity 0.35s;
 
         &.visible {
             opacity: 1;
@@ -206,7 +206,7 @@
         }
 
         &__in {
-            right: 0
+            right: 0;
         }
 
         &__out {

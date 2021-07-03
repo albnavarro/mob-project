@@ -31,7 +31,7 @@
         background-color: $black;
         padding: 10px;
 
-        &:after {
+        &::after {
             content: '';
             width: 0;
             height: 0;
@@ -44,13 +44,12 @@
         }
     }
 
-
     &--is-right {
         left: auto;
         right: 0;
 
         .tooltip-pop__inner {
-            &:after {
+            &::after {
                 left: auto;
                 right: 1rem;
             }
@@ -64,7 +63,7 @@
         padding-bottom: 0;
 
         .tooltip-pop__inner {
-            &:after {
+            &::after {
                 top: auto;
                 bottom: 100%;
                 border-left: 8px solid transparent;

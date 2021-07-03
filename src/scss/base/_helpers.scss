@@ -3,33 +3,33 @@
  * These are some useful classes which I will need
  */
 
- /**
+/**
   * Clear inner floats
   */
 
-.clearfix:before,
-.clearfix:after {
-  content: "";
-  display: table;
+.clearfix::before,
+.clearfix::after {
+    content: "";
+    display: table;
 }
 
-.clearfix:after {
-  clear: both;
+.clearfix::after {
+    clear: both;
 }
 
-.img-responsive{
-  max-width: 100%;
-  height: auto;
+.img-responsive {
+    max-width: 100%;
+    height: auto;
 }
 
 .is-center {
-	text-align: center;
+    text-align: center;
 }
 
 .is-right {
-	text-align: right;
+    text-align: right;
 }
 
 .overflow-hidden {
-  overflow: hidden;
+    overflow: hidden;
 }

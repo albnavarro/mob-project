@@ -26,7 +26,7 @@ meta(property='og:locale' content=getlangCode())
 
 - const alternateLang = getAlternateLangCode()
 each item, key in alternateLang    
-    meta(property='og:locale:alternate' content=item[1].code)
+    meta(property='og:locale:alternate' content=item)
     
 meta(property='og:site_name' content=ssgPrint(ssgSiteName))
 

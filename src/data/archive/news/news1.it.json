@@ -1,9 +1,9 @@
 {
-    "pageTitle" : "novitá 1",
-    "slug" : "novita1",
-    "exportPost" : {
-        "data" : {
-            "title" : "novitá 1"
+    "pageTitle": "novitá 1",
+    "slug": "novita1",
+    "exportPost": {
+        "data": {
+            "title": "novitá 1"
         }
     }
 }

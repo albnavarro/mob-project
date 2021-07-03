@@ -1,17 +1,11 @@
 {
-    "pageTitle" : "tag1",
-    "slug" : "archive-tag-1",
-    "description" : "custom description",
-    "additionalData" : [
-        "nav.json"
-    ],
-    "registerComponent" : [
-        "to-top/pug/toTop.pug"
-    ],
-    "isArchive" : {
-        "pagination" : false
+    "pageTitle": "tag1",
+    "slug": "archive-tag-1",
+    "description": "custom description",
+    "additionalData": ["nav.json"],
+    "registerComponent": ["to-top/pug/toTop.pug"],
+    "isArchive": {
+        "pagination": false
     },
-    "importTag" : [
-        "tag1"
-    ]
+    "importTag": ["tag1"]
 }

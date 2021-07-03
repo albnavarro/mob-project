@@ -1,11 +1,7 @@
 {
     "template": "fixed",
-    "pageTitle" : "fixed",
-    "description" : "custom description",
-    "additionalData" : [
-        "nav.json"
-    ],
-    "registerComponent" : [
-        "to-top/pug/toTop.pug"
-    ]
+    "pageTitle": "fixed",
+    "description": "custom description",
+    "additionalData": ["nav.json"],
+    "registerComponent": ["to-top/pug/toTop.pug"]
 }

@@ -1,18 +1,14 @@
 {
-    "description" : "custom description",
-    "pageTitle" : "news 2",
-    "additionalData" : [
-        "nav.json"
-    ],
-    "registerComponent" : [
-        "to-top/pug/toTop.pug"
-    ],
-    "exportPost" : {
-        "category" : "news",
-        "date" : "10-05-2021",
-        "data" : {
-            "title" : "news 2",
-            "description" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus diam urna, sagittis sed diam vitae, aliquet ultricies sem. Quisque quam nibh, aliquet at cursus id, commodo vel urna."
+    "description": "custom description",
+    "pageTitle": "news 2",
+    "additionalData": ["nav.json"],
+    "registerComponent": ["to-top/pug/toTop.pug"],
+    "exportPost": {
+        "category": "news",
+        "date": "10-05-2021",
+        "data": {
+            "title": "news 2",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus diam urna, sagittis sed diam vitae, aliquet ultricies sem. Quisque quam nibh, aliquet at cursus id, commodo vel urna."
         }
     }
 }

@@ -1,9 +1,9 @@
-const path = require('path')
-const del = require('del')
-const fs = require('fs')
-const themePath = path.resolve('src')
-const destPath = path.resolve('www')
-const distPath = path.join(destPath, 'assets/dist')
+const path = require('path');
+const del = require('del');
+const fs = require('fs');
+const themePath = path.resolve('src');
+const destPath = path.resolve('www');
+const distPath = path.join(destPath, 'assets/dist');
 
 /**
  * Delete all revision file
@@ -12,14 +12,9 @@ const distPath = path.join(destPath, 'assets/dist')
  * @return {function}
  */
 function cleanDist(done) {
-    del.sync([
-        path.join(distPath, '*'),
-        path.join(distPath, '*.*')
-    ]);
-    done()
+    del.sync([path.join(distPath, '*'), path.join(distPath, '*.*')]);
+    done();
 }
-
-
 
 /**
  * Remove build folder
@@ -28,11 +23,9 @@ function cleanDist(done) {
  * @return {function}
  */
 function cleanAll(done) {
-    fs.rmdirSync(destPath, { recursive: true })
-    done()
+    fs.rmdirSync(destPath, { recursive: true });
+    done();
 }
 
-
-
-exports.cleanDist = cleanDist
-exports.cleanAll = cleanAll
+exports.cleanDist = cleanDist;
+exports.cleanAll = cleanAll;

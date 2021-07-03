@@ -1,20 +1,12 @@
 {
-    "pageTitle" : "archive",
-    "description" : "custom description",
-    "additionalData" : [
-        "nav.json"
-    ],
-    "registerComponent" : [
-        "to-top/pug/toTop.pug"
-    ],
-    "isArchive" : {
-        "pagination" : true,
-        "postPerPage" : "3",
-        "dinamicPageName" : "archive-"
+    "pageTitle": "archive",
+    "description": "custom description",
+    "additionalData": ["nav.json"],
+    "registerComponent": ["to-top/pug/toTop.pug"],
+    "isArchive": {
+        "pagination": true,
+        "postPerPage": "3",
+        "dinamicPageName": "archive-"
     },
-    "importPost" : [
-        "news",
-        "articles",
-        "nonEsistenteCategoria"
-    ]
+    "importPost": ["news", "articles", "nonEsistenteCategoria"]
 }

@@ -1,31 +1,31 @@
 .to-top {
-  z-index: 10;
-  background-color: transparent;
-  border-radius: 50%;
-  border: 0;
-  bottom: -3rem;
-  outline: none;
-  padding: 0;
-  position: fixed;
-  right: 1rem;
-  transition: bottom .35s;
-
-  &.visible {
-    bottom: 5px;
-  }
-
-  svg {
-    fill: $black;
-    height: 40px;
-    margin: 0;
-    width: 40px;
-  }
-
-  &:hover {
+    z-index: 10;
     background-color: transparent;
+    border-radius: 50%;
+    border: 0;
+    bottom: -3rem;
+    outline: none;
+    padding: 0;
+    position: fixed;
+    right: 1rem;
+    transition: bottom 0.35s;
+
+    &.visible {
+        bottom: 5px;
+    }
 
     svg {
-      fill: $black;
+        fill: $black;
+        height: 40px;
+        margin: 0;
+        width: 40px;
     }
-  }
+
+    &:hover {
+        background-color: transparent;
+
+        svg {
+            fill: $black;
+        }
+    }
 }

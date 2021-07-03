@@ -16,23 +16,23 @@ $max-width: 1194px !default;
 
 /// Breakpoints map
 $breakpoints: (
-  'x-small': 320px,
-  'small':   360px,
-  'medium':  600px,
-  'tablet':  768px,
-  'desktop': 992px,
-  'large':   1200px,
-  'x-large':   1400px
+    'x-small': 320px,
+    'small':   360px,
+    'medium':  600px,
+    'tablet':  768px,
+    'desktop': 992px,
+    'large':   1200px,
+    'x-large':   1400px
 );
 
 $html-font-size: (
-  'x-small': 16px,
-  'small':   16px,
-  'medium':  16px,
-  'tablet':  16px,
-  'desktop': 20px,
-  'large':   20px,
-  'x-large':   20px
+    'x-small': 16px,
+    'small':   16px,
+    'medium':  16px,
+    'tablet':  16px,
+    'desktop': 20px,
+    'large':   20px,
+    'x-large':   20px
 );
 
 $default-font-size: 'desktop';
@@ -44,25 +44,25 @@ $default-font-size: 'desktop';
 $base-url: '/assets/' !default;
 
 $susy: (
-  'columns': susy-repeat(12),
-  'gutters': 25/50, //25px gutter per col di 50px = .5
-  'spread': 'narrow',
-  'container-spread': 'narrow',
-	'svg-grid-colors': hsl(180, 50%, 80%),
+    'columns': susy-repeat(12),
+    'gutters': 25/50, //25px gutter per col di 50px = .5
+    'spread': 'narrow',
+    'container-spread': 'narrow',
+    'svg-grid-colors': hsl(180, 50%, 80%),
 );
 
 $wideconf: (
-  'columns': susy-repeat(12),
-  'gutters': 2rem,
-  'spread': 'wide',
-  'container-spread': 'wide',
-	'svg-grid-colors': hsl(180, 50%, 80%),
+    'columns': susy-repeat(12),
+    'gutters': 2rem,
+    'spread': 'wide',
+    'container-spread': 'wide',
+    'svg-grid-colors': hsl(180, 50%, 80%),
 );
 
 $asymmetriconf: (
-  'columns': 120px susy-repeat(4) 100px,
-  'gutters': 50px,
-  'spread': 'narrow',
-  'container-spread': 'narrow',
-	'svg-grid-colors': hsl(180, 50%, 80%),
+    'columns': 120px susy-repeat(4) 100px,
+    'gutters': 50px,
+    'spread': 'narrow',
+    'container-spread': 'narrow',
+    'svg-grid-colors': hsl(180, 50%, 80%),
 );

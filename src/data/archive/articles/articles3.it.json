@@ -1,9 +1,9 @@
 {
-    "pageTitle" : "articolo 3",
-    "slug" : "articolo3",
-    "exportPost" : {
-        "data" : {
-            "title" : "articolo 3"
+    "pageTitle": "articolo 3",
+    "slug": "articolo3",
+    "exportPost": {
+        "data": {
+            "title": "articolo 3"
         }
     }
 }

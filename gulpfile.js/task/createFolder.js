@@ -1,15 +1,14 @@
-const gulp = require('gulp')
-const fs = require('fs')
-const path = require('path')
-const destPath = path.resolve('www')
-const assetPath = path.join(destPath, 'assets')
-const cssPath = path.join(assetPath, 'css')
-const dataPath = path.join(assetPath, 'data')
-const distPath = path.join(assetPath, 'dist')
-const fontsPath = path.join(assetPath, 'fonts')
-const jsPath = path.join(assetPath, 'js')
-const svgPath = path.join(assetPath, 'svg')
-
+const gulp = require('gulp');
+const fs = require('fs');
+const path = require('path');
+const destPath = path.resolve('www');
+const assetPath = path.join(destPath, 'assets');
+const cssPath = path.join(assetPath, 'css');
+const dataPath = path.join(assetPath, 'data');
+const distPath = path.join(assetPath, 'dist');
+const fontsPath = path.join(assetPath, 'fonts');
+const jsPath = path.join(assetPath, 'js');
+const svgPath = path.join(assetPath, 'svg');
 
 /**
  * Create all empty folder necessary in build main folder
@@ -27,7 +26,7 @@ function createFolder(done) {
     if (!fs.existsSync(jsPath)) fs.mkdirSync(jsPath);
     if (!fs.existsSync(svgPath)) fs.mkdirSync(svgPath);
 
-    done()
+    done();
 }
 
-exports.createFolder = createFolder
+exports.createFolder = createFolder;

@@ -1,7 +1,7 @@
 {
-    "pageTitle" : "archivio",
-    "slug" : "archivio",
-    "isArchive" : {
-        "dinamicPageName" : "archivio-"
+    "pageTitle": "archivio",
+    "slug": "archivio",
+    "isArchive": {
+        "dinamicPageName": "archivio-"
     }
 }

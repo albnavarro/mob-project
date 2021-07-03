@@ -3,10 +3,11 @@
  * Most of these are inherited from Base, but I want to change a few.
  */
 html {
-	line-height: 1.7em;
-	color: $mainColor;
-	height:100%;
-	@include font-size-map();
+    line-height: 1.7em;
+    color: $mainColor;
+    height: 100%;
+
+    @include font-size-map();
 }
 
 h1,
@@ -16,22 +17,22 @@ h4,
 h5,
 h6,
 label {
-	color: $mainColor;
+    color: $mainColor;
 }
 
 .fonts-loaded {
-  body {
-    font-family: $opensans;
-    font-weight: 100;
-  }
+    body {
+        font-family: $opensans;
+        font-weight: 100;
+    }
 }
 
 h1 {
-	font-size: rem(30px);
-	line-height: line-height(30,37)
-	// font-size: rem(30px , 'desktop');
+    font-size: rem(30px);
+    line-height: line-height(30, 37)
+    // font-size: rem(30px , 'desktop');
 }
 
 a {
-	text-decoration: none;
+    text-decoration: none;
 }

@@ -1,5 +1,4 @@
-const browserSync = require('browser-sync').create()
-
+const browserSync = require('browser-sync').create();
 
 /**
  * Browser sync configuration
@@ -10,14 +9,13 @@ const browserSync = require('browser-sync').create()
 function browser_sync(done) {
     browserSync.init({
         server: {
-            baseDir: "./www/"
+            baseDir: './www/',
         },
-        open: false
-    })
+        open: false,
+    });
 
     done();
-};
-
+}
 
 /**
  * Reload page function configuration
@@ -26,10 +24,10 @@ function browser_sync(done) {
  * @return {function}
  */
 function reloadPage(done) {
-    browserSync.reload()
+    browserSync.reload();
     done();
-};
+}
 
-exports.browserSync = browserSync
-exports.browser_sync = browser_sync
-exports.reloadPage = reloadPage
+exports.browserSync = browserSync;
+exports.browser_sync = browser_sync;
+exports.reloadPage = reloadPage;

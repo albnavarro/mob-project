@@ -1,4 +1,5 @@
 {
-    "pageTitle" : "pagina casa",
-    "slug" : "pagina-casa"
+    "pageTitle": "pagina casa",
+    "slug": "pagina-casa",
+    "additionalData": ["string/it.json", "nav.json", "nonEsistenteFile.json"]
 }

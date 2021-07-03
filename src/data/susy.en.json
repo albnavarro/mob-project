@@ -1,12 +1,8 @@
 {
     "template": "susy",
-    "slug" : "susy",
-    "pageTitle" : "susy",
-    "description" : "custom description",
-    "additionalData" : [
-        "nav.json"
-    ],
-    "registerComponent" : [
-        "to-top/pug/toTop.pug"
-    ]
+    "slug": "susy",
+    "pageTitle": "susy",
+    "description": "custom description",
+    "additionalData": ["nav.json"],
+    "registerComponent": ["to-top/pug/toTop.pug"]
 }

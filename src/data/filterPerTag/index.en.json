@@ -1,28 +1,17 @@
 {
-    "pageTitle" : "tag filtered",
-    "slug" : "filter-tag",
-    "description" : "custom description",
-    "additionalData" : [
-        "nav.json"
-    ],
-    "registerComponent" : [
-        "to-top/pug/toTop.pug"
-    ],
-    "isArchive" : {
-        "pagination" : true,
-        "postPerPage" : "1",
-        "dinamicPageName" : "tagPagination-"
+    "pageTitle": "tag filtered",
+    "slug": "filter-tag",
+    "description": "custom description",
+    "additionalData": ["nav.json"],
+    "registerComponent": ["to-top/pug/toTop.pug"],
+    "isArchive": {
+        "pagination": true,
+        "postPerPage": "1",
+        "dinamicPageName": "tagPagination-"
     },
-    "importTag" : [
-        "tag3",
-        "tag2",
-        "tag1"
-    ],
-    "tagFilter" : {
-        "type" : "every",
-        "category" : [
-            "articles",
-            "news"
-        ]
+    "importTag": ["tag3", "tag2", "tag1"],
+    "tagFilter": {
+        "type": "every",
+        "category": ["articles", "news"]
     }
 }

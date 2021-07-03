@@ -1,10 +1,10 @@
 {
-    "pageTitle" : "articolo 7",
-    "slug" : "articolo7",
-    "draft" : false,
-    "exportPost" : {
-        "data" : {
-            "title" : "articolo 7"
+    "pageTitle": "articolo 7",
+    "slug": "articolo7",
+    "draft": false,
+    "exportPost": {
+        "data": {
+            "title": "articolo 7"
         }
     }
 }

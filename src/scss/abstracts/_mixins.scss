@@ -7,73 +7,78 @@
 /// @param {Bool} $self [false] - Whether or not to include current selector
 /// @link https://twitter.com/csswizardry/status/478938530342006784 Original tweet from Harry Roberts
 @mixin on-event($self: false) {
-  @if $self {
-    &.active,
-    &:hover,
-    &:active,
-    &:focus {
-      @content;
+    @if $self {
+        &.active,
+        &:hover,
+        &:active,
+        &:focus {
+            @content;
+        }
     }
-  } @else {
-    &:hover,
-    &:active,
-    &:focus {
-      @content;
+
+    @else {
+        &:hover,
+        &:active,
+        &:focus {
+            @content;
+        }
     }
-  }
 }
 
 /// Make a context based selector a little more friendly
 /// @author Hugo Giraudel
 /// @param {String} $context
 @mixin when-inside($context) {
-  #{$context} & {
-    @content;
-  }
+    #{$context} & {
+        @content;
+    }
 }
 
 /// Make media queries smarter
 @include breakpoint-set('to ems', true);
 
 @mixin _mq($min, $max: '') {
-  @if $max == '' {
-    @include breakpoint(map-get($breakpoints, $min)) {
-      @content;
+    @if $max == '' {
+        @include breakpoint(map-get($breakpoints, $min)) {
+            @content;
+        }
     }
-  } @else {
-    @if $min == 'max' {
-      @include breakpoint('max-width' (map-get($breakpoints, $max) - 1)) {
-        @content;
-      }
-    } @else {
-      @include breakpoint(
-        ((map-get($breakpoints, $min))
-        (map-get($breakpoints, $max) - 1))) {
-        @content;
-      }
+
+    @else {
+        @if $min == 'max' {
+            @include breakpoint('max-width' (map-get($breakpoints, $max) - 1)) {
+                @content;
+            }
+        }
+
+        @else {
+            @include breakpoint(
+                ((map-get($breakpoints, $min))
+                (map-get($breakpoints, $max) - 1))) {
+                @content;
+            }
+        }
     }
-  }
 }
 
 @mixin susy-use(
-  $config
+    $config
 ) {
-  //  parse and normalize any shorthand arguments
-  $config: susy-compile($config);
+    //  parse and normalize any shorthand arguments
+    $config: susy-compile($config);
 
-  // record the global settings -
-  // and update the global variable with our new settings
-  $global: $susy;
-  $susy: map-merge($susy, $config) !global;
+    // record the global settings -
+    // and update the global variable with our new settings
+    $global: $susy;
+    $susy: map-merge($susy, $config) !global;
 
-  // any content inside this mixin
-  // will use the local settings
-  @content;
+    // any content inside this mixin
+    // will use the local settings
+    @content;
 
-  // return the global variable to its initial value
-  $susy: $global !global;
+    // return the global variable to its initial value
+    $susy: $global !global;
 }
-
 
 ///
 /// Helper function to easily use an SVG inline in CSS
@@ -88,26 +93,26 @@
 /// @param {String} $svg - SVG image to encode
 /// @return {String} - Encoded SVG data uri
 @function svg-uri($svg) {
-  $encoded: '';
-  $slice: 2000;
-  $index: 0;
-  $loops: ceil(str-length($svg) / $slice);
+    $encoded: '';
+    $slice: 2000;
+    $index: 0;
+    $loops: ceil(str-length($svg) / $slice);
 
-  @for $i from 1 through $loops {
-    $chunk: str-slice($svg, $index, $index + $slice - 1);
-    $chunk: str-replace($chunk, '"', "'");
-    $chunk: str-replace($chunk, '%', '%25');
-    $chunk: str-replace($chunk, '{', '%7B');
-    $chunk: str-replace($chunk, '}', '%7D');
-    $chunk: str-replace($chunk, '<', '%3C');
-    $chunk: str-replace($chunk, '>', '%3E');
-    $chunk: str-replace($chunk, '&', '%26');
-    $chunk: str-replace($chunk, '#', '%23');
-    $encoded: #{$encoded}#{$chunk};
-    $index: $index + $slice;
-  }
+    @for $i from 1 through $loops {
+        $chunk: str-slice($svg, $index, $index + $slice - 1);
+        $chunk: str-replace($chunk, '"', "'");
+        $chunk: str-replace($chunk, '%', '%25');
+        $chunk: str-replace($chunk, '{', '%7B');
+        $chunk: str-replace($chunk, '}', '%7D');
+        $chunk: str-replace($chunk, '<', '%3C');
+        $chunk: str-replace($chunk, '>', '%3E');
+        $chunk: str-replace($chunk, '&', '%26');
+        $chunk: str-replace($chunk, '#', '%23');
+        $encoded: #{$encoded}#{$chunk};
+        $index: $index + $slice;
+    }
 
-  @return url("data:image/svg+xml;charset=utf8,#{$encoded}");
+    @return url("data:image/svg+xml;charset=utf8,#{$encoded}");
 }
 
 /// Replace `$search` with `$replace` in `$string`
@@ -118,13 +123,13 @@
 /// @param {String} $replace ('') - New value
 /// @return {String} - Updated string
 @function str-replace($string, $search, $replace: '') {
-  $index: str-index($string, $search);
+    $index: str-index($string, $search);
 
-  @if $index {
-      @return str-slice($string, 1, $index - 1) + $replace + str-replace(str-slice($string, $index + str-length($search)), $search, $replace);
-  }
+    @if $index {
+        @return str-slice($string, 1, $index - 1) + $replace + str-replace(str-slice($string, $index + str-length($search)), $search, $replace);
+    }
 
-  @return $string;
+    @return $string;
 }
 
 // responsive font size mixin v1
@@ -138,34 +143,34 @@
 
 // responsive font size mixin v2
 @mixin font-size-map() {
-  $last-output: null;
-  @each $key, $value in $html-font-size {
-    @if $last-output != $value {
-      @include _mq($key) {
-        font-size: $value;
-      }
+    $last-output: null;
+
+    @each $key, $value in $html-font-size {
+        @if $last-output != $value {
+            @include _mq($key) {
+                font-size: $value;
+            }
+        }
+        $last-output: $value;
     }
-    $last-output: $value;
-  }
 }
 
 @mixin get-dot-bg($dotWidth, $dotColor) {
-    background-image:svg-uri('<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><rect y="50%" x="50%" width="#{$dotWidth}" height="#{$dotWidth}" fill="#{$dotColor}"/></svg>');
+    background-image: svg-uri('<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><rect y="50%" x="50%" width="#{$dotWidth}" height="#{$dotWidth}" fill="#{$dotColor}"/></svg>');
     background-position: left top;
-};
+}
 
 @mixin Ie11() {
-  @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
-     @content;
-  }
+    @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+        @content;
+    }
 }
 
 @mixin Edge() {
-  @supports (-ms-accelerator:true) {
-     @content;
-  }
+    @supports (-ms-accelerator:true) {
+        @content;
+    }
 }
-
 
 @mixin vwHeight() {
     height: calc(100vh - 80px);
@@ -190,10 +195,12 @@
     @if $u1 == $u2 and $u1 == $u3 and $u1 == $u4 {
         & {
             font-size: $min-font-size;
+
             @media screen and (min-width: $min-vw) {
                 font-size: -webkit-calc(#{$min-font-size} + #{strip-unit($max-font-size - $min-font-size)} * ((100vw - #{$min-vw}) / #{strip-unit($max-vw - $min-vw)}));
                 font-size: calc(#{$min-font-size} + #{strip-unit($max-font-size - $min-font-size)} * ((100vw - #{$min-vw}) / #{strip-unit($max-vw - $min-vw)}));
             }
+
             @media screen and (min-width: $max-vw) {
                 font-size: $max-font-size;
             }
@@ -205,21 +212,22 @@
 
 // Function
 @function get-vw($target, $max-breakpoint-fluid) {
-  // 1 vw is equal to 1% of the viewport width
-  $vw-context: ($max-breakpoint-fluid * .01) * 1px; // 1% viewport width
-  @return ($target/$vw-context) * 1vw;
+    // 1 vw is equal to 1% of the viewport width
+    $vw-context: ($max-breakpoint-fluid * 0.01) * 1px; // 1% viewport width
+
+    @return ($target/$vw-context) * 1vw;
 }
 
 // Mixin
 @mixin vw($size, $max-breakpoint-fluid, $use-breakpoint: true) {
-  font-size: get-vw($size,$max-breakpoint-fluid);
-  // Prevent font-size from getting too big
+    font-size: get-vw($size, $max-breakpoint-fluid);
+    // Prevent font-size from getting too big
 
-  @if $use-breakpoint {
-      @media (min-width: #{$max-breakpoint-fluid}px) {
-          font-size: $size;
-      }
-  }
+    @if $use-breakpoint {
+        @media (min-width: #{$max-breakpoint-fluid}px) {
+            font-size: $size;
+        }
+    }
 }
 
 @mixin fluidElementWH($imgW , $imgH, $max-breakpoint-fluid,  $use-breakpoint: true) {
@@ -235,11 +243,11 @@
             height: $imgH * 1px;
         }
     }
-
 }
 
 @mixin fluidElementW($imgW, $max-breakpoint-fluid,  $use-breakpoint: true) {
     $widthW: (100 * $imgW) / $max-breakpoint-fluid;
+
     width: $widthW * 1vw;
 
     @if $use-breakpoint {

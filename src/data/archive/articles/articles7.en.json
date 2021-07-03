@@ -1,19 +1,15 @@
 {
-    "description" : "custom description",
-    "pageTitle" : "article 7",
-    "draft" : true,
-    "additionalData" : [
-        "nav.json"
-    ],
-    "registerComponent" : [
-        "to-top/pug/toTop.pug"
-    ],
-    "exportPost" : {
-        "category" : "articles",
-        "date" : "10-06-2021",
-        "data" : {
-            "title" : "articles 7",
-            "description" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus diam urna, sagittis sed diam vitae, aliquet ultricies sem. Quisque quam nibh, aliquet at cursus id, commodo vel urna."
+    "description": "custom description",
+    "pageTitle": "article 7",
+    "draft": true,
+    "additionalData": ["nav.json"],
+    "registerComponent": ["to-top/pug/toTop.pug"],
+    "exportPost": {
+        "category": "articles",
+        "date": "10-06-2021",
+        "data": {
+            "title": "articles 7",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus diam urna, sagittis sed diam vitae, aliquet ultricies sem. Quisque quam nibh, aliquet at cursus id, commodo vel urna."
         }
     }
 }

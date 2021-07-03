@@ -1,11 +1,11 @@
 #overlay--comp {
     position: fixed;
-    background-color: rgba($black, .7);
+    background-color: rgba($black, 0.7);
     z-index: 11;
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transition: opacity .35s, visibility .35s;
+    transition: opacity 0.35s, visibility 0.35s;
 
     &.active {
         opacity: 1;

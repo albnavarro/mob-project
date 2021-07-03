@@ -1,7 +1,7 @@
 {
-    "pageTitle" : "tag filtrati",
-    "slug" : "filtri-tag",
-    "isArchive" : {
-        "dinamicPageName" : "tagPaginazione-"
+    "pageTitle": "tag filtrati",
+    "slug": "filtri-tag",
+    "isArchive": {
+        "dinamicPageName": "tagPaginazione-"
     }
 }

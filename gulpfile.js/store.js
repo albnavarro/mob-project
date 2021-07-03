@@ -1,141 +1,139 @@
-const arg = require('./functions/arg.js')
+const arg = require('./functions/arg.js');
 
 class storeClass {
     constructor() {
         /*
         How many time watch task is invoked
         */
-        this._counterRun = 0
+        this._counterRun = 0;
 
         /*
         last file saved
         */
-        this._fileModified = ''
+        this._fileModified = '';
 
         /*
         Map of all includes file
         */
-        this._includesFileMap = []
+        this._includesFileMap = [];
 
         /*
         Map of all pageTitle
         */
-        this._permalinkMapData = {}
+        this._permalinkMapData = {};
 
         /*
         Map of all pageTitle
         */
-        this._pageTitleMapData = {}
+        this._pageTitleMapData = {};
 
         /*
         Map of all cateogry
         */
-        this._categoryMapData = {}
+        this._categoryMapData = {};
 
         /*
         Map of all draft
         */
-        this._draftMapData = {}
+        this._draftMapData = {};
 
         /*
         Map of all crtial css by template
         */
-        this._criticalCssMapData = {}
+        this._criticalCssMapData = {};
 
         /*
         Map of all asstes
         */
-        this._manifest = {}
+        this._manifest = {};
 
         /*
         Argument
         */
-        this._arg = {}
+        this._arg = {};
     }
 
     set counterRun(value) {
-        this._counterRun = value
+        this._counterRun = value;
     }
 
     get counterRun() {
-        return this._counterRun
+        return this._counterRun;
     }
 
     set fileModified(value) {
-        this._fileModified = value
+        this._fileModified = value;
     }
 
     get fileModified() {
-        return this._fileModified
+        return this._fileModified;
     }
 
     set includesFileMap(value) {
-        this._includesFileMap = value
+        this._includesFileMap = value;
     }
 
     get includesFileMap() {
-        return this._includesFileMap
+        return this._includesFileMap;
     }
 
     set permalinkMapData(value) {
-        this._permalinkMapData = value
+        this._permalinkMapData = value;
     }
 
     get permalinkMapData() {
-        return this._permalinkMapData
+        return this._permalinkMapData;
     }
 
     set pageTitleMapData(value) {
-        this._pageTitleMapData = value
+        this._pageTitleMapData = value;
     }
 
     get pageTitleMapData() {
-        return this._pageTitleMapData
+        return this._pageTitleMapData;
     }
 
     set categoryMapData(value) {
-        this._categoryMapData = value
+        this._categoryMapData = value;
     }
 
     get categoryMapData() {
-        return this._categoryMapData
+        return this._categoryMapData;
     }
 
     set draftMapData(value) {
-        this._draftMapData = value
+        this._draftMapData = value;
     }
 
     get draftMapData() {
-        return this._draftMapData
+        return this._draftMapData;
     }
 
     set criticalCssMapData(value) {
-        this._criticalCssMapData = value
+        this._criticalCssMapData = value;
     }
 
     get criticalCssMapData() {
-        return this._criticalCssMapData
+        return this._criticalCssMapData;
     }
 
     set manifest(value) {
-        this._manifest = value
+        this._manifest = value;
     }
 
     get manifest() {
-        return this._manifest
+        return this._manifest;
     }
 
     set arg(value) {
-        this._arg = value
+        this._arg = value;
     }
 
     get arg() {
-        return this._arg
+        return this._arg;
     }
 }
 
-
-
-const store = new storeClass()
-store.arg = arg
-module.exports = store
+const store = new storeClass();
+store.arg = arg;
+module.exports = store;

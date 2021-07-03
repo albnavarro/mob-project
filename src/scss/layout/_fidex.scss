@@ -6,7 +6,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        width: 100%
+        width: 100%;
     }
 
     &__dummy {
@@ -27,5 +27,5 @@
     width: 200px;
     height: 200px;
     background-color: #ccc;
-    border: 0px $black solid;
+    border: 0 $black solid;
 }

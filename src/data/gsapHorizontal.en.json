@@ -1,11 +1,7 @@
 {
     "template": "gsapHorizontal",
-    "pageTitle" : "gsap Horizontal",
-    "description" : "custom description",
-    "additionalData" : [
-        "nav.json"
-    ],
-    "registerComponent" : [
-        "to-top/pug/toTop.pug"
-    ]
+    "pageTitle": "gsap Horizontal",
+    "description": "custom description",
+    "additionalData": ["nav.json"],
+    "registerComponent": ["to-top/pug/toTop.pug"]
 }
