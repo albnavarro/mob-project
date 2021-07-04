@@ -1,10 +1,17 @@
-import { eventManager } from "../../../js/base/eventManager.js";
-import { modernzier } from "../../../js/utility/modernizr.js"
-import { outerWidth, offset, getParents, getSiblings } from "../../../js/utility/vanillaFunction.js";
+import { eventManager } from '../../../js/base/eventManager.js';
+import { modernzier } from '../../../js/utility/modernizr.js';
+import {
+    outerWidth,
+    offset,
+    getParents,
+    getSiblings,
+} from '../../../js/utility/vanillaFunction.js';
 
 class toolTipClass {
     constructor() {
-        this.bnt = document.querySelectorAll("*[data-conponent='m-comp--tooltip']");
+        this.bnt = document.querySelectorAll(
+            "*[data-conponent='m-comp--tooltip']"
+        );
         this.body = document.querySelector('body');
         this.lastToolTip = null;
         this.overTool = false;
@@ -17,12 +24,12 @@ class toolTipClass {
     addHandler() {
         const btnArray = Array.from(this.bnt);
         for (const btn of btnArray) {
-            btn.addEventListener('click', this.onClick.bind(this))
-            btn.addEventListener('mouseover', this.onMouseOver.bind(this))
-            btn.addEventListener('mouseout', this.onMouseOut.bind(this))
+            btn.addEventListener('click', this.onClick.bind(this));
+            btn.addEventListener('mouseover', this.onMouseOver.bind(this));
+            btn.addEventListener('mouseout', this.onMouseOut.bind(this));
         }
 
-        this.body.addEventListener('click', this.bodyOnCLick.bind(this))
+        this.body.addEventListener('click', this.bodyOnCLick.bind(this));
     }
 
     onClick(event) {
@@ -38,9 +45,12 @@ class toolTipClass {
     onMouseOver(event) {
         if (!Modernizr.touchevents) {
             // Controllo che non passi sopra il toolotip per non chiuderlo
-            const currentTarget = event.currentTarget
+            const currentTarget = event.currentTarget;
 
-            if (!currentTarget.classList.contains('tooltip-pop') && !this.overTool) {
+            if (
+                !currentTarget.classList.contains('tooltip-pop') &&
+                !this.overTool
+            ) {
                 this.addTollTip(currentTarget, event);
                 this.overTool = true;
             }
@@ -53,27 +63,31 @@ class toolTipClass {
         const realtedTarget = event.relatedTarget;
         const parents = getParents(realtedTarget, 'tooltip-pop');
 
-        if (typeof(realtedTarget) === 'undefined' || realtedTarget === null) return;
+        if (typeof realtedTarget === 'undefined' || realtedTarget === null)
+            return;
 
         // Chiudo il PopUp solo se non passo dal btn al PopUp aperto
-        if (!Modernizr.touchevents
-            && !realtedTarget.classList.contains('tooltip-pop')
-            && parents.length == 0) {
-                this.resetTooltip();
-                this.overTool = false;
-
-        } else if (!Modernizr.touchevents && realtedTarget.classList.contains('tooltip-pop')) {
-
+        if (
+            !Modernizr.touchevents &&
+            !realtedTarget.classList.contains('tooltip-pop') &&
+            parents.length == 0
+        ) {
+            this.resetTooltip();
+            this.overTool = false;
+        } else if (
+            !Modernizr.touchevents &&
+            realtedTarget.classList.contains('tooltip-pop')
+        ) {
             // Altrimenti agiungo un listener al popUp per vedere quando esco dallo stesso
             this.overTool = true;
 
             // REMOVE LISTERNER
-            const clonedNode = realtedTarget.cloneNode(true)
-            const parent = realtedTarget.parentNode
-            parent.replaceChild(clonedNode, realtedTarget)
+            const clonedNode = realtedTarget.cloneNode(true);
+            const parent = realtedTarget.parentNode;
+            parent.replaceChild(clonedNode, realtedTarget);
             // ADD LISTENER
-            const tooltip = parent.querySelector('.tooltip-pop')
-            tooltip.addEventListener('mouseout', this.outOfPopUp.bind(this))
+            const tooltip = parent.querySelector('.tooltip-pop');
+            tooltip.addEventListener('mouseout', this.outOfPopUp.bind(this));
         }
     }
 
@@ -88,18 +102,18 @@ class toolTipClass {
         if (
             // Se entro dentro un sottoelemento del popUp ( es. un link )
             parents.length > 0 ||
-
             // Se da un sottoelemento del popUp torno nel popUp
             realtedTarget.classList.contains('tooltip-pop') ||
-
             // Se dal pop up entro nel bottone che lo ha aperto
-            (realtedTarget.classList.contains('tooltip') && siblings.length == 1)
-        ) return;
+            (realtedTarget.classList.contains('tooltip') &&
+                siblings.length == 1)
+        )
+            return;
 
         // Altrimenti chiudo il popUp:
-        const clonedNode = target.cloneNode(true)
-        const parent = target.parentNode
-        parent.replaceChild(clonedNode, target)
+        const clonedNode = target.cloneNode(true);
+        const parent = target.parentNode;
+        parent.replaceChild(clonedNode, target);
 
         this.resetTooltip();
         this.overTool = false;
@@ -109,9 +123,11 @@ class toolTipClass {
         const target = event.target;
         const parentToolTip = getParents(target, 'tooltip-pop');
 
-        if (!target.classList.contains('tooltip')
-            && parentToolTip.length == 0
-            && !target.classList.contains('tooltip-pop')) {
+        if (
+            !target.classList.contains('tooltip') &&
+            parentToolTip.length == 0 &&
+            !target.classList.contains('tooltip-pop')
+        ) {
             this.resetTooltip();
         }
     }
@@ -125,7 +141,10 @@ class toolTipClass {
         toolTipPopInner.innerHTML = data;
         toolTipPop.appendChild(toolTipPopInner);
 
-        if (typeof(this.lastToolTip) != 'undefined' && this.lastToolTip != null) {
+        if (
+            typeof this.lastToolTip != 'undefined' &&
+            this.lastToolTip != null
+        ) {
             if (this.lastToolTip !== item) {
                 this.resetTooltip();
             }
@@ -136,7 +155,7 @@ class toolTipClass {
                 item.classList.add('tooltip-active');
 
                 // PARENT
-                const wrapper = item.parentNode
+                const wrapper = item.parentNode;
                 wrapper.appendChild(toolTipPop);
 
                 const toolTip = wrapper.querySelector('.tooltip-pop');
@@ -144,21 +163,23 @@ class toolTipClass {
                 const toolTipPosY = offset(toolTip).top;
                 const toolTipPosWidth = outerWidth(toolTip);
 
-                if ((toolTipPosX + toolTipPosWidth) >= eventManager.windowsWidth()) {
-                    toolTip.classList.add('tooltip-pop--is-right')
+                if (
+                    toolTipPosX + toolTipPosWidth >=
+                    eventManager.windowsWidth()
+                ) {
+                    toolTip.classList.add('tooltip-pop--is-right');
                 }
 
                 if (toolTipPosY - eventManager.scrollTop() < 0) {
-                    toolTip.classList.add('tooltip-pop--is-bottom')
+                    toolTip.classList.add('tooltip-pop--is-bottom');
                 }
 
                 toolTip.classList.add('active');
-                this.lastToolTip = item
-
+                this.lastToolTip = item;
             } else {
                 item.classList.remove('tooltip-active');
 
-                const parent = item.parentNode
+                const parent = item.parentNode;
                 const toolTipAdded = parent.querySelector('.tooltip-pop');
                 parent.removeChild(toolTipAdded);
             }
@@ -166,7 +187,10 @@ class toolTipClass {
     }
 
     resetTooltip() {
-        if (typeof(this.lastToolTip) != 'undefined' && this.lastToolTip != null) {
+        if (
+            typeof this.lastToolTip != 'undefined' &&
+            this.lastToolTip != null
+        ) {
             this.lastToolTip.classList.remove('tooltip-active');
 
             const allTootTip = document.querySelectorAll('.tooltip-pop');
@@ -180,7 +204,6 @@ class toolTipClass {
             this.lastToolTip = null;
         }
     }
-
 }
 
-export const toolTip = new toolTipClass()
+export const toolTip = new toolTipClass();

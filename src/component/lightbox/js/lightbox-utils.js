@@ -1,17 +1,20 @@
-import { eventManager } from "../../../js/base/eventManager.js";
+import { eventManager } from '../../../js/base/eventManager.js';
 
 class lightboxUtilsClass {
-
     // RESETTO IL CONTENUTO DELLA DESCRIZIONE LIGHTBOX SE TALE ELEMENTO ESISTE
     // ALLA CHIUSURA DELLA LIGHTBOX O AL CAMBIO LIOGHTBOX
     resetDescriptionBox(wrapper) {
         const parent = wrapper.closest('.lightbox');
         const descriptionBox = parent.querySelector('.lightbox__description');
 
-        if (typeof(descriptionBox) != 'undefined' && descriptionBox != null) {
+        if (typeof descriptionBox != 'undefined' && descriptionBox != null) {
             const title = descriptionBox.querySelector('.lightbox__title');
-            const description = descriptionBox.querySelector('.lightbox__paragraph');
-            const HideDescriptionLightbox = descriptionBox.querySelector('.lightbox__description__btn');
+            const description = descriptionBox.querySelector(
+                '.lightbox__paragraph'
+            );
+            const HideDescriptionLightbox = descriptionBox.querySelector(
+                '.lightbox__description__btn'
+            );
 
             title.innerHTML = '';
             description.innerHTML = '';
@@ -24,20 +27,24 @@ class lightboxUtilsClass {
         const parent = wrapper.closest('.lightbox');
         const descriptionBox = parent.querySelector('.lightbox__description');
 
-        if (typeof(descriptionBox) != 'undefined' && descriptionBox != null) {
+        if (typeof descriptionBox != 'undefined' && descriptionBox != null) {
             descriptionBox.classList.remove('hide');
             descriptionBox.classList.add('show');
         }
     }
 
     // CANCELLO IL wrapperO SOLO SE DINAMICO ( E' UN CONTENUTO DI TIPO IMMAGINE )
-    onCloseLightbox({wrapper, type}) {
-        if (typeof(wrapper) != 'undefined' && wrapper != null && type == 'dynamic') {
-            wrapper.innerHTML = "";
+    onCloseLightbox({ wrapper, type }) {
+        if (
+            typeof wrapper != 'undefined' &&
+            wrapper != null &&
+            type == 'dynamic'
+        ) {
+            wrapper.innerHTML = '';
             const style = {
-                'width': '200px',
-                'height': '200px'
-            }
+                width: '200px',
+                height: '200px',
+            };
 
             Object.assign(wrapper.style, style);
         }
@@ -49,11 +56,10 @@ class lightboxUtilsClass {
     calculateAspectRatioFit(srcWidth, srcHeight, maxWidth, maxHeight) {
         const ratio = Math.min(maxWidth / srcWidth, maxHeight / srcHeight);
         return {
-            width: srcWidth * ratio,
-            height: srcHeight * ratio
+            ratioWidth: srcWidth * ratio,
+            ratioHeight: srcHeight * ratio,
         };
     }
-
 }
 
-export const lightboxUtils = new lightboxUtilsClass()
+export const lightboxUtils = new lightboxUtilsClass();

@@ -1,9 +1,16 @@
-import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
-import { eventManager } from "../../../js/base/eventManager.js";
-import { outerHeight, outerWidth, position } from "../../../js/utility/vanillaFunction.js";
+import {
+    disableBodyScroll,
+    enableBodyScroll,
+    clearAllBodyScrollLocks,
+} from 'body-scroll-lock';
+import { eventManager } from '../../../js/base/eventManager.js';
+import {
+    outerHeight,
+    outerWidth,
+    position,
+} from '../../../js/utility/vanillaFunction.js';
 
 export class overlayClass {
-
     constructor(data) {
         this.overlay = document.querySelector(data.element);
         this.delay = data.delay || 300;
@@ -15,9 +22,10 @@ export class overlayClass {
     }
 
     init() {
-        if (typeof(this.overlay) === 'undefined' || this.overlay === null) return;
+        if (typeof this.overlay === 'undefined' || this.overlay === null)
+            return;
 
-        this.overlay.addEventListener('click', (e) => this.onClick())
+        this.overlay.addEventListener('click', (e) => this.onClick());
     }
 
     onClick() {
@@ -50,28 +58,40 @@ export class overlayClass {
 
             if (isNaN(data.top)) {
                 const el = document.querySelector(data.top);
-                top = parseInt(position(el).top) + parseInt(outerHeight(el)) + 'px'
+                top =
+                    parseInt(position(el).top) +
+                    parseInt(outerHeight(el)) +
+                    'px';
             } else {
                 top = `${data.top}px`;
             }
 
             if (isNaN(data.right)) {
                 const el = document.querySelector(data.right);
-                right = eventManager.windowsWidth() - parseInt(position(el).left) + 'px';
+                right =
+                    eventManager.windowsWidth() -
+                    parseInt(position(el).left) +
+                    'px';
             } else {
                 right = `${data.right}px`;
             }
 
             if (isNaN(data.bottom)) {
                 const el = document.querySelector(data.bottom);
-                bottom = eventManager.windowsHeight() - parseInt(position(el).top) + 'px';
+                bottom =
+                    eventManager.windowsHeight() -
+                    parseInt(position(el).top) +
+                    'px';
             } else {
                 bottom = `${data.bottom}px`;
             }
 
             if (isNaN(data.left)) {
                 const el = document.querySelector(data.left);
-                left = parseInt(position(el).left) + parseInt(outerWidth(el)) + 'px';
+                left =
+                    parseInt(position(el).left) +
+                    parseInt(outerWidth(el)) +
+                    'px';
             } else {
                 left = `${data.left}px`;
             }
@@ -79,27 +99,25 @@ export class overlayClass {
             if (data.name) dataName = data.name;
 
             const style = {
-                'top': top,
-                'bottom': bottom,
-                'left': left,
-                'right': right
+                top: top,
+                bottom: bottom,
+                left: left,
+                right: right,
             };
             Object.assign(this.overlay.style, style);
 
             this.overlay.classList.add('active');
-            this.overlay.setAttribute('data-name', dataName)
-
+            this.overlay.setAttribute('data-name', dataName);
         }, this.delay);
     }
 
     close() {
         this.overlay.classList.remove('active');
-        this.overlay.setAttribute('data-name', '')
+        this.overlay.setAttribute('data-name', '');
         if (this.bodyOverflow) enableBodyScroll(this.overlay);
     }
 
     set callback(fn) {
         this._callBack = fn;
     }
-
 }

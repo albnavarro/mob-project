@@ -1,8 +1,11 @@
-import { eventManager } from "../../../js/base/eventManager.js";
-import { slideUpDownReset, slideUp, slideDown } from "../../../js/utility/animation.js";
+import { eventManager } from '../../../js/base/eventManager.js';
+import {
+    slideUpDownReset,
+    slideUp,
+    slideDown,
+} from '../../../js/utility/animation.js';
 
 export class popToggleClass {
-
     constructor(data) {
         this._name = data.name || '';
         this.btn = document.querySelector(data.openButton);
@@ -10,7 +13,8 @@ export class popToggleClass {
         this.closeBtn = document.querySelector(data.closeButton); // Optional
         this._openCallBack = []; // funzioni opzionale da eseguire all'apertura del sigolo PopUp
         this._closeCallBack = []; // funzioni opzionale da eseguire alla chiusura del sigolo PopUp
-        this.isDropDown = typeof data.isDropDown === "undefined" ? false : data.isDropDown;
+        this.isDropDown =
+            typeof data.isDropDown === 'undefined' ? false : data.isDropDown;
         this.manager = data.manager;
 
         this.init();
@@ -21,16 +25,16 @@ export class popToggleClass {
 
         /// GASP INITIAL STATE
         if (this.isDropDown) {
-            if (typeof(this.target) != 'undefined' && this.target != null) {
+            if (typeof this.target != 'undefined' && this.target != null) {
                 slideUpDownReset(this.target);
             }
         }
 
-        if (typeof(this.btn) != 'undefined' && this.btn != null) {
+        if (typeof this.btn != 'undefined' && this.btn != null) {
             this.btn.addEventListener('click', (e) => this.openPop());
         }
 
-        if (typeof(this.closeBtn) != 'undefined' && this.closeBtn != null) {
+        if (typeof this.closeBtn != 'undefined' && this.closeBtn != null) {
             this.closeBtn.addEventListener('click', (e) => this.closePop());
         }
     }
@@ -49,7 +53,7 @@ export class popToggleClass {
             }
 
             if (this._openCallBack.length) {
-                for (const item of  this._openCallBack) {
+                for (const item of this._openCallBack) {
                     item();
                 }
             }
@@ -70,7 +74,7 @@ export class popToggleClass {
             }
 
             if (this._closeCallBack.length) {
-                for (const item of  this._closeCallBack) {
+                for (const item of this._closeCallBack) {
                     item();
                 }
             }

@@ -1,18 +1,16 @@
 export class popToggleManagerClass {
-
     constructor() {
         this.popArray = [];
         this.functionArray = [];
-
     }
 
     pushToggle(_fn) {
-        this.popArray.push(_fn)
+        this.popArray.push(_fn);
     }
 
     // // funzione opzionale da eseguire all'apertura del sigolo PopUp
     callBackFunction(_fn) {
-        this.functionArray.push(_fn)
+        this.functionArray.push(_fn);
     }
 
     onOpenPop(_name) {

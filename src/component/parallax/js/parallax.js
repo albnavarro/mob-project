@@ -1,9 +1,11 @@
-import {eventManager} from "../../../js/base/eventManager.js";
-import {parallaxItemClass} from "./parallaxItem.js";
+import { eventManager } from '../../../js/base/eventManager.js';
+import { parallaxItemClass } from './parallaxItem.js';
 
 class parallaxClass {
     constructor() {
-        this.parallaxItem = document.querySelectorAll("*[data-conponent='m-comp--parallax']");
+        this.parallaxItem = document.querySelectorAll(
+            "*[data-conponent='m-comp--parallax']"
+        );
         this.instances = [];
     }
 
@@ -13,9 +15,9 @@ class parallaxClass {
 
     inzializeData() {
         const itemArray = Array.from(this.parallaxItem);
-        const dataArray = itemArray.map(item => {
+        const dataArray = itemArray.map((item) => {
             return this.getItemData(item);
-        })
+        });
 
         for (const item of dataArray) {
             const parallaxItem = new parallaxItemClass(item);
@@ -39,16 +41,15 @@ class parallaxClass {
         data.container = item.closest('.parallax__container');
 
         // String: fixed || default
-        data.computationType = item.getAttribute('data-computationType') || 'default';
-
-
+        data.computationType =
+            item.getAttribute('data-computationType') || 'default';
 
         // FIXED PROPS
 
         // Boolean
         // Mandatory computationType = 'fixed'
         // Inverts the calculated minimum and maximum values
-        data.fixedInward = (item.hasAttribute('data-fixedInward'));
+        data.fixedInward = item.hasAttribute('data-fixedInward');
 
         // String: 0 to infinite
         // shilft animation start 0 - 100 -> vh value
@@ -96,18 +97,15 @@ class parallaxClass {
         // 1- 100: percentage of the viewport from which the opcity ends
         data.opacityEnd = item.getAttribute('data-opacityEnd') || 0;
 
-
-
-
         // COMMON PROPS
-
 
         data.perspective = item.getAttribute('data-perspective') || null;
 
         // String: DOM element
         // Custom element on which to apply the calculated values
         // Default itself
-        data.applyEl = document.querySelector(item.getAttribute('data-applyEl')) || null;
+        data.applyEl =
+            document.querySelector(item.getAttribute('data-applyEl')) || null;
 
         // String: DOM element
         // Performs calculations based on another element of the DOM at your choice
@@ -149,8 +147,6 @@ class parallaxClass {
 
         return data;
     }
-
-
 }
 
-export const parallax = new parallaxClass()
+export const parallax = new parallaxClass();

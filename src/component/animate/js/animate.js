@@ -1,9 +1,11 @@
-import { eventManager } from "../../../js/base/eventManager.js";
-import { animateItemClass } from "./animateItem.js";
+import { eventManager } from '../../../js/base/eventManager.js';
+import { animateItemClass } from './animateItem.js';
 
 class animateClass {
     constructor() {
-        this.componentItem = document.querySelectorAll("*[data-conponent='m-comp--animate']");
+        this.componentItem = document.querySelectorAll(
+            "*[data-conponent='m-comp--animate']"
+        );
         this.instances = [];
     }
 
@@ -13,9 +15,9 @@ class animateClass {
 
     inzializeData() {
         const itemArray = Array.from(this.componentItem);
-        const dataArray = itemArray.map(item => {
+        const dataArray = itemArray.map((item) => {
             return this.getItemData(item);
-        })
+        });
 
         for (const item of dataArray) {
             const componentItem = new animateItemClass(item);
@@ -27,8 +29,8 @@ class animateClass {
     getItemData(item) {
         const data = {};
         data.compRoot = item;
-        data.rootMargin = item.getAttribute('data-rootMargin') || 0 ;
-        data.threshold = item.getAttribute('data-threshold') || .15 ;
+        data.rootMargin = item.getAttribute('data-rootMargin') || 0;
+        data.threshold = item.getAttribute('data-threshold') || 0.15;
         data.triggerEl = item.getAttribute('data-triggerEl') || null;
         data.noRepeat = item.hasAttribute('data-noRepeat');
 
@@ -36,4 +38,4 @@ class animateClass {
     }
 }
 
-export const animate = new animateClass()
+export const animate = new animateClass();

@@ -1,10 +1,12 @@
-import { eventManager } from "../../../js/base/eventManager.js";
-import { outerWidth } from "../../../js/utility/vanillaFunction.js";
+import { eventManager } from '../../../js/base/eventManager.js';
+import { outerWidth } from '../../../js/utility/vanillaFunction.js';
 
 export class offsetSliderItemClass {
     constructor(data) {
-        this.component =  data.component;
-        this.container = data.component.querySelector('.offset-slider__container');
+        this.component = data.component;
+        this.container = data.component.querySelector(
+            '.offset-slider__container'
+        );
         this.step = data.step || 5;
         this.containerWidth = 0;
         this.items = data.component.querySelectorAll('.offset-slider__item');
@@ -24,7 +26,8 @@ export class offsetSliderItemClass {
     }
 
     init() {
-        if (typeof(this.container) === 'undefined' || this.container === null) return;
+        if (typeof this.container === 'undefined' || this.container === null)
+            return;
 
         this.setData();
         this.getDrivenIndex();
@@ -32,16 +35,18 @@ export class offsetSliderItemClass {
         this.setContainerWidth();
         this.setAdvancement();
         this.initSwipe();
-        this.prevBtn.addEventListener('click', this.prevStep.bind(this))
-        this.nextBtn.addEventListener('click', this.nextStep.bind(this))
+        this.prevBtn.addEventListener('click', this.prevStep.bind(this));
+        this.nextBtn.addEventListener('click', this.nextStep.bind(this));
 
         eventManager.push('resize', this.setContainerWidth.bind(this));
         eventManager.push('resize', this.updateData.bind(this));
         eventManager.push('resize', this.setAdvancement.bind(this));
-        eventManager.push('resize', this.setDriveElPosition.bind(this, {fireEvent: false}));
+        eventManager.push(
+            'resize',
+            this.setDriveElPosition.bind(this, { fireEvent: false })
+        );
         eventManager.push('resize', this.setOtherElPosition.bind(this));
     }
-
 
     setData() {
         function obj(item, context) {
@@ -56,25 +61,30 @@ export class offsetSliderItemClass {
                 this.pxWidth = outerWidth(this.item);
             };
             this.calcAdvancement = () => {
-                this.advancement = (this.pxWidth - this.containerWidth) / parseInt(context.step)
-            }
+                this.advancement =
+                    (this.pxWidth - this.containerWidth) /
+                    parseInt(context.step);
+            };
         }
 
         const elArray = Array.from(this.items);
-        this.elArray = elArray.map(element => {
+        this.elArray = elArray.map((element) => {
             return new obj(element, this);
-        })
+        });
     }
 
     updateData() {
-        for( const el of this.elArray) {
+        for (const el of this.elArray) {
             el.calcPxWidth();
             el.calcAdvancement();
         }
     }
 
     checkIfScrollable() {
-        return this.elArray[this.drivenElIndex].pxWidth > eventManager.windowsWidth();
+        return (
+            this.elArray[this.drivenElIndex].pxWidth >
+            eventManager.windowsWidth()
+        );
     }
 
     initSwipe() {
@@ -101,13 +111,12 @@ export class offsetSliderItemClass {
         });
 
         this.container.addEventListener('mousemove', (e) => {
-            this.onMousemoveTouchmove(e)
+            this.onMousemoveTouchmove(e);
         });
 
         this.container.addEventListener('touchmove', (e) => {
-            this.onMousemoveTouchmove(e)
+            this.onMousemoveTouchmove(e);
         });
-
     }
 
     onMousedownTouchstart(e) {
@@ -159,10 +168,12 @@ export class offsetSliderItemClass {
         this.val = this.drivenTranslatePosition - this.walk;
 
         let style = {};
-        style[this.transformProperty] = `translate3d(0,0,0) translateX(${this.val}px)`;
+        style[
+            this.transformProperty
+        ] = `translate3d(0,0,0) translateX(${this.val}px)`;
 
         const $cont = this.elArray[this.drivenElIndex].item;
-        Object.assign($cont.style, style)
+        Object.assign($cont.style, style);
 
         this.setOtherElPosition(this.val);
     }
@@ -173,7 +184,7 @@ export class offsetSliderItemClass {
 
     updateIndex() {
         let nextIdnexGap = 0;
-        if(this.startX > this.endX) nextIdnexGap = 1;
+        if (this.startX > this.endX) nextIdnexGap = 1;
 
         for (let index = 0; index < this.step; index++) {
             const min = index * this.advancement;
@@ -184,24 +195,29 @@ export class offsetSliderItemClass {
                 el.classList.remove('no-transition');
             }
 
-            if (-this.drivenTranslatePosition > min && -this.drivenTranslatePosition < max) {
+            if (
+                -this.drivenTranslatePosition > min &&
+                -this.drivenTranslatePosition < max
+            ) {
                 this.activeStep = -(index + nextIdnexGap);
 
                 // CONTROLLI DI SICUREZZA
-                if (this.activeStep > 0 ) this.activeStep = 0;
-                if (this.activeStep < -parseInt(this.step)) this.activeStep = -parseInt(this.step);
+                if (this.activeStep > 0) this.activeStep = 0;
+                if (this.activeStep < -parseInt(this.step))
+                    this.activeStep = -parseInt(this.step);
 
                 this.setDriveElPosition();
                 this.setOtherElPosition();
                 break;
-
             } else if (this.drivenTranslatePosition > 0) {
                 this.activeStep = 0;
                 this.setDriveElPosition();
                 this.setOtherElPosition();
                 break;
-
-            } else if (-this.drivenTranslatePosition > (this.step * this.advancement)) {
+            } else if (
+                -this.drivenTranslatePosition >
+                this.step * this.advancement
+            ) {
                 this.activeStep = -this.step;
                 this.setDriveElPosition();
                 this.setOtherElPosition();
@@ -216,7 +232,7 @@ export class offsetSliderItemClass {
             if (el.driven) {
                 this.drivenElIndex = index;
             }
-            index ++
+            index++;
         }
     }
 
@@ -225,14 +241,15 @@ export class offsetSliderItemClass {
             let unit = 'px';
             if (el.fluid) unit = 'vw';
 
-            el.item.style.width = `${el.width}${unit}`
+            el.item.style.width = `${el.width}${unit}`;
             el.calcPxWidth();
         }
     }
 
     setAdvancement() {
         const el = this.elArray[this.drivenElIndex];
-        this.advancement = (el.pxWidth - this.containerWidth) / parseInt(this.step);
+        this.advancement =
+            (el.pxWidth - this.containerWidth) / parseInt(this.step);
     }
 
     prevStep() {
@@ -263,24 +280,28 @@ export class offsetSliderItemClass {
     }
 
     setDriveElPosition(data) {
-        let fireEvent = true
-        if(data && !data.fireEvent)  fireEvent = false
+        let fireEvent = true;
+        if (data && !data.fireEvent) fireEvent = false;
 
         const el = this.elArray[this.drivenElIndex];
         const val = this.activeStep * this.advancement;
 
         let style = {};
-        style[this.transformProperty] = `translate3d(0,0,0) translateX(${val}px)`;
+        style[
+            this.transformProperty
+        ] = `translate3d(0,0,0) translateX(${val}px)`;
         Object.assign(el.item.style, style);
 
         this.drivenTranslatePosition = val;
 
-        if(fireEvent) {
-            this.component.dispatchEvent(new CustomEvent("stepChange", {
-                detail: {
-                    index: Math.abs(this.activeStep)
-                }
-            }));
+        if (fireEvent) {
+            this.component.dispatchEvent(
+                new CustomEvent('stepChange', {
+                    detail: {
+                        index: Math.abs(this.activeStep),
+                    },
+                })
+            );
         }
     }
 
@@ -297,9 +318,13 @@ export class offsetSliderItemClass {
 
         for (const el of this.elArray) {
             if (!el.driven) {
-                const val = ((el.pxWidth - this.containerWidth) * walk) / (drivenEl.pxWidth - this.containerWidth);
+                const val =
+                    ((el.pxWidth - this.containerWidth) * walk) /
+                    (drivenEl.pxWidth - this.containerWidth);
                 let style = {};
-                style[this.transformProperty] = `translate3d(0,0,0) translateX(${val}px)`;
+                style[
+                    this.transformProperty
+                ] = `translate3d(0,0,0) translateX(${val}px)`;
                 Object.assign(el.item.style, style);
             }
         }

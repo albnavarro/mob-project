@@ -1,9 +1,11 @@
-import {eventManager} from "../../../js/base/eventManager.js";
-import {mouseParallaxItemClass} from "./mouseParallaxitem.js";
+import { eventManager } from '../../../js/base/eventManager.js';
+import { mouseParallaxItemClass } from './mouseParallaxitem.js';
 
 class mouseParallaxClass {
     constructor() {
-        this.mouseItem = document.querySelectorAll("*[data-conponent='m-comp--mouseParallax']");
+        this.mouseItem = document.querySelectorAll(
+            "*[data-conponent='m-comp--mouseParallax']"
+        );
         this.instances = [];
     }
 
@@ -13,9 +15,9 @@ class mouseParallaxClass {
 
     inzializeData() {
         const itemArray = Array.from(this.mouseItem);
-        const dataArray = itemArray.map(item => {
+        const dataArray = itemArray.map((item) => {
             return this.getItemData(item);
-        })
+        });
 
         for (const item of dataArray) {
             const mouseParallaxItem = new mouseParallaxItemClass(item);
@@ -32,12 +34,12 @@ class mouseParallaxClass {
 
     getItemData(item) {
         const data = {};
-        data.item = item
+        data.item = item;
         data.container = item.closest('.mouseParallax__container');
         data.centerToViewoport = item.hasAttribute('data-centerToViewoport');
-        data.range = item.getAttribute('data-range') || 20
+        data.range = item.getAttribute('data-range') || 20;
         return data;
     }
 }
 
-export const mouseParallax = new mouseParallaxClass()
+export const mouseParallax = new mouseParallaxClass();

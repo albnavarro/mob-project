@@ -1,20 +1,29 @@
-import { eventManager } from "../../../js/base/eventManager.js";
-import { lightDescription } from "./lightbox-description.js";
-import { lightboxUtils } from "./lightbox-utils.js";
+import { eventManager } from '../../../js/base/eventManager.js';
+import { lightDescription } from './lightbox-description.js';
+import { lightboxUtils } from './lightbox-utils.js';
 
 class lightBoxVideoClass {
-
     constructor() {
         this.onResizeId = -1;
     }
 
-    init({wrapper, title, description, sourceType, url, hGap, wGap, ratioW, ratioH}) {
-        eventManager.remove('resize', this.onResizeId)
+    init({
+        wrapper,
+        title,
+        description,
+        sourceType,
+        url,
+        hGap,
+        wGap,
+        ratioW,
+        ratioH,
+    }) {
+        eventManager.remove('resize', this.onResizeId);
 
         const videoEl = document.createElement('div');
         videoEl.classList.add('lightbox__video');
 
-        this.setVideoSize(wrapper, hGap, wGap, ratioW, ratioH)
+        this.setVideoSize(wrapper, hGap, wGap, ratioW, ratioH);
 
         wrapper.appendChild(videoEl);
         const videoWrapper = wrapper.querySelector('.lightbox__video');
@@ -23,11 +32,11 @@ class lightBoxVideoClass {
             switch (sourceType) {
                 case 'youtube':
                     const iframe = document.createElement('iframe');
-                    iframe.src = `https://www.youtube.com/embed/${url }`;
+                    iframe.src = `https://www.youtube.com/embed/${url}`;
                     iframe.setAttribute('allowfullscreen', '');
                     iframe.setAttribute('frameborder', '0');
                     videoWrapper.appendChild(iframe);
-                break;
+                    break;
 
                 case 'local':
                     const video = document.createElement('video');
@@ -42,14 +51,15 @@ class lightBoxVideoClass {
                     videoWrapper.appendChild(video);
                     const videoEl = videoWrapper.querySelector('video');
                     videoEl.appendChild(source);
-                break;
-
+                    break;
             }
 
             videoWrapper.classList.add('visible');
         }, 200);
 
-        this.onResizeId = eventManager.push('resize', () => this.setVideoSize(wrapper, hGap, wGap, ratioW, ratioH))
+        this.onResizeId = eventManager.push('resize', () =>
+            this.setVideoSize(wrapper, hGap, wGap, ratioW, ratioH)
+        );
         this.openDescription(title, description, wrapper);
     }
 
@@ -57,16 +67,21 @@ class lightBoxVideoClass {
         // WW and WH gap
         const newHGap = (eventManager.windowsHeight() / 100) * parseInt(hGap);
         const newWGap = (eventManager.windowsWidth() / 100) * parseInt(wGap);
-
-        const maxHeight = eventManager.windowsHeight() - newHGap,
-            maxWidth = eventManager.windowsWidth() - newWGap,
-            width = ratioW,
-            height = ratioH,
-            ratio = lightboxUtils.calculateAspectRatioFit(width, height, maxWidth, maxHeight);
+        const maxHeight = eventManager.windowsHeight() - newHGap;
+        const maxWidth = eventManager.windowsWidth() - newWGap;
+        const width = ratioW;
+        const height = ratioH;
+        const { ratioWidth, ratioHeight } =
+            lightboxUtils.calculateAspectRatioFit(
+                width,
+                height,
+                maxWidth,
+                maxHeight
+            );
 
         const style = {
-            'width': ratio.width + 'px',
-            'height': ratio.height + 'px'
+            width: `${ratioWidth}px`,
+            height: `${ratioHeight}px`,
         };
         Object.assign(wrapper.style, style);
     }
@@ -75,10 +90,9 @@ class lightBoxVideoClass {
         lightDescription.init({
             title,
             description,
-            wrapper
-        })
+            wrapper,
+        });
     }
-
 }
 
-export const lightBoxVideo = new lightBoxVideoClass()
+export const lightBoxVideo = new lightBoxVideoClass();

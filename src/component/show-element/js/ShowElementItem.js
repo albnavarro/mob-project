@@ -1,38 +1,40 @@
-import { eventManager } from "../../../js/base/eventManager.js";
-import { offset } from "../../../js/utility/vanillaFunction.js";
+import { eventManager } from '../../../js/base/eventManager.js';
+import { offset } from '../../../js/utility/vanillaFunction.js';
 
 export class showElementItemClass {
     constructor(data) {
         this.pos = 0;
         this.hide = true;
         this.firstActive = false;
-        this.item = data.item
-        this.useOtherPosition = data.useOtherPosition
-        this.OtherPositionGap = data.OtherPositionGap
-        this.onlyOnce = data.onlyOnce
-        this.startClass = data.startClass
-        this.gap = data.gap
-        this.endClass = data.endClass
+        this.item = data.item;
+        this.useOtherPosition = data.useOtherPosition;
+        this.OtherPositionGap = data.OtherPositionGap;
+        this.onlyOnce = data.onlyOnce;
+        this.startClass = data.startClass;
+        this.gap = data.gap;
+        this.endClass = data.endClass;
     }
 
     init() {
-        this.calcOffset()
-        this.checkPosition()
-        eventManager.push('scroll', this.checkPosition.bind(this))
-        eventManager.push('resize', this.refresh.bind(this))
+        this.calcOffset();
+        this.checkPosition();
+        eventManager.push('scroll', this.checkPosition.bind(this));
+        eventManager.push('resize', this.refresh.bind(this));
     }
 
     calcOffset() {
         if (this.useOtherPosition == null) {
-            this.pos = parseInt(offset(this.item).top)
+            this.pos = parseInt(offset(this.item).top);
         } else {
-            this.pos = parseInt(offset(document.querySelector(this.useOtherPosition)).top)
+            this.pos = parseInt(
+                offset(document.querySelector(this.useOtherPosition)).top
+            );
         }
     }
 
     refresh() {
-        this.calcOffset()
-        this.checkPosition()
+        this.calcOffset();
+        this.checkPosition();
     }
 
     checkPosition() {
@@ -46,10 +48,14 @@ export class showElementItemClass {
             this.item.classList.add(this.endClass);
             this.hide = false;
             this.firstActive = true;
-        } else if (postion >= eventManager.scrollTop() && !this.hide && isAble) {
+        } else if (
+            postion >= eventManager.scrollTop() &&
+            !this.hide &&
+            isAble
+        ) {
             this.item.classList.remove(this.endClass);
             this.item.classList.add(this.startClass);
-            this.hide = true
+            this.hide = true;
         }
     }
 }

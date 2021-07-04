@@ -1,9 +1,11 @@
-import {eventManager} from "../../../js/base/eventManager.js";
-import {accordionItemClass} from "./accordionItem.js";
+import { eventManager } from '../../../js/base/eventManager.js';
+import { accordionItemClass } from './accordionItem.js';
 
 class accordionClass {
     constructor() {
-        this.accordionItem = document.querySelectorAll("*[data-conponent='m-comp--accordion']");
+        this.accordionItem = document.querySelectorAll(
+            "*[data-conponent='m-comp--accordion']"
+        );
         this.instances = [];
     }
 
@@ -13,16 +15,15 @@ class accordionClass {
 
     inzializeData() {
         const itemArray = Array.from(this.accordionItem);
-        const dataArray = itemArray.map(item => {
+        const dataArray = itemArray.map((item) => {
             return this.getItemData(item);
-        })
+        });
 
         for (const item of dataArray) {
             const accordionItem = new accordionItemClass(item);
             this.instances.push(accordionItem);
             accordionItem.init();
         }
-
     }
 
     getItemData(item) {
@@ -30,13 +31,10 @@ class accordionClass {
         data.container = item;
         data.breackpoint = item.getAttribute('data-breackpoint') || 'x-small';
         data.queryType = item.getAttribute('data-queryType') || 'min';
-        data.multiple = item.hasAttribute('data-multiple')
-
+        data.multiple = item.hasAttribute('data-multiple');
 
         return data;
     }
-
-
 }
 
-export const accordion = new accordionClass()
+export const accordion = new accordionClass();

@@ -1,7 +1,12 @@
-import { eventManager } from "../../../js/base/eventManager.js";
-import { position, outerWidth, outerHeight, offset } from "../../../js/utility/vanillaFunction.js";
-import { bodyScrollTo } from "../../../js/utility/animation.js";
-import {modernzier} from "../../../js/utility/modernizr.js"
+import { eventManager } from '../../../js/base/eventManager.js';
+import {
+    position,
+    outerWidth,
+    outerHeight,
+    offset,
+} from '../../../js/utility/vanillaFunction.js';
+import { bodyScrollTo } from '../../../js/utility/animation.js';
+import { modernzier } from '../../../js/utility/modernizr.js';
 
 export class tBlocksItemClass {
     constructor(container) {
@@ -16,17 +21,18 @@ export class tBlocksItemClass {
     init() {
         const itemArray = Array.from(this.items);
         for (const el of itemArray) {
-            el.addEventListener('click', this.onClick.bind(this))
+            el.addEventListener('click', this.onClick.bind(this));
         }
-        eventManager.push('load', this.setWidth.bind(this))
-        eventManager.push('load', this.setTransformOrigin.bind(this))
-        eventManager.push('load', this.setActiveTransform.bind(this))
-        eventManager.push('resize', this.setWidth.bind(this))
-        eventManager.push('resize', this.removeSwapItem.bind(this))
+        eventManager.push('load', this.setWidth.bind(this));
+        eventManager.push('load', this.setTransformOrigin.bind(this));
+        eventManager.push('load', this.setActiveTransform.bind(this));
+        eventManager.push('resize', this.setWidth.bind(this));
+        eventManager.push('resize', this.removeSwapItem.bind(this));
     }
 
     calcCenter() {
-        this.center = position(this.container).left + outerWidth(this.container) / 2;
+        this.center =
+            position(this.container).left + outerWidth(this.container) / 2;
     }
 
     setWidth() {
@@ -34,25 +40,30 @@ export class tBlocksItemClass {
         const width = outerWidth(this.container);
         for (const el of itemArray) {
             const innerElement = el.querySelector('.tBlocks__item__wrap');
-            innerElement.style.width = `${width/2}px`;
+            innerElement.style.width = `${width / 2}px`;
         }
         this.calcCenter();
     }
 
     setActiveTransform(item = null, child = null) {
-        if (item == null) item = this.container.querySelector('.tBlocks__item--active');
+        if (item == null)
+            item = this.container.querySelector('.tBlocks__item--active');
         if (child == null) child = item.querySelector('.tBlocks__item__wrap');
 
         const childH = outerHeight(child);
         const itemH = outerHeight(item);
         const scaleYVal = itemH / childH;
 
-        let style = {}
-        style[this.transformProperty] = `translate3d(0,0,0) scale(2,${scaleYVal})`;
+        let style = {};
+        style[
+            this.transformProperty
+        ] = `translate3d(0,0,0) scale(2,${scaleYVal})`;
         Object.assign(child.style, style);
 
         const content = child.querySelector('.tBlocks__item__notScaled');
-        style[this.transformProperty] = `translate3d(0,0,0) scale(.5,${1/scaleYVal})`;
+        style[this.transformProperty] = `translate3d(0,0,0) scale(.5,${
+            1 / scaleYVal
+        })`;
         Object.assign(content.style, style);
     }
 
@@ -61,7 +72,7 @@ export class tBlocksItemClass {
         style[this.transformProperty] = `translate3d(0,0,0) scale(1,1)`;
 
         for (const el of items) {
-            const innerEl = el.querySelector('.tBlocks__item__wrap')
+            const innerEl = el.querySelector('.tBlocks__item__wrap');
             Object.assign(innerEl.style, style);
 
             const content = el.querySelector('.tBlocks__item__notScaled');
@@ -70,33 +81,33 @@ export class tBlocksItemClass {
     }
 
     setTransformOrigin(item = null, child = null, posX = null) {
-        if (item == null) item = this.container.querySelector('.tBlocks__item--active');
+        if (item == null)
+            item = this.container.querySelector('.tBlocks__item--active');
         if (child == null) child = item.querySelector('.tBlocks__item__wrap');
         if (posX == null) posX = offset(item).left;
 
-        if(posX > this.center - 20) {
+        if (posX > this.center - 20) {
             child.classList.add('tg-form-right');
-            child.classList.remove('tg-form-left')
-            this.activeHDirection = 'sx'
-
+            child.classList.remove('tg-form-left');
+            this.activeHDirection = 'sx';
         } else {
             child.classList.add('tg-form-left');
-            child.classList.remove('tg-form-right')
-            this.activeHDirection = 'dx'
+            child.classList.remove('tg-form-right');
+            this.activeHDirection = 'dx';
         }
     }
 
     removeSwapItem() {
         const prevSwapItem = this.container.querySelector('.t-swap-item');
-        if (typeof(prevSwapItem) != 'undefined' && prevSwapItem != null) {
-            prevSwapItem.classList.remove('t-swap-item')
-            prevSwapItem.classList.remove('t-swap-item--formLeft')
-            prevSwapItem.classList.remove('t-swap-item--formRight')
+        if (typeof prevSwapItem != 'undefined' && prevSwapItem != null) {
+            prevSwapItem.classList.remove('t-swap-item');
+            prevSwapItem.classList.remove('t-swap-item--formLeft');
+            prevSwapItem.classList.remove('t-swap-item--formRight');
         }
 
         const clonedSwap = this.container.querySelector('.t-clone');
-        if (typeof(prevSwapItem) != 'undefined' && prevSwapItem != null) {
-            clonedSwap.remove()
+        if (typeof prevSwapItem != 'undefined' && prevSwapItem != null) {
+            clonedSwap.remove();
         }
     }
 
@@ -112,7 +123,9 @@ export class tBlocksItemClass {
         const width = outerWidth(this.container);
         const activeId = item.getAttribute('data-id');
         const currentInnerElement = item.querySelector('.tBlocks__item__wrap');
-        let itemNotActive = this.container.querySelectorAll('.tBlocks__item:not(.tBlocks__item--active)');
+        let itemNotActive = this.container.querySelectorAll(
+            '.tBlocks__item:not(.tBlocks__item--active)'
+        );
         let itemNotActiveArray = Array.from(itemNotActive);
         let vDirection = this.container.getAttribute('data-diretction');
 
@@ -124,11 +137,13 @@ export class tBlocksItemClass {
         // find item that change layout position
         const swapItem = itemNotActiveArray.find((el) => {
             return el !== item;
-        })
+        });
         swapItem.classList.add('t-swap-item');
 
         // Posizione il precendete elemento attivo a dx o sx
-        const activerItem = this.container.querySelector('.tBlocks__item--active');
+        const activerItem = this.container.querySelector(
+            '.tBlocks__item--active'
+        );
         if (this.activeHDirection == 'sx') {
             activerItem.style.order = 3;
             swapItem.classList.add('t-swap-item--formLeft');
@@ -138,42 +153,50 @@ export class tBlocksItemClass {
         }
 
         // // Posiziono l'attuale elemento attivo
-        this.setTransformOrigin(item,currentInnerElement,posX);
+        this.setTransformOrigin(item, currentInnerElement, posX);
 
         //CLONE
         const swapClone = swapItem.cloneNode(true);
         swapClone.classList.add('t-clone');
         this.container.appendChild(swapClone);
-        (this.activeHDirection == 'sx') ? swapClone.classList.add('t-clone--sx') : swapClone.classList.add('t-clone--dx');
-        (vDirection == 'up') ? swapClone.classList.add('t-clone--down') : swapClone.classList.add('t-clone--up');
+        this.activeHDirection == 'sx'
+            ? swapClone.classList.add('t-clone--sx')
+            : swapClone.classList.add('t-clone--dx');
+        vDirection == 'up'
+            ? swapClone.classList.add('t-clone--down')
+            : swapClone.classList.add('t-clone--up');
 
         // Setto l'altrnanza top/bottom
-        (vDirection == 'up') ?  vDirection = 'down' :  vDirection = 'up';
-        this.container.setAttribute('data-diretction', vDirection )
-        this.container.setAttribute('data-activeId', activeId )
+        vDirection == 'up' ? (vDirection = 'down') : (vDirection = 'up');
+        this.container.setAttribute('data-diretction', vDirection);
+        this.container.setAttribute('data-activeId', activeId);
         this.activeIndex = activeId;
 
         const scrollDestination = offset(this.container).top;
         bodyScrollTo(scrollDestination);
 
         // RESET LAST ACTIVE ITEM
-        activerItem.classList.remove('tBlocks__item--active')
+        activerItem.classList.remove('tBlocks__item--active');
 
         // SET NEW ACTIVE ITEM
-        item.classList.add('tBlocks__item--active')
+        item.classList.add('tBlocks__item--active');
 
-        itemNotActive = this.container.querySelectorAll('.tBlocks__item:not(.tBlocks__item--active)');
+        itemNotActive = this.container.querySelectorAll(
+            '.tBlocks__item:not(.tBlocks__item--active)'
+        );
         itemNotActiveArray = Array.from(itemNotActive);
 
-        this.resetTransform(itemNotActiveArray)
-        this.setActiveTransform(item,currentInnerElement);
+        this.resetTransform(itemNotActiveArray);
+        this.setActiveTransform(item, currentInnerElement);
 
-        this.container.dispatchEvent(new CustomEvent("itemChange", {
-            detail: {
-                hDirection: vDirection,
-                index: this.activeIndex
-            }
-        }));
+        this.container.dispatchEvent(
+            new CustomEvent('itemChange', {
+                detail: {
+                    hDirection: vDirection,
+                    index: this.activeIndex,
+                },
+            })
+        );
     }
 }
 
