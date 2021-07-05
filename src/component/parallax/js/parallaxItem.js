@@ -103,22 +103,24 @@ export class parallaxItemClass {
         eventManager.push('resize', this.refresh.bind(this));
     }
 
-    normalizeRange(n) {
-        let _n = n;
-
-        if (_n < 0) _n = 0.1;
-        if (_n >= 10) _n = 9.9;
-
-        return 10 - _n;
+    normalizeRange(value) {
+        if (value < 0) {
+            return 9.9;
+        } else if (value >= 10) {
+            return 0.1;
+        } else {
+            return 10 - value;
+        }
     }
 
-    normalizeVelocity(n) {
-        let _n = n;
-
-        if (_n < 1) _n = 1;
-        if (_n >= 10) _n = 9.9;
-
-        return (10 - _n) * 10;
+    normalizeVelocity(value) {
+        if (value < 1) {
+            return 1;
+        } else if (value >= 10) {
+            return 9.9;
+        } else {
+            return (10 - value) * 10;
+        }
     }
 
     calcOffset() {
@@ -253,19 +255,20 @@ export class parallaxItemClass {
 
         switch (this.computationType) {
             case 'fixed':
-                const fixedResult = this.fixedValue(applyStyle);
-                applyStyle = fixedResult.applyStyle;
-                this.endValue = fixedResult.val;
+                const { applyStyleFixedFinal, finalVal } =
+                    this.fixedValue(applyStyle);
+                applyStyle = applyStyleFixedFinal;
+                this.endValue = finalVal;
                 break;
 
             default:
                 switch (this.propierties) {
                     case 'opacity':
-                        this.endValue = this.opacityValue();
+                        this.endValue = this.opacityValue().toFixed(2);
                         break;
 
                     default:
-                        if (isNaN(this.align)) {
+                        if (Number.isNaN(parseInt(this.align))) {
                             this.endValue = this.isNaNValue().toFixed(1) / 2;
                         } else {
                             this.endValue =
@@ -284,8 +287,68 @@ export class parallaxItemClass {
         }
     }
 
-    fixedValue(applyStyle) {
-        let val = 0;
+    getFixedFinalValue(
+        scrollTop,
+        windowsHeight,
+        startPoint,
+        offset,
+        height,
+        fixedInward,
+        maxVal,
+        fixedStartOff,
+        applyStyleFixed,
+        fixedEndOff,
+        partialVal
+    ) {
+        const getElPos = (
+            scrollTop,
+            windowsHeight,
+            startPoint,
+            offset,
+            height
+        ) => {
+            if (scrollTop + windowsHeight - startPoint < offset) {
+                return 'OVER';
+            } else if (
+                scrollTop + windowsHeight - startPoint >
+                offset + height
+            ) {
+                return 'DOWN';
+            } else {
+                return 'INSIDE';
+            }
+        };
+
+        const elPos = getElPos(
+            scrollTop,
+            windowsHeight,
+            startPoint,
+            offset,
+            height
+        );
+
+        switch (elPos) {
+            case 'OVER':
+                return {
+                    pxVal: fixedInward ? maxVal : 0,
+                    applyStyleFixedFinal: fixedStartOff
+                        ? false
+                        : applyStyleFixed,
+                };
+            case 'DOWN':
+                return {
+                    pxVal: fixedInward ? 0 : -maxVal,
+                    applyStyleFixedFinal: fixedEndOff ? false : applyStyleFixed,
+                };
+            case 'INSIDE':
+                return {
+                    pxVal: fixedInward ? partialVal : partialVal - maxVal,
+                    applyStyleFixedFinal: applyStyleFixed,
+                };
+        }
+    }
+
+    fixedValue(applyStyleFixed) {
         const scrollTop = eventManager.scrollTop();
         const windowsHeight = eventManager.windowsHeight();
         const height = this.height;
@@ -297,11 +360,7 @@ export class parallaxItemClass {
         const fixedEndOff = this.fixedEndOff;
         const range = this.range;
         const fixedOffset = this.fixedOffset;
-
-        /*
-        sp = Start point calculated in vh
-        */
-        const startPoint = (windowsHeight / 100) * fixedOffset;
+        const startPoint = (windowsHeight / 100) * fixedOffset; //sp = Start point calculated in vh
         const partials = -(
             scrollTop +
             windowsHeight -
@@ -310,48 +369,61 @@ export class parallaxItemClass {
         );
         const maxVal = (height / 100) * range;
         const partialVal = (partials / 100) * range;
+        const { pxVal, applyStyleFixedFinal } = this.getFixedFinalValue(
+            scrollTop,
+            windowsHeight,
+            startPoint,
+            offset,
+            height,
+            fixedInward,
+            maxVal,
+            fixedStartOff,
+            applyStyleFixed,
+            fixedEndOff,
+            partialVal
+        );
+        const percent = (Math.abs(pxVal) * 100) / height;
 
-        if (scrollTop + windowsHeight - startPoint < offset) {
-            val = fixedInward ? maxVal : 0;
-            if (fixedStartOff) applyStyle = false;
-        } else if (scrollTop + windowsHeight - startPoint > offset + height) {
-            val = fixedInward ? 0 : -maxVal;
-            if (fixedEndOff) applyStyle = false;
-        } else {
-            val = fixedInward ? partialVal : partialVal - maxVal;
-        }
-
-        /*
-        percent = percent value
-        */
-        const percent = (Math.abs(val) * 100) / height;
         switch (this.propierties) {
             case 'horizontal':
-                val = -((width / 100) * percent) - (selfWidth / 100) * percent;
-                break;
+                return {
+                    applyStyleFixedFinal,
+                    finalVal:
+                        -((width / 100) * percent) -
+                        (selfWidth / 100) * percent,
+                };
 
             case 'scale':
-                val = percent * 10;
-                break;
+                return {
+                    applyStyleFixedFinal,
+                    finalVal: percent * 10,
+                };
 
             case 'opacity':
-                val = percent / 100;
-                break;
+                return {
+                    applyStyleFixedFinal,
+                    finalVal: percent / 100,
+                };
 
             case 'rotate':
             case 'rotateX':
             case 'rotateY':
             case 'rotateZ':
             case 'border-width':
-                val = percent;
-                break;
-        }
+                return {
+                    applyStyleFixedFinal,
+                    finalVal: percent,
+                };
 
-        return { applyStyle, val };
+            default:
+                return {
+                    applyStyleFixedFinal,
+                    finalVal: pxVal,
+                };
+        }
     }
 
     opacityValue() {
-        let val = 0;
         const scrollTop = eventManager.scrollTop();
         const windowsheight = eventManager.windowsHeight();
         const offset = this.offset;
@@ -359,25 +431,19 @@ export class parallaxItemClass {
         const vhStart =
             windowsheight - (windowsheight / 100) * this.opacityStart;
 
-        if (this.align == 'start') {
-            val = -scrollTop;
-        } else {
-            val = scrollTop + vhLimit - offset;
-        }
-
-        val = val * -1;
+        const val =
+            this.align == 'start'
+                ? -scrollTop * -1
+                : (scrollTop + vhLimit - offset) * -1;
 
         if (this.align == 'start') {
-            val = 1 - val / offset;
+            return 1 - val / offset;
         } else {
-            val = 1 - val / (windowsheight - vhStart - vhLimit);
+            return 1 - val / (windowsheight - vhStart - vhLimit);
         }
-
-        return val.toFixed(2);
     }
 
     isNaNValue() {
-        let val = 0;
         const scrollTop = eventManager.scrollTop();
         const windowsheight = eventManager.windowsHeight();
         const documentHeight = eventManager.documentHeight();
@@ -388,29 +454,23 @@ export class parallaxItemClass {
         // Prefixed align
         switch (this.align) {
             case 'start':
-                val = scrollTop / range;
-                break;
+                return scrollTop / range;
 
             case 'top':
-                val = (scrollTop - offset) / range;
-                break;
+                return (scrollTop - offset) / range;
 
             case 'center':
-                val =
+                return (
                     (scrollTop + (windowsheight / 2 - height / 2) - offset) /
-                    range;
-                break;
+                    range
+                );
 
             case 'bottom':
-                val = (scrollTop + (windowsheight - height) - offset) / range;
-                break;
+                return (scrollTop + (windowsheight - height) - offset) / range;
 
             case 'end':
-                val = -(documentHeight - (scrollTop + windowsheight)) / range;
-                break;
+                return -(documentHeight - (scrollTop + windowsheight)) / range;
         }
-
-        return val;
     }
 
     isANumberValue() {
@@ -424,147 +484,164 @@ export class parallaxItemClass {
     }
 
     switchAfterZero(val) {
-        if (this.propierties != 'opacity') {
+        const getValueOnSwitchNoPacity = (value) => {
             switch (this.onSwitch) {
                 case 'stop':
                     if (
-                        (!this.reverse && val > 0) ||
-                        (this.reverse && val < 0)
+                        (!this.reverse && value > 0) ||
+                        (this.reverse && value < 0)
                     ) {
-                        val = 0;
+                        return 0;
                     }
-                    break;
 
                 case 'back':
                     if (
-                        (!this.reverse && val > 0) ||
-                        (this.reverse && val < 0)
+                        (!this.reverse && value > 0) ||
+                        (this.reverse && value < 0)
                     ) {
-                        val = -val;
+                        return -value;
                     }
-                    break;
+
+                default:
+                    return value;
             }
+        };
+
+        const getElementPositionStatus = (
+            elementOffset,
+            limitTop,
+            limitBottom
+        ) => {
+            if (elementOffset >= limitTop && elementOffset <= limitBottom) {
+                return 'INSIDE';
+            } else if (elementOffset < limitTop && !this.reverse) {
+                return 'OVER';
+            } else if (elementOffset < limitTop && this.reverse) {
+                return 'OVER-REVERSE';
+            }
+        };
+
+        const getValueByPositionBack = (positionStatus, val) => {
+            switch (positionStatus) {
+                case 'INSIDE':
+                    const valStep1 = val > 1.999 ? 1.999 : val;
+                    const valStep2 = valStep1 < 0 ? -valStep1 : valStep1;
+                    const valStep3 =
+                        valStep2 > 1 ? 1 - (valStep2 % 1) : valStep2;
+                    return valStep3;
+
+                case 'OVER':
+                    return 0;
+
+                case 'OVER-REVERSE':
+                    return -val;
+
+                default:
+                    return val;
+            }
+        };
+
+        if (this.propierties !== 'opacity') {
+            return getValueOnSwitchNoPacity(val);
         } else {
-            if (this.onSwitch == 'back') {
-                const windowsHeight = eventManager.windowsHeight();
-                const scrollTop = eventManager.scrollTop();
-                const opacityEnd = this.opacityEnd;
-                const opacityStart = this.opacityStart;
-                const offset = this.offset;
+            if (this.onSwitch !== 'back') return val;
 
-                /*
-                start value in wh percent
-                */
-                const startValue = (windowsHeight / 100) * opacityStart;
+            const windowsHeight = eventManager.windowsHeight();
+            const scrollTop = eventManager.scrollTop();
+            const opacityEnd = this.opacityEnd;
+            const opacityStart = this.opacityStart;
+            const offset = this.offset;
 
-                /*
-                end value in vh percent
-                */
-                const endValue = (windowsHeight / 100) * opacityEnd;
+            // start value in wh percent
+            const startValue = (windowsHeight / 100) * opacityStart;
 
-                /*
-                Are the upper and lower limits where opacity should be applied
-                */
-                const limitTop = endValue - (startValue - endValue);
-                const limitBottom =
-                    windowsHeight - (windowsHeight - startValue);
-                /*
-                el relative offset in relation to the window
-                */
-                const relOffset = offset - scrollTop;
+            // end value in vh percent
+            const endValue = (windowsHeight / 100) * opacityEnd;
 
-                /*
-                Invert opacity if should be applied
-                */
-                if (relOffset >= limitTop && relOffset <= limitBottom) {
-                    if (val > 1.999) val = 1.999;
-                    if (val < 0) val = -val;
-                    if (val > 1) val = 1 - (val % 1);
-                } else if (relOffset < limitTop && !this.reverse) {
-                    val = 0;
-                } else if (relOffset < limitTop && this.reverse) {
-                    val = val = -val;
-                }
-            }
+            // Are the upper and lower limits where opacity should be applied
+            const limitTop = endValue - (startValue - endValue);
+            const limitBottom = windowsHeight - (windowsHeight - startValue);
+
+            // el relative offset in relation to the window
+            const elementOffset = offset - scrollTop;
+
+            // Invert opacity if should be applied
+            const positionStatus = getElementPositionStatus(
+                elementOffset,
+                limitTop,
+                limitBottom
+            );
+            return getValueByPositionBack(positionStatus, val);
         }
-
-        return val;
     }
 
     setReverse(val) {
-        if (this.reverse) {
-            switch (this.propierties) {
-                case 'opacity':
-                    val = 1 - val;
-                    break;
+        switch (this.propierties) {
+            case 'opacity':
+                return 1 - val;
 
-                default:
-                    val = -val;
-            }
+            default:
+                return -val;
         }
-        return val;
     }
 
     setStyle(val) {
-        let style = {};
-
-        // CHECK Reverse
-        val = this.setReverse(val);
-        if (this.computationType != 'fixed') val = this.switchAfterZero(val);
+        const reverseVal = this.reverse ? this.setReverse(val) : val;
+        const typeVal =
+            this.computationType != 'fixed'
+                ? this.switchAfterZero(reverseVal)
+                : reverseVal;
 
         switch (this.propierties) {
             case 'vertical':
-                style[
-                    this.transformProperty
-                ] = `translate3d(0,0,0) translateY(${val}px)`;
-                break;
+                return {
+                    [this
+                        .transformProperty]: `translate3d(0,0,0) translateY(${typeVal}px)`,
+                };
 
             case 'horizontal':
-                style[
-                    this.transformProperty
-                ] = `translate3d(0,0,0) translateX(${val}px)`;
-                break;
+                return {
+                    [this
+                        .transformProperty]: `translate3d(0,0,0) translateX(${typeVal}px)`,
+                };
 
             case 'rotate':
-                style[
-                    this.transformProperty
-                ] = `translate3d(0,0,0) rotate(${val}deg)`;
+                return {
+                    [this
+                        .transformProperty]: `translate3d(0,0,0) rotate(${typeVal}deg)`,
+                };
                 break;
 
             case 'rotateY':
-                style[
-                    this.transformProperty
-                ] = `translate3d(0,0,0) rotateY(${val}deg)`;
-                break;
+                return {
+                    [this
+                        .transformProperty]: `translate3d(0,0,0) rotateY(${typeVal}deg)`,
+                };
 
             case 'rotateX':
-                style[
-                    this.transformProperty
-                ] = `translate3d(0,0,0) rotateX(${val}deg)`;
-                break;
+                return {
+                    [this
+                        .transformProperty]: `translate3d(0,0,0) rotateX(${typeVal}deg)`,
+                };
 
             case 'rotateZ':
-                style[
-                    this.transformProperty
-                ] = `translate3d(0,0,0) rotateZ(${val}deg)`;
-                break;
+                return {
+                    [this
+                        .transformProperty]: `translate3d(0,0,0) rotateZ(${typeVal}deg)`,
+                };
 
             case 'border-width':
-                style['border-width'] = `${val}px`;
-                break;
+                return { 'border-width': `${typeVal}px` };
 
             case 'opacity':
-                style['opacity'] = `${val}`;
-                break;
+                return { opacity: `${typeVal}` };
 
             case 'scale':
-                const scaleVal = 1 + val / 1000;
-                style[
-                    this.transformProperty
-                ] = `translate3d(0,0,0) scale(${scaleVal})`;
-                break;
+                const scaleVal = 1 + typeVal / 1000;
+                return {
+                    [this
+                        .transformProperty]: `translate3d(0,0,0) scale(${scaleVal})`,
+                };
         }
-
-        return style;
     }
 }
