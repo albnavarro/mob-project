@@ -39,9 +39,7 @@ export class showElementItemClass {
 
     checkPosition() {
         const postion = this.pos - eventManager.windowsHeight() + this.gap;
-
-        let isAble = true;
-        if (this.onlyOnce && this.firstActive) isAble = false;
+        const isAble = this.onlyOnce && this.firstActive ? false : true;
 
         if (postion < eventManager.scrollTop() && this.hide && isAble) {
             this.item.classList.remove(this.startClass);

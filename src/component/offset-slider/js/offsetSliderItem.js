@@ -167,7 +167,7 @@ export class offsetSliderItemClass {
         this.walk = this.startX - this.endX;
         this.val = this.drivenTranslatePosition - this.walk;
 
-        let style = {};
+        const style = {};
         style[
             this.transformProperty
         ] = `translate3d(0,0,0) translateX(${this.val}px)`;
@@ -183,8 +183,7 @@ export class offsetSliderItemClass {
     }
 
     updateIndex() {
-        let nextIdnexGap = 0;
-        if (this.startX > this.endX) nextIdnexGap = 1;
+        const nextIdnexGap = this.startX > this.endX ? 1 : 0;
 
         for (let index = 0; index < this.step; index++) {
             const min = index * this.advancement;
@@ -227,19 +226,12 @@ export class offsetSliderItemClass {
     }
 
     getDrivenIndex() {
-        let index = 0;
-        for (const el of this.elArray) {
-            if (el.driven) {
-                this.drivenElIndex = index;
-            }
-            index++;
-        }
+        this.drivenElIndex = this.elArray.findIndex((el, i) => el.driven);
     }
 
     setWidth() {
         for (const el of this.elArray) {
-            let unit = 'px';
-            if (el.fluid) unit = 'vw';
+            const unit = el.fluid ? 'vw' : 'px';
 
             el.item.style.width = `${el.width}${unit}`;
             el.calcPxWidth();
@@ -280,13 +272,12 @@ export class offsetSliderItemClass {
     }
 
     setDriveElPosition(data) {
-        let fireEvent = true;
-        if (data && !data.fireEvent) fireEvent = false;
+        const fireEvent = data && !data.fireEvent ? false : true;
 
         const el = this.elArray[this.drivenElIndex];
         const val = this.activeStep * this.advancement;
 
-        let style = {};
+        const style = {};
         style[
             this.transformProperty
         ] = `translate3d(0,0,0) translateX(${val}px)`;
@@ -306,14 +297,7 @@ export class offsetSliderItemClass {
     }
 
     setOtherElPosition(val = null) {
-        let walk = 0;
-
-        if (val) {
-            walk = val;
-        } else {
-            walk = this.drivenTranslatePosition;
-        }
-
+        const walk = val ? val : this.drivenTranslatePosition;
         const drivenEl = this.elArray[this.drivenElIndex];
 
         for (const el of this.elArray) {
@@ -321,10 +305,11 @@ export class offsetSliderItemClass {
                 const val =
                     ((el.pxWidth - this.containerWidth) * walk) /
                     (drivenEl.pxWidth - this.containerWidth);
-                let style = {};
-                style[
-                    this.transformProperty
-                ] = `translate3d(0,0,0) translateX(${val}px)`;
+                const style = {
+                    [this
+                        .transformProperty]: `translate3d(0,0,0) translateX(${val}px)`,
+                };
+
                 Object.assign(el.item.style, style);
             }
         }
