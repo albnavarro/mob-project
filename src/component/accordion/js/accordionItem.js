@@ -6,7 +6,7 @@ import {
     slideDown,
 } from '../../../js/utility/animation.js';
 
-export class accordionItemClass {
+export class AccordionItemClass {
     constructor(data) {
         this.container = data.container;
         this.breackpoint = data.breackpoint || 'x-small';

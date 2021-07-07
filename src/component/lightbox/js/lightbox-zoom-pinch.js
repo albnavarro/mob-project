@@ -6,7 +6,7 @@ import {
     offset,
 } from '../../../js/utility/vanillaFunction.js';
 
-class lightPichZoomClass {
+class LightPichZoomClass {
     constructor() {
         this.scale = 1;
         this.maxZoom = 2;
@@ -279,4 +279,4 @@ class lightPichZoomClass {
     }
 }
 
-export const lightPichZoom = new lightPichZoomClass();
+export const lightPichZoom = new LightPichZoomClass();

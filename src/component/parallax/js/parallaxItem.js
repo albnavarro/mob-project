@@ -7,8 +7,9 @@ import {
     offset,
 } from '../../../js/utility/vanillaFunction.js';
 import {} from '../../../js/polyfill/closest.js';
+import { parallaxUtils } from './parallaxUtils.js';
 
-export class parallaxItemClass {
+export class ParallaxItemClass {
     constructor(data) {
         this.offset = 0;
         this.endValue = 0;
@@ -62,8 +63,8 @@ export class parallaxItemClass {
         this.calcWidth();
         this.checkapplyElIsValid();
         if (this.computationType != 'fixed')
-            this.range = this.normalizeRange(this.range);
-        this.jsDelta = this.normalizeVelocity(this.jsDelta);
+            this.range = parallaxUtils.normalizeRange(this.range);
+        this.jsDelta = parallaxUtils.normalizeVelocity(this.jsDelta);
 
         if (this.perspective !== null) {
             const style = {
@@ -101,26 +102,6 @@ export class parallaxItemClass {
         }
 
         eventManager.push('resize', this.refresh.bind(this));
-    }
-
-    normalizeRange(value) {
-        if (value < 0) {
-            return 9.9;
-        } else if (value >= 10) {
-            return 0.1;
-        } else {
-            return 10 - value;
-        }
-    }
-
-    normalizeVelocity(value) {
-        if (value < 1) {
-            return 1;
-        } else if (value >= 10) {
-            return 9.9;
-        } else {
-            return (10 - value) * 10;
-        }
     }
 
     calcOffset() {
@@ -227,10 +208,10 @@ export class parallaxItemClass {
             if (this.applyElIsValid) {
                 Object.assign(
                     this.applyEl.style,
-                    this.setStyle(this.startValue)
+                    this.getStyle(this.startValue)
                 );
             } else {
-                Object.assign(this.item.style, this.setStyle(this.startValue));
+                Object.assign(this.item.style, this.getStyle(this.startValue));
             }
 
             // La RAF viene "rigenerata" fino a quando tutti gli elementi rimangono fermi
@@ -255,24 +236,24 @@ export class parallaxItemClass {
 
         switch (this.computationType) {
             case 'fixed':
-                const { applyStyleFixedFinal, finalVal } =
-                    this.fixedValue(applyStyle);
-                applyStyle = applyStyleFixedFinal;
+                const { applyStyleComputed, finalVal } =
+                    this.getFixedValue(applyStyle);
+                applyStyle = applyStyleComputed;
                 this.endValue = finalVal;
                 break;
 
             default:
                 switch (this.propierties) {
                     case 'opacity':
-                        this.endValue = this.opacityValue().toFixed(2);
+                        this.endValue = this.getOpacityValue().toFixed(2);
                         break;
 
                     default:
                         if (Number.isNaN(parseInt(this.align))) {
-                            this.endValue = this.isNaNValue().toFixed(1) / 2;
+                            this.endValue = this.getIsNaNValue().toFixed(1) / 2;
                         } else {
                             this.endValue =
-                                this.isANumberValue().toFixed(1) / 2;
+                                this.getIsANumberValue().toFixed(1) / 2;
                         }
                         break;
                 }
@@ -281,74 +262,13 @@ export class parallaxItemClass {
         if (!applyStyle) return;
 
         if (this.applyElIsValid) {
-            Object.assign(this.applyEl.style, this.setStyle(this.endValue));
+            Object.assign(this.applyEl.style, this.getStyle(this.endValue));
         } else {
-            Object.assign(this.item.style, this.setStyle(this.endValue));
+            Object.assign(this.item.style, this.getStyle(this.endValue));
         }
     }
 
-    getFixedFinalValue(
-        scrollTop,
-        windowsHeight,
-        startPoint,
-        offset,
-        height,
-        fixedInward,
-        maxVal,
-        fixedStartOff,
-        applyStyleFixed,
-        fixedEndOff,
-        partialVal
-    ) {
-        const getElPos = (
-            scrollTop,
-            windowsHeight,
-            startPoint,
-            offset,
-            height
-        ) => {
-            if (scrollTop + windowsHeight - startPoint < offset) {
-                return 'OVER';
-            } else if (
-                scrollTop + windowsHeight - startPoint >
-                offset + height
-            ) {
-                return 'DOWN';
-            } else {
-                return 'INSIDE';
-            }
-        };
-
-        const elPos = getElPos(
-            scrollTop,
-            windowsHeight,
-            startPoint,
-            offset,
-            height
-        );
-
-        switch (elPos) {
-            case 'OVER':
-                return {
-                    pxVal: fixedInward ? maxVal : 0,
-                    applyStyleFixedFinal: fixedStartOff
-                        ? false
-                        : applyStyleFixed,
-                };
-            case 'DOWN':
-                return {
-                    pxVal: fixedInward ? 0 : -maxVal,
-                    applyStyleFixedFinal: fixedEndOff ? false : applyStyleFixed,
-                };
-            case 'INSIDE':
-                return {
-                    pxVal: fixedInward ? partialVal : partialVal - maxVal,
-                    applyStyleFixedFinal: applyStyleFixed,
-                };
-        }
-    }
-
-    fixedValue(applyStyleFixed) {
+    getFixedValue(applyStyle) {
         const scrollTop = eventManager.scrollTop();
         const windowsHeight = eventManager.windowsHeight();
         const height = this.height;
@@ -369,25 +289,31 @@ export class parallaxItemClass {
         );
         const maxVal = (height / 100) * range;
         const partialVal = (partials / 100) * range;
-        const { pxVal, applyStyleFixedFinal } = this.getFixedFinalValue(
+
+        const elementAlign = parallaxUtils.getFixedElementAlign({
             scrollTop,
             windowsHeight,
             startPoint,
             offset,
             height,
-            fixedInward,
-            maxVal,
-            fixedStartOff,
-            applyStyleFixed,
-            fixedEndOff,
-            partialVal
-        );
+        });
+
+        const { pxVal, applyStyleComputed } =
+            parallaxUtils.getFixedValueByAlign(elementAlign)({
+                fixedInward,
+                maxVal,
+                fixedStartOff,
+                applyStyle,
+                fixedEndOff,
+                partialVal,
+            });
+
         const percent = (Math.abs(pxVal) * 100) / height;
 
         switch (this.propierties) {
             case 'horizontal':
                 return {
-                    applyStyleFixedFinal,
+                    applyStyleComputed,
                     finalVal:
                         -((width / 100) * percent) -
                         (selfWidth / 100) * percent,
@@ -395,13 +321,13 @@ export class parallaxItemClass {
 
             case 'scale':
                 return {
-                    applyStyleFixedFinal,
+                    applyStyleComputed,
                     finalVal: percent * 10,
                 };
 
             case 'opacity':
                 return {
-                    applyStyleFixedFinal,
+                    applyStyleComputed,
                     finalVal: percent / 100,
                 };
 
@@ -411,19 +337,19 @@ export class parallaxItemClass {
             case 'rotateZ':
             case 'border-width':
                 return {
-                    applyStyleFixedFinal,
+                    applyStyleComputed,
                     finalVal: percent,
                 };
 
             default:
                 return {
-                    applyStyleFixedFinal,
+                    applyStyleComputed,
                     finalVal: pxVal,
                 };
         }
     }
 
-    opacityValue() {
+    getOpacityValue() {
         const scrollTop = eventManager.scrollTop();
         const windowsheight = eventManager.windowsHeight();
         const offset = this.offset;
@@ -443,7 +369,7 @@ export class parallaxItemClass {
         }
     }
 
-    isNaNValue() {
+    getIsNaNValue() {
         const scrollTop = eventManager.scrollTop();
         const windowsheight = eventManager.windowsHeight();
         const documentHeight = eventManager.documentHeight();
@@ -473,7 +399,7 @@ export class parallaxItemClass {
         }
     }
 
-    isANumberValue() {
+    getIsANumberValue() {
         const scrollTop = eventManager.scrollTop();
         const windowsHeight = eventManager.windowsHeight();
         const align = this.align;
@@ -483,68 +409,15 @@ export class parallaxItemClass {
         return (scrollTop + (windowsHeight / 100) * align - offset) / range;
     }
 
-    switchAfterZero(val) {
-        const getValueOnSwitchNoPacity = (value) => {
-            switch (this.onSwitch) {
-                case 'stop':
-                    if (
-                        (!this.reverse && value > 0) ||
-                        (this.reverse && value < 0)
-                    ) {
-                        return 0;
-                    }
-
-                case 'back':
-                    if (
-                        (!this.reverse && value > 0) ||
-                        (this.reverse && value < 0)
-                    ) {
-                        return -value;
-                    }
-
-                default:
-                    return value;
-            }
-        };
-
-        const getElementPositionStatus = (
-            elementOffset,
-            limitTop,
-            limitBottom
-        ) => {
-            if (elementOffset >= limitTop && elementOffset <= limitBottom) {
-                return 'INSIDE';
-            } else if (elementOffset < limitTop && !this.reverse) {
-                return 'OVER';
-            } else if (elementOffset < limitTop && this.reverse) {
-                return 'OVER-REVERSE';
-            }
-        };
-
-        const getValueByPositionBack = (positionStatus, val) => {
-            switch (positionStatus) {
-                case 'INSIDE':
-                    const valStep1 = val > 1.999 ? 1.999 : val;
-                    const valStep2 = valStep1 < 0 ? -valStep1 : valStep1;
-                    const valStep3 =
-                        valStep2 > 1 ? 1 - (valStep2 % 1) : valStep2;
-                    return valStep3;
-
-                case 'OVER':
-                    return 0;
-
-                case 'OVER-REVERSE':
-                    return -val;
-
-                default:
-                    return val;
-            }
-        };
-
+    getSwitchAfterZeroValue(value) {
         if (this.propierties !== 'opacity') {
-            return getValueOnSwitchNoPacity(val);
+            return parallaxUtils.getValueOnSwitchNoPacity({
+                switchPropierties: this.onSwitch,
+                isReverse: this.reverse,
+                value,
+            });
         } else {
-            if (this.onSwitch !== 'back') return val;
+            if (this.onSwitch !== 'back') return value;
 
             const windowsHeight = eventManager.windowsHeight();
             const scrollTop = eventManager.scrollTop();
@@ -565,31 +438,24 @@ export class parallaxItemClass {
             // el relative offset in relation to the window
             const elementOffset = offset - scrollTop;
 
-            // Invert opacity if should be applied
-            const positionStatus = getElementPositionStatus(
-                elementOffset,
+            const elementAlign = parallaxUtils.getOpacityElementAlign({
+                isReverse: this.reverse,
+                elementOffset: elementOffset,
                 limitTop,
-                limitBottom
-            );
-            return getValueByPositionBack(positionStatus, val);
+                limitBottom,
+            });
+
+            return parallaxUtils.getOpacityValueByAlign(elementAlign)(value);
         }
     }
 
-    setReverse(val) {
-        switch (this.propierties) {
-            case 'opacity':
-                return 1 - val;
-
-            default:
-                return -val;
-        }
-    }
-
-    setStyle(val) {
-        const reverseVal = this.reverse ? this.setReverse(val) : val;
+    getStyle(val) {
+        const reverseVal = this.reverse
+            ? parallaxUtils.getRetReverseValue(this.propierties, val)
+            : val;
         const typeVal =
             this.computationType != 'fixed'
-                ? this.switchAfterZero(reverseVal)
+                ? this.getSwitchAfterZeroValue(reverseVal)
                 : reverseVal;
 
         switch (this.propierties) {

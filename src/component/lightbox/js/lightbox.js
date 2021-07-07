@@ -11,7 +11,7 @@ import { lightBoxImageSlide } from './lightbox-image-slide.js';
 import { lightBoxVideo } from './lightbox-video.js';
 import { lightPichZoom } from './lightbox-zoom-pinch.js';
 
-export class lightBoxClass {
+export class LightBoxClass {
     constructor(data) {
         this.openBtn = document.querySelectorAll(data.openBtn) || null;
         this.closeBtn = document.querySelectorAll(data.closeBtn) || null;

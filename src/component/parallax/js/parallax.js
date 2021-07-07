@@ -1,7 +1,7 @@
 import { eventManager } from '../../../js/base/eventManager.js';
-import { parallaxItemClass } from './parallaxItem.js';
+import { ParallaxItemClass } from './parallaxItem.js';
 
-class parallaxClass {
+class ParallaxClass {
     constructor() {
         this.parallaxItem = document.querySelectorAll(
             "*[data-conponent='m-comp--parallax']"
@@ -20,7 +20,7 @@ class parallaxClass {
         });
 
         for (const item of dataArray) {
-            const parallaxItem = new parallaxItemClass(item);
+            const parallaxItem = new ParallaxItemClass(item);
             this.instances.push(parallaxItem);
             parallaxItem.init();
         }
@@ -149,4 +149,4 @@ class parallaxClass {
     }
 }
 
-export const parallax = new parallaxClass();
+export const parallax = new ParallaxClass();

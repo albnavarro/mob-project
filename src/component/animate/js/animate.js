@@ -1,7 +1,7 @@
 import { eventManager } from '../../../js/base/eventManager.js';
-import { animateItemClass } from './animateItem.js';
+import { AnimateItemClass } from './animateItem.js';
 
-class animateClass {
+class AnimateClass {
     constructor() {
         this.componentItem = document.querySelectorAll(
             "*[data-conponent='m-comp--animate']"
@@ -20,7 +20,7 @@ class animateClass {
         });
 
         for (const item of dataArray) {
-            const componentItem = new animateItemClass(item);
+            const componentItem = new AnimateItemClass(item);
             this.instances.push(componentItem);
             componentItem.init();
         }
@@ -38,4 +38,4 @@ class animateClass {
     }
 }
 
-export const animate = new animateClass();
+export const animate = new AnimateClass();

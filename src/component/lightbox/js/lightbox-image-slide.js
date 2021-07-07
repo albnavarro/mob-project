@@ -2,7 +2,7 @@ import { eventManager } from '../../../js/base/eventManager.js';
 import { lightboxUtils } from './lightbox-utils.js';
 import { lightBoxImage } from './lightbox-image.js';
 
-class lightBoxImageSlideClass {
+class LightBoxImageSlideClass {
     constructor() {
         this.buttons = [];
         this.itemArray = [];
@@ -121,4 +121,4 @@ class lightBoxImageSlideClass {
     }
 }
 
-export const lightBoxImageSlide = new lightBoxImageSlideClass();
+export const lightBoxImageSlide = new LightBoxImageSlideClass();

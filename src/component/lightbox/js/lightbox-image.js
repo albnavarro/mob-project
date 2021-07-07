@@ -4,7 +4,7 @@ import { loadImages } from '../../../js/utility/loadImages.js';
 import { lightboxUtils } from './lightbox-utils.js';
 import { lightPichZoom } from './lightbox-zoom-pinch.js';
 
-class lightBoxImageClass {
+class LightBoxImageClass {
     constructor() {
         this.image = [];
         this.onResizeId = -1;
@@ -149,4 +149,4 @@ class lightBoxImageClass {
     }
 }
 
-export const lightBoxImage = new lightBoxImageClass();
+export const lightBoxImage = new LightBoxImageClass();

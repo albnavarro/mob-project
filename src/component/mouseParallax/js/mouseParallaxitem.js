@@ -6,7 +6,7 @@ import {
     offset,
 } from '../../../js/utility/vanillaFunction.js';
 
-export class mouseParallaxItemClass {
+export class MouseParallaxItemClass {
     constructor(data) {
         this.item = data.item;
         this.centerToViewoport = data.centerToViewoport;

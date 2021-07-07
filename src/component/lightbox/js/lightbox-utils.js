@@ -1,6 +1,6 @@
 import { eventManager } from '../../../js/base/eventManager.js';
 
-class lightboxUtilsClass {
+class LightboxUtilsClass {
     // RESETTO IL CONTENUTO DELLA DESCRIZIONE LIGHTBOX SE TALE ELEMENTO ESISTE
     // ALLA CHIUSURA DELLA LIGHTBOX O AL CAMBIO LIOGHTBOX
     resetDescriptionBox(wrapper) {
@@ -62,4 +62,4 @@ class lightboxUtilsClass {
     }
 }
 
-export const lightboxUtils = new lightboxUtilsClass();
+export const lightboxUtils = new LightboxUtilsClass();

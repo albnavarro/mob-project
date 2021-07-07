@@ -1,6 +1,6 @@
 import { eventManager } from '../../../js/base/eventManager.js';
 
-class lightDescriptionClass {
+class LightDescriptionClass {
     init({ title, description, wrapper }) {
         if (title || description != '') {
             const parent = wrapper.closest('.lightbox');
@@ -50,4 +50,4 @@ class lightDescriptionClass {
     }
 }
 
-export const lightDescription = new lightDescriptionClass();
+export const lightDescription = new LightDescriptionClass();

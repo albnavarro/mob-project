@@ -1,7 +1,7 @@
 import { eventManager } from '../../../js/base/eventManager.js';
-import { mouseParallaxItemClass } from './mouseParallaxitem.js';
+import { MouseParallaxItemClass } from './mouseParallaxitem.js';
 
-class mouseParallaxClass {
+class MouseParallaxClass {
     constructor() {
         this.mouseItem = document.querySelectorAll(
             "*[data-conponent='m-comp--mouseParallax']"
@@ -20,7 +20,7 @@ class mouseParallaxClass {
         });
 
         for (const item of dataArray) {
-            const mouseParallaxItem = new mouseParallaxItemClass(item);
+            const mouseParallaxItem = new MouseParallaxItemClass(item);
             this.instances.push(mouseParallaxItem);
             mouseParallaxItem.init();
         }
@@ -42,4 +42,4 @@ class mouseParallaxClass {
     }
 }
 
-export const mouseParallax = new mouseParallaxClass();
+export const mouseParallax = new MouseParallaxClass();

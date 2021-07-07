@@ -2,7 +2,7 @@ import { eventManager } from '../../../js/base/eventManager.js';
 import { lightDescription } from './lightbox-description.js';
 import { lightboxUtils } from './lightbox-utils.js';
 
-class lightBoxVideoClass {
+class LightBoxVideoClass {
     constructor() {
         this.onResizeId = -1;
     }
@@ -95,4 +95,4 @@ class lightBoxVideoClass {
     }
 }
 
-export const lightBoxVideo = new lightBoxVideoClass();
+export const lightBoxVideo = new LightBoxVideoClass();

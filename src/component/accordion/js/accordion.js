@@ -1,7 +1,7 @@
 import { eventManager } from '../../../js/base/eventManager.js';
-import { accordionItemClass } from './accordionItem.js';
+import { AccordionItemClass } from './accordionItem.js';
 
-class accordionClass {
+class AccordionClass {
     constructor() {
         this.accordionItem = document.querySelectorAll(
             "*[data-conponent='m-comp--accordion']"
@@ -20,7 +20,7 @@ class accordionClass {
         });
 
         for (const item of dataArray) {
-            const accordionItem = new accordionItemClass(item);
+            const accordionItem = new AccordionItemClass(item);
             this.instances.push(accordionItem);
             accordionItem.init();
         }
@@ -37,4 +37,4 @@ class accordionClass {
     }
 }
 
-export const accordion = new accordionClass();
+export const accordion = new AccordionClass();

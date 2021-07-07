@@ -1,0 +1,130 @@
+export const parallaxUtils = {
+    normalizeVelocity(value) {
+        if (value < 1) {
+            return 1;
+        } else if (value >= 10) {
+            return 9.9;
+        } else {
+            return (10 - value) * 10;
+        }
+    },
+
+    normalizeRange(value) {
+        if (value < 0) {
+            return 9.9;
+        } else if (value >= 10) {
+            return 0.1;
+        } else {
+            return 10 - value;
+        }
+    },
+
+    getFixedElementAlign({
+        scrollTop,
+        windowsHeight,
+        startPoint,
+        offset,
+        height,
+    }) {
+        if (scrollTop + windowsHeight - startPoint < offset) {
+            return 'OVER';
+        } else if (scrollTop + windowsHeight - startPoint > offset + height) {
+            return 'DOWN';
+        } else {
+            return 'INSIDE';
+        }
+    },
+
+    getFixedValueByAlign(elementAlign) {
+        return ({
+            fixedInward,
+            maxVal,
+            fixedStartOff,
+            applyStyle,
+            fixedEndOff,
+            partialVal,
+        }) => {
+            switch (elementAlign) {
+                case 'OVER':
+                    return {
+                        pxVal: fixedInward ? maxVal : 0,
+                        applyStyleComputed: fixedStartOff ? false : applyStyle,
+                    };
+                case 'DOWN':
+                    return {
+                        pxVal: fixedInward ? 0 : -maxVal,
+                        applyStyleComputed: fixedEndOff ? false : applyStyle,
+                    };
+                case 'INSIDE':
+                    return {
+                        pxVal: fixedInward ? partialVal : partialVal - maxVal,
+                        applyStyleComputed: applyStyle,
+                    };
+            }
+        };
+    },
+
+    getValueOnSwitchNoPacity({ switchPropierties, isReverse, value }) {
+        switch (switchPropierties) {
+            case 'stop':
+                if ((!isReverse && value > 0) || (isReverse && value < 0)) {
+                    return 0;
+                }
+
+            case 'back':
+                if ((!isReverse && value > 0) || (isReverse && value < 0)) {
+                    return -value;
+                }
+
+            default:
+                return value;
+        }
+    },
+
+    getOpacityElementAlign({
+        isReverse,
+        elementOffset,
+        limitTop,
+        limitBottom,
+    }) {
+        if (elementOffset >= limitTop && elementOffset <= limitBottom) {
+            return 'INSIDE';
+        } else if (elementOffset < limitTop && !isReverse) {
+            return 'OVER';
+        } else if (elementOffset < limitTop && isReverse) {
+            return 'OVER-REVERSE';
+        }
+    },
+
+    getOpacityValueByAlign(elementAlign) {
+        return (val) => {
+            switch (elementAlign) {
+                case 'INSIDE':
+                    const valStep1 = val > 1.999 ? 1.999 : val;
+                    const valStep2 = valStep1 < 0 ? -valStep1 : valStep1;
+                    const valStep3 =
+                        valStep2 > 1 ? 1 - (valStep2 % 1) : valStep2;
+                    return valStep3;
+
+                case 'OVER':
+                    return 0;
+
+                case 'OVER-REVERSE':
+                    return -val;
+
+                default:
+                    return val;
+            }
+        };
+    },
+
+    getRetReverseValue(propierties, val) {
+        switch (propierties) {
+            case 'opacity':
+                return 1 - val;
+
+            default:
+                return -val;
+        }
+    },
+};

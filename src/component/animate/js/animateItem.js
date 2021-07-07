@@ -1,4 +1,4 @@
-export class animateItemClass {
+export class AnimateItemClass {
     constructor(data) {
         this.compRoot = data.compRoot;
         this.rootMargin = data.rootMargin;
