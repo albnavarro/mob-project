@@ -61,9 +61,14 @@ export class ParallaxItemClass {
         this.calcOffset();
         this.calcHeight();
         this.calcWidth();
-        this.checkapplyElIsValid();
+
+        this.applyEl !== null
+            ? (this.applyElIsValid = true)
+            : (this.applyElIsValid = false);
+
         if (this.computationType != 'fixed')
             this.range = parallaxUtils.normalizeRange(this.range);
+
         this.jsDelta = parallaxUtils.normalizeVelocity(this.jsDelta);
 
         if (this.perspective !== null) {
@@ -135,23 +140,6 @@ export class ParallaxItemClass {
             );
         }
     }
-
-    checkapplyElIsValid() {
-        this.applyEl !== null
-            ? (this.applyElIsValid = true)
-            : (this.applyElIsValid = false);
-    }
-
-    isInViewport() {
-        return (
-            this.offset + this.height > eventManager.scrollTop() - this.gap &&
-            this.offset <
-                eventManager.scrollTop() +
-                    (eventManager.windowsHeight() + this.gap)
-        );
-    }
-
-    /////
 
     refresh() {
         this.calcOffset();
@@ -230,16 +218,22 @@ export class ParallaxItemClass {
     executeParallax(applyStyle = true) {
         if (!mq[this.queryType](this.breackpoint)) return;
 
-        // this.isInViewport() -> Esegui i colcoli solo se l'lemento è visibile nello schemro
-        // limiterOff ->  forzo il sempre il calcolo per lementi in postion fixed/sticky e otherPos attivo
-        if (!this.isInViewport() && !this.limiterOff) return;
+        if (
+            !parallaxUtils.isInViewport({
+                offset: this.offset,
+                height: this.height,
+                gap: this.gap,
+            }) &&
+            !this.limiterOff
+        )
+            return;
 
         switch (this.computationType) {
             case 'fixed':
-                const { applyStyleComputed, finalVal } =
+                const { applyStyleComputed, value } =
                     this.getFixedValue(applyStyle);
                 applyStyle = applyStyleComputed;
-                this.endValue = finalVal;
+                this.endValue = value;
                 break;
 
             default:
@@ -298,7 +292,7 @@ export class ParallaxItemClass {
             height,
         });
 
-        const { pxVal, applyStyleComputed } =
+        const { value, applyStyleComputed } =
             parallaxUtils.getFixedValueByAlign(elementAlign)({
                 fixedInward,
                 maxVal,
@@ -308,13 +302,13 @@ export class ParallaxItemClass {
                 partialVal,
             });
 
-        const percent = (Math.abs(pxVal) * 100) / height;
+        const percent = (Math.abs(value) * 100) / height;
 
         switch (this.propierties) {
             case 'horizontal':
                 return {
                     applyStyleComputed,
-                    finalVal:
+                    value:
                         -((width / 100) * percent) -
                         (selfWidth / 100) * percent,
                 };
@@ -322,13 +316,13 @@ export class ParallaxItemClass {
             case 'scale':
                 return {
                     applyStyleComputed,
-                    finalVal: percent * 10,
+                    value: percent * 10,
                 };
 
             case 'opacity':
                 return {
                     applyStyleComputed,
-                    finalVal: percent / 100,
+                    value: percent / 100,
                 };
 
             case 'rotate':
@@ -338,13 +332,13 @@ export class ParallaxItemClass {
             case 'border-width':
                 return {
                     applyStyleComputed,
-                    finalVal: percent,
+                    value: percent,
                 };
 
             default:
                 return {
                     applyStyleComputed,
-                    finalVal: pxVal,
+                    value,
                 };
         }
     }
@@ -453,6 +447,7 @@ export class ParallaxItemClass {
         const reverseVal = this.reverse
             ? parallaxUtils.getRetReverseValue(this.propierties, val)
             : val;
+
         const typeVal =
             this.computationType != 'fixed'
                 ? this.getSwitchAfterZeroValue(reverseVal)

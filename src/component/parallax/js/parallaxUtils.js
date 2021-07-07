@@ -1,3 +1,5 @@
+import { eventManager } from '../../../js/base/eventManager.js';
+
 export const parallaxUtils = {
     normalizeVelocity(value) {
         if (value < 1) {
@@ -17,6 +19,14 @@ export const parallaxUtils = {
         } else {
             return 10 - value;
         }
+    },
+
+    isInViewport({ offset, height, gap }) {
+        return (
+            offset + height > eventManager.scrollTop() - gap &&
+            offset <
+                eventManager.scrollTop() + (eventManager.windowsHeight() + gap)
+        );
     },
 
     getFixedElementAlign({
@@ -47,17 +57,17 @@ export const parallaxUtils = {
             switch (elementAlign) {
                 case 'OVER':
                     return {
-                        pxVal: fixedInward ? maxVal : 0,
+                        value: fixedInward ? maxVal : 0,
                         applyStyleComputed: fixedStartOff ? false : applyStyle,
                     };
                 case 'DOWN':
                     return {
-                        pxVal: fixedInward ? 0 : -maxVal,
+                        value: fixedInward ? 0 : -maxVal,
                         applyStyleComputed: fixedEndOff ? false : applyStyle,
                     };
                 case 'INSIDE':
                     return {
-                        pxVal: fixedInward ? partialVal : partialVal - maxVal,
+                        value: fixedInward ? partialVal : partialVal - maxVal,
                         applyStyleComputed: applyStyle,
                     };
             }
