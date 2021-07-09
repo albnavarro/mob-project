@@ -109,104 +109,121 @@ export class move3DContainerClass {
     }
 
     onMove() {
-        let vw = 0;
-        let vh = 0;
-
-        if (this.centerToViewoport || this.drag) {
-            vw = eventManager.windowsWidth();
-            vh = eventManager.windowsHeight();
-        } else {
-            vw = this.width;
-            vh = this.height;
-        }
-
-        let x = mouseManager.clientX();
-        let y = 0;
-        this.pageY ? (y = mouseManager.pageY()) : (y = mouseManager.clientY());
-
-        if (Modernizr.touchevents) {
-            x = mouseManager.pageX();
-            y = mouseManager.pageY();
-        }
-
-        let xgap = 0;
-        let ygap = 0;
-        if (this.drag && this.onDrag) {
-            if (this.firstDrag) {
-                xgap = 0;
-                ygap = 0;
-                this.firstDrag = false;
+        const { vw, vh } = (() => {
+            if (this.centerToViewoport || this.drag) {
+                return {
+                    vw: eventManager.windowsWidth(),
+                    vh: eventManager.windowsHeight(),
+                };
             } else {
-                xgap = x - this.lastX;
-                ygap = y - this.lastY;
+                return {
+                    vw: this.width,
+                    vh: this.height,
+                };
             }
+        })();
 
+        const x = Modernizr.touchevents
+            ? mouseManager.pageX()
+            : mouseManager.clientX();
+
+        const y =
+            Modernizr.touchevents || this.pageY
+                ? mouseManager.pageY()
+                : mouseManager.clientY();
+
+        const { xgap, ygap } = (() => {
+            if (!this.onDrag) return { xgap: 0, ygap: 0 };
+
+            if (this.firstDrag) {
+                this.firstDrag = false;
+                return {
+                    xgap: 0,
+                    ygap: 0,
+                };
+            } else {
+                return {
+                    xgap: x - this.lastX,
+                    ygap: y - this.lastY,
+                };
+            }
+        })();
+
+        if (this.onDrag) {
             this.dragX += xgap;
-            x = this.dragX;
-
             this.dragY += ygap;
-            y = this.dragY;
         }
+
+        const { xInMotion, yInMotion } = (() => {
+            if (this.onDrag) {
+                return {
+                    xInMotion: this.dragX,
+                    yInMotion: this.dragY,
+                };
+            } else {
+                return {
+                    xInMotion: x,
+                    yInMotion: y,
+                };
+            }
+        })();
 
         /*
         ax = grado di rotazione sull'asse X
         ay = grado di rotazione sull'asse Y
         */
-        let ax = 0;
-        let ay = 0;
+        const { ax, ay } = (() => {
+            if (this.centerToViewoport || this.drag) {
+                return {
+                    ax: -(vw / 2 - xInMotion) / this.xDepth,
+                    ay: (vh / 2 - yInMotion) / this.yDepth,
+                };
+            } else {
+                return {
+                    ax: -(vw / 2 - (xInMotion - this.offSetLeft)) / this.xDepth,
+                    ay: (vh / 2 - (yInMotion - this.offSetTop)) / this.yDepth,
+                };
+            }
+        })();
 
-        if (this.centerToViewoport || this.drag) {
-            ax = -(vw / 2 - x) / this.xDepth;
-            ay = (vh / 2 - y) / this.yDepth;
-        } else {
-            ax = -(vw / 2 - (x - this.offSetLeft)) / this.xDepth;
-            ay = (vh / 2 - (y - this.offSetTop)) / this.yDepth;
-        }
+        const xlimitReached = Math.abs(ax) > this.xLimit;
+        const ylimitReached = Math.abs(ay) > this.yLimit;
 
-        if (Math.abs(ax) > this.xLimit) {
-            ax > 0 ? (ax = this.xLimit) : (ax = -this.xLimit);
-            /*
-            prevent stall when angle reaches the limit
-            */
-            this.dragX -= xgap;
-        }
+        const axLimited = (() => {
+            if (!xlimitReached) return ax;
+            return ax > 0 ? this.xLimit : -this.xLimit;
+        })();
 
-        if (Math.abs(ay) > this.yLimit) {
-            ay > 0 ? (ay = this.yLimit) : (ay = -this.yLimit);
-            /*
-            prevent stall when angle reaches the limit
-            */
-            this.dragY -= ygap;
-        }
+        const ayLimited = (() => {
+            if (!ylimitReached) return ay;
+            return ay > 0 ? this.yLimit : -this.yLimit;
+        })();
 
-        this.lastX = mouseManager.clientX();
-        this.pageY
-            ? (this.lastY = mouseManager.pageY())
-            : (this.lastY = mouseManager.clientY());
+        // TODO: calcolare il valore x y corrspondente all 'angolo limite e assegnarlo
+        if (xlimitReached) this.dragX -= xgap;
+        if (ylimitReached) this.dragY -= ygap;
 
-        if (Modernizr.touchevents) {
-            this.lastX = mouseManager.pageX();
-            this.lastY = mouseManager.pageY();
-        }
+        this.lastX = x;
+        this.lastY = y;
 
         /*
         Calcolo il valore da passare ai componenti figli per animarre l'asse Z.
         Il delta sarà l'ipotenusa del triangolo formato dai volri ax e ay
         */
         this.delta = Math.sqrt(
-            Math.pow(Math.abs(ay), 2) + Math.pow(Math.abs(ax), 2)
+            Math.pow(Math.abs(ayLimited), 2) + Math.pow(Math.abs(axLimited), 2)
         );
+
         this.limit = Math.sqrt(
             Math.pow(Math.abs(this.xLimit), 2) +
                 Math.pow(Math.abs(this.yLimit), 2)
         );
 
-        let apply = false;
-        if ((this.drag && this.onDrag) || !this.drag) apply = true;
+        const apply = (this.drag && this.onDrag) || !this.drag ? true : false;
 
         if (apply) {
             const style = {
-                transform: `rotateY(${ax}deg) rotateX(${ay}deg) translateZ(0)`,
+                transform: `rotateY(${axLimited}deg) rotateX(${ayLimited}deg) translateZ(0)`,
             };
             Object.assign(this.container.style, style);
 

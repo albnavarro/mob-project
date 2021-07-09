@@ -120,10 +120,13 @@ class LightPichZoomClass {
     }
 
     onWeel(e) {
-        let delta = 0;
-        if (e.deltaY !== 0) {
-            delta = e.deltaY > 0 ? -0.2 : 0.2;
-        }
+        const delta = ((e) => {
+            if (e.deltaY !== 0) {
+                return e.deltaY > 0 ? -0.2 : 0.2;
+            } else {
+                return 0;
+            }
+        })(e);
 
         this.scale += delta;
 
@@ -150,84 +153,151 @@ class LightPichZoomClass {
     onMove() {
         if (this.scale == 1) this.onDrag = false;
 
-        let x = mouseManager.clientX();
-        let y = mouseManager.clientY();
-
-        if (Modernizr.touchevents) {
-            x = mouseManager.pageX();
-            y = mouseManager.pageY();
-        }
-
-        let xgap = 0;
-        let ygap = 0;
-        if (this.onDrag) {
-            if (this.firstDrag) {
-                xgap = 0;
-                ygap = 0;
-                this.firstDrag = false;
+        const { x, y } = (() => {
+            if (Modernizr.touchevents) {
+                return {
+                    x: mouseManager.pageX(),
+                    y: mouseManager.pageY(),
+                };
             } else {
-                xgap = x - this.lastX;
-                ygap = y - this.lastY;
+                return {
+                    x: mouseManager.clientX(),
+                    y: mouseManager.clientY(),
+                };
             }
+        })();
 
+        const { xgap, ygap } = (() => {
+            if (!this.onDrag) return { xgap: 0, ygap: 0 };
+
+            if (this.firstDrag) {
+                this.firstDrag = false;
+                return {
+                    xgap: 0,
+                    ygap: 0,
+                };
+            } else {
+                return {
+                    xgap: x - this.lastX,
+                    ygap: y - this.lastY,
+                };
+            }
+        })();
+
+        if (this.onDrag) {
             this.dragX += xgap;
-            x = this.dragX;
-
             this.dragY += ygap;
-            y = this.dragY;
         }
 
-        // XLIMITER TO CONTAINER ( window )
-        const imagePosleft = offset(this.image).left;
+        const { xComputed, yComputed } = (() => {
+            if (this.onDrag) {
+                return {
+                    xComputed: this.dragX,
+                    yComputed: this.dragY,
+                };
+            } else {
+                return {
+                    xComputed: x,
+                    yComputed: y,
+                };
+            }
+        })();
+
         const imagewidth = outerWidth(this.image) * this.scale;
-        const limitX = (imagewidth - eventManager.windowsWidth()) / 2;
-
-        if (imagewidth < eventManager.windowsWidth()) {
-            // NO DRAG ON X
-            x = 0;
-            this.dragX -= xgap;
-        } else if (this.dragX <= -limitX && this.dragX <= limitX) {
-            // RIGHT LIMIT
-            x = -limitX;
-            this.dragX -= this.dragX + limitX;
-        } else if (this.dragX > -limitX && this.dragX >= limitX) {
-            // LEFT LIMIT
-            x = limitX;
-            this.dragX -= this.dragX - limitX;
-        }
-        ////
-
-        // YLIMITER TO CONTAINER ( window )
-        const imagePostop = offset(this.image).top;
         const imageheight = outerHeight(this.image) * this.scale;
+        const limitX = (imagewidth - eventManager.windowsWidth()) / 2;
         const limitY = (imageheight - eventManager.windowsHeight()) / 2;
 
-        if (imageheight < eventManager.windowsHeight()) {
-            // NO DRAG ON Y
-            y = 0;
-            this.dragY -= ygap;
-        } else if (this.dragY <= -limitY && this.dragY <= limitY) {
-            // BOTTOM LIMIT
-            y = -limitY;
-            this.dragY -= this.dragY + limitY;
-        } else if (this.dragY > -limitY && this.dragY >= limitY) {
-            // TOP LIMIT
-            y = limitY;
-            this.dragY -= this.dragY - limitY;
-        }
-        ////
+        const xCondition = (() => {
+            if (imagewidth < eventManager.windowsWidth()) {
+                return 'NO-DRAG';
+            } else if (this.dragX <= -limitX && this.dragX <= limitX) {
+                return 'RIGHT-LIMIT';
+            } else if (this.dragX > -limitX && this.dragX >= limitX) {
+                return 'LEFT-LIMIT';
+            } else {
+                return 'DEFAULT';
+            }
+        })();
 
-        this.lastX = mouseManager.clientX();
-        this.lastY = mouseManager.clientY();
+        const yCondition = (() => {
+            if (imageheight < eventManager.windowsHeight()) {
+                return 'NO-DRAG';
+            } else if (this.dragY <= -limitY && this.dragY <= limitY) {
+                return 'BOTTOM-LIMIT';
+            } else if (this.dragY > -limitY && this.dragY >= limitY) {
+                return 'TOP-LIMIT';
+            } else {
+                return 'DEFAULT';
+            }
+        })();
 
-        if (Modernizr.touchevents) {
-            this.lastX = mouseManager.pageX();
-            this.lastY = mouseManager.pageY();
+        const xLimited = (() => {
+            switch (xCondition) {
+                case 'NO-DRAG':
+                    return 0;
+
+                case 'RIGHT-LIMIT':
+                    return -limitX;
+
+                case 'LEFT-LIMIT':
+                    return limitX;
+
+                case 'DEFAULT':
+                    return xComputed;
+            }
+        })();
+
+        const yLimited = (() => {
+            switch (yCondition) {
+                case 'NO-DRAG':
+                    return 0;
+
+                case 'BOTTOM-LIMIT':
+                    return -limitY;
+
+                case 'TOP-LIMIT':
+                    return limitY;
+
+                case 'DEFAULT':
+                    return yComputed;
+            }
+        })();
+
+        switch (xCondition) {
+            case 'NO-DRAG':
+                this.dragX -= xgap;
+                break;
+
+            case 'RIGHT-LIMIT':
+                this.dragX -= this.dragX + limitX;
+                break;
+
+            case 'LEFT-LIMIT':
+                this.dragX -= this.dragX - limitX;
+                break;
         }
+
+        switch (yCondition) {
+            case 'NO-DRAG':
+                this.dragY -= ygap;
+                break;
+
+            case 'BOTTOM-LIMIT':
+                this.dragY -= this.dragY + limitY;
+                break;
+
+            case 'TOP-LIMIT':
+                this.dragY -= this.dragY - limitY;
+                break;
+        }
+
+        this.lastX = x;
+        this.lastY = y;
 
         if (this.onDrag) {
             const style = {
-                transform: `translateX(${x}px) translateY(${y}px) scale(${this.scale})`,
+                transform: `translateX(${xLimited}px) translateY(${yLimited}px) scale(${this.scale})`,
             };
             Object.assign(this.image.style, style);
         }

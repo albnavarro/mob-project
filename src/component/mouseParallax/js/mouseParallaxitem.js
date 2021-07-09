@@ -36,32 +36,36 @@ export class MouseParallaxItemClass {
     }
 
     onMove() {
-        let vw = 0;
-        let vh = 0;
+        const {vw, vh} = (() => {
+            if (this.centerToViewoport) {
+                return {
+                    vw: eventManager.windowsWidth(),
+                    vh: eventManager.windowsHeight()
+                }
+            } else {
+                return {
+                    vw: this.width,
+                    vh: this.height
+                }
+            }
+        })()
 
-        if (this.centerToViewoport) {
-            vw = eventManager.windowsWidth();
-            vh = eventManager.windowsHeight();
-        } else {
-            vw = this.width;
-            vh = this.height;
-        }
+        const x = mouseManager.clientX();
+        const y = !this.centerToViewoport ? mouseManager.pageY() : mouseManager.clientY();
 
-        let x = mouseManager.clientX();
-        let y = 0;
-        !this.centerToViewoport
-            ? (y = mouseManager.pageY())
-            : (y = mouseManager.clientY());
-
-        let ax = 0;
-        let ay = 0;
-        if (this.centerToViewoport) {
-            ax = (x - vw / 2) / this.range;
-            ay = (y - vh / 2) / this.range;
-        } else {
-            ax = (x - this.offSetLeft - vw / 2) / this.range;
-            ay = (y - this.offSetTop - vh / 2) / this.range;
-        }
+        const {ax, ay} = (() => {
+            if (this.centerToViewoport) {
+                return {
+                    ax: (x - vw / 2) / this.range,
+                    ay:(y - vh / 2) / this.range
+                }
+            } else {
+                return {
+                    ax: (x - this.offSetLeft - vw / 2) / this.range,
+                    ay: (y - this.offSetTop - vh / 2) / this.range
+                }
+            }
+        })()
 
         const style = {
             transform: `translate3D(${ax}px, ${ay}px, 0)`,
