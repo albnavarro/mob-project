@@ -3,21 +3,21 @@
     padding-top: 300px;
 
     &__inner {
+        width: 300px;
         height: 500px;
         border: 1px #000 solid;
-        width: 300px;
 
         &--1,
         &--2 {
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
         }
 
         &__sticky {
+            display: flex;
             position: sticky;
             top: 0;
-            display: flex;
             justify-content: center;
             width: 100%;
         }
@@ -30,12 +30,13 @@
     }
 }
 
-.gaspP {
-    height: 100vh;
+.gaspP,
+.gaspC {
     display: flex;
-    border: 1px #000 solid;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
+    height: 100vh;
+    border: 1px #000 solid;
 
     &__inner {
         border: 1px #000 solid;
@@ -54,16 +55,16 @@
     }
 
     &__item {
-        height: 100vh;
-        border: 10px solid #ccc;
         display: flex;
         position: sticky;
         top: 0;
+        height: 100vh;
+        border: 10px solid #ccc;
     }
 
     &__card {
-        padding: 100px;
         flex: 0 0 100vw;
+        padding: 100px;
         background: #ccc;
         background-clip: content-box;
     }

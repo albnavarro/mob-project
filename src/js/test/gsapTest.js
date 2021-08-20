@@ -13,12 +13,14 @@ class gsapTestClass {
         gsap.registerPlugin(ScrollTrigger)
 
         eventManager.push('load', () => {
-            this.stikyNoPin()
-            this.triggerAnimation()
-            this.triggerScroll()
-            this.parallax()
-            this.horizontalScroll()
-            this.horizontalScrollSingleCard()
+            this.stikyNoPin();
+            this.triggerAnimation();
+            this.triggerScroll();
+            this.parallaxSimple();
+            this.parallaxSimpleCentered();
+            this.parallax();
+            this.horizontalScroll();
+            this.horizontalScrollSingleCard();
         })
     }
 
@@ -119,6 +121,35 @@ class gsapTestClass {
         });
 
     }
+
+    parallaxSimple() {
+        gsap.to('.gaspT__inner--3', {
+            y: -300,
+            scrollTrigger: {
+                scrub: 1,
+                scroller: window,
+                trigger: '.gaspT__inner--3',
+                start: 'top bottom',
+                end: 'bottom top',
+            },
+        });
+    }
+
+
+    parallaxSimpleCentered() {
+       const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: '.gaspC--2',
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: 1,
+          }
+        })
+        .fromTo('.gaspT__inner--4', {y: "300"}, {y: "0"})
+        .fromTo('.gaspT__inner--4', {y: "0"}, {y: "-300"})
+    }
+
+
 
     /*
     // HORIZONTAL
