@@ -1,0 +1,14 @@
+.pageScroller {
+    position: relative;
+
+    &__shadow {
+        position: relative;
+    }
+
+    &__content {
+        position: fixed;
+        top: 0;
+        right: 0;
+        left: 0;
+    }
+}

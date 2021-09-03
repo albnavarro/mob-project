@@ -5,28 +5,30 @@
 
     &-end {
         transform: translateY(0);
-        transition: transform 0.5s 0.15s;
+        transition: transform .5s .15s;
     }
 }
 
 .opacity {
     &-start {
+        transition: opacity .5s .15s;
         opacity: 0;
     }
 
     &-end {
+        transition: opacity .5s .15s;
         opacity: 1;
-        transition: opacity 0.5s 0.15s;
     }
 }
 
 .clipath {
     &-start {
         clip-path: polygon(0% 0%, 0% 0%, 0% 200%);
+        transition: clip-path 1.5s;
     }
 
     &-end {
         clip-path: polygon(0% 0%, 200% 0%, 0% 200%);
-        transition: clip-path 1.5s 0.15s;
+        transition: clip-path 1.5s .15s;
     }
 }

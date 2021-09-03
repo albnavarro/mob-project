@@ -50,7 +50,7 @@ export class LightBoxClass {
 
     openBtnOnClick(event) {
         event.preventDefault();
-        const $btn = event.currentTarget;
+        const btn = event.currentTarget;
 
         if (!this.lightBox.classList.contains('active')) {
             this.lightBox.classList.add('active');
@@ -59,31 +59,31 @@ export class LightBoxClass {
             switch (this.dataType) {
                 case 'normal':
                     lightDescription.init({
-                        title: $btn.getAttribute('data-title') || '',
+                        title: btn.getAttribute('data-title') || '',
                         description:
-                            $btn.getAttribute('data-description') || '',
+                            btn.getAttribute('data-description') || '',
                         wrapper: this.staticWrapper,
                     });
                     break;
 
                 case 'image':
                     lightBoxImage.init({
-                        url: $btn.getAttribute('data-url'),
-                        title: $btn.getAttribute('data-title') || '',
+                        url: btn.getAttribute('data-url'),
+                        title: btn.getAttribute('data-title') || '',
                         description:
-                            $btn.getAttribute('data-description') || '',
+                            btn.getAttribute('data-description') || '',
                         wrapper: this.dynamicWrapper,
-                        hGap: $btn.getAttribute('data-hGap') || '20',
-                        wGap: $btn.getAttribute('data-wGap') || '20',
-                        zoom: $btn.hasAttribute('data-zoom'),
+                        hGap: btn.getAttribute('data-hGap') || '20',
+                        wGap: btn.getAttribute('data-wGap') || '20',
+                        zoom: btn.hasAttribute('data-zoom'),
                     });
                     break;
 
                 case 'image-slide':
                     lightBoxImageSlide.init({
-                        group: $btn.getAttribute('data-imagegroup'),
+                        group: btn.getAttribute('data-imagegroup'),
                         allItem: this.openBtn,
-                        item: $btn,
+                        item: btn,
                         wrapper: this.dynamicWrapper,
                     });
                     break;
@@ -91,16 +91,16 @@ export class LightBoxClass {
                 case 'video':
                     lightBoxVideo.init({
                         sourceType:
-                            $btn.getAttribute('data-sourceType') || 'youtube',
-                        url: $btn.getAttribute('data-url'),
-                        title: $btn.getAttribute('data-title') || '',
+                            btn.getAttribute('data-sourceType') || 'youtube',
+                        url: btn.getAttribute('data-url'),
+                        title: btn.getAttribute('data-title') || '',
                         description:
-                            $btn.getAttribute('data-description') || '',
-                        ratioW: $btn.getAttribute('data-ratioW') || '16',
-                        ratioH: $btn.getAttribute('data-ratioH') || '9',
+                            btn.getAttribute('data-description') || '',
+                        ratioW: btn.getAttribute('data-ratioW') || '16',
+                        ratioH: btn.getAttribute('data-ratioH') || '9',
                         wrapper: this.dynamicWrapper,
-                        hGap: $btn.getAttribute('data-hGap') || '20',
-                        wGap: $btn.getAttribute('data-wGap') || '20',
+                        hGap: btn.getAttribute('data-hGap') || '20',
+                        wGap: btn.getAttribute('data-wGap') || '20',
                     });
                     break;
             }

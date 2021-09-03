@@ -33,6 +33,7 @@ import { toolTip } from '../component/tooltip/js/tooltip.js';
 import { move3D } from '../component/move3D/js/move3D.js';
 import { mouseParallax } from '../component/mouseParallax/js/mouseParallax.js';
 import { animate } from '../component/animate/js/animate.js';
+import { pageScroll } from '../component/pageScroll/js/pageScroll.js';
 
 //TEST
 import { gsapTest } from './test/gsapTest.js';
@@ -42,6 +43,7 @@ const body = document.querySelector('body');
 
 eventManager.init(true, true);
 mouseManager.init();
+pageScroll.init();
 parallax.init();
 tBlocks.init();
 showElement.init();

@@ -1,0 +1,5 @@
+{
+    "template": "pageScroller",
+    "pageTitle": "pageScroller",
+    "additionalData": ["string/en.json", "nav.json", "nonEsistenteFile.json"]
+}

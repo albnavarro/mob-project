@@ -15,6 +15,10 @@
                 {
                     "label" : "",
                     "univoqueId" : "mouseParallax"
+                },
+                {
+                    "label" : "",
+                    "univoqueId" : "pageScroller"
                 }
             ]
         },

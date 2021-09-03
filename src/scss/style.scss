@@ -1,52 +1,43 @@
 @charset 'UTF-8';
-
-@import
-  // Vendors
+@import // Vendors
   '../../node_modules/breakpoint-sass/stylesheets/breakpoint',
-  '../../node_modules/susy/sass/susy',
-  '../../node_modules/susy/sass/plugins/svg-grid';
+    '../../node_modules/susy/sass/susy',
+    '../../node_modules/susy/sass/plugins/svg-grid';
 
 // 1. Configuration and helpers
-@import
-  'abstracts/variables',
-  'abstracts/functions',
-  'abstracts/mixins';
-
-@import
-  'vendor/normalize';
+@import 'abstracts/variables',
+    'abstracts/functions',
+    'abstracts/mixins';
+@import 'vendor/normalize';
 
 // 3. Base stuff
-@import
-  'base/base',
-  'base/typography',
-  'base/fonts',
-  'base/helpers';
+@import 'base/base',
+    'base/typography',
+    'base/fonts',
+    'base/helpers';
 
 // utility
-@import
-  'utility/loader';
+@import 'utility/loader';
 
 // component vanilla
-@import
-  '../component/to-top/scss/toTop',
-  '../component/offset-slider/scss/offsetSlider.scss',
-  '../component/tooltip/scss/tooltip',
-  '../component/navigation/scss/menu',
+@import '../component/to-top/scss/toTop',
+    '../component/offset-slider/scss/offsetSlider.scss',
+    '../component/tooltip/scss/tooltip',
+    '../component/navigation/scss/menu',
   '../component/lightbox/scss/lightbox',
   '../component/show-element/scss/ShowElement',
   '../component/overlay/sass/overlay.scss',
   '../component/threeBlocks/scss/tBlocks',
   '../component/parallax/scss/parallax',
   '../component/move3D/scss/move3D',
-  '../component/mouseParallax/scss/mouseParallax';
-
+  '../component/mouseParallax/scss/mouseParallax',
+  '../component/pageScroll/scss/_pageScroll.scss';
 
 // layout
-@import
-  'layout/index',
-  'layout/footer',
-  'layout/fidex',
-  'layout/susy',
-  'layout/move3D',
-  'layout/mouseParallax',
-  'layout/gsap';
+@import 'layout/index',
+    'layout/footer',
+    'layout/fidex',
+    'layout/susy',
+    'layout/move3D',
+    'layout/mouseParallax',
+    'layout/gsap';
