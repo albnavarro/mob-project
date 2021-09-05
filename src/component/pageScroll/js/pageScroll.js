@@ -1,44 +1,52 @@
-import { eventManager } from '../../../js/base/eventManager.js';
-import { PageScrollItemClass } from './pageScrollItem.js';
+import { eventManager } from "../../../js/base/eventManager.js";
+import { PageScrollItemClass } from "./pageScrollItem.js";
 
 class PageScrollClass {
-    constructor() {
-        this.pageScrollItem = document.querySelectorAll(
-            "*[data-conponent='m-comp--pageScroller']"
-        );
-        this.instances = [];
+  constructor() {
+    this.pageScrollItem = document.querySelectorAll(
+      "*[data-conponent='m-comp--pageScroller']"
+    );
+    this.instances = [];
+  }
+
+  init() {
+    eventManager.push("load", this.inzializeData.bind(this));
+  }
+
+  inzializeData() {
+    const itemArray = Array.from(this.pageScrollItem);
+    const dataArray = itemArray.map((item) => {
+      return this.getItemData(item);
+    });
+
+    for (const item of dataArray) {
+      const pageScrollItem = new PageScrollItemClass(item);
+      this.instances.push(pageScrollItem);
+      pageScrollItem.init();
     }
+  }
 
-    init() {
-        eventManager.push('load', this.inzializeData.bind(this));
+  refresh() {
+    for (const item of this.instances) {
+      item.refresh();
     }
+  }
 
-    inzializeData() {
-        const itemArray = Array.from(this.pageScrollItem);
-        const dataArray = itemArray.map((item) => {
-            return this.getItemData(item);
-        });
+  getItemData(item) {
+    const data = {};
+    data.item = item;
 
-        for (const item of dataArray) {
-            const pageScrollItem = new PageScrollItemClass(item);
-            this.instances.push(pageScrollItem);
-            pageScrollItem.init();
-        }
-    }
+    data.speed = item.getAttribute("data-speed") || 15;
 
-    refresh() {
-        for (const item of this.instances) {
-            item.refresh();
-        }
-    }
+    // String
+    data.breackpoint = item.getAttribute("data-breackpoint") || "desktop";
 
-    getItemData(item) {
-        const data = {};
-        data.item = item;
+    // String
+    // refer to mediaManager obj
+    data.queryType = item.getAttribute("data-queryType") || "min";
 
-
-        return data;
-    }
+    return data;
+  }
 }
 
 export const pageScroll = new PageScrollClass();

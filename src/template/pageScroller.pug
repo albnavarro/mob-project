@@ -4,7 +4,8 @@ block content
     .interceptTrigger.parallax__item-test(
         data-conponent='m-comp--animate'
         data-triggerEl=".interceptObserver-1")
-    .pageScroller(data-conponent='m-comp--pageScroller')
+    .pageScroller(
+            data-conponent='m-comp--pageScroller')
         .pageScroller__shadow
         .pageScroller__content
             header
@@ -125,8 +126,6 @@ block content
                                 .accrdion-item__content
                                     span
                                         |content
-
-                        include ../component/lightbox/pug/button.pug
 
                         include ../component/tooltip/pug/tooltip.pug
                         
@@ -284,10 +283,157 @@ block content
                             data-align='end',
                             data-ease="linear",
                             data-propierties="horizontal")
+                            .parallax__item-test        
+                        
+                    
+                        
+    
+    .pageScroller(
+            data-conponent='m-comp--pageScroller')
+        .pageScroller__shadow
+        .pageScroller__content
+            main
+                .container.clearfix
+                    .content
+                        .parallax__container
+                            .parallax__item(
+                                data-conponent='m-comp--parallax',
+                                data-range='8',
+                                data-jsDelta="8",
+                                data-align='start',
+                                data-ease="smooth"
+                                data-smoothType="css")
+                                .parallax__item-test
+                        .parallax__container
+                            .parallax__item(
+                                data-conponent='m-comp--parallax',
+                                data-align='start',
+                                data-propierties="opacity")
+                                .parallax__item-test
+
+
+
+
+                include ../component/offset-slider/pug/offsetSlider.pug
+                .container.container-block-1
+                    include ../component/threeBlocks/pug/tBlocks.pug
+                .container.container-block-2
+                    include ../component/threeBlocks/pug/tBlocks.pug
+
+                section.overflow-hidden
+                
+                    .interceptObserver.interceptObserver-1(
+                        data-conponent='m-comp--animate')
+                    .interceptObserver.interceptObserver-2(
+                        data-conponent='m-comp--animate')
+                
+                    .index-timeline
+                        .index-timeline__dummy.index-timeline__dummy--1
+                        .index-timeline__dummy.index-timeline__dummy--2
+                        .parallax__container
+                            .parallax__item.inlineBLock(
+                                data-conponent='m-comp--parallax'
+                                data-computationType="fixed"
+                                data-propierties="horizontal"
+                                data-range="50"
+                                data-fixedOffset="20"
+                                data-triggerEl=".index-timeline__dummy--1")
+                                .parallax__item(
+                                    data-conponent='m-comp--parallax'
+                                    data-computationType="fixed"
+                                    data-propierties="horizontal"
+                                    data-reverse
+                                    data-range="50"
+                                    data-fixedOffset="20"
+                                    data-triggerEl=".index-timeline__dummy--2")
+                                    .parallax__item-test
+                                    
+                    .parallax__container
+                        .parallax__item.inlineBLock(
+                            data-conponent='m-comp--parallax'
+                            data-computationType="fixed"
+                            data-propierties="rotate"
+                            data-range="90"
+                            data-fixedOffset="20")
+                            .parallax__item-test
+                            
+                    .parallax__container.flex.justify-center
+                        .parallax__item(
+                            data-conponent='m-comp--parallax'
+                            data-perspective="400"
+                            data-propierties="rotateX"
+                            data-range="6")
+                            .parallax__item(
+                                data-conponent='m-comp--parallax'
+                                data-range="6")
+                                .parallax__item-test
+
+                    .parallax__container
+                        .parallax__item(
+                            data-conponent='m-comp--parallax',
+                            data-propierties="opacity"
+                            data-opacityStart="80"
+                            data-opacityEnd="45"
+                            data-onSwitch="back")
+                            .parallax__item-test
+
+                    .parallax__container.clearfix
+                        .parallax__item.inlineBLock(
+                            data-conponent='m-comp--parallax',
+                            data-range='9.5',
+                            data-jsDelta="8",
+                            data-ease="smooth",
+                            data-onSwitch="back",
+                            data-propierties="scale")
+                            .parallax__item-test.parallax__item-test--float
+
+                    .parallax__container
+                        .parallax__item(
+                            data-conponent='m-comp--parallax',
+                            data-range='2',
+                            data-align='90',
+                            data-ease="linear",
+                            data-onSwitch="back",
+                            data-reverse,
+                            data-propierties="horizontal")
+                            .parallax__item-test
+
+                    .clipath-start(
+                        data-conponent='m-comp--toggleEl',
+                        data-startClass="clipath-start",
+                        data-endClass="clipath-end")
+                            .trasition-item-test 
+
+                    .parallax__container.flex
+                        .parallax__item(
+                            data-conponent='m-comp--parallax',
+                            data-range='8',
+                            data-jsDelta="8",
+                            data-ease="smooth")
+                            .parallax__item-test.parallax__item-test--float
+
+                        .parallax__item(
+                            data-conponent='m-comp--parallax',
+                            data-range='8',
+                            data-jsDelta="8",
+                            data-ease="smooth",
+                            data-reverse)
+                            .parallax__item-test.parallax__item-test--float
+
+                    .transformY-start(
+                        data-conponent='m-comp--toggleEl',
+                        data-startClass="transformY-start",
+                        data-endClass="transformY-end",
+                        data-onlyOnce)
+                            .trasition-item-test 
+                            
+                    .parallax__container
+                        .parallax__item(
+                            data-conponent='m-comp--parallax',
+                            data-range='2',
+                            data-align='end',
+                            data-ease="linear",
+                            data-propierties="horizontal")
                             .parallax__item-test
 
                     div(style="height:200px;")
-
-            include ../component/lightbox/pug/lightbox-simple.pug
-            include ../component/lightbox/pug/lightbox-image.pug
-            include ../component/lightbox/pug/lightbox-video.pug
