@@ -10,7 +10,6 @@ export class PageScrollItemClass {
   constructor(data) {
     this.root = data.item;
     this.content = data.item.querySelector(".pageScroller__content");
-    this.shadow = data.item.querySelector(".pageScroller__shadow");
     this.speed = data.speed;
     this.breackpoint = data.breackpoint;
     this.queryType = data.queryType;
@@ -19,12 +18,13 @@ export class PageScrollItemClass {
     this.startValue = 0;
     this.endValue = 0;
     this.prevValue = 0;
+    this.firstScroll = true;
   }
 
   init() {
-    eventManager.push("load", () => this.setShadow());
-    eventManager.push("load", () => this.setOffset());
-    eventManager.push("load", () => this.setContent());
+    this.setShadow();
+    this.setOffset();
+    this.setContent();
     eventManager.push("resize", () => this.setShadow());
     eventManager.push("resize", () => this.setOffset());
     eventManager.push("resize", () => this.setContent());
@@ -41,18 +41,15 @@ export class PageScrollItemClass {
           height: `${height}px`,
         }
       : {
-          width: "0px",
-          height: "0px",
+          width: "",
+          height: "",
         };
 
-    Object.assign(this.shadow.style, style);
-
-    // hide cotent to avoid bad calcultation on resize
-    this.content.style.display = "none";
+    Object.assign(this.root.style, style);
   }
 
   setOffset() {
-    this.offsetTop = offset(this.shadow).top;
+    this.offsetTop = offset(this.root).top;
   }
 
   setContent() {
@@ -63,19 +60,17 @@ export class PageScrollItemClass {
     const style = mq[this.queryType](this.breackpoint)
       ? {
           transform: `translateY(${-this.endValue}px)`,
-          position: `fixed`,
-          top: `0`,
-          left: `0`,
-          right: `0`,
-          display: `block`,
+          position: 'fixed',
+          top: '0',
+          left: '0',
+          right: '0',
         }
       : {
           transform: "translateY(0)",
           position: "static",
-          top: `0`,
-          left: `0`,
-          right: `0`,
-          display: `block`,
+          top: '',
+          left: '',
+          right: '',
         };
 
     Object.assign(this.content.style, style);
@@ -100,7 +95,8 @@ export class PageScrollItemClass {
         v = this.speed,
         val = (f - s) / v + s * 1;
 
-      this.startValue = val.toFixed(1);
+      this.startValue = (this.firstScroll) ? this.endValue : val.toFixed(1);
+      this.firstScroll = false
 
       const style = mq[this.queryType](this.breackpoint)
         ? {

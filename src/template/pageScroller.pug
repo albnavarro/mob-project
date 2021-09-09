@@ -6,7 +6,6 @@ block content
         data-triggerEl=".interceptObserver-1")
     .pageScroller(
             data-conponent='m-comp--pageScroller')
-        .pageScroller__shadow
         .pageScroller__content
             header
                 .container
@@ -59,20 +58,20 @@ block content
                             .accrdion-item(data-item)
                                 button.accrdion-item__btn(data-toggle)
                                     |item1
-                                .accrdion-item__content(data-content)
+                                .accrdion-item__content(data-content, style='height:0;overflow:hidden;')
                                     span
                                         |content
                             .accrdion-item(data-item)
                                 button.accrdion-item__btn(data-toggle)
                                     span
                                         |item2
-                                .accrdion-item__content(data-content)
+                                .accrdion-item__content(data-content, style='height:0;overflow:hidden;')
                                     span
                                         |content
                             .accrdion-item(data-item)
                                 button.accrdion-item__btn(data-toggle)
                                     |item2
-                                .accrdion-item__content(data-content)
+                                .accrdion-item__content(data-content, style='height:0;overflow:hidden;')
                                     span
                                         |content
 
@@ -86,20 +85,20 @@ block content
                             .accrdion-item(data-item)
                                 button.accrdion-item__btn(data-toggle)
                                     |item1
-                                .accrdion-item__content(data-content)
+                                .accrdion-item__content(data-content, style='height:0;overflow:hidden;')
                                     span
                                         |content
                             .accrdion-item(data-item)
                                 button.accrdion-item__btn(data-toggle)
                                     span
                                         |item2
-                                .accrdion-item__content(data-content)
+                                .accrdion-item__content(data-content, style='height:0;overflow:hidden;')
                                     span
                                         |content
                             .accrdion-item(data-item)
                                 button.accrdion-item__btn(data-toggle)
                                     |item2
-                                .accrdion-item__content(data-content)
+                                .accrdion-item__content(data-content, style='height:0;overflow:hidden;')
                                     span
                                         |content
                                         
@@ -110,20 +109,20 @@ block content
                             .accrdion-item
                                 button.accrdion-item__btn
                                     |item1
-                                .accrdion-item__content
+                                .accrdion-item__content(style='height:0;overflow:hidden;')
                                     span
                                         |content
                             .accrdion-item
                                 button.accrdion-item__btn
                                     span
                                         |item2
-                                .accrdion-item__content
+                                .accrdion-item__content(style='height:0;overflow:hidden;')
                                     span
                                         |content
                             .accrdion-item
                                 button.accrdion-item__btn
                                     |item2
-                                .accrdion-item__content
+                                .accrdion-item__content(style='height:0;overflow:hidden;')
                                     span
                                         |content
 
@@ -290,7 +289,6 @@ block content
     
     .pageScroller(
             data-conponent='m-comp--pageScroller')
-        .pageScroller__shadow
         .pageScroller__content
             main
                 .container.clearfix

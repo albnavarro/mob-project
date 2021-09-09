@@ -1,5 +1,6 @@
 .pageScroller {
     position: relative;
+    overflow-anchor: none;
 
     &__shadow {
         position: relative;
