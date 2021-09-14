@@ -42,7 +42,7 @@ import { loadImageFromManifest } from "./test/loadImageFromManifest.js";
 
 const body = document.querySelector("body");
 eventManager.init(true, true);
-// smoothScroll.init();
+smoothScroll.init();
 mouseManager.init();
 pageScroll.init();
 parallax.init();

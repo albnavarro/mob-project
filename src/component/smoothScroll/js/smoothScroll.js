@@ -1,4 +1,5 @@
 import { eventManager } from "../../../js/base/eventManager.js";
+import { normalizeWheel } from "./normalizeWhell.js";
 
 class SmoothScrollClass {
   constructor() {
@@ -18,6 +19,11 @@ class SmoothScrollClass {
     this.target.addEventListener("wheel", (e) => this.onScroll(e), {
       passive: false,
     });
+
+    // TODO: is necessary ?
+    this.target.addEventListener("DOMMouseScroll", (e) => this.onScroll(e), {
+      passive: false,
+    });
   }
 
   reset() {
@@ -30,31 +36,33 @@ class SmoothScrollClass {
   onScroll(e) {
     // Prevent scroll with body in overflow = hidden;
     const bodyIsOverflow = document.body.style.overflow === "hidden";
-    if (bodyIsOverflow || !("wheelDelta" in e)) return;
+    if (bodyIsOverflow) return;
+
+    // If wheelDelta or wheelDeltaY is not supported return
+    if (!("wheelDelta" in e) || !("wheelDeltaY" in e)) return;
 
     e.preventDefault();
 
-    const delta = ((e) => {
-      if (e.detail) {
-        if (e.wheelDelta) {
-          return (e.wheelDelta / e.detail / 40) * (e.detail > 0 ? 1 : -1); // Opera
-        } else {
-          return -e.detail / 1.5; // Firefox
-        }
-      } else {
-        return e.wheelDelta / 120; // IE,Safari,Chrome
-      }
-    })(e);
-
-    // const delta = ((e) => {
-    //   if (e.wheelDelta) {
-    //     return e.wheelDelta / 120; // IE,Safari,Chrome
-    //   } else {
-    //     return -e.deltaY / 2; // Firefox
-    //   }
+    // Simple solution
+    // const spinY = ((e) => {
+    //     if (!e) {
+    //         e = window.event;
+    //     }
+    //     const w = e.wheelDelta;
+    //     const d = e.detail;
+    //     if (d) {
+    //         return -d / 3; // Firefox;
+    //     }
+    //
+    //     console.log(d)
+    //     // IE, Safari, Chrome & other browsers
+    //     return -(w / 120);
     // })(e);
 
-    this.endValue += -delta * this.speed;
+    // Facebook normalize whell code
+    const { spinY } = normalizeWheel(e);
+
+    this.endValue += spinY * this.speed;
     this.endValue = Math.max(
       0,
       Math.min(
