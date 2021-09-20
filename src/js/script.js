@@ -32,6 +32,8 @@ import { menuClass } from "../component/navigation/js/menu.js";
 import { toolTip } from "../component/tooltip/js/tooltip.js";
 import { move3D } from "../component/move3D/js/move3D.js";
 import { mouseParallax } from "../component/mouseParallax/js/mouseParallax.js";
+import { glitch } from "../component/glitch/js/glitch.js";
+import { wave } from "../component/wave/js/wave.js";
 import { animate } from "../component/animate/js/animate.js";
 import { pageScroll } from "../component/pageScroll/js/pageScroll.js";
 import { smoothScroll } from "../component/smoothScroll/js/smoothScroll.js";
@@ -54,6 +56,8 @@ vh.init();
 offsetSlider.init();
 move3D.init();
 mouseParallax.init();
+glitch.init();
+wave.init();
 accordion.init();
 if (
   body.classList.contains("page-gsap") ||
