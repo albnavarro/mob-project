@@ -1,10 +1,10 @@
 import { eventManager } from '../../../js/base/eventManager.js';
-import { WaveItemClass } from './waveItem.js';
+import { PredictiveTurbolenceItemClass } from './predictiveTurbolenceItem.js';
 
-class waveClass {
+class PredictiveTurbolenceClass {
     constructor() {
-        this.waveItem = document.querySelectorAll(
-            "*[data-conponent='m-comp--wave']"
+        this.predictiveItem = document.querySelectorAll(
+            "*[data-conponent='m-comp--predictiveTurbolence']"
         );
         this.instances = [];
     }
@@ -14,15 +14,15 @@ class waveClass {
     }
 
     inzializeData() {
-        const itemArray = Array.from(this.waveItem);
+        const itemArray = Array.from(this.predictiveItem);
         const dataArray = itemArray.map((item, i) => {
             return this.getItemData(item, i);
         });
 
         for (const item of dataArray) {
-            const waveItem = new WaveItemClass(item);
-            this.instances.push(waveItem);
-            waveItem.init();
+            const predictiveItem = new PredictiveTurbolenceItemClass(item);
+            this.instances.push(predictiveItem);
+            predictiveItem.init();
         }
     }
 
@@ -31,13 +31,16 @@ class waveClass {
         const data = {};
         data.item = item;
         data.counter = i;
-        data.baseFrequency = item.getAttribute('data-basefrequency') || '0.05';
+        data.maxFrequency = item.getAttribute('data-maxfrequency') || '0.09';
+        data.minFrequency = item.getAttribute('data-minfrequency') || '0.01';
         data.duration = item.getAttribute('data-duration') || '1.5';
         data.scale = item.getAttribute('data-scale') || '20';
+        data.maxDistance = item.getAttribute('data-maxDistance') || '1500';
+        data.invert = item.hasAttribute('data-invert');
         data.breackpoint = item.getAttribute('data-breackpoint') || 'desktop';
         data.queryType = item.getAttribute('data-queryType') || 'min';
         return data;
     }
 }
 
-export const wave = new waveClass();
+export const predictiveTurbolence = new PredictiveTurbolenceClass();

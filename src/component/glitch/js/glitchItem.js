@@ -1,4 +1,3 @@
-// https://codepen.io/Jojocaster/pen/KKpyjQY
 import { requestInterval } from '../../../js/utility/setInterval.js';
 import { mq } from '../../../js/base/mediaManager.js';
 
@@ -24,7 +23,7 @@ export class GlitchItemClass {
     init() {
         // Create svg filter element
         const div = document.createElement('div');
-        const svg = `<svg viewBox="0 0 0 0" class="glitch-svg glitch-svg-${this.counter}" style="display: none;">
+        const svg = `<svg viewBox="0 0 0 0" class="glitch-svg glitch-svg-${this.counter}">
             <filter id="noise${this.counter}" x="0%" y="0%" width="100%" height="100%">
                 <feTurbulence type="fractalNoise" baseFrequency="0 0" result="NOISE" numOctaves="2"></feTurbulence>
                 <feDisplacementMap in="SourceGraphic" in2="NOISE" scale="30" xChannelSelector="R" yChannelSelector="R"></feDisplacementMap>
@@ -32,6 +31,8 @@ export class GlitchItemClass {
         </svg>`;
 
         div.innerHTML = svg.trim();
+        div.style.height = '0px';
+        div.style.overflow = 'hidden';
         document.body.appendChild(div);
         this.turbolenceEl = document.querySelector(`.glitch-svg-${this.counter} #noise${this.counter} feTurbulence`);
 
@@ -41,16 +42,14 @@ export class GlitchItemClass {
         }
         Object.assign(this.item.style, style);
 
-        // Start setInterval
-        const startRaf = () => {
-            this.raf = requestAnimationFrame(loop);
-        }
+        // start animation every this.steptime value
+        setInterval(() => {
+            if (!mq[this.queryType](this.breackpoint)) return;
 
-        requestInterval(startRaf,this.steptime)
+            this.raf = requestAnimationFrame(loop);
+        }, this.steptime)
 
         const loop = (timestamp) => {
-          if (!mq[this.queryType](this.breackpoint)) return;
-
           if (!this.start) this.start = timestamp;
           this.progress = timestamp - this.start;
 

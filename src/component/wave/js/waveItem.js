@@ -1,3 +1,5 @@
+import { mq } from '../../../js/base/mediaManager.js';
+
 export class WaveItemClass {
     constructor(data) {
         this.item = data.item;
@@ -7,14 +9,26 @@ export class WaveItemClass {
         this.baseFrequency = parseFloat(data.baseFrequency);
         this.duration = parseFloat(data.duration);
         this.scale = parseInt(data.scale);
+        this.breackpoint = data.breackpoint;
+        this.queryType = data.queryType;
     }
 
     init() {
+        this.inzializeSvg();
+
+        // SAFARI MALEDETTO
+        document.body.style.height = '0px';
+        document.body.style.height = '';
+    }
+
+    inzializeSvg() {
+        if (!mq[this.queryType](this.breackpoint)) return;
+
         // Create svg filter element
         const div = document.createElement('div');
-        const svg = `<svg viewBox="0 0 0 0" class="wave-svg" style="display: none;">
+        const svg = `<svg viewBox="0 0 0 0" class="wave-svg">
             <filter id="wave${this.counter}">
-                <feTurbulence baseFrequency="${this.baseFrequency}"/>
+                <feTurbulence baseFrequency="${this.baseFrequency}" type="turbulence" result="NOISE" numOctaves="2"/>
                     <feColorMatrix type="hueRotate" values="0">
                         <animate
                             attributeName="values"
@@ -36,6 +50,8 @@ export class WaveItemClass {
         </svg>`;
 
         div.innerHTML = svg.trim();
+        div.style.height = '0px';
+        div.style.overflow = 'hidden';
         document.body.appendChild(div);
 
         // Apply filter url to element

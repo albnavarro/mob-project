@@ -34,6 +34,7 @@ import { move3D } from "../component/move3D/js/move3D.js";
 import { mouseParallax } from "../component/mouseParallax/js/mouseParallax.js";
 import { glitch } from "../component/glitch/js/glitch.js";
 import { wave } from "../component/wave/js/wave.js";
+import { predictiveTurbolence } from "../component/predictiveTurbolence/js/predictiveTurbolence.js";
 import { animate } from "../component/animate/js/animate.js";
 import { pageScroll } from "../component/pageScroll/js/pageScroll.js";
 import { smoothScroll } from "../component/smoothScroll/js/smoothScroll.js";
@@ -58,6 +59,7 @@ move3D.init();
 mouseParallax.init();
 glitch.init();
 wave.init();
+predictiveTurbolence.init();
 accordion.init();
 if (
   body.classList.contains("page-gsap") ||

@@ -37,16 +37,20 @@
             ]
         },
         {
-            "label" : "",
-            "univoqueId" : "move3D",
+            "label" : "vari",
+            "univoqueId" : "",
             "children" : [
                 {
-                    "label" : "test",
-                    "univoqueId" : ""
+                    "label" : "",
+                    "univoqueId" : "move3D"
+                },
+                {
+                    "label" : "",
+                    "univoqueId" : "svg"
                 },
                 {
                     "label" : "test",
-                    "univoqueId" : "#",
+                    "univoqueId" : "",
                     "children" : [
                         {
                             "label" : "test",
@@ -61,10 +65,6 @@
                             "univoqueId" : ""
                         }
                     ]
-                },
-                {
-                    "label" : "test",
-                    "univoqueId" : ""
                 }
             ]
         },

@@ -1,0 +1,23 @@
+extends default/_wrapper.pug
+
+block content
+    header
+        .container
+            include ../includes/langSelector.pug
+        .container.menu-container.menu-container--top
+            include ../includes/navigation.pug
+    main(style='height:2000vh;')
+        .container
+            h2(data-conponent='m-comp--glitch')
+                |GLITCH
+            
+            h2(data-conponent='m-comp--wave')
+                |WAVE
+            
+            div
+                h2(
+                    style='display:inline-block;font-size:100px;margin:0;overflow:hidden;line-height:1;'
+                    data-conponent='m-comp--predictiveTurbolence'
+                    data-invert
+                    )
+                    |WAVE
