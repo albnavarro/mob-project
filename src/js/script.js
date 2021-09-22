@@ -57,17 +57,22 @@ vh.init();
 offsetSlider.init();
 move3D.init();
 mouseParallax.init();
-glitch.init();
-wave.init();
-predictiveTurbolence.init();
+
 accordion.init();
 if (
   body.classList.contains("page-gsap") ||
   body.classList.contains("page-gsapHorizontal")
 )
-  gsapTest.init();
+
+gsapTest.init();
 animate.init();
 loadImageFromManifest.init();
+
+// SVG
+glitch.init();
+wave.init();
+predictiveTurbolence.init();
+
 
 // CUSTOM ACCORDION VIA JS
 const accordionCustom = new AccordionItemClass({

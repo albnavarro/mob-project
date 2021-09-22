@@ -32,8 +32,9 @@ class GlitchClass {
         data.item = item;
         data.steptime = item.getAttribute('data-steptime') || 3000;
         data.duration = item.getAttribute('data-duration') || 1000;
-        data.increase = item.getAttribute('data-increase') || 0.1;
-        data.multiplier = item.getAttribute('data-multiplier') || 0.2;
+        data.velocity = item.getAttribute('data-velocity') || 0.1;
+        data.loop = item.hasAttribute('data-loop');
+        data.baseFrequency = item.getAttribute('data-basefrequency') || 0.4;
         data.breackpoint = item.getAttribute('data-breackpoint') || 'desktop';
         data.queryType = item.getAttribute('data-queryType') || 'min';
         data.counter = i;

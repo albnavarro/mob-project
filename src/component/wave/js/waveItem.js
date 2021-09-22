@@ -1,4 +1,6 @@
 import { mq } from '../../../js/base/mediaManager.js';
+import { forceRedraw } from '../../../js/utility/redrowNode.js';
+import { detectSafari } from '../../../js/utility/isSafari.js';
 
 export class WaveItemClass {
     constructor(data) {
@@ -16,9 +18,15 @@ export class WaveItemClass {
     init() {
         this.inzializeSvg();
 
-        // SAFARI MALEDETTO
-        document.body.style.height = '0px';
-        document.body.style.height = '';
+        setTimeout(() => {
+            this.redRawItem();
+        }, 100)
+    }
+
+    redRawItem() {
+        if(detectSafari()) {
+            forceRedraw(this.item);
+        }
     }
 
     inzializeSvg() {
@@ -28,7 +36,7 @@ export class WaveItemClass {
         const div = document.createElement('div');
         const svg = `<svg viewBox="0 0 0 0" class="wave-svg">
             <filter id="wave${this.counter}">
-                <feTurbulence baseFrequency="${this.baseFrequency}" type="turbulence" result="NOISE" numOctaves="2"/>
+                <feTurbulence baseFrequency="${this.baseFrequency}" type="fractalNoise" result="NOISE" numOctaves="2"/>
                     <feColorMatrix type="hueRotate" values="0">
                         <animate
                             attributeName="values"
@@ -56,7 +64,8 @@ export class WaveItemClass {
 
         // Apply filter url to element
         const style = {
-            filter: `url(#wave${this.counter})`
+            filter: `url(#wave${this.counter})`,
+            transform: 'translate3D(0, 0, 0)',
         }
         Object.assign(this.item.style, style);
     }

@@ -6,18 +6,21 @@ block content
             include ../includes/langSelector.pug
         .container.menu-container.menu-container--top
             include ../includes/navigation.pug
-    main(style='height:2000vh;')
+    main
         .container
-            h2(data-conponent='m-comp--glitch')
-                |GLITCH
+            .svg-filter
+                h2.svg-filter__item(data-conponent='m-comp--glitch')
+                    |GLITCH
             
-            h2(data-conponent='m-comp--wave')
-                |WAVE
-            
-            div
-                h2(
-                    style='display:inline-block;font-size:100px;margin:0;overflow:hidden;line-height:1;'
-                    data-conponent='m-comp--predictiveTurbolence'
-                    data-invert
-                    )
+            .svg-filter
+                h2.svg-filter__item(data-conponent='m-comp--wave')
                     |WAVE
+            
+            .svg-container.svg-filter
+                .svg-container__img-container.svg-filter__item(
+                    data-conponent='m-comp--predictiveTurbolence' 
+                    data-maxScale="100"
+                    data-invert)
+                    img(src=ssgAsset('flower1.jpg'))
+
+                

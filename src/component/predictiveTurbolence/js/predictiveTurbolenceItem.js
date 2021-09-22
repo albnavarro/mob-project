@@ -6,6 +6,8 @@ import {
   outerWidth,
   offset,
 } from "../../../js/utility/vanillaFunction.js";
+import { forceRedraw } from '../../../js/utility/redrowNode.js';
+import { detectSafari } from '../../../js/utility/isSafari.js';
 
 export class PredictiveTurbolenceItemClass {
   constructor(data) {
@@ -39,9 +41,16 @@ export class PredictiveTurbolenceItemClass {
     mouseManager.push("scroll", () => this.onMove());
     eventManager.push("resize", () => this.onResize());
 
-    // SAFARI MALEDETTO
-    document.body.style.height = "0px";
-    document.body.style.height = "";
+    setTimeout(() => {
+        this.redRawItem();
+    }, 100)
+
+  }
+
+  redRawItem() {
+      if(detectSafari()) {
+          forceRedraw(this.item);
+      }
   }
 
   inzializeSvg() {
@@ -50,6 +59,24 @@ export class PredictiveTurbolenceItemClass {
     div.style.height = "0px";
     div.style.overflow = "hidden";
 
+
+    // https://medium.com/@codebro/svg-noise-filter-bc6247ba4399
+    //
+    // Hue Rotate
+    // This allows us to smoothly and continuously change our rainbow colors through a full spectrum of color.
+    //
+    // Color Matrix
+    // While cycling through our color spectrum we will want to isolate a single
+    // color in order to access and apply our noise.
+    //
+    // 1 - Nest our color matrix inside our filters under our turbulence.
+    //
+    // 2 - Nest our animation inside our color matrix. Setting repeatCount to indefinite will create a continuous loop.
+    //  You will notice the rainbow colors changing.
+    //
+    // 3 - Add our second color matrix to isolate a color channel.
+    //  We only need the alpha value of either the R, G or B channels to be present.
+    //
     const svg = `<svg viewBox="0 0 0 0" class="predictiveTurbolence-svg predictiveTurbolence-svg-${this.counter}">
             <filter id="predictiveTurbolence${this.counter}">
                 <feTurbulence baseFrequency="${this.minFrequency}" type="fractalNoise" result="NOISE" numOctaves="2"/>
@@ -86,6 +113,7 @@ export class PredictiveTurbolenceItemClass {
     // Apply filter url to element
     const style = {
       filter: `url(#predictiveTurbolence${this.counter})`,
+      transform: 'translate3D(0, 0, 0)',
     };
     Object.assign(this.item.style, style);
   }
