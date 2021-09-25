@@ -6,8 +6,9 @@ import {
   outerWidth,
   offset,
 } from "../../../js/utility/vanillaFunction.js";
-import { forceRedraw } from '../../../js/utility/redrowNode.js';
-import { detectSafari } from '../../../js/utility/isSafari.js';
+import { forceRedraw } from "../../../js/utility/redrowNode.js";
+import { detectSafari } from "../../../js/utility/isSafari.js";
+import { tUtils } from "./predictiveTurbolenceUtils.js";
 
 export class PredictiveTurbolenceItemClass {
   constructor(data) {
@@ -42,15 +43,14 @@ export class PredictiveTurbolenceItemClass {
     eventManager.push("resize", () => this.onResize());
 
     setTimeout(() => {
-        this.redRawItem();
-    }, 100)
-
+      this.redRawItem();
+    }, 100);
   }
 
   redRawItem() {
-      if(detectSafari()) {
-          forceRedraw(this.item);
-      }
+    if (detectSafari()) {
+      forceRedraw(this.item);
+    }
   }
 
   inzializeSvg() {
@@ -58,7 +58,6 @@ export class PredictiveTurbolenceItemClass {
     const div = document.createElement("div");
     div.style.height = "0px";
     div.style.overflow = "hidden";
-
 
     // https://medium.com/@codebro/svg-noise-filter-bc6247ba4399
     //
@@ -98,7 +97,7 @@ export class PredictiveTurbolenceItemClass {
                 />
                 <feDisplacementMap in="SourceGraphic" scale="${this.minScale}"/>
             </filter>
-    </svg>`;
+        </svg>`;
 
     div.innerHTML = svg.trim();
     document.body.appendChild(div);
@@ -113,7 +112,7 @@ export class PredictiveTurbolenceItemClass {
     // Apply filter url to element
     const style = {
       filter: `url(#predictiveTurbolence${this.counter})`,
-      transform: 'translate3D(0, 0, 0)',
+      transform: "translate3D(0, 0, 0)",
     };
     Object.assign(this.item.style, style);
   }
@@ -129,95 +128,75 @@ export class PredictiveTurbolenceItemClass {
     const x = mouseManager.pageX();
     const y = mouseManager.pageY();
 
-    const positionX = (() => {
-      if (x < this.offsetX) {
-        return "LEFT";
-      } else if (x >= this.offsetX && x <= this.offsetX + this.width) {
-        return "INNERX";
-      } else if (x > this.offsetX + this.width) {
-        return "RIGHT";
-      }
-    })();
+    // Define axsis data
+    const xData = {
+      position: x,
+      offset: this.offsetX,
+      dimension: this.width,
+    };
 
-    const positionY = (() => {
-      if (y < this.offsetY) {
-        return "TOP";
-      } else if (y >= this.offsetY && y <= this.offsetY + this.height) {
-        return "INNERY";
-      } else if (y > this.offsetY + this.height) {
-        return "BOTTOM";
-      }
-    })();
+    const yData = {
+      position: y,
+      offset: this.offsetY,
+      dimension: this.height,
+    };
 
-    const isOver = (() => {
-      return positionX == "INNERX" && positionY == "INNERY";
-    })();
+    // Get position form object
+    const horizontalGap = tUtils.getDifferenceValue(
+      tUtils.getAlignFormObject(xData)
+    )(xData);
 
-    const gapX = (() => {
-      if (positionX === "LEFT") {
-        return Math.abs(this.offsetX - x);
-      } else if (positionX === "RIGHT") {
-        return Math.abs(x - (this.offsetX + this.width));
-      } else {
-        return 1;
-      }
-    })();
+    const vertialGap = tUtils.getDifferenceValue(
+      tUtils.getAlignFormObject(yData)
+    )(yData);
 
-    const gapY = (() => {
-      if (positionY === "TOP") {
-        return Math.abs(this.offsetY - y);
-      } else if (positionY === "BOTTOM") {
-        return Math.abs(y - (this.offsetY + this.height));
-      } else {
-        return 1;
-      }
-    })();
-
+    // Get ipotenusa from cateti = dalta val
     const delta = Math.sqrt(
-      Math.pow(Math.abs(gapY), 2) + Math.pow(Math.abs(gapX), 2)
+      Math.pow(Math.abs(vertialGap), 2) + Math.pow(Math.abs(horizontalGap), 2)
     );
 
+    // Invert delta alue
     const deltaInvert = this.maxDistance - delta;
 
-    const deltaFiltered =
-      deltaInvert < this.minFrequency ? this.minFrequency : deltaInvert;
+    // Calculate propieries value frequency and scale
+    const baseFrequencyData = {
+      delta: tUtils.getInvertValue(deltaInvert, this.minFrequency),
+      maxVal: this.maxFrequency,
+      minVal: this.minFrequency,
+      maxDistance: this.maxDistance,
+    };
 
-    const scaleFiltered =
-      deltaInvert < this.minScale ? this.minScale : deltaInvert;
+    const baseScaleData = {
+      delta: tUtils.getInvertValue(deltaInvert, this.minScale),
+      maxVal: this.maxScale,
+      minVal: this.minScale,
+      maxDistance: this.maxDistance,
+    };
 
-    // maxFrequency : x = maxDistance : delta
-    const baseFrequency = (() => {
-      if (isOver) {
-        return this.maxFrequency;
-      } else {
-        return (
-          ((this.maxFrequency - this.minFrequency) * deltaFiltered) /
-            this.maxDistance +
-          this.minFrequency
-        );
-      }
-    })();
+    const baseFrequency = tUtils.getPropiertiesValue(
+      tUtils.getIntersect(xData, yData)
+    )(baseFrequencyData);
 
-    const scale = (() => {
-      if (isOver) {
-        return this.maxScale;
-      } else {
-        return (
-          ((this.maxScale - this.minScale) * scaleFiltered) / this.maxDistance +
-          this.minScale
-        );
-      }
-    })();
+    const scale = tUtils.getPropiertiesValue(tUtils.getIntersect(xData, yData))(
+      baseScaleData
+    );
 
-    const baseFrequencyFinal = this.invert
-      ? this.maxFrequency - baseFrequency + this.minFrequency
-      : baseFrequency;
+    // Clamp propierties value
+    const baseFrequencyClamped = tUtils.getClampedPropiesties(
+      this.invert,
+      baseFrequency,
+      this.maxFrequency,
+      this.minFrequency
+    );
 
-    const scaleFinal = this.invert
-      ? this.maxScale - scale + this.minScale
-      : scale;
+    const scaleClamped = tUtils.getClampedPropiesties(
+      this.invert,
+      scale,
+      this.maxScale,
+      this.minScale
+    );
 
-    this.turbolenceEl.setAttribute("baseFrequency", `${baseFrequencyFinal}`);
-    this.displacementMap.setAttribute("scale", `${scaleFinal}`);
+    this.turbolenceEl.setAttribute("baseFrequency", `${baseFrequencyClamped}`);
+    this.displacementMap.setAttribute("scale", `${scaleClamped}`);
   }
 }
