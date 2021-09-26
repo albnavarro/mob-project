@@ -1,96 +1,110 @@
 {
-    "navigation": [
+  "navigation": [
+    {
+      "label": "",
+      "univoqueId": "index"
+    },
+    {
+      "label": "parallax",
+      "univoqueId": "",
+      "children": [
         {
-            "label" : "",
-            "univoqueId" : "index"
+          "label": "",
+          "univoqueId": "fixed"
         },
         {
-            "label" : "parallax",
-            "univoqueId" : "",
-            "children" : [
-                {
-                    "label" : "",
-                    "univoqueId" : "fixed"
-                },
-                {
-                    "label" : "",
-                    "univoqueId" : "mouseParallax"
-                },
-                {
-                    "label" : "",
-                    "univoqueId" : "pageScroller"
-                }
-            ]
+          "label": "",
+          "univoqueId": "mouseParallax"
         },
         {
-            "label" : "gsap",
-            "univoqueId" : "",
-            "children" : [
-                {
-                    "label" : "",
-                    "univoqueId" : "gsap"
-                },
-                {
-                    "label" : "",
-                    "univoqueId" : "gsapHorizontal"
-                }
-            ]
-        },
-        {
-            "label" : "vari",
-            "univoqueId" : "",
-            "children" : [
-                {
-                    "label" : "",
-                    "univoqueId" : "move3D"
-                },
-                {
-                    "label" : "",
-                    "univoqueId" : "svg"
-                },
-                {
-                    "label" : "test",
-                    "univoqueId" : "",
-                    "children" : [
-                        {
-                            "label" : "test",
-                            "univoqueId" : ""
-                        },
-                        {
-                            "label" : "test",
-                            "univoqueId" : ""
-                        },
-                        {
-                            "label" : "test",
-                            "univoqueId" : ""
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "label" : "",
-            "univoqueId" : "archive/index",
-            "children" : [
-                {
-                    "label" : "",
-                    "univoqueId" : "archive/articles/index"
-                },
-                {
-                    "label" : "",
-                    "univoqueId" : "archive/news/index"
-                }
-            ]
-        },
-        {
-            "label" : "",
-            "univoqueId" : "filterPerTag/index",
-            "children" : [
-                {
-                    "label" : "",
-                    "univoqueId" : "tag1/index"
-                }
-            ]
+          "label": "",
+          "univoqueId": "pageScroller"
         }
-    ]
+      ]
+    },
+    {
+      "label": "gsap",
+      "univoqueId": "",
+      "children": [
+        {
+          "label": "",
+          "univoqueId": "gsap"
+        },
+        {
+          "label": "",
+          "univoqueId": "gsapHorizontal"
+        }
+      ]
+    },
+    {
+      "label": "vari",
+      "univoqueId": "",
+      "children": [
+        {
+          "label": "",
+          "univoqueId": "move3D"
+        },
+        {
+          "label": "",
+          "univoqueId": "svg"
+        },
+        {
+          "label": "test",
+          "univoqueId": "",
+          "children": [
+            {
+              "label": "test",
+              "univoqueId": ""
+            },
+            {
+              "label": "test",
+              "univoqueId": ""
+            },
+            {
+              "label": "test",
+              "univoqueId": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "",
+      "univoqueId": "archive/index",
+      "children": [
+        {
+          "label": "",
+          "univoqueId": "archive/articles/index"
+        },
+        {
+          "label": "",
+          "univoqueId": "archive/news/index"
+        }
+      ]
+    },
+    {
+      "label": "",
+      "univoqueId": "filterPerTag/index",
+      "children": [
+        {
+          "label": "",
+          "univoqueId": "tag1/index",
+          "children": [
+            {
+              "label": "test",
+              "univoqueId": ""
+            },
+            {
+              "label": "test",
+              "univoqueId": ""
+            },
+            {
+              "label": "test",
+              "univoqueId": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }
