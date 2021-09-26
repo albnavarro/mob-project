@@ -93,7 +93,7 @@ export class move3DContainerClass {
     data.depth = item.getAttribute("data-depth") || 0;
     // additional rotate
     data.rotate = item.getAttribute("data-rotate") || null;
-    data.direction = item.getAttribute("data-positionfromcenter") || null;
+    data.anchorPoint = item.getAttribute("data-anchorPoint") || null;
     data.range = item.getAttribute("data-range") || 0;
     data.initialRotate = item.getAttribute("data-initialRotate") || 0;
     //
