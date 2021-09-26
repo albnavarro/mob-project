@@ -92,11 +92,81 @@
           "children": [
             {
               "label": "test",
-              "univoqueId": ""
+              "univoqueId": "",
+              "children": [
+                {
+                  "label": "test",
+                  "univoqueId": ""
+                },
+                {
+                  "label": "test",
+                  "univoqueId": ""
+                },
+                {
+                  "label": "test",
+                  "univoqueId": ""
+                }
+              ]
             },
             {
               "label": "test",
-              "univoqueId": ""
+              "univoqueId": "",
+              "children": [
+                {
+                  "label": "test",
+                  "univoqueId": "",
+                  "children": [
+                    {
+                      "label": "test",
+                      "univoqueId": ""
+                    },
+                    {
+                      "label": "test",
+                      "univoqueId": "",
+                      "children": [
+                        {
+                          "label": "test",
+                          "univoqueId": ""
+                        },
+                        {
+                          "label": "test",
+                          "univoqueId": ""
+                        },
+                        {
+                          "label": "test",
+                          "univoqueId": ""
+                        }
+                      ]
+                    },
+                    {
+                      "label": "test",
+                      "univoqueId": "",
+                      "children": [
+                        {
+                          "label": "test",
+                          "univoqueId": ""
+                        },
+                        {
+                          "label": "test",
+                          "univoqueId": ""
+                        },
+                        {
+                          "label": "test",
+                          "univoqueId": ""
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "label": "test",
+                  "univoqueId": ""
+                },
+                {
+                  "label": "test",
+                  "univoqueId": ""
+                }
+              ]
             },
             {
               "label": "test",

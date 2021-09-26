@@ -167,9 +167,9 @@ export class menuClass {
       this.parentItemPos = 0;
       this.parentItemWidth = 0;
       this.maxLevel = [...this.submenu].reduce((p, c) => {
-        const numSubmenuParents = getParents(c, context.SUB_MENU).length - 1;
-        return numSubmenuParents > p ? numSubmenuParents : 0;
-      }, 0);
+        const numSubmenuParents = getParents(c, context.SUB_MENU).length;
+        return numSubmenuParents > p ? numSubmenuParents : p;
+      }, 1);
       this.totalWidth = 0;
     }
 
@@ -383,18 +383,11 @@ export class menuClass {
     }
   }
 
-  // TODO:
-  // ogni click di un arrow controlla che solo il successivo ci stia nello schermo nel caso applica
-  // la regola solo al successivo
   SetPosition() {
     if (mq.min(this.mediaQ)) {
       this.firstLevelmenuData.forEach((el, index) => {
         el.parentItemPos = parseInt(offset(el.parentItem).left);
-        el.parentItemWidth = parseInt(outerWidth(el.parentItem));
-        el.totalWidth =
-          el.parentItemPos +
-          el.parentItemWidth +
-          el.maxLevel * this.subMenuWidth;
+        el.totalWidth = el.parentItemPos + el.maxLevel * this.subMenuWidth;
 
         if (el.totalWidth > eventManager.windowsWidth()) {
           el.item.style.right = "0";
