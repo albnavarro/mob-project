@@ -160,24 +160,24 @@ export class PredictiveTurbolenceItemClass {
 
     // Calculate propieries value frequency and scale
     const baseFrequencyData = {
-      delta: tUtils.getInvertValue(deltaInvert, this.minFrequency),
+      delta: tUtils.clampMinimumDelta(deltaInvert, this.minFrequency),
       maxVal: this.maxFrequency,
       minVal: this.minFrequency,
       maxDistance: this.maxDistance,
     };
 
     const baseScaleData = {
-      delta: tUtils.getInvertValue(deltaInvert, this.minScale),
+      delta: tUtils.clampMinimumDelta(deltaInvert, this.minScale),
       maxVal: this.maxScale,
       minVal: this.minScale,
       maxDistance: this.maxDistance,
     };
 
     const baseFrequency = tUtils.getPropiertiesValue(
-      tUtils.getIntersect(xData, yData)
+      tUtils.isOverlap(xData, yData)
     )(baseFrequencyData);
 
-    const scale = tUtils.getPropiertiesValue(tUtils.getIntersect(xData, yData))(
+    const scale = tUtils.getPropiertiesValue(tUtils.isOverlap(xData, yData))(
       baseScaleData
     );
 

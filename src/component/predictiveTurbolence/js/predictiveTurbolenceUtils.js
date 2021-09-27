@@ -24,11 +24,11 @@ export const tUtils = {
     };
   },
 
-  getInvertValue(delta, minVal) {
+  clampMinimumDelta(delta, minVal) {
     return delta < minVal ? minVal : delta;
   },
 
-  getIntersect(xData, yData) {
+  isOverlap(xData, yData) {
     return (
       this.getAlignFormObject(xData) === "INNER" &&
       this.getAlignFormObject(yData) === "INNER"
