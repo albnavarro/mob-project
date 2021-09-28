@@ -9,6 +9,7 @@ import {
 import { forceRedraw } from "../../../js/utility/redrowNode.js";
 import { detectSafari } from "../../../js/utility/isSafari.js";
 import { tUtils } from "./predictiveTurbolenceUtils.js";
+import { SimpleStore } from "../../../js/utility/simpleStore.js";
 
 export class PredictiveTurbolenceItemClass {
   constructor(data) {
@@ -25,12 +26,17 @@ export class PredictiveTurbolenceItemClass {
     this.breackpoint = data.breackpoint;
     this.queryType = data.queryType;
     this.invert = data.invert;
-    this.turbolenceEl = null;
-    this.displacementMap = null;
-    this.offsetY = 0;
-    this.offsetX = 0;
-    this.width = 0;
-    this.height = 0;
+
+    this.store = new SimpleStore({
+      turbolenceEl: null,
+      displacementMap: null,
+      offsetY: 0,
+      offsetX: 0,
+      width: 0,
+      height: 0,
+    });
+
+    Object.freeze(this);
   }
 
   init() {
@@ -60,22 +66,6 @@ export class PredictiveTurbolenceItemClass {
     div.style.overflow = "hidden";
 
     // https://medium.com/@codebro/svg-noise-filter-bc6247ba4399
-    //
-    // Hue Rotate
-    // This allows us to smoothly and continuously change our rainbow colors through a full spectrum of color.
-    //
-    // Color Matrix
-    // While cycling through our color spectrum we will want to isolate a single
-    // color in order to access and apply our noise.
-    //
-    // 1 - Nest our color matrix inside our filters under our turbulence.
-    //
-    // 2 - Nest our animation inside our color matrix. Setting repeatCount to indefinite will create a continuous loop.
-    //  You will notice the rainbow colors changing.
-    //
-    // 3 - Add our second color matrix to isolate a color channel.
-    //  We only need the alpha value of either the R, G or B channels to be present.
-    //
     const svg = `<svg viewBox="0 0 0 0" class="predictiveTurbolence-svg predictiveTurbolence-svg-${this.counter}">
             <filter id="predictiveTurbolence${this.counter}">
                 <feTurbulence baseFrequency="${this.minFrequency}" type="fractalNoise" result="NOISE" numOctaves="2"/>
@@ -101,44 +91,54 @@ export class PredictiveTurbolenceItemClass {
 
     div.innerHTML = svg.trim();
     document.body.appendChild(div);
-    this.turbolenceEl = document.querySelector(
+
+    const turbolenceEl = document.querySelector(
       `.predictiveTurbolence-svg-${this.counter} feTurbulence`
     );
+    this.store.setProp("turbolenceEl", turbolenceEl);
 
-    this.displacementMap = document.querySelector(
+    const displacementMap = document.querySelector(
       `.predictiveTurbolence-svg-${this.counter} feDisplacementMap`
     );
+    this.store.setProp("displacementMap", displacementMap);
 
     // Apply filter url to element
     const style = {
       filter: `url(#predictiveTurbolence${this.counter})`,
       transform: "translate3D(0, 0, 0)",
     };
+
     Object.assign(this.item.style, style);
   }
 
   onResize() {
-    this.offsetY = offset(this.item).top;
-    this.offsetX = offset(this.item).left;
-    this.width = outerWidth(this.item);
-    this.height = outerHeight(this.item);
+    const item = this.item;
+
+    this.store.setProp("offsetY", offset(item).top);
+    this.store.setProp("offsetX", offset(item).left);
+    this.store.setProp("width", outerWidth(item));
+    this.store.setProp("height", outerHeight(item));
   }
 
   onMove() {
     const x = mouseManager.pageX();
     const y = mouseManager.pageY();
+    const offsetX = this.store.getProp("offsetX");
+    const offsetY = this.store.getProp("offsetY");
+    const width = this.store.getProp("width");
+    const height = this.store.getProp("height");
 
     // Define axsis data
     const xData = {
       position: x,
-      offset: this.offsetX,
-      dimension: this.width,
+      offset: offsetX,
+      dimension: width,
     };
 
     const yData = {
       position: y,
-      offset: this.offsetY,
-      dimension: this.height,
+      offset: offsetY,
+      dimension: height,
     };
 
     // Get position form object
@@ -196,7 +196,10 @@ export class PredictiveTurbolenceItemClass {
       this.minScale
     );
 
-    this.turbolenceEl.setAttribute("baseFrequency", `${baseFrequencyClamped}`);
-    this.displacementMap.setAttribute("scale", `${scaleClamped}`);
+    const turbolenceEl = this.store.getProp("turbolenceEl");
+    const displacementMap = this.store.getProp("displacementMap");
+
+    turbolenceEl.setAttribute("baseFrequency", `${baseFrequencyClamped}`);
+    displacementMap.setAttribute("scale", `${scaleClamped}`);
   }
 }
