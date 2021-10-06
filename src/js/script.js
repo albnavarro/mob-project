@@ -1,14 +1,14 @@
 // POLYFILL
-import {} from "./polyfill/arrayFrom.js";
-import {} from "./polyfill/objAssign.js";
-import {} from "./polyfill/closest.js";
-import {} from "./polyfill/matches.js";
-import {} from "./polyfill/flat.js";
-import {} from "./polyfill/includes.js";
-import {} from "./polyfill/find.js";
-import {} from "./polyfill/remove.js";
-import {} from "./polyfill/customEvent.js";
-import {} from "./polyfill/entries.js";
+import { arrayFromPolyfill } from "./polyfill/arrayFrom.js";
+import { objAssignPolyfill } from "./polyfill/objAssign.js";
+import { closestPolyfill } from "./polyfill/closest.js";
+import { arrayMatchesPolyfill } from "./polyfill/matches.js";
+import { arrayFlatPolyfill } from "./polyfill/flat.js";
+import { arrayIncludesPolyfill } from "./polyfill/includes.js";
+import { arrayFindPolyfill } from "./polyfill/find.js";
+import { removePolyfill } from "./polyfill/remove.js";
+import { customEventPolyfill } from "./polyfill/customEvent.js";
+import { objEntriesPolyfill } from "./polyfill/entries.js";
 
 // BASE MODULE
 import { eventManager } from "./base/eventManager.js";
@@ -63,8 +63,7 @@ if (
   body.classList.contains("page-gsap") ||
   body.classList.contains("page-gsapHorizontal")
 )
-
-gsapTest.init();
+  gsapTest.init();
 animate.init();
 loadImageFromManifest.init();
 
@@ -72,7 +71,6 @@ loadImageFromManifest.init();
 glitch.init();
 wave.init();
 predictiveTurbolence.init();
-
 
 // CUSTOM ACCORDION VIA JS
 const accordionCustom = new AccordionItemClass({

@@ -32,12 +32,12 @@ export function SimpleStore(data) {
   };
 
 
-  // this.store.onChange('prop', (newVal, oldVal) => {
+  // this.store.watch('prop', (newVal, oldVal) => {
   //     console.log('old val:', oldVal);
   //     console.log('new val:', newVal);
   //     }
   // );
-  const onChange = (prop, fn) => {
+  const watch = (prop, fn) => {
       fnStore.push({
           prop,
           fn,
@@ -47,6 +47,6 @@ export function SimpleStore(data) {
   return {
     setProp,
     getProp,
-    onChange
+    watch
   };
 }
