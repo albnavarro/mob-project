@@ -10,7 +10,7 @@
     &__row {
         @include _mq('desktop') {
             display: flex;
-            position: fixed;
+            position: sticky;
             top: 0;
             left: 0;
             height: 100vh;

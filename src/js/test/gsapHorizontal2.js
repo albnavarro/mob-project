@@ -8,7 +8,8 @@ import { offset, outerHeight, outerWidth } from '../utility/vanillaFunction.js';
 class GsapHorizontal2Class {
     constructor() {
         // GSAP
-        this.gsapContainer = document.querySelector('.HP__trigger');
+        this.mainContainer = document.querySelector('.HP__main');
+        this.triggerContainer = document.querySelector('.HP__trigger');
         this.row = document.querySelector('.HP__row');
         this.cards = document.querySelectorAll('.HP__section');
         this.shadowMainClass = 'HP__shadowEl';
@@ -40,7 +41,8 @@ class GsapHorizontal2Class {
         const percentRange =
             (100 * (width - eventManager.windowsWidth())) / width;
 
-        this.gsapContainer.style.height = `${width}px`;
+        this.triggerContainer.style.height = `${width}px`;
+        this.mainContainer.style.height = `${width * 8}px`;
         this.row.style.width = `${width}px`;
 
         this.store.setProp('percentRange', percentRange);
@@ -83,11 +85,11 @@ class GsapHorizontal2Class {
         </div>`;
 
         const shadows = [...[shadowsEl], ...[shadowsTransition]].join('');
-        this.gsapContainer.innerHTML = shadows;
+        this.triggerContainer.innerHTML = shadows;
     }
 
     removeShadow() {
-        this.gsapContainer.innerHTML = '';
+        this.triggerContainer.innerHTML = '';
     }
 
     updateShadow() {
@@ -128,7 +130,7 @@ class GsapHorizontal2Class {
 
             const heightParsed = ((i) => {
                 switch (i) {
-                    case length:
+                    case shadowEl.length - 1:
                         return height + itemDifference / percentrange;
 
                     case 0:
@@ -141,13 +143,15 @@ class GsapHorizontal2Class {
 
             item.style.height = `${width}px`;
             item.style.width = `${width}px`;
+            this.mainContainer.style.height = `${width * 8}px`;
+            this.triggerContainer.style['margin-top'] = `-${height}px`;
             shadowTransitionEl.style.top = `${top}px`;
             shadowTransitionEl.style.height = `${heightParsed}px`;
         });
     }
 
     initGsap() {
-        if (!this.gsapContainer || mq.max('desktop')) return;
+        if (!this.triggerContainer || mq.max('desktop')) return;
         this.setDimension();
         this.updateShadow();
 
@@ -155,12 +159,12 @@ class GsapHorizontal2Class {
             xPercent: -this.store.getProp('percentRange'), // Percent calc
             ease: 'none',
             scrollTrigger: {
-                trigger: this.gsapContainer,
+                trigger: this.triggerContainer,
                 scrub: 1,
                 start: 'top top',
                 end: 'bottom bottom',
                 onUpdate: (self) => {
-                    this.gsapContainer.style.setProperty(
+                    this.triggerContainer.style.setProperty(
                         '--progress',
                         self.progress
                     );
@@ -192,7 +196,7 @@ class GsapHorizontal2Class {
             });
             this.row.style.transform = '';
             this.row.style.width = '';
-            this.gsapContainer.style.height = '';
+            this.triggerContainer.style.height = '';
             this.store.setProp('tl', null);
             this.store.setProp('gsapisActive', false);
         }
