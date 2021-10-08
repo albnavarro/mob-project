@@ -1,0 +1,65 @@
+.HP {
+    &__trigger {
+        @include _mq('desktop') {
+            z-index: 10;
+            position: relative;
+            pointer-events: none;
+        }
+    }
+
+    &__row {
+        @include _mq('desktop') {
+            display: flex;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            // border: 2px solid #ccc;
+        }
+    }
+
+    &__section {
+        height: 100vh;
+
+        @include _mq('desktop') {
+            flex: 0 0 auto;
+            width: 100vw;
+            height: 100vh;
+            background: #ccc;
+            border: 1px #000 solid;
+        }
+    }
+
+    &__shadowEl {
+        display: none;
+
+        @include _mq('desktop') {
+            width: 100%;
+            border: 2px red solid;
+            display: block;
+            pointer-events: none;
+        }
+    }
+
+    &__shadowTransition-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+    }
+
+    &__shadowTransition {
+        display: none;
+
+        @include _mq('desktop') {
+            border: 1px yellow solid;
+            border-bottom: 5px yellow solid;
+            pointer-events: none;
+            display: block;
+            position: absolute;
+            left: 0;
+            right: 0;
+            background: rgba($black, 0.2);
+        }
+    }
+}

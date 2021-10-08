@@ -41,6 +41,7 @@ import { smoothScroll } from "../component/smoothScroll/js/smoothScroll.js";
 
 //TEST
 import { gsapTest } from "./test/gsapTest.js";
+import { gsapHorizontal2 } from "./test/gsapHorizontal2.js";
 import { loadImageFromManifest } from "./test/loadImageFromManifest.js";
 
 const body = document.querySelector("body");
@@ -64,6 +65,8 @@ if (
   body.classList.contains("page-gsapHorizontal")
 )
   gsapTest.init();
+
+if (body.classList.contains("page-gsapHorizontal2")) gsapHorizontal2.init();
 animate.init();
 loadImageFromManifest.init();
 

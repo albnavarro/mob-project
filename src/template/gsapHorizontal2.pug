@@ -1,0 +1,31 @@
+extends default/_wrapper.pug
+
+block content
+
+    header
+        .container
+            include ../includes/langSelector.pug
+        .container.menu-container.menu-container--top
+            include ../includes/navigation.pug
+
+    main
+        .HP
+            .HP__main
+                .HP__trigger
+                .HP__row
+                    section.HP__section(data-shadow='HP-1')
+                        h1 section 1
+                    section.HP__section(data-shadow='HP-2')
+                        h1 section 2
+                    section.HP__section.HP__section--3(data-shadow='HP-3')
+                        h1.test section 3
+                    section.HP__section(data-shadow='HP-4')
+                        h1 section 4
+                    section.HP__section(data-shadow='HP-5')
+                        h1 section 5
+                    section.HP__section.HP__section--3(data-shadow='HP-6')
+                        h1.test section 6
+                    section.HP__section(data-shadow='HP-7')
+                        h1 section 7
+                    section.HP__section(data-shadow='HP-8')
+                        h1 section 8
