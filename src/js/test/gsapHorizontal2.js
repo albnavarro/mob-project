@@ -19,6 +19,7 @@ class GsapHorizontal2Class {
         this.store = new SimpleStore({
             gsapisActive: false,
             horizontalWidth: 0,
+            verticalHeight: 0,
             tl: null,
             percentRange: 0,
         });
@@ -52,6 +53,12 @@ class GsapHorizontal2Class {
         const horizontalWidth = [...this.cards]
             .map((item) => {
                 return outerWidth(item);
+            })
+            .reduce((a, b) => a + b, 0);
+
+        const verticalHeight = [...this.cards]
+            .map((item) => {
+                return outerHeight(item);
             })
             .reduce((a, b) => a + b, 0);
 
@@ -96,6 +103,7 @@ class GsapHorizontal2Class {
         const shadowEl = document.querySelectorAll(`.${this.shadowMainClass}`);
         const numItem = shadowEl.length;
         const horizontalWidth = this.store.getProp('horizontalWidth');
+        const verticalHeight = this.store.getProp('verticalHeight');
 
         shadowEl.forEach((item, i) => {
             const shadowData = item.dataset.shadow;
@@ -111,6 +119,27 @@ class GsapHorizontal2Class {
             const height = outerHeight(originalItem);
             const itemDifference = width - height;
             const percentrange = this.store.getProp('percentRange') / 100;
+            const screenRatio = window.innerWidth / window.innerHeight;
+            const windowDifference = window.innerWidth - window.innerHeight;
+
+            const previousEl = [...shadowEl].slice(0, i);
+            const widthAmount = previousEl
+                .map((item) => {
+                    const width = outerWidth(item);
+
+                    return width / screenRatio;
+                })
+                .reduce((a, b) => a + b, 0);
+
+            const previousCardEl = [...this.cards].slice(0, i);
+            const lessLastItem = [...previousCardEl].slice(0, -1);
+            const diffAmount = lessLastItem
+                .map((item) => {
+                    const width = outerWidth(item);
+                    const height = outerHeight(item);
+                    return width - height;
+                })
+                .reduce((a, b) => a + b, 0);
 
             const top = ((i) => {
                 switch (i) {
@@ -118,32 +147,42 @@ class GsapHorizontal2Class {
                         return 0;
 
                     case 1:
-                        return height;
+                        return width / screenRatio;
 
                     default:
-                        return (
-                            height * i +
-                            (itemDifference * (i - 1)) / percentrange
-                        );
+                        return widthAmount + diffAmount / percentrange;
+                    // return (
+                    //     widthAmount +
+                    //     (windowDifference * (i - 1)) / percentrange
+                    // );
                 }
             })(i);
 
             const heightParsed = ((i) => {
                 switch (i) {
                     case shadowEl.length - 1:
-                        return height + itemDifference / percentrange;
+                        return (
+                            width / screenRatio +
+                            windowDifference / percentrange
+                        );
 
                     case 0:
-                        return height + itemDifference / percentrange;
+                        return (
+                            width / screenRatio +
+                            windowDifference / percentrange
+                        );
 
                     default:
-                        return height + (itemDifference / percentrange) * 2;
+                        return (
+                            width / screenRatio +
+                            (windowDifference / percentrange) * 2
+                        );
                 }
             })(i);
 
             item.style.height = `${width}px`;
             item.style.width = `${width}px`;
-            this.mainContainer.style.height = `${width * 8}px`;
+            this.mainContainer.style.height = `${horizontalWidth}px`;
             this.triggerContainer.style['margin-top'] = `-${height}px`;
             shadowTransitionEl.style.top = `${top}px`;
             shadowTransitionEl.style.height = `${heightParsed}px`;
