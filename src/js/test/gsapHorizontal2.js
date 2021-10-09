@@ -117,12 +117,14 @@ class GsapHorizontal2Class {
 
             const width = outerWidth(originalItem);
             const height = outerHeight(originalItem);
-            const itemDifference = width - height;
+            const itemDifference = Math.abs(width - height);
             const percentrange = this.store.getProp('percentRange') / 100;
             const screenRatio = window.innerWidth / window.innerHeight;
-            const windowDifference = window.innerWidth - window.innerHeight;
+            const windowDifference = Math.abs(
+                window.innerWidth - window.innerHeight
+            );
 
-            const previousEl = [...shadowEl].slice(0, i);
+            const previousEl = [...this.cards].slice(0, i);
             const widthAmount = previousEl
                 .map((item) => {
                     const width = outerWidth(item);
@@ -131,13 +133,12 @@ class GsapHorizontal2Class {
                 })
                 .reduce((a, b) => a + b, 0);
 
-            const previousCardEl = [...this.cards].slice(0, i);
-            const lessLastItem = [...previousCardEl].slice(0, -1);
+            const lessLastItem = [...previousEl].slice(0, -1);
             const diffAmount = lessLastItem
                 .map((item) => {
                     const width = outerWidth(item);
                     const height = outerHeight(item);
-                    return width - height;
+                    return Math.abs(width - height);
                 })
                 .reduce((a, b) => a + b, 0);
 
