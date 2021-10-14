@@ -115,32 +115,11 @@ class GsapHorizontal2Class {
                 `.HP__shadowTransition[data-shadow="${shadowData}"]`
             );
 
-            const width = outerWidth(originalItem);
-            const height = outerHeight(originalItem);
-            const itemDifference = Math.abs(width - height);
+            // START STABLE SECTION SCREEN SIZE //
+            const width = eventManager.windowsWidth();
+            const height = eventManager.windowsHeight();
+            const itemDifference = width - height;
             const percentrange = this.store.getProp('percentRange') / 100;
-            const screenRatio = window.innerWidth / window.innerHeight;
-            const windowDifference = Math.abs(
-                window.innerWidth - window.innerHeight
-            );
-
-            const previousEl = [...this.cards].slice(0, i);
-            const widthAmount = previousEl
-                .map((item) => {
-                    const width = outerWidth(item);
-
-                    return width / screenRatio;
-                })
-                .reduce((a, b) => a + b, 0);
-
-            const lessLastItem = [...previousEl].slice(0, -1);
-            const diffAmount = lessLastItem
-                .map((item) => {
-                    const width = outerWidth(item);
-                    const height = outerHeight(item);
-                    return Math.abs(width - height);
-                })
-                .reduce((a, b) => a + b, 0);
 
             const top = ((i) => {
                 switch (i) {
@@ -148,38 +127,95 @@ class GsapHorizontal2Class {
                         return 0;
 
                     case 1:
-                        return width / screenRatio;
+                        return height;
 
                     default:
-                        return widthAmount + diffAmount / percentrange;
-                    // return (
-                    //     widthAmount +
-                    //     (windowDifference * (i - 1)) / percentrange
-                    // );
+                        return (
+                            height * i +
+                            (itemDifference * (i - 1)) / percentrange
+                        );
                 }
             })(i);
 
             const heightParsed = ((i) => {
                 switch (i) {
-                    case shadowEl.length - 1:
-                        return (
-                            width / screenRatio +
-                            windowDifference / percentrange
-                        );
-
                     case 0:
-                        return (
-                            width / screenRatio +
-                            windowDifference / percentrange
-                        );
+                        return height + itemDifference / percentrange;
+
+                    case numItem - 1:
+                        return height + itemDifference / percentrange;
 
                     default:
-                        return (
-                            width / screenRatio +
-                            (windowDifference / percentrange) * 2
-                        );
+                        return height + (itemDifference / percentrange) * 2;
                 }
             })(i);
+            // END STABLE SECTION SCREEN SIZE //
+
+            // const width = outerWidth(originalItem);
+            // const height = outerHeight(originalItem);
+            // const itemDifference = Math.abs(width - height);
+            // const percentrange = this.store.getProp('percentRange') / 100;
+            // const screenRatio = window.innerWidth / window.innerHeight;
+            // const windowDifference = Math.abs(
+            //     window.innerWidth - window.innerHeight
+            // );
+            //
+            // const previousEl = [...this.cards].slice(0, i);
+            // const widthAmount = previousEl
+            //     .map((item) => {
+            //         const width = outerWidth(item);
+            //
+            //         return width / screenRatio;
+            //     })
+            //     .reduce((a, b) => a + b, 0);
+            //
+            // const lessLastItem = [...previousEl].slice(0, -1);
+            // const diffAmount = lessLastItem
+            //     .map((item) => {
+            //         const width = outerWidth(item);
+            //         const height = outerHeight(item);
+            //         return Math.abs(width - height);
+            //     })
+            //     .reduce((a, b) => a + b, 0);
+            //
+            // const top = ((i) => {
+            //     switch (i) {
+            //         case 0:
+            //             return 0;
+            //
+            //         case 1:
+            //             return width / screenRatio;
+            //
+            //         default:
+            //             // return widthAmount + diffAmount / percentrange;
+            //             return (
+            //                 widthAmount +
+            //                 (windowDifference * (i - 1)) / percentrange
+            //             );
+            //     }
+            // })(i);
+            //
+            // const heightParsed = ((i) => {
+            //     switch (i) {
+            //         case shadowEl.length - 1:
+            //             return (
+            //                 width / screenRatio +
+            //                 windowDifference / percentrange
+            //             );
+            //
+            //         case 0:
+            //             return (
+            //                 width / screenRatio +
+            //                 windowDifference / percentrange
+            //             );
+            //
+            //         default:
+            //             return (
+            //                 width / screenRatio +
+            //                 (windowDifference / percentrange) * 2
+            //             );
+            //     }
+            // })(i);
 
             item.style.height = `${width}px`;
             item.style.width = `${width}px`;
