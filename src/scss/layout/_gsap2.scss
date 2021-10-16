@@ -22,10 +22,25 @@
 
         @include _mq('desktop') {
             flex: 0 0 auto;
-            width: 100vw;
+            width: 80vw;
             height: 100vh;
-            background: #ccc;
             border: 1px #000 solid;
+
+            &:nth-of-type(2) {
+                width: 400px;
+            }
+
+            &:nth-of-type(3) {
+                width: 40vw;
+            }
+
+            &:nth-of-type(4) {
+                width: 300px;
+            }
+
+            &:nth-of-type(7) {
+                width: 50px;
+            }
         }
     }
 
@@ -34,7 +49,7 @@
 
         @include _mq('desktop') {
             width: 100%;
-            border: 2px red solid;
+            // border: 2px red solid;
             display: block;
             pointer-events: none;
         }
@@ -51,14 +66,25 @@
         display: none;
 
         @include _mq('desktop') {
-            border: 1px yellow solid;
-            border-bottom: 5px yellow solid;
+            border: 1px #000 solid;
             pointer-events: none;
             display: block;
             position: absolute;
             left: 0;
             right: 0;
-            background: rgba($black, 0.2);
+            // background: rgba($black, 0.2);
+
+            &__start {
+                position: absolute;
+                bottom: 100%;
+                right: 30px;
+            }
+
+            &__end {
+                position: absolute;
+                top: 100%;
+                left: 30px;
+            }
         }
     }
 }
