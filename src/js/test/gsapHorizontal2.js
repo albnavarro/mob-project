@@ -63,6 +63,7 @@ class GsapHorizontal2Class {
             .reduce((a, b) => a + b, 0);
 
         this.store.setProp('horizontalWidth', horizontalWidth);
+        this.store.setProp('verticalHeight', verticalHeight);
     }
 
     createShadow() {
@@ -122,36 +123,41 @@ class GsapHorizontal2Class {
 
             const width = outerWidth(originalItem);
             const height = outerHeight(originalItem);
+            const offset = originalItem.getBoundingClientRect().left;
             const itemDifference = width - height;
             const percentrange = this.store.getProp('percentRange') / 100;
             const screenRatio = window.innerWidth / window.innerHeight;
             const windowDifference = window.innerWidth - window.innerHeight;
-            const previousEl = [...this.cards].slice(0, i);
+            // const previousEl = [...this.cards].slice(0, i);
 
-            const isInsideVieport = (() => {
-                // this.row.style.transform = 'translate(0,0)';
-                const result =
-                    originalItem.getBoundingClientRect().left <
-                    window.innerWidth
-                        ? true
-                        : false;
-                // this.row.style.transform = ``;
-                return result;
-            })();
+            // const isInsideVieport = (() => {
+            //     // this.row.style.transform = 'translate(0,0)';
+            //     const result =
+            //         originalItem.getBoundingClientRect().left <
+            //         window.innerWidth
+            //             ? true
+            //             : false;
+            //     // this.row.style.transform = ``;
+            //     return result;
+            // })();
+            //
+            // const widthAmount = previousEl
+            //     .map((item) => {
+            //         const width = outerWidth(item);
+            //         return width / screenRatio;
+            //     })
+            //     .reduce((a, b) => a + b, 0);
+            //
+            // const diffAmount = previousEl
+            //     .map((item) => {
+            //         const width = outerWidth(item);
+            //         return width - width / screenRatio;
+            //     })
+            //     .reduce((a, b) => a + b, 0);
+            //
 
-            const widthAmount = previousEl
-                .map((item) => {
-                    const width = outerWidth(item);
-                    return width / screenRatio;
-                })
-                .reduce((a, b) => a + b, 0);
-
-            const diffAmount = previousEl
-                .map((item) => {
-                    const width = outerWidth(item);
-                    return width - width / screenRatio;
-                })
-                .reduce((a, b) => a + b, 0);
+            const widthAmount = offset / screenRatio;
+            const diffAmount = offset - offset / screenRatio;
 
             const top = ((i) => {
                 switch (i) {
@@ -159,36 +165,62 @@ class GsapHorizontal2Class {
                         return 0;
 
                     default:
-                        return isInsideVieport
-                            ? originalItem.getBoundingClientRect().left /
-                                  screenRatio
-                            : widthAmount +
-                                  diffAmount / percentrange -
-                                  windowDifference / percentrange;
+                        // return isInsideVieport
+                        //     ? offset / screenRatio
+                        //     : widthAmount +
+                        //           diffAmount / percentrange -
+                        //           windowDifference / percentrange;
+                        return (
+                            widthAmount +
+                            diffAmount / percentrange -
+                            windowDifference / percentrange
+                        );
                 }
             })(i);
 
             const heightParsed = ((i) => {
+                const base =
+                    (width - (window.innerWidth - width) / screenRatio) /
+                    percentrange;
+
                 switch (i) {
                     case shadowEl.length - 1:
-                        return (
-                            width / screenRatio +
-                            windowDifference / percentrange
-                        );
+                        return base;
 
                     case 0:
-                        return (
-                            width / screenRatio +
-                            windowDifference / percentrange
-                        );
+                        return base;
 
                     default:
-                        return (
-                            width / screenRatio +
-                            (windowDifference / percentrange) * 2
-                        );
+                        return base;
                 }
             })(i);
+
+            // const heightParsed = ((i) => {
+            //     const windowRef =
+            //         window.innerWidth > window.innerHeight
+            //             ? window.innerWidth
+            //             : window.innerheight;
+            //
+            //     switch (i) {
+            //         case shadowEl.length - 1:
+            //             return (
+            //                 width / screenRatio +
+            //                 windowDifference / percentrange
+            //             );
+            //
+            //         case 0:
+            //             return (
+            //                 width / screenRatio +
+            //                 windowDifference / percentrange
+            //             );
+            //
+            //         default:
+            //             return (
+            //                 width / screenRatio +
+            //                 (windowDifference / percentrange) * 2
+            //             );
+            //     }
+            // })(i);
 
             item.style.height = `${width}px`;
             item.style.width = `${width}px`;
