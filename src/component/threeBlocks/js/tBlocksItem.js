@@ -7,196 +7,258 @@ import {
 } from '../../../js/utility/vanillaFunction.js';
 import { bodyScrollTo } from '../../../js/utility/animation.js';
 import { modernzier } from '../../../js/utility/modernizr.js';
+import { SimpleStore } from '../../../js/utility/simpleStore.js';
 
 export class tBlocksItemClass {
     constructor(container) {
+        this.UP = 'UP';
+        this.DOWN = 'DOWN';
+        this.SX = 'SX';
+        this.DX = 'DX';
         this.container = container;
         this.items = container.querySelectorAll('.tBlocks__item');
-        this.activeHDirection = 'dx';
-        this.activeIndex = 0;
-        this.center = position(container).left + outerWidth(container) / 2;
-        this.transformProperty = Modernizr.prefixed('transform');
+
+        this.store = new SimpleStore({
+            activeItem: this.container.querySelector('.tBlocks__item--active'),
+            itemNotActive: null,
+            swapItem: null,
+            clone: null,
+            offsetLeft: 0,
+            horizontalDirection: this.DX,
+            verticalDirection: this.UP,
+            center: 0,
+        });
+
+        Object.freeze(this);
     }
 
     init() {
-        const itemArray = Array.from(this.items);
-        for (const el of itemArray) {
-            el.addEventListener('click', this.onClick.bind(this));
-        }
-        eventManager.push('load', this.setWidth.bind(this));
-        eventManager.push('load', this.setTransformOrigin.bind(this));
-        eventManager.push('load', this.setActiveTransform.bind(this));
-        eventManager.push('resize', this.setWidth.bind(this));
-        eventManager.push('resize', this.removeSwapItem.bind(this));
+        [...this.items].forEach((item, i) => {
+            item.addEventListener('click', (event) => this.onClick(event));
+        });
+
+        this.container.dataset.diretction = this.UP.toLowerCase();
+
+        eventManager.push('load', () => this.setWidth());
+        eventManager.push('load', () => this.calcCenter());
+        eventManager.push('load', () => this.setActiveitemTransformOrigin());
+        eventManager.push('load', () => this.setActiveitemStyle());
+        eventManager.push('resize', () => this.setWidth());
+        eventManager.push('resize', () => this.calcCenter());
+        eventManager.push('resize', () => this.store.setProp('clone', null));
+
+        this.store.watch('activeItem', (newVal, oldVal) => {
+            const item = newVal;
+            const lastItem = oldVal;
+            if (item === lastItem) return;
+            this.onItemChange(item, lastItem);
+        });
+
+        this.store.watch('clone', (newVal, oldVal) => {
+            const item = newVal;
+            const lastItem = oldVal;
+            this.onCloneChange(item, lastItem);
+        });
+
+        this.store.watch('swapItem', (newVal, oldVal) => {
+            const item = newVal;
+            const lastItem = oldVal;
+            this.onSwapChange(item, lastItem);
+        });
+
+        this.store.watch('itemNotActive', (newVal, oldVal) => {
+            const items = newVal;
+            this.onItemNotActiveChange(items);
+        });
     }
 
     calcCenter() {
-        this.center =
+        const center =
             position(this.container).left + outerWidth(this.container) / 2;
+
+        this.store.setProp('center', center);
     }
 
     setWidth() {
-        const itemArray = Array.from(this.items);
         const width = outerWidth(this.container);
-        for (const el of itemArray) {
-            const innerElement = el.querySelector('.tBlocks__item__wrap');
+        [...this.items].forEach((item, i) => {
+            const innerElement = item.querySelector('.tBlocks__item__wrap');
             innerElement.style.width = `${width / 2}px`;
-        }
-        this.calcCenter();
-    }
-
-    setActiveTransform(item = null, child = null) {
-        if (item == null)
-            item = this.container.querySelector('.tBlocks__item--active');
-        if (child == null) child = item.querySelector('.tBlocks__item__wrap');
-
-        const childH = outerHeight(child);
-        const itemH = outerHeight(item);
-        const scaleYVal = itemH / childH;
-
-        let style = {};
-        style[
-            this.transformProperty
-        ] = `translate3d(0,0,0) scale(2,${scaleYVal})`;
-        Object.assign(child.style, style);
-
-        const content = child.querySelector('.tBlocks__item__notScaled');
-        style[this.transformProperty] = `translate3d(0,0,0) scale(.5,${
-            1 / scaleYVal
-        })`;
-        Object.assign(content.style, style);
-    }
-
-    resetTransform(items) {
-        const style = {};
-        style[this.transformProperty] = `translate3d(0,0,0) scale(1,1)`;
-
-        for (const el of items) {
-            const innerEl = el.querySelector('.tBlocks__item__wrap');
-            Object.assign(innerEl.style, style);
-
-            const content = el.querySelector('.tBlocks__item__notScaled');
-            Object.assign(content.style, style);
-        }
-    }
-
-    setTransformOrigin(item = null, child = null, posX = null) {
-        if (item == null)
-            item = this.container.querySelector('.tBlocks__item--active');
-        if (child == null) child = item.querySelector('.tBlocks__item__wrap');
-        if (posX == null) posX = offset(item).left;
-
-        if (posX > this.center - 20) {
-            child.classList.add('tg-form-right');
-            child.classList.remove('tg-form-left');
-            this.activeHDirection = 'sx';
-        } else {
-            child.classList.add('tg-form-left');
-            child.classList.remove('tg-form-right');
-            this.activeHDirection = 'dx';
-        }
-    }
-
-    removeSwapItem() {
-        const prevSwapItem = this.container.querySelector('.t-swap-item');
-        if (typeof prevSwapItem != 'undefined' && prevSwapItem != null) {
-            prevSwapItem.classList.remove('t-swap-item');
-            prevSwapItem.classList.remove('t-swap-item--formLeft');
-            prevSwapItem.classList.remove('t-swap-item--formRight');
-        }
-
-        const clonedSwap = this.container.querySelector('.t-clone');
-        if (typeof prevSwapItem != 'undefined' && prevSwapItem != null) {
-            clonedSwap.remove();
-        }
+        });
     }
 
     onClick(event) {
         const item = event.currentTarget;
+        this.store.setProp('activeItem', item);
+    }
 
-        if (item.classList.contains('tBlocks__item--active')) return;
-
-        // reset lastSwapItem ( item that change layout position)
-        this.removeSwapItem();
-
-        const posX = offset(item).left;
-        const width = outerWidth(this.container);
-        const activeId = item.getAttribute('data-id');
-        const currentInnerElement = item.querySelector('.tBlocks__item__wrap');
-        let itemNotActive = this.container.querySelectorAll(
+    setNotActiveitemStyle() {
+        const itemNotActive = this.container.querySelectorAll(
             '.tBlocks__item:not(.tBlocks__item--active)'
         );
-        let itemNotActiveArray = Array.from(itemNotActive);
-        let vDirection = this.container.getAttribute('data-diretction');
 
-        // POSIZIONO "NEL MEZZO" gli item non attivi
-        for (const el of itemNotActiveArray) {
-            el.style.order = 2;
+        [...itemNotActive].forEach((item, i) => {
+            const innerEl = item.querySelector('.tBlocks__item__wrap');
+            innerEl.style.transform = `translate3d(0,0,0) scale(1,1)`;
+
+            const content = item.querySelector('.tBlocks__item__notScaled');
+            content.style.transform = `translate3d(0,0,0) scale(1,1)`;
+        });
+    }
+
+    setActiveitemStyle() {
+        const activeItem = this.store.getProp('activeItem');
+        const child = activeItem.querySelector('.tBlocks__item__wrap');
+        const itemH = outerHeight(activeItem);
+        const childH = outerHeight(child);
+        const scaleYVal = itemH / childH;
+
+        child.style.transform = `translate3d(0,0,0) scale(2,${scaleYVal})`;
+
+        const content = child.querySelector('.tBlocks__item__notScaled');
+        content.style.transform = `translate3d(0,0,0) scale(.5,${
+            1 / scaleYVal
+        })`;
+    }
+
+    setActiveitemTransformOrigin() {
+        const activeItem = this.store.getProp('activeItem');
+        const offsetLeft = this.store.getProp('offsetLeft');
+        const center = this.store.getProp('center');
+        const child = activeItem.querySelector('.tBlocks__item__wrap');
+
+        if (offsetLeft > center - 20) {
+            child.classList.add('tg-form-right');
+            child.classList.remove('tg-form-left');
+            this.store.setProp('horizontalDirection', this.SX);
+        } else {
+            child.classList.add('tg-form-left');
+            child.classList.remove('tg-form-right');
+            this.store.setProp('horizontalDirection', this.DX);
         }
+    }
 
-        // find item that change layout position
-        const swapItem = itemNotActiveArray.find((el) => {
+    // Add or remove clone on clone prop change
+    onCloneChange(clone, lastClone) {
+        if (clone !== null) {
+            // ADD CLONE
+            const verticalDirection = this.store.getProp('verticalDirection');
+            const horizontalDirection = this.store.getProp(
+                'horizontalDirection'
+            );
+
+            clone.classList.add('t-clone');
+            this.container.appendChild(clone);
+
+            horizontalDirection == this.SX
+                ? clone.classList.add('t-clone--sx')
+                : clone.classList.add('t-clone--dx');
+
+            verticalDirection == this.UP
+                ? clone.classList.add('t-clone--down')
+                : clone.classList.add('t-clone--up');
+        } else {
+            // REMOVE CLONE
+            const prevSwapItem = this.container.querySelector('.t-swap-item');
+
+            if (typeof prevSwapItem != 'undefined' && prevSwapItem != null) {
+                prevSwapItem.classList.remove('t-swap-item');
+                prevSwapItem.classList.remove('t-swap-item--formLeft');
+                prevSwapItem.classList.remove('t-swap-item--formRight');
+            }
+
+            if (typeof lastClone != 'undefined' && lastClone != null) {
+                lastClone.remove();
+            }
+        }
+    }
+
+    onSwapChange(item, lastItem) {
+        if (item === null) return;
+
+        const horizontalDirection = this.store.getProp('horizontalDirection');
+        item.classList.add('t-swap-item');
+
+        if (horizontalDirection == this.SX) {
+            item.classList.add('t-swap-item--formLeft');
+        } else {
+            item.classList.add('t-swap-item--formRight');
+        }
+    }
+
+    onItemNotActiveChange(items) {
+        if (items === null) return;
+
+        [...items].forEach((item, i) => {
+            item.style.order = 2;
+        });
+    }
+
+    onItemChange(item, lastItem) {
+        const verticalDirection = this.store.getProp('verticalDirection');
+        const horizontalDirection = this.store.getProp('horizontalDirection');
+
+        // Remove clone
+        this.store.setProp('clone', null);
+
+        // Get new offset value
+        this.store.setProp('offsetLeft', offset(item).left);
+
+        // Set non active item order style
+        const itemNotActive = this.container.querySelectorAll(
+            '.tBlocks__item:not(.tBlocks__item--active)'
+        );
+        this.store.setProp('itemNotActive', itemNotActive);
+
+        // Set item that change layout position
+        const swapItem = [...itemNotActive].find((el) => {
             return el !== item;
         });
-        swapItem.classList.add('t-swap-item');
+        this.store.setProp('swapItem', swapItem);
 
-        // Posizione il precendete elemento attivo a dx o sx
-        const activerItem = this.container.querySelector(
-            '.tBlocks__item--active'
-        );
-        if (this.activeHDirection == 'sx') {
-            activerItem.style.order = 3;
-            swapItem.classList.add('t-swap-item--formLeft');
-        } else {
-            activerItem.style.order = 1;
-            swapItem.classList.add('t-swap-item--formRight');
-        }
+        // Position the previous active element on the right or left
+        lastItem.style.order = horizontalDirection === this.SX ? 3 : 1;
 
-        // // Posiziono l'attuale elemento attivo
-        this.setTransformOrigin(item, currentInnerElement, posX);
+        // Set transform origin of the current active element and recalculate the value of horizontalDirection
+        this.setActiveitemTransformOrigin();
 
-        //CLONE
-        const swapClone = swapItem.cloneNode(true);
-        swapClone.classList.add('t-clone');
-        this.container.appendChild(swapClone);
-        this.activeHDirection == 'sx'
-            ? swapClone.classList.add('t-clone--sx')
-            : swapClone.classList.add('t-clone--dx');
-        vDirection == 'up'
-            ? swapClone.classList.add('t-clone--down')
-            : swapClone.classList.add('t-clone--up');
+        // create Clone
+        const clone = swapItem.cloneNode(true);
+        this.store.setProp('clone', clone);
 
-        // Setto l'altrnanza top/bottom
-        vDirection == 'up' ? (vDirection = 'down') : (vDirection = 'up');
-        this.container.setAttribute('data-diretction', vDirection);
-        this.container.setAttribute('data-activeId', activeId);
-        this.activeIndex = activeId;
+        // Update top/bottom value
+        const newVerticalDirection =
+            verticalDirection === this.UP ? this.DOWN : this.UP;
+        this.container.dataset.diretction = newVerticalDirection.toLowerCase();
+        this.store.setProp('verticalDirection', newVerticalDirection);
 
-        const scrollDestination = offset(this.container).top;
-        bodyScrollTo(scrollDestination);
+        // Get active id
+        const activeId = item.dataset.id;
+        this.container.dataset.activeid = activeId;
+        const activeIndex = activeId;
 
         // RESET LAST ACTIVE ITEM
-        activerItem.classList.remove('tBlocks__item--active');
+        lastItem.classList.remove('tBlocks__item--active');
 
         // SET NEW ACTIVE ITEM
         item.classList.add('tBlocks__item--active');
 
-        itemNotActive = this.container.querySelectorAll(
-            '.tBlocks__item:not(.tBlocks__item--active)'
-        );
-        itemNotActiveArray = Array.from(itemNotActive);
-
-        this.resetTransform(itemNotActiveArray);
-        this.setActiveTransform(item, currentInnerElement);
+        this.setNotActiveitemStyle();
+        this.setActiveitemStyle();
 
         this.container.dispatchEvent(
             new CustomEvent('itemChange', {
                 detail: {
-                    hDirection: vDirection,
-                    index: this.activeIndex,
+                    hDirection: newVerticalDirection,
+                    index: activeIndex,
                 },
             })
         );
+
+        setTimeout(() => {
+            const scrollDestination = offset(this.container).top;
+            bodyScrollTo(scrollDestination);
+        }, 500);
     }
 }
 

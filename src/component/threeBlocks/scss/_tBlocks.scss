@@ -131,7 +131,7 @@ $activeHeight: calc(var(--vh, 1vh) * 60);
         }
     }
 
-    &[data-diretction="up"] {
+    &[data-diretction='up'] {
         align-items: flex-end;
 
         .tBlocks__item--active {
@@ -139,7 +139,7 @@ $activeHeight: calc(var(--vh, 1vh) * 60);
         }
     }
 
-    &[data-diretction="down"] {
+    &[data-diretction='down'] {
         .tBlocks__item:not(.tBlocks__item--active) {
             align-self: start;
         }
