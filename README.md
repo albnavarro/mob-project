@@ -1,9 +1,3 @@
-### Setup NPM
+node version v14.3.0
 
-Type this command in terminal
-
--   npm install
-
-NPM will install all the dependencies
-
-### IN PROGRESS TO DO ....
+### IN PROGRESS ....
