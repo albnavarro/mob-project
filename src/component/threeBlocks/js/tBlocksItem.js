@@ -15,14 +15,23 @@ export class tBlocksItemClass {
         this.DOWN = 'DOWN';
         this.SX = 'SX';
         this.DX = 'DX';
+        this.ADD = 'ADD';
+        this.UPDATE = 'UPDATE';
+        this.REMOVE = 'REMOVE';
         this.container = container;
         this.items = container.querySelectorAll('.tBlocks__item');
 
         this.store = new SimpleStore({
             activeItem: this.container.querySelector('.tBlocks__item--active'),
             itemNotActive: null,
-            swapItem: null,
-            clone: null,
+            swapItem: {
+                item: null,
+                action: null,
+            },
+            clone: {
+                item: null,
+                action: null,
+            },
             offsetLeft: 0,
             horizontalDirection: this.DX,
             verticalDirection: this.UP,
@@ -45,25 +54,27 @@ export class tBlocksItemClass {
         eventManager.push('load', () => this.setActiveitemStyle());
         eventManager.push('resize', () => this.setWidth());
         eventManager.push('resize', () => this.calcCenter());
-        eventManager.push('resize', () => this.store.setProp('clone', null));
+        eventManager.push('resize', () => {
+            const { item } = this.store.getProp('clone');
+            this.store.setProp('clone', { item, action: this.REMOVE });
+        });
 
+        // SET WATCHER
         this.store.watch('activeItem', (newVal, oldVal) => {
             const item = newVal;
-            const lastItem = oldVal;
-            if (item === lastItem) return;
-            this.onItemChange(item, lastItem);
+            const oldItem = oldVal;
+            if (item === oldItem) return;
+            this.onItemChange(item, oldItem);
         });
 
         this.store.watch('clone', (newVal, oldVal) => {
             const item = newVal;
-            const lastItem = oldVal;
-            this.onCloneChange(item, lastItem);
+            this.onCloneChange(item);
         });
 
         this.store.watch('swapItem', (newVal, oldVal) => {
             const item = newVal;
-            const lastItem = oldVal;
-            this.onSwapChange(item, lastItem);
+            this.onSwapChange(item);
         });
 
         this.store.watch('itemNotActive', (newVal, oldVal) => {
@@ -72,6 +83,17 @@ export class tBlocksItemClass {
         });
     }
 
+    /**
+     * Handler
+     */
+    onClick(event) {
+        const item = event.currentTarget;
+        this.store.setProp('activeItem', item);
+    }
+
+    /**
+     * Utils
+     */
     calcCenter() {
         const center =
             position(this.container).left + outerWidth(this.container) / 2;
@@ -85,11 +107,6 @@ export class tBlocksItemClass {
             const innerElement = item.querySelector('.tBlocks__item__wrap');
             innerElement.style.width = `${width / 2}px`;
         });
-    }
-
-    onClick(event) {
-        const item = event.currentTarget;
-        this.store.setProp('activeItem', item);
     }
 
     setNotActiveitemStyle() {
@@ -138,51 +155,61 @@ export class tBlocksItemClass {
         }
     }
 
+    /**
+     * Watch methods
+     */
+
     // Add or remove clone on clone prop change
-    onCloneChange(clone, lastClone) {
-        if (clone !== null) {
+    onCloneChange(newItem) {
+        const { item, action } = newItem;
+
+        if (item === null) return;
+
+        if (action === this.ADD) {
             // ADD CLONE
             const verticalDirection = this.store.getProp('verticalDirection');
             const horizontalDirection = this.store.getProp(
                 'horizontalDirection'
             );
 
-            clone.classList.add('t-clone');
-            this.container.appendChild(clone);
-
+            item.classList.add('t-clone');
             horizontalDirection == this.SX
-                ? clone.classList.add('t-clone--sx')
-                : clone.classList.add('t-clone--dx');
+                ? item.classList.add('t-clone--sx')
+                : item.classList.add('t-clone--dx');
 
             verticalDirection == this.UP
-                ? clone.classList.add('t-clone--down')
-                : clone.classList.add('t-clone--up');
-        } else {
-            // REMOVE CLONE
-            const prevSwapItem = this.container.querySelector('.t-swap-item');
+                ? item.classList.add('t-clone--down')
+                : item.classList.add('t-clone--up');
 
-            if (typeof prevSwapItem != 'undefined' && prevSwapItem != null) {
-                prevSwapItem.classList.remove('t-swap-item');
-                prevSwapItem.classList.remove('t-swap-item--formLeft');
-                prevSwapItem.classList.remove('t-swap-item--formRight');
-            }
-
-            if (typeof lastClone != 'undefined' && lastClone != null) {
-                lastClone.remove();
-            }
+            this.container.appendChild(item);
+        } else if (action === this.REMOVE) {
+            // REMOVE PREVIOUS CLONE ( new item is null )
+            item.remove();
         }
     }
 
-    onSwapChange(item, lastItem) {
+    onSwapChange(newItem) {
+        const { item, action } = newItem;
+
         if (item === null) return;
 
-        const horizontalDirection = this.store.getProp('horizontalDirection');
-        item.classList.add('t-swap-item');
+        if (action === this.UPDATE) {
+            // Set swap item prop
+            const horizontalDirection = this.store.getProp(
+                'horizontalDirection'
+            );
+            item.classList.add('t-swap-item');
 
-        if (horizontalDirection == this.SX) {
-            item.classList.add('t-swap-item--formLeft');
-        } else {
-            item.classList.add('t-swap-item--formRight');
+            if (horizontalDirection == this.SX) {
+                item.classList.add('t-swap-item--formLeft');
+            } else {
+                item.classList.add('t-swap-item--formRight');
+            }
+        } else if (action === this.REMOVE) {
+            // Remove swap item prop
+            item.classList.remove('t-swap-item');
+            item.classList.remove('t-swap-item--formLeft');
+            item.classList.remove('t-swap-item--formRight');
         }
     }
 
@@ -194,12 +221,20 @@ export class tBlocksItemClass {
         });
     }
 
-    onItemChange(item, lastItem) {
+    onItemChange(item, prevItem) {
         const verticalDirection = this.store.getProp('verticalDirection');
         const horizontalDirection = this.store.getProp('horizontalDirection');
 
-        // Remove clone
-        this.store.setProp('clone', null);
+        // Reset clone
+        const { item: pevClone } = this.store.getProp('clone');
+        this.store.setProp('clone', { item: pevClone, action: this.REMOVE });
+
+        // Reset swap Item
+        const { item: prevSwapItem } = this.store.getProp('swapItem');
+        this.store.setProp('swapItem', {
+            item: prevSwapItem,
+            action: this.REMOVE,
+        });
 
         // Get new offset value
         this.store.setProp('offsetLeft', offset(item).left);
@@ -214,17 +249,17 @@ export class tBlocksItemClass {
         const swapItem = [...itemNotActive].find((el) => {
             return el !== item;
         });
-        this.store.setProp('swapItem', swapItem);
+        this.store.setProp('swapItem', { item: swapItem, action: this.UPDATE });
 
         // Position the previous active element on the right or left
-        lastItem.style.order = horizontalDirection === this.SX ? 3 : 1;
+        prevItem.style.order = horizontalDirection === this.SX ? 3 : 1;
 
         // Set transform origin of the current active element and recalculate the value of horizontalDirection
         this.setActiveitemTransformOrigin();
 
         // create Clone
         const clone = swapItem.cloneNode(true);
-        this.store.setProp('clone', clone);
+        this.store.setProp('clone', { item: clone, action: this.ADD });
 
         // Update top/bottom value
         const newVerticalDirection =
@@ -238,7 +273,7 @@ export class tBlocksItemClass {
         const activeIndex = activeId;
 
         // RESET LAST ACTIVE ITEM
-        lastItem.classList.remove('tBlocks__item--active');
+        prevItem.classList.remove('tBlocks__item--active');
 
         // SET NEW ACTIVE ITEM
         item.classList.add('tBlocks__item--active');
