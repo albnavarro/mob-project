@@ -1,52 +1,81 @@
 export function SimpleStore(data) {
-  const fnStore = [];
-  const store = { ...data };
+    let counterId = 0;
+    let fnStore = [];
+    const store = { ...data };
 
-  // this.store.setProp("prop", val);
-  const setProp = (prop, val) => {
-    if (prop in store) {
+    // this.store.setProp("prop", val);
+    const setProp = (prop, val) => {
+        if (prop in store) {
+            const oldVal = store[prop];
+            store[prop] = val;
 
-      const fnByProp = fnStore.filter((item) => item.prop === prop);
-      fnByProp.forEach((item, i) => {
-          item.fn(val, store[prop]);
-      });
+            const fnByProp = fnStore.filter((item) => item.prop === prop);
+            fnByProp.forEach((item, i) => {
+                item.fn(val, oldVal);
+            });
+        } else {
+            throw new Error(
+                `trying to execute set data method: store.${prop} not exist`
+            );
+        }
+    };
 
-      store[prop] = val;
+    // const val = this.store.getProp("prop");
+    const getProp = (prop) => {
+        if (prop in store) {
+            return store[prop];
+        } else {
+            throw new Error(
+                `trying to execute get data method: store.${prop} not exist`
+            );
+        }
+    };
 
-    } else {
-      throw new Error(
-        `trying to execute set data method: store.${prop} not exist`
-      );
-    }
-  };
+    // const id2 =  this.store.watch('prop', (newVal, oldVal) => {
+    //     console.log('old val:', oldVal);
+    //     console.log('new val:', newVal);
+    //     }
+    // );
+    const watch = (prop, fn) => {
+        fnStore.push({
+            prop,
+            fn,
+            id: counterId,
+        });
 
-  // const val = this.store.getProp("prop");
-  const getProp = (prop) => {
-    if (prop in store) {
-      return store[prop];
-    } else {
-      throw new Error(
-        `trying to execute get data method: store.${prop} not exist`
-      );
-    }
-  };
+        counterId++;
+        return counterId;
+    };
 
+    // store.unWatch(id);
+    const unWatch = (id) => {
+        fnStore = fnStore.filter((item) => item.id !== id);
+    };
 
-  // this.store.watch('prop', (newVal, oldVal) => {
-  //     console.log('old val:', oldVal);
-  //     console.log('new val:', newVal);
-  //     }
-  // );
-  const watch = (prop, fn) => {
-      fnStore.push({
-          prop,
-          fn,
-      })
-  }
+    // store.emit('prop');
+    const emit = (prop) => {
+        if (prop in store) {
+            const fnByProp = fnStore.filter((item) => item.prop === prop);
+            fnByProp.forEach((item, i) => {
+                item.fn(store[prop], store[prop]);
+            });
+        } else {
+            throw new Error(
+                `trying to execute set data method: store.${prop} not exist`
+            );
+        }
+    };
 
-  return {
-    setProp,
-    getProp,
-    watch
-  };
+    const debug = () => {
+        console.log(store);
+    };
+
+    return {
+        setProp,
+        getProp,
+        watch,
+        unWatch,
+        emit,
+        debug,
+    };
 }
