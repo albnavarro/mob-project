@@ -55,8 +55,7 @@ export class tBlocksItemClass {
         eventManager.push('resize', () => this.setWidth());
         eventManager.push('resize', () => this.calcCenter());
         eventManager.push('resize', () => {
-            const { item } = this.store.getProp('clone');
-            this.store.setProp('clone', { item, action: this.REMOVE });
+            this.store.updatePropObj('clone', { action: this.REMOVE });
         });
 
         // SET WATCHER
@@ -226,15 +225,10 @@ export class tBlocksItemClass {
         const horizontalDirection = this.store.getProp('horizontalDirection');
 
         // Reset clone
-        const { item: pevClone } = this.store.getProp('clone');
-        this.store.setProp('clone', { item: pevClone, action: this.REMOVE });
+        this.store.updatePropObj('clone', { action: this.REMOVE });
 
         // Reset swap Item
-        const { item: prevSwapItem } = this.store.getProp('swapItem');
-        this.store.setProp('swapItem', {
-            item: prevSwapItem,
-            action: this.REMOVE,
-        });
+        this.store.updatePropObj('swapItem', { action: this.REMOVE });
 
         // Get new offset value
         this.store.setProp('offsetLeft', offset(item).left);
