@@ -55,7 +55,7 @@ export class tBlocksItemClass {
         eventManager.push('resize', () => this.setWidth());
         eventManager.push('resize', () => this.calcCenter());
         eventManager.push('resize', () => {
-            this.store.updatePropObj('clone', { action: this.REMOVE });
+            this.store.setObj('clone', { action: this.REMOVE });
         });
 
         // SET WATCHER
@@ -225,10 +225,10 @@ export class tBlocksItemClass {
         const horizontalDirection = this.store.getProp('horizontalDirection');
 
         // Reset clone
-        this.store.updatePropObj('clone', { action: this.REMOVE });
+        this.store.setObj('clone', { action: this.REMOVE });
 
         // Reset swap Item
-        this.store.updatePropObj('swapItem', { action: this.REMOVE });
+        this.store.setObj('swapItem', { action: this.REMOVE });
 
         // Get new offset value
         this.store.setProp('offsetLeft', offset(item).left);
@@ -243,7 +243,7 @@ export class tBlocksItemClass {
         const swapItem = [...itemNotActive].find((el) => {
             return el !== item;
         });
-        this.store.setProp('swapItem', { item: swapItem, action: this.UPDATE });
+        this.store.setObj('swapItem', { item: swapItem, action: this.UPDATE });
 
         // Position the previous active element on the right or left
         prevItem.style.order = horizontalDirection === this.SX ? 3 : 1;
@@ -253,7 +253,7 @@ export class tBlocksItemClass {
 
         // create Clone
         const clone = swapItem.cloneNode(true);
-        this.store.setProp('clone', { item: clone, action: this.ADD });
+        this.store.setObj('clone', { item: clone, action: this.ADD });
 
         // Update top/bottom value
         const newVerticalDirection =

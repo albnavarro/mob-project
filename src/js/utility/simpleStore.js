@@ -3,6 +3,12 @@ export function SimpleStore(data) {
     let fnStore = [];
     const store = { ...data };
 
+    const isObject = (obj) => {
+        return Object.prototype.toString.call(obj) === '[object Object]';
+    };
+
+    const logStyle = 'background: #222; color: #bada55';
+
     /**
      * Set propierities value of store item
      * Fire all the callback associate to the prop
@@ -13,6 +19,14 @@ export function SimpleStore(data) {
      * @param  {any} val object to merge with the corresponding in store
      */
     const setProp = (prop, val) => {
+        if (isObject(val)) {
+            console.warn(
+                `%c trying to execute setProp data method on '${prop}' propierties: '${prop}' property allow only objects as value`,
+                logStyle
+            );
+            return;
+        }
+
         if (prop in store) {
             const oldVal = store[prop];
             store[prop] = val;
@@ -23,7 +37,8 @@ export function SimpleStore(data) {
             });
         } else {
             console.warn(
-                `trying to execute set data method: store.${prop} not exist`
+                `%c trying to execute set data method: store.${prop} not exist`,
+                logStyle
             );
         }
     };
@@ -32,12 +47,20 @@ export function SimpleStore(data) {
      * Update propierities of store item by prop keys, only if store item is an object
      * Fire all the callback associate to the prop
      * Usage:
-     * this.store.updatePropObj("prop", {prop: val});
+     * this.store.setObj("prop", {prop: val});
      *
      * @param  {string} prop keys of obj in store to update
      * @param  {object} val object to merge with the corresponding in store
      */
-    const updatePropObj = (prop, val) => {
+    const setObj = (prop, val) => {
+        if (!isObject(val)) {
+            console.warn(
+                `%c trying to execute setObj data method on '${prop}' propierties: '${prop}' property does not allow objects as value`,
+                logStyle
+            );
+            return;
+        }
+
         if (prop in store) {
             const valKeys = Object.keys(val);
             const propKeys = Object.keys(store[prop]);
@@ -53,12 +76,14 @@ export function SimpleStore(data) {
                 });
             } else {
                 console.warn(
-                    `trying to execute updatePropObj data method: one of these keys '${valKeys}' not exist in store.${prop}`
+                    `%c trying to execute setObj data method: one of these keys '${valKeys}' not exist in store.${prop}`,
+                    logStyle
                 );
             }
         } else {
             console.warn(
-                `trying to execute set updatePropObj method: store.${prop} not exist`
+                `%c trying to execute set setObj method: store.${prop} not exist`,
+                logStyle
             );
         }
     };
@@ -76,7 +101,8 @@ export function SimpleStore(data) {
             return store[prop];
         } else {
             console.warn(
-                `trying to execute get data method: store.${prop} not exist`
+                `%c trying to execute get data method: store.${prop} not exist`,
+                logStyle
             );
         }
     };
@@ -139,7 +165,7 @@ export function SimpleStore(data) {
 
     return {
         setProp,
-        updatePropObj,
+        setObj,
         getProp,
         watch,
         unWatch,
