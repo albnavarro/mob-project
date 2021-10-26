@@ -1,13 +1,58 @@
 export function SimpleStore(data) {
-    let counterId = 0;
-    let fnStore = [];
-    const store = { ...data };
-
+    /**
+     * Set propierities value of store item
+     * Fire all the callback associate to the prop
+     * Usage:
+     * this.store.setProp("prop", val);
+     *
+     * @param  {object} Obj target
+     * @param  {Boolean} true if Onj is a Object
+     */
     const isObject = (obj) => {
         return Object.prototype.toString.call(obj) === '[object Object]';
     };
 
+    /**
+     * Set propierities value of store item
+     * Fire all the callback associate to the prop
+     * Usage:
+     * this.store.setProp("prop", val);
+     *
+     * @param  {object} Obj target
+     * @param  {Number} max number of nested levels
+     */
+    const maxDepth = (object) => {
+        if (!isObject(object)) return 0;
+        const values = Object.values(object);
+
+        return (
+            (values.length &&
+                Math.max(...values.map((value) => maxDepth(value)))) + 1
+        );
+    };
+
+    /**
+     * Log Style
+     */
     const logStyle = 'background: #222; color: #bada55';
+
+    /**
+     * Inizialize varibales
+     */
+    let counterId = 0;
+    let fnStore = [];
+    const dataDepth = maxDepth(data);
+    const store = (() => {
+        if (dataDepth > 2) {
+            console.warn(
+                `%c data depth on store creation allowed is maximun 2 this data is ${dataDepth}`,
+                logStyle
+            );
+            return {};
+        } else {
+            return { ...data };
+        }
+    })();
 
     /**
      * Set propierities value of store item
@@ -19,28 +64,50 @@ export function SimpleStore(data) {
      * @param  {any} val object to merge with the corresponding in store
      */
     const setProp = (prop, val) => {
+        /**
+         * Check if val is an Object
+         */
         if (isObject(val)) {
             console.warn(
-                `%c trying to execute setProp data method on '${prop}' propierties: '${prop}' property allow only objects as value`,
+                `%c trying to execute setProp method on '${prop}' propierties: setProp methods doasn't allow objects as value, ${JSON.stringify(
+                    val
+                )} is an Object`,
                 logStyle
             );
             return;
         }
 
-        if (prop in store) {
-            const oldVal = store[prop];
-            store[prop] = val;
-
-            const fnByProp = fnStore.filter((item) => item.prop === prop);
-            fnByProp.forEach((item, i) => {
-                item.fn(val, oldVal);
-            });
-        } else {
+        /**
+         * Check if prop exist in store
+         */
+        if (!(prop in store)) {
             console.warn(
-                `%c trying to execute set data method: store.${prop} not exist`,
+                `%c trying to execute setProp method: store.${prop} not exist`,
                 logStyle
             );
+            return;
         }
+
+        /**
+         * Check if prop is an Object
+         */
+        if (isObject(store[prop])) {
+            console.warn(
+                `%c trying to execute setProp method on '${prop}' propierties: '${JSON.stringify(
+                    prop
+                )}' is an objects`,
+                logStyle
+            );
+            return;
+        }
+
+        const oldVal = store[prop];
+        store[prop] = val;
+
+        const fnByProp = fnStore.filter((item) => item.prop === prop);
+        fnByProp.forEach((item, i) => {
+            item.fn(val, oldVal);
+        });
     };
 
     /**
@@ -53,39 +120,73 @@ export function SimpleStore(data) {
      * @param  {object} val object to merge with the corresponding in store
      */
     const setObj = (prop, val) => {
+        /**
+         * Check if val is not an Object
+         */
         if (!isObject(val)) {
             console.warn(
-                `%c trying to execute setObj data method on '${prop}' propierties: '${prop}' property does not allow objects as value`,
+                `%c trying to execute setObj method on '${prop}' propierties: setObj methods allow only objects as value, ${val} is not an Object`,
                 logStyle
             );
             return;
         }
 
-        if (prop in store) {
-            const valKeys = Object.keys(val);
-            const propKeys = Object.keys(store[prop]);
-            const hasKeys = valKeys.every((item) => propKeys.includes(item));
-
-            if (hasKeys) {
-                const oldVal = store[prop];
-                store[prop] = { ...store[prop], ...val };
-
-                const fnByProp = fnStore.filter((item) => item.prop === prop);
-                fnByProp.forEach((item, i) => {
-                    item.fn(store[prop], oldVal);
-                });
-            } else {
-                console.warn(
-                    `%c trying to execute setObj data method: one of these keys '${valKeys}' not exist in store.${prop}`,
-                    logStyle
-                );
-            }
-        } else {
+        /**
+         * Check if prop exist in store
+         */
+        if (!(prop in store)) {
             console.warn(
                 `%c trying to execute set setObj method: store.${prop} not exist`,
                 logStyle
             );
+            return;
         }
+
+        /**
+         * Check if prop is not an Object
+         */
+        if (!isObject(store[prop])) {
+            console.warn(
+                `%c trying to execute setObj data method on '${prop}' propierties: store propierties '${prop}' is not an object`,
+                logStyle
+            );
+            return;
+        }
+
+        /**
+         * Check if prop has val keys
+         */
+        const valKeys = Object.keys(val);
+        const propKeys = Object.keys(store[prop]);
+        const hasKeys = valKeys.every((item) => propKeys.includes(item));
+        if (!hasKeys) {
+            console.warn(
+                `%c trying to execute setObj data method: one of these keys '${valKeys}' not exist in store.${prop}`,
+                logStyle
+            );
+        }
+
+        /**
+         * Check val have nested Object
+         */
+        const dataDepth = maxDepth(val);
+        if (dataDepth > 1) {
+            console.warn(
+                `%c trying to execute setObj data method on '${prop}' propierties: '${JSON.stringify(
+                    val
+                )}' have a depth > 1, nested obj is not allowed`,
+                logStyle
+            );
+            return;
+        }
+
+        const oldVal = store[prop];
+        store[prop] = { ...store[prop], ...val };
+
+        const fnByProp = fnStore.filter((item) => item.prop === prop);
+        fnByProp.forEach((item, i) => {
+            item.fn(store[prop], oldVal);
+        });
     };
 
     /**
