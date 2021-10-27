@@ -38,6 +38,29 @@ export class tBlocksItemClass {
             center: 0,
         });
 
+        this.store.validate({
+            clone: {
+                action: (val) => {
+                    const values = [this.REMOVE, this.ADD];
+                    return values.includes(val);
+                },
+            },
+            swapItem: {
+                action: (val) => {
+                    const values = [this.UPDATE, this.REMOVE];
+                    return values.includes(val);
+                },
+            },
+            horizontalDirection: (val) => {
+                const values = [this.SX, this.DX];
+                return values.includes(val);
+            },
+            verticalDirection: (val) => {
+                const values = [this.UP, this.DOWN];
+                return values.includes(val);
+            },
+        });
+
         Object.freeze(this);
     }
 

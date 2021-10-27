@@ -34,13 +34,14 @@ export function SimpleStore(data) {
     /**
      * Log Style
      */
-    const logStyle = 'background: #222; color: #bada55';
+    let logStyle = 'background: #222; color: yellow; padding: 10px;';
 
     /**
      * Inizialize varibales
      */
     let counterId = 0;
     let fnStore = [];
+    let fnValidate = {};
     const dataDepth = maxDepth(data);
     const store = (() => {
         if (dataDepth > 2) {
@@ -101,6 +102,28 @@ export function SimpleStore(data) {
             return;
         }
 
+        /**
+         * Validates the value if it has an associated validation function
+         */
+        const valueIsValidated = (() => {
+            if (!(prop in fnValidate)) {
+                return true;
+            } else {
+                return fnValidate[prop](val);
+            }
+        })();
+
+        if (!valueIsValidated) {
+            console.warn(
+                `%c trying to execute setProp method on '${prop}' propierties: '${val}' is not a valid value, check validate function`,
+                logStyle
+            );
+            return;
+        }
+
+        /**
+         * Update value and fire callback associated
+         */
         const oldVal = store[prop];
         store[prop] = val;
 
@@ -164,6 +187,7 @@ export function SimpleStore(data) {
                 `%c trying to execute setObj data method: one of these keys '${valKeys}' not exist in store.${prop}`,
                 logStyle
             );
+            return;
         }
 
         /**
@@ -180,6 +204,34 @@ export function SimpleStore(data) {
             return;
         }
 
+        /**
+         * Validate each value if there is a validation function associated with each value
+         */
+        const valueIsValidated = (() => {
+            const arr = Object.entries(val);
+
+            return arr.every((item) => {
+                const [subProp, subVal] = item;
+
+                if (!(prop in fnValidate)) return true;
+
+                return subProp in fnValidate[prop]
+                    ? fnValidate[prop][subProp](subVal)
+                    : true;
+            });
+        })();
+
+        if (!valueIsValidated) {
+            console.warn(
+                `%c trying to execute setObj method on '${prop}' propierties: one of the values passed to the object is not a valid value, check validate function`,
+                logStyle
+            );
+            return;
+        }
+
+        /**
+         * Update value and fire callback associated
+         */
         const oldVal = store[prop];
         store[prop] = { ...store[prop], ...val };
 
@@ -260,8 +312,44 @@ export function SimpleStore(data) {
         }
     };
 
+    /**
+     * Set validate array
+     * Usage:
+     *   this.store.validate({
+     *       prop: (val) => {
+     *           return ....
+     *       },
+     *       prop2: {
+     *           subprop: (val) => {
+     *               return ....
+     *           },
+     *       }
+     *     });
+     *
+     * @param  {Object} data Object with validate function
+     */
+    const validate = (data) => {
+        const dataDepth = maxDepth(data);
+
+        fnValidate = (() => {
+            if (dataDepth > 2) {
+                console.warn(
+                    `%c data depth on validate object creation allowed is maximun 2 this data is ${dataDepth}`,
+                    logStyle
+                );
+                return {};
+            } else {
+                return { ...data };
+            }
+        })();
+    };
+
     const debug = () => {
         console.log(store);
+    };
+
+    const setStyle = (string) => {
+        logStyle = string;
     };
 
     return {
@@ -271,6 +359,8 @@ export function SimpleStore(data) {
         watch,
         unWatch,
         emit,
+        validate,
         debug,
+        setStyle,
     };
 }
