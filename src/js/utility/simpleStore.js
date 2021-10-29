@@ -37,10 +37,55 @@ export function SimpleStore(data) {
     let logStyle = 'background: #222; color: yellow; padding: 10px;';
 
     /**
+     * Set propierities value of store item
+     * Fire all the callback associate to the prop
+     *
+     * @param  {string} prop keys of obj in store to update
+     * @param  {void}
+     */
+    function fireComputed(prop) {
+        /**
+         * If therte is computed whith almoust one kye associated fired it
+         */
+        fnComputed.forEach((item, i) => {
+            const { prop: propTarget, keys, fn: computedFn } = item;
+
+            // Prendo la lista di tutte le chiavi dello store
+            const storeKeys = Object.keys(store);
+
+            // Controllo che tutte le chiavi della mutazione esistano nello store
+            const hasKeys = keys.every((item) => storeKeys.includes(item));
+
+            // Controllo se la prop principale esiste come chiave da monitorare e tutte le chiavi esistono nello store
+            if (keys.includes(prop) && hasKeys) {
+                // Prendo il valore di ogni propietá data la chiave
+                const props = keys.map((item) => {
+                    return store[item];
+                });
+
+                const computedResult = computedFn(...props);
+
+                if (!isObject(store[propTarget])) {
+                    setProp(propTarget, computedFn(...props));
+                } else {
+                    setObj(propTarget, computedFn(...props));
+                }
+            } else if (!hasKeys) {
+                // se una delle delle chiavi da monitoriare non esiste nello store
+                console.warn(
+                    `%c one of this key ${keys} defined in computed method of prop to monitor '${propTarget}' prop not exist`,
+                    logStyle
+                );
+            }
+        });
+    }
+
+    /**
      * Inizialize varibales
      */
     let counterId = 0;
     let fnStore = [];
+    let fnComputed = [];
     let fnValidate = {};
     const dataDepth = maxDepth(data);
     const store = (() => {
@@ -131,6 +176,8 @@ export function SimpleStore(data) {
         fnByProp.forEach((item, i) => {
             item.fn(val, oldVal);
         });
+
+        fireComputed(prop);
     };
 
     /**
@@ -239,6 +286,8 @@ export function SimpleStore(data) {
         fnByProp.forEach((item, i) => {
             item.fn(store[prop], oldVal);
         });
+
+        fireComputed(prop);
     };
 
     /**
@@ -352,6 +401,85 @@ export function SimpleStore(data) {
         logStyle = string;
     };
 
+    /**
+     * Set propierities value of store item
+     * Fire all the callback associate to the prop
+     * @example:
+     *
+     *  Prop target not Object, and not Object keys:
+     *  store.addComputed('prop', ['key', 'key'], (val1, val2) => {
+     *      return val1 + val2;
+     *  });
+     *
+     *  Prop target not Object and Object keys (obj.val1 , obj.val2)
+     *  store.addComputed('prop', ['obj'], (obj) => {
+     *       return obj.val1 + obj.val2;
+     *  })
+     *
+     *  Prop target Object ( obj.sum ), and not Object keys:
+     *  store.addComputed('obj', ['key', 'key'], (val1, val2) => {
+     *      return { sum: val1 + val2 };
+     *  });
+     *
+     *  Prop target Object ( obj.sum ), and Object keys (obj.val1 , obj.val2):
+     *  store.addComputed('obj', ['obj'], (obj) => {
+     *      return { sum: obj.val1 + obj.val2 };
+     *  });
+     *
+     * @param  {string} prop keys of obj in store to update
+     * @param  {keys} Array of keys to watch
+     * @param  {fn} Function Callback
+     */
+    const addComputed = (prop, keys, fn) => {
+        // Create a temp array with the fuiture computeda added to check
+        const tempComputedArray = [...fnComputed, ...[{ prop, keys, fn }]];
+
+        // Get all prop stored in tempComputedArray
+        const keyList = tempComputedArray.map((item) => item.prop).flat();
+
+        //  Keys can't be a prop used in some computed
+        const keysIsusedInSomeComputed = keyList.some((item) =>
+            keys.includes(item)
+        );
+
+        // Key is not a prop
+        const keysIsNotProp = keys.includes(prop);
+
+        /**
+         * if - Key to watch can't be a prop used in some computed to avoid infinite loop
+         *
+         * @param  {Bollean} keysIsusedInSomeComputed
+         * @return {void}
+         */
+        if (keysIsusedInSomeComputed) {
+            console.warn(
+                `%c una delel chiavi [${keys}] é gia usata come target di una mutazione`,
+                logStyle
+            );
+            return;
+        }
+
+        /**
+         * if - Key to watch can't be a prop to mutate to avoid infinite loop
+         *
+         * @param  {Bollean} keysIsNotProp
+         * @return {void}
+         */
+        if (keysIsNotProp) {
+            console.warn(
+                `%c una delel chiavi [${keys}] coincide con la prop '${prop}' da mutare`,
+                logStyle
+            );
+            return;
+        }
+
+        fnComputed.push({
+            prop,
+            keys,
+            fn,
+        });
+    };
+
     return {
         setProp,
         setObj,
@@ -360,6 +488,7 @@ export function SimpleStore(data) {
         unWatch,
         emit,
         validate,
+        addComputed,
         debug,
         setStyle,
     };
