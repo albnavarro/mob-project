@@ -30,26 +30,34 @@ class StoreTestClass {
             sum: (val) => val === 3,
         });
 
+        // WATCHER
         store.watch('input', (val, oldVal, validate) => {
-            result1.innerHTML = `val: ${val} ,oldval: ${oldVal} , validate:${validate}`;
+            result1.innerHTML = `input1: ${val} ,oldval: ${oldVal} , validate:${validate}`;
         });
 
         store.watch('obj', (val, oldVal, validate) => {
-            const { input } = val;
+            const { input: value } = val;
             const { input: prevValue } = oldVal;
             const { input: error } = validate;
 
-            result2.innerHTML = `val: ${input},oldval: ${prevValue} , validate:${error}`;
+            result2.innerHTML = `input2: ${value},oldval: ${prevValue} , validate:${error}`;
         });
 
         store.watch('sum', (val, oldVal, validate) => {
-            result3.innerHTML = `val: ${val} ,oldval: ${oldVal} , validate:${validate}`;
+            result3.innerHTML = `sum of input field: ${val} ,oldval: ${oldVal} , is equal 3:${validate}`;
         });
 
+        // COMPUTED
         store.addComputed('sum', ['input', 'obj'], (input, obj) => {
-            return parseInt(input) + parseInt(obj.input);
+            const input1IsValid = store.getValidation('input');
+            const { input: input2IsValid } = store.getValidation('obj');
+
+            return input1IsValid && input2IsValid
+                ? parseInt(input) + parseInt(obj.input)
+                : null;
         });
 
+        // HANDLER
         inputField1.addEventListener('input', (e) => {
             store.setProp('input', inputField1.value);
         });
@@ -61,7 +69,7 @@ class StoreTestClass {
         inputField3.addEventListener('click', (e) => {
             const field1 = store.getProp('input');
             const field1isValid = store.getValidation('input');
-            getValidate.innerHTML = `field1: ${field1} validator status is ${field1isValid}`;
+            getValidate.innerHTML = `field1: ${field1},  is number: ${field1isValid}`;
         });
     }
 }

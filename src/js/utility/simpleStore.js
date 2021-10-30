@@ -1,4 +1,6 @@
 export function SimpleStore(data) {
+    // Private function
+
     /**
      * Set propierities value of store item
      * Fire all the callback associate to the prop
@@ -79,26 +81,7 @@ export function SimpleStore(data) {
         });
     }
 
-    /**
-     * Inizialize varibales
-     */
-    let counterId = 0;
-    let fnStore = [];
-    let fnComputed = [];
-    let fnValidate = {};
-    const validateError = {};
-    const dataDepth = maxDepth(data);
-    const store = (() => {
-        if (dataDepth > 2) {
-            console.warn(
-                `%c data depth on store creation allowed is maximun 2 this data is ${dataDepth}`,
-                logStyle
-            );
-            return {};
-        } else {
-            return { ...data };
-        }
-    })();
+    // Public function
 
     /**
      * Set propierities value of store item
@@ -148,17 +131,9 @@ export function SimpleStore(data) {
         }
 
         /**
-         * Validate value and store the result in validateError arr
+         * Check if there is a validate function and update validateError arr
          */
-        const valueIsValidated = (() => {
-            if (!(prop in fnValidate)) {
-                return true;
-            } else {
-                return fnValidate[prop](val);
-            }
-        })();
-
-        validateError[prop] = valueIsValidated;
+        if (prop in fnValidate) validateError[prop] = fnValidate[prop](val);
 
         /**
          * Update value and fire callback associated
@@ -246,25 +221,18 @@ export function SimpleStore(data) {
         }
 
         /**
-         * Validate value and store the result in validateError arr
+         * Validate value (value passed to setObj is a Object to merge with original) and store the result in validateError arr
          * id there is no validation return true, otherwse get boolean value from fnValidate obj
          */
-        const valueIsValidated = (() => {
-            const arr = Object.entries(val);
 
-            return arr.every((item) => {
-                const [subProp, subVal] = item;
+        const valuesArray = Object.entries(val);
+        valuesArray.forEach((item, i) => {
+            const [subProp, subVal] = item;
 
-                if (!(prop in fnValidate)) {
-                    validateError[prop][subProp] = true;
-                } else {
-                    validateError[prop][subProp] =
-                        subProp in fnValidate[prop]
-                            ? fnValidate[prop][subProp](subVal)
-                            : true;
-                }
-            });
-        })();
+            if (prop in fnValidate && subProp in fnValidate[prop])
+                validateError[prop][subProp] =
+                    fnValidate[prop][subProp](subVal);
+        });
 
         /**
          * Update value and fire callback associated
@@ -401,31 +369,20 @@ export function SimpleStore(data) {
             }
         })();
 
-        // Create validateError obj map whehre store error status
-        // Default is true for every obj in store, otherwise get value from fnValidate
+        // Update validateError Object for every element in store that have a validate function asociated
         for (const key in store) {
             if (isObject(store[key])) {
-                // Get value for every propierties in Object
-                const obj = store[key];
-
-                // If there is no obj create an empty obj
-                if (!(key in validateError)) validateError[key] = {};
-
-                for (const key2 in store[key]) {
-                    if (key2 in fnValidate[key]) {
-                        validateError[key][key2] = fnValidate[key][key2](
-                            store[key][key2]
+                for (const subkey in store[key]) {
+                    if (subkey in fnValidate[key]) {
+                        validateError[key][subkey] = fnValidate[key][subkey](
+                            store[key][subkey]
                         );
-                    } else {
-                        validateError[key][key2] = true;
                     }
                 }
             } else {
                 // Get value from not obj
                 if (fnValidate[key]) {
                     validateError[key] = fnValidate[key](store[key]);
-                } else {
-                    validateError[key] = true;
                 }
             }
         }
@@ -521,6 +478,42 @@ export function SimpleStore(data) {
             fn,
         });
     };
+
+    /**
+     * Inizialize store
+     */
+    let counterId = 0;
+    let fnStore = [];
+    let fnComputed = [];
+    let fnValidate = {};
+    const validateError = {};
+    const dataDepth = maxDepth(data);
+    const store = (() => {
+        if (dataDepth > 2) {
+            console.warn(
+                `%c data depth on store creation allowed is maximun 2 this data is ${dataDepth}`,
+                logStyle
+            );
+            return {};
+        } else {
+            return { ...data };
+        }
+    })();
+
+    // Update validateError Object with basic value at store inizialization
+    // At inizialization every propierites dasn't have a validate function associated, so th validation is true
+    for (const key in store) {
+        if (isObject(store[key])) {
+            // If there is no obj create an empty obj
+            validateError[key] = {};
+
+            for (const subkey in store[key]) {
+                validateError[key][subkey] = true;
+            }
+        } else {
+            validateError[key] = true;
+        }
+    }
 
     return {
         setProp,
