@@ -1,0 +1,8 @@
+{
+    "template": "store",
+    "slug": "store",
+    "pageTitle": "store",
+    "description": "custom description",
+    "additionalData": ["nav.json"],
+    "registerComponent": ["to-top/pug/toTop.pug"]
+}

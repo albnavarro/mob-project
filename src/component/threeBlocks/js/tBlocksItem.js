@@ -39,15 +39,15 @@ export class tBlocksItemClass {
         });
 
         this.store.validate({
-            clone: {
-                action: (val) => {
-                    const values = [this.REMOVE, this.ADD];
-                    return values.includes(val);
-                },
-            },
             swapItem: {
                 action: (val) => {
                     const values = [this.UPDATE, this.REMOVE];
+                    return values.includes(val);
+                },
+            },
+            clone: {
+                action: (val) => {
+                    const values = [this.REMOVE, this.ADD];
                     return values.includes(val);
                 },
             },

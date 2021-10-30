@@ -1,0 +1,30 @@
+extends default/_wrapper.pug
+
+block content
+    header
+        .container
+            include ../includes/langSelector.pug
+        .container.menu-container.menu-container--top
+            include ../includes/navigation.pug
+    main
+        .container.clearfix
+            div
+                input.input1(type="text")
+            div
+                input.input2(type="text")
+            div
+                button.input3(type="button")
+                    |get validate status
+            div
+                .result1
+                    |result 1
+            div
+                .result2
+                    |result 2
+            div
+                .result3
+                    |result 3
+            div
+                .getValidate
+                    
+                

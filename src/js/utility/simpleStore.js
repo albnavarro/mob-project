@@ -44,16 +44,13 @@ export function SimpleStore(data) {
      * @param  {void}
      */
     function fireComputed(prop) {
-        /**
-         * If therte is computed whith almoust one kye associated fired it
-         */
         fnComputed.forEach((item, i) => {
             const { prop: propTarget, keys, fn: computedFn } = item;
 
             // Prendo la lista di tutte le chiavi dello store
             const storeKeys = Object.keys(store);
 
-            // Controllo che tutte le chiavi della mutazione esistano nello store
+            // Controllo che tutte le chiavi da monitorare nella computed esistano nello store
             const hasKeys = keys.every((item) => storeKeys.includes(item));
 
             // Controllo se la prop principale esiste come chiave da monitorare e tutte le chiavi esistono nello store
@@ -63,12 +60,14 @@ export function SimpleStore(data) {
                     return store[item];
                 });
 
-                const computedResult = computedFn(...props);
+                // Genero il valore dalla funzione di callback da passare ai setter per aggiornare la prop
+                const computedValue = computedFn(...props);
 
+                // Eseguo la funzione di call back passandogli tutti i valori delle props
                 if (!isObject(store[propTarget])) {
-                    setProp(propTarget, computedFn(...props));
+                    setProp(propTarget, computedValue);
                 } else {
-                    setObj(propTarget, computedFn(...props));
+                    setObj(propTarget, computedValue);
                 }
             } else if (!hasKeys) {
                 // se una delle delle chiavi da monitoriare non esiste nello store
@@ -87,6 +86,7 @@ export function SimpleStore(data) {
     let fnStore = [];
     let fnComputed = [];
     let fnValidate = {};
+    const validateError = {};
     const dataDepth = maxDepth(data);
     const store = (() => {
         if (dataDepth > 2) {
@@ -148,7 +148,7 @@ export function SimpleStore(data) {
         }
 
         /**
-         * Validates the value if it has an associated validation function
+         * Validate value and store the result in validateError arr
          */
         const valueIsValidated = (() => {
             if (!(prop in fnValidate)) {
@@ -158,13 +158,7 @@ export function SimpleStore(data) {
             }
         })();
 
-        if (!valueIsValidated) {
-            console.warn(
-                `%c trying to execute setProp method on '${prop}' propierties: '${val}' is not a valid value, check validate function`,
-                logStyle
-            );
-            return;
-        }
+        validateError[prop] = valueIsValidated;
 
         /**
          * Update value and fire callback associated
@@ -174,7 +168,7 @@ export function SimpleStore(data) {
 
         const fnByProp = fnStore.filter((item) => item.prop === prop);
         fnByProp.forEach((item, i) => {
-            item.fn(val, oldVal);
+            item.fn(val, oldVal, validateError[prop]);
         });
 
         fireComputed(prop);
@@ -252,7 +246,8 @@ export function SimpleStore(data) {
         }
 
         /**
-         * Validate each value if there is a validation function associated with each value
+         * Validate value and store the result in validateError arr
+         * id there is no validation return true, otherwse get boolean value from fnValidate obj
          */
         const valueIsValidated = (() => {
             const arr = Object.entries(val);
@@ -260,21 +255,16 @@ export function SimpleStore(data) {
             return arr.every((item) => {
                 const [subProp, subVal] = item;
 
-                if (!(prop in fnValidate)) return true;
-
-                return subProp in fnValidate[prop]
-                    ? fnValidate[prop][subProp](subVal)
-                    : true;
+                if (!(prop in fnValidate)) {
+                    validateError[prop][subProp] = true;
+                } else {
+                    validateError[prop][subProp] =
+                        subProp in fnValidate[prop]
+                            ? fnValidate[prop][subProp](subVal)
+                            : true;
+                }
             });
         })();
-
-        if (!valueIsValidated) {
-            console.warn(
-                `%c trying to execute setObj method on '${prop}' propierties: one of the values passed to the object is not a valid value, check validate function`,
-                logStyle
-            );
-            return;
-        }
 
         /**
          * Update value and fire callback associated
@@ -284,7 +274,7 @@ export function SimpleStore(data) {
 
         const fnByProp = fnStore.filter((item) => item.prop === prop);
         fnByProp.forEach((item, i) => {
-            item.fn(store[prop], oldVal);
+            item.fn(store[prop], oldVal, validateError[prop]);
         });
 
         fireComputed(prop);
@@ -310,9 +300,28 @@ export function SimpleStore(data) {
     };
 
     /**
+     * Get validation value of propierties in validateError obj
+     * Usage:
+     * this.store.getValidation("prop");
+     *
+     * @param  {string} prop keys of obj in store
+     * @return {Boolean} return validation status
+     */
+    const getValidation = (prop) => {
+        if (prop in validateError) {
+            return validateError[prop];
+        } else {
+            console.warn(
+                `%c trying to execute getValidation method: validateError.${prop} not exist`,
+                logStyle
+            );
+        }
+    };
+
+    /**
      * Add callback for specific propierties in store
      * Usage:
-     * const id2 =  this.store.watch('prop', (newVal, oldVal) => {})
+     * const id2 =  this.store.watch('prop', (newVal, oldVal, validate) => {})
      *
      * @param  {string} prop keys of obj in store
      * @param  {function} fn callback Function, fired on prop value change
@@ -391,10 +400,43 @@ export function SimpleStore(data) {
                 return { ...data };
             }
         })();
+
+        // Create validateError obj map whehre store error status
+        // Default is true for every obj in store, otherwise get value from fnValidate
+        for (const key in store) {
+            if (isObject(store[key])) {
+                // Get value for every propierties in Object
+                const obj = store[key];
+
+                // If there is no obj create an empty obj
+                if (!(key in validateError)) validateError[key] = {};
+
+                for (const key2 in store[key]) {
+                    if (key2 in fnValidate[key]) {
+                        validateError[key][key2] = fnValidate[key][key2](
+                            store[key][key2]
+                        );
+                    } else {
+                        validateError[key][key2] = true;
+                    }
+                }
+            } else {
+                // Get value from not obj
+                if (fnValidate[key]) {
+                    validateError[key] = fnValidate[key](store[key]);
+                } else {
+                    validateError[key] = true;
+                }
+            }
+        }
     };
 
-    const debug = () => {
+    const debugStore = () => {
         console.log(store);
+    };
+
+    const debugValidate = () => {
+        console.log(validateError);
     };
 
     const setStyle = (string) => {
@@ -484,12 +526,14 @@ export function SimpleStore(data) {
         setProp,
         setObj,
         getProp,
+        getValidation,
         watch,
         unWatch,
         emit,
         validate,
         addComputed,
-        debug,
+        debugStore,
+        debugValidate,
         setStyle,
     };
 }

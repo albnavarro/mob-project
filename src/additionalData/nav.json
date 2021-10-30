@@ -1,184 +1,184 @@
 {
-  "navigation": [
-    {
-      "label": "",
-      "univoqueId": "index"
-    },
-    {
-      "label": "parallax",
-      "univoqueId": "",
-      "children": [
+    "navigation": [
         {
-          "label": "",
-          "univoqueId": "fixed"
+            "label": "",
+            "univoqueId": "index"
         },
         {
-          "label": "",
-          "univoqueId": "mouseParallax"
-        },
-        {
-          "label": "",
-          "univoqueId": "pageScroller"
-        }
-      ]
-    },
-    {
-      "label": "gsap",
-      "univoqueId": "",
-      "children": [
-        {
-          "label": "",
-          "univoqueId": "gsap"
-        },
-        {
-          "label": "",
-          "univoqueId": "gsapHorizontal"
-        },
-        {
-          "label": "",
-          "univoqueId": "gsapHorizontal2"
-        }
-      ]
-    },
-    {
-      "label": "vari",
-      "univoqueId": "",
-      "children": [
-        {
-          "label": "",
-          "univoqueId": "move3D"
-        },
-        {
-          "label": "",
-          "univoqueId": "svg"
-        },
-        {
-          "label": "test",
-          "univoqueId": "",
-          "children": [
-            {
-              "label": "test",
-              "univoqueId": ""
-            },
-            {
-              "label": "test",
-              "univoqueId": ""
-            },
-            {
-              "label": "test",
-              "univoqueId": ""
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "label": "",
-      "univoqueId": "archive/index",
-      "children": [
-        {
-          "label": "",
-          "univoqueId": "archive/articles/index"
-        },
-        {
-          "label": "",
-          "univoqueId": "archive/news/index"
-        }
-      ]
-    },
-    {
-      "label": "",
-      "univoqueId": "filterPerTag/index",
-      "children": [
-        {
-          "label": "",
-          "univoqueId": "tag1/index",
-          "children": [
-            {
-              "label": "test",
-              "univoqueId": "",
-              "children": [
+            "label": "parallax",
+            "univoqueId": "",
+            "children": [
                 {
-                  "label": "test",
-                  "univoqueId": ""
+                    "label": "",
+                    "univoqueId": "fixed"
                 },
                 {
-                  "label": "test",
-                  "univoqueId": ""
+                    "label": "",
+                    "univoqueId": "mouseParallax"
                 },
                 {
-                  "label": "test",
-                  "univoqueId": ""
+                    "label": "",
+                    "univoqueId": "pageScroller"
                 }
-              ]
-            },
-            {
-              "label": "test",
-              "univoqueId": "",
-              "children": [
+            ]
+        },
+        {
+            "label": "gsap",
+            "univoqueId": "",
+            "children": [
                 {
-                  "label": "test",
-                  "univoqueId": "",
-                  "children": [
-                    {
-                      "label": "test",
-                      "univoqueId": ""
-                    },
-                    {
-                      "label": "test",
-                      "univoqueId": "",
-                      "children": [
-                        {
-                          "label": "test",
-                          "univoqueId": ""
-                        },
-                        {
-                          "label": "test",
-                          "univoqueId": ""
-                        },
-                        {
-                          "label": "test",
-                          "univoqueId": ""
-                        }
-                      ]
-                    },
-                    {
-                      "label": "test",
-                      "univoqueId": "",
-                      "children": [
-                        {
-                          "label": "test",
-                          "univoqueId": ""
-                        },
-                        {
-                          "label": "test",
-                          "univoqueId": ""
-                        },
-                        {
-                          "label": "test",
-                          "univoqueId": ""
-                        }
-                      ]
-                    }
-                  ]
+                    "label": "",
+                    "univoqueId": "gsap"
                 },
                 {
-                  "label": "test",
-                  "univoqueId": ""
+                    "label": "",
+                    "univoqueId": "gsapHorizontal"
                 },
                 {
-                  "label": "test",
-                  "univoqueId": ""
+                    "label": "",
+                    "univoqueId": "gsapHorizontal2"
                 }
-              ]
-            },
-            {
-              "label": "test",
-              "univoqueId": ""
-            }
-          ]
+            ]
+        },
+        {
+            "label": "vari",
+            "univoqueId": "",
+            "children": [
+                {
+                    "label": "",
+                    "univoqueId": "move3D"
+                },
+                {
+                    "label": "",
+                    "univoqueId": "svg"
+                },
+                {
+                    "label": "",
+                    "univoqueId": "store",
+                    "children": [
+                        {
+                            "label": "test",
+                            "univoqueId": ""
+                        },
+                        {
+                            "label": "test",
+                            "univoqueId": ""
+                        },
+                        {
+                            "label": "test",
+                            "univoqueId": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "label": "",
+            "univoqueId": "archive/index",
+            "children": [
+                {
+                    "label": "",
+                    "univoqueId": "archive/articles/index"
+                },
+                {
+                    "label": "",
+                    "univoqueId": "archive/news/index"
+                }
+            ]
+        },
+        {
+            "label": "",
+            "univoqueId": "filterPerTag/index",
+            "children": [
+                {
+                    "label": "",
+                    "univoqueId": "tag1/index",
+                    "children": [
+                        {
+                            "label": "test",
+                            "univoqueId": "",
+                            "children": [
+                                {
+                                    "label": "test",
+                                    "univoqueId": ""
+                                },
+                                {
+                                    "label": "test",
+                                    "univoqueId": ""
+                                },
+                                {
+                                    "label": "test",
+                                    "univoqueId": ""
+                                }
+                            ]
+                        },
+                        {
+                            "label": "test",
+                            "univoqueId": "",
+                            "children": [
+                                {
+                                    "label": "test",
+                                    "univoqueId": "",
+                                    "children": [
+                                        {
+                                            "label": "test",
+                                            "univoqueId": ""
+                                        },
+                                        {
+                                            "label": "test",
+                                            "univoqueId": "",
+                                            "children": [
+                                                {
+                                                    "label": "test",
+                                                    "univoqueId": ""
+                                                },
+                                                {
+                                                    "label": "test",
+                                                    "univoqueId": ""
+                                                },
+                                                {
+                                                    "label": "test",
+                                                    "univoqueId": ""
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "label": "test",
+                                            "univoqueId": "",
+                                            "children": [
+                                                {
+                                                    "label": "test",
+                                                    "univoqueId": ""
+                                                },
+                                                {
+                                                    "label": "test",
+                                                    "univoqueId": ""
+                                                },
+                                                {
+                                                    "label": "test",
+                                                    "univoqueId": ""
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "label": "test",
+                                    "univoqueId": ""
+                                },
+                                {
+                                    "label": "test",
+                                    "univoqueId": ""
+                                }
+                            ]
+                        },
+                        {
+                            "label": "test",
+                            "univoqueId": ""
+                        }
+                    ]
+                }
+            ]
         }
-      ]
-    }
-  ]
+    ]
 }
