@@ -1,0 +1,8 @@
+{
+    "template": "dragger",
+    "slug": "dragger",
+    "pageTitle": "dragger",
+    "description": "custom description",
+    "additionalData": ["nav.json"],
+    "registerComponent": ["to-top/pug/toTop.pug"]
+}

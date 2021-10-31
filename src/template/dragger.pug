@@ -1,0 +1,21 @@
+extends default/_wrapper.pug
+
+block content
+    header
+        .container
+            include ../includes/langSelector.pug
+        .container.menu-container.menu-container--top
+            include ../includes/navigation.pug
+    main
+        .container.clearfix
+            .dragger-container
+                .dragger(data-conponent='m-comp--dragger')
+                    .dragger__wrap
+                        .dragger__item
+            .dragger-container
+                .dragger(data-conponent='m-comp--dragger')
+                    .dragger__wrap
+                        .dragger__item
+
+                    
+                

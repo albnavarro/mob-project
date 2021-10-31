@@ -54,6 +54,10 @@
                 },
                 {
                     "label": "",
+                    "univoqueId": "dragger"
+                },
+                {
+                    "label": "",
                     "univoqueId": "store",
                     "children": [
                         {

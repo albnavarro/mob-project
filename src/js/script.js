@@ -38,6 +38,7 @@ import { predictiveTurbolence } from '../component/predictiveTurbolence/js/predi
 import { animate } from '../component/animate/js/animate.js';
 import { pageScroll } from '../component/pageScroll/js/pageScroll.js';
 import { smoothScroll } from '../component/smoothScroll/js/smoothScroll.js';
+import { dragger } from '../component/dragger/js/dragger.js';
 
 //TEST
 import { gsapTest } from './test/gsapTest.js';
@@ -59,6 +60,7 @@ vh.init();
 offsetSlider.init();
 move3D.init();
 mouseParallax.init();
+dragger.init();
 
 accordion.init();
 if (

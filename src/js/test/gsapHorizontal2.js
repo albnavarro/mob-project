@@ -253,11 +253,11 @@ class GsapHorizontal2Class {
             },
         });
         this.store.setProp('gsapisActive', true);
-        this.store.setProp('tl', tl);
+        this.store.setProp('tl', [tl]);
     }
 
     onResize() {
-        const tl = this.store.getProp('tl');
+        const [tl] = this.store.getProp('tl');
         const gsapisActive = this.store.getProp('gsapisActive');
 
         if (gsapisActive && mq.min('desktop')) {
