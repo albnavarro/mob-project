@@ -1,0 +1,22 @@
+.scrollerH-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+.scrollerH {
+    height: 100vh;
+    border: 20px red solid;
+    display: flex;
+
+    &__item {
+        width: 60vw;
+        height: 100%;
+        flex: 0 0 auto;
+        border: 20px black solid;
+
+        &:nth-of-type(2) {
+            width: 200px;
+        }
+    }
+}

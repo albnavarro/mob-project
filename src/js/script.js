@@ -37,7 +37,7 @@ import { wave } from '../component/wave/js/wave.js';
 import { predictiveTurbolence } from '../component/predictiveTurbolence/js/predictiveTurbolence.js';
 import { animate } from '../component/animate/js/animate.js';
 import { pageScroll } from '../component/pageScroll/js/pageScroll.js';
-import { smoothScroll } from '../component/smoothScroll/js/smoothScroll.js';
+import { SmoothScrollClass } from '../component/smoothScroll/js/smoothScroll.js';
 import { dragger } from '../component/dragger/js/dragger.js';
 
 //TEST
@@ -48,7 +48,22 @@ import { loadImageFromManifest } from './test/loadImageFromManifest.js';
 
 const body = document.querySelector('body');
 eventManager.init(true, true);
-smoothScroll.init();
+
+if (!body.classList.contains('template-scrollerH')) {
+    const smoothScroll = new SmoothScrollClass();
+    smoothScroll.init();
+}
+
+if (body.classList.contains('template-scrollerH')) {
+    const smoothScroll = new SmoothScrollClass({
+        target: document.querySelector('.scrollerH'),
+        direction: 'HORIZONTAL',
+        speed: 60,
+        ease: 20,
+    });
+    smoothScroll.init();
+}
+
 mouseManager.init();
 pageScroll.init();
 parallax.init();

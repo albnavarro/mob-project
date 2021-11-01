@@ -58,6 +58,10 @@
                 },
                 {
                     "label": "",
+                    "univoqueId": "scrollerH"
+                },
+                {
+                    "label": "",
                     "univoqueId": "store",
                     "children": [
                         {
