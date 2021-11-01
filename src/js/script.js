@@ -55,14 +55,34 @@ if (!body.classList.contains('template-scrollerH')) {
 }
 
 if (body.classList.contains('template-scrollerH')) {
-    const smoothScroll = new SmoothScrollClass({
+    const smoothScrollFull = new SmoothScrollClass({
         target: '.scrollerH',
         direction: 'HORIZONTAL',
         speed: 60,
         ease: 20,
         drag: true,
     });
-    smoothScroll.init();
+    smoothScrollFull.init();
+
+    const smoothScrollContiner = new SmoothScrollClass({
+        target: '.scrollerH2',
+        container: '.scrollerH-container2',
+        direction: 'HORIZONTAL',
+        speed: 120,
+        ease: 20,
+        drag: true,
+    });
+    smoothScrollContiner.init();
+
+    const smoothScrollContiner2 = new SmoothScrollClass({
+        target: '.scrollerH3',
+        container: '.scrollerH-container3',
+        direction: 'VERTICAL',
+        speed: 120,
+        ease: 20,
+        drag: true,
+    });
+    smoothScrollContiner2.init();
 }
 
 mouseManager.init();

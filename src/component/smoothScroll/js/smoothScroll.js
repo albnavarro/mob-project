@@ -11,7 +11,7 @@ import { getTranslateValues } from '../../../js/utility/getTranslateValues.js';
 export class SmoothScrollClass {
     constructor(data = {}) {
         this.VERTICAL = 'VERTICAL';
-        this.HORINZONTAL = 'HORIZONTAL';
+        this.HORIZONTAL = 'HORIZONTAL';
         this.direction = data.direction || this.VERTICAL;
         this.targetClass = data.target;
         this.target =
@@ -19,11 +19,15 @@ export class SmoothScrollClass {
         this.speed = data.speed || 60;
         this.ease = data.ease || 10;
         this.drag = data.drag || false;
+        this.container =
+            document.querySelector(data.container) || document.documentElement;
         this.endValue = window.pageYOffset;
         this.startValue = 0;
         this.endValue = 0;
         this.prevValue = 0;
         this.rafOnScroll = null;
+        this.containerWidth = 0;
+        this.containerHeight = 0;
 
         // Touch controls
         this.dragEnable = null;
@@ -36,6 +40,7 @@ export class SmoothScrollClass {
     init() {
         // COMMON LISTENER
         eventManager.push('load', () => this.reset(), 10);
+        eventManager.push('resize', () => this.reset(), 10);
         eventManager.push('scrollStart', () => this.reset(), 10);
         eventManager.push('scrollEnd', () => this.reset(), 10);
 
@@ -69,26 +74,57 @@ export class SmoothScrollClass {
             if (Modernizr.touchevents) {
                 mouseManager.push('touchstart', () => this.onMouseDown());
                 mouseManager.push('touchend', () => this.onMouseUp());
-                mouseManager.push('touchmove', () => this.onTouchMove());
             } else {
                 mouseManager.push('mousedown', () => this.onMouseDown());
                 mouseManager.push('mouseup', () => this.onMouseUp());
-                mouseManager.push('mousemove', () => this.onTouchMove());
             }
+            mouseManager.push('mousemove', () => this.onTouchMove());
+            mouseManager.push('touchmove', () => this.onTouchMove());
         }
     }
 
     // RESET DATA
     reset() {
-        const resetValue =
-            this.target === document.documentElement
-                ? window.pageYOffset
-                : -getTranslateValues(this.target).y;
+        this.containerWidth =
+            this.container === document.documentElement
+                ? document.documentElement.clientWidth
+                : outerWidth(this.container);
+
+        this.containerHeight =
+            this.container === document.documentElement
+                ? document.documentElement.clientHeight
+                : outerHeight(this.container);
+
+        const resetValue = (() => {
+            if (
+                this.target === document.documentElement &&
+                this.direction === this.VERTICAL
+            ) {
+                return window.pageYOffset;
+            } else if (
+                this.target === document.documentElement &&
+                this.direction === this.HORIZONTAL
+            ) {
+                return window.pageXOffset;
+            } else if (
+                this.target !== document.documentElement &&
+                this.direction === this.VERTICAL
+            ) {
+                return -getTranslateValues(this.target).y;
+            } else if (
+                this.target !== document.documentElement &&
+                this.direction === this.HORIZONTAL
+            ) {
+                return -getTranslateValues(this.target).x;
+            }
+        })();
 
         this.startValue = resetValue;
         this.endValue = resetValue;
         this.prevValue = resetValue;
         this.rafOnScroll = null;
+
+        this.calcaluteValue();
     }
 
     // DRAG CONTROLS
@@ -171,10 +207,7 @@ export class SmoothScrollClass {
 
                 return Math.max(
                     0,
-                    Math.min(
-                        this.endValue,
-                        value - document.documentElement.clientHeight
-                    )
+                    Math.min(this.endValue, value - this.containerHeight)
                 );
             } else {
                 const value =
@@ -184,10 +217,7 @@ export class SmoothScrollClass {
 
                 return Math.max(
                     0,
-                    Math.min(
-                        this.endValue,
-                        value - document.documentElement.clientWidth
-                    )
+                    Math.min(this.endValue, value - this.containerWidth)
                 );
             }
         })();
