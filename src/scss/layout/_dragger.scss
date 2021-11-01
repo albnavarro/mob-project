@@ -6,12 +6,12 @@
     align-items: center;
 }
 
-.dragger {
+.dragger-test {
     width: 50vw;
     height: 300px;
     border: 1px #000 solid;
 
-    &__item {
+    .dragger__item {
         width: 100vw;
         height: 100vh;
         border: 20px red solid;

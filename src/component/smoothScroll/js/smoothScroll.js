@@ -56,8 +56,13 @@ export class SmoothScrollClass {
             (this.direction === this.VERTICAL) === 'hidden';
         if (bodyIsOverflow) return;
 
-        // If wheelDelta or wheelDeltaY is not supported return
-        if (!('wheelDelta' in e) || !('wheelDeltaY' in e)) return;
+        // If wheelDelta or wheelDeltaY is not supported and target is document return
+        // ( secure check )
+        if (
+            (!('wheelDelta' in e) || !('wheelDeltaY' in e)) &&
+            this.target === document.documentElement
+        )
+            return;
 
         e.preventDefault();
 
