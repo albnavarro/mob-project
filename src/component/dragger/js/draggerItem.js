@@ -8,8 +8,21 @@ import {
 
 export class DraggerItemClass {
     constructor(data) {
+        // Constant
+        this.TOP_LEFT = 'TOP-LEFT';
+        this.TOP_RIGHT = 'TOP-RIGHT';
+        this.BOTTOM_LEFT = 'BOTTOM-LEFT';
+        this.BOTTOM_RIGHT = 'BOTTOM-RIGHT';
+        this.CENTER = 'CENTER';
+
+        // Prop
         this.compRoot = data.compRoot;
+        this.smooth = data.ease;
+        this.startPosition = data.position.toUpperCase();
+        console.log(this.startPosition);
         this.item = this.compRoot.querySelector('.dragger__item');
+
+        // MUTABLE
         this.touchstart = null;
         this.touchend = null;
         this.mousedown = null;
@@ -22,10 +35,12 @@ export class DraggerItemClass {
         this.itemHeight = this.item.offsetHeight;
         this.contWidth = this.compRoot.offsetWidth;
         this.contHeight = this.compRoot.offsetHeight;
+        this.limitX = (this.itemWidth - this.contWidth) / 2;
+        this.limitY = (this.itemHeight - this.contHeight) / 2;
 
+        // EASING
         this.endValue = { xLimited: 0, yLimited: 0 };
         this.startValue = { xLimited: 0, yLimited: 0 };
-        this.smooth = 10;
         this.prevValue = 0;
         this.rafOnScroll = null;
     }
@@ -60,6 +75,75 @@ export class DraggerItemClass {
         this.touchmove = mouseManager.push('touchmove', () => this.onMove());
         this.mousemove = mouseManager.push('mousemove', () => this.onMove());
         this.mousemove = eventManager.push('resize', () => this.onResize());
+
+        this.TOP_LEFT = 'TOP-LEFT';
+        this.TOP_RIGHT = 'TOP-RIGHT';
+        this.BOTTOM_LEFT = 'BOTTOM-LEFT';
+        this.BOTTOM_RIGHT = 'BOTTOM-RIGHT';
+
+        // Set start position
+        switch (this.startPosition) {
+            case this.TOP_LEFT:
+                this.item.style.transform = `translate3D(${this.limitX}px, ${this.limitY}px, 0)`;
+                this.endValue = {
+                    xLimited: this.limitX,
+                    yLimited: this.limitY,
+                };
+                this.startValue = {
+                    xLimited: this.limitX,
+                    yLimited: this.limitY,
+                };
+                this.dragX = this.itemWidth;
+                this.dragY = this.itemHeight;
+                break;
+
+            case this.TOP_RIGHT:
+                this.item.style.transform = `translate3D(${-this.limitX}px, ${
+                    this.limitY
+                }px, 0)`;
+                this.endValue = {
+                    xLimited: -this.limitX,
+                    yLimited: this.limitY,
+                };
+                this.startValue = {
+                    xLimited: -this.limitX,
+                    yLimited: this.limitY,
+                };
+                this.dragX = -this.itemWidth;
+                this.dragY = this.itemHeight;
+                break;
+
+            case this.BOTTOM_LEFT:
+                this.item.style.transform = `translate3D(${
+                    this.limitX
+                }px, ${-this.limitY}px, 0)`;
+                this.endValue = {
+                    xLimited: this.limitX,
+                    yLimited: -this.limitY,
+                };
+                this.startValue = {
+                    xLimited: this.limitX,
+                    yLimited: -this.limitY,
+                };
+                this.dragX = this.itemWidth;
+                this.dragY = -this.itemHeight;
+                break;
+
+            case this.BOTTOM_RIGHT:
+                this.item.style.transform = `translate3D(${-this
+                    .limitX}px, ${-this.limitY}px, 0)`;
+                this.endValue = {
+                    xLimited: -this.limitX,
+                    yLimited: -this.limitY,
+                };
+                this.startValue = {
+                    xLimited: -this.limitX,
+                    yLimited: -this.limitY,
+                };
+                this.dragX = -this.itemWidth;
+                this.dragY = -this.itemHeight;
+                break;
+        }
     }
 
     onResize() {
@@ -67,6 +151,8 @@ export class DraggerItemClass {
         this.itemHeight = this.item.offsetHeight;
         this.contWidth = this.compRoot.offsetWidth;
         this.contHeight = this.compRoot.offsetHeight;
+        this.limitX = (this.itemWidth - this.contWidth) / 2;
+        this.limitY = (this.itemHeight - this.contHeight) / 2;
     }
 
     onMouseDown() {
@@ -133,15 +219,15 @@ export class DraggerItemClass {
             }
         })();
 
-        const limitX = (this.itemWidth - this.contWidth) / 2;
-        const limitY = (this.itemHeight - this.contHeight) / 2;
-
         const xCondition = (() => {
             if (this.itemWidth < this.contWidth) {
                 return 'NO-DRAG';
-            } else if (this.dragX <= -limitX && this.dragX <= limitX) {
+            } else if (
+                this.dragX <= -this.limitX &&
+                this.dragX <= this.limitX
+            ) {
                 return 'RIGHT-LIMIT';
-            } else if (this.dragX > -limitX && this.dragX >= limitX) {
+            } else if (this.dragX > -this.limitX && this.dragX >= this.limitX) {
                 return 'LEFT-LIMIT';
             } else {
                 return 'DEFAULT';
@@ -151,9 +237,12 @@ export class DraggerItemClass {
         const yCondition = (() => {
             if (this.itemHeight < this.contHeight) {
                 return 'NO-DRAG';
-            } else if (this.dragY <= -limitY && this.dragY <= limitY) {
+            } else if (
+                this.dragY <= -this.limitY &&
+                this.dragY <= this.limitY
+            ) {
                 return 'BOTTOM-LIMIT';
-            } else if (this.dragY > -limitY && this.dragY >= limitY) {
+            } else if (this.dragY > -this.limitY && this.dragY >= this.limitY) {
                 return 'TOP-LIMIT';
             } else {
                 return 'DEFAULT';
@@ -166,10 +255,10 @@ export class DraggerItemClass {
                     return 0;
 
                 case 'RIGHT-LIMIT':
-                    return -limitX;
+                    return -this.limitX;
 
                 case 'LEFT-LIMIT':
-                    return limitX;
+                    return this.limitX;
 
                 case 'DEFAULT':
                     return xComputed;
@@ -182,10 +271,10 @@ export class DraggerItemClass {
                     return 0;
 
                 case 'BOTTOM-LIMIT':
-                    return -limitY;
+                    return -this.limitY;
 
                 case 'TOP-LIMIT':
-                    return limitY;
+                    return this.limitY;
 
                 case 'DEFAULT':
                     return yComputed;
@@ -198,11 +287,11 @@ export class DraggerItemClass {
                 break;
 
             case 'RIGHT-LIMIT':
-                this.dragX -= this.dragX + limitX;
+                this.dragX -= this.dragX + this.limitX;
                 break;
 
             case 'LEFT-LIMIT':
-                this.dragX -= this.dragX - limitX;
+                this.dragX -= this.dragX - this.limitX;
                 break;
         }
 
@@ -212,11 +301,11 @@ export class DraggerItemClass {
                 break;
 
             case 'BOTTOM-LIMIT':
-                this.dragY -= this.dragY + limitY;
+                this.dragY -= this.dragY + this.limitY;
                 break;
 
             case 'TOP-LIMIT':
-                this.dragY -= this.dragY - limitY;
+                this.dragY -= this.dragY - this.limitY;
                 break;
         }
 

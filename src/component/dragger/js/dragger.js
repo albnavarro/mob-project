@@ -29,7 +29,8 @@ class DraggerClass {
     getItemData(item) {
         const data = {};
         data.compRoot = item;
-
+        data.ease = item.getAttribute('data-ease') || 8;
+        data.position = item.getAttribute('data-position') || 'CENTER';
         return data;
     }
 }
