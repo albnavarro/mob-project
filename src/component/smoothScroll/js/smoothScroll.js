@@ -4,14 +4,18 @@ import { normalizeWheel } from './normalizeWhell.js';
 import {
     outerHeight,
     outerWidth,
+    offset,
 } from '../../../js/utility/vanillaFunction.js';
+import { getTranslateValues } from '../../../js/utility/getTranslateValues.js';
 
 export class SmoothScrollClass {
     constructor(data = {}) {
         this.VERTICAL = 'VERTICAL';
         this.HORINZONTAL = 'HORIZONTAL';
         this.direction = data.direction || this.VERTICAL;
-        this.target = data.target || document.documentElement;
+        this.targetClass = data.target;
+        this.target =
+            document.querySelector(data.target) || document.documentElement;
         this.speed = data.speed || 60;
         this.ease = data.ease || 10;
         this.drag = data.drag || false;
@@ -36,22 +40,14 @@ export class SmoothScrollClass {
         eventManager.push('scrollEnd', () => this.reset(), 10);
 
         // WHEEL LISTENER
-        document.documentElement.addEventListener(
-            'wheel',
-            (e) => this.onWhell(e),
-            {
-                passive: false,
-            }
-        );
+        this.target.addEventListener('wheel', (e) => this.onWhell(e), {
+            passive: false,
+        });
 
         // TODO: is necessary ?
-        document.documentElement.addEventListener(
-            'DOMMouseScroll',
-            (e) => this.onWhell(e),
-            {
-                passive: false,
-            }
-        );
+        this.target.addEventListener('DOMMouseScroll', (e) => this.onWhell(e), {
+            passive: false,
+        });
 
         // DRAG LISTENER
         if (this.drag) {
@@ -73,21 +69,25 @@ export class SmoothScrollClass {
             if (Modernizr.touchevents) {
                 mouseManager.push('touchstart', () => this.onMouseDown());
                 mouseManager.push('touchend', () => this.onMouseUp());
+                mouseManager.push('touchmove', () => this.onTouchMove());
             } else {
                 mouseManager.push('mousedown', () => this.onMouseDown());
                 mouseManager.push('mouseup', () => this.onMouseUp());
+                mouseManager.push('mousemove', () => this.onTouchMove());
             }
-
-            mouseManager.push('touchmove', () => this.onTouchMove());
-            mouseManager.push('mousemove', () => this.onTouchMove());
         }
     }
 
     // RESET DATA
     reset() {
-        this.startValue = window.pageYOffset;
-        this.endValue = window.pageYOffset;
-        this.prevValue = window.pageYOffset;
+        const resetValue =
+            this.target === document.documentElement
+                ? window.pageYOffset
+                : -getTranslateValues(this.target).y;
+
+        this.startValue = resetValue;
+        this.endValue = resetValue;
+        this.prevValue = resetValue;
         this.rafOnScroll = null;
     }
 
@@ -110,9 +110,13 @@ export class SmoothScrollClass {
     }
 
     onMouseDown() {
-        this.dragEnable = true;
-        this.prevTouchVal = this.getMousePos();
-        this.touchVal = this.getMousePos();
+        const target = mouseManager.getTarget();
+
+        if (target === this.item || target.closest(this.targetClass)) {
+            this.dragEnable = true;
+            this.prevTouchVal = this.getMousePos();
+            this.touchVal = this.getMousePos();
+        }
     }
 
     onMouseUp() {

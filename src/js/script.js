@@ -56,7 +56,7 @@ if (!body.classList.contains('template-scrollerH')) {
 
 if (body.classList.contains('template-scrollerH')) {
     const smoothScroll = new SmoothScrollClass({
-        target: document.querySelector('.scrollerH'),
+        target: '.scrollerH',
         direction: 'HORIZONTAL',
         speed: 60,
         ease: 20,
