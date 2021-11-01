@@ -1,10 +1,5 @@
 import { eventManager } from '../../../js/base/eventManager.js';
 import { mouseManager } from '../../../js/base/mouseManager.js';
-import {
-    outerHeight,
-    outerWidth,
-    offset,
-} from '../../../js/utility/vanillaFunction.js';
 
 export class DraggerItemClass {
     constructor(data) {

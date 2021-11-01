@@ -60,6 +60,7 @@ if (body.classList.contains('template-scrollerH')) {
         direction: 'HORIZONTAL',
         speed: 60,
         ease: 20,
+        drag: true,
     });
     smoothScroll.init();
 }

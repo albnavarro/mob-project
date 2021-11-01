@@ -1,4 +1,5 @@
 import { eventManager } from '../../../js/base/eventManager.js';
+import { mouseManager } from '../../../js/base/mouseManager.js';
 import { normalizeWheel } from './normalizeWhell.js';
 import {
     outerHeight,
@@ -13,20 +14,31 @@ export class SmoothScrollClass {
         this.target = data.target || document.documentElement;
         this.speed = data.speed || 60;
         this.ease = data.ease || 10;
+        this.drag = data.drag || false;
         this.endValue = window.pageYOffset;
         this.startValue = 0;
         this.endValue = 0;
         this.prevValue = 0;
         this.rafOnScroll = null;
+
+        // Touch controls
+        this.dragEnable = null;
+        this.touchend = null;
+        this.touchmove = null;
+        this.prevTouchVal = 0;
+        this.touchVal = 0;
     }
 
     init() {
+        // COMMON LISTENER
         eventManager.push('load', () => this.reset(), 10);
         eventManager.push('scrollStart', () => this.reset(), 10);
         eventManager.push('scrollEnd', () => this.reset(), 10);
+
+        // WHEEL LISTENER
         document.documentElement.addEventListener(
             'wheel',
-            (e) => this.onScroll(e),
+            (e) => this.onWhell(e),
             {
                 passive: false,
             }
@@ -35,13 +47,43 @@ export class SmoothScrollClass {
         // TODO: is necessary ?
         document.documentElement.addEventListener(
             'DOMMouseScroll',
-            (e) => this.onScroll(e),
+            (e) => this.onWhell(e),
             {
                 passive: false,
             }
         );
+
+        // DRAG LISTENER
+        if (this.drag) {
+            this.target.addEventListener(
+                'mousedown',
+                (e) => e.preventDefault(),
+                false
+            );
+
+            this.target.addEventListener(
+                'mousedown',
+                (e) => e.preventDefault(),
+                false
+            );
+
+            this.prevTouchVal = this.getMousePos();
+            this.touchVal = this.getMousePos();
+
+            if (Modernizr.touchevents) {
+                mouseManager.push('touchstart', () => this.onMouseDown());
+                mouseManager.push('touchend', () => this.onMouseUp());
+            } else {
+                mouseManager.push('mousedown', () => this.onMouseDown());
+                mouseManager.push('mouseup', () => this.onMouseUp());
+            }
+
+            mouseManager.push('touchmove', () => this.onTouchMove());
+            mouseManager.push('mousemove', () => this.onTouchMove());
+        }
     }
 
+    // RESET DATA
     reset() {
         this.startValue = window.pageYOffset;
         this.endValue = window.pageYOffset;
@@ -49,7 +91,48 @@ export class SmoothScrollClass {
         this.rafOnScroll = null;
     }
 
-    onScroll(e) {
+    // DRAG CONTROLS
+    getMousePos() {
+        const { x, y } = (() => {
+            if (Modernizr.touchevents) {
+                return {
+                    x: mouseManager.pageX(),
+                    y: mouseManager.pageY(),
+                };
+            } else {
+                return {
+                    x: mouseManager.clientX(),
+                    y: mouseManager.clientY(),
+                };
+            }
+        })();
+        return this.direction === this.VERTICAL ? y : x;
+    }
+
+    onMouseDown() {
+        this.dragEnable = true;
+        this.prevTouchVal = this.getMousePos();
+        this.touchVal = this.getMousePos();
+    }
+
+    onMouseUp() {
+        this.dragEnable = false;
+    }
+
+    onTouchMove() {
+        if (this.dragEnable) {
+            this.prevTouchVal = this.touchVal;
+            this.touchVal = this.getMousePos();
+
+            const result = parseInt(this.prevTouchVal - this.touchVal);
+
+            this.endValue += result;
+            this.calcaluteValue();
+        }
+    }
+
+    // WHEEL CONTROLS
+    onWhell(e) {
         // Prevent scroll with body in overflow = hidden;
         const bodyIsOverflow =
             document.body.style.overflow &&
@@ -70,6 +153,11 @@ export class SmoothScrollClass {
         const { spinY } = normalizeWheel(e);
 
         this.endValue += spinY * this.speed;
+        this.calcaluteValue();
+    }
+
+    // COMMON CALCULATE VALUE
+    calcaluteValue() {
         this.endValue = (() => {
             if (this.direction === this.VERTICAL) {
                 const value =
@@ -94,8 +182,7 @@ export class SmoothScrollClass {
                     0,
                     Math.min(
                         this.endValue,
-                        outerWidth(this.target) -
-                            document.documentElement.clientWidth
+                        value - document.documentElement.clientWidth
                     )
                 );
             }
@@ -107,6 +194,7 @@ export class SmoothScrollClass {
             );
     }
 
+    // EASING
     onReuqestAnimScroll(timeStamp) {
         const draw = (timeStamp) => {
             this.prevValue = this.startValue;
@@ -122,15 +210,15 @@ export class SmoothScrollClass {
                 if (this.target === document.documentElement) {
                     this.target.scrollTop = this.startValue;
                 } else {
-                    this.target.style.transform = `translateY(${-this
-                        .startValue}px)`;
+                    this.target.style.transform = `translate3D(0, ${-this
+                        .startValue}px, 0)`;
                 }
             } else {
                 if (this.target === document.documentElement) {
                     this.target.scrollleft = this.startValue;
                 } else {
-                    this.target.style.transform = `translateX(${-this
-                        .startValue}px)`;
+                    this.target.style.transform = `translate3D(${-this
+                        .startValue}px, 0, 0)`;
                 }
             }
 
