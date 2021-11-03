@@ -1,5 +1,6 @@
 import { eventManager } from '../../../js/base/eventManager.js';
 import { mouseManager } from '../../../js/base/mouseManager.js';
+import { isDescendant } from '../../../js/utility/vanillaFunction.js';
 
 export class DraggerItemClass {
     constructor(data) {
@@ -9,12 +10,12 @@ export class DraggerItemClass {
         this.BOTTOM_LEFT = 'BOTTOM-LEFT';
         this.BOTTOM_RIGHT = 'BOTTOM-RIGHT';
         this.CENTER = 'CENTER';
+        this.targetClass = '.dragger__item';
 
         // Prop
         this.compRoot = data.compRoot;
         this.smooth = data.ease;
         this.startPosition = data.position.toUpperCase();
-        console.log(this.startPosition);
         this.item = this.compRoot.querySelector('.dragger__item');
 
         // MUTABLE
@@ -153,7 +154,7 @@ export class DraggerItemClass {
     onMouseDown() {
         const target = mouseManager.getTarget();
 
-        if (target === this.item) {
+        if (target === this.item || isDescendant(this.item, target)) {
             this.onDrag = true;
             this.firstDrag = true;
         }

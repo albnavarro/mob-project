@@ -58,7 +58,7 @@ if (body.classList.contains('template-scrollerH')) {
     const smoothScrollFull = new SmoothScrollClass({
         target: '.scrollerH',
         direction: 'HORIZONTAL',
-        speed: 60,
+        speed: 40,
         ease: 20,
         drag: true,
     });

@@ -28,6 +28,10 @@ export class SmoothScrollClass {
         this.rafOnScroll = null;
         this.containerWidth = 0;
         this.containerHeight = 0;
+        this.progress = 0;
+        this.prevent = false;
+        this.firstTouchValue = 0;
+        this.threshold = 30;
 
         // Touch controls
         this.dragEnable = null;
@@ -56,17 +60,25 @@ export class SmoothScrollClass {
 
         // DRAG LISTENER
         if (this.drag) {
-            this.target.addEventListener(
-                'mousedown',
-                (e) => e.preventDefault(),
-                false
-            );
+            // Prevent default listener
+            // this.target.addEventListener(
+            //     'touchend',
+            //     (e) => this.preventChecker(e),
+            //     false
+            // );
+            //
+            // this.target.addEventListener(
+            //     'mouseup',
+            //     (e) => this.preventChecker(e),
+            //     false
+            // );
 
             this.target.addEventListener(
-                'mousedown',
-                (e) => e.preventDefault(),
+                'click',
+                (e) => this.preventChecker(e),
                 false
             );
+            // End prevent default listener
 
             this.prevTouchVal = this.getMousePos();
             this.touchVal = this.getMousePos();
@@ -80,6 +92,26 @@ export class SmoothScrollClass {
             }
             mouseManager.push('mousemove', () => this.onTouchMove());
             mouseManager.push('touchmove', () => this.onTouchMove());
+        }
+
+        // Set link and button to draggable false, prevent mousemouve fail
+        this.target.style['user-select'] = 'none';
+        const activeElement = this.target.querySelectorAll('a, button');
+        [...activeElement].forEach((item, i) => {
+            item.setAttribute('draggable', false);
+            item.style['user-select'] = 'none';
+        });
+    }
+
+    /**
+     * preventChecker - prevent default if scroll difference from dow to up is less thshold value
+     *
+     * @param  {event} e listener event
+     * @return {void}
+     */
+    preventChecker(e) {
+        if (Math.abs(this.endValue - this.firstTouchValue) > this.threshold) {
+            e.preventDefault();
         }
     }
 
@@ -149,6 +181,7 @@ export class SmoothScrollClass {
         const target = mouseManager.getTarget();
 
         if (target === this.item || target.closest(this.targetClass)) {
+            this.firstTouchValue = this.endValue;
             this.dragEnable = true;
             this.prevTouchVal = this.getMousePos();
             this.touchVal = this.getMousePos();
@@ -165,8 +198,8 @@ export class SmoothScrollClass {
             this.touchVal = this.getMousePos();
 
             const result = parseInt(this.prevTouchVal - this.touchVal);
-
             this.endValue += result;
+
             this.calcaluteValue();
         }
     }
@@ -205,22 +238,40 @@ export class SmoothScrollClass {
                         ? this.target.scrollHeight
                         : outerHeight(this.target);
 
-                return Math.max(
+                // Clamped result
+                const result = Math.max(
                     0,
                     Math.min(this.endValue, value - this.containerHeight)
                 );
+
+                // Update progress
+                this.progress = (
+                    result / parseInt(value - this.containerHeight)
+                ).toFixed(2);
+
+                return result;
             } else {
                 const value =
                     this.target === document.documentElement
                         ? this.target.scrollWidth
                         : outerWidth(this.target);
 
-                return Math.max(
+                // Clamped result
+                const result = Math.max(
                     0,
                     Math.min(this.endValue, value - this.containerWidth)
                 );
+
+                // Update progress
+                this.progress = (
+                    result / parseInt(value - this.containerWidth)
+                ).toFixed(2);
+
+                return result;
             }
         })();
+
+        this.target.style.setProperty('--progress', `${this.progress * 100}%`);
 
         if (!this.rafOnScroll)
             this.rafOnScroll = requestAnimationFrame(
@@ -244,14 +295,14 @@ export class SmoothScrollClass {
                 if (this.target === document.documentElement) {
                     this.target.scrollTop = this.startValue;
                 } else {
-                    this.target.style.transform = `translate3D(0, ${-this
+                    this.target.style.transform = `translate3d(0, ${-this
                         .startValue}px, 0)`;
                 }
             } else {
                 if (this.target === document.documentElement) {
                     this.target.scrollleft = this.startValue;
                 } else {
-                    this.target.style.transform = `translate3D(${-this
+                    this.target.style.transform = `translate3d(${-this
                         .startValue}px, 0, 0)`;
                 }
             }
