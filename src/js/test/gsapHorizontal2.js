@@ -4,16 +4,18 @@ import { eventManager } from '../base/eventManager.js';
 import { mq } from '../base/mediaManager.js';
 import { SimpleStore } from '../utility/simpleStore.js';
 import { offset, outerHeight, outerWidth } from '../utility/vanillaFunction.js';
+import { getTranslateValues } from '../utility/getTranslateValues.js';
 
 class GsapHorizontal2Class {
     constructor() {
         // GSAP
-        this.mainContainer = document.querySelector('.HP__main');
-        this.triggerContainer = document.querySelector('.HP__trigger');
-        this.row = document.querySelector('.HP__row');
-        this.cards = document.querySelectorAll('.HP__section');
-        this.shadowMainClass = 'HP__shadowEl';
-        this.shadowMainClassTransition = 'HP__shadowTransition';
+        this.mainContainer = document.querySelector('.scroller');
+        this.triggerContainer = document.querySelector('.scroller__trigger');
+        this.row = document.querySelector('.scroller__row');
+        this.cards = document.querySelectorAll('.scroller__section');
+        this.shadow = document.querySelectorAll('[data-shadow]');
+        this.shadowMainClass = 'scroller__shadowEl';
+        this.shadowMainClassTransition = 'scroller__shadow';
 
         // GSAP store
         this.store = new SimpleStore({
@@ -24,7 +26,7 @@ class GsapHorizontal2Class {
             percentRange: 0,
         });
 
-        // Object.freeze(this);
+        Object.freeze(this);
     }
 
     init() {
@@ -43,7 +45,6 @@ class GsapHorizontal2Class {
             (100 * (width - eventManager.windowsWidth())) / width;
 
         this.triggerContainer.style.height = `${width}px`;
-        this.mainContainer.style.height = `${width * 8}px`;
         this.row.style.width = `${width}px`;
 
         this.store.setProp('percentRange', percentRange);
@@ -67,38 +68,23 @@ class GsapHorizontal2Class {
     }
 
     createShadow() {
-        const shadowsEl = [...this.cards]
-            .map((item) => {
-                const shadowClass = item.dataset.shadow;
-
-                return `
-            <div class='${this.shadowMainClass} ${shadowClass}' data-shadow='${shadowClass}'>
-            </div>`;
-            })
-            .join('');
-
-        const shadowsTransition = `<div class='HP__shadowTransition-container'>
-            ${[...this.cards]
+        const shadowsTransition = `
+            ${[...this.shadow]
                 .map((item, i) => {
                     const shadowClass = item.dataset.shadow;
+                    const debug = item.dataset.debug ? 'debug' : '';
 
                     return `
-                        <div class='${
-                            this.shadowMainClassTransition
-                        } ${shadowClass}-transition' data-shadow='${shadowClass}'>
-                        <span class="HP__shadowTransition__start">start ${shadowClass} / i:${
-                        i + 1
-                    }</span>
-                        <span class="HP__shadowTransition__end">end ${shadowClass} / i:${
-                        i + 1
-                    }</span>
+                        <div class='${this.shadowMainClassTransition} ${this.shadowMainClassTransition}--${shadowClass}' data-shadow='${shadowClass}'>
+                            <span class="${this.shadowMainClassTransition}__start ${debug}">start ${shadowClass}</span>
+                            <span class="${this.shadowMainClassTransition}__center ${debug}">center ${shadowClass}</span>
+                            <span class="${this.shadowMainClassTransition}__end ${debug}">end ${shadowClass}</span>
                         </div>`;
                 })
                 .join('')}
-        </div>`;
+        `;
 
-        const shadows = [...[shadowsEl], ...[shadowsTransition]].join('');
-        this.triggerContainer.innerHTML = shadows;
+        this.triggerContainer.innerHTML = shadowsTransition;
     }
 
     removeShadow() {
@@ -108,68 +94,36 @@ class GsapHorizontal2Class {
     updateShadow() {
         const shadowEl = document.querySelectorAll(`.${this.shadowMainClass}`);
         const numItem = shadowEl.length;
-        const horizontalWidth = this.store.getProp('horizontalWidth');
-        const verticalHeight = this.store.getProp('verticalHeight');
 
-        shadowEl.forEach((item, i) => {
-            const shadowData = item.dataset.shadow;
-            const originalItem = [...this.cards].find((item) => {
-                return item.dataset.shadow === shadowData;
-            });
-
-            const shadowTransitionEl = document.querySelector(
-                `.HP__shadowTransition[data-shadow="${shadowData}"]`
-            );
-
-            const width = outerWidth(originalItem);
-            const height = outerHeight(originalItem);
-            const offset = originalItem.getBoundingClientRect().left;
-            const itemDifference = width - height;
+        [...this.shadow].forEach((item, i) => {
             const percentrange = this.store.getProp('percentRange') / 100;
-            const screenRatio = window.innerWidth / window.innerHeight;
-            const windowDifference = window.innerWidth - window.innerHeight;
-            // const previousEl = [...this.cards].slice(0, i);
-
-            // const isInsideVieport = (() => {
-            //     // this.row.style.transform = 'translate(0,0)';
-            //     const result =
-            //         originalItem.getBoundingClientRect().left <
-            //         window.innerWidth
-            //             ? true
-            //             : false;
-            //     // this.row.style.transform = ``;
-            //     return result;
-            // })();
-            //
-            // const widthAmount = previousEl
-            //     .map((item) => {
-            //         const width = outerWidth(item);
-            //         return width / screenRatio;
-            //     })
-            //     .reduce((a, b) => a + b, 0);
-            //
-            // const diffAmount = previousEl
-            //     .map((item) => {
-            //         const width = outerWidth(item);
-            //         return width - width / screenRatio;
-            //     })
-            //     .reduce((a, b) => a + b, 0);
-            //
-
+            const shadowData = item.dataset.shadow;
+            const width = outerWidth(item);
+            const height = outerHeight(item);
+            const { x } = getTranslateValues(this.row);
+            const offset = item.getBoundingClientRect().left - x;
+            const screenRatio =
+                eventManager.windowsWidth() / eventManager.windowsHeight();
+            const windowDifference =
+                eventManager.windowsWidth() - eventManager.windowsHeight();
             const widthAmount = offset / screenRatio;
             const diffAmount = offset - offset / screenRatio;
+            const shadowTransitionEl = document.querySelector(
+                `.scroller__shadow[data-shadow="${shadowData}"]`
+            );
+            const centerMarker = shadowTransitionEl.querySelector(
+                '.scroller__shadow__center'
+            );
+            const endMarker = shadowTransitionEl.querySelector(
+                '.scroller__shadow__end'
+            );
 
-            const top = ((i) => {
+            const start = ((i) => {
                 switch (i) {
                     case 0:
                         return 0;
 
                     default:
-                        // return isInsideVieport
-                        //     ? offset / screenRatio
-                        //     : widthAmount +
-                        //           diffAmount / percentrange -
-                        //           windowDifference / percentrange;
                         return (
                             widthAmount +
                             diffAmount / percentrange -
@@ -178,61 +132,38 @@ class GsapHorizontal2Class {
                 }
             })(i);
 
-            const heightParsed = ((i) => {
-                const base =
-                    (width - (window.innerWidth - width) / screenRatio) /
-                    percentrange;
+            const center = ((i) => {
+                const val =
+                    eventManager.windowsWidth() > eventManager.windowsHeight()
+                        ? windowDifference / percentrange
+                        : windowDifference / percentrange +
+                          eventManager.windowsWidth() / screenRatio;
 
                 switch (i) {
-                    case shadowEl.length - 1:
-                        return base;
-
                     case 0:
-                        return base;
+                        return 0;
 
                     default:
-                        return base;
+                        return val;
                 }
             })(i);
 
-            // const heightParsed = ((i) => {
-            //     const windowRef =
-            //         window.innerWidth > window.innerHeight
-            //             ? window.innerWidth
-            //             : window.innerheight;
-            //
-            //     switch (i) {
-            //         case shadowEl.length - 1:
-            //             return (
-            //                 width / screenRatio +
-            //                 windowDifference / percentrange
-            //             );
-            //
-            //         case 0:
-            //             return (
-            //                 width / screenRatio +
-            //                 windowDifference / percentrange
-            //             );
-            //
-            //         default:
-            //             return (
-            //                 width / screenRatio +
-            //                 (windowDifference / percentrange) * 2
-            //             );
-            //     }
-            // })(i);
+            const end = ((i) => {
+                const val1 = width / screenRatio;
+                const val2 = (width - width / screenRatio) / percentrange;
+                return val1 + val2 + center;
+            })(i);
 
-            item.style.height = `${width}px`;
-            item.style.width = `${width}px`;
-            this.mainContainer.style.height = `${horizontalWidth}px`;
             this.triggerContainer.style['margin-top'] = `-${height}px`;
-            shadowTransitionEl.style.top = `${top}px`;
-            shadowTransitionEl.style.height = `${heightParsed}px`;
+            shadowTransitionEl.style.top = `${start}px`;
+            centerMarker.style.height = `${center}px`;
+            endMarker.style.height = `${end}px`;
+            shadowTransitionEl.style.height = `${center}px`;
         });
     }
 
     initGsap() {
-        if (!this.triggerContainer || mq.max('desktop')) return;
+        if (!this.triggerContainer || mq.max('small')) return;
         this.setDimension();
         this.updateShadow();
 
@@ -260,19 +191,22 @@ class GsapHorizontal2Class {
         const [tl] = this.store.getProp('tl');
         const gsapisActive = this.store.getProp('gsapisActive');
 
-        if (gsapisActive && mq.min('desktop')) {
+        if (gsapisActive && mq.min('small')) {
             this.getWidth();
             this.setDimension();
             this.updateShadow();
-            tl.scrollTrigger.refresh();
-        } else if (!gsapisActive && mq.min('desktop')) {
+            tl.scrollTrigger.kill();
+            this.store.setProp('tl', null);
+            this.store.setProp('gsapisActive', false);
+            this.initGsap();
+        } else if (!gsapisActive && mq.min('small')) {
             window.scrollTo(0, 0);
             this.getWidth();
             this.updateShadow();
             this.initGsap();
-        } else if (gsapisActive && mq.max('desktop')) {
+        } else if (gsapisActive && mq.max('small')) {
             tl.kill();
-            gsap.set('.HP__row', {
+            gsap.set('.scroller__row', {
                 xPercent: 0,
             });
             this.row.style.transform = '';

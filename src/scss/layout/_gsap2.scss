@@ -1,6 +1,6 @@
-.HP {
+.scroller {
     &__trigger {
-        @include _mq('desktop') {
+        @include _mq('small') {
             z-index: 10;
             position: relative;
             pointer-events: none;
@@ -8,7 +8,7 @@
     }
 
     &__row {
-        @include _mq('desktop') {
+        @include _mq('small') {
             display: flex;
             position: sticky;
             top: 0;
@@ -20,11 +20,14 @@
     &__section {
         height: 100vh;
 
-        @include _mq('desktop') {
+        @include _mq('small') {
             flex: 0 0 auto;
             width: 80vw;
             height: 100vh;
             border: 1px #000 solid;
+            display: flex;
+            justify-content: center;
+            align-items: center;
 
             &:nth-of-type(2) {
                 width: 400px;
@@ -47,43 +50,61 @@
     &__shadowEl {
         display: none;
 
-        @include _mq('desktop') {
+        @include _mq('small') {
             width: 100%;
-            // border: 2px red solid;
             display: block;
             pointer-events: none;
         }
     }
 
-    &__shadowTransition-container {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-    }
-
-    &__shadowTransition {
+    &__shadow {
         display: none;
 
-        @include _mq('desktop') {
-            border: 1px #000 solid;
+        @include _mq('small') {
             pointer-events: none;
             display: block;
             position: absolute;
             left: 0;
             right: 0;
-            // background: rgba($black, 0.2);
+
+            &__start,
+            &__center,
+            &__end {
+                opacity: 0;
+
+                &.debug {
+                    opacity: 1;
+                }
+            }
 
             &__start {
+                border-bottom: 1px red solid;
                 position: absolute;
                 bottom: 100%;
-                right: 30px;
+                right: 0;
+                padding-right: 40px;
+            }
+
+            &__center {
+                border-bottom: 1px red solid;
+                position: absolute;
+                top: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                padding: 0 40px;
+                display: flex;
+                align-items: self-end;
+                text-align: center;
             }
 
             &__end {
+                border-bottom: 1px red solid;
                 position: absolute;
-                top: 100%;
-                left: 30px;
+                top: 0;
+                left: 0;
+                padding-left: 40px;
+                display: flex;
+                align-items: self-end;
             }
         }
     }
