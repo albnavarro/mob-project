@@ -119,7 +119,7 @@ export class GsapHorizontalCustomClass {
             const percentrange = this.store.getProp('percentRange') / 100;
             const shadowData = item.dataset.shadow;
             const width = outerWidth(item);
-            const height = outerHeight(item);
+            const height = outerHeight(this.row);
             const { x } = getTranslateValues(this.row);
             const offset = item.getBoundingClientRect().left - x;
             const screenRatio =
@@ -156,8 +156,8 @@ export class GsapHorizontalCustomClass {
                     ? eventManager.windowsHeight() / 2
                     : 0;
 
-            const start = ((i) => {
-                switch (i) {
+            const start = (() => {
+                switch (offset) {
                     case 0:
                         return 0;
 
@@ -168,33 +168,33 @@ export class GsapHorizontalCustomClass {
                             windowDifference / percentrange
                         );
                 }
-            })(i);
+            })();
 
-            const left = ((i) => {
+            const left = (() => {
                 const val =
                     eventManager.windowsWidth() > eventManager.windowsHeight()
                         ? windowDifference / percentrange
                         : windowDifference / percentrange +
                           eventManager.windowsWidth() / screenRatio;
 
-                switch (i) {
+                switch (offset) {
                     case 0:
                         return 0;
 
                     default:
                         return val;
                 }
-            })(i);
+            })();
 
-            const end = ((i) => {
+            const end = (() => {
                 const val1 = width / screenRatio;
                 const val2 = (width - width / screenRatio) / percentrange;
                 return val1 + val2 + left;
-            })(i);
+            })();
 
-            const inCenter = ((i) => {
+            const inCenter = (() => {
                 return end / 2 + plusHalf;
-            })(i);
+            })();
 
             this.triggerContainer.style['margin-top'] = `-${height}px`;
             shadowTransitionEl.style.top = `${start}px`;
