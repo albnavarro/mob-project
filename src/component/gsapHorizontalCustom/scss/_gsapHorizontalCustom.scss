@@ -54,7 +54,7 @@ $mediaQ: 'desktop';
             &__left,
             &__end {
                 opacity: 0;
-                border: 1px $black solid;
+                border: 1px red dashed;
                 width: 25%;
 
                 &.debug {
@@ -63,7 +63,6 @@ $mediaQ: 'desktop';
             }
 
             &__in-center {
-                border-bottom: 1px red solid;
                 position: absolute;
                 top: 0;
                 right: 0;
@@ -72,7 +71,6 @@ $mediaQ: 'desktop';
             }
 
             &__out-center {
-                border-bottom: 1px red solid;
                 position: absolute;
                 top: 0;
                 right: 0;
@@ -81,7 +79,6 @@ $mediaQ: 'desktop';
             }
 
             &__left {
-                border-bottom: 1px red solid;
                 position: absolute;
                 top: 0;
                 left: 50%;
@@ -91,7 +88,6 @@ $mediaQ: 'desktop';
             }
 
             &__end {
-                border-bottom: 1px red solid;
                 position: absolute;
                 top: 0;
                 left: 0;

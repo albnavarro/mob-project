@@ -86,7 +86,7 @@ export class GsapHorizontalCustomClass {
                         ? `center out : ${shadowClass}`
                         : '';
                     const end = item.dataset.debug
-                        ? `out : ${shadowClass}`
+                        ? `in out : ${shadowClass}`
                         : '';
 
                     return `
