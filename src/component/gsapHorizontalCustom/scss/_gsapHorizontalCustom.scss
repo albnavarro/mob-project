@@ -1,4 +1,6 @@
 .scroller {
+    --sectionheight: 100vh;
+
     &__trigger {
         @include _mq('small') {
             z-index: 10;
@@ -13,12 +15,12 @@
             position: sticky;
             top: 0;
             left: 0;
-            height: 100vh;
+            height: var(--sectionheight);
         }
     }
 
     &__section {
-        height: 100vh;
+        height: var(--sectionheight);
 
         @include _mq('small') {
             flex: 0 0 auto;

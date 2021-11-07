@@ -1,8 +1,9 @@
-.test-custom-scroller {
+.test-custom-scroller,
+.test-custom-scroller2 {
     .scroller__section {
         @include _mq('small') {
             width: 80vw;
-            height: 100vh;
+            height: 100%;
             border: 1px #000 solid;
             display: flex;
             justify-content: center;

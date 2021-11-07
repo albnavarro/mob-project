@@ -110,6 +110,11 @@ if (body.classList.contains('page-gsapHorizontal2')) {
         '.test-custom-scroller'
     );
     gsapHorizontalCustom.init();
+
+    const gsapHorizontalCustom2 = new GsapHorizontalCustomClass(
+        '.test-custom-scroller2'
+    );
+    gsapHorizontalCustom2.init();
 }
 if (body.classList.contains('page-store')) storeTest.init();
 animate.init();
