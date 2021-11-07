@@ -1,19 +1,23 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { eventManager } from '../base/eventManager.js';
-import { mq } from '../base/mediaManager.js';
-import { SimpleStore } from '../utility/simpleStore.js';
-import { offset, outerHeight, outerWidth } from '../utility/vanillaFunction.js';
-import { getTranslateValues } from '../utility/getTranslateValues.js';
+import { eventManager } from '../../../js/base/eventManager.js';
+import { mq } from '../../../js/base/mediaManager.js';
+import { SimpleStore } from '../../../js/utility/simpleStore.js';
+import {
+    offset,
+    outerHeight,
+    outerWidth,
+} from '../../../js/utility/vanillaFunction.js';
+import { getTranslateValues } from '../../../js/utility/getTranslateValues.js';
 
-class GsapHorizontal2Class {
-    constructor() {
-        // GSAP
-        this.mainContainer = document.querySelector('.scroller');
-        this.triggerContainer = document.querySelector('.scroller__trigger');
-        this.row = document.querySelector('.scroller__row');
-        this.cards = document.querySelectorAll('.scroller__section');
-        this.shadow = document.querySelectorAll('[data-shadow]');
+export class GsapHorizontalCustomClass {
+    constructor(rootEl) {
+        this.mainContainer = document.querySelector(rootEl);
+        this.triggerContainer =
+            this.mainContainer.querySelector('.scroller__trigger');
+        this.row = this.mainContainer.querySelector('.scroller__row');
+        this.cards = this.mainContainer.querySelectorAll('.scroller__section');
+        this.shadow = this.mainContainer.querySelectorAll('[data-shadow]');
         this.shadowMainClass = 'scroller__shadowEl';
         this.shadowMainClassTransition = 'scroller__shadow';
 
@@ -21,7 +25,6 @@ class GsapHorizontal2Class {
         this.store = new SimpleStore({
             gsapisActive: false,
             horizontalWidth: 0,
-            verticalHeight: 0,
             tl: null,
             percentRange: 0,
         });
@@ -57,14 +60,7 @@ class GsapHorizontal2Class {
             })
             .reduce((a, b) => a + b, 0);
 
-        const verticalHeight = [...this.cards]
-            .map((item) => {
-                return outerHeight(item);
-            })
-            .reduce((a, b) => a + b, 0);
-
         this.store.setProp('horizontalWidth', horizontalWidth);
-        this.store.setProp('verticalHeight', verticalHeight);
     }
 
     createShadow() {
@@ -73,12 +69,34 @@ class GsapHorizontal2Class {
                 .map((item, i) => {
                     const shadowClass = item.dataset.shadow;
                     const debug = item.dataset.debug ? 'debug' : '';
+                    const start = item.dataset.debug ? `in ${shadowClass}` : '';
+                    const left = item.dataset.debug
+                        ? `left left : ${shadowClass}`
+                        : '';
+                    const inCenter = item.dataset.debug
+                        ? `in center : ${shadowClass}`
+                        : '';
+                    const outCenter = item.dataset.debug
+                        ? `center out : ${shadowClass}`
+                        : '';
+                    const end = item.dataset.debug
+                        ? `out : ${shadowClass}`
+                        : '';
 
                     return `
                         <div class='${this.shadowMainClassTransition} ${this.shadowMainClassTransition}--${shadowClass}' data-shadow='${shadowClass}'>
-                            <span class="${this.shadowMainClassTransition}__start ${debug}">start ${shadowClass}</span>
-                            <span class="${this.shadowMainClassTransition}__center ${debug}">center ${shadowClass}</span>
-                            <span class="${this.shadowMainClassTransition}__end ${debug}">end ${shadowClass}</span>
+                            <span class="${this.shadowMainClassTransition}__in-center ${debug}">
+                                ${inCenter}
+                            </span>
+                            <span class="${this.shadowMainClassTransition}__out-center ${debug}">
+                                ${outCenter}
+                            </span>
+                            <span class="${this.shadowMainClassTransition}__left ${debug}">
+                                ${left}
+                            </span>
+                            <span class="${this.shadowMainClassTransition}__end ${debug}">
+                                ${end}
+                            </span>
                         </div>`;
                 })
                 .join('')}
@@ -92,7 +110,9 @@ class GsapHorizontal2Class {
     }
 
     updateShadow() {
-        const shadowEl = document.querySelectorAll(`.${this.shadowMainClass}`);
+        const shadowEl = this.mainContainer.querySelectorAll(
+            `.${this.shadowMainClass}`
+        );
         const numItem = shadowEl.length;
 
         [...this.shadow].forEach((item, i) => {
@@ -108,15 +128,33 @@ class GsapHorizontal2Class {
                 eventManager.windowsWidth() - eventManager.windowsHeight();
             const widthAmount = offset / screenRatio;
             const diffAmount = offset - offset / screenRatio;
-            const shadowTransitionEl = document.querySelector(
+            const shadowTransitionEl = this.mainContainer.querySelector(
                 `.scroller__shadow[data-shadow="${shadowData}"]`
             );
-            const centerMarker = shadowTransitionEl.querySelector(
-                '.scroller__shadow__center'
+            const inCenterMarker = shadowTransitionEl.querySelector(
+                '.scroller__shadow__in-center'
+            );
+            const outCenterMarker = shadowTransitionEl.querySelector(
+                '.scroller__shadow__out-center'
+            );
+            const leftMarker = shadowTransitionEl.querySelector(
+                '.scroller__shadow__left'
             );
             const endMarker = shadowTransitionEl.querySelector(
                 '.scroller__shadow__end'
             );
+
+            // Strengh shadow end item to bottom of page
+            const plusFull =
+                eventManager.windowsWidth() > eventManager.windowsHeight()
+                    ? eventManager.windowsHeight()
+                    : 0;
+
+            // Strengh center in out item to bottom of page
+            const plusHalf =
+                eventManager.windowsWidth() > eventManager.windowsHeight()
+                    ? eventManager.windowsHeight() / 2
+                    : 0;
 
             const start = ((i) => {
                 switch (i) {
@@ -132,7 +170,7 @@ class GsapHorizontal2Class {
                 }
             })(i);
 
-            const center = ((i) => {
+            const left = ((i) => {
                 const val =
                     eventManager.windowsWidth() > eventManager.windowsHeight()
                         ? windowDifference / percentrange
@@ -151,14 +189,21 @@ class GsapHorizontal2Class {
             const end = ((i) => {
                 const val1 = width / screenRatio;
                 const val2 = (width - width / screenRatio) / percentrange;
-                return val1 + val2 + center;
+                return val1 + val2 + left;
+            })(i);
+
+            const inCenter = ((i) => {
+                return end / 2 + plusHalf;
             })(i);
 
             this.triggerContainer.style['margin-top'] = `-${height}px`;
             shadowTransitionEl.style.top = `${start}px`;
-            centerMarker.style.height = `${center}px`;
-            endMarker.style.height = `${end}px`;
-            shadowTransitionEl.style.height = `${center}px`;
+            inCenterMarker.style.height = `${inCenter}px`;
+            outCenterMarker.style.height = `${inCenter}px`;
+            outCenterMarker.style.top = `${inCenter}px`;
+            leftMarker.style.height = `${left}px`;
+            endMarker.style.height = `${end + plusFull}px`;
+            shadowTransitionEl.style.height = `${left}px`;
         });
     }
 
@@ -217,5 +262,3 @@ class GsapHorizontal2Class {
         }
     }
 }
-
-export const gsapHorizontal2 = new GsapHorizontal2Class();

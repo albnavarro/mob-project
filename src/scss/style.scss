@@ -25,8 +25,9 @@
     '../component/threeBlocks/scss/tBlocks',
     '../component/parallax/scss/parallax', '../component/move3D/scss/move3D',
     '../component/mouseParallax/scss/mouseParallax',
-    '../component/pageScroll/scss/_pageScroll.scss',
-    '../component/dragger/scss/_dragger.scss';
+    '../component/pageScroll/scss/pageScroll.scss',
+    '../component/dragger/scss/dragger.scss',
+    '../component/gsapHorizontalCustom/scss/gsapHorizontalCustom.scss';
 
 // layout
 @import 'layout/index', 'layout/footer', 'layout/fidex', 'layout/susy',

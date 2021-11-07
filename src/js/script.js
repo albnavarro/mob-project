@@ -39,10 +39,10 @@ import { animate } from '../component/animate/js/animate.js';
 import { pageScroll } from '../component/pageScroll/js/pageScroll.js';
 import { SmoothScrollClass } from '../component/smoothScroll/js/smoothScroll.js';
 import { dragger } from '../component/dragger/js/dragger.js';
+import { GsapHorizontalCustomClass } from '../component/gsapHorizontalCustom/js/gsapHorizontalCustom.js';
 
 //TEST
 import { gsapTest } from './test/gsapTest.js';
-import { gsapHorizontal2 } from './test/gsapHorizontal2.js';
 import { storeTest } from './test/storeTest.js';
 import { loadImageFromManifest } from './test/loadImageFromManifest.js';
 
@@ -105,7 +105,12 @@ if (
 )
     gsapTest.init();
 
-if (body.classList.contains('page-gsapHorizontal2')) gsapHorizontal2.init();
+if (body.classList.contains('page-gsapHorizontal2')) {
+    const gsapHorizontalCustom = new GsapHorizontalCustomClass(
+        '.test-custom-scroller'
+    );
+    gsapHorizontalCustom.init();
+}
 if (body.classList.contains('page-store')) storeTest.init();
 animate.init();
 loadImageFromManifest.init();

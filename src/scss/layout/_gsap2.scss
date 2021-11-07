@@ -1,27 +1,6 @@
-.scroller {
-    &__trigger {
+.test-custom-scroller {
+    .scroller__section {
         @include _mq('small') {
-            z-index: 10;
-            position: relative;
-            pointer-events: none;
-        }
-    }
-
-    &__row {
-        @include _mq('small') {
-            display: flex;
-            position: sticky;
-            top: 0;
-            left: 0;
-            height: 100vh;
-        }
-    }
-
-    &__section {
-        height: 100vh;
-
-        @include _mq('small') {
-            flex: 0 0 auto;
             width: 80vw;
             height: 100vh;
             border: 1px #000 solid;
@@ -38,73 +17,11 @@
             }
 
             &:nth-of-type(4) {
-                width: 300px;
+                width: 400px;
             }
 
             &:nth-of-type(7) {
                 width: 50px;
-            }
-        }
-    }
-
-    &__shadowEl {
-        display: none;
-
-        @include _mq('small') {
-            width: 100%;
-            display: block;
-            pointer-events: none;
-        }
-    }
-
-    &__shadow {
-        display: none;
-
-        @include _mq('small') {
-            pointer-events: none;
-            display: block;
-            position: absolute;
-            left: 0;
-            right: 0;
-
-            &__start,
-            &__center,
-            &__end {
-                opacity: 0;
-
-                &.debug {
-                    opacity: 1;
-                }
-            }
-
-            &__start {
-                border-bottom: 1px red solid;
-                position: absolute;
-                bottom: 100%;
-                right: 0;
-                padding-right: 40px;
-            }
-
-            &__center {
-                border-bottom: 1px red solid;
-                position: absolute;
-                top: 0;
-                left: 50%;
-                transform: translateX(-50%);
-                padding: 0 40px;
-                display: flex;
-                align-items: self-end;
-                text-align: center;
-            }
-
-            &__end {
-                border-bottom: 1px red solid;
-                position: absolute;
-                top: 0;
-                left: 0;
-                padding-left: 40px;
-                display: flex;
-                align-items: self-end;
             }
         }
     }
