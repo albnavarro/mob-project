@@ -11,8 +11,10 @@ import {
 import { getTranslateValues } from '../../../js/utility/getTranslateValues.js';
 
 export class GsapHorizontalCustomClass {
-    constructor(rootEl) {
-        this.mainContainer = document.querySelector(rootEl);
+    constructor(data = {}) {
+        this.breackpoint = data.breackpoint || 'desktop';
+        this.queryType = data.queryType || 'min';
+        this.mainContainer = document.querySelector(data.rootEl);
         this.triggerContainer =
             this.mainContainer.querySelector('.scroller__trigger');
         this.row = this.mainContainer.querySelector('.scroller__row');
@@ -25,7 +27,7 @@ export class GsapHorizontalCustomClass {
         this.store = new SimpleStore({
             gsapisActive: false,
             horizontalWidth: 0,
-            tl: null,
+            tl: [],
             percentRange: 0,
         });
 
@@ -54,6 +56,8 @@ export class GsapHorizontalCustomClass {
     }
 
     getWidth() {
+        if (!mq[this.queryType](this.breackpoint)) return;
+
         const horizontalWidth = [...this.cards]
             .map((item) => {
                 return outerWidth(item);
@@ -64,6 +68,8 @@ export class GsapHorizontalCustomClass {
     }
 
     createShadow() {
+        if (!mq[this.queryType](this.breackpoint)) return;
+
         const shadowsTransition = `
             ${[...this.shadow]
                 .map((item, i) => {
@@ -110,6 +116,8 @@ export class GsapHorizontalCustomClass {
     }
 
     updateShadow() {
+        if (!mq[this.queryType](this.breackpoint)) return;
+
         const shadowEl = this.mainContainer.querySelectorAll(
             `.${this.shadowMainClass}`
         );
@@ -208,7 +216,8 @@ export class GsapHorizontalCustomClass {
     }
 
     initGsap() {
-        if (!this.triggerContainer || mq.max('small')) return;
+        if (!this.triggerContainer || !mq[this.queryType](this.breackpoint))
+            return;
         this.setDimension();
         this.updateShadow();
 
@@ -232,33 +241,40 @@ export class GsapHorizontalCustomClass {
         this.store.setProp('tl', [tl]);
     }
 
-    onResize() {
+    killGsap() {
         const [tl] = this.store.getProp('tl');
         const gsapisActive = this.store.getProp('gsapisActive');
 
-        if (gsapisActive && mq.min('small')) {
+        if (gsapisActive) {
+            tl.scrollTrigger.kill();
+            this.store.setProp('tl', []);
+            this.store.setProp('gsapisActive', false);
+        }
+    }
+
+    onResize() {
+        const gsapisActive = this.store.getProp('gsapisActive');
+
+        if (gsapisActive && mq[this.queryType](this.breackpoint)) {
             this.getWidth();
             this.setDimension();
             this.updateShadow();
-            tl.scrollTrigger.kill();
-            this.store.setProp('tl', null);
-            this.store.setProp('gsapisActive', false);
+            this.killGsap();
             this.initGsap();
-        } else if (!gsapisActive && mq.min('small')) {
-            window.scrollTo(0, 0);
+        } else if (!gsapisActive && mq[this.queryType](this.breackpoint)) {
             this.getWidth();
+            this.createShadow();
             this.updateShadow();
             this.initGsap();
-        } else if (gsapisActive && mq.max('small')) {
-            tl.kill();
+        } else if (gsapisActive && !mq[this.queryType](this.breackpoint)) {
             gsap.set('.scroller__row', {
                 xPercent: 0,
             });
             this.row.style.transform = '';
             this.row.style.width = '';
             this.triggerContainer.style.height = '';
-            this.store.setProp('tl', null);
-            this.store.setProp('gsapisActive', false);
+            this.removeShadow();
+            this.killGsap();
         }
     }
 }

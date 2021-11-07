@@ -1,7 +1,9 @@
+$mediaQ: 'desktop';
+
 .test-custom-scroller,
 .test-custom-scroller2 {
     .scroller__section {
-        @include _mq('small') {
+        @include _mq($mediaQ) {
             width: 80vw;
             height: 100%;
             border: 1px #000 solid;
