@@ -35,8 +35,8 @@ export class DraggerItemClass {
         this.limitY = (this.itemHeight - this.contHeight) / 2;
 
         // EASING
-        this.endValue = { xLimited: 0, yLimited: 0 };
-        this.startValue = { xLimited: 0, yLimited: 0 };
+        this.endValue = { xValue: 0, yValue: 0 };
+        this.startValue = { xValue: 0, yValue: 0 };
         this.prevValue = 0;
         this.rafOnScroll = null;
     }
@@ -82,12 +82,12 @@ export class DraggerItemClass {
             case this.TOP_LEFT:
                 this.item.style.transform = `translate3D(${this.limitX}px, ${this.limitY}px, 0)`;
                 this.endValue = {
-                    xLimited: this.limitX,
-                    yLimited: this.limitY,
+                    xValue: this.limitX,
+                    yValue: this.limitY,
                 };
                 this.startValue = {
-                    xLimited: this.limitX,
-                    yLimited: this.limitY,
+                    xValue: this.limitX,
+                    yValue: this.limitY,
                 };
                 this.dragX = this.itemWidth;
                 this.dragY = this.itemHeight;
@@ -98,12 +98,12 @@ export class DraggerItemClass {
                     this.limitY
                 }px, 0)`;
                 this.endValue = {
-                    xLimited: -this.limitX,
-                    yLimited: this.limitY,
+                    xValue: -this.limitX,
+                    yValue: this.limitY,
                 };
                 this.startValue = {
-                    xLimited: -this.limitX,
-                    yLimited: this.limitY,
+                    xValue: -this.limitX,
+                    yValue: this.limitY,
                 };
                 this.dragX = -this.itemWidth;
                 this.dragY = this.itemHeight;
@@ -114,12 +114,12 @@ export class DraggerItemClass {
                     this.limitX
                 }px, ${-this.limitY}px, 0)`;
                 this.endValue = {
-                    xLimited: this.limitX,
-                    yLimited: -this.limitY,
+                    xValue: this.limitX,
+                    yValue: -this.limitY,
                 };
                 this.startValue = {
-                    xLimited: this.limitX,
-                    yLimited: -this.limitY,
+                    xValue: this.limitX,
+                    yValue: -this.limitY,
                 };
                 this.dragX = this.itemWidth;
                 this.dragY = -this.itemHeight;
@@ -129,12 +129,12 @@ export class DraggerItemClass {
                 this.item.style.transform = `translate3D(${-this
                     .limitX}px, ${-this.limitY}px, 0)`;
                 this.endValue = {
-                    xLimited: -this.limitX,
-                    yLimited: -this.limitY,
+                    xValue: -this.limitX,
+                    yValue: -this.limitY,
                 };
                 this.startValue = {
-                    xLimited: -this.limitX,
-                    yLimited: -this.limitY,
+                    xValue: -this.limitX,
+                    yValue: -this.limitY,
                 };
                 this.dragX = -this.itemWidth;
                 this.dragY = -this.itemHeight;
@@ -164,6 +164,10 @@ export class DraggerItemClass {
         this.onDrag = false;
     }
 
+    clamp(num, min, max) {
+        return Math.min(Math.max(num, min), max);
+    }
+
     onMove() {
         const { x, y } = (() => {
             if (Modernizr.touchevents) {
@@ -179,6 +183,9 @@ export class DraggerItemClass {
             }
         })();
 
+        /**
+         * Get diffrence form last value
+         */
         const { xgap, ygap } = (() => {
             if (!this.onDrag) return { xgap: 0, ygap: 0 };
 
@@ -196,16 +203,28 @@ export class DraggerItemClass {
             }
         })();
 
-        if (this.onDrag) {
-            this.dragX += xgap;
-            this.dragY += ygap;
-        }
+        /**
+         * Get x value clamped to min max if is dragging or last vlue
+         */
+        const dragX = this.onDrag
+            ? this.clamp(this.dragX + xgap, -this.limitX, this.limitX)
+            : this.dragX;
 
+        /**
+         * Get y value clamped to min max if is dragging or last vlue
+         */
+        const dragY = this.onDrag
+            ? this.clamp(this.dragY + ygap, -this.limitY, this.limitY)
+            : this.dragY;
+
+        /**
+         * use calmped value or mouse value if is dragging
+         */
         const { xComputed, yComputed } = (() => {
             if (this.onDrag) {
                 return {
-                    xComputed: this.dragX,
-                    yComputed: this.dragY,
+                    xComputed: dragX,
+                    yComputed: dragY,
                 };
             } else {
                 return {
@@ -215,101 +234,23 @@ export class DraggerItemClass {
             }
         })();
 
-        const xCondition = (() => {
-            if (this.itemWidth < this.contWidth) {
-                return 'NO-DRAG';
-            } else if (
-                this.dragX <= -this.limitX &&
-                this.dragX <= this.limitX
-            ) {
-                return 'RIGHT-LIMIT';
-            } else if (this.dragX > -this.limitX && this.dragX >= this.limitX) {
-                return 'LEFT-LIMIT';
-            } else {
-                return 'DEFAULT';
-            }
-        })();
+        /**
+         * Get final value if item is bigger then container
+         */
+        const xValue = this.itemWidth < this.contWidth ? 0 : xComputed;
+        const yValue = this.itemHeight < this.contHeight ? 0 : yComputed;
 
-        const yCondition = (() => {
-            if (this.itemHeight < this.contHeight) {
-                return 'NO-DRAG';
-            } else if (
-                this.dragY <= -this.limitY &&
-                this.dragY <= this.limitY
-            ) {
-                return 'BOTTOM-LIMIT';
-            } else if (this.dragY > -this.limitY && this.dragY >= this.limitY) {
-                return 'TOP-LIMIT';
-            } else {
-                return 'DEFAULT';
-            }
-        })();
-
-        const xLimited = (() => {
-            switch (xCondition) {
-                case 'NO-DRAG':
-                    return 0;
-
-                case 'RIGHT-LIMIT':
-                    return -this.limitX;
-
-                case 'LEFT-LIMIT':
-                    return this.limitX;
-
-                case 'DEFAULT':
-                    return xComputed;
-            }
-        })();
-
-        const yLimited = (() => {
-            switch (yCondition) {
-                case 'NO-DRAG':
-                    return 0;
-
-                case 'BOTTOM-LIMIT':
-                    return -this.limitY;
-
-                case 'TOP-LIMIT':
-                    return this.limitY;
-
-                case 'DEFAULT':
-                    return yComputed;
-            }
-        })();
-
-        switch (xCondition) {
-            case 'NO-DRAG':
-                this.dragX -= xgap;
-                break;
-
-            case 'RIGHT-LIMIT':
-                this.dragX -= this.dragX + this.limitX;
-                break;
-
-            case 'LEFT-LIMIT':
-                this.dragX -= this.dragX - this.limitX;
-                break;
-        }
-
-        switch (yCondition) {
-            case 'NO-DRAG':
-                this.dragY -= ygap;
-                break;
-
-            case 'BOTTOM-LIMIT':
-                this.dragY -= this.dragY + this.limitY;
-                break;
-
-            case 'TOP-LIMIT':
-                this.dragY -= this.dragY - this.limitY;
-                break;
-        }
+        /**
+         * Update gobal value
+         */
+        this.dragX = dragX;
+        this.dragY = dragY;
 
         this.lastX = x;
         this.lastY = y;
 
         if (this.onDrag) {
-            this.endValue = { xLimited, yLimited };
+            this.endValue = { xValue, yValue };
 
             if (!this.rafOnScroll)
                 this.rafOnScroll = requestAnimationFrame(
@@ -322,30 +263,27 @@ export class DraggerItemClass {
         const draw = (timeStamp) => {
             this.prevValue = { ...this.startValue };
 
-            const { xLimited, yLimited } = (() => {
+            const { xValue, yValue } = (() => {
                 const v = this.smooth;
-                const { xLimited: xLimitedStart, yLimited: yLimitedStart } =
+                const { xValue: xValueStart, yValue: yValueStart } =
                     this.startValue;
-                const { xLimited: xLimitedEnd, yLimited: yLimitedEnd } =
-                    this.endValue;
+                const { xValue: xValueEnd, yValue: yValueEnd } = this.endValue;
 
-                const xLimited =
-                    (xLimitedEnd - xLimitedStart) / v + xLimitedStart * 1;
-                const yLimited =
-                    (yLimitedEnd - yLimitedStart) / v + yLimitedStart * 1;
+                const xValue = (xValueEnd - xValueStart) / v + xValueStart * 1;
+                const yValue = (yValueEnd - yValueStart) / v + yValueStart * 1;
 
                 return {
-                    xLimited: xLimited.toFixed(1),
-                    yLimited: yLimited.toFixed(1),
+                    xValue: xValue.toFixed(1),
+                    yValue: yValue.toFixed(1),
                 };
             })();
 
-            this.startValue = { xLimited, yLimited };
-            const { xLimited: axPrev, yLimited: ayPrev } = this.prevValue;
+            this.startValue = { xValue, yValue };
+            const { xValue: axPrev, yValue: ayPrev } = this.prevValue;
 
-            this.item.style.transform = `translate3D(${xLimited}px, ${yLimited}px, 0)`;
+            this.item.style.transform = `translate3D(${xValue}px, ${yValue}px, 0)`;
 
-            if (xLimited == axPrev && yLimited == ayPrev) {
+            if (xValue == axPrev && yValue == ayPrev) {
                 cancelAnimationFrame(this.rafOnScroll);
                 this.rafOnScroll = null;
                 return;
