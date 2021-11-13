@@ -39,6 +39,10 @@ export class DraggerItemClass {
         this.startValue = { xValue: 0, yValue: 0 };
         this.prevValue = 0;
         this.rafOnScroll = null;
+
+        // Detect click
+        this.firstTouchValue = 0;
+        this.threshold = 30;
     }
 
     init() {
@@ -71,6 +75,16 @@ export class DraggerItemClass {
         this.touchmove = mouseManager.push('touchmove', () => this.onMove());
         this.mousemove = mouseManager.push('mousemove', () => this.onMove());
         this.mousemove = eventManager.push('resize', () => this.onResize());
+
+        // Prevent default listener
+        this.compRoot.addEventListener(
+            'click',
+            (e) => this.preventChecker(e),
+            false
+        );
+
+        this.firstTouchValue = this.getMouseCoord();
+        // End prevent default listener
 
         this.TOP_LEFT = 'TOP-LEFT';
         this.TOP_RIGHT = 'TOP-RIGHT';
@@ -140,6 +154,14 @@ export class DraggerItemClass {
                 this.dragY = -this.itemHeight;
                 break;
         }
+
+        // Set link and button to draggable false, prevent mousemouve fail
+        this.compRoot.style['user-select'] = 'none';
+        const activeElement = this.compRoot.querySelectorAll('a, button');
+        [...activeElement].forEach((item, i) => {
+            item.setAttribute('draggable', false);
+            item.style['user-select'] = 'none';
+        });
     }
 
     onResize() {
@@ -151,12 +173,44 @@ export class DraggerItemClass {
         this.limitY = (this.itemHeight - this.contHeight) / 2;
     }
 
+    getMouseCoord() {
+        if (Modernizr.touchevents) {
+            return {
+                x: mouseManager.pageX(),
+                y: mouseManager.pageY(),
+            };
+        } else {
+            return {
+                x: mouseManager.clientX(),
+                y: mouseManager.clientY(),
+            };
+        }
+    }
+
+    /**
+     * preventChecker - prevent default if scroll difference from dow to up is less thshold value
+     *
+     * @param  {event} e listener event
+     * @return {void}
+     */
+    preventChecker(e) {
+        const { x: xFirst, y: yFirst } = this.firstTouchValue;
+
+        const xChecker = Math.abs(this.lastX - xFirst) > this.threshold;
+        const yChecker = Math.abs(this.lastY - yFirst) > this.threshold;
+
+        if (xChecker || yChecker) {
+            e.preventDefault();
+        }
+    }
+
     onMouseDown() {
         const target = mouseManager.getTarget();
 
         if (target === this.item || isDescendant(this.item, target)) {
             this.onDrag = true;
             this.firstDrag = true;
+            this.firstTouchValue = this.getMouseCoord();
         }
     }
 
@@ -169,19 +223,7 @@ export class DraggerItemClass {
     }
 
     onMove() {
-        const { x, y } = (() => {
-            if (Modernizr.touchevents) {
-                return {
-                    x: mouseManager.pageX(),
-                    y: mouseManager.pageY(),
-                };
-            } else {
-                return {
-                    x: mouseManager.clientX(),
-                    y: mouseManager.clientY(),
-                };
-            }
-        })();
+        const { x, y } = this.getMouseCoord();
 
         /**
          * Get diffrence form last value
