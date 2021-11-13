@@ -24,9 +24,6 @@ import { parallax } from '../component/parallax/js/parallax.js';
 import { accordion } from '../component/accordion/js/accordion.js';
 import { AccordionItemClass } from '../component/accordion/js/accordionItem.js';
 import { showElement } from '../component/show-element/js/ShowElement.js';
-import { popToggleClass } from '../component/popToggle/js/popToggle.js';
-import { popToggleManagerClass } from '../component/popToggle/js/popToggleManager.js';
-import { overlayClass } from '../component/overlay/js/overlay.js';
 import { LightBoxClass } from '../component/lightbox/js/lightbox.js';
 import { menuClass } from '../component/navigation/js/menu.js';
 import { toolTip } from '../component/tooltip/js/tooltip.js';
@@ -220,71 +217,6 @@ const sidebarMenu = new menuClass({
     sideDirection: 'left',
     offCanvas: false,
 });
-
-// POPTOGGLE
-// TEST CALLBACK
-function callback1() {
-    console.log('callback open');
-}
-
-function callback2() {
-    console.log('callback close');
-}
-
-const popToggleManager = new popToggleManagerClass();
-const overlay = new overlayClass({ element: '#overlay--comp', delay: 300 });
-overlay.callback = popToggleManager.closeAllPop.bind(popToggleManager);
-
-// POP 1
-const popToggle1 = new popToggleClass({
-    name: 'pop1',
-    openButton: '.popTogglebtn-1',
-    target: '.popTarget-1',
-    manager: popToggleManager,
-});
-popToggle1.openCallBack = overlay.open.bind(overlay, {
-    top: '.accordion-custom',
-    right: '.popTarget-1',
-    bottom: '0',
-    left: '0',
-    name: 'pop1',
-    bodyOverflow: true,
-});
-popToggle1.openCallBack = callback1.bind(window);
-popToggle1.closeCallBack = overlay.close.bind(overlay);
-popToggle1.closeCallBack = callback2.bind(window);
-
-// POP 2
-const popToggle2 = new popToggleClass({
-    name: 'pop2',
-    openButton: '.popTogglebtn-2',
-    closeButton: '.popTarget-2 button',
-    target: '.popTarget-2',
-    manager: popToggleManager,
-});
-popToggle2.openCallBack = overlay.open.bind(overlay, {
-    top: '.popTogglebtn-2',
-    right: '.popTarget-2',
-    bottom: '0',
-    left: '0',
-    name: 'pop2',
-    bodyOverflow: true,
-});
-popToggle2.closeCallBack = overlay.close.bind(overlay);
-
-// POP 3
-const popToggle3 = new popToggleClass({
-    name: 'pop3',
-    openButton: '.popTogglebtn-3',
-    closeButton: '.popTarget-3 button',
-    target: '.popTarget-3',
-    isDropDown: true,
-    manager: popToggleManager,
-});
-
-// POP MANAGER CALLBACK
-// popToggleManager.callBackFunction(sidebarMenu.openMainMenu.bind(sidebarMenu));
-// popToggleManager.callBackFunction(callback2.bind(this))
 
 // Provvisorio
 const forceResize = () => {

@@ -99,6 +99,7 @@ class LightBoxImageClass {
             this.image.classList.add('visible');
 
             if (zoom) {
+                lightPichZoom.resetData();
                 lightPichZoom.init({
                     wrapper: wrapper,
                     image: this.image,

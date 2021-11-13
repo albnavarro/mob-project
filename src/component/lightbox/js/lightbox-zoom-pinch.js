@@ -9,7 +9,7 @@ import {
 class LightPichZoomClass {
     constructor() {
         this.scale = 1;
-        this.maxZoom = 2;
+        this.maxZoom = 3;
         this.touchstart = null;
         this.touchend = null;
         this.mousedown = null;
@@ -17,12 +17,18 @@ class LightPichZoomClass {
         this.touchmove = null;
         this.mousemove = null;
         this.onresize = null;
+        this.itemWidth = 0;
+        this.itemHeight = 0;
+        this.limitX = 0;
+        this.limitY = 0;
+        this.contWidth = eventManager.windowsWidth();
+        this.contHeight = eventManager.windowsHeight();
     }
 
     init({ image, wrapper }) {
         this.image = image;
         this.wrapper = wrapper;
-        this.resetData();
+        this.setDimension();
 
         const lightbox = wrapper.closest('.lightbox');
 
@@ -40,12 +46,7 @@ class LightPichZoomClass {
         const zoom = lightbox.querySelector('.lightbox__zoom');
         zoom.appendChild(zoomIn);
         zoom.appendChild(zoomOut);
-
-        const zoomOutbtn = document.querySelector('.lightbox__zoom__in');
-        zoomOutbtn.addEventListener('click', () => this.zoomOut());
-
-        const zoomInBtn = document.querySelector('.lightbox__zoom__out');
-        zoomInBtn.addEventListener('click', () => this.zoomIn());
+        this.setZoomBtnhandler();
 
         this.image.addEventListener(
             'mousedown',
@@ -79,44 +80,104 @@ class LightPichZoomClass {
         this.onresize = eventManager.push('resizeW', () => this.resetZoom());
     }
 
-    zoomIn() {
-        if (this.scale > 1) this.scale -= 0.5;
-        if (this.scale == 1) this.image.classList.remove('drag-cursor');
+    setZoomBtnhandler() {
+        const zoomOutbtn = document.querySelector('.lightbox__zoom__in');
+        zoomOutbtn.addEventListener('click', () => this.zoomOut());
 
-        this.dragY = 0;
+        const zoomInBtn = document.querySelector('.lightbox__zoom__out');
+        zoomInBtn.addEventListener('click', () => this.zoomIn());
+    }
+
+    setDimension() {
+        this.itemWidth = outerWidth(this.image) * this.scale;
+        this.itemHeight = outerHeight(this.image) * this.scale;
+        this.limitX = (this.itemWidth - eventManager.windowsWidth()) / 2;
+        this.limitY = (this.itemHeight - eventManager.windowsHeight()) / 2;
+    }
+
+    resetData() {
+        this.lastX = 0;
         this.dragX = 0;
+        this.lastY = 0;
+        this.dragY = 0;
+        this.onDrag = false;
+        this.firstDrag = false;
+        this.scale = 1;
+        this.itemWidth = 0;
+        this.itemHeight = 0;
+        this.limitX = 0;
+        this.limitY = 0;
 
-        this.image.classList.add('transition');
-        const style = {
-            transform: `translateX(${this.dragX}px) translateY(${this.dragY}px) scale(${this.scale})`,
-        };
-        Object.assign(this.image.style, style);
+        if (Modernizr.touchevents) {
+            mouseManager.remove('touchstart', this.touchstart);
+            mouseManager.remove('touchend', this.touchend);
+        } else {
+            mouseManager.remove('mousedown', this.mousedown);
+            mouseManager.remove('mouseup', this.mouseup);
+        }
+
+        mouseManager.remove('touchmove', this.touchmove);
+        mouseManager.remove('mousemove', this.mousemove);
+        eventManager.remove('resize', this.onresize);
+
+        if (typeof this.wrapper != 'undefined' && this.wrapper != null) {
+            const lightbox = this.wrapper.closest('.lightbox');
+            const zoom = lightbox.querySelector('.lightbox__zoom');
+
+            if (typeof zoom != 'undefined' && zoom != null) {
+                lightbox.removeChild(zoom);
+            }
+        }
+    }
+
+    // EVENT
+
+    zoomIn() {
+        this.scale = this.clamp(this.scale - 0.5, 1, this.maxZoom);
+        if (this.scale === 1) this.image.classList.remove('drag-cursor');
+        this.afterZoom();
     }
 
     zoomOut() {
-        if (this.scale < this.maxZoom) this.scale += 0.5;
-
-        this.image.classList.add('transition');
-        const style = {
-            transform: `translateX(${this.dragX}px) translateY(${this.dragY}px) scale(${this.scale})`,
-        };
-        Object.assign(this.image.style, style);
-
+        this.scale = this.clamp(this.scale + 0.5, 1, this.maxZoom);
         this.image.classList.add('drag-cursor');
+        this.afterZoom();
+    }
+
+    afterZoom() {
+        this.image.classList.add('transition');
+        this.setDimension();
+
+        // Center image when needed
+        if (
+            this.itemWidth * this.scale < eventManager.windowsWidth() ||
+            this.itemHeight * this.scale < eventManager.windowsHeight()
+        ) {
+            this.dragY = 0;
+            this.dragX = 0;
+        }
+
+        this.onMove(true);
     }
 
     resetZoom() {
         this.scale = 1;
-        this.dragY = 0;
-        this.dragX = 0;
-
-        this.image.classList.add('transition');
-        const style = {
-            transform: `translateX(${this.dragX}px) translateY(${this.dragY}px) scale(${this.scale})`,
-        };
-        Object.assign(this.image.style, style);
-
         this.image.classList.remove('drag-cursor');
+        this.afterZoom();
+    }
+
+    onMouseDown() {
+        const target = mouseManager.getTarget();
+
+        if (target.classList.contains('lightbox__img')) {
+            this.image.classList.remove('transition');
+            this.onDrag = true;
+            this.firstDrag = true;
+        }
+    }
+
+    onMouseUp() {
+        this.onDrag = false;
     }
 
     onWeel(e) {
@@ -128,11 +189,7 @@ class LightPichZoomClass {
             }
         })(e);
 
-        this.scale += delta;
-
-        if (this.scale < 1) this.scale = 1;
-
-        if (this.scale > this.maxZoom) this.scale = 2;
+        this.scale = this.clamp(this.scale + delta, 1, this.maxZoom);
 
         if (this.scale > 1) {
             this.image.classList.add('drag-cursor');
@@ -140,17 +197,14 @@ class LightPichZoomClass {
             this.image.classList.remove('drag-cursor');
         }
 
-        this.dragY = 0;
-        this.dragX = 0;
-
-        this.image.classList.add('transition');
-        const style = {
-            transform: `translateX(${this.dragX}px) translateY(${this.dragY}px) scale(${this.scale})`,
-        };
-        Object.assign(this.image.style, style);
+        this.afterZoom();
     }
 
-    onMove() {
+    clamp(num, min, max) {
+        return Math.min(Math.max(num, min), max);
+    }
+
+    onMove(force = false) {
         if (this.scale == 1) this.onDrag = false;
 
         const { x, y } = (() => {
@@ -184,16 +238,27 @@ class LightPichZoomClass {
             }
         })();
 
-        if (this.onDrag) {
-            this.dragX += xgap;
-            this.dragY += ygap;
-        }
+        /**
+         * Get x value clamped to min max if is dragging or last vlue
+         */
+        const dragX =
+            this.onDrag || force
+                ? this.clamp(this.dragX + xgap, -this.limitX, this.limitX)
+                : this.dragX;
+
+        /**
+         * Get y value clamped to min max if is dragging or last vlue
+         */
+        const dragY =
+            this.onDrag || force
+                ? this.clamp(this.dragY + ygap, -this.limitY, this.limitY)
+                : this.dragY;
 
         const { xComputed, yComputed } = (() => {
-            if (this.onDrag) {
+            if (this.onDrag || force) {
                 return {
-                    xComputed: this.dragX,
-                    yComputed: this.dragY,
+                    xComputed: dragX,
+                    yComputed: dragY,
                 };
             } else {
                 return {
@@ -203,148 +268,26 @@ class LightPichZoomClass {
             }
         })();
 
-        const imagewidth = outerWidth(this.image) * this.scale;
-        const imageheight = outerHeight(this.image) * this.scale;
-        const limitX = (imagewidth - eventManager.windowsWidth()) / 2;
-        const limitY = (imageheight - eventManager.windowsHeight()) / 2;
+        /**
+         * Get final value if item is bigger then container
+         */
+        const xValue = this.itemWidth < this.contWidth ? 0 : xComputed;
+        const yValue = this.itemHeight < this.contHeight ? 0 : yComputed;
 
-        const xCondition = (() => {
-            if (imagewidth < eventManager.windowsWidth()) {
-                return 'NO-DRAG';
-            } else if (this.dragX <= -limitX && this.dragX <= limitX) {
-                return 'RIGHT-LIMIT';
-            } else if (this.dragX > -limitX && this.dragX >= limitX) {
-                return 'LEFT-LIMIT';
-            } else {
-                return 'DEFAULT';
-            }
-        })();
-
-        const yCondition = (() => {
-            if (imageheight < eventManager.windowsHeight()) {
-                return 'NO-DRAG';
-            } else if (this.dragY <= -limitY && this.dragY <= limitY) {
-                return 'BOTTOM-LIMIT';
-            } else if (this.dragY > -limitY && this.dragY >= limitY) {
-                return 'TOP-LIMIT';
-            } else {
-                return 'DEFAULT';
-            }
-        })();
-
-        const xLimited = (() => {
-            switch (xCondition) {
-                case 'NO-DRAG':
-                    return 0;
-
-                case 'RIGHT-LIMIT':
-                    return -limitX;
-
-                case 'LEFT-LIMIT':
-                    return limitX;
-
-                case 'DEFAULT':
-                    return xComputed;
-            }
-        })();
-
-        const yLimited = (() => {
-            switch (yCondition) {
-                case 'NO-DRAG':
-                    return 0;
-
-                case 'BOTTOM-LIMIT':
-                    return -limitY;
-
-                case 'TOP-LIMIT':
-                    return limitY;
-
-                case 'DEFAULT':
-                    return yComputed;
-            }
-        })();
-
-        switch (xCondition) {
-            case 'NO-DRAG':
-                this.dragX -= xgap;
-                break;
-
-            case 'RIGHT-LIMIT':
-                this.dragX -= this.dragX + limitX;
-                break;
-
-            case 'LEFT-LIMIT':
-                this.dragX -= this.dragX - limitX;
-                break;
-        }
-
-        switch (yCondition) {
-            case 'NO-DRAG':
-                this.dragY -= ygap;
-                break;
-
-            case 'BOTTOM-LIMIT':
-                this.dragY -= this.dragY + limitY;
-                break;
-
-            case 'TOP-LIMIT':
-                this.dragY -= this.dragY - limitY;
-                break;
-        }
+        /**
+         * Update gobal value
+         */
+        this.dragX = dragX;
+        this.dragY = dragY;
 
         this.lastX = x;
         this.lastY = y;
 
-        if (this.onDrag) {
+        if (this.onDrag || force) {
             const style = {
-                transform: `translateX(${xLimited}px) translateY(${yLimited}px) scale(${this.scale})`,
+                transform: `translateX(${xValue}px) translateY(${yValue}px) scale(${this.scale})`,
             };
             Object.assign(this.image.style, style);
-        }
-    }
-
-    onMouseDown() {
-        const target = mouseManager.getTarget();
-
-        if (target.classList.contains('lightbox__img')) {
-            this.image.classList.remove('transition');
-            this.onDrag = true;
-            this.firstDrag = true;
-        }
-    }
-
-    onMouseUp() {
-        this.onDrag = false;
-    }
-
-    resetData() {
-        this.lastX = 0;
-        this.dragX = 0;
-        this.lastY = 0;
-        this.dragY = 0;
-        this.onDrag = false;
-        this.firstDrag = false;
-        this.scale = 1;
-
-        if (Modernizr.touchevents) {
-            mouseManager.remove('touchstart', this.touchstart);
-            mouseManager.remove('touchend', this.touchend);
-        } else {
-            mouseManager.remove('mousedown', this.mousedown);
-            mouseManager.remove('mouseup', this.mouseup);
-        }
-
-        mouseManager.remove('touchmove', this.touchmove);
-        mouseManager.remove('mousemove', this.mousemove);
-        eventManager.remove('resize', this.onresize);
-
-        if (typeof this.wrapper != 'undefined' && this.wrapper != null) {
-            const lightbox = this.wrapper.closest('.lightbox');
-            const zoom = lightbox.querySelector('.lightbox__zoom');
-
-            if (typeof zoom != 'undefined' && zoom != null) {
-                lightbox.removeChild(zoom);
-            }
         }
     }
 }
