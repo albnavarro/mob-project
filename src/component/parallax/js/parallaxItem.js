@@ -6,7 +6,6 @@ import {
     outerWidth,
     offset,
 } from '../../../js/utility/vanillaFunction.js';
-import {} from '../../../js/polyfill/closest.js';
 import { parallaxUtils } from './parallaxUtils.js';
 
 export class ParallaxItemClass {
