@@ -7,6 +7,7 @@ import {
     offset,
 } from '../../../js/utility/vanillaFunction.js';
 import { parallaxUtils } from './parallaxUtils.js';
+import { getTranslateValues } from '../../../js/utility/getTranslateValues.js';
 
 export class ParallaxItemClass {
     constructor(data) {
@@ -16,6 +17,7 @@ export class ParallaxItemClass {
         this.prevValue = 0;
         this.height = 0;
         this.width = 0;
+        this.wScroll = 0;
         this.applyElIsValid = false;
         this.transformProperty = Modernizr.prefixed('transform');
         this.req = null;
@@ -24,6 +26,11 @@ export class ParallaxItemClass {
         // 'PROPS'
         this.item = data.item;
         this.container = data.container;
+        this.direction = data.direction;
+        this.scroller =
+            data.scroller === window
+                ? window
+                : document.querySelector(data.scroller);
 
         //Fixed prop
         this.fixedInward = data.fixedInward;
@@ -42,8 +49,8 @@ export class ParallaxItemClass {
         this.computationType = data.computationType;
         this.perspective = data.perspective;
         this.applyEl = data.applyEl;
-        this.triggerEl = data.triggerEl;
-        this.breackpoint = data.breackpoint;
+        (this.triggerEl = document.querySelector(data.triggerEl)),
+            (this.breackpoint = data.breackpoint);
         this.queryType = data.queryType;
         this.limiterOff = data.limiterOff;
         this.jsDelta = data.jsDelta;
@@ -109,42 +116,98 @@ export class ParallaxItemClass {
     }
 
     calcOffset() {
-        if (this.triggerEl == null) {
-            this.offset = parseInt(offset(this.container).top);
+        if (this.triggerEl === null) {
+            if (this.direction === 'VERTICAL') {
+                this.offset =
+                    this.scroller !== window
+                        ? parseInt(offset(this.container).top) -
+                          getTranslateValues(this.scroller).y
+                        : parseInt(offset(this.container).top);
+            } else {
+                this.offset =
+                    this.scroller !== window
+                        ? parseInt(offset(this.container).left) -
+                          getTranslateValues(this.scroller).x
+                        : parseInt(offset(this.container).left);
+            }
         } else {
-            this.offset = parseInt(
-                offset(document.querySelector(this.triggerEl)).top
-            );
+            if (this.direction === 'VERTICAL') {
+                this.offset =
+                    this.scroller !== window
+                        ? parseInt(offset(this.triggerEl).top) -
+                          getTranslateValues(this.scroller).y
+                        : parseInt(offset(this.triggerEl).top);
+            } else {
+                this.offset =
+                    this.scroller !== window
+                        ? parseInt(offset(this.triggerEl).left) -
+                          getTranslateValues(this.scroller).x
+                        : parseInt(offset(this.triggerEl).left);
+            }
         }
     }
 
     calcHeight() {
         if (this.triggerEl == null) {
-            this.height = parseInt(outerHeight(this.container));
+            this.height =
+                this.direction === 'VERTICAL'
+                    ? parseInt(outerHeight(this.container))
+                    : parseInt(outerWidth(this.container));
         } else {
-            this.height = parseInt(
-                outerHeight(document.querySelector(this.triggerEl))
-            );
+            this.height =
+                this.direction === 'VERTICAL'
+                    ? parseInt(outerHeight(this.triggerEl))
+                    : parseInt(outerWidth(this.triggerEl));
         }
     }
 
     calcWidth() {
-        this.selfWidth = parseInt(outerWidth(this.item));
+        this.selfWidth =
+            this.direction === 'VERTICAL'
+                ? parseInt(outerWidth(this.item))
+                : parseInt(outerHeight(this.item));
 
         if (this.triggerEl == null) {
-            this.width = parseInt(outerWidth(this.container));
+            this.width =
+                this.direction === 'VERTICAL'
+                    ? parseInt(outerWidth(this.container))
+                    : parseInt(outerHeight(this.container));
         } else {
-            this.width = parseInt(
-                outerWidth(document.querySelector(this.triggerEl))
-            );
+            this.width =
+                this.direction === 'VERTICAL'
+                    ? parseInt(outerWidth(this.triggerEl))
+                    : parseInt(outerHeight(this.triggerEl));
         }
+    }
+
+    getScrollOffset() {
+        if (this.scroller === window) {
+            this.wScroll =
+                this.direction === 'VERTICAL'
+                    ? this.scroller.pageYOffset
+                    : this.scroller.pageXOffset;
+        } else {
+            this.wScroll =
+                this.direction === 'VERTICAL'
+                    ? -getTranslateValues(this.scroller).y
+                    : -getTranslateValues(this.scroller).x;
+        }
+    }
+
+    getWindowsHeight() {
+        return this.direction === 'VERTICAL'
+            ? window.innerHeight
+            : window.innerWidth;
     }
 
     refresh() {
         this.calcOffset();
         this.calcHeight();
         this.calcWidth();
+        this.move();
+    }
 
+    move() {
         switch (this.ease) {
             case 'linear':
                 this.executeParallax();
@@ -217,11 +280,17 @@ export class ParallaxItemClass {
     executeParallax(applyStyle = true) {
         if (!mq[this.queryType](this.breackpoint)) return;
 
+        this.getScrollOffset();
+        const scrollTop = this.wScroll;
+        const windowsHeight = this.getWindowsHeight();
+
         if (
             !parallaxUtils.isInViewport({
                 offset: this.offset,
                 height: this.height,
                 gap: this.gap,
+                wScrollTop: scrollTop,
+                wHeight: windowsHeight,
             }) &&
             !this.limiterOff
         )
@@ -262,8 +331,8 @@ export class ParallaxItemClass {
     }
 
     getFixedValue(applyStyle) {
-        const scrollTop = eventManager.scrollTop();
-        const windowsHeight = eventManager.windowsHeight();
+        const scrollTop = this.wScroll;
+        const windowsHeight = this.getWindowsHeight();
         const height = this.height;
         const width = this.width;
         const selfWidth = this.selfWidth;
@@ -343,12 +412,13 @@ export class ParallaxItemClass {
     }
 
     getOpacityValue() {
-        const scrollTop = eventManager.scrollTop();
-        const windowsheight = eventManager.windowsHeight();
+        const scrollTop = this.wScroll;
+        const windowsHeight = this.getWindowsHeight();
+
         const offset = this.offset;
-        const vhLimit = (windowsheight / 100) * this.opacityEnd;
+        const vhLimit = (windowsHeight / 100) * this.opacityEnd;
         const vhStart =
-            windowsheight - (windowsheight / 100) * this.opacityStart;
+            windowsHeight - (windowsHeight / 100) * this.opacityStart;
 
         const val =
             this.align == 'start'
@@ -358,14 +428,18 @@ export class ParallaxItemClass {
         if (this.align == 'start') {
             return 1 - val / offset;
         } else {
-            return 1 - val / (windowsheight - vhStart - vhLimit);
+            return 1 - val / (windowsHeight - vhStart - vhLimit);
         }
     }
 
     getIsNaNValue() {
-        const scrollTop = eventManager.scrollTop();
-        const windowsheight = eventManager.windowsHeight();
-        const documentHeight = eventManager.documentHeight();
+        const scrollTop = this.wScroll;
+        const windowsHeight = this.getWindowsHeight();
+
+        const documentHeight =
+            this.direction === 'VERTICAL'
+                ? document.documentElement.scrollHeight
+                : document.documentElement.scrollWidth;
         const range = this.range;
         const offset = this.offset;
         const height = this.height;
@@ -380,21 +454,22 @@ export class ParallaxItemClass {
 
             case 'center':
                 return (
-                    (scrollTop + (windowsheight / 2 - height / 2) - offset) /
+                    (scrollTop + (windowsHeight / 2 - height / 2) - offset) /
                     range
                 );
 
             case 'bottom':
-                return (scrollTop + (windowsheight - height) - offset) / range;
+                return (scrollTop + (windowsHeight - height) - offset) / range;
 
             case 'end':
-                return -(documentHeight - (scrollTop + windowsheight)) / range;
+                return -(documentHeight - (scrollTop + windowsHeight)) / range;
         }
     }
 
     getIsANumberValue() {
-        const scrollTop = eventManager.scrollTop();
-        const windowsHeight = eventManager.windowsHeight();
+        const scrollTop = this.wScroll;
+        const windowsHeight = this.getWindowsHeight();
+
         const align = this.align;
         const offset = this.offset;
         const range = this.range;
@@ -412,8 +487,9 @@ export class ParallaxItemClass {
         } else {
             if (this.onSwitch !== 'back') return value;
 
-            const windowsHeight = eventManager.windowsHeight();
-            const scrollTop = eventManager.scrollTop();
+            const scrollTop = this.wScroll;
+            const windowsHeight = this.getWindowsHeight();
+
             const opacityEnd = this.opacityEnd;
             const opacityStart = this.opacityStart;
             const offset = this.offset;

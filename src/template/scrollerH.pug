@@ -13,11 +13,53 @@ block content
                     .scrollerH__item
                     .scrollerH__item
                     .scrollerH__item
-                        a(href="https://www.google.com/" target="_blank")
-                            |button
+                        .parallax__container(style="display:inline-block;")
+                            .parallax__item(
+                                data-conponent='m-comp--parallax',
+                                data-direction='horizontal'
+                                data-scroller='.scrollerH-container .scrollerH'
+                                data-align='start',
+                                data-smoothType = 'linear'
+                                data-propierties='horizontal')
+                                a(href="https://www.google.com/" target="_blank")
+                                    |button
                     .scrollerH__item
+                        .parallax__container(style="display:inline-block;")
+                            .parallax__item(
+                                data-conponent='m-comp--parallax',
+                                data-direction='horizontal'
+                                data-scroller='.scrollerH-container .scrollerH'
+                                data-onSwitch='stop'
+                                data-reverse
+                                data-smoothType='linear'
+                                data-propierties='horizontal')
+                                |test
                     .scrollerH__item
+                        .parallax__container(style="display:inline-block;")
+                            .parallax__item(
+                                data-conponent='m-comp--parallax',
+                                data-direction='horizontal'
+                                data-scroller='.scrollerH-container .scrollerH'
+                                data-smoothType='linear'
+                                data-opacityStart='100'
+                                data-opacityend='50'
+                                data-propierties='opacity')
+                                |test
                     .scrollerH__item
+                        .pluto(style='width:400px;height:400px;border:1px #000 solid;')
+                            .parallax__container(style="display:inline-block;")
+                                .parallax__item(
+                                    data-conponent='m-comp--parallax',
+                                    data-direction='horizontal'
+                                    data-scroller='.scrollerH-container .scrollerH'
+                                    data-computationType='fixed'
+                                    data-reverse
+                                    data-triggerEl='.pluto'
+                                    data-smoothType='linear'
+                                    data-range='100'
+                                    data-fixedOffset='30'
+                                    data-propierties='horizontal')
+                                    |test
                     .scrollerH__item
                         
             .scrollerH-container2

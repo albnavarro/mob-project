@@ -32,6 +32,12 @@ class ParallaxClass {
         }
     }
 
+    move() {
+        for (const item of this.instances) {
+            item.move();
+        }
+    }
+
     getItemData(item) {
         const data = {};
         data.item = item;
@@ -43,6 +49,12 @@ class ParallaxClass {
         // String: fixed || default
         data.computationType =
             item.getAttribute('data-computationType') || 'default';
+
+        // String: 'VERTICAL' || 'HORIZONTAL'
+        data.direction = item.getAttribute('data-direction') || 'VERTICAL';
+
+        // Custom container with a transate movement
+        data.scroller = item.getAttribute('data-scroller') || window;
 
         // FIXED PROPS
 

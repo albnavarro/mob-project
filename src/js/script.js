@@ -60,6 +60,7 @@ if (body.classList.contains('template-scrollerH')) {
         drag: true,
     });
     smoothScrollFull.init();
+    smoothScrollFull.onTick(() => parallax.move());
 
     const smoothScrollContiner = new SmoothScrollClass({
         target: '.scrollerH2',

@@ -21,11 +21,10 @@ export const parallaxUtils = {
         }
     },
 
-    isInViewport({ offset, height, gap }) {
+    isInViewport({ offset, height, gap, wScrollTop, wHeight }) {
         return (
-            offset + height > eventManager.scrollTop() - gap &&
-            offset <
-                eventManager.scrollTop() + (eventManager.windowsHeight() + gap)
+            offset + height > wScrollTop - gap &&
+            offset < wScrollTop + (wHeight + gap)
         );
     },
 

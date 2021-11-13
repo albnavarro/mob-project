@@ -8,6 +8,8 @@ import {
 } from '../../../js/utility/vanillaFunction.js';
 import { getTranslateValues } from '../../../js/utility/getTranslateValues.js';
 
+import { parallax } from '../../parallax/js/parallax.js';
+
 export class SmoothScrollClass {
     constructor(data = {}) {
         this.VERTICAL = 'VERTICAL';
@@ -38,6 +40,9 @@ export class SmoothScrollClass {
         this.touchmove = null;
         this.prevTouchVal = 0;
         this.touchVal = 0;
+
+        //
+        this.callback = [];
     }
 
     init() {
@@ -88,6 +93,10 @@ export class SmoothScrollClass {
             item.setAttribute('draggable', false);
             item.style['user-select'] = 'none';
         });
+    }
+
+    onTick(fn) {
+        this.callback.push(fn);
     }
 
     /**
@@ -294,6 +303,10 @@ export class SmoothScrollClass {
                         .startValue}px, 0, 0)`;
                 }
             }
+
+            this.callback.forEach((item, i) => {
+                item();
+            });
 
             // La RAF viene "rigenerata" fino a quando tutti gli elementi rimangono fermi
             if (this.prevValue == this.startValue) {
