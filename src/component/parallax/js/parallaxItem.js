@@ -7,7 +7,6 @@ import {
     offset,
 } from '../../../js/utility/vanillaFunction.js';
 import { parallaxUtils } from './parallaxUtils.js';
-import { getTranslateValues } from '../../../js/utility/getTranslateValues.js';
 
 export class ParallaxItemClass {
     constructor(data) {
@@ -121,13 +120,13 @@ export class ParallaxItemClass {
                 this.offset =
                     this.scroller !== window
                         ? parseInt(offset(this.container).top) -
-                          getTranslateValues(this.scroller).y
+                          offset(this.scroller).top
                         : parseInt(offset(this.container).top);
             } else {
                 this.offset =
                     this.scroller !== window
                         ? parseInt(offset(this.container).left) -
-                          getTranslateValues(this.scroller).x
+                          offset(this.scroller).left
                         : parseInt(offset(this.container).left);
             }
         } else {
@@ -135,13 +134,13 @@ export class ParallaxItemClass {
                 this.offset =
                     this.scroller !== window
                         ? parseInt(offset(this.triggerEl).top) -
-                          getTranslateValues(this.scroller).y
+                          offset(this.scroller).top
                         : parseInt(offset(this.triggerEl).top);
             } else {
                 this.offset =
                     this.scroller !== window
                         ? parseInt(offset(this.triggerEl).left) -
-                          getTranslateValues(this.scroller).x
+                          offset(this.scroller).left
                         : parseInt(offset(this.triggerEl).left);
             }
         }
@@ -189,8 +188,8 @@ export class ParallaxItemClass {
         } else {
             this.wScroll =
                 this.direction === 'VERTICAL'
-                    ? -getTranslateValues(this.scroller).y
-                    : -getTranslateValues(this.scroller).x;
+                    ? -offset(this.scroller).top
+                    : -offset(this.scroller).left;
         }
     }
 
