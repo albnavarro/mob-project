@@ -29,7 +29,6 @@ export class SmoothScrollClass {
         this.containerWidth = 0;
         this.containerHeight = 0;
         this.progress = 0;
-        this.prevent = false;
         this.firstTouchValue = 0;
         this.threshold = 30;
 
@@ -61,18 +60,6 @@ export class SmoothScrollClass {
         // DRAG LISTENER
         if (this.drag) {
             // Prevent default listener
-            // this.target.addEventListener(
-            //     'touchend',
-            //     (e) => this.preventChecker(e),
-            //     false
-            // );
-            //
-            // this.target.addEventListener(
-            //     'mouseup',
-            //     (e) => this.preventChecker(e),
-            //     false
-            // );
-
             this.target.addEventListener(
                 'click',
                 (e) => this.preventChecker(e),
@@ -208,8 +195,9 @@ export class SmoothScrollClass {
     onWhell(e) {
         // Prevent scroll with body in overflow = hidden;
         const bodyIsOverflow =
-            document.body.style.overflow &&
-            (this.direction === this.VERTICAL) === 'hidden';
+            document.body.style.overflow === 'hidden' &&
+            this.direction === this.VERTICAL;
+
         if (bodyIsOverflow) return;
 
         // If wheelDelta or wheelDeltaY is not supported and target is document return
