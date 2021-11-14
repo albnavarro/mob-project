@@ -76,14 +76,19 @@ export const parallaxUtils = {
     getValueOnSwitchNoPacity({ switchPropierties, isReverse, value }) {
         switch (switchPropierties) {
             case 'stop':
-                if ((!isReverse && value > 0) || (isReverse && value < 0)) {
-                    return 0;
-                }
+                return (!isReverse && value > 0) || (isReverse && value < 0)
+                    ? 0
+                    : value;
 
             case 'back':
-                if ((!isReverse && value > 0) || (isReverse && value < 0)) {
-                    return -value;
-                }
+                return (!isReverse && value > 0) || (isReverse && value < 0)
+                    ? -value
+                    : value;
+
+            case 'out':
+                return (!isReverse && value < 0) || (isReverse && value > 0)
+                    ? 0
+                    : value;
 
             default:
                 return value;

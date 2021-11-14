@@ -83,6 +83,19 @@ if (body.classList.contains('template-scrollerH')) {
     smoothScrollContiner2.init();
 }
 
+if (body.classList.contains('page-gsapHorizontal2')) {
+    const gsapHorizontalCustom = new GsapHorizontalCustomClass({
+        rootEl: '.test-custom-scroller',
+    });
+    gsapHorizontalCustom.init();
+    gsapHorizontalCustom.onTick(() => parallax.move());
+
+    const gsapHorizontalCustom2 = new GsapHorizontalCustomClass({
+        rootEl: '.test-custom-scroller2',
+    });
+    gsapHorizontalCustom2.init();
+}
+
 mouseManager.init();
 pageScroll.init();
 parallax.init();
@@ -103,17 +116,6 @@ if (
 )
     gsapTest.init();
 
-if (body.classList.contains('page-gsapHorizontal2')) {
-    const gsapHorizontalCustom = new GsapHorizontalCustomClass({
-        rootEl: '.test-custom-scroller',
-    });
-    gsapHorizontalCustom.init();
-
-    const gsapHorizontalCustom2 = new GsapHorizontalCustomClass({
-        rootEl: '.test-custom-scroller2',
-    });
-    gsapHorizontalCustom2.init();
-}
 if (body.classList.contains('page-store')) storeTest.init();
 animate.init();
 loadImageFromManifest.init();

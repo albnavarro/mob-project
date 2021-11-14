@@ -83,10 +83,11 @@ class ParallaxClass {
         // 1 - 10
         data.range = item.getAttribute('data-range') || 8;
 
-        // String: stop - back
+        // String: stop - back - out
         // Mandatory computationType = 'default'
         // stop: stop the calculation reached zero
         // back: revert the calculation reached zero
+        // out: move element only ofter reached 0
         data.onSwitch = item.getAttribute('data-onSwitch') || '';
 
         // String

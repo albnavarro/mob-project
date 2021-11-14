@@ -16,7 +16,8 @@ export class ParallaxItemClass {
         this.prevValue = 0;
         this.height = 0;
         this.width = 0;
-        this.wScroll = 0;
+        this.scrollerScroll = 0;
+        this.scrollerHeight = 0;
         this.applyElIsValid = false;
         this.transformProperty = Modernizr.prefixed('transform');
         this.req = null;
@@ -66,6 +67,7 @@ export class ParallaxItemClass {
         this.calcOffset();
         this.calcHeight();
         this.calcWidth();
+        this.getScrollerHeight();
 
         this.applyEl !== null
             ? (this.applyElIsValid = true)
@@ -179,30 +181,32 @@ export class ParallaxItemClass {
         }
     }
 
-    getScrollOffset() {
+    getScrollerOffset() {
         if (this.scroller === window) {
-            this.wScroll =
+            this.scrollerScroll =
                 this.direction === 'VERTICAL'
                     ? this.scroller.pageYOffset
                     : this.scroller.pageXOffset;
         } else {
-            this.wScroll =
+            this.scrollerScroll =
                 this.direction === 'VERTICAL'
                     ? -offset(this.scroller).top
                     : -offset(this.scroller).left;
         }
     }
 
-    getWindowsHeight() {
-        return this.direction === 'VERTICAL'
-            ? window.innerHeight
-            : window.innerWidth;
+    getScrollerHeight() {
+        this.scrollerHeight =
+            this.direction === 'VERTICAL'
+                ? window.innerHeight
+                : window.innerWidth;
     }
 
     refresh() {
         this.calcOffset();
         this.calcHeight();
         this.calcWidth();
+        this.getScrollerHeight();
         this.move();
     }
 
@@ -279,9 +283,9 @@ export class ParallaxItemClass {
     executeParallax(applyStyle = true) {
         if (!mq[this.queryType](this.breackpoint)) return;
 
-        this.getScrollOffset();
-        const scrollTop = this.wScroll;
-        const windowsHeight = this.getWindowsHeight();
+        this.getScrollerOffset();
+        const scrollTop = this.scrollerScroll;
+        const windowsHeight = this.scrollerHeight;
 
         if (
             !parallaxUtils.isInViewport({
@@ -330,8 +334,8 @@ export class ParallaxItemClass {
     }
 
     getFixedValue(applyStyle) {
-        const scrollTop = this.wScroll;
-        const windowsHeight = this.getWindowsHeight();
+        const scrollTop = this.scrollerScroll;
+        const windowsHeight = this.scrollerHeight;
         const height = this.height;
         const width = this.width;
         const selfWidth = this.selfWidth;
@@ -411,8 +415,8 @@ export class ParallaxItemClass {
     }
 
     getOpacityValue() {
-        const scrollTop = this.wScroll;
-        const windowsHeight = this.getWindowsHeight();
+        const scrollTop = this.scrollerScroll;
+        const windowsHeight = this.scrollerHeight;
 
         const offset = this.offset;
         const vhLimit = (windowsHeight / 100) * this.opacityEnd;
@@ -432,8 +436,8 @@ export class ParallaxItemClass {
     }
 
     getIsNaNValue() {
-        const scrollTop = this.wScroll;
-        const windowsHeight = this.getWindowsHeight();
+        const scrollTop = this.scrollerScroll;
+        const windowsHeight = this.scrollerHeight;
 
         const documentHeight =
             this.direction === 'VERTICAL'
@@ -466,8 +470,8 @@ export class ParallaxItemClass {
     }
 
     getIsANumberValue() {
-        const scrollTop = this.wScroll;
-        const windowsHeight = this.getWindowsHeight();
+        const scrollTop = this.scrollerScroll;
+        const windowsHeight = this.scrollerHeight;
 
         const align = this.align;
         const offset = this.offset;
@@ -486,8 +490,8 @@ export class ParallaxItemClass {
         } else {
             if (this.onSwitch !== 'back') return value;
 
-            const scrollTop = this.wScroll;
-            const windowsHeight = this.getWindowsHeight();
+            const scrollTop = this.scrollerScroll;
+            const windowsHeight = this.scrollerHeight;
 
             const opacityEnd = this.opacityEnd;
             const opacityStart = this.opacityStart;

@@ -22,6 +22,8 @@ export class GsapHorizontalCustomClass {
         this.shadow = this.mainContainer.querySelectorAll('[data-shadow]');
         this.shadowMainClass = 'scroller__shadowEl';
         this.shadowMainClassTransition = 'scroller__shadow';
+        //
+        this.callback = [];
 
         // GSAP store
         this.store = new SimpleStore({
@@ -41,6 +43,10 @@ export class GsapHorizontalCustomClass {
         eventManager.push('load', () => this.createShadow());
         eventManager.push('load', () => this.initGsap());
         eventManager.push('resize', () => this.onResize());
+    }
+
+    onTick(fn) {
+        this.callback.push(fn);
     }
 
     setDimension() {
@@ -234,6 +240,10 @@ export class GsapHorizontalCustomClass {
                         '--progress',
                         self.progress
                     );
+
+                    this.callback.forEach((item, i) => {
+                        item();
+                    });
                 },
             },
         });

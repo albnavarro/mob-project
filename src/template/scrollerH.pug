@@ -29,11 +29,21 @@ block content
                                 data-conponent='m-comp--parallax',
                                 data-direction='horizontal'
                                 data-scroller='.scrollerH-container .scrollerH'
-                                data-onSwitch='stop'
+                                data-onSwitch='out'
+                                data-range='4'
                                 data-reverse
                                 data-smoothType='linear'
                                 data-propierties='horizontal')
-                                |test
+                                .parallax__item(
+                                    data-conponent='m-comp--parallax',
+                                    data-direction='horizontal'
+                                    data-scroller='.scrollerH-container .scrollerH'
+                                    data-onSwitch='stop'
+                                    data-range='9'
+                                    data-reverse
+                                    data-smoothType='linear'
+                                    data-propierties='horizontal')
+                                    |test
                     .scrollerH__item
                         .parallax__container(style="display:inline-block;")
                             .parallax__item(
