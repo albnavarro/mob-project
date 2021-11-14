@@ -117,49 +117,28 @@ export class ParallaxItemClass {
     }
 
     calcOffset() {
-        if (this.triggerEl === null) {
-            if (this.direction === 'VERTICAL') {
-                this.offset =
-                    this.scroller !== window
-                        ? parseInt(offset(this.container).top) -
-                          offset(this.scroller).top
-                        : parseInt(offset(this.container).top);
-            } else {
-                this.offset =
-                    this.scroller !== window
-                        ? parseInt(offset(this.container).left) -
-                          offset(this.scroller).left
-                        : parseInt(offset(this.container).left);
-            }
+        const el = this.triggerEl === null ? this.container : this.triggerEl;
+
+        if (this.direction === 'VERTICAL') {
+            this.offset =
+                this.scroller !== window
+                    ? parseInt(offset(el).top) - offset(this.scroller).top
+                    : parseInt(offset(el).top);
         } else {
-            if (this.direction === 'VERTICAL') {
-                this.offset =
-                    this.scroller !== window
-                        ? parseInt(offset(this.triggerEl).top) -
-                          offset(this.scroller).top
-                        : parseInt(offset(this.triggerEl).top);
-            } else {
-                this.offset =
-                    this.scroller !== window
-                        ? parseInt(offset(this.triggerEl).left) -
-                          offset(this.scroller).left
-                        : parseInt(offset(this.triggerEl).left);
-            }
+            this.offset =
+                this.scroller !== window
+                    ? parseInt(offset(el).left) - offset(this.scroller).left
+                    : parseInt(offset(el).left);
         }
     }
 
     calcHeight() {
-        if (this.triggerEl == null) {
-            this.height =
-                this.direction === 'VERTICAL'
-                    ? parseInt(outerHeight(this.container))
-                    : parseInt(outerWidth(this.container));
-        } else {
-            this.height =
-                this.direction === 'VERTICAL'
-                    ? parseInt(outerHeight(this.triggerEl))
-                    : parseInt(outerWidth(this.triggerEl));
-        }
+        const el = this.triggerEl === null ? this.container : this.triggerEl;
+
+        this.height =
+            this.direction === 'VERTICAL'
+                ? parseInt(outerHeight(el))
+                : parseInt(outerWidth(el));
     }
 
     calcWidth() {
@@ -168,17 +147,11 @@ export class ParallaxItemClass {
                 ? parseInt(outerWidth(this.item))
                 : parseInt(outerHeight(this.item));
 
-        if (this.triggerEl == null) {
-            this.width =
-                this.direction === 'VERTICAL'
-                    ? parseInt(outerWidth(this.container))
-                    : parseInt(outerHeight(this.container));
-        } else {
-            this.width =
-                this.direction === 'VERTICAL'
-                    ? parseInt(outerWidth(this.triggerEl))
-                    : parseInt(outerHeight(this.triggerEl));
-        }
+        const el = this.triggerEl === null ? this.container : this.triggerEl;
+        this.width =
+            this.direction === 'VERTICAL'
+                ? parseInt(outerWidth(el))
+                : parseInt(outerHeight(el));
     }
 
     getScrollerOffset() {
