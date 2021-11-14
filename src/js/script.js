@@ -88,7 +88,6 @@ if (body.classList.contains('page-gsapHorizontal2')) {
         rootEl: '.test-custom-scroller',
     });
     gsapHorizontalCustom.init();
-    gsapHorizontalCustom.onTick(() => parallax.move());
 
     const gsapHorizontalCustom2 = new GsapHorizontalCustomClass({
         rootEl: '.test-custom-scroller2',
