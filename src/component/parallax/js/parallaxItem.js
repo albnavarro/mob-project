@@ -5,6 +5,7 @@ import {
     outerHeight,
     outerWidth,
     offset,
+    position,
 } from '../../../js/utility/vanillaFunction.js';
 import { parallaxUtils } from './parallaxUtils.js';
 
@@ -31,6 +32,10 @@ export class ParallaxItemClass {
             data.scroller === window
                 ? window
                 : document.querySelector(data.scroller);
+        this.screen =
+            data.screen === window
+                ? window
+                : document.querySelector(data.screen);
 
         //Fixed prop
         this.fixedInward = data.fixedInward;
@@ -67,7 +72,7 @@ export class ParallaxItemClass {
         this.calcOffset();
         this.calcHeight();
         this.calcWidth();
-        this.getScrollerHeight();
+        this.getScreenHeight();
 
         this.applyEl !== null
             ? (this.applyElIsValid = true)
@@ -119,7 +124,7 @@ export class ParallaxItemClass {
     calcOffset() {
         const el = this.triggerEl === null ? this.container : this.triggerEl;
 
-        if (this.direction === 'VERTICAL') {
+        if (this.direction === 'vertical') {
             this.offset =
                 this.scroller !== window
                     ? parseInt(offset(el).top) - offset(this.scroller).top
@@ -130,26 +135,26 @@ export class ParallaxItemClass {
                     ? parseInt(offset(el).left) - offset(this.scroller).left
                     : parseInt(offset(el).left);
         }
+
+        if (this.screen !== window) {
+            this.direction === 'vertical'
+                ? (this.offset -= parseInt(position(this.screen).top))
+                : (this.offset -= parseInt(position(this.screen).left));
+        }
     }
 
     calcHeight() {
         const el = this.triggerEl === null ? this.container : this.triggerEl;
-
         this.height =
-            this.direction === 'VERTICAL'
+            this.direction === 'vertical'
                 ? parseInt(outerHeight(el))
                 : parseInt(outerWidth(el));
     }
 
     calcWidth() {
-        this.selfWidth =
-            this.direction === 'VERTICAL'
-                ? parseInt(outerWidth(this.item))
-                : parseInt(outerHeight(this.item));
-
         const el = this.triggerEl === null ? this.container : this.triggerEl;
         this.width =
-            this.direction === 'VERTICAL'
+            this.direction === 'vertical'
                 ? parseInt(outerWidth(el))
                 : parseInt(outerHeight(el));
     }
@@ -157,29 +162,36 @@ export class ParallaxItemClass {
     getScrollerOffset() {
         if (this.scroller === window) {
             this.scrollerScroll =
-                this.direction === 'VERTICAL'
+                this.direction === 'vertical'
                     ? this.scroller.pageYOffset
                     : this.scroller.pageXOffset;
         } else {
             this.scrollerScroll =
-                this.direction === 'VERTICAL'
+                this.direction === 'vertical'
                     ? -offset(this.scroller).top
                     : -offset(this.scroller).left;
         }
     }
 
-    getScrollerHeight() {
-        this.scrollerHeight =
-            this.direction === 'VERTICAL'
-                ? window.innerHeight
-                : window.innerWidth;
+    getScreenHeight() {
+        if (this.screen === window) {
+            this.scrollerHeight =
+                this.direction === 'vertical'
+                    ? window.innerHeight
+                    : window.innerWidth;
+        } else {
+            this.scrollerHeight =
+                this.direction === 'vertical'
+                    ? parseInt(this.screen.offsetHeight)
+                    : parseInt(this.screen.offsetWidth);
+        }
     }
 
     refresh() {
         this.calcOffset();
         this.calcHeight();
         this.calcWidth();
-        this.getScrollerHeight();
+        this.getScreenHeight();
         this.move();
     }
 
@@ -311,7 +323,6 @@ export class ParallaxItemClass {
         const windowsHeight = this.scrollerHeight;
         const height = this.height;
         const width = this.width;
-        const selfWidth = this.selfWidth;
         const offset = this.offset;
         const fixedInward = this.fixedInward;
         const fixedStartOff = this.fixedStartOff;
@@ -350,11 +361,10 @@ export class ParallaxItemClass {
 
         switch (this.propierties) {
             case 'horizontal':
+            case 'vertical':
                 return {
                     applyStyleComputed,
-                    value:
-                        -((width / 100) * percent) -
-                        (selfWidth / 100) * percent,
+                    value: -((width / 100) * percent),
                 };
 
             case 'scale':
@@ -377,12 +387,6 @@ export class ParallaxItemClass {
                 return {
                     applyStyleComputed,
                     value: percent,
-                };
-
-            default:
-                return {
-                    applyStyleComputed,
-                    value,
                 };
         }
     }
@@ -413,7 +417,7 @@ export class ParallaxItemClass {
         const windowsHeight = this.scrollerHeight;
 
         const documentHeight =
-            this.direction === 'VERTICAL'
+            this.direction === 'vertical'
                 ? document.documentElement.scrollHeight
                 : document.documentElement.scrollWidth;
         const range = this.range;

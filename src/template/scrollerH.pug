@@ -56,19 +56,17 @@ block content
                                 data-propierties='opacity')
                                 |test
                     .scrollerH__item
-                        .pluto(style='width:50vw;height:50vw;border:1px #000 solid;text-align:center;')
-                            .parallax__container(style="display:inline-block;")
+                        .pluto(style='width:200px;height:150px;border:1px #000 solid;')
+                            .parallax__container(style="display:inline-block;border:1px #000 solid;")
                                 .parallax__item(
                                     data-conponent='m-comp--parallax',
                                     data-direction='horizontal'
                                     data-scroller='.scrollerH-container .scrollerH'
                                     data-computationType='fixed'
-                            
                                     data-triggerEl='.pluto'
                                     data-smoothType='linear'
-                                    data-range='50'
-                                    data-fixedOffset='50'
-                                    data-propierties='horizontal')
+                                    data-reverse
+                                    data-range='100')
                                     |test
                     .scrollerH__item
                         
@@ -77,7 +75,32 @@ block content
                     .scrollerH2__item
                     .scrollerH2__item
                     .scrollerH2__item
+                        .parallax__container(style="display:inline-block;")
+                            .parallax__item(
+                                data-conponent='m-comp--parallax',
+                                data-direction='horizontal'
+                                data-scroller='.scrollerH-container2 .scrollerH2'
+                                data-screen='.scrollerH-container2'
+                                data-smoothType='linear'
+                                data-reverse
+                                data-onSwitch='stop'
+                                data-propierties='horizontal')
+                                |test
                     .scrollerH2__item
+                        .pluto2(style='width:300px;height:100px;border:1px #000 solid;')
+                            .parallax__container(style="display:inline-block;")
+                                .parallax__item(
+                                    data-conponent='m-comp--parallax',
+                                    data-direction='horizontal'
+                                    data-scroller='.scrollerH-container2 .scrollerH2'
+                                    data-screen='.scrollerH-container2'
+                                    data-computationType='fixed'
+                                    data-triggerEl='.pluto2'
+                                    data-reverse
+                                    data-range='100'
+                                    data-propierties='horizontal'
+                                    data-smoothType='linear')
+                                    |test
                     .scrollerH2__item
                     .scrollerH2__item
                     .scrollerH2__item

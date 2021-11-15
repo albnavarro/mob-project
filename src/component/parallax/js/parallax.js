@@ -51,10 +51,13 @@ class ParallaxClass {
             item.getAttribute('data-computationType') || 'default';
 
         // String: 'VERTICAL' || 'HORIZONTAL'
-        data.direction = item.getAttribute('data-direction') || 'VERTICAL';
+        data.direction = item.getAttribute('data-direction') || 'vertical';
 
         // Custom container with a transate movement
         data.scroller = item.getAttribute('data-scroller') || window;
+
+        // Custom screen
+        data.screen = item.getAttribute('data-screen') || window;
 
         // FIXED PROPS
 
