@@ -80,17 +80,22 @@ class ParallaxClass {
         // Inhibits the application of the minimum value
         data.fixedStartOff = item.hasAttribute('data-fixedStartOff');
 
+        // Boolean
+        // start animation form opposite side ( top in vetical, right in horizontal)
+        data.fixedInvertSide = item.hasAttribute('data-fixedInvertSide');
+
         // LINEAR PROPS
         // String
         // Mandatory computationType = 'default'
         // 1 - 10
         data.range = item.getAttribute('data-range') || 8;
 
-        // String: stop - back - out
+        // String: in-stop - in-back - out-stop - out-back
         // Mandatory computationType = 'default'
-        // stop: stop the calculation reached zero
-        // back: revert the calculation reached zero
-        // out: move element only ofter reached 0
+        // in-stop: stop the calculation reached zero
+        // in-back : revert the calculation reached zero
+        // out-stop: move element only ofter reached 0
+        // out-back
         data.onSwitch = item.getAttribute('data-onSwitch') || '';
 
         // String

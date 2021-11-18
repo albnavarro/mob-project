@@ -28,7 +28,7 @@ export const parallaxUtils = {
         );
     },
 
-    getFixedElementAlign({
+    getFixedElementAlignNatural({
         scrollTop,
         windowsHeight,
         startPoint,
@@ -38,6 +38,22 @@ export const parallaxUtils = {
         if (scrollTop + windowsHeight - startPoint < offset) {
             return 'OVER';
         } else if (scrollTop + windowsHeight - startPoint > offset + height) {
+            return 'DOWN';
+        } else {
+            return 'INSIDE';
+        }
+    },
+
+    getFixedElementAlignInvert({
+        scrollTop,
+        windowsHeight,
+        startPoint,
+        offset,
+        height,
+    }) {
+        if (scrollTop + startPoint < offset) {
+            return 'OVER';
+        } else if (scrollTop + startPoint > offset + height) {
             return 'DOWN';
         } else {
             return 'INSIDE';
@@ -75,19 +91,24 @@ export const parallaxUtils = {
 
     getValueOnSwitchNoPacity({ switchPropierties, isReverse, value }) {
         switch (switchPropierties) {
-            case 'stop':
+            case 'in-stop':
                 return (!isReverse && value > 0) || (isReverse && value < 0)
                     ? 0
                     : value;
 
-            case 'back':
+            case 'in-back':
                 return (!isReverse && value > 0) || (isReverse && value < 0)
                     ? -value
                     : value;
 
-            case 'out':
+            case 'out-stop':
                 return (!isReverse && value < 0) || (isReverse && value > 0)
                     ? 0
+                    : value;
+
+            case 'out-back':
+                return (!isReverse && value < 0) || (isReverse && value > 0)
+                    ? -value
                     : value;
 
             default:

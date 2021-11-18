@@ -42,9 +42,12 @@ export class ParallaxItemClass {
         this.fixedOffset = data.fixedOffset;
         this.fixedEndOff = data.fixedEndOff;
         this.fixedStartOff = data.fixedStartOff;
+        this.fixedInvertSide = data.fixedInvertSide;
 
         //Lienar prop
         this.align = data.align;
+
+        // Opacity Prop
         this.opacityStart = data.opacityStart;
         this.opacityEnd = data.opacityEnd;
         this.onSwitch = data.onSwitch;
@@ -138,7 +141,7 @@ export class ParallaxItemClass {
 
         if (this.screen !== window) {
             this.direction === 'vertical'
-                ? (this.offset -= parseInt(position(this.screen).top))
+                ? (this.offset += parseInt(position(this.screen).top))
                 : (this.offset -= parseInt(position(this.screen).left));
         }
     }
@@ -321,6 +324,7 @@ export class ParallaxItemClass {
     getFixedValue(applyStyle) {
         const scrollTop = this.scrollerScroll;
         const windowsHeight = this.scrollerHeight;
+        const invertEnterSide = this.fixedInvertSide;
         const height = this.height;
         const width = this.width;
         const offset = this.offset;
@@ -330,22 +334,29 @@ export class ParallaxItemClass {
         const range = this.range;
         const fixedOffset = this.fixedOffset;
         const startPoint = (windowsHeight / 100) * fixedOffset; //sp = Start point calculated in vh
-        const partials = -(
-            scrollTop +
-            windowsHeight -
-            startPoint -
-            (offset + height)
-        );
+
+        const partials = !invertEnterSide
+            ? -(scrollTop + windowsHeight - startPoint - (offset + height))
+            : -(scrollTop + startPoint - (offset + height));
+
         const maxVal = (height / 100) * range;
         const partialVal = (partials / 100) * range;
 
-        const elementAlign = parallaxUtils.getFixedElementAlign({
-            scrollTop,
-            windowsHeight,
-            startPoint,
-            offset,
-            height,
-        });
+        const elementAlign = !invertEnterSide
+            ? parallaxUtils.getFixedElementAlignNatural({
+                  scrollTop,
+                  windowsHeight,
+                  startPoint,
+                  offset,
+                  height,
+              })
+            : parallaxUtils.getFixedElementAlignInvert({
+                  scrollTop,
+                  windowsHeight,
+                  startPoint,
+                  offset,
+                  height,
+              });
 
         const { value, applyStyleComputed } =
             parallaxUtils.getFixedValueByAlign(elementAlign)({

@@ -82,6 +82,7 @@ if (body.classList.contains('template-scrollerH')) {
         drag: true,
     });
     smoothScrollContiner2.init();
+    smoothScrollContiner2.onTick(() => parallax.move());
 }
 
 if (body.classList.contains('page-gsapHorizontal2')) {
