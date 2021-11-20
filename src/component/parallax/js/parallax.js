@@ -91,7 +91,7 @@ class ParallaxClass {
         data.range = item.getAttribute('data-range') || 8;
 
         // String: in-stop - in-back - out-stop - out-back
-        // Mandatory computationType = 'default'
+        // Mandatory computationType = 'default' doasn't work with opacity
         // in-stop: stop the calculation reached zero
         // in-back : revert the calculation reached zero
         // out-stop: move element only ofter reached 0

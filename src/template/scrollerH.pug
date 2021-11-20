@@ -134,8 +134,41 @@ block content
                 .scrollerH3
                     .scrollerH3__item
                     .scrollerH3__item
+                        .pluto6(style='width:300px;height:100px;border:1px #000 solid;')
+                        .pluto5(style='width:300px;height:100px;border:1px #000 solid;')
+                            .parallax__container(style="display:inline-block;border:1px #000 solid;")
+                                .parallax__item(
+                                    data-conponent='m-comp--parallax',
+                                    data-scroller='.scrollerH-container3 .scrollerH3'
+                                    data-screen='.scrollerH-container3'
+                                    data-computationType='fixed'
+                                    data-triggerEl='.pluto5'
+                                    data-reverse
+                                    data-propierties="horizontal"
+                                    data-smoothType='linear'
+                                    data-range='100')
+                                    .parallax__item(
+                                        data-conponent='m-comp--parallax',
+                                        data-fixedInvertSide
+                                        data-scroller='.scrollerH-container3 .scrollerH3'
+                                        data-screen='.scrollerH-container3'
+                                        data-computationType='fixed'
+                                        data-triggerEl='.pluto6'
+                                        data-propierties="horizontal"
+                                        data-smoothType='linear'
+                                        data-range='100')
+                                        |test
                     .scrollerH3__item
                     .scrollerH3__item
+                        .parallax__container(style="display:inline-block;")
+                            .parallax__item(
+                                data-conponent='m-comp--parallax',
+                                data-scroller='.scrollerH-container3 .scrollerH3'
+                                data-screen='.scrollerH-container3'
+                                data-smoothType='linear'
+                                data-onSwitch='out-stop'
+                                data-propierties='horizontal')
+                                |test
                     .scrollerH3__item
                     .scrollerH3__item
                     .scrollerH3__item

@@ -89,7 +89,7 @@ export const parallaxUtils = {
         };
     },
 
-    getValueOnSwitchNoPacity({ switchPropierties, isReverse, value }) {
+    getValueOnSwitch({ switchPropierties, isReverse, value }) {
         switch (switchPropierties) {
             case 'in-stop':
                 return (!isReverse && value > 0) || (isReverse && value < 0)
@@ -116,43 +116,6 @@ export const parallaxUtils = {
         }
     },
 
-    getOpacityElementAlign({
-        isReverse,
-        elementOffset,
-        limitTop,
-        limitBottom,
-    }) {
-        if (elementOffset >= limitTop && elementOffset <= limitBottom) {
-            return 'INSIDE';
-        } else if (elementOffset < limitTop && !isReverse) {
-            return 'OVER';
-        } else if (elementOffset < limitTop && isReverse) {
-            return 'OVER-REVERSE';
-        }
-    },
-
-    getOpacityValueByAlign(elementAlign) {
-        return (val) => {
-            switch (elementAlign) {
-                case 'INSIDE':
-                    const valStep1 = val > 1.999 ? 1.999 : val;
-                    const valStep2 = valStep1 < 0 ? -valStep1 : valStep1;
-                    const valStep3 =
-                        valStep2 > 1 ? 1 - (valStep2 % 1) : valStep2;
-                    return valStep3;
-
-                case 'OVER':
-                    return 0;
-
-                case 'OVER-REVERSE':
-                    return -val;
-
-                default:
-                    return val;
-            }
-        };
-    },
-
     getRetReverseValue(propierties, val) {
         switch (propierties) {
             case 'opacity':
@@ -161,5 +124,9 @@ export const parallaxUtils = {
             default:
                 return -val;
         }
+    },
+
+    clamp(num, min, max) {
+        return Math.min(Math.max(num, min), max);
     },
 };

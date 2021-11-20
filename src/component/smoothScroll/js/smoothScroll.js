@@ -1,14 +1,7 @@
 import { eventManager } from '../../../js/base/eventManager.js';
 import { mouseManager } from '../../../js/base/mouseManager.js';
 import { normalizeWheel } from './normalizeWhell.js';
-import {
-    outerHeight,
-    outerWidth,
-    offset,
-} from '../../../js/utility/vanillaFunction.js';
 import { getTranslateValues } from '../../../js/utility/getTranslateValues.js';
-
-import { parallax } from '../../parallax/js/parallax.js';
 
 export class SmoothScrollClass {
     constructor(data = {}) {
@@ -116,12 +109,12 @@ export class SmoothScrollClass {
         this.containerWidth =
             this.container === document.documentElement
                 ? document.documentElement.clientWidth
-                : outerWidth(this.container);
+                : this.container.offsetWidth;
 
         this.containerHeight =
             this.container === document.documentElement
                 ? document.documentElement.clientHeight
-                : outerHeight(this.container);
+                : this.container.offsetHeight;
 
         const resetValue = (() => {
             if (
@@ -233,7 +226,7 @@ export class SmoothScrollClass {
                 const value =
                     this.target === document.documentElement
                         ? this.target.scrollHeight
-                        : outerHeight(this.target);
+                        : this.target.offsetHeight;
 
                 // Clamped result
                 const result = Math.max(
@@ -251,7 +244,7 @@ export class SmoothScrollClass {
                 const value =
                     this.target === document.documentElement
                         ? this.target.scrollWidth
-                        : outerWidth(this.target);
+                        : this.target.offsetWidth;
 
                 // Clamped result
                 const result = Math.max(
