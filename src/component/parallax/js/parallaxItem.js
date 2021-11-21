@@ -1,12 +1,7 @@
 import { eventManager } from '../../../js/base/eventManager.js';
 import { modernzier } from '../../../js/utility/modernizr.js';
 import { mq } from '../../../js/base/mediaManager.js';
-import {
-    outerHeight,
-    outerWidth,
-    offset,
-    position,
-} from '../../../js/utility/vanillaFunction.js';
+import { offset, position } from '../../../js/utility/vanillaFunction.js';
 import { parallaxUtils } from './parallaxUtils.js';
 
 export class ParallaxItemClass {
@@ -26,7 +21,6 @@ export class ParallaxItemClass {
 
         // 'PROPS'
         this.item = data.item;
-        this.container = data.container;
         this.direction = data.direction;
         this.scroller =
             data.scroller === window
@@ -57,8 +51,8 @@ export class ParallaxItemClass {
         this.computationType = data.computationType;
         this.perspective = data.perspective;
         this.applyEl = data.applyEl;
-        (this.triggerEl = document.querySelector(data.triggerEl)),
-            (this.breackpoint = data.breackpoint);
+        this.triggerEl = document.querySelector(data.triggerEl);
+        this.breackpoint = data.breackpoint;
         this.queryType = data.queryType;
         this.limiterOff = data.limiterOff;
         this.jsDelta = data.jsDelta;
@@ -72,6 +66,7 @@ export class ParallaxItemClass {
     init() {
         if (this.computationType == 'fixed') this.limiterOff = true;
 
+        this.item.classList.add('parallax__item');
         this.calcOffset();
         this.calcHeight();
         this.calcWidth();
@@ -89,9 +84,10 @@ export class ParallaxItemClass {
         if (this.perspective !== null) {
             const style = {
                 perspective: `${this.perspective}px`,
+                'transform-style': 'preserve-3d',
             };
-            Object.assign(this.container.style, style);
-            this.item.classList.add('parallax__item--3d');
+            const parent = this.item.parentNode;
+            Object.assign(parent.style, style);
         }
 
         switch (this.ease) {
@@ -103,7 +99,8 @@ export class ParallaxItemClass {
             case 'smooth':
                 switch (this.smoothType) {
                     case 'css':
-                        this.item.classList.add('smooth-transition');
+                        this.item.style.transition =
+                            'transform 1s cubic-bezier(0.305, 0.55, 0.47, 1.015)';
                         eventManager.push(
                             'scrollThrottle',
                             this.executeParallax.bind(this)
@@ -125,7 +122,7 @@ export class ParallaxItemClass {
     }
 
     calcOffset() {
-        const el = this.triggerEl === null ? this.container : this.triggerEl;
+        const el = this.triggerEl === null ? this.item : this.triggerEl;
 
         if (this.direction === 'vertical') {
             this.offset =
@@ -147,7 +144,7 @@ export class ParallaxItemClass {
     }
 
     calcHeight() {
-        const el = this.triggerEl === null ? this.container : this.triggerEl;
+        const el = this.triggerEl === null ? this.item : this.triggerEl;
         this.height =
             this.direction === 'vertical'
                 ? parseInt(el.offsetHeight)
@@ -155,7 +152,7 @@ export class ParallaxItemClass {
     }
 
     calcWidth() {
-        const el = this.triggerEl === null ? this.container : this.triggerEl;
+        const el = this.triggerEl === null ? this.item : this.triggerEl;
         this.width =
             this.direction === 'vertical'
                 ? parseInt(el.offsetWidth)
@@ -223,8 +220,8 @@ export class ParallaxItemClass {
             this.req = requestAnimationFrame(this.onReuqestAnim.bind(this));
     }
 
-    onReuqestAnim(timeStamp) {
-        const draw = (timeStamp) => {
+    onReuqestAnim() {
+        const draw = () => {
             this.prevValue = this.startValue;
 
             const s = this.startValue,
@@ -232,28 +229,29 @@ export class ParallaxItemClass {
                 v = this.jsDelta,
                 val = (f - s) / v + s * 1;
 
-            this.startValue = val.toFixed(4);
-
-            if (this.applyElIsValid) {
-                Object.assign(
-                    this.applyEl.style,
-                    this.getStyle(this.startValue)
-                );
-            } else {
-                Object.assign(this.item.style, this.getStyle(this.startValue));
-            }
+            this.startValue = val.toFixed(3);
+            this.updateStyle(this.startValue);
 
             // La RAF viene "rigenerata" fino a quando tutti gli elementi rimangono fermi
             if (this.prevValue == this.startValue) {
                 cancelAnimationFrame(this.req);
                 this.req = null;
+                this.updateStyle(this.endValue);
                 return;
             }
 
             this.req = requestAnimationFrame(draw);
         };
 
-        draw(timeStamp);
+        draw();
+    }
+
+    updateStyle(val) {
+        if (this.applyElIsValid) {
+            Object.assign(this.applyEl.style, this.getStyle(val));
+        } else {
+            Object.assign(this.item.style, this.getStyle(val));
+        }
     }
 
     executeParallax(applyStyle = true) {
@@ -301,12 +299,7 @@ export class ParallaxItemClass {
         }
 
         if (!applyStyle) return;
-
-        if (this.applyElIsValid) {
-            Object.assign(this.applyEl.style, this.getStyle(this.endValue));
-        } else {
-            Object.assign(this.item.style, this.getStyle(this.endValue));
-        }
+        this.updateStyle(this.endValue);
     }
 
     getFixedValue(applyStyle) {

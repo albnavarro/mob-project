@@ -42,10 +42,6 @@ class ParallaxClass {
         const data = {};
         data.item = item;
 
-        // String: DOM element
-        // Reference element to retrieve height and offset
-        data.container = item.closest('.parallax__container');
-
         // String: fixed || default
         data.computationType =
             item.getAttribute('data-computationType') || 'default';
@@ -73,11 +69,13 @@ class ParallaxClass {
         // Boolean
         // Mandatory computationType = 'fixed'
         // Inhibits the application of the maximum value
+        // Dont use with ease === 'smooth'
         data.fixedEndOff = item.hasAttribute('data-fixedEndOff');
 
         // Boolean
         // Mandatory computationType = 'fixed'
         // Inhibits the application of the minimum value
+        // Dont use with ease === 'smooth'
         data.fixedStartOff = item.hasAttribute('data-fixedStartOff');
 
         // Boolean
