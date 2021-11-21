@@ -280,10 +280,9 @@ export class ParallaxItemClass {
 
                     default:
                         if (Number.isNaN(parseInt(this.align))) {
-                            this.endValue = this.getIsNaNValue().toFixed(1) / 2;
+                            this.endValue = this.getIsNaNValue() / 2;
                         } else {
-                            this.endValue =
-                                this.getIsANumberValue().toFixed(1) / 2;
+                            this.endValue = this.getIsANumberValue() / 2;
                         }
                         break;
                 }
@@ -501,7 +500,7 @@ export class ParallaxItemClass {
                 return {
                     [this
                         .transformProperty]: `translate3d(0,0,0) scale(${scaleVal.toFixed(
-                        2
+                        3
                     )})`,
                 };
 
