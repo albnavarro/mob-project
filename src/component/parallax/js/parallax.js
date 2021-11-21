@@ -60,7 +60,7 @@ class ParallaxClass {
         // Boolean
         // Mandatory computationType = 'fixed'
         // Inverts the calculated minimum and maximum values
-        data.fixedInward = item.hasAttribute('data-fixedInward');
+        data.fixedFromTo = item.hasAttribute('data-fixedFromTo');
 
         // String: 0 to infinite
         // shilft animation start 0 - 100 -> vh value
@@ -123,12 +123,12 @@ class ParallaxClass {
         // String: DOM element
         // Custom element on which to apply the calculated values
         // Default itself
-        data.applyEl =
-            document.querySelector(item.getAttribute('data-applyEl')) || null;
+        data.applyTo =
+            document.querySelector(item.getAttribute('data-applyTo')) || null;
 
         // String: DOM element
         // Performs calculations based on another element of the DOM at your choice
-        data.triggerEl = item.getAttribute('data-triggerEl') || null;
+        data.scrollTrigger = item.getAttribute('data-scrollTrigger') || null;
 
         // String
         data.breackpoint = item.getAttribute('data-breackpoint') || 'desktop';
@@ -144,7 +144,7 @@ class ParallaxClass {
 
         // String
         // 1 - 10
-        data.jsDelta = item.getAttribute('data-jsDelta') || 8;
+        data.scrub = item.getAttribute('data-scrub') || 8;
 
         // Boolean
         // Mandatory computationType = 'default'
@@ -153,7 +153,7 @@ class ParallaxClass {
 
         // String
         // Linear || smooth
-        data.ease = item.getAttribute('data-ease') || 'linear';
+        data.ease = item.hasAttribute('data-ease');
 
         // String
         // vertical , horizontal , rotate , border-width , opacity, scale
@@ -162,7 +162,7 @@ class ParallaxClass {
         // String
         // ccs || js
         // Ease calculated in css or js
-        data.smoothType = item.getAttribute('data-smoothType') || 'js';
+        data.easeType = item.getAttribute('data-easeType') || 'js';
 
         return data;
     }

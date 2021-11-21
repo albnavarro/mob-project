@@ -62,7 +62,7 @@ export const parallaxUtils = {
 
     getFixedValueByAlign(elementAlign) {
         return ({
-            fixedInward,
+            fixedFromTo,
             maxVal,
             fixedStartOff,
             applyStyle,
@@ -72,17 +72,17 @@ export const parallaxUtils = {
             switch (elementAlign) {
                 case 'OVER':
                     return {
-                        value: fixedInward ? maxVal : 0,
+                        value: fixedFromTo ? maxVal : 0,
                         applyStyleComputed: fixedStartOff ? false : applyStyle,
                     };
                 case 'DOWN':
                     return {
-                        value: fixedInward ? 0 : -maxVal,
+                        value: fixedFromTo ? 0 : -maxVal,
                         applyStyleComputed: fixedEndOff ? false : applyStyle,
                     };
                 case 'INSIDE':
                     return {
-                        value: fixedInward ? partialVal : partialVal - maxVal,
+                        value: fixedFromTo ? partialVal : partialVal - maxVal,
                         applyStyleComputed: applyStyle,
                     };
             }
