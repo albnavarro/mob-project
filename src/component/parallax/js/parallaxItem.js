@@ -14,52 +14,54 @@ export class ParallaxItemClass {
         this.width = 0;
         this.scrollerScroll = 0;
         this.scrollerHeight = 0;
-        this.applyToIsValid = false;
         this.transformProperty = Modernizr.prefixed('transform');
         this.req = null;
         this.gap = 150;
 
         // 'PROPS'
         this.item = data.item;
-        this.direction = data.direction;
-        this.scroller =
-            data.scroller === window
-                ? window
-                : document.querySelector(data.scroller);
-        this.screen =
-            data.screen === window
-                ? window
-                : document.querySelector(data.screen);
+        this.direction = data.direction || 'vertical';
+        this.scroller = data.scroller
+            ? document.querySelector(data.scroller)
+            : window;
+
+        this.screen = data.screen
+            ? document.querySelector(data.screen)
+            : window;
 
         //Fixed prop
-        this.fixedFromTo = data.fixedFromTo;
-        this.fixedOffset = data.fixedOffset;
-        this.fixedEndOff = data.fixedEndOff;
-        this.fixedStartOff = data.fixedStartOff;
-        this.fixedInvertSide = data.fixedInvertSide;
+        this.fixedFromTo = data.fixedFromTo || false;
+        this.fixedOffset = data.fixedOffset || 0;
+        this.fixedEndOff = data.fixedEndOff || false;
+        this.fixedStartOff = data.fixedStartOff || false;
+        this.fixedInvertSide = data.fixedInvertSide || false;
 
         //Lienar prop
-        this.align = data.align;
+        this.align = data.align || 'center';
 
         // Opacity Prop
-        this.opacityStart = data.opacityStart;
-        this.opacityEnd = data.opacityEnd;
-        this.onSwitch = data.onSwitch;
+        this.opacityStart = data.opacityStart || 100;
+        this.opacityEnd = data.opacityEnd || 0;
+        this.onSwitch = data.onSwitch || false;
 
         // Common prop
-        this.range = data.range;
-        this.computationType = data.computationType;
-        this.perspective = data.perspective;
-        this.applyTo = data.applyTo;
-        this.scrollTrigger = document.querySelector(data.scrollTrigger);
-        this.breackpoint = data.breackpoint;
-        this.queryType = data.queryType;
-        this.limiterOff = data.limiterOff;
-        this.scrub = data.scrub;
-        this.reverse = data.reverse;
-        this.ease = data.ease;
-        this.propierties = data.propierties;
-        this.easeType = data.easeType;
+        this.computationType = data.computationType || 'default';
+        this.range =
+            data.range ||
+            (() => (this.computationType === 'default' ? 8 : 100))();
+        this.perspective = data.perspective || false;
+        this.applyTo = data.applyTo || false;
+        this.scrollTrigger = data.scrollTrigger
+            ? document.querySelector(data.scrollTrigger)
+            : null;
+        this.breackpoint = data.breackpoint || 'desktop';
+        this.queryType = data.queryType || 'min';
+        this.limiterOff = data.limiterOff || false;
+        this.scrub = data.scrub || 8;
+        this.reverse = data.reverse || false;
+        this.ease = data.ease || false;
+        this.propierties = data.propierties || 'vertical';
+        this.easeType = data.easeType || 'js';
         //
     }
 
@@ -72,16 +74,12 @@ export class ParallaxItemClass {
         this.calcWidth();
         this.getScreenHeight();
 
-        this.applyTo !== null
-            ? (this.applyToIsValid = true)
-            : (this.applyToIsValid = false);
-
         if (this.computationType != 'fixed')
             this.range = parallaxUtils.normalizeRange(this.range);
 
         this.scrub = parallaxUtils.normalizeVelocity(this.scrub);
 
-        if (this.perspective !== null) {
+        if (this.perspective) {
             const style = {
                 perspective: `${this.perspective}px`,
                 'transform-style': 'preserve-3d',
@@ -238,7 +236,7 @@ export class ParallaxItemClass {
     }
 
     updateStyle(val) {
-        if (this.applyToIsValid) {
+        if (this.applyTo) {
             Object.assign(this.applyTo.style, this.getStyle(val));
         } else {
             Object.assign(this.item.style, this.getStyle(val));

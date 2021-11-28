@@ -32,6 +32,7 @@ class AccordionClass {
         data.breackpoint = item.getAttribute('data-breackpoint') || 'x-small';
         data.queryType = item.getAttribute('data-queryType') || 'min';
         data.multiple = item.hasAttribute('data-multiple');
+        data.notAllClose = item.hasAttribute('data-notAllClose');
 
         return data;
     }

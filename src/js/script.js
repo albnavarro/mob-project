@@ -21,6 +21,7 @@ import { totop } from '../component/to-top/js/toTop.js';
 import { offsetSlider } from '../component/offset-slider/js/offsetSlider.js';
 import { tBlocks } from '../component/threeBlocks/js/tBlocks.js';
 import { parallax } from '../component/parallax/js/parallax.js';
+import { ParallaxItemClass } from '../component/parallax/js/parallaxItem.js';
 import { accordion } from '../component/accordion/js/accordion.js';
 import { AccordionItemClass } from '../component/accordion/js/accordionItem.js';
 import { showElement } from '../component/show-element/js/ShowElement.js';
@@ -41,6 +42,7 @@ import { GsapHorizontalCustomClass } from '../component/gsapHorizontalCustom/js/
 //TEST
 import { gsapTest } from './test/gsapTest.js';
 import { storeTest } from './test/storeTest.js';
+import { hScroller } from './test/hScroller.js';
 import { loadImageFromManifest } from './test/loadImageFromManifest.js';
 
 const body = document.querySelector('body');
@@ -52,37 +54,7 @@ if (!body.classList.contains('template-scrollerH')) {
 }
 
 if (body.classList.contains('template-scrollerH')) {
-    const smoothScrollFull = new SmoothScrollClass({
-        target: '.scrollerH',
-        direction: 'HORIZONTAL',
-        speed: 40,
-        ease: 20,
-        drag: true,
-    });
-    smoothScrollFull.init();
-    smoothScrollFull.onTick(() => parallax.move());
-
-    const smoothScrollContiner = new SmoothScrollClass({
-        target: '.scrollerH2',
-        container: '.scrollerH-container2',
-        direction: 'HORIZONTAL',
-        speed: 120,
-        ease: 20,
-        drag: true,
-    });
-    smoothScrollContiner.init();
-    smoothScrollContiner.onTick(() => parallax.move());
-
-    const smoothScrollContiner2 = new SmoothScrollClass({
-        target: '.scrollerH3',
-        container: '.scrollerH-container3',
-        direction: 'VERTICAL',
-        speed: 120,
-        ease: 20,
-        drag: true,
-    });
-    smoothScrollContiner2.init();
-    smoothScrollContiner2.onTick(() => parallax.move());
+    hScroller();
 }
 
 if (body.classList.contains('page-gsapHorizontal2')) {

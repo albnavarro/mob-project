@@ -6,6 +6,7 @@ class ParallaxClass {
         this.parallaxItem = document.querySelectorAll(
             "*[data-conponent='m-comp--parallax']"
         );
+        this.id = 0;
         this.instances = [];
     }
 
@@ -14,28 +15,47 @@ class ParallaxClass {
     }
 
     inzializeData() {
-        const itemArray = Array.from(this.parallaxItem);
-        const dataArray = itemArray.map((item) => {
+        const dataArray = [...this.parallaxItem].map((item) => {
             return this.getItemData(item);
         });
 
-        for (const item of dataArray) {
+        dataArray.forEach((item, i) => {
+            this.id++;
             const parallaxItem = new ParallaxItemClass(item);
-            this.instances.push(parallaxItem);
+            this.instances.push({ id: this.id, istance: parallaxItem });
             parallaxItem.init();
-        }
+        });
     }
 
     refresh() {
         for (const item of this.instances) {
-            item.refresh();
+            const { istance } = item;
+            if (istance) istance.refresh();
         }
     }
 
     move() {
         for (const item of this.instances) {
-            item.move();
+            const { istance } = item;
+            if (istance) istance.move();
         }
+    }
+
+    add(istance) {
+        this.id++;
+        this.instances.push({ id: this.id, istance: istance });
+        return this.id;
+    }
+
+    remove(id) {
+        const newInstances = this.instances.filter((item) => {
+            const { id: instaceId } = item;
+            const itemToRemove = instaceId === id;
+            if (itemToRemove) delete item.istance;
+            return !itemToRemove;
+        });
+
+        this.instances = newInstances;
     }
 
     getItemData(item) {
@@ -47,13 +67,13 @@ class ParallaxClass {
             item.getAttribute('data-computationType') || 'default';
 
         // String: 'VERTICAL' || 'HORIZONTAL'
-        data.direction = item.getAttribute('data-direction') || 'vertical';
+        data.direction = item.getAttribute('data-direction');
 
         // Custom container with a transate movement
-        data.scroller = item.getAttribute('data-scroller') || window;
+        data.scroller = item.getAttribute('data-scroller');
 
         // Custom screen
-        data.screen = item.getAttribute('data-screen') || window;
+        data.screen = item.getAttribute('data-screen');
 
         // FIXED PROPS
 
@@ -64,7 +84,7 @@ class ParallaxClass {
 
         // String: 0 to infinite
         // shilft animation start 0 - 100 -> vh value
-        data.fixedOffset = item.getAttribute('data-fixedOffset') || 0;
+        data.fixedOffset = item.getAttribute('data-fixedOffset');
 
         // Boolean
         // Mandatory computationType = 'fixed'
@@ -86,7 +106,7 @@ class ParallaxClass {
         // String
         // Mandatory computationType = 'default'
         // 1 - 10
-        data.range = item.getAttribute('data-range') || 8;
+        data.range = item.getAttribute('data-range');
 
         // String: in-stop - in-back - out-stop - out-back
         // Mandatory computationType = 'default' doasn't work with opacity
@@ -94,7 +114,7 @@ class ParallaxClass {
         // in-back : revert the calculation reached zero
         // out-stop: move element only ofter reached 0
         // out-back
-        data.onSwitch = item.getAttribute('data-onSwitch') || '';
+        data.onSwitch = item.getAttribute('data-onSwitch');
 
         // String
         // Mandatory computationType = 'default'
@@ -104,38 +124,39 @@ class ParallaxClass {
         // center = zero at middle of the viewport
         // bottom = zero at bottom of the viewport
         // end = zero at bottom of the document
-        data.align = item.getAttribute('data-align') || 'center';
+        data.align = item.getAttribute('data-align');
 
         // String
         // Mandatory propierties = 'opacity'
         // 1- 100: percentage of the viewport from which the opcity starts
-        data.opacityStart = item.getAttribute('data-opacityStart') || 100;
+        data.opacityStart = item.getAttribute('data-opacityStart');
 
         // String
         // Mandatory propierties = 'opacity'
         // 1- 100: percentage of the viewport from which the opcity ends
-        data.opacityEnd = item.getAttribute('data-opacityEnd') || 0;
+        data.opacityEnd = item.getAttribute('data-opacityEnd');
 
         // COMMON PROPS
 
-        data.perspective = item.getAttribute('data-perspective') || null;
+        data.perspective = item.getAttribute('data-perspective');
 
         // String: DOM element
         // Custom element on which to apply the calculated values
         // Default itself
-        data.applyTo =
-            document.querySelector(item.getAttribute('data-applyTo')) || null;
+        data.applyTo = document.querySelector(
+            item.getAttribute('data-applyTo')
+        );
 
         // String: DOM element
         // Performs calculations based on another element of the DOM at your choice
-        data.scrollTrigger = item.getAttribute('data-scrollTrigger') || null;
+        data.scrollTrigger = item.getAttribute('data-scrollTrigger');
 
         // String
-        data.breackpoint = item.getAttribute('data-breackpoint') || 'desktop';
+        data.breackpoint = item.getAttribute('data-breackpoint');
 
         // String
         // refer to mediaManager obj
-        data.queryType = item.getAttribute('data-queryType') || 'min';
+        data.queryType = item.getAttribute('data-queryType');
 
         // Boolean
         // By default the calculations are performed when the element is visible in the viewport,
@@ -144,7 +165,7 @@ class ParallaxClass {
 
         // String
         // 1 - 10
-        data.scrub = item.getAttribute('data-scrub') || 8;
+        data.scrub = item.getAttribute('data-scrub');
 
         // Boolean
         // Mandatory computationType = 'default'
@@ -157,12 +178,12 @@ class ParallaxClass {
 
         // String
         // vertical , horizontal , rotate , border-width , opacity, scale
-        data.propierties = item.getAttribute('data-propierties') || 'vertical';
+        data.propierties = item.getAttribute('data-propierties');
 
         // String
         // ccs || js
         // Ease calculated in css or js
-        data.easeType = item.getAttribute('data-easeType') || 'js';
+        data.easeType = item.getAttribute('data-easeType');
 
         return data;
     }

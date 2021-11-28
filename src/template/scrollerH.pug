@@ -43,14 +43,7 @@ block content
                                 data-propierties='horizontal')
                                 |test
                     .scrollerH__item
-                        div(style="display:inline-block;"
-                            data-conponent='m-comp--parallax',
-                            data-direction='horizontal'
-                            data-scroller='.scrollerH-container .scrollerH'
-                            data-ease
-                            data-opacityStart='100'
-                            data-opacityend='50'
-                            data-propierties='opacity')
+                        .parallax-via-js-opacity
                             |test
                     .scrollerH__item
                         .pluto(style='width:200px;height:150px;border:1px #000 solid;')
@@ -66,28 +59,11 @@ block content
                     .scrollerH__item
                         .pluto4(style='width:300px;height:100px;border:1px #000 solid;transform:translateX(-100%);')
                         .pluto3(style='width:300px;height:100px;border:1px #000 solid;')
-                            div(style="display:inline-block;border:1px #000 solid;")
-                                .div(
-                                    data-conponent='m-comp--parallax',
-                                    data-direction='horizontal'
-                                    data-scroller='.scrollerH-container .scrollerH'
-                                    data-computationType='fixed'
-                                    data-scrollTrigger='.pluto3'
-                                    data-ease
-                                    data-reverse
-                                    data-propierties="horizontal"
-                                    data-range='100')
-                                    .div(
-                                        data-conponent='m-comp--parallax',
-                                        data-direction='horizontal'
-                                        data-fixedInvertSide
-                                        data-ease
-                                        data-scroller='.scrollerH-container .scrollerH'
-                                        data-computationType='fixed'
-                                        data-scrollTrigger='.pluto4'
-                                        data-propierties="horizontal"
-                                        data-range='100')
+                            .parallax-via-js-in
+                                .parallax-via-js-out
+                                    div(style="display:inline-block;border:1px #000 solid;")
                                         |test
+
                     .scrollerH__item
                         
             .scrollerH-container2
@@ -128,8 +104,7 @@ block content
                     .scrollerH3__item
                         .pluto6(style='width:300px;height:100px;border:1px #000 solid;')
                         .pluto5(style='width:300px;height:100px;border:1px #000 solid;')
-                            div(style="display:inline-block;border:1px #000 solid;"
-                                data-conponent='m-comp--parallax',
+                            div(data-conponent='m-comp--parallax',
                                 data-scroller='.scrollerH-container3 .scrollerH3'
                                 data-screen='.scrollerH-container3'
                                 data-computationType='fixed'
@@ -147,7 +122,8 @@ block content
                                     data-propierties="horizontal"
                                     data-smoothType='linear'
                                     data-range='100')
-                                    |test
+                                    div(style="display:inline-block;border:1px #000 solid;")
+                                        |test
                     .scrollerH3__item
                     .scrollerH3__item
                         div(style="display:inline-block;"

@@ -10,6 +10,7 @@ export class AccordionItemClass {
     constructor(data) {
         this.container = data.container;
         this.breackpoint = data.breackpoint || 'x-small';
+        this.notAllClose = data.notAllClose || false;
         this.queryType = data.queryType || 'min';
         this.multiple = data.multiple;
         this.itemClass = data.item || '[data-item]';
@@ -52,7 +53,7 @@ export class AccordionItemClass {
 
             const targetArray = Array.from(this.target);
             for (const el of targetArray) {
-                if (el !== target.item) {
+                if (el !== target) {
                     slideUp(el).then(() => {
                         window.dispatchEvent(new Event('resize'));
                     });
@@ -64,12 +65,24 @@ export class AccordionItemClass {
             btn.classList.add('active');
             slideDown(target).then(() => {
                 window.dispatchEvent(new Event('resize'));
+                this.dispatch();
             });
-        } else {
+        } else if (!this.notAllClose && btn.classList.contains('active')) {
             btn.classList.remove('active');
             slideUp(target).then(() => {
                 window.dispatchEvent(new Event('resize'));
+                this.dispatch();
             });
         }
+    }
+
+    dispatch() {
+        this.container.dispatchEvent(
+            new CustomEvent('accordionChange', {
+                detail: {
+                    item: this.container,
+                },
+            })
+        );
     }
 }
