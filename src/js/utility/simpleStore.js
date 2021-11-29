@@ -92,7 +92,7 @@ export function SimpleStore(data) {
      * @param  {string} prop keys of obj in store to update
      * @param  {any} val object to merge with the corresponding in store
      */
-    const setProp = (prop, val) => {
+    const setProp = (prop, val, fireCallback = true) => {
         /**
          * Check if val is an Object
          */
@@ -141,10 +141,12 @@ export function SimpleStore(data) {
         const oldVal = store[prop];
         store[prop] = val;
 
-        const fnByProp = fnStore.filter((item) => item.prop === prop);
-        fnByProp.forEach((item, i) => {
-            item.fn(val, oldVal, validateError[prop]);
-        });
+        if (fireCallback) {
+            const fnByProp = fnStore.filter((item) => item.prop === prop);
+            fnByProp.forEach((item, i) => {
+                item.fn(val, oldVal, validateError[prop]);
+            });
+        }
 
         fireComputed(prop);
     };
@@ -158,7 +160,7 @@ export function SimpleStore(data) {
      * @param  {string} prop keys of obj in store to update
      * @param  {object} val object to merge with the corresponding in store
      */
-    const setObj = (prop, val) => {
+    const setObj = (prop, val, fireCallback = true) => {
         /**
          * Check if val is not an Object
          */
@@ -240,10 +242,12 @@ export function SimpleStore(data) {
         const oldVal = store[prop];
         store[prop] = { ...store[prop], ...val };
 
-        const fnByProp = fnStore.filter((item) => item.prop === prop);
-        fnByProp.forEach((item, i) => {
-            item.fn(store[prop], oldVal, validateError[prop]);
-        });
+        if (fireCallback) {
+            const fnByProp = fnStore.filter((item) => item.prop === prop);
+            fnByProp.forEach((item, i) => {
+                item.fn(store[prop], oldVal, validateError[prop]);
+            });
+        }
 
         fireComputed(prop);
     };
