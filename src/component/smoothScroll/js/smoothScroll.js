@@ -61,9 +61,12 @@ export class SmoothScrollClass {
         useTouchEnd((data) => this.onMouseUp(data));
         useMouseDown((data) => this.onMouseDown(data));
         useMouseUp((data) => this.onMouseUp(data));
-        useMouseMove((data) => this.onTouchMove(data));
-        useTouchMove((data) => this.onTouchMove(data));
         useMouseWheel((data) => this.onWhell(data));
+
+        if(this.target !== document.documentElement) {            
+            useMouseMove((data) => this.onTouchMove(data));
+            useTouchMove((data) => this.onTouchMove(data));
+        }
 
         // DRAG LISTENER
         if (this.drag) {
