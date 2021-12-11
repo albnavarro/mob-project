@@ -63,7 +63,7 @@ export class SmoothScrollClass {
         useMouseUp((data) => this.onMouseUp(data));
         useMouseWheel((data) => this.onWhell(data));
 
-        if(this.target !== document.documentElement) {            
+        if (this.target !== document.documentElement) {
             useMouseMove((data) => this.onTouchMove(data));
             useTouchMove((data) => this.onTouchMove(data));
         }
