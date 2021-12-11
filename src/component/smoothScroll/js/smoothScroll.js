@@ -1,4 +1,3 @@
-import { normalizeWheel } from './normalizeWhell.js';
 import { getTranslateValues } from '../../../js/utility/getTranslateValues.js';
 import { useResize } from '.../../../js/events/resizeUtils/useResize.js';
 import { useScroll } from '.../../../js/events/scrollUtils/useScroll.js';
@@ -50,22 +49,34 @@ export class SmoothScrollClass {
 
         //
         this.callback = [];
+
+        // Unsubscribe event
+        this.subscribeResize = () => {};
+        this.subscribeScrollStart = () => {};
+        this.subscribeScrollEnd = () => {};
+        this.subscribeTouchStart = () => {};
+        this.subscribeTouchEnd = () => {};
+        this.subscribeMouseDown = () => {};
+        this.subscribeMouseUp = () => {};
+        this.subscribeMouseWheel = () => {};
+        this.subscribeMouseMove = () => {};
+        this.subscribeTouchMove = () => {};
     }
 
     init() {
         this.reset();
-        useResize(() => this.reset());
-        useScrollStart(() => this.reset());
-        useScrollEnd(() => this.reset());
-        useTouchStart((data) => this.onMouseDown(data));
-        useTouchEnd((data) => this.onMouseUp(data));
-        useMouseDown((data) => this.onMouseDown(data));
-        useMouseUp((data) => this.onMouseUp(data));
-        useMouseWheel((data) => this.onWhell(data));
+        this.subscribeResize = useResize(() => this.reset());
+        this.subscribeScrollStart = useScrollStart(() => this.reset());
+        this.subscribeScrollEnd = useScrollEnd(() => this.reset());
+        this.subscribeTouchStart = useTouchStart((data) => this.onMouseDown(data));
+        this.subscribeTouchEnd = useTouchEnd((data) => this.onMouseUp(data));
+        this.subscribeMouseDown = useMouseDown((data) => this.onMouseDown(data));
+        this.subscribeMouseUp = useMouseUp((data) => this.onMouseUp(data));
+        this.subscribeMouseWheel = useMouseWheel((data) => this.onWhell(data));
 
         if (this.target !== document.documentElement) {
-            useMouseMove((data) => this.onTouchMove(data));
-            useTouchMove((data) => this.onTouchMove(data));
+            this.subscribeMouseMove = useMouseMove((data) => this.onTouchMove(data));
+            this.subscribeTouchMove = useTouchMove((data) => this.onTouchMove(data));
         }
 
         // DRAG LISTENER
@@ -86,6 +97,19 @@ export class SmoothScrollClass {
             item.setAttribute('draggable', false);
             item.style['user-select'] = 'none';
         });
+    }
+
+    destroy() {
+        this.subscribeResize();
+        this.subscribeScrollStart();
+        this.subscribeScrollEnd();
+        this.subscribeTouchStart();
+        this.subscribeTouchEnd();
+        this.subscribeMouseDown();
+        this.subscribeMouseUp();
+        this.subscribeMouseWheel();
+        this.subscribeMouseMove();
+        this.subscribeTouchMove();
     }
 
     onTick(fn) {
