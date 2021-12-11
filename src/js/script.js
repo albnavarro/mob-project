@@ -18,7 +18,6 @@ import { findElement } from './utility/findElement.js';
 
 // NEW VANILLA COMPONENT MODULE
 import { totop } from '../component/to-top/js/toTop.js';
-import { offsetSlider } from '../component/offset-slider/js/offsetSlider.js';
 import { tBlocks } from '../component/threeBlocks/js/tBlocks.js';
 import { parallax } from '../component/parallax/js/parallax.js';
 import { ParallaxItemClass } from '../component/parallax/js/parallaxItem.js';
@@ -77,7 +76,6 @@ showElement.init();
 toolTip.init();
 totop.init();
 vh.init();
-offsetSlider.init();
 move3D.init();
 mouseParallax.init();
 dragger.init();

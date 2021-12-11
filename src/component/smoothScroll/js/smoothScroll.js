@@ -1,7 +1,21 @@
-import { eventManager } from '../../../js/base/eventManager.js';
-import { mouseManager } from '../../../js/base/mouseManager.js';
 import { normalizeWheel } from './normalizeWhell.js';
 import { getTranslateValues } from '../../../js/utility/getTranslateValues.js';
+import { useResize } from '.../../../js/events/resizeUtils/useResize.js';
+import { useScroll } from '.../../../js/events/scrollUtils/useScroll.js';
+import {
+    useScrollStart,
+    useScrollEnd,
+} from '.../../../js/events/scrollUtils/useScrollUtils.js';
+import {
+    useTouchStart,
+    useTouchEnd,
+    useMouseDown,
+    useMouseUp,
+    useMouseMove,
+    useTouchMove,
+    useMouseWheel,
+} from '.../../../js/events/mouseUtils/useMouse.js';
+import { isDescendant } from '../../../js/utility/vanillaFunction.js';
 
 export class SmoothScrollClass {
     constructor(data = {}) {
@@ -39,21 +53,17 @@ export class SmoothScrollClass {
     }
 
     init() {
-        // COMMON LISTENER
-        eventManager.push('load', () => this.reset(), 10);
-        eventManager.push('resize', () => this.reset(), 10);
-        eventManager.push('scrollStart', () => this.reset(), 10);
-        eventManager.push('scrollEnd', () => this.reset(), 10);
-
-        // WHEEL LISTENER
-        this.target.addEventListener('wheel', (e) => this.onWhell(e), {
-            passive: false,
-        });
-
-        // TODO: is necessary ?
-        this.target.addEventListener('DOMMouseScroll', (e) => this.onWhell(e), {
-            passive: false,
-        });
+        this.reset();
+        useResize(() => this.reset());
+        useScrollStart(() => this.reset());
+        useScrollEnd(() => this.reset());
+        useTouchStart((data) => this.onMouseDown(data));
+        useTouchEnd((data) => this.onMouseUp(data));
+        useMouseDown((data) => this.onMouseDown(data));
+        useMouseUp((data) => this.onMouseUp(data));
+        useMouseMove((data) => this.onTouchMove(data));
+        useTouchMove((data) => this.onTouchMove(data));
+        useMouseWheel((data) => this.onWhell(data));
 
         // DRAG LISTENER
         if (this.drag) {
@@ -64,19 +74,6 @@ export class SmoothScrollClass {
                 false
             );
             // End prevent default listener
-
-            this.prevTouchVal = this.getMousePos();
-            this.touchVal = this.getMousePos();
-
-            if (Modernizr.touchevents) {
-                mouseManager.push('touchstart', () => this.onMouseDown());
-                mouseManager.push('touchend', () => this.onMouseUp());
-            } else {
-                mouseManager.push('mousedown', () => this.onMouseDown());
-                mouseManager.push('mouseup', () => this.onMouseUp());
-            }
-            mouseManager.push('mousemove', () => this.onTouchMove());
-            mouseManager.push('touchmove', () => this.onTouchMove());
         }
 
         // Set link and button to draggable false, prevent mousemouve fail
@@ -149,42 +146,34 @@ export class SmoothScrollClass {
     }
 
     // DRAG CONTROLS
-    getMousePos() {
-        const { x, y } = (() => {
-            if (Modernizr.touchevents) {
-                return {
-                    x: mouseManager.pageX(),
-                    y: mouseManager.pageY(),
-                };
-            } else {
-                return {
-                    x: mouseManager.clientX(),
-                    y: mouseManager.clientY(),
-                };
-            }
-        })();
+    getMousePos(page) {
+        const { x, y } = page;
         return this.direction === this.VERTICAL ? y : x;
     }
 
-    onMouseDown() {
-        const target = mouseManager.getTarget();
-
-        if (target === this.item || target.closest(this.targetClass)) {
+    onMouseDown({ target, page }) {
+        if (target === this.target || isDescendant(this.target, target)) {
             this.firstTouchValue = this.endValue;
             this.dragEnable = true;
-            this.prevTouchVal = this.getMousePos();
-            this.touchVal = this.getMousePos();
+            this.prevTouchVal = this.getMousePos(page);
+            this.touchVal = this.getMousePos(page);
+            console.log(this.prevTouchVal);
         }
     }
 
-    onMouseUp() {
+    onMouseUp({ target, page }) {
         this.dragEnable = false;
     }
 
-    onTouchMove() {
-        if (this.dragEnable) {
+    onTouchMove({ target, page, preventDefault }) {
+        if (
+            target === this.target ||
+            (isDescendant(this.target, target) && this.dragEnable)
+        ) {
+            preventDefault();
+
             this.prevTouchVal = this.touchVal;
-            this.touchVal = this.getMousePos();
+            this.touchVal = this.getMousePos(page);
 
             const result = parseInt(this.prevTouchVal - this.touchVal);
             this.endValue += result;
@@ -194,7 +183,7 @@ export class SmoothScrollClass {
     }
 
     // WHEEL CONTROLS
-    onWhell(e) {
+    onWhell({ target, spinY, preventDefault }) {
         // Prevent scroll with body in overflow = hidden;
         const bodyIsOverflow =
             document.body.style.overflow === 'hidden' &&
@@ -202,21 +191,11 @@ export class SmoothScrollClass {
 
         if (bodyIsOverflow) return;
 
-        // If wheelDelta or wheelDeltaY is not supported and target is document return
-        // ( secure check )
-        if (
-            (!('wheelDelta' in e) || !('wheelDeltaY' in e)) &&
-            this.target === document.documentElement
-        )
-            return;
-
-        e.preventDefault();
-
-        // Facebook normalize whell code
-        const { spinY } = normalizeWheel(e);
-
-        this.endValue += spinY * this.speed;
-        this.calcaluteValue();
+        if (target === this.target || isDescendant(this.target, target)) {
+            preventDefault();
+            this.endValue += spinY * this.speed;
+            this.calcaluteValue();
+        }
     }
 
     // COMMON CALCULATE VALUE

@@ -8,7 +8,6 @@
         "to-top/pug/toTop.pug",
         "tooltip/pug/tooltip.pug",
         "overlay/pug/overlay.pug",
-        "offset-slider/pug/offsetSlider.pug",
         "lightbox/pug/button.pug",
         "lightbox/pug/lightbox-image.pug",
         "lightbox/pug/lightbox-simple.pug",

@@ -44,14 +44,17 @@ class ParallaxClass {
     add(istance) {
         this.id++;
         this.instances.push({ id: this.id, istance: istance });
-        return this.id;
+        return (() => this.remove(this.id))
     }
 
     remove(id) {
         const newInstances = this.instances.filter((item) => {
-            const { id: instaceId } = item;
+            const { id: instaceId, istance } = item;
             const itemToRemove = instaceId === id;
-            if (itemToRemove) delete item.istance;
+
+            if (itemToRemove) {
+                istance.unsubscribe();
+            }
             return !itemToRemove;
         });
 

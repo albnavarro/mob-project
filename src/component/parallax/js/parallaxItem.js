@@ -1,8 +1,9 @@
-import { eventManager } from '../../../js/base/eventManager.js';
-import { modernzier } from '../../../js/utility/modernizr.js';
 import { mq } from '../../../js/base/mediaManager.js';
 import { offset, position } from '../../../js/utility/vanillaFunction.js';
 import { parallaxUtils } from './parallaxUtils.js';
+import { useFrame } from '.../../../js/events/rafutils/rafUtils.js';
+import { useResize } from '.../../../js/events/resizeUtils/useResize.js';
+import { useScroll } from '.../../../js/events/scrollUtils/useScroll.js';
 
 export class ParallaxItemClass {
     constructor(data) {
@@ -17,6 +18,8 @@ export class ParallaxItemClass {
         this.transformProperty = Modernizr.prefixed('transform');
         this.req = null;
         this.gap = 150;
+        this.unsubscribeResize = () => {};
+        this.unsubscribeScroll = () => {};
 
         // 'PROPS'
         this.item = data.item;
@@ -93,25 +96,25 @@ export class ParallaxItemClass {
                 case 'css':
                     this.item.style.transition =
                         'transform 1s cubic-bezier(0.305, 0.55, 0.47, 1.015)';
-                    eventManager.push(
-                        'scrollThrottle',
-                        this.executeParallax.bind(this)
+                    this.unsubscribeScroll = useScroll(() =>
+                        this.executeParallax()
                     );
-                    this.executeParallax();
+
                     break;
                 case 'js':
-                    eventManager.push(
-                        'scroll',
-                        this.smoothParallaxJs.bind(this)
+                    this.unsubscribeScroll = useScroll(() =>
+                        this.smoothParallaxJs()
                     );
+
                     this.smoothParallaxJs();
                     break;
             }
         } else {
-            eventManager.push('scroll', this.executeParallax.bind(this));
+            this.unsubscribeScroll = useScroll(() => this.executeParallax());
             this.executeParallax();
         }
-        eventManager.push('resize', this.refresh.bind(this));
+
+        this.unsubscribeResize = useResize(() => this.refresh());
     }
 
     calcOffset() {
@@ -180,6 +183,11 @@ export class ParallaxItemClass {
         }
     }
 
+    unsubscribe() {
+        this.unsubscribeScroll();
+        this.unsubscribeResize();
+    }
+
     refresh() {
         this.calcOffset();
         this.calcHeight();
@@ -236,11 +244,13 @@ export class ParallaxItemClass {
     }
 
     updateStyle(val) {
-        if (this.applyTo) {
-            Object.assign(this.applyTo.style, this.getStyle(val));
-        } else {
-            Object.assign(this.item.style, this.getStyle(val));
-        }
+        useFrame(() => {
+            if (this.applyTo) {
+                Object.assign(this.applyTo.style, this.getStyle(val));
+            } else {
+                Object.assign(this.item.style, this.getStyle(val));
+            }
+        });
     }
 
     executeParallax(applyStyle = true) {
@@ -287,6 +297,7 @@ export class ParallaxItemClass {
         }
 
         if (!applyStyle) return;
+
         this.updateStyle(this.endValue);
     }
 

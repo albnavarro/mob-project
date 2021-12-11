@@ -39,8 +39,8 @@ export const hScroller = () => {
         propierties: 'horizontal',
     });
     parallaxOut.init();
-    const id = parallax.add(parallaxOut);
-    // parallax.remove(id);
+    const unsubscribe = parallax.add(parallaxOut);
+    // unsubscribe();
     // parallaxOut = null;
 
     const smoothScrollFull = new SmoothScrollClass({
