@@ -4,19 +4,18 @@ import { parallaxUtils } from './parallaxUtils.js';
 import { useFrame } from '.../../../js/events/rafutils/rafUtils.js';
 import { useResize } from '.../../../js/events/resizeUtils/useResize.js';
 import { useScroll } from '.../../../js/events/scrollUtils/useScroll.js';
+import { useSpring } from '.../../../js/animation/spring/useSpring.js';
 
 export class ParallaxItemClass {
     constructor(data) {
         this.offset = 0;
         this.endValue = 0;
-        this.startValue = 0;
-        this.prevValue = 0;
+        this.currentValue = 0;
         this.height = 0;
         this.width = 0;
         this.scrollerScroll = 0;
         this.scrollerHeight = 0;
         this.transformProperty = Modernizr.prefixed('transform');
-        this.req = null;
         this.gap = 150;
         this.unsubscribeResize = () => {};
         this.unsubscribeScroll = () => {};
@@ -66,6 +65,7 @@ export class ParallaxItemClass {
         this.propierties = data.propierties || 'vertical';
         this.easeType = data.easeType || 'js';
         //
+        this.spring = new useSpring();
     }
 
     init() {
@@ -213,44 +213,17 @@ export class ParallaxItemClass {
 
     smoothParallaxJs() {
         this.executeParallax(false);
-        if (!this.req)
-            this.req = requestAnimationFrame(this.onReuqestAnim.bind(this));
-    }
-
-    onReuqestAnim() {
-        const draw = () => {
-            this.prevValue = this.startValue;
-
-            const s = this.startValue,
-                f = this.endValue,
-                v = this.scrub,
-                val = (f - s) / v + s * 1;
-
-            this.startValue = val.toFixed(3);
-            this.updateStyle(this.startValue);
-
-            // La RAF viene "rigenerata" fino a quando tutti gli elementi rimangono fermi
-            if (this.prevValue == this.startValue) {
-                cancelAnimationFrame(this.req);
-                this.req = null;
-                this.updateStyle(this.endValue);
-                return;
-            }
-
-            this.req = requestAnimationFrame(draw);
-        };
-
-        draw();
+        this.spring.set(this.endValue, (value) => {
+            this.updateStyle(value);
+        });
     }
 
     updateStyle(val) {
-        useFrame(() => {
-            if (this.applyTo) {
-                Object.assign(this.applyTo.style, this.getStyle(val));
-            } else {
-                Object.assign(this.item.style, this.getStyle(val));
-            }
-        });
+        if (this.applyTo) {
+            Object.assign(this.applyTo.style, this.getStyle(val));
+        } else {
+            Object.assign(this.item.style, this.getStyle(val));
+        }
     }
 
     executeParallax(applyStyle = true) {
@@ -298,7 +271,9 @@ export class ParallaxItemClass {
 
         if (!applyStyle) return;
 
-        this.updateStyle(this.endValue);
+        useFrame(() => {
+            this.updateStyle(this.endValue);
+        });
     }
 
     getFixedValue(applyStyle) {
@@ -508,9 +483,7 @@ export class ParallaxItemClass {
                 const scaleVal = 1 + typeVal / 1000;
                 return {
                     [this
-                        .transformProperty]: `translate3d(0,0,0) scale(${scaleVal.toFixed(
-                        3
-                    )})`,
+                        .transformProperty]: `translate3d(0,0,0) scale(${scaleVal})`,
                 };
 
             default:
