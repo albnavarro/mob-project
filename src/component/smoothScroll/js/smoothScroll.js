@@ -39,6 +39,8 @@ export class SmoothScrollClass {
         this.progress = 0;
         this.firstTouchValue = 0;
         this.threshold = 30;
+        this.maxValue = 0;
+        this.minValue - 0;
 
         // Touch controls
         this.dragEnable = null;
@@ -68,15 +70,23 @@ export class SmoothScrollClass {
         this.subscribeResize = useResize(() => this.reset());
         this.subscribeScrollStart = useScrollStart(() => this.reset());
         this.subscribeScrollEnd = useScrollEnd(() => this.reset());
-        this.subscribeTouchStart = useTouchStart((data) => this.onMouseDown(data));
+        this.subscribeTouchStart = useTouchStart((data) =>
+            this.onMouseDown(data)
+        );
         this.subscribeTouchEnd = useTouchEnd((data) => this.onMouseUp(data));
-        this.subscribeMouseDown = useMouseDown((data) => this.onMouseDown(data));
+        this.subscribeMouseDown = useMouseDown((data) =>
+            this.onMouseDown(data)
+        );
         this.subscribeMouseUp = useMouseUp((data) => this.onMouseUp(data));
         this.subscribeMouseWheel = useMouseWheel((data) => this.onWhell(data));
 
         if (this.target !== document.documentElement) {
-            this.subscribeMouseMove = useMouseMove((data) => this.onTouchMove(data));
-            this.subscribeTouchMove = useTouchMove((data) => this.onTouchMove(data));
+            this.subscribeMouseMove = useMouseMove((data) =>
+                this.onTouchMove(data)
+            );
+            this.subscribeTouchMove = useTouchMove((data) =>
+                this.onTouchMove(data)
+            );
         }
 
         // DRAG LISTENER
@@ -97,6 +107,10 @@ export class SmoothScrollClass {
             item.setAttribute('draggable', false);
             item.style['user-select'] = 'none';
         });
+    }
+
+    clamp(num, min, max) {
+        return Math.min(Math.max(num, min), max);
     }
 
     destroy() {
@@ -169,10 +183,28 @@ export class SmoothScrollClass {
         this.prevValue = resetValue;
         this.rafOnScroll = null;
 
+        this.maxValue = (() => {
+            if (this.direction === this.VERTICAL) {
+                const value =
+                    this.target === document.documentElement
+                        ? this.target.scrollHeight
+                        : this.target.offsetHeight;
+
+                return value - this.containerHeight;
+            } else {
+                const value =
+                    this.target === document.documentElement
+                        ? this.target.scrollWidth
+                        : this.target.offsetWidth;
+
+                return value - this.containerWidth;
+            }
+        })();
+
         this.calcaluteValue();
     }
 
-    // DRAG CONTROLS
+    // GET POSITION FORM MOUSE/TOUCH EVENT
     getMousePos(client) {
         const { x, y } = client;
         return this.direction === this.VERTICAL ? y : x;
@@ -184,20 +216,17 @@ export class SmoothScrollClass {
             this.dragEnable = true;
             this.prevTouchVal = this.getMousePos(client);
             this.touchVal = this.getMousePos(client);
-            console.log(this.prevTouchVal);
         }
     }
 
     onMouseUp({ target, client }) {
         this.dragEnable = false;
-        this.prevTouchVal = this.getMousePos(client);
-        this.touchVal = this.getMousePos(client);
     }
 
     onTouchMove({ target, client, preventDefault }) {
         if (
-            target === this.target ||
-            (isDescendant(this.target, target) && this.dragEnable)
+            (target === this.target || isDescendant(this.target, target)) &&
+            this.dragEnable
         ) {
             preventDefault();
 
@@ -209,7 +238,6 @@ export class SmoothScrollClass {
 
             this.calcaluteValue();
         } else {
-
             // Secure check on qucky change to drag to whell
             this.dragEnable = false;
         }
@@ -236,46 +264,7 @@ export class SmoothScrollClass {
 
     // COMMON CALCULATE VALUE
     calcaluteValue() {
-        this.endValue = (() => {
-            if (this.direction === this.VERTICAL) {
-                const value =
-                    this.target === document.documentElement
-                        ? this.target.scrollHeight
-                        : this.target.offsetHeight;
-
-                // Clamped result
-                const result = Math.max(
-                    0,
-                    Math.min(this.endValue, value - this.containerHeight)
-                );
-
-                // Update progress
-                this.progress = (
-                    result / parseInt(value - this.containerHeight)
-                ).toFixed(2);
-
-                return result;
-            } else {
-                const value =
-                    this.target === document.documentElement
-                        ? this.target.scrollWidth
-                        : this.target.offsetWidth;
-
-                // Clamped result
-                const result = Math.max(
-                    0,
-                    Math.min(this.endValue, value - this.containerWidth)
-                );
-
-                // Update progress
-                this.progress = (
-                    result / parseInt(value - this.containerWidth)
-                ).toFixed(2);
-
-                return result;
-            }
-        })();
-
+        this.endValue = this.clamp(this.endValue, 0, this.maxValue);
         this.target.style.setProperty('--progress', `${this.progress * 100}%`);
 
         if (!this.rafOnScroll)
