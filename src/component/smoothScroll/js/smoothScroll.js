@@ -237,10 +237,7 @@ export class SmoothScrollClass {
             this.endValue += result;
 
             this.calcaluteValue();
-        } else {
-            // Secure check on qucky change to drag to whell
-            this.dragEnable = false;
-        }
+        } 
     }
 
     // WHEEL CONTROLS
