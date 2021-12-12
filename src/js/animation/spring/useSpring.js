@@ -21,12 +21,19 @@ export function useSpring(customConfig) {
     function onReuqestAnim(cb) {
         let velocity = config.velocity;
         let currentValue = lastValue;
-        let lastTime = 0;
         let animationLastTime = 0;
+        let animationVelocity = 0;
 
         const draw = () => {
-            // https://github.com/pmndrs/react-spring/blob/cd5548a987383b8023efd620f3726a981f9e18ea/src/animated/FrameLoop.ts
+            // Reset velocity if new value come form set methods
+            // Use confog value when set methods os invoked quickly, then use calculated value
+            velocity = animationVelocity !== 0 ? animationVelocity : config.velocity;
+
+            // Get current time
             const time = getTime();
+
+            // lastTime is set to now the first time.
+            // then check the difference from now and last time to check if we lost frame
             let lastTime = animationLastTime !== 0 ? animationLastTime : time;
 
             // If we lost a lot of frames just jump to the end.
@@ -47,16 +54,22 @@ export function useSpring(customConfig) {
 
             console.log('draw');
 
+            // Fire callback
             cb(parseFloat(currentValue));
 
-            // Set last time
+            // Update last time
             animationLastTime = time;
+
+            // Update velocity
+            animationVelocity = velocity
 
             if (Math.abs(currentValue - toValue) > config.precision) {
                 req = requestAnimationFrame(draw);
             } else {
                 // End of animation
                 lastValue = toValue;
+
+                // Fire callback with exact end value
                 cb(parseFloat(currentValue));
                 cancelAnimationFrame(req);
                 req = null;
