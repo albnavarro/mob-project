@@ -173,26 +173,28 @@ export class SmoothScrollClass {
     }
 
     // DRAG CONTROLS
-    getMousePos(page) {
-        const { x, y } = page;
+    getMousePos(client) {
+        const { x, y } = client;
         return this.direction === this.VERTICAL ? y : x;
     }
 
-    onMouseDown({ target, page }) {
+    onMouseDown({ target, client }) {
         if (target === this.target || isDescendant(this.target, target)) {
             this.firstTouchValue = this.endValue;
             this.dragEnable = true;
-            this.prevTouchVal = this.getMousePos(page);
-            this.touchVal = this.getMousePos(page);
+            this.prevTouchVal = this.getMousePos(client);
+            this.touchVal = this.getMousePos(client);
             console.log(this.prevTouchVal);
         }
     }
 
-    onMouseUp({ target, page }) {
+    onMouseUp({ target, client }) {
         this.dragEnable = false;
+        this.prevTouchVal = this.getMousePos(client);
+        this.touchVal = this.getMousePos(client);
     }
 
-    onTouchMove({ target, page, preventDefault }) {
+    onTouchMove({ target, client, preventDefault }) {
         if (
             target === this.target ||
             (isDescendant(this.target, target) && this.dragEnable)
@@ -200,12 +202,16 @@ export class SmoothScrollClass {
             preventDefault();
 
             this.prevTouchVal = this.touchVal;
-            this.touchVal = this.getMousePos(page);
+            this.touchVal = this.getMousePos(client);
 
             const result = parseInt(this.prevTouchVal - this.touchVal);
             this.endValue += result;
 
             this.calcaluteValue();
+        } else {
+
+            // Secure check on qucky change to drag to whell
+            this.dragEnable = false;
         }
     }
 
@@ -217,6 +223,9 @@ export class SmoothScrollClass {
             this.direction === this.VERTICAL;
 
         if (bodyIsOverflow) return;
+
+        // Secure check on qucky change to drag to whell
+        this.dragEnable = false;
 
         if (target === this.target || isDescendant(this.target, target)) {
             preventDefault();
