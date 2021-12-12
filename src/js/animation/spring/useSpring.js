@@ -1,8 +1,8 @@
 const defaultSpringConfig = {
     tension: 250,
-    mass: 3,
+    mass: 5,
     friction: 26,
-    velocity: 2,
+    velocity: 4,
     precision: 0.01,
 };
 

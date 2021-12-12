@@ -47,7 +47,7 @@ import { loadImageFromManifest } from './test/loadImageFromManifest.js';
 const body = document.querySelector('body');
 eventManager.init(true, true);
 
-if (!body.classList.contains('template-scrollerH')) {
+if (body.classList.contains('template-fixed')) {
     const smoothScroll = new SmoothScrollClass();
     smoothScroll.init();
 }
@@ -196,6 +196,6 @@ const sidebarMenu = new menuClass({
 const forceResize = () => {
     setTimeout(() => {
         window.dispatchEvent(new Event('resize'));
-    }, 200);
+    }, 500);
 };
 eventManager.push('load', forceResize);
