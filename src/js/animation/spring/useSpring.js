@@ -1,8 +1,8 @@
 const defaultSpringConfig = {
-    tension: 250,
-    mass: 5,
-    friction: 26,
-    velocity: 4,
+    tension: 20,
+    mass: 1,
+    friction: 5,
+    velocity: 0,
     precision: 0.01,
 };
 
@@ -11,6 +11,10 @@ export function useSpring(customConfig) {
     let toValue = 0;
     let lastValue = 0;
     let req = null;
+
+    // TODO: chec ho to use reset animationVelocity evry time se methods is called
+    // maybe interesting
+    // let animationVelocity = 0;
 
     const getTime = () => {
         return typeof window !== 'undefined'
@@ -22,12 +26,11 @@ export function useSpring(customConfig) {
         let velocity = config.velocity;
         let currentValue = lastValue;
         let animationLastTime = 0;
-        let animationVelocity = 0;
 
         const draw = () => {
-            // Reset velocity if new value come form set methods
-            // Use confog value when set methods os invoked quickly, then use calculated value
-            velocity = animationVelocity !== 0 ? animationVelocity : config.velocity;
+            // TODO: chec ho to use reset animationVelocity evry time se methods is called
+            // maybe interesting
+            // velocity = animationVelocity !== 0 ? animationVelocity : config.velocity;
 
             // Get current time
             const time = getTime();
@@ -60,8 +63,9 @@ export function useSpring(customConfig) {
             // Update last time
             animationLastTime = time;
 
-            // Update velocity
-            animationVelocity = velocity
+            // TODO: chec ho to use reset animationVelocity evry time se methods is called
+            // maybe interesting
+            // animationVelocity = velocity
 
             if (Math.abs(currentValue - toValue) > config.precision) {
                 req = requestAnimationFrame(draw);
@@ -81,6 +85,10 @@ export function useSpring(customConfig) {
 
     function set(_toValue, cb) {
         toValue = _toValue;
+
+        // TODO: chec ho to use reset animationVelocity evry time se methods is called
+        // maybe interesting
+        // animationVelocity = 0;
 
         if (!req) {
             req = requestAnimationFrame(() => onReuqestAnim(cb));
