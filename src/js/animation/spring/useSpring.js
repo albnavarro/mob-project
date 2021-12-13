@@ -11,10 +11,8 @@ export function useSpring(customConfig) {
     let toValue = 0;
     let lastValue = 0;
     let req = null;
-
-    // TODO: chec ho to use reset animationVelocity evry time se methods is called
-    // maybe interesting
-    // let animationVelocity = 0;
+    let previousReject = null;
+    let promise = null;
 
     const getTime = () => {
         return typeof window !== 'undefined'
@@ -22,16 +20,12 @@ export function useSpring(customConfig) {
             : Date.now();
     };
 
-    function onReuqestAnim(cb) {
+    function onReuqestAnim(cb, res) {
         let velocity = config.velocity;
         let currentValue = lastValue;
         let animationLastTime = 0;
 
         const draw = () => {
-            // TODO: chec ho to use reset animationVelocity evry time se methods is called
-            // maybe interesting
-            // velocity = animationVelocity !== 0 ? animationVelocity : config.velocity;
-
             // Get current time
             const time = getTime();
 
@@ -63,39 +57,158 @@ export function useSpring(customConfig) {
             // Update last time
             animationLastTime = time;
 
-            // TODO: chec ho to use reset animationVelocity evry time se methods is called
-            // maybe interesting
-            // animationVelocity = velocity
+            // If tension == 0 linear movement
+            const isDisplacement =
+                config.tension !== 0
+                    ? Math.abs(currentValue - toValue) > config.precision
+                    : false;
 
-            if (Math.abs(currentValue - toValue) > config.precision) {
+            if (isDisplacement) {
                 req = requestAnimationFrame(draw);
             } else {
+                cancelAnimationFrame(req);
+                req = null;
+
                 // End of animation
                 lastValue = toValue;
 
                 // Fire callback with exact end value
                 cb(parseFloat(currentValue));
-                cancelAnimationFrame(req);
-                req = null;
+
+                // On complete
+                res();
+
+                // Set promise reference to null once resolved
+                promise = null;
             }
         };
 
         draw();
     }
 
-    function set(_toValue, cb) {
-        toValue = _toValue;
+    /**
+     * cancelRaf - Clear raf id force option is true
+     *
+     * @return {void}  description
+     */
+    function cancelRaf() {
+        // Abort promise
+        if (previousReject) {
+            previousReject();
+            promise = null;
+        }
 
-        // TODO: chec ho to use reset animationVelocity evry time se methods is called
-        // maybe interesting
-        // animationVelocity = 0;
-
-        if (!req) {
-            req = requestAnimationFrame(() => onReuqestAnim(cb));
+        // Reset RAF
+        if (req) {
+            cancelAnimationFrame(req);
+            req = null;
         }
     }
 
+    /**
+     * goTo - go from lastValue stored to new toValue
+     * If force reject previous primise use .catch((err) => {});
+     *
+     * @param  {number} to new toValue
+     * @param  {number} cb callback
+     * @param  {boolean} force force cancel FAR and restart
+     * @return {promise}  onComplete promise
+     */
+    function goTo(to, cb, force = false) {
+        if (force) cancelRaf();
+
+        toValue = to;
+
+        if (!req) {
+            promise = new Promise((res, reject) => {
+                previousReject = reject;
+                req = requestAnimationFrame(() => onReuqestAnim(cb, res));
+            });
+        }
+
+        return promise;
+    }
+
+    /**
+     * goFrom - go from new lastValue ( manually update lastValue )  to toValue sored
+     * If force reject previous primise use .catch((err) => {});
+     *
+     * @param  {number} from new lastValue
+     * @param  {number} cb callback
+     * @param  {boolean} force force cancel FAR and restart
+     * @return {promise}  onComplete promise
+     */
+    function goFrom(from, cb, force = false) {
+        if (force) cancelRaf();
+
+        lastValue = from;
+
+        if (!req) {
+            promise = new Promise((res, reject) => {
+                previousReject = reject;
+                req = requestAnimationFrame(() => onReuqestAnim(cb, res));
+            });
+        }
+
+        return promise;
+    }
+
+    /**
+     * goFromTo - Go From new lastValue to new toValue
+     * If force reject previous primise use .catch((err) => {});
+     *
+     * @param  {number} from new lastValue
+     * @param  {number} to new toValue
+     * @param  {number} cb callback
+     * @param  {boolean} force force cancel FAR and restart
+     * @return {promise}  onComplete promise
+     */
+    function goFromTo(from, to, cb, force = false) {
+        if (force) cancelRaf();
+
+        lastValue = from;
+        toValue = to;
+
+        if (!req) {
+            promise = new Promise((res, reject) => {
+                previousReject = reject;
+                req = requestAnimationFrame(() => onReuqestAnim(cb, res));
+            });
+        }
+
+        return promise;
+    }
+
+    /**
+     * set - set a a vlue without animation ( teleport )
+     * If force reject previous primise use .catch((err) => {});
+     *
+     * @param  {number} value new lastValue and new toValue
+     * @param  {number} cb callback
+     * @param  {boolean} force force cancel FAR and restart
+     * @return {promise}  onComplete promise
+     */
+    function set(value, cb, force = false) {
+        if (force) cancelRaf();
+
+        lastValue = value;
+        toValue = value;
+
+        if (!req) {
+            promise = new Promise((res, reject) => {
+                previousReject = reject;
+                req = requestAnimationFrame(() => onReuqestAnim(cb, res));
+            });
+        }
+
+        return promise;
+    }
+
+    // Public methods
     return {
+        goTo,
+        goFrom,
+        goFromTo,
         set,
     };
 }

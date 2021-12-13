@@ -213,7 +213,7 @@ export class ParallaxItemClass {
 
     smoothParallaxJs() {
         this.executeParallax(false);
-        this.spring.set(this.endValue, (value) => {
+        this.spring.goTo(this.endValue, (value) => {
             this.updateStyle(value);
         });
     }
