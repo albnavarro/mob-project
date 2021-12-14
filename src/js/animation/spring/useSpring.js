@@ -8,11 +8,10 @@ const defaultSpringConfig = {
 
 export function useSpring(customConfig) {
     const config = customConfig ? customConfig : defaultSpringConfig;
-    let toValue = 0;
-    let lastValue = 0;
     let req = null;
     let previousReject = null;
     let promise = null;
+    let values = [];
 
     const getTime = () => {
         return typeof window !== 'undefined'
@@ -21,9 +20,13 @@ export function useSpring(customConfig) {
     };
 
     function onReuqestAnim(cb, res) {
-        let velocity = config.velocity;
-        let currentValue = lastValue;
         let animationLastTime = 0;
+        let cbObject = {};
+
+        values.forEach((item, i) => {
+            item.velocity = config.velocity;
+            item.currentValue = item.lastValue;
+        });
 
         const draw = () => {
             // Get current time
@@ -41,39 +44,66 @@ export function useSpring(customConfig) {
 
             // Get lost frame, update vales until time is now
             for (let i = 0; i < numSteps; ++i) {
-                const tensionForce = -config.tension * (currentValue - toValue);
-                const dampingForce = -config.friction * velocity;
-                const acceleration =
-                    (tensionForce + dampingForce) / config.mass;
-                velocity = velocity + (acceleration * 1) / 1000;
-                currentValue = currentValue + (velocity * 1) / 1000;
+                values.forEach((item, i) => {
+                    const tensionForce =
+                        -config.tension * (item.currentValue - item.toValue);
+                    const dampingForce = -config.friction * item.velocity;
+                    const acceleration =
+                        (tensionForce + dampingForce) / config.mass;
+                    item.velocity = item.velocity + (acceleration * 1) / 1000;
+                    item.currentValue =
+                        item.currentValue + (item.velocity * 1) / 1000;
+
+                    // If tension == 0 linear movement
+                    const isRunning =
+                        config.tension !== 0
+                            ? Math.abs(item.currentValue - item.toValue) >
+                              config.precision
+                            : false;
+
+                    item.settled = !isRunning;
+                });
             }
 
-            console.log('draw');
+            // Prepare an obj to pass to the callback
+            // 1- Seta an array of object: [{prop: value},{prop2: value2} ...
+            // 1- Reduce to a Object: { prop: value, prop2: value2 } ...
+            cbObject = values
+                .map((item) => {
+                    return {
+                        [item.prop]: parseFloat(item.currentValue),
+                    };
+                })
+                .reduce((p, c) => {
+                    return { ...p, ...c };
+                }, {});
 
             // Fire callback
-            cb(parseFloat(currentValue));
+            cb(cbObject);
 
             // Update last time
             animationLastTime = time;
 
-            // If tension == 0 linear movement
-            const isDisplacement =
-                config.tension !== 0
-                    ? Math.abs(currentValue - toValue) > config.precision
-                    : false;
+            // Check if all values is completed
+            const allSettled = values.every((item) => item.settled === true);
 
-            if (isDisplacement) {
+            console.log('draw');
+
+            if (!allSettled) {
                 req = requestAnimationFrame(draw);
             } else {
                 cancelAnimationFrame(req);
                 req = null;
 
                 // End of animation
-                lastValue = toValue;
+                // Set lastValue with ended value
+                // At the next call lastValue become the start value
+                values.forEach((item, i) => {
+                    item.lastValue = item.toValue;
+                });
 
                 // Fire callback with exact end value
-                cb(parseFloat(currentValue));
+                cb(cbObject);
 
                 // On complete
                 res();
@@ -105,6 +135,55 @@ export function useSpring(customConfig) {
         }
     }
 
+    // Set initial data
+    function seData(obj) {
+        const valToArray = Object.keys(obj);
+
+        values = valToArray.map((item) => {
+            return {
+                prop: item,
+                toValue: 0,
+                lastValue: 0,
+                velocity: config.velocity,
+                currentValue: 0,
+                settled: false,
+            };
+        });
+    }
+
+    /**
+     * mergeData - Update values array with new data form methods
+     * Check if newData has new value for each prop
+     * If yes merge new value
+     *
+     * @param  {Array} newData description
+     * @return {void}         description
+     */
+    function mergeData(newData) {
+        values = values.map((item) => {
+            const itemToMerge = newData.find((item2) => {
+                return item2.prop === item.prop;
+            });
+
+            // If exist merge
+            return itemToMerge ? { ...item, ...itemToMerge } : item;
+        });
+    }
+
+    /**
+     * compareKeys - Compare fromObj, toObj in goFromTo methods
+     * Check if has the same keys
+     *
+     * @param  {Object} a fromObj Object
+     * @param  {Object} b toObj Object
+     * @return {bollean} has thew same keys
+     */
+    function compareKeys(a, b) {
+        var aKeys = Object.keys(a).sort();
+        var bKeys = Object.keys(b).sort();
+        return JSON.stringify(aKeys) === JSON.stringify(bKeys);
+    }
+
     /**
      * goTo - go from lastValue stored to new toValue
      * If force reject previous primise use .catch((err) => {});
@@ -113,11 +192,24 @@ export function useSpring(customConfig) {
      * @param  {number} cb callback
      * @param  {boolean} force force cancel FAR and restart
      * @return {promise}  onComplete promise
+     *
+     * @example
+     * mySpring.goTo({ val: 100 }, ({ val }) => {
+     *   console.log(val)
+     * });
      */
-    function goTo(to, cb, force = false) {
+    function goTo(obj, cb, force = false) {
         if (force) cancelRaf();
 
-        toValue = to;
+        const newDataArray = Object.keys(obj).map((item) => {
+            return {
+                prop: item,
+                toValue: obj[item],
+                settled: false,
+            };
+        });
+
+        mergeData(newDataArray);
 
         if (!req) {
             promise = new Promise((res, reject) => {
@@ -137,11 +229,24 @@ export function useSpring(customConfig) {
      * @param  {number} cb callback
      * @param  {boolean} force force cancel FAR and restart
      * @return {promise}  onComplete promise
+     *
+     * @example
+     * mySpring.goFrom({ val: 100 }, ({ val }) => {
+     *   console.log(val)
+     * });
      */
-    function goFrom(from, cb, force = false) {
+    function goFrom(obj, cb, force = false) {
         if (force) cancelRaf();
 
-        lastValue = from;
+        const newDataArray = Object.keys(obj).map((item) => {
+            return {
+                prop: item,
+                lastValue: obj[item],
+                settled: false,
+            };
+        });
+
+        mergeData(newDataArray);
 
         if (!req) {
             promise = new Promise((res, reject) => {
@@ -162,12 +267,29 @@ export function useSpring(customConfig) {
      * @param  {number} cb callback
      * @param  {boolean} force force cancel FAR and restart
      * @return {promise}  onComplete promise
+     *
+     * @example
+     * mySpring.goFromTo({ val: 0 },{ val: 100 }, ({ val }) => {
+     *   console.log(val)
+     * });
      */
-    function goFromTo(from, to, cb, force = false) {
+    function goFromTo(fromObj, toObj, cb, force = false) {
         if (force) cancelRaf();
 
-        lastValue = from;
-        toValue = to;
+        // Check if fromObj has the same keys of toObj
+        const dataIsValid = compareKeys(fromObj, toObj);
+        if (!dataIsValid) return promise;
+
+        const newDataArray = Object.keys(fromObj).map((item) => {
+            return {
+                prop: item,
+                lastValue: fromObj[item],
+                toValue: toObj[item],
+                settled: false,
+            };
+        });
+
+        mergeData(newDataArray);
 
         if (!req) {
             promise = new Promise((res, reject) => {
@@ -187,12 +309,26 @@ export function useSpring(customConfig) {
      * @param  {number} cb callback
      * @param  {boolean} force force cancel FAR and restart
      * @return {promise}  onComplete promise
+     *
+     *
+     * @example
+     * mySpring.set({ val: 100 }, ({ val }) => {
+     *   console.log(val)
+     * });
      */
-    function set(value, cb, force = false) {
+    function set(obj, cb, force = false) {
         if (force) cancelRaf();
 
-        lastValue = value;
-        toValue = value;
+        const newDataArray = Object.keys(obj).map((item) => {
+            return {
+                prop: item,
+                lastValue: obj[item],
+                toValue: obj[item],
+                settled: false,
+            };
+        });
+
+        mergeData(newDataArray);
 
         if (!req) {
             promise = new Promise((res, reject) => {
@@ -210,5 +346,6 @@ export function useSpring(customConfig) {
         goFrom,
         goFromTo,
         set,
+        seData,
     };
 }

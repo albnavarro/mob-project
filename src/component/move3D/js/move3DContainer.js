@@ -6,6 +6,7 @@ import {
     outerWidth,
     offset,
 } from '../../../js/utility/vanillaFunction.js';
+import { useSpring } from '.../../../js/animation/spring/useSpring.js';
 
 export class move3DContainerClass {
     constructor(data) {
@@ -35,11 +36,8 @@ export class move3DContainerClass {
         this.pageY = false;
         this.childrenInstances = [];
 
-        this.endValue = { axLimited: 0, ayLimited: 0 };
-        this.startValue = { axLimited: 0, ayLimited: 0 };
-        this.smooth = 10;
-        this.prevValue = 0;
-        this.rafOnScroll = null;
+        this.spring = new useSpring();
+        this.spring.seData({ axLimited: 0, ayLimited: 0 });
     }
 
     init() {
@@ -230,57 +228,18 @@ export class move3DContainerClass {
         if (apply) {
             this.endValue = { axLimited, ayLimited };
 
-            if (!this.rafOnScroll)
-                this.rafOnScroll = requestAnimationFrame(
-                    this.onReuqestAnimScroll.bind(this)
-                );
+            this.spring.goTo(
+                { axLimited, ayLimited },
+                ({ axLimited, ayLimited }) => {
+                    this.container.style.transform = `rotateY(${axLimited}deg) rotateX(${ayLimited}deg) translateZ(0)`;
+                }
+            );
 
             // Children
             for (const item of this.childrenInstances) {
                 if (item.animate) item.move(this.delta, this.limit);
             }
         }
-    }
-
-    onReuqestAnimScroll(timeStamp) {
-        const draw = (timeStamp) => {
-            // console.log('tick');
-
-            this.prevValue = { ...this.startValue };
-
-            const { axLimited, ayLimited } = (() => {
-                const v = this.smooth;
-                const { axLimited: axLimitedStart, ayLimited: ayLimitedStart } =
-                    this.startValue;
-                const { axLimited: axLimitedEnd, ayLimited: ayLimitedEnd } =
-                    this.endValue;
-
-                const axLimited =
-                    (axLimitedEnd - axLimitedStart) / v + axLimitedStart * 1;
-                const ayLimited =
-                    (ayLimitedEnd - ayLimitedStart) / v + ayLimitedStart * 1;
-
-                return {
-                    axLimited: axLimited.toFixed(1),
-                    ayLimited: ayLimited.toFixed(1),
-                };
-            })();
-
-            this.startValue = { axLimited, ayLimited };
-            const { axLimited: axPrev, ayLimited: ayPrev } = this.prevValue;
-
-            this.container.style.transform = `rotateY(${axLimited}deg) rotateX(${ayLimited}deg) translateZ(0)`;
-
-            if (axLimited == axPrev && ayLimited == ayPrev) {
-                cancelAnimationFrame(this.rafOnScroll);
-                this.rafOnScroll = null;
-                return;
-            }
-
-            this.rafOnScroll = requestAnimationFrame(draw);
-        };
-
-        draw(timeStamp);
     }
 
     draggable() {

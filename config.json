@@ -21,7 +21,7 @@
         "post" : "default/post.pug"
     },
     "defaultLocales" : "en",
-    "disableLocales" : [],
+    "disableLocales" : ["it"],
     "ogDefault" : {
         "title" : "og title default",
         "description" : "og description default",

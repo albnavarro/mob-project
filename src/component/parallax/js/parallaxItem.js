@@ -66,6 +66,8 @@ export class ParallaxItemClass {
         this.easeType = data.easeType || 'js';
         //
         this.spring = new useSpring();
+
+        this.spring.seData({ val: 0 });
     }
 
     init() {
@@ -213,8 +215,9 @@ export class ParallaxItemClass {
 
     smoothParallaxJs() {
         this.executeParallax(false);
-        this.spring.goTo(this.endValue, (value) => {
-            this.updateStyle(value);
+
+        this.spring.goTo({ val: this.endValue }, ({ val }) => {
+            this.updateStyle(val);
         });
     }
 
