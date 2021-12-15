@@ -72,7 +72,8 @@ export class useSpring {
                     const isRunning =
                         this.config.tension !== 0
                             ? Math.abs(item.currentValue - item.toValue) >
-                              this.config.precision
+                                  this.config.precision &&
+                              Math.abs(item.velocity) > this.config.precision
                             : false;
 
                     item.settled = !isRunning;
