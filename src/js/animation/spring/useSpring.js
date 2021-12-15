@@ -135,6 +135,12 @@ export class useSpring {
      * @return {void}  description
      */
     cancelRaf() {
+        // Update local values with last
+        this.values.forEach((item, i) => {
+            item.toValue = item.currentValue;
+            item.fromValue = item.toValue;
+        });
+
         // Abort promise
         if (this.previousReject) {
             this.previousReject();
@@ -347,7 +353,27 @@ export class useSpring {
         return this.promise;
     }
 
+    /**
+     * updateConfig - Update config object
+     *
+     * @param  {Object} config udate single prop of config object
+     * @return {void}
+     *
+     */
     updateConfig(config) {
         this.config = { ...this.config, ...config };
+    }
+
+    /**
+     * updatePreset - Update config object with new preset
+     *
+     * @param  {String} preset new preset
+     * @return {void}
+     *
+     */
+    updatePreset(preset) {
+        if (preset in springConfig) {
+            this.config = springConfig[preset];
+        }
     }
 }
