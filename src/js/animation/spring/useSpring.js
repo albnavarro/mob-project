@@ -197,15 +197,19 @@ export class useSpring {
      * setData - Set initial data structure
      *
      * @return {void}  description
+     *
+     * @example
+     * mySpring.setData({ val: 100 });
      */
     setData(obj) {
-        const valToArray = Object.keys(obj);
+        const valToArray = Object.entries(obj);
 
         this.values = valToArray.map((item) => {
+            const [prop, value] = item;
             return {
-                prop: item,
+                prop: prop,
                 toValue: 0,
-                fromValue: 0,
+                fromValue: value,
                 velocity: this.config.velocity,
                 currentValue: 0,
                 settled: false,
@@ -240,9 +244,7 @@ export class useSpring {
      * @return {promise}  onComplete promise
      *
      * @example
-     * mySpring.goTo({ val: 100 }, ({ val }) => {
-     *   console.log(val)
-     * });
+     * mySpring.goTo({ val: 100 });
      */
     goTo(obj) {
         const newDataArray = Object.keys(obj).map((item) => {
@@ -275,9 +277,7 @@ export class useSpring {
      * @return {promise}  onComplete promise
      *
      * @example
-     * mySpring.goFrom({ val: 100 }, ({ val }) => {
-     *   console.log(val)
-     * });
+     * mySpring.goFrom({ val: 100 });
      */
     goFrom(obj) {
         const newDataArray = Object.keys(obj).map((item) => {
@@ -311,9 +311,7 @@ export class useSpring {
      * @return {promise}  onComplete promise
      *
      * @example
-     * mySpring.goFromTo({ val: 0 },{ val: 100 }, ({ val }) => {
-     *   console.log(val)
-     * });
+     * mySpring.goFromTo({ val: 0 },{ val: 100 });
      */
     goFromTo(fromObj, toObj) {
         // Check if fromObj has the same keys of toObj
@@ -351,9 +349,7 @@ export class useSpring {
      *
      *
      * @example
-     * mySpring.set({ val: 100 }, ({ val }) => {
-     *   console.log(val)
-     * });
+     * mySpring.set({ val: 100 });
      */
     set(obj) {
         const newDataArray = Object.keys(obj).map((item) => {
