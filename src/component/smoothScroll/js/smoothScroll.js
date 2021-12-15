@@ -13,6 +13,7 @@ import {
     useMouseMove,
     useTouchMove,
     useMouseWheel,
+    useMouseClick
 } from '.../../../js/events/mouseUtils/useMouse.js';
 import { isDescendant } from '../../../js/utility/vanillaFunction.js';
 
@@ -63,6 +64,7 @@ export class SmoothScrollClass {
         this.subscribeMouseWheel = () => {};
         this.subscribeMouseMove = () => {};
         this.subscribeTouchMove = () => {};
+        this.subscribeMouseClick = () => {};
     }
 
     init() {
@@ -91,13 +93,9 @@ export class SmoothScrollClass {
 
         // DRAG LISTENER
         if (this.drag) {
-            // Prevent default listener
-            this.target.addEventListener(
-                'click',
-                (e) => this.preventChecker(e),
-                false
-            );
-            // End prevent default listener
+            this.subscribeMouseClick = useMouseClick(({target, preventDefault}) => {
+                this.preventChecker({target, preventDefault})
+            })
         }
 
         // Set link and button to draggable false, prevent mousemouve fail
@@ -124,6 +122,7 @@ export class SmoothScrollClass {
         this.subscribeMouseWheel();
         this.subscribeMouseMove();
         this.subscribeTouchMove();
+        this.subscribeMouseClick();
     }
 
     onTick(fn) {
@@ -136,9 +135,11 @@ export class SmoothScrollClass {
      * @param  {event} e listener event
      * @return {void}
      */
-    preventChecker(e) {
-        if (Math.abs(this.endValue - this.firstTouchValue) > this.threshold) {
-            e.preventDefault();
+    preventChecker({target, preventDefault}) {
+        if (target === this.target || isDescendant(this.target, target)) {
+            if (Math.abs(this.endValue - this.firstTouchValue) > this.threshold) {
+                preventDefault();
+            }
         }
     }
 
@@ -237,7 +238,7 @@ export class SmoothScrollClass {
             this.endValue += result;
 
             this.calcaluteValue();
-        } 
+        }
     }
 
     // WHEEL CONTROLS

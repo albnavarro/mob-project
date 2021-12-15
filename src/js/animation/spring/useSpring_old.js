@@ -1,46 +1,36 @@
-import { springConfig } from './springConfig.js';
-
-const getSpringTime = () => {
-    return typeof window !== 'undefined'
-        ? window.performance.now()
-        : Date.now();
+const defaultSpringConfig = {
+    tension: 20,
+    mass: 1,
+    friction: 5,
+    velocity: 0,
+    precision: 0.01,
 };
 
-/**
- * compareKeys - Compare fromObj, toObj in goFromTo methods
- * Check if has the same keys
- *
- * @param  {Object} a fromObj Object
- * @param  {Object} b toObj Object
- * @return {bollean} has thew same keys
- */
-function compareKeys(a, b) {
-    var aKeys = Object.keys(a).sort();
-    var bKeys = Object.keys(b).sort();
-    return JSON.stringify(aKeys) === JSON.stringify(bKeys);
-}
+export function useSpring(customConfig) {
+    const config = customConfig ? customConfig : defaultSpringConfig;
+    let req = null;
+    let previousReject = null;
+    let promise = null;
+    let values = [];
 
-export class useSpring {
-    constructor(config = springConfig.default) {
-        this.config = config;
-        this.req = null;
-        this.previousReject = null;
-        this.promise = null;
-        this.values = [];
-    }
+    const getTime = () => {
+        return typeof window !== 'undefined'
+            ? window.performance.now()
+            : Date.now();
+    };
 
-    onReuqestAnim(cb, res) {
+    function onReuqestAnim(cb, res) {
         let animationLastTime = 0;
         let cbObject = {};
 
-        this.values.forEach((item, i) => {
-            item.velocity = this.config.velocity;
-            item.currentValue = item.fromValue;
+        values.forEach((item, i) => {
+            item.velocity = config.velocity;
+            item.currentValue = item.lastValue;
         });
 
         const draw = () => {
             // Get current time
-            const time = getSpringTime();
+            const time = getTime();
 
             // lastTime is set to now the first time.
             // then check the difference from now and last time to check if we lost frame
@@ -54,22 +44,21 @@ export class useSpring {
 
             // Get lost frame, update vales until time is now
             for (let i = 0; i < numSteps; ++i) {
-                this.values.forEach((item, i) => {
+                values.forEach((item, i) => {
                     const tensionForce =
-                        -this.config.tension *
-                        (item.currentValue - item.toValue);
-                    const dampingForce = -this.config.friction * item.velocity;
+                        -config.tension * (item.currentValue - item.toValue);
+                    const dampingForce = -config.friction * item.velocity;
                     const acceleration =
-                        (tensionForce + dampingForce) / this.config.mass;
+                        (tensionForce + dampingForce) / config.mass;
                     item.velocity = item.velocity + (acceleration * 1) / 1000;
                     item.currentValue =
                         item.currentValue + (item.velocity * 1) / 1000;
 
                     // If tension == 0 linear movement
                     const isRunning =
-                        this.config.tension !== 0
+                        config.tension !== 0
                             ? Math.abs(item.currentValue - item.toValue) >
-                              this.config.precision
+                              config.precision
                             : false;
 
                     item.settled = !isRunning;
@@ -79,7 +68,7 @@ export class useSpring {
             // Prepare an obj to pass to the callback
             // 1- Seta an array of object: [{prop: value},{prop2: value2} ...
             // 1- Reduce to a Object: { prop: value, prop2: value2 } ...
-            cbObject = this.values
+            cbObject = values
                 .map((item) => {
                     return {
                         [item.prop]: parseFloat(item.currentValue),
@@ -96,23 +85,21 @@ export class useSpring {
             animationLastTime = time;
 
             // Check if all values is completed
-            const allSettled = this.values.every(
-                (item) => item.settled === true
-            );
+            const allSettled = values.every((item) => item.settled === true);
 
             console.log('draw');
 
             if (!allSettled) {
-                this.req = requestAnimationFrame(draw);
+                req = requestAnimationFrame(draw);
             } else {
-                cancelAnimationFrame(this.req);
-                this.req = null;
+                cancelAnimationFrame(req);
+                req = null;
 
                 // End of animation
-                // Set fromValue with ended value
-                // At the next call fromValue become the start value
-                this.values.forEach((item, i) => {
-                    item.fromValue = item.toValue;
+                // Set lastValue with ended value
+                // At the next call lastValue become the start value
+                values.forEach((item, i) => {
+                    item.lastValue = item.toValue;
                 });
 
                 // Fire callback with exact end value
@@ -122,7 +109,7 @@ export class useSpring {
                 res();
 
                 // Set promise reference to null once resolved
-                this.promise = null;
+                promise = null;
             }
         };
 
@@ -134,30 +121,30 @@ export class useSpring {
      *
      * @return {void}  description
      */
-    cancelRaf() {
+    function cancelRaf() {
         // Abort promise
-        if (this.previousReject) {
-            this.previousReject();
-            this.promise = null;
+        if (previousReject) {
+            previousReject();
+            promise = null;
         }
 
         // Reset RAF
-        if (this.req) {
-            cancelAnimationFrame(this.req);
-            this.req = null;
+        if (req) {
+            cancelAnimationFrame(req);
+            req = null;
         }
     }
 
     // Set initial data
-    seData(obj) {
+    function seData(obj) {
         const valToArray = Object.keys(obj);
 
-        this.values = valToArray.map((item) => {
+        values = valToArray.map((item) => {
             return {
                 prop: item,
                 toValue: 0,
-                fromValue: 0,
-                velocity: this.config.velocity,
+                lastValue: 0,
+                velocity: config.velocity,
                 currentValue: 0,
                 settled: false,
             };
@@ -172,10 +159,10 @@ export class useSpring {
      * @param  {Array} newData description
      * @return {void}         description
      */
-    mergeData(newData) {
-        this.values = this.values.map((item) => {
-            const itemToMerge = newData.find((newItem) => {
-                return newItem.prop === item.prop;
+    function mergeData(newData) {
+        values = values.map((item) => {
+            const itemToMerge = newData.find((item2) => {
+                return item2.prop === item.prop;
             });
 
             // If exist merge
@@ -184,7 +171,21 @@ export class useSpring {
     }
 
     /**
-     * goTo - go from fromValue stored to new toValue
+     * compareKeys - Compare fromObj, toObj in goFromTo methods
+     * Check if has the same keys
+     *
+     * @param  {Object} a fromObj Object
+     * @param  {Object} b toObj Object
+     * @return {bollean} has thew same keys
+     */
+    function compareKeys(a, b) {
+        var aKeys = Object.keys(a).sort();
+        var bKeys = Object.keys(b).sort();
+        return JSON.stringify(aKeys) === JSON.stringify(bKeys);
+    }
+
+    /**
+     * goTo - go from lastValue stored to new toValue
      * If force reject previous primise use .catch((err) => {});
      *
      * @param  {number} to new toValue
@@ -197,8 +198,8 @@ export class useSpring {
      *   console.log(val)
      * });
      */
-    goTo(obj, cb, force = false) {
-        if (force) this.cancelRaf();
+    function goTo(obj, cb, force = false) {
+        if (force) cancelRaf();
 
         const newDataArray = Object.keys(obj).map((item) => {
             return {
@@ -208,25 +209,23 @@ export class useSpring {
             };
         });
 
-        this.mergeData(newDataArray);
+        mergeData(newDataArray);
 
-        if (!this.req) {
-            this.promise = new Promise((res, reject) => {
-                this.previousReject = reject;
-                this.req = requestAnimationFrame(() =>
-                    this.onReuqestAnim(cb, res)
-                );
+        if (!req) {
+            promise = new Promise((res, reject) => {
+                previousReject = reject;
+                req = requestAnimationFrame(() => onReuqestAnim(cb, res));
             });
         }
 
-        return this.promise;
+        return promise;
     }
 
     /**
-     * goFrom - go from new fromValue ( manually update fromValue )  to toValue sored
+     * goFrom - go from new lastValue ( manually update lastValue )  to toValue sored
      * If force reject previous primise use .catch((err) => {});
      *
-     * @param  {number} from new fromValue
+     * @param  {number} from new lastValue
      * @param  {number} cb callback
      * @param  {boolean} force force cancel FAR and restart
      * @return {promise}  onComplete promise
@@ -236,36 +235,34 @@ export class useSpring {
      *   console.log(val)
      * });
      */
-    goFrom(obj, cb, force = false) {
-        if (force) this.cancelRaf();
+    function goFrom(obj, cb, force = false) {
+        if (force) cancelRaf();
 
         const newDataArray = Object.keys(obj).map((item) => {
             return {
                 prop: item,
-                fromValue: obj[item],
+                lastValue: obj[item],
                 settled: false,
             };
         });
 
-        this.mergeData(newDataArray);
+        mergeData(newDataArray);
 
-        if (!this.req) {
-            this.promise = new Promise((res, reject) => {
-                this.previousReject = reject;
-                this.req = requestAnimationFrame(() =>
-                    this.onReuqestAnim(cb, res)
-                );
+        if (!req) {
+            promise = new Promise((res, reject) => {
+                previousReject = reject;
+                req = requestAnimationFrame(() => onReuqestAnim(cb, res));
             });
         }
 
-        return this.promise;
+        return promise;
     }
 
     /**
-     * goFromTo - Go From new fromValue to new toValue
+     * goFromTo - Go From new lastValue to new toValue
      * If force reject previous primise use .catch((err) => {});
      *
-     * @param  {number} from new fromValue
+     * @param  {number} from new lastValue
      * @param  {number} to new toValue
      * @param  {number} cb callback
      * @param  {boolean} force force cancel FAR and restart
@@ -276,41 +273,39 @@ export class useSpring {
      *   console.log(val)
      * });
      */
-    goFromTo(fromObj, toObj, cb, force = false) {
-        if (force) this.cancelRaf();
+    function goFromTo(fromObj, toObj, cb, force = false) {
+        if (force) cancelRaf();
 
         // Check if fromObj has the same keys of toObj
         const dataIsValid = compareKeys(fromObj, toObj);
-        if (!dataIsValid) return this.promise;
+        if (!dataIsValid) return promise;
 
         const newDataArray = Object.keys(fromObj).map((item) => {
             return {
                 prop: item,
-                fromValue: fromObj[item],
+                lastValue: fromObj[item],
                 toValue: toObj[item],
                 settled: false,
             };
         });
 
-        this.mergeData(newDataArray);
+        mergeData(newDataArray);
 
-        if (!this.req) {
-            this.promise = new Promise((res, reject) => {
-                this.previousReject = reject;
-                this.req = requestAnimationFrame(() =>
-                    this.onReuqestAnim(cb, res)
-                );
+        if (!req) {
+            promise = new Promise((res, reject) => {
+                previousReject = reject;
+                req = requestAnimationFrame(() => onReuqestAnim(cb, res));
             });
         }
 
-        return this.promise;
+        return promise;
     }
 
     /**
      * set - set a a vlue without animation ( teleport )
      * If force reject previous primise use .catch((err) => {});
      *
-     * @param  {number} value new fromValue and new toValue
+     * @param  {number} value new lastValue and new toValue
      * @param  {number} cb callback
      * @param  {boolean} force force cancel FAR and restart
      * @return {promise}  onComplete promise
@@ -321,33 +316,36 @@ export class useSpring {
      *   console.log(val)
      * });
      */
-    set(obj, cb, force = false) {
-        if (this.force) this.cancelRaf();
+    function set(obj, cb, force = false) {
+        if (force) cancelRaf();
 
         const newDataArray = Object.keys(obj).map((item) => {
             return {
                 prop: item,
-                fromValue: obj[item],
+                lastValue: obj[item],
                 toValue: obj[item],
                 settled: false,
             };
         });
 
-        this.mergeData(newDataArray);
+        mergeData(newDataArray);
 
-        if (!this.req) {
-            this.promise = new Promise((res, reject) => {
-                this.previousReject = reject;
-                this.req = requestAnimationFrame(() =>
-                    this.onReuqestAnim(cb, res)
-                );
+        if (!req) {
+            promise = new Promise((res, reject) => {
+                previousReject = reject;
+                req = requestAnimationFrame(() => onReuqestAnim(cb, res));
             });
         }
 
-        return this.promise;
+        return promise;
     }
 
-    updateConfig(config) {
-        this.config = { ...this.config, ...config };
-    }
+    // Public methods
+    return {
+        goTo,
+        goFrom,
+        goFromTo,
+        set,
+        seData,
+    };
 }

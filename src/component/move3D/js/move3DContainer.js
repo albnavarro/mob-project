@@ -37,7 +37,7 @@ export class move3DContainerClass {
         this.childrenInstances = [];
 
         this.spring = new useSpring();
-        this.spring.seData({ axLimited: 0, ayLimited: 0 });
+        this.spring.seData({ ax: 0, ay: 0 });
     }
 
     init() {
@@ -226,14 +226,9 @@ export class move3DContainerClass {
         const apply = (this.drag && this.onDrag) || !this.drag ? true : false;
 
         if (apply) {
-            this.endValue = { axLimited, ayLimited };
-
-            this.spring.goTo(
-                { axLimited, ayLimited },
-                ({ axLimited, ayLimited }) => {
-                    this.container.style.transform = `rotateY(${axLimited}deg) rotateX(${ayLimited}deg) translateZ(0)`;
-                }
-            );
+            this.spring.goTo({ ax: axLimited, ay: ayLimited }, ({ ax, ay }) => {
+                this.container.style.transform = `rotateY(${ax}deg) rotateX(${ay}deg) translateZ(0)`;
+            });
 
             // Children
             for (const item of this.childrenInstances) {

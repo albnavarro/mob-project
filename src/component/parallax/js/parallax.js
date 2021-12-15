@@ -166,9 +166,9 @@ class ParallaxClass {
         // with this attribute they will always be performed
         data.limiterOff = item.hasAttribute('data-limiterOff');
 
-        // String
-        // 1 - 10
-        data.scrub = item.getAttribute('data-scrub');
+        // spring config
+        // use string form spingConfig.js definition
+        data.springConfig = item.getAttribute('data-springConfig');
 
         // Boolean
         // Mandatory computationType = 'default'

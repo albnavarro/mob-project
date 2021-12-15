@@ -1,0 +1,37 @@
+export const springConfig = {
+    default: {
+        tension: 20,
+        mass: 1,
+        friction: 5,
+        velocity: 0,
+        precision: 0.01,
+    },
+    linear: {
+        tension: 280,
+        mass: 1,
+        friction: 60,
+        velocity: 0,
+        precision: 0.01,
+    },
+    gentle: {
+        tension: 120,
+        mass: 1,
+        friction: 14,
+        velocity: 0,
+        precision: 0.01,
+    },
+    wobbly: {
+        tension: 180,
+        mass: 1,
+        friction: 12,
+        velocity: 0,
+        precision: 0.01,
+    },
+    slow: {
+        tension: 280,
+        mass: 1,
+        friction: 120,
+        velocity: 0,
+        precision: 0.01,
+    },
+};

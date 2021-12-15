@@ -5,6 +5,7 @@ import { useFrame } from '.../../../js/events/rafutils/rafUtils.js';
 import { useResize } from '.../../../js/events/resizeUtils/useResize.js';
 import { useScroll } from '.../../../js/events/scrollUtils/useScroll.js';
 import { useSpring } from '.../../../js/animation/spring/useSpring.js';
+import { springConfig } from '.../../../js/animation/spring/springConfig.js';
 
 export class ParallaxItemClass {
     constructor(data) {
@@ -65,12 +66,18 @@ export class ParallaxItemClass {
         this.propierties = data.propierties || 'vertical';
         this.easeType = data.easeType || 'js';
         //
+        this.springConfig = data.springConfig || null
         this.spring = new useSpring();
-
         this.spring.seData({ val: 0 });
     }
 
     init() {
+        if(this.springConfig && this.springConfig in springConfig) {
+            const config = springConfig[this.springConfig];
+            this.spring.updateConfig(config);
+        }
+
+
         if (this.computationType == 'fixed') this.limiterOff = true;
 
         this.item.classList.add('parallax__item');

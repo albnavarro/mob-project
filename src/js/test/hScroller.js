@@ -21,7 +21,7 @@ export const hScroller = () => {
         scrollTrigger: '.pluto3',
         direction: 'horizontal',
         computationType: 'fixed',
-        // ease: true,
+        ease: true,
         reverse: true,
         propierties: 'horizontal',
     });
