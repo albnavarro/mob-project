@@ -43,9 +43,14 @@ import { gsapTest } from './test/gsapTest.js';
 import { storeTest } from './test/storeTest.js';
 import { hScroller } from './test/hScroller.js';
 import { loadImageFromManifest } from './test/loadImageFromManifest.js';
+import { springTest } from './test/springTest.js';
 
 const body = document.querySelector('body');
 eventManager.init(true, true);
+
+if (body.classList.contains('page-index')) {
+   springTest();
+}
 
 if (body.classList.contains('template-fixed')) {
     const smoothScroll = new SmoothScrollClass();

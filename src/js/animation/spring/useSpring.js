@@ -24,12 +24,15 @@ export class useSpring {
     constructor(config = springConfig.default) {
         this.config = config;
         this.req = null;
+        this.previousResolve = null;
         this.previousReject = null;
         this.promise = null;
         this.values = [];
+        this.id = 0;
+        this.callback = [];
     }
 
-    onReuqestAnim(cb, res) {
+    onReuqestAnim(res) {
         let animationLastTime = 0;
         let cbObject = {};
 
@@ -90,7 +93,9 @@ export class useSpring {
                 }, {});
 
             // Fire callback
-            cb(cbObject);
+            this.callback.forEach(({ cb }) => {
+                cb(cbObject);
+            });
 
             // Update last time
             animationLastTime = time;
@@ -116,7 +121,9 @@ export class useSpring {
                 });
 
                 // Fire callback with exact end value
-                cb(cbObject);
+                this.callback.forEach(({ cb }) => {
+                    cb(cbObject);
+                });
 
                 // On complete
                 res();
@@ -130,11 +137,11 @@ export class useSpring {
     }
 
     /**
-     * cancelRaf - Clear raf id force option is true
+     * stop - Stop animatona and force return reject form promise
      *
      * @return {void}  description
      */
-    cancelRaf() {
+    stop() {
         // Update local values with last
         this.values.forEach((item, i) => {
             item.toValue = item.currentValue;
@@ -154,8 +161,43 @@ export class useSpring {
         }
     }
 
-    // Set initial data
-    seData(obj) {
+    /**
+     * pause - Pause animation
+     *
+     * @return {void}  description
+     */
+    pause() {
+        // Update fromValue values with currentValue
+        this.values.forEach((item, i) => {
+            item.fromValue = item.currentValue;
+        });
+
+        // Reset RAF
+        if (this.req) {
+            cancelAnimationFrame(this.req);
+            this.req = null;
+        }
+    }
+
+    /**
+     * play - Play animation if is in pause, use resolve of last promise
+     *
+     * @return {void}  description
+     */
+    play() {
+        if (!this.req && this.previousResolve) {
+            this.req = requestAnimationFrame(() =>
+                this.onReuqestAnim(this.previousResolve)
+            );
+        }
+    }
+
+    /**
+     * setData - Set initial data structure
+     *
+     * @return {void}  description
+     */
+    setData(obj) {
         const valToArray = Object.keys(obj);
 
         this.values = valToArray.map((item) => {
@@ -194,8 +236,6 @@ export class useSpring {
      * If force reject previous primise use .catch((err) => {});
      *
      * @param  {number} to new toValue
-     * @param  {number} cb callback
-     * @param  {boolean} force force cancel FAR and restart
      * @return {promise}  onComplete promise
      *
      * @example
@@ -203,9 +243,7 @@ export class useSpring {
      *   console.log(val)
      * });
      */
-    goTo(obj, cb, force = false) {
-        if (force) this.cancelRaf();
-
+    goTo(obj) {
         const newDataArray = Object.keys(obj).map((item) => {
             return {
                 prop: item,
@@ -219,9 +257,8 @@ export class useSpring {
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
                 this.previousReject = reject;
-                this.req = requestAnimationFrame(() =>
-                    this.onReuqestAnim(cb, res)
-                );
+                this.previousResolve = res;
+                this.req = requestAnimationFrame(() => this.onReuqestAnim(res));
             });
         }
 
@@ -233,7 +270,6 @@ export class useSpring {
      * If force reject previous primise use .catch((err) => {});
      *
      * @param  {number} from new fromValue
-     * @param  {number} cb callback
      * @param  {boolean} force force cancel FAR and restart
      * @return {promise}  onComplete promise
      *
@@ -242,9 +278,7 @@ export class useSpring {
      *   console.log(val)
      * });
      */
-    goFrom(obj, cb, force = false) {
-        if (force) this.cancelRaf();
-
+    goFrom(obj) {
         const newDataArray = Object.keys(obj).map((item) => {
             return {
                 prop: item,
@@ -258,9 +292,8 @@ export class useSpring {
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
                 this.previousReject = reject;
-                this.req = requestAnimationFrame(() =>
-                    this.onReuqestAnim(cb, res)
-                );
+                this.previousResolve = res;
+                this.req = requestAnimationFrame(() => this.onReuqestAnim(res));
             });
         }
 
@@ -273,7 +306,6 @@ export class useSpring {
      *
      * @param  {number} from new fromValue
      * @param  {number} to new toValue
-     * @param  {number} cb callback
      * @param  {boolean} force force cancel FAR and restart
      * @return {promise}  onComplete promise
      *
@@ -282,9 +314,7 @@ export class useSpring {
      *   console.log(val)
      * });
      */
-    goFromTo(fromObj, toObj, cb, force = false) {
-        if (force) this.cancelRaf();
-
+    goFromTo(fromObj, toObj) {
         // Check if fromObj has the same keys of toObj
         const dataIsValid = compareKeys(fromObj, toObj);
         if (!dataIsValid) return this.promise;
@@ -303,9 +333,8 @@ export class useSpring {
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
                 this.previousReject = reject;
-                this.req = requestAnimationFrame(() =>
-                    this.onReuqestAnim(cb, res)
-                );
+                this.previousResolve = res;
+                this.req = requestAnimationFrame(() => this.onReuqestAnim(res));
             });
         }
 
@@ -317,8 +346,6 @@ export class useSpring {
      * If force reject previous primise use .catch((err) => {});
      *
      * @param  {number} value new fromValue and new toValue
-     * @param  {number} cb callback
-     * @param  {boolean} force force cancel FAR and restart
      * @return {promise}  onComplete promise
      *
      *
@@ -327,9 +354,7 @@ export class useSpring {
      *   console.log(val)
      * });
      */
-    set(obj, cb, force = false) {
-        if (this.force) this.cancelRaf();
-
+    set(obj) {
         const newDataArray = Object.keys(obj).map((item) => {
             return {
                 prop: item,
@@ -344,9 +369,8 @@ export class useSpring {
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
                 this.previousReject = reject;
-                this.req = requestAnimationFrame(() =>
-                    this.onReuqestAnim(cb, res)
-                );
+                this.previousResolve = res;
+                this.req = requestAnimationFrame(() => this.onReuqestAnim(res));
             });
         }
 
@@ -375,5 +399,22 @@ export class useSpring {
         if (preset in springConfig) {
             this.config = springConfig[preset];
         }
+    }
+
+    /**
+     * subscribe - add callback to stack
+     *
+     * @param  {function} cb cal function
+     * @return {function} unsubscribe callback
+     *
+     */
+    subscribe(cb) {
+        this.callback.push({ cb, id: this.id });
+        const cbId = this.id;
+        this.id++;
+
+        return () => {
+            this.callback = this.callback.filter((item) => item.id !== cbId);
+        };
     }
 }

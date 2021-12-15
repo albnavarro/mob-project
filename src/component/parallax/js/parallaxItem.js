@@ -68,10 +68,16 @@ export class ParallaxItemClass {
         //
         this.springConfig = data.springConfig || null
         this.spring = new useSpring();
-        this.spring.seData({ val: 0 });
+        this.unsubscribeSpring = () => {};
     }
 
     init() {
+        this.spring.setData({ val: 0 });
+
+        this.unsubscribeSpring = this.spring.subscribe(({ val }) => {
+            this.updateStyle(val);
+        });
+
         if(this.springConfig && this.springConfig in springConfig) {
             const config = springConfig[this.springConfig];
             this.spring.updateConfig(config);
@@ -195,6 +201,7 @@ export class ParallaxItemClass {
     unsubscribe() {
         this.unsubscribeScroll();
         this.unsubscribeResize();
+        this.unsubscribeSpring();
     }
 
     refresh() {
@@ -222,10 +229,7 @@ export class ParallaxItemClass {
 
     smoothParallaxJs() {
         this.executeParallax(false);
-
-        this.spring.goTo({ val: this.endValue }, ({ val }) => {
-            this.updateStyle(val);
-        });
+        this.spring.goTo({ val: this.endValue });
     }
 
     updateStyle(val) {

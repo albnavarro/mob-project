@@ -9,7 +9,6 @@ import {
 import { forceRedraw } from '../../../js/utility/redrowNode.js';
 import { detectSafari } from '../../../js/utility/isSafari.js';
 import { tUtils } from './predictiveTurbolenceUtils.js';
-import { SimpleStore } from '../../../js/utility/simpleStore.js';
 import { useSpring } from '.../../../js/animation/spring/useSpring.js';
 import { springConfig } from '.../../../js/animation/spring/springConfig.js';
 
@@ -28,23 +27,27 @@ export class PredictiveTurbolenceItemClass {
         this.breackpoint = data.breackpoint;
         this.queryType = data.queryType;
         this.invert = data.invert;
+        this.turbolenceEl = null;
+        this.displacementMap = null;
+        this.offsetY = 0;
+        this.offsetX = 0;
+        this.width = 0;
+        this.height = 0;
         this.spring = new useSpring();
-        this.spring.seData({ baseFrequency: 0, scale: 0 });
-
-        this.store = new SimpleStore({
-            turbolenceEl: null,
-            displacementMap: null,
-            offsetY: 0,
-            offsetX: 0,
-            width: 0,
-            height: 0,
-        });
-
-        Object.freeze(this);
+        this.unsubscribeSpring = () => {};
     }
 
     init() {
         if (!mq[this.queryType](this.breackpoint)) return;
+
+        this.spring.setData({ baseFrequency: 0, scale: 0 });
+
+        this.unsubscribeSpring = this.spring.subscribe(
+            ({ baseFrequency, scale }) => {
+                if(this.turbolenceEl) this.turbolenceEl.setAttribute('baseFrequency', `${baseFrequency}`);
+                if(this.displacementMap)  this.displacementMap.setAttribute('scale', `${scale}`);
+            }
+        );
 
         this.spring.updateConfig(springConfig.linear);
 
@@ -98,15 +101,13 @@ export class PredictiveTurbolenceItemClass {
         div.innerHTML = svg.trim();
         document.body.appendChild(div);
 
-        const turbolenceEl = document.querySelector(
+        this.turbolenceEl = document.querySelector(
             `.predictiveTurbolence-svg-${this.counter} feTurbulence`
         );
-        this.store.setProp('turbolenceEl', turbolenceEl);
 
-        const displacementMap = document.querySelector(
+        this.displacementMap = document.querySelector(
             `.predictiveTurbolence-svg-${this.counter} feDisplacementMap`
         );
-        this.store.setProp('displacementMap', displacementMap);
 
         // Apply filter url to element
         const style = {
@@ -120,31 +121,27 @@ export class PredictiveTurbolenceItemClass {
     onResize() {
         const item = this.item;
 
-        this.store.setProp('offsetY', offset(item).top);
-        this.store.setProp('offsetX', offset(item).left);
-        this.store.setProp('width', outerWidth(item));
-        this.store.setProp('height', outerHeight(item));
+        this.offsetY = offset(item).top;
+        this.offsetX = offset(item).left;
+        this.width = outerWidth(item);
+        this.height = outerHeight(item);
     }
 
     onMove() {
         const x = mouseManager.pageX();
         const y = mouseManager.pageY();
-        const offsetX = this.store.getProp('offsetX');
-        const offsetY = this.store.getProp('offsetY');
-        const width = this.store.getProp('width');
-        const height = this.store.getProp('height');
 
         // Define axsis data
         const xData = {
             position: x,
-            offset: offsetX,
-            dimension: width,
+            offset: this.offsetX,
+            dimension: this.width,
         };
 
         const yData = {
             position: y,
-            offset: offsetY,
-            dimension: height,
+            offset: this.offsetY,
+            dimension: this.height,
         };
 
         // Get position form object
@@ -203,18 +200,9 @@ export class PredictiveTurbolenceItemClass {
             this.minScale
         );
 
-        const turbolenceEl = this.store.getProp('turbolenceEl');
-        const displacementMap = this.store.getProp('displacementMap');
-
-        this.spring.goTo(
-            { baseFrequency: baseFrequencyClamped, scale: scaleClamped },
-            ({ baseFrequency, scale }) => {
-                turbolenceEl.setAttribute(
-                    'baseFrequency',
-                    `${baseFrequency}`
-                );
-                displacementMap.setAttribute('scale', `${scale}`);
-            }
-        );
+        this.spring.goTo({
+            baseFrequency: baseFrequencyClamped,
+            scale: scaleClamped,
+        });
     }
 }

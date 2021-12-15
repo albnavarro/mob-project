@@ -34,4 +34,11 @@ export const springConfig = {
         velocity: 0,
         precision: 0.01,
     },
+    bounce: {
+        tension: 200,
+        mass: 3,
+        friction: 5,
+        velocity: 0,
+        precision: 0.01,
+    },
 };
