@@ -169,17 +169,18 @@ export class useSpring {
 
     /**
      * pause - Pause animation
+     * @param  {Number} decay px amout to decay animation
      *
      * @return {void}  description
      */
-    pause() {
+    pause(decay = .01) {
         if (this.pauseStatus) return;
         this.pauseStatus = true;
 
         this.values.forEach((item, i) => {
             if (!item.settled) {
                 item.toValueOnPause = item.toValue;
-                item.toValue = item.currentValue + 1;
+                item.toValue = item.currentValue + decay;
                 item.onPause = true;
             } else {
                 item.onPause = false;
