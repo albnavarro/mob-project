@@ -3,10 +3,10 @@ import { springConfig } from '../animation/spring/springConfig.js';
 
 export function springTest() {
     const btnStart = document.querySelector('.spring-btn-start');
-    const btnBack= document.querySelector('.spring-btn-back');
-    const btnStop= document.querySelector('.spring-btn-stop');
-    const btnPause= document.querySelector('.spring-btn-pause');
-    const btnPlay= document.querySelector('.spring-btn-play');
+    const btnBack = document.querySelector('.spring-btn-back');
+    const btnStop = document.querySelector('.spring-btn-stop');
+    const btnPause = document.querySelector('.spring-btn-pause');
+    const btnPlay = document.querySelector('.spring-btn-play');
     const target = document.querySelector('.spring-target');
 
     const mySpring = new useSpring();
@@ -41,11 +41,17 @@ export function springTest() {
         return mySpring.goTo({ x: -100, rotate: 90 });
     }
 
+    function tween4() {
+        mySpring.updatePreset('gentle');
+        return mySpring.goTo({ x: 0, y: 0, rotate: 0 });
+    }
+
     btnStart.addEventListener('click', () => {
         intialTween()
             .then(() => tween1())
             .then(() => tween2())
             .then(() => tween3())
+            .then(() => tween4())
             .catch(() => {});
     });
 
@@ -62,6 +68,6 @@ export function springTest() {
     });
 
     btnPlay.addEventListener('click', () => {
-        mySpring.play();
+        mySpring.resume();
     });
 }

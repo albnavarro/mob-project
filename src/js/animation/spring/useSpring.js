@@ -30,6 +30,7 @@ export class useSpring {
         this.values = [];
         this.id = 0;
         this.callback = [];
+        this.pauseStatus = false;
     }
 
     onReuqestAnim(res) {
@@ -127,10 +128,12 @@ export class useSpring {
                 });
 
                 // On complete
-                res();
+                if (!this.pauseStatus) {
+                    res();
 
-                // Set promise reference to null once resolved
-                this.promise = null;
+                    // Set promise reference to null once resolved
+                    this.promise = null;
+                }
             }
         };
 
@@ -143,6 +146,8 @@ export class useSpring {
      * @return {void}  description
      */
     stop() {
+        this.resetValueOnResume();
+
         // Update local values with last
         this.values.forEach((item, i) => {
             item.toValue = item.currentValue;
@@ -168,28 +173,46 @@ export class useSpring {
      * @return {void}  description
      */
     pause() {
-        // Update fromValue values with currentValue
-        this.values.forEach((item, i) => {
-            item.fromValue = item.currentValue;
-        });
+        if (this.pauseStatus) return;
+        this.pauseStatus = true;
 
-        // Reset RAF
-        if (this.req) {
-            cancelAnimationFrame(this.req);
-            this.req = null;
-        }
+        this.values.forEach((item, i) => {
+            if (!item.settled) {
+                item.toValueOnPause = item.toValue;
+                item.toValue = item.currentValue + 1;
+                item.onPause = true;
+            } else {
+                item.onPause = false;
+            }
+        });
+    }
+
+    resetValueOnResume() {
+      this.values.forEach((item, i) => {
+          if (item.onPause) {
+              item.toValue = item.toValueOnPause;
+              item.velocity = this.config.velocity,
+              item.onPause = false;
+              item.settled = false;
+          }
+      });
+
+      this.pauseStatus = false;
     }
 
     /**
-     * play - Play animation if is in pause, use resolve of last promise
+     * resume - resume animation if is in pause, use resolve of last promise
      *
      * @return {void}  description
      */
-    play() {
+    resume() {
+        if (!this.pauseStatus) return;
+        this.resetValueOnResume();
+
         if (!this.req && this.previousResolve) {
-            this.req = requestAnimationFrame(() =>
-                this.onReuqestAnim(this.previousResolve)
-            );
+            this.req = requestAnimationFrame(() => {
+                this.onReuqestAnim(this.previousResolve);
+            });
         }
     }
 
@@ -209,10 +232,12 @@ export class useSpring {
             return {
                 prop: prop,
                 toValue: 0,
+                toValueOnPause: 0,
                 fromValue: value,
                 velocity: this.config.velocity,
                 currentValue: 0,
                 settled: false,
+                onPause: false,
             };
         });
     }
@@ -247,6 +272,8 @@ export class useSpring {
      * mySpring.goTo({ val: 100 });
      */
     goTo(obj) {
+        if (this.pauseStatus) this.resetValueOnResume();
+
         const newDataArray = Object.keys(obj).map((item) => {
             return {
                 prop: item,
@@ -280,6 +307,8 @@ export class useSpring {
      * mySpring.goFrom({ val: 100 });
      */
     goFrom(obj) {
+        if (this.pauseStatus) this.resetValueOnResume();
+
         const newDataArray = Object.keys(obj).map((item) => {
             return {
                 prop: item,
@@ -314,6 +343,8 @@ export class useSpring {
      * mySpring.goFromTo({ val: 0 },{ val: 100 });
      */
     goFromTo(fromObj, toObj) {
+        if (this.pauseStatus) this.resetValueOnResume();
+
         // Check if fromObj has the same keys of toObj
         const dataIsValid = compareKeys(fromObj, toObj);
         if (!dataIsValid) return this.promise;
@@ -352,6 +383,8 @@ export class useSpring {
      * mySpring.set({ val: 100 });
      */
     set(obj) {
+        if (this.pauseStatus) this.resetValueOnResume();
+
         const newDataArray = Object.keys(obj).map((item) => {
             return {
                 prop: item,
