@@ -1,14 +1,8 @@
-import { springConfig } from './springConfig.js';
+import { tweenConfig } from './tweenConfig.js';
 
-const getSpringTime = () => {
-    return typeof window !== 'undefined'
-        ? window.performance.now()
-        : Date.now();
-};
-
-export class useSpring {
-    constructor(config = springConfig.default) {
-        this.config = config;
+export class useTween {
+    constructor(ease = tweenConfig.easeOutBack) {
+        this.ease = ease;
         this.req = null;
         this.previousResolve = null;
         this.previousReject = null;
@@ -17,55 +11,42 @@ export class useSpring {
         this.id = 0;
         this.callback = [];
         this.pauseStatus = false;
+        this.duration = 1000;
+        this.startTime = null;
+        this.isRunning = false;
+        this.timeElapsed = 0;
+        this.pauseTime = 0;
     }
 
-    onReuqestAnim(res) {
-        let animationLastTime = 0;
+    onReuqestAnim(timestamp, res) {
         let cbObject = {};
 
-        this.values.forEach((item, i) => {
-            item.velocity = this.config.velocity;
-            item.currentValue = item.fromValue;
-        });
+        this.startTime = timestamp;
 
-        const draw = () => {
-            // Get current time
-            const time = getSpringTime();
-
-            // lastTime is set to now the first time.
-            // then check the difference from now and last time to check if we lost frame
-            let lastTime = animationLastTime !== 0 ? animationLastTime : time;
-
-            // If we lost a lot of frames just jump to the end.
-            if (time > lastTime + 64) lastTime = time;
-
-            // http://gafferongames.com/game-physics/fix-your-timestep/
-            let numSteps = Math.floor(time - lastTime);
-
-            // Get lost frame, update vales until time is now
-            for (let i = 0; i < numSteps; ++i) {
-                this.values.forEach((item, i) => {
-                    const tensionForce =
-                        -this.config.tension *
-                        (item.currentValue - item.toValue);
-                    const dampingForce = -this.config.friction * item.velocity;
-                    const acceleration =
-                        (tensionForce + dampingForce) / this.config.mass;
-                    item.velocity = item.velocity + (acceleration * 1) / 1000;
-                    item.currentValue =
-                        item.currentValue + (item.velocity * 1) / 1000;
-
-                    // If tension == 0 linear movement
-                    const isRunning =
-                        this.config.tension !== 0
-                            ? Math.abs(item.currentValue - item.toValue) >
-                                  this.config.precision &&
-                              Math.abs(item.velocity) > this.config.precision
-                            : false;
-
-                    item.settled = !isRunning;
-                });
+        const draw = (timestamp) => {
+            if (this.pauseStatus) {
+                this.pauseTime = timestamp - this.startTime - this.timeElapsed;
             }
+            this.timeElapsed = timestamp - this.startTime - this.pauseTime;
+
+            if (this.isRunning && parseInt(this.timeElapsed) >= this.duration) {
+                this.timeElapsed = this.duration;
+            }
+
+            this.values.forEach((item, i) => {
+                if (item.update) {
+                    item.currentValue = this.ease(
+                        this.timeElapsed,
+                        item.fromValue,
+                        item.toValProcessed,
+                        this.duration
+                    );
+                } else {
+                    item.currentValue = item.fromValue;
+                }
+            });
+
+            const isSettled = parseInt(this.timeElapsed) === this.duration;
 
             // Prepare an obj to pass to the callback
             // 1- Seta an array of object: [{prop: value},{prop2: value2} ...
@@ -85,27 +66,24 @@ export class useSpring {
                 cb(cbObject);
             });
 
-            // Update last time
-            animationLastTime = time;
+            this.isRunning = true;
 
-            // Check if all values is completed
-            const allSettled = this.values.every(
-                (item) => item.settled === true
-            );
-
-            console.log('draw');
-
-            if (!allSettled) {
+            if (!isSettled) {
                 this.req = requestAnimationFrame(draw);
             } else {
                 cancelAnimationFrame(this.req);
                 this.req = null;
+                this.isRunning = false;
+                this.pauseTime = 0;
 
                 // End of animation
                 // Set fromValue with ended value
                 // At the next call fromValue become the start value
                 this.values.forEach((item, i) => {
-                    item.fromValue = item.toValue;
+                    if (item.update) {
+                        item.toValue = item.currentValue;
+                        item.fromValue = item.currentValue;
+                    }
                 });
 
                 // Fire callback with exact end value
@@ -123,11 +101,11 @@ export class useSpring {
             }
         };
 
-        draw();
+        draw(timestamp);
     }
 
     /**
-     * compareKeys - Compare fromObj, toObj in goFromTo methods
+     * this.compareKeys - Compare fromObj, toObj in goFromTo methods
      * Check if has the same keys
      *
      * @param  {Object} a fromObj Object
@@ -146,7 +124,8 @@ export class useSpring {
      * @return {void}  description
      */
     stop() {
-        this.resetValueOnResume();
+        this.pauseTime = 0;
+        this.pauseStatus = false;
 
         // Update local values with last
         this.values.forEach((item, i) => {
@@ -173,31 +152,9 @@ export class useSpring {
      *
      * @return {void}  description
      */
-    pause(decay = 0.01) {
+    pause() {
         if (this.pauseStatus) return;
         this.pauseStatus = true;
-
-        this.values.forEach((item, i) => {
-            if (!item.settled) {
-                item.toValueOnPause = item.toValue;
-                item.toValue = item.currentValue + decay;
-                item.onPause = true;
-            } else {
-                item.onPause = false;
-            }
-        });
-    }
-
-    resetValueOnResume() {
-        this.values.forEach((item, i) => {
-            if (item.onPause) {
-                item.toValue = item.toValueOnPause;
-                (item.velocity = this.config.velocity), (item.onPause = false);
-                item.settled = false;
-            }
-        });
-
-        this.pauseStatus = false;
     }
 
     /**
@@ -207,13 +164,7 @@ export class useSpring {
      */
     resume() {
         if (!this.pauseStatus) return;
-        this.resetValueOnResume();
-
-        if (!this.req && this.previousResolve) {
-            this.req = requestAnimationFrame(() => {
-                this.onReuqestAnim(this.previousResolve);
-            });
-        }
+        this.pauseStatus = false;
     }
 
     /**
@@ -233,11 +184,10 @@ export class useSpring {
                 prop: prop,
                 toValue: 0,
                 toValueOnPause: 0,
+                toValProcessed: 0,
                 fromValue: value,
-                velocity: this.config.velocity,
                 currentValue: 0,
-                settled: false,
-                onPause: false,
+                update: false,
             };
         });
     }
@@ -257,7 +207,17 @@ export class useSpring {
             });
 
             // If exist merge
-            return itemToMerge ? { ...item, ...itemToMerge } : item;
+            return itemToMerge
+                ? { ...item, ...itemToMerge, ...{ update: true } }
+                : { ...item, ...{ update: false } };
+        });
+    }
+
+    setToValProcessed() {
+        this.values.forEach((item, i) => {
+            if (item.update) {
+                item.toValProcessed = item.toValue - item.fromValue;
+            }
         });
     }
 
@@ -271,24 +231,27 @@ export class useSpring {
      * @example
      * mySpring.goTo({ val: 100 });
      */
-    goTo(obj) {
-        if (this.pauseStatus) this.resetValueOnResume();
+    goTo(obj, duration = 1000) {
+        this.pauseStatus = false;
+        this.duration = duration;
 
         const newDataArray = Object.keys(obj).map((item) => {
             return {
                 prop: item,
                 toValue: obj[item],
-                settled: false,
             };
         });
 
         this.mergeData(newDataArray);
+        this.setToValProcessed();
 
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
                 this.previousReject = reject;
                 this.previousResolve = res;
-                this.req = requestAnimationFrame(() => this.onReuqestAnim(res));
+                this.req = requestAnimationFrame((timestamp) => {
+                    this.onReuqestAnim(timestamp, res);
+                });
             });
         }
 
@@ -306,24 +269,26 @@ export class useSpring {
      * @example
      * mySpring.goFrom({ val: 100 });
      */
-    goFrom(obj) {
-        if (this.pauseStatus) this.resetValueOnResume();
+    goFrom(obj, duration = 1000) {
+        this.duration = duration;
 
         const newDataArray = Object.keys(obj).map((item) => {
             return {
                 prop: item,
                 fromValue: obj[item],
-                settled: false,
             };
         });
 
         this.mergeData(newDataArray);
+        this.setToValProcessed();
 
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
                 this.previousReject = reject;
                 this.previousResolve = res;
-                this.req = requestAnimationFrame(() => this.onReuqestAnim(res));
+                this.req = requestAnimationFrame((timestamp) => {
+                    this.onReuqestAnim(timestamp, res);
+                });
             });
         }
 
@@ -342,8 +307,8 @@ export class useSpring {
      * @example
      * mySpring.goFromTo({ val: 0 },{ val: 100 });
      */
-    goFromTo(fromObj, toObj) {
-        if (this.pauseStatus) this.resetValueOnResume();
+    goFromTo(fromObj, toObj, duration = 1000) {
+        this.duration = duration;
 
         // Check if fromObj has the same keys of toObj
         const dataIsValid = this.compareKeys(fromObj, toObj);
@@ -354,17 +319,19 @@ export class useSpring {
                 prop: item,
                 fromValue: fromObj[item],
                 toValue: toObj[item],
-                settled: false,
             };
         });
 
         this.mergeData(newDataArray);
+        this.setToValProcessed();
 
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
                 this.previousReject = reject;
                 this.previousResolve = res;
-                this.req = requestAnimationFrame(() => this.onReuqestAnim(res));
+                this.req = requestAnimationFrame((timestamp) => {
+                    this.onReuqestAnim(timestamp, res);
+                });
             });
         }
 
@@ -382,40 +349,31 @@ export class useSpring {
      * @example
      * mySpring.set({ val: 100 });
      */
-    set(obj) {
-        if (this.pauseStatus) this.resetValueOnResume();
+    set(obj, duration = 1000) {
+        this.duration = duration;
 
         const newDataArray = Object.keys(obj).map((item) => {
             return {
                 prop: item,
                 fromValue: obj[item],
                 toValue: obj[item],
-                settled: false,
             };
         });
 
         this.mergeData(newDataArray);
+        this.setToValProcessed();
 
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
                 this.previousReject = reject;
                 this.previousResolve = res;
-                this.req = requestAnimationFrame(() => this.onReuqestAnim(res));
+                this.req = requestAnimationFrame((timestamp) => {
+                    this.onReuqestAnim(timestamp, res);
+                });
             });
         }
 
         return this.promise;
-    }
-
-    /**
-     * updateConfig - Update config object
-     *
-     * @param  {Object} config udate single prop of config object
-     * @return {void}
-     *
-     */
-    updateConfig(config) {
-        this.config = { ...this.config, ...config };
     }
 
     /**
@@ -426,8 +384,8 @@ export class useSpring {
      *
      */
     updatePreset(preset) {
-        if (preset in springConfig) {
-            this.config = springConfig[preset];
+        if (preset in tweenConfig) {
+            this.ease = tweenConfig[preset];
         }
     }
 

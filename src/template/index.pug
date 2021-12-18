@@ -36,6 +36,22 @@ block content
                 button.spring-btn-play(type="button")
                   |resume
                 .parallax__item-test.spring-target
+                  
+                  
+                // TWEEN TEST
+                h1
+                  |Calssic tween chain animation
+                button.tween-btn-start(type="button")
+                  |start
+                button.tween-btn-back(type="button")
+                  |back
+                button.tween-btn-stop(type="button")
+                  |stop
+                button.tween-btn-pause(type="button")
+                  |pause
+                button.tween-btn-play(type="button")
+                  |resume
+                .parallax__item-test.tween-target
 
                 //- ACCORDION
                 h3
@@ -115,7 +131,7 @@ block content
                 include ../component/lightbox/pug/button.pug
 
                 include ../component/tooltip/pug/tooltip.pug
-                    
+                
 
                 .parallax__item-test(
                     data-conponent='m-comp--parallax',
@@ -129,7 +145,9 @@ block content
                     data-align='start',
                     data-propierties="opacity")
 
-
+        include ../component/threeBlocks/pug/tBlocks.pug
+        include ../component/threeBlocks/pug/tBlocks.pug
+        
         section.overflow-hidden
             .interceptTrigger.parallax__item-test(
                 data-conponent='m-comp--animate'

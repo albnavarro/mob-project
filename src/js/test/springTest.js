@@ -1,5 +1,4 @@
 import { useSpring } from '../animation/spring/useSpring.js';
-import { springConfig } from '../animation/spring/springConfig.js';
 
 export function springTest() {
     const btnStart = document.querySelector('.spring-btn-start');

@@ -1,14 +1,14 @@
 // POLYFILL
-import { arrayFromPolyfill } from './polyfill/arrayFrom.js';
-import { objAssignPolyfill } from './polyfill/objAssign.js';
-import { closestPolyfill } from './polyfill/closest.js';
-import { arrayMatchesPolyfill } from './polyfill/matches.js';
-import { arrayFlatPolyfill } from './polyfill/flat.js';
-import { arrayIncludesPolyfill } from './polyfill/includes.js';
-import { arrayFindPolyfill } from './polyfill/find.js';
-import { removePolyfill } from './polyfill/remove.js';
-import { customEventPolyfill } from './polyfill/customEvent.js';
-import { objEntriesPolyfill } from './polyfill/entries.js';
+// import { arrayFromPolyfill } from './polyfill/arrayFrom.js';
+// import { objAssignPolyfill } from './polyfill/objAssign.js';
+// import { closestPolyfill } from './polyfill/closest.js';
+// import { arrayMatchesPolyfill } from './polyfill/matches.js';
+// import { arrayFlatPolyfill } from './polyfill/flat.js';
+// import { arrayIncludesPolyfill } from './polyfill/includes.js';
+// import { arrayFindPolyfill } from './polyfill/find.js';
+// import { removePolyfill } from './polyfill/remove.js';
+// import { customEventPolyfill } from './polyfill/customEvent.js';
+// import { objEntriesPolyfill } from './polyfill/entries.js';
 
 // BASE MODULE
 import { eventManager } from './base/eventManager.js';
@@ -33,7 +33,7 @@ import { glitch } from '../component/glitch/js/glitch.js';
 import { wave } from '../component/wave/js/wave.js';
 import { predictiveTurbolence } from '../component/predictiveTurbolence/js/predictiveTurbolence.js';
 import { animate } from '../component/animate/js/animate.js';
-import { pageScroll } from '../component/pageScroll/js/pageScroll.js';
+// import { pageScroll } from '../component/pageScroll/js/pageScroll.js';
 import { SmoothScrollClass } from '../component/smoothScroll/js/smoothScroll.js';
 import { dragger } from '../component/dragger/js/dragger.js';
 import { GsapHorizontalCustomClass } from '../component/gsapHorizontalCustom/js/gsapHorizontalCustom.js';
@@ -44,12 +44,14 @@ import { storeTest } from './test/storeTest.js';
 import { hScroller } from './test/hScroller.js';
 import { loadImageFromManifest } from './test/loadImageFromManifest.js';
 import { springTest } from './test/springTest.js';
+import { tweenTest } from './test/tweenTest.js';
 
 const body = document.querySelector('body');
 eventManager.init(true, true);
 
 if (body.classList.contains('page-index')) {
-   springTest();
+    springTest();
+    tweenTest();
 }
 
 if (body.classList.contains('template-fixed')) {
@@ -74,7 +76,7 @@ if (body.classList.contains('page-gsapHorizontal2')) {
 }
 
 mouseManager.init();
-pageScroll.init();
+// pageScroll.init();
 parallax.init();
 tBlocks.init();
 showElement.init();
@@ -126,26 +128,6 @@ if (typeof tBlockContaner1 != 'undefined' && tBlockContaner1 != null) {
         false
     );
 }
-
-// Offset custom event
-// L'evento su OffsetSlider è legato all'elemento component ( .offset-slider ) che lo dispaccia
-// Sul cambio di step possiamo fare cose, arriva:
-// Active Index
-const offsetSliderTest = document.querySelector('.offset-slider');
-if (typeof offsetSliderTest != 'undefined' && offsetSliderTest != null) {
-    offsetSliderTest.addEventListener(
-        'stepChange',
-        (e) => {
-            console.log(e.detail);
-        },
-        false
-    );
-}
-
-// const offsetSlider = new offsetSliderClass({
-//     container: '.offset-slider',
-//     step: 8
-// })
 
 // FIND ELEMENT
 findElement('.offset-slider')

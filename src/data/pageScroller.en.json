@@ -1,6 +1,7 @@
 {
     "template": "pageScroller",
     "pageTitle": "pageScroller",
+    "draft": true,
     "description": "custom description",
     "additionalData": ["string/en.json", "nav.json", "nonEsistenteFile.json"],
     "registerComponent": [
