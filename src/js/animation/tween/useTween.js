@@ -97,6 +97,8 @@ export class useTween {
 
                     // Set promise reference to null once resolved
                     this.promise = null;
+                    this.previousReject = null;
+                    this.previousResolve = null;
                 }
             }
         };
@@ -137,6 +139,8 @@ export class useTween {
         if (this.previousReject) {
             this.previousReject();
             this.promise = null;
+            this.previousReject = null;
+            this.previousResolve = null;
         }
 
         // Reset RAF
@@ -237,6 +241,12 @@ export class useTween {
         });
     }
 
+    /**
+     * setToValProcessed - Update to value to match an absolute destination
+     *
+     * @return {void}  onComplete promise
+     *
+     */
     setToValProcessed() {
         this.values.forEach((item, i) => {
             if (item.update) {
@@ -255,8 +265,8 @@ export class useTween {
      * myTween.goTo({ val: 100 }).catch((err) => {});
      */
     goTo(obj, duration = 1000) {
-        this.pauseStatus = false;
         this.duration = duration;
+        if (this.pauseStatus) this.stop();
 
         const newDataArray = Object.keys(obj).map((item) => {
             return {
@@ -294,6 +304,7 @@ export class useTween {
      */
     goFrom(obj, duration = 1000) {
         this.duration = duration;
+        if (this.pauseStatus) this.stop();
 
         const newDataArray = Object.keys(obj).map((item) => {
             return {
@@ -332,6 +343,7 @@ export class useTween {
      */
     goFromTo(fromObj, toObj, duration = 1000) {
         this.duration = duration;
+        if (this.pauseStatus) this.stop();
 
         // Check if fromObj has the same keys of toObj
         const dataIsValid = this.compareKeys(fromObj, toObj);
@@ -374,6 +386,7 @@ export class useTween {
      */
     set(obj, duration = 1000) {
         this.duration = duration;
+        if (this.pauseStatus) this.stop();
 
         const newDataArray = Object.keys(obj).map((item) => {
             return {

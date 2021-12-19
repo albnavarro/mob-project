@@ -1,6 +1,7 @@
 import { eventManager } from '../../../js/base/eventManager.js';
 import { mouseManager } from '../../../js/base/mouseManager.js';
 import { isDescendant } from '../../../js/utility/vanillaFunction.js';
+import { useSpring } from '.../../../js/animation/spring/useSpring.js';
 
 export class DraggerItemClass {
     constructor(data) {
@@ -34,15 +35,14 @@ export class DraggerItemClass {
         this.limitX = (this.itemWidth - this.contWidth) / 2;
         this.limitY = (this.itemHeight - this.contHeight) / 2;
 
-        // EASING
-        this.endValue = { xValue: 0, yValue: 0 };
-        this.startValue = { xValue: 0, yValue: 0 };
-        this.prevValue = 0;
-        this.rafOnScroll = null;
-
         // Detect click
         this.firstTouchValue = 0;
         this.threshold = 30;
+
+        // Animation
+        this.endValue = { xValue: 0, yValue: 0 };
+        this.spring = new useSpring();
+        this.unsubscribeSpring = () => {};
     }
 
     init() {
@@ -94,12 +94,7 @@ export class DraggerItemClass {
         // Set start position
         switch (this.startPosition) {
             case this.TOP_LEFT:
-                this.item.style.transform = `translate3D(${this.limitX}px, ${this.limitY}px, 0)`;
                 this.endValue = {
-                    xValue: this.limitX,
-                    yValue: this.limitY,
-                };
-                this.startValue = {
                     xValue: this.limitX,
                     yValue: this.limitY,
                 };
@@ -108,14 +103,7 @@ export class DraggerItemClass {
                 break;
 
             case this.TOP_RIGHT:
-                this.item.style.transform = `translate3D(${-this.limitX}px, ${
-                    this.limitY
-                }px, 0)`;
                 this.endValue = {
-                    xValue: -this.limitX,
-                    yValue: this.limitY,
-                };
-                this.startValue = {
                     xValue: -this.limitX,
                     yValue: this.limitY,
                 };
@@ -124,14 +112,7 @@ export class DraggerItemClass {
                 break;
 
             case this.BOTTOM_LEFT:
-                this.item.style.transform = `translate3D(${
-                    this.limitX
-                }px, ${-this.limitY}px, 0)`;
                 this.endValue = {
-                    xValue: this.limitX,
-                    yValue: -this.limitY,
-                };
-                this.startValue = {
                     xValue: this.limitX,
                     yValue: -this.limitY,
                 };
@@ -140,13 +121,7 @@ export class DraggerItemClass {
                 break;
 
             case this.BOTTOM_RIGHT:
-                this.item.style.transform = `translate3D(${-this
-                    .limitX}px, ${-this.limitY}px, 0)`;
                 this.endValue = {
-                    xValue: -this.limitX,
-                    yValue: -this.limitY,
-                };
-                this.startValue = {
                     xValue: -this.limitX,
                     yValue: -this.limitY,
                 };
@@ -154,6 +129,22 @@ export class DraggerItemClass {
                 this.dragY = -this.itemHeight;
                 break;
         }
+
+        // Setup spring animation
+        this.spring.setData({
+            x: 0,
+            y: 0,
+        });
+
+        // Set inzial position based on align selected
+        this.spring.set({
+            x: this.endValue.xValue,
+            y: this.endValue.yValue,
+        });
+
+        this.unsubscribeSpring = this.spring.subscribe(({ x, y }) => {
+            this.item.style.transform = `translate3D(${x}px, ${y}px, 0)`;
+        });
 
         // Set link and button to draggable false, prevent mousemouve fail
         this.compRoot.style['user-select'] = 'none';
@@ -293,47 +284,7 @@ export class DraggerItemClass {
 
         if (this.onDrag) {
             this.endValue = { xValue, yValue };
-
-            if (!this.rafOnScroll)
-                this.rafOnScroll = requestAnimationFrame(
-                    this.onReuqestAnimScroll.bind(this)
-                );
+            this.spring.goTo({ x: xValue, y: yValue }).catch((err) => {});
         }
-    }
-
-    onReuqestAnimScroll(timeStamp) {
-        const draw = (timeStamp) => {
-            this.prevValue = { ...this.startValue };
-
-            const { xValue, yValue } = (() => {
-                const v = this.smooth;
-                const { xValue: xValueStart, yValue: yValueStart } =
-                    this.startValue;
-                const { xValue: xValueEnd, yValue: yValueEnd } = this.endValue;
-
-                const xValue = (xValueEnd - xValueStart) / v + xValueStart * 1;
-                const yValue = (yValueEnd - yValueStart) / v + yValueStart * 1;
-
-                return {
-                    xValue: xValue.toFixed(1),
-                    yValue: yValue.toFixed(1),
-                };
-            })();
-
-            this.startValue = { xValue, yValue };
-            const { xValue: axPrev, yValue: ayPrev } = this.prevValue;
-
-            this.item.style.transform = `translate3D(${xValue}px, ${yValue}px, 0)`;
-
-            if (xValue == axPrev && yValue == ayPrev) {
-                cancelAnimationFrame(this.rafOnScroll);
-                this.rafOnScroll = null;
-                return;
-            }
-
-            this.rafOnScroll = requestAnimationFrame(draw);
-        };
-
-        draw(timeStamp);
     }
 }

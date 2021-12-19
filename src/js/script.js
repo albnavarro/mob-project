@@ -45,6 +45,7 @@ import { hScroller } from './test/hScroller.js';
 import { loadImageFromManifest } from './test/loadImageFromManifest.js';
 import { springTest } from './test/springTest.js';
 import { tweenTest } from './test/tweenTest.js';
+import { lerpTest } from './test/lerpTest.js';
 
 const body = document.querySelector('body');
 eventManager.init(true, true);
@@ -52,6 +53,7 @@ eventManager.init(true, true);
 if (body.classList.contains('page-index')) {
     springTest();
     tweenTest();
+    lerpTest();
 }
 
 if (body.classList.contains('template-fixed')) {

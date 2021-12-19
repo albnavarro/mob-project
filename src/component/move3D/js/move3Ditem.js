@@ -1,4 +1,5 @@
 import { move3DUtils } from './move3Dutils.js';
+import { useLerp } from '.../../../js/animation/lerp/useLerp.js';
 
 export class move3DitemClass {
     constructor(data) {
@@ -9,15 +10,19 @@ export class move3DitemClass {
         this.range = data.range;
         this.initialRotate = data.initialRotate;
         this.animate = data.animate;
-
-        this.endValue = { depth: 0, rotateX: 0, rotateY: 0 };
-        this.startValue = { depth: 0, rotateX: 0, rotateY: 0 };
-        this.smooth = 10;
-        this.prevValue = 0;
-        this.rafOnScroll = null;
+        this.lerp = new useLerp();
+        this.unsubscribelerp = () => {};
     }
 
     init() {
+        this.lerp.setData({ depth: 0, rotateX: 0, rotateY: 0 });
+
+        this.unsubscribelerp = this.lerp.subscribe(
+            ({ depth, rotateX, rotateY }) => {
+                this.item.style.transform = `translate3D(0,0,${depth}px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            }
+        );
+
         if (!this.animate) {
             const style = {
                 transform: `translateZ(${this.depth}px)`,
@@ -48,64 +53,6 @@ export class move3DitemClass {
             getRotateFromPositionData
         );
 
-        this.endValue = { depth, rotateX, rotateY };
-
-        if (!this.rafOnScroll)
-            this.rafOnScroll = requestAnimationFrame(
-                this.onReuqestAnimScroll.bind(this)
-            );
-    }
-
-    onReuqestAnimScroll(timeStamp) {
-        const draw = (timeStamp) => {
-            // console.log('tick');
-
-            this.prevValue = { ...this.startValue };
-
-            const { depth, rotateX, rotateY } = (() => {
-                const v = this.smooth;
-                const {
-                    depth: depthStart,
-                    rotateX: rotateXStart,
-                    rotateY: rotateYStart,
-                } = this.startValue;
-                const {
-                    depth: depthEnd,
-                    rotateX: rotateXEnd,
-                    rotateY: rotateYEnd,
-                } = this.endValue;
-
-                const depth = (depthEnd - depthStart) / v + depthStart * 1;
-                const rotateX =
-                    (rotateXEnd - rotateXStart) / v + rotateXStart * 1;
-                const rotateY =
-                    (rotateYEnd - rotateYStart) / v + rotateYStart * 1;
-
-                return {
-                    depth: depth.toFixed(1),
-                    rotateX: rotateX.toFixed(1),
-                    rotateY: rotateY.toFixed(1),
-                };
-            })();
-
-            this.startValue = { depth, rotateX, rotateY };
-            const {
-                depth: depthPrev,
-                rotateX: axPrev,
-                rotateY: ayPrev,
-            } = this.prevValue;
-
-            this.item.style.transform = `translate3D(0,0,${depth}px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-
-            if (depth == depthPrev && rotateX == axPrev && rotateY == ayPrev) {
-                cancelAnimationFrame(this.rafOnScroll);
-                this.rafOnScroll = null;
-                return;
-            }
-
-            this.rafOnScroll = requestAnimationFrame(draw);
-        };
-
-        draw(timeStamp);
+        this.lerp.goTo({ depth, rotateX, rotateY }).catch((err) => {});
     }
 }

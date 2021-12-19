@@ -5,6 +5,7 @@ import {
     outerWidth,
     offset,
 } from '../../../js/utility/vanillaFunction.js';
+import { useSpring } from '.../../../js/animation/spring/useSpring.js';
 
 export class MouseParallaxItemClass {
     constructor(data) {
@@ -16,11 +17,9 @@ export class MouseParallaxItemClass {
         this.width = 0;
         this.offSetTop = 0;
         this.offSetLeft = 0;
-        this.endValue = { ax: 0, ay: 0 };
-        this.startValue = { ax: 0, ay: 0 };
         this.smooth = 10;
-        this.prevValue = 0;
-        this.rafOnScroll = null;
+        this.spring = new useSpring();
+        this.unsubscribeSpring = () => {};
     }
 
     init() {
@@ -31,6 +30,12 @@ export class MouseParallaxItemClass {
             eventManager.push('resize', () => this.getDimension());
             mouseManager.push('scroll', () => this.onMove());
         }
+
+        this.spring.setData({ ax: 0, ay: 0 });
+
+        this.unsubscribeSpring = this.spring.subscribe(({ ax, ay }) => {
+            this.item.style.transform = `translate3D(${ax}px, ${ay}px, 0)`;
+        });
     }
 
     getDimension() {
@@ -74,44 +79,6 @@ export class MouseParallaxItemClass {
             }
         })();
 
-        this.endValue = { ax, ay };
-
-        if (!this.rafOnScroll)
-            this.rafOnScroll = requestAnimationFrame(
-                this.onReuqestAnimScroll.bind(this)
-            );
-    }
-
-    onReuqestAnimScroll(timeStamp) {
-        const draw = (timeStamp) => {
-            console.log('tick');
-
-            this.prevValue = { ...this.startValue };
-
-            const { ax, ay } = (() => {
-                const v = this.smooth;
-                const { ax: axStart, ay: ayStart } = this.startValue;
-                const { ax: axEnd, ay: ayEnd } = this.endValue;
-
-                const ax = (axEnd - axStart) / v + axStart * 1;
-                const ay = (ayEnd - ayStart) / v + ayStart * 1;
-
-                return { ax: ax.toFixed(1), ay: ay.toFixed(1) };
-            })();
-
-            this.startValue = { ax, ay };
-            const { ax: axPrev, ay: ayPrev } = this.prevValue;
-            this.item.style.transform = `translate3D(${ax}px, ${ay}px, 0)`;
-
-            if (ax == axPrev && ay == ayPrev) {
-                cancelAnimationFrame(this.rafOnScroll);
-                this.rafOnScroll = null;
-                return;
-            }
-
-            this.rafOnScroll = requestAnimationFrame(draw);
-        };
-
-        draw(timeStamp);
+        this.spring.goTo({ ax, ay }).catch((err) => {});
     }
 }
