@@ -11,6 +11,7 @@ export class useTween {
         this.id = 0;
         this.callback = [];
         this.pauseStatus = false;
+        this.comeFromResume = false;
         this.duration = 1000;
         this.startTime = null;
         this.isRunning = false;
@@ -128,6 +129,7 @@ export class useTween {
     stop() {
         this.pauseTime = 0;
         this.pauseStatus = false;
+        this.comeFromResume = false;
 
         // Update local values with last
         this.values.forEach((item, i) => {
@@ -169,6 +171,7 @@ export class useTween {
     resume() {
         if (!this.pauseStatus) return;
         this.pauseStatus = false;
+        this.comeFromResume = true;
     }
 
     /**
@@ -266,7 +269,7 @@ export class useTween {
      */
     goTo(obj, duration = 1000) {
         this.duration = duration;
-        if (this.pauseStatus) this.stop();
+        if (this.pauseStatus || this.comeFromResume) this.stop();
 
         const newDataArray = Object.keys(obj).map((item) => {
             return {
@@ -304,7 +307,7 @@ export class useTween {
      */
     goFrom(obj, duration = 1000) {
         this.duration = duration;
-        if (this.pauseStatus) this.stop();
+        if (this.pauseStatus || this.comeFromResume) this.stop();
 
         const newDataArray = Object.keys(obj).map((item) => {
             return {
@@ -343,7 +346,7 @@ export class useTween {
      */
     goFromTo(fromObj, toObj, duration = 1000) {
         this.duration = duration;
-        if (this.pauseStatus) this.stop();
+        if (this.pauseStatus || this.comeFromResume) this.stop();
 
         // Check if fromObj has the same keys of toObj
         const dataIsValid = this.compareKeys(fromObj, toObj);
@@ -386,7 +389,7 @@ export class useTween {
      */
     set(obj, duration = 1000) {
         this.duration = duration;
-        if (this.pauseStatus) this.stop();
+        if (this.pauseStatus || this.comeFromResume) this.stop();
 
         const newDataArray = Object.keys(obj).map((item) => {
             return {
