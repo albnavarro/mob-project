@@ -1,8 +1,8 @@
 import { tweenConfig } from './tweenConfig.js';
 
 export class useTween {
-    constructor(ease = tweenConfig.easeOutBack) {
-        this.ease = ease;
+    constructor(ease = 'easeOutBack') {
+        this.ease = tweenConfig[ease];
         this.req = null;
         this.previousResolve = null;
         this.previousReject = null;
@@ -173,7 +173,7 @@ export class useTween {
      * @return {void}  description
      *
      * @example
-     * mySpring.setData({ val: 100 });
+     * myTween.setData({ val: 100 });
      */
     setData(obj) {
         const valToArray = Object.entries(obj);
@@ -213,6 +213,30 @@ export class useTween {
         });
     }
 
+    /**
+     * updateDataWhileRunning - Cancel RAF when event fire while is isRunning
+     * update form value
+     *
+     * @return {void}
+     */
+    updateDataWhileRunning() {
+        cancelAnimationFrame(this.req);
+        this.req = null;
+
+        // Abort promise
+        if (this.previousReject) {
+            this.previousReject();
+            this.promise = null;
+        }
+
+        this.values.forEach((item, i) => {
+            if (item.update) {
+                item.fromValue = item.currentValue;
+                // item.currentValue = 0;
+            }
+        });
+    }
+
     setToValProcessed() {
         this.values.forEach((item, i) => {
             if (item.update) {
@@ -223,13 +247,12 @@ export class useTween {
 
     /**
      * goTo - go from fromValue stored to new toValue
-     * If force reject previous primise use .catch((err) => {});
      *
      * @param  {number} to new toValue
      * @return {promise}  onComplete promise
      *
      * @example
-     * mySpring.goTo({ val: 100 });
+     * myTween.goTo({ val: 100 }).catch((err) => {});
      */
     goTo(obj, duration = 1000) {
         this.pauseStatus = false;
@@ -243,6 +266,7 @@ export class useTween {
         });
 
         this.mergeData(newDataArray);
+        if (this.req) this.updateDataWhileRunning();
         this.setToValProcessed();
 
         if (!this.req) {
@@ -260,14 +284,13 @@ export class useTween {
 
     /**
      * goFrom - go from new fromValue ( manually update fromValue )  to toValue sored
-     * If force reject previous primise use .catch((err) => {});
      *
      * @param  {number} from new fromValue
      * @param  {boolean} force force cancel FAR and restart
      * @return {promise}  onComplete promise
      *
      * @example
-     * mySpring.goFrom({ val: 100 });
+     * myTween.goFrom({ val: 100 }).catch((err) => {});
      */
     goFrom(obj, duration = 1000) {
         this.duration = duration;
@@ -280,6 +303,7 @@ export class useTween {
         });
 
         this.mergeData(newDataArray);
+        if (this.req) this.updateDataWhileRunning();
         this.setToValProcessed();
 
         if (!this.req) {
@@ -297,7 +321,6 @@ export class useTween {
 
     /**
      * goFromTo - Go From new fromValue to new toValue
-     * If force reject previous primise use .catch((err) => {});
      *
      * @param  {number} from new fromValue
      * @param  {number} to new toValue
@@ -305,7 +328,7 @@ export class useTween {
      * @return {promise}  onComplete promise
      *
      * @example
-     * mySpring.goFromTo({ val: 0 },{ val: 100 });
+     * myTween.goFromTo({ val: 0 },{ val: 100 }).catch((err) => {});
      */
     goFromTo(fromObj, toObj, duration = 1000) {
         this.duration = duration;
@@ -323,6 +346,7 @@ export class useTween {
         });
 
         this.mergeData(newDataArray);
+        if (this.req) this.updateDataWhileRunning();
         this.setToValProcessed();
 
         if (!this.req) {
@@ -340,14 +364,13 @@ export class useTween {
 
     /**
      * set - set a a vlue without animation ( teleport )
-     * If force reject previous primise use .catch((err) => {});
      *
      * @param  {number} value new fromValue and new toValue
      * @return {promise}  onComplete promise
      *
      *
      * @example
-     * mySpring.set({ val: 100 });
+     * myTween.set({ val: 100 }).catch((err) => {});
      */
     set(obj, duration = 1000) {
         this.duration = duration;
@@ -361,6 +384,7 @@ export class useTween {
         });
 
         this.mergeData(newDataArray);
+        if (this.req) this.updateDataWhileRunning();
         this.setToValProcessed();
 
         if (!this.req) {

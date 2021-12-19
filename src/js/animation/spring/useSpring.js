@@ -7,8 +7,8 @@ const getSpringTime = () => {
 };
 
 export class useSpring {
-    constructor(config = springConfig.default) {
-        this.config = config;
+    constructor(config = 'default') {
+        this.config = springConfig[config];
         this.req = null;
         this.previousResolve = null;
         this.previousReject = null;
@@ -262,14 +262,25 @@ export class useSpring {
     }
 
     /**
+     * Force fail primse when new event is call while running, so clear che promise chain
+     *
+     * @return {void}
+     */
+    updateDataWhileRunning() {
+        // Abort promise
+        if (this.previousReject) {
+            this.previousReject();
+        }
+    }
+
+    /**
      * goTo - go from fromValue stored to new toValue
-     * If force reject previous primise use .catch((err) => {});
      *
      * @param  {number} to new toValue
      * @return {promise}  onComplete promise
      *
      * @example
-     * mySpring.goTo({ val: 100 });
+     * mySpring.goTo({ val: 100 }).catch((err) => {});
      */
     goTo(obj) {
         if (this.pauseStatus) this.resetValueOnResume();
@@ -283,6 +294,7 @@ export class useSpring {
         });
 
         this.mergeData(newDataArray);
+        if (this.req) this.updateDataWhileRunning();
 
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
@@ -297,14 +309,13 @@ export class useSpring {
 
     /**
      * goFrom - go from new fromValue ( manually update fromValue )  to toValue sored
-     * If force reject previous primise use .catch((err) => {});
      *
      * @param  {number} from new fromValue
      * @param  {boolean} force force cancel FAR and restart
      * @return {promise}  onComplete promise
      *
      * @example
-     * mySpring.goFrom({ val: 100 });
+     * mySpring.goFrom({ val: 100 }).catch((err) => {});
      */
     goFrom(obj) {
         if (this.pauseStatus) this.resetValueOnResume();
@@ -318,6 +329,7 @@ export class useSpring {
         });
 
         this.mergeData(newDataArray);
+        if (this.req) this.updateDataWhileRunning();
 
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
@@ -332,7 +344,6 @@ export class useSpring {
 
     /**
      * goFromTo - Go From new fromValue to new toValue
-     * If force reject previous primise use .catch((err) => {});
      *
      * @param  {number} from new fromValue
      * @param  {number} to new toValue
@@ -340,7 +351,7 @@ export class useSpring {
      * @return {promise}  onComplete promise
      *
      * @example
-     * mySpring.goFromTo({ val: 0 },{ val: 100 });
+     * mySpring.goFromTo({ val: 0 },{ val: 100 }).catch((err) => {});
      */
     goFromTo(fromObj, toObj) {
         if (this.pauseStatus) this.resetValueOnResume();
@@ -359,6 +370,7 @@ export class useSpring {
         });
 
         this.mergeData(newDataArray);
+        if (this.req) this.updateDataWhileRunning();
 
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
@@ -373,14 +385,13 @@ export class useSpring {
 
     /**
      * set - set a a vlue without animation ( teleport )
-     * If force reject previous primise use .catch((err) => {});
      *
      * @param  {number} value new fromValue and new toValue
      * @return {promise}  onComplete promise
      *
      *
      * @example
-     * mySpring.set({ val: 100 });
+     * mySpring.set({ val: 100 }).catch((err) => {});
      */
     set(obj) {
         if (this.pauseStatus) this.resetValueOnResume();
@@ -395,6 +406,7 @@ export class useSpring {
         });
 
         this.mergeData(newDataArray);
+        if (this.req) this.updateDataWhileRunning();
 
         if (!this.req) {
             this.promise = new Promise((res, reject) => {

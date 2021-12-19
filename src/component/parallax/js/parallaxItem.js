@@ -66,7 +66,7 @@ export class ParallaxItemClass {
         this.propierties = data.propierties || 'vertical';
         this.easeType = data.easeType || 'js';
         //
-        this.springConfig = data.springConfig || null
+        this.springConfig = data.springConfig || null;
         this.spring = new useSpring();
         this.unsubscribeSpring = () => {};
     }
@@ -78,11 +78,10 @@ export class ParallaxItemClass {
             this.updateStyle(val);
         });
 
-        if(this.springConfig && this.springConfig in springConfig) {
+        if (this.springConfig && this.springConfig in springConfig) {
             const config = springConfig[this.springConfig];
             this.spring.updateConfig(config);
         }
-
 
         if (this.computationType == 'fixed') this.limiterOff = true;
 
@@ -229,7 +228,7 @@ export class ParallaxItemClass {
 
     smoothParallaxJs() {
         this.executeParallax(false);
-        this.spring.goTo({ val: this.endValue });
+        this.spring.goTo({ val: this.endValue }).catch((err) => {});
     }
 
     updateStyle(val) {

@@ -16,7 +16,6 @@ export function springTest() {
 
     function tweenback() {
         mySpring.updatePreset('gentle');
-        mySpring.stop();
         return mySpring.goTo({ x: 0, y: 0, rotate: 180 });
     }
 

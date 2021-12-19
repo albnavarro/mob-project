@@ -16,7 +16,6 @@ export function tweenTest() {
 
     function tweenback() {
         myTween.updatePreset('easeOutBack');
-        myTween.stop();
         return myTween.goTo({ x: 0, y: 0, rotate: 180 });
     }
 

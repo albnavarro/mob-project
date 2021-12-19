@@ -44,8 +44,13 @@ export class PredictiveTurbolenceItemClass {
 
         this.unsubscribeSpring = this.spring.subscribe(
             ({ baseFrequency, scale }) => {
-                if(this.turbolenceEl) this.turbolenceEl.setAttribute('baseFrequency', `${baseFrequency}`);
-                if(this.displacementMap)  this.displacementMap.setAttribute('scale', `${scale}`);
+                if (this.turbolenceEl)
+                    this.turbolenceEl.setAttribute(
+                        'baseFrequency',
+                        `${baseFrequency}`
+                    );
+                if (this.displacementMap)
+                    this.displacementMap.setAttribute('scale', `${scale}`);
             }
         );
 
@@ -200,9 +205,11 @@ export class PredictiveTurbolenceItemClass {
             this.minScale
         );
 
-        this.spring.goTo({
-            baseFrequency: baseFrequencyClamped,
-            scale: scaleClamped,
-        });
+        this.spring
+            .goTo({
+                baseFrequency: baseFrequencyClamped,
+                scale: scaleClamped,
+            })
+            .catch((err) => {});
     }
 }

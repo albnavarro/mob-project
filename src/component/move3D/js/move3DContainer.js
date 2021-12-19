@@ -44,9 +44,8 @@ export class move3DContainerClass {
         this.spring.setData({ ax: 0, ay: 0 });
 
         this.unsubscribeSpring = this.spring.subscribe(({ ax, ay }) => {
-          this.container.style.transform = `rotateY(${ax}deg) rotateX(${ay}deg) translateZ(0)`;
+            this.container.style.transform = `rotateY(${ax}deg) rotateX(${ay}deg) translateZ(0)`;
         });
-
 
         if (Modernizr.touchevents && !this.drag) return;
 
@@ -233,7 +232,9 @@ export class move3DContainerClass {
         const apply = (this.drag && this.onDrag) || !this.drag ? true : false;
 
         if (apply) {
-            this.spring.goTo({ ax: axLimited, ay: ayLimited });
+            this.spring
+                .goTo({ ax: axLimited, ay: ayLimited })
+                .catch((err) => {});
 
             // Children
             for (const item of this.childrenInstances) {
