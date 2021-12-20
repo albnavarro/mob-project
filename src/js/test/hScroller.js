@@ -46,9 +46,10 @@ export const hScroller = () => {
     const smoothScrollFull = new SmoothScrollClass({
         target: '.scrollerH',
         direction: 'HORIZONTAL',
-        speed: 80,
+        speed: 40,
         ease: 20,
         drag: true,
+        // motionType: 'spring',
     });
     smoothScrollFull.init();
     smoothScrollFull.onTick(() => {

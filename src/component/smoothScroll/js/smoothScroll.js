@@ -13,9 +13,11 @@ import {
     useMouseMove,
     useTouchMove,
     useMouseWheel,
-    useMouseClick
+    useMouseClick,
 } from '.../../../js/events/mouseUtils/useMouse.js';
 import { isDescendant } from '../../../js/utility/vanillaFunction.js';
+import { useLerp } from '.../../../js/animation/lerp/useLerp.js';
+import { useSpring } from '.../../../js/animation/spring/useSpring.js';
 
 export class SmoothScrollClass {
     constructor(data = {}) {
@@ -26,7 +28,6 @@ export class SmoothScrollClass {
         this.target =
             document.querySelector(data.target) || document.documentElement;
         this.speed = data.speed || 60;
-        this.ease = data.ease || 10;
         this.drag = data.drag || false;
         this.container =
             document.querySelector(data.container) || document.documentElement;
@@ -65,9 +66,26 @@ export class SmoothScrollClass {
         this.subscribeMouseMove = () => {};
         this.subscribeTouchMove = () => {};
         this.subscribeMouseClick = () => {};
+
+        // Animation
+        this.LERP = 'lerp';
+        this.SPRING = 'spring';
+        this.motionType = data.motionType || this.LERP;
+        this.motion = null;
+        this.unsubscribeMotion = () => {};
     }
 
     init() {
+        switch (this.motionType) {
+            case this.SPRING:
+                this.motion = new useSpring('gentle');
+                break;
+
+            default:
+                this.motion = new useLerp(160);
+                break;
+        }
+
         this.reset();
         this.subscribeResize = useResize(() => this.reset());
         this.subscribeScrollStart = useScrollStart(() => this.reset());
@@ -93,10 +111,33 @@ export class SmoothScrollClass {
 
         // DRAG LISTENER
         if (this.drag) {
-            this.subscribeMouseClick = useMouseClick(({target, preventDefault}) => {
-                this.preventChecker({target, preventDefault})
-            })
+            this.subscribeMouseClick = useMouseClick(
+                ({ target, preventDefault }) => {
+                    this.preventChecker({ target, preventDefault });
+                }
+            );
         }
+
+        this.motion.setData({ val: 0 });
+        this.unsubscribeMotion = this.motion.subscribe(({ val }) => {
+            if (this.direction == this.VERTICAL) {
+                if (this.target === document.documentElement) {
+                    this.target.scrollTop = val;
+                } else {
+                    this.target.style.transform = `translate3d(0, ${-val}px, 0)`;
+                }
+            } else {
+                if (this.target === document.documentElement) {
+                    this.target.scrollleft = val;
+                } else {
+                    this.target.style.transform = `translate3d(${-val}px, 0, 0)`;
+                }
+            }
+
+            this.callback.forEach((item, i) => {
+                item();
+            });
+        });
 
         // Set link and button to draggable false, prevent mousemouve fail
         this.target.style['user-select'] = 'none';
@@ -123,6 +164,7 @@ export class SmoothScrollClass {
         this.subscribeMouseMove();
         this.subscribeTouchMove();
         this.subscribeMouseClick();
+        this.unsubscribeMotion();
     }
 
     onTick(fn) {
@@ -135,9 +177,11 @@ export class SmoothScrollClass {
      * @param  {event} e listener event
      * @return {void}
      */
-    preventChecker({target, preventDefault}) {
+    preventChecker({ target, preventDefault }) {
         if (target === this.target || isDescendant(this.target, target)) {
-            if (Math.abs(this.endValue - this.firstTouchValue) > this.threshold) {
+            if (
+                Math.abs(this.endValue - this.firstTouchValue) > this.threshold
+            ) {
                 preventDefault();
             }
         }
@@ -145,6 +189,8 @@ export class SmoothScrollClass {
 
     // RESET DATA
     reset() {
+        this.isScrolling = false;
+
         this.containerWidth =
             this.container === document.documentElement
                 ? document.documentElement.clientWidth
@@ -179,10 +225,8 @@ export class SmoothScrollClass {
             }
         })();
 
-        this.startValue = resetValue;
         this.endValue = resetValue;
-        this.prevValue = resetValue;
-        this.rafOnScroll = null;
+        this.motion.set({ val: resetValue }).catch((err) => {});
 
         this.maxValue = (() => {
             if (this.direction === this.VERTICAL) {
@@ -213,6 +257,9 @@ export class SmoothScrollClass {
 
     onMouseDown({ target, client }) {
         if (target === this.target || isDescendant(this.target, target)) {
+            // Stop lerp when user use scrollbar while lerp is running
+            if (this.target === document.documentElement) this.motion.stop();
+
             this.firstTouchValue = this.endValue;
             this.dragEnable = true;
             this.prevTouchVal = this.getMousePos(client);
@@ -227,7 +274,8 @@ export class SmoothScrollClass {
     onTouchMove({ target, client, preventDefault }) {
         if (
             (target === this.target || isDescendant(this.target, target)) &&
-            this.dragEnable
+            this.dragEnable &&
+            this.drag
         ) {
             preventDefault();
 
@@ -265,54 +313,6 @@ export class SmoothScrollClass {
         this.endValue = this.clamp(this.endValue, 0, this.maxValue);
         this.target.style.setProperty('--progress', `${this.progress * 100}%`);
 
-        if (!this.rafOnScroll)
-            this.rafOnScroll = requestAnimationFrame(
-                this.onReuqestAnimScroll.bind(this)
-            );
-    }
-
-    // EASING
-    onReuqestAnimScroll(timeStamp) {
-        const draw = (timeStamp) => {
-            this.prevValue = this.startValue;
-
-            const s = this.startValue,
-                f = this.endValue,
-                v = this.ease,
-                val = (f - s) / v + s * 1;
-
-            this.startValue = val.toFixed(1);
-
-            if (this.direction == this.VERTICAL) {
-                if (this.target === document.documentElement) {
-                    this.target.scrollTop = this.startValue;
-                } else {
-                    this.target.style.transform = `translate3d(0, ${-this
-                        .startValue}px, 0)`;
-                }
-            } else {
-                if (this.target === document.documentElement) {
-                    this.target.scrollleft = this.startValue;
-                } else {
-                    this.target.style.transform = `translate3d(${-this
-                        .startValue}px, 0, 0)`;
-                }
-            }
-
-            this.callback.forEach((item, i) => {
-                item();
-            });
-
-            // La RAF viene "rigenerata" fino a quando tutti gli elementi rimangono fermi
-            if (this.prevValue == this.startValue) {
-                cancelAnimationFrame(this.rafOnScroll);
-                this.rafOnScroll = null;
-                return;
-            }
-
-            this.rafOnScroll = requestAnimationFrame(draw);
-        };
-
-        draw(timeStamp);
+        this.motion.goTo({ val: this.endValue }).catch((err) => {});
     }
 }
