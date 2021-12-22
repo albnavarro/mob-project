@@ -1,4 +1,3 @@
-import { eventManager } from '../../../js/base/eventManager.js';
 import { WaveItemClass } from './waveItem.js';
 
 class waveClass {
@@ -10,7 +9,7 @@ class waveClass {
     }
 
     init() {
-        eventManager.push('load', this.inzializeData.bind(this));
+        this.inzializeData();
     }
 
     inzializeData() {
@@ -25,7 +24,6 @@ class waveClass {
             waveItem.init();
         }
     }
-
 
     getItemData(item, i) {
         const data = {};

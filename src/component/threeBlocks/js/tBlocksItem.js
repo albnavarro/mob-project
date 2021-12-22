@@ -1,4 +1,3 @@
-import { eventManager } from '../../../js/base/eventManager.js';
 import {
     position,
     outerWidth,
@@ -8,6 +7,7 @@ import {
 import { bodyScrollTo } from '../../../js/utility/animation.js';
 import { modernzier } from '../../../js/utility/modernizr.js';
 import { SimpleStore } from '../../../js/utility/simpleStore.js';
+import { useResize } from '.../../../js/events/resizeUtils/useResize.js';
 
 export class tBlocksItemClass {
     constructor(container) {
@@ -36,6 +36,7 @@ export class tBlocksItemClass {
             horizontalDirection: this.DX,
             verticalDirection: this.UP,
             center: 0,
+            unsubscribeResize: () => {},
         });
 
         this.store.validate({
@@ -71,15 +72,17 @@ export class tBlocksItemClass {
 
         this.container.dataset.diretction = this.UP.toLowerCase();
 
-        eventManager.push('load', () => this.setWidth());
-        eventManager.push('load', () => this.calcCenter());
-        eventManager.push('load', () => this.setActiveitemTransformOrigin());
-        eventManager.push('load', () => this.setActiveitemStyle());
-        eventManager.push('resize', () => this.setWidth());
-        eventManager.push('resize', () => this.calcCenter());
-        eventManager.push('resize', () => {
+        this.setWidth();
+        this.calcCenter();
+        this.setActiveitemTransformOrigin();
+        this.setActiveitemStyle();
+
+        const unsubscribeResize = useResize(() => {
+            this.setWidth();
+            this.calcCenter();
             this.store.setObj('clone', { action: this.REMOVE });
         });
+        this.store.setProp('unsubscribeResize', unsubscribeResize);
 
         // SET WATCHER
         this.store.watch('activeItem', (newVal, oldVal) => {
@@ -103,6 +106,11 @@ export class tBlocksItemClass {
             const items = newVal;
             this.onItemNotActiveChange(items);
         });
+    }
+
+    destroy() {
+        const unsubscribeResize = this.store.getProp('unsubscribeResize');
+        unsubscribeResize();
     }
 
     /**

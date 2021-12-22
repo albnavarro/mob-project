@@ -1,4 +1,3 @@
-import { eventManager } from '../../../js/base/eventManager.js';
 import { AnimateItemClass } from './animateItem.js';
 
 class AnimateClass {
@@ -10,7 +9,7 @@ class AnimateClass {
     }
 
     init() {
-        eventManager.push('load', this.inzializeData.bind(this));
+        this.inzializeData();
     }
 
     inzializeData() {

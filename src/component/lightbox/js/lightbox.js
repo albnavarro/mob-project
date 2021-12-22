@@ -3,7 +3,6 @@ import {
     enableBodyScroll,
     clearAllBodyScrollLocks,
 } from 'body-scroll-lock';
-import { eventManager } from '../../../js/base/eventManager.js';
 import { lightDescription } from './lightbox-description.js';
 import { lightboxUtils } from './lightbox-utils.js';
 import { lightBoxImage } from './lightbox-image.js';
@@ -60,8 +59,7 @@ export class LightBoxClass {
                 case 'normal':
                     lightDescription.init({
                         title: btn.getAttribute('data-title') || '',
-                        description:
-                            btn.getAttribute('data-description') || '',
+                        description: btn.getAttribute('data-description') || '',
                         wrapper: this.staticWrapper,
                     });
                     break;
@@ -70,8 +68,7 @@ export class LightBoxClass {
                     lightBoxImage.init({
                         url: btn.getAttribute('data-url'),
                         title: btn.getAttribute('data-title') || '',
-                        description:
-                            btn.getAttribute('data-description') || '',
+                        description: btn.getAttribute('data-description') || '',
                         wrapper: this.dynamicWrapper,
                         hGap: btn.getAttribute('data-hGap') || '20',
                         wGap: btn.getAttribute('data-wGap') || '20',
@@ -94,8 +91,7 @@ export class LightBoxClass {
                             btn.getAttribute('data-sourceType') || 'youtube',
                         url: btn.getAttribute('data-url'),
                         title: btn.getAttribute('data-title') || '',
-                        description:
-                            btn.getAttribute('data-description') || '',
+                        description: btn.getAttribute('data-description') || '',
                         ratioW: btn.getAttribute('data-ratioW') || '16',
                         ratioH: btn.getAttribute('data-ratioH') || '9',
                         wrapper: this.dynamicWrapper,

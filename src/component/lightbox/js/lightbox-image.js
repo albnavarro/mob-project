@@ -1,21 +1,21 @@
-import { eventManager } from '../../../js/base/eventManager.js';
 import { lightDescription } from './lightbox-description.js';
 import { loadImages } from '../../../js/utility/loadImages.js';
 import { lightboxUtils } from './lightbox-utils.js';
 import { lightPichZoom } from './lightbox-zoom-pinch.js';
+import { useResize } from '.../../../js/events/resizeUtils/useResize.js';
 
 class LightBoxImageClass {
     constructor() {
         this.image = [];
-        this.onResizeId = -1;
         this.isLoading = false;
         this.isOpen = false;
         this.loadimage = null;
+        this.unsubscribeResize = () => {};
     }
 
     init({ wrapper, title, url, hGap, wGap, zoom, description }) {
         this.isOpen = true;
-        eventManager.remove('resizeW', this.onResizeId);
+        this.unsubscribeResize();
 
         const image = new Image();
         image.classList.add('lightbox__img');
@@ -45,9 +45,10 @@ class LightBoxImageClass {
 
                 this.removeLoder(wrapper);
 
-                this.onResizeId = eventManager.push('resizeW', () =>
-                    this.onResizeLightboxImage(wrapper, hGap, wGap, zoom)
-                );
+                this.unsubscribeResize = useResize(() => {
+                    this.onResizeLightboxImage(wrapper, hGap, wGap, zoom);
+                });
+
                 this.isLoading = false;
             })
             .catch((err) => console.log(err));
@@ -74,12 +75,12 @@ class LightBoxImageClass {
 
     displayImage(wrapper, hGap, wGap, zoom) {
         // WW and WH gap
-        const newHGap = (eventManager.windowsHeight() / 100) * parseInt(hGap);
-        const newWGap = (eventManager.windowsWidth() / 100) * parseInt(wGap);
+        const newHGap = (window.innerHeight / 100) * parseInt(hGap);
+        const newWGap = (window.innerWidth / 100) * parseInt(wGap);
         const height = this.image.naturalHeight;
         const width = this.image.naturalWidth;
-        const maxHeight = eventManager.windowsHeight() - newHGap;
-        const maxWidth = eventManager.windowsWidth() - newWGap;
+        const maxHeight = window.innerHeight - newHGap;
+        const maxWidth = window.innerWidth - newWGap;
 
         const { ratioWidth, ratioHeight } =
             lightboxUtils.calculateAspectRatioFit(
@@ -114,6 +115,7 @@ class LightBoxImageClass {
     }
 
     onResizeLightboxImage(wrapper, hGap, wGap, zoom) {
+        console.log('resize');
         this.image.classList.remove('visible');
         this.displayImage(wrapper, hGap, wGap, zoom);
     }
@@ -142,7 +144,7 @@ class LightBoxImageClass {
         this.isOpen = false;
         this.isLoading = false;
         this.removeLoder();
-        eventManager.remove('resizeW', this.onResizeId);
+        this.unsubscribeResize();
     }
 
     imageIsLoading() {

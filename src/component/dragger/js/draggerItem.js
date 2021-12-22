@@ -1,7 +1,16 @@
-import { eventManager } from '../../../js/base/eventManager.js';
-import { mouseManager } from '../../../js/base/mouseManager.js';
 import { isDescendant } from '../../../js/utility/vanillaFunction.js';
 import { useSpring } from '.../../../js/animation/spring/useSpring.js';
+
+import { useResize } from '.../../../js/events/resizeUtils/useResize.js';
+import { useScroll } from '.../../../js/events/scrollUtils/useScroll.js';
+import {
+    useTouchStart,
+    useTouchEnd,
+    useMouseDown,
+    useMouseUp,
+    useMouseMove,
+    useTouchMove,
+} from '.../../../js/events/mouseUtils/useMouse.js';
 
 export class DraggerItemClass {
     constructor(data) {
@@ -36,45 +45,52 @@ export class DraggerItemClass {
         this.limitY = (this.itemHeight - this.contHeight) / 2;
 
         // Detect click
-        this.firstTouchValue = 0;
+        this.firstTouchValue = { x: 0, y: 0 };
         this.threshold = 30;
 
         // Animation
         this.endValue = { xValue: 0, yValue: 0 };
         this.spring = new useSpring();
         this.unsubscribeSpring = () => {};
+
+        this.unsubscribeResize = () => {};
+        this.unsubscribeTouchStart = () => {};
+        this.unsubscribeTouchEnd = () => {};
+        this.unsubscribeMouseDown = () => {};
+        this.unsubscribeMouseUp = () => {};
+        this.unsubscribeMouseMove = () => {};
+        this.unsubscribeTouchMove = () => {};
+        this.unsubscribeResize = () => {};
     }
 
     init() {
-        this.item.addEventListener(
-            'mousedown',
-            (e) => e.preventDefault(),
-            false
-        );
+        this.unsubscribeTouchStart = useTouchStart(({ page, target }) => {
+            this.onMouseDown({ page, target });
+        });
 
-        this.item.addEventListener(
-            'mousedown',
-            (e) => e.preventDefault(),
-            false
-        );
+        this.unsubscribeMouseDown = useMouseDown(({ page, target }) => {
+            this.onMouseDown({ page, target });
+        });
 
-        if (Modernizr.touchevents) {
-            this.touchstart = mouseManager.push('touchstart', () =>
-                this.onMouseDown()
-            );
-            this.touchend = mouseManager.push('touchend', () =>
-                this.onMouseUp()
-            );
-        } else {
-            this.mousedown = mouseManager.push('mousedown', () =>
-                this.onMouseDown()
-            );
-            this.mouseup = mouseManager.push('mouseup', () => this.onMouseUp());
-        }
+        this.unsubscribeTouchEnd = useTouchEnd(() => {
+            this.onMouseUp();
+        });
 
-        this.touchmove = mouseManager.push('touchmove', () => this.onMove());
-        this.mousemove = mouseManager.push('mousemove', () => this.onMove());
-        this.mousemove = eventManager.push('resize', () => this.onResize());
+        this.unsubscribeMouseUp = useMouseUp(() => {
+            this.onMouseUp();
+        });
+
+        this.unsubscribeMouseMove = useMouseMove(({ page }) => {
+            this.onMove({ page });
+        });
+
+        this.unsubscribeTouchMove = useTouchMove(({ page }) => {
+            this.onMove({ page });
+        });
+
+        this.unsubscribeResize = useResize(() => {
+            this.onResize();
+        });
 
         // Prevent default listener
         this.compRoot.addEventListener(
@@ -82,9 +98,6 @@ export class DraggerItemClass {
             (e) => this.preventChecker(e),
             false
         );
-
-        this.firstTouchValue = this.getMouseCoord();
-        // End prevent default listener
 
         this.TOP_LEFT = 'TOP-LEFT';
         this.TOP_RIGHT = 'TOP-RIGHT';
@@ -155,6 +168,17 @@ export class DraggerItemClass {
         });
     }
 
+    destroy() {
+        this.unsubscribeResize();
+        this.unsubscribeTouchStart();
+        this.unsubscribeTouchEnd();
+        this.unsubscribeMouseDown();
+        this.unsubscribeMouseUp();
+        this.unsubscribeMouseMove();
+        this.unsubscribeTouchMove();
+        this.unsubscribeResize();
+    }
+
     onResize() {
         this.itemWidth = this.item.offsetWidth;
         this.itemHeight = this.item.offsetHeight;
@@ -162,20 +186,6 @@ export class DraggerItemClass {
         this.contHeight = this.compRoot.offsetHeight;
         this.limitX = (this.itemWidth - this.contWidth) / 2;
         this.limitY = (this.itemHeight - this.contHeight) / 2;
-    }
-
-    getMouseCoord() {
-        if (Modernizr.touchevents) {
-            return {
-                x: mouseManager.pageX(),
-                y: mouseManager.pageY(),
-            };
-        } else {
-            return {
-                x: mouseManager.clientX(),
-                y: mouseManager.clientY(),
-            };
-        }
     }
 
     /**
@@ -195,13 +205,11 @@ export class DraggerItemClass {
         }
     }
 
-    onMouseDown() {
-        const target = mouseManager.getTarget();
-
+    onMouseDown({ page, target }) {
         if (target === this.item || isDescendant(this.item, target)) {
             this.onDrag = true;
             this.firstDrag = true;
-            this.firstTouchValue = this.getMouseCoord();
+            this.firstTouchValue = { x: page.x, y: page.y };
         }
     }
 
@@ -213,8 +221,8 @@ export class DraggerItemClass {
         return Math.min(Math.max(num, min), max);
     }
 
-    onMove() {
-        const { x, y } = this.getMouseCoord();
+    onMove({ page }) {
+        const { x, y } = page;
 
         /**
          * Get diffrence form last value

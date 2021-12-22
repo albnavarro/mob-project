@@ -1,4 +1,3 @@
-import { eventManager } from '../../../js/base/eventManager.js';
 import { move3DContainerClass } from './move3DContainer.js';
 
 class move3DClass {
@@ -10,7 +9,7 @@ class move3DClass {
     }
 
     init() {
-        eventManager.push('load', this.inzializeData.bind(this));
+        this.inzializeData();
     }
 
     inzializeData() {

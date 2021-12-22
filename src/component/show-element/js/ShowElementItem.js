@@ -1,5 +1,6 @@
-import { eventManager } from '../../../js/base/eventManager.js';
 import { offset } from '../../../js/utility/vanillaFunction.js';
+import { useResize } from '.../../../js/events/resizeUtils/useResize.js';
+import { useScroll } from '.../../../js/events/scrollUtils/useScroll.js';
 
 export class showElementItemClass {
     constructor(data) {
@@ -13,13 +14,26 @@ export class showElementItemClass {
         this.startClass = data.startClass;
         this.gap = data.gap;
         this.endClass = data.endClass;
+
+        this.unsubscribeScroll = () => {};
+        this.unsubscribeResize = () => {};
     }
 
     init() {
         this.calcOffset();
         this.checkPosition();
-        eventManager.push('scroll', this.checkPosition.bind(this));
-        eventManager.push('resize', this.refresh.bind(this));
+
+        this.unsubscribeScroll = useScroll(() => {
+            this.checkPosition();
+        });
+        this.unsubscribeResize = useResize(() => {
+            this.refresh();
+        });
+    }
+
+    destroy() {
+        this.unsubscribeScroll();
+        this.unsubscribeResize();
     }
 
     calcOffset() {
@@ -38,19 +52,15 @@ export class showElementItemClass {
     }
 
     checkPosition() {
-        const postion = this.pos - eventManager.windowsHeight() + this.gap;
+        const postion = this.pos - window.innerHeight + this.gap;
         const isAble = this.onlyOnce && this.firstActive ? false : true;
 
-        if (postion < eventManager.scrollTop() && this.hide && isAble) {
+        if (postion < window.pageYOffset && this.hide && isAble) {
             this.item.classList.remove(this.startClass);
             this.item.classList.add(this.endClass);
             this.hide = false;
             this.firstActive = true;
-        } else if (
-            postion >= eventManager.scrollTop() &&
-            !this.hide &&
-            isAble
-        ) {
+        } else if (postion >= window.pageYOffset && !this.hide && isAble) {
             this.item.classList.remove(this.endClass);
             this.item.classList.add(this.startClass);
             this.hide = true;

@@ -1,5 +1,3 @@
-import { mouseManager } from '../../../js/base/mouseManager.js';
-import { eventManager } from '../../../js/base/eventManager.js';
 import { mq } from '../../../js/base/mediaManager.js';
 import {
     outerHeight,
@@ -11,6 +9,9 @@ import { detectSafari } from '../../../js/utility/isSafari.js';
 import { tUtils } from './predictiveTurbolenceUtils.js';
 import { useSpring } from '.../../../js/animation/spring/useSpring.js';
 import { springConfig } from '.../../../js/animation/spring/springConfig.js';
+import { useResize } from '.../../../js/events/resizeUtils/useResize.js';
+import { useScroll } from '.../../../js/events/scrollUtils/useScroll.js';
+import { useMouseMove } from '.../../../js/events/mouseUtils/useMouse.js';
 
 export class PredictiveTurbolenceItemClass {
     constructor(data) {
@@ -35,6 +36,13 @@ export class PredictiveTurbolenceItemClass {
         this.height = 0;
         this.spring = new useSpring();
         this.unsubscribeSpring = () => {};
+        this.unsubscribeScroll = () => {};
+        this.unsubscribeResize = () => {};
+        this.unsubscribeMouseMove = () => {};
+
+        // MOUSE COORD
+        this.pageCoord = { x: 0, y: 0 };
+        this.lastScrolledTop = 0;
     }
 
     init() {
@@ -58,13 +66,28 @@ export class PredictiveTurbolenceItemClass {
 
         this.inzializeSvg();
         this.onResize();
-        mouseManager.push('mousemove', () => this.onMove());
-        mouseManager.push('scroll', () => this.onMove());
-        eventManager.push('resize', () => this.onResize());
+
+        this.unsubscribeMouseMove = useMouseMove(({ page }) => {
+            this.setGlobalCoord({ page });
+            this.onMove();
+        });
+        this.unsubscribeScroll = useScroll(({ scrolY }) => {
+            this.onScroll({ scrolY });
+        });
+        this.unsubscribeResize = useResize(() => {
+            this.onResize();
+        });
 
         setTimeout(() => {
             this.redRawItem();
         }, 100);
+    }
+
+    destroy() {
+        this.unsubscribeSpring();
+        this.unsubscribeScroll();
+        this.unsubscribeResize();
+        this.unsubscribeMouseMove();
     }
 
     redRawItem() {
@@ -132,9 +155,25 @@ export class PredictiveTurbolenceItemClass {
         this.height = outerHeight(item);
     }
 
+    setGlobalCoord({ page }) {
+        this.pageCoord = { x: page.x, y: page.y };
+    }
+
+    onScroll({ scrolY }) {
+        const scrollTop = window.pageYOffset;
+
+        if (this.lastScrolledTop != scrollTop) {
+            this.pageCoord.y -= this.lastScrolledTop;
+            this.lastScrolledTop = scrollTop;
+            this.pageCoord.y += this.lastScrolledTop;
+        }
+
+        this.onMove();
+    }
+
     onMove() {
-        const x = mouseManager.pageX();
-        const y = mouseManager.pageY();
+        const x = this.pageCoord.x;
+        const y = this.pageCoord.y;
 
         // Define axsis data
         const xData = {

@@ -1,4 +1,3 @@
-import { eventManager } from '../../../js/base/eventManager.js';
 import { MouseParallaxItemClass } from './mouseParallaxitem.js';
 
 class MouseParallaxClass {
@@ -10,7 +9,7 @@ class MouseParallaxClass {
     }
 
     init() {
-        eventManager.push('load', this.inzializeData.bind(this));
+        this.inzializeData();
     }
 
     inzializeData() {

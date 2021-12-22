@@ -1,5 +1,3 @@
-import { eventManager } from '../../../js/base/eventManager.js';
-
 class LightDescriptionClass {
     init({ title, description, wrapper }) {
         if (title || description != '') {

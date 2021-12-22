@@ -1,11 +1,12 @@
-import { mouseManager } from '../../../js/base/mouseManager.js';
-import { eventManager } from '../../../js/base/eventManager.js';
 import {
     outerHeight,
     outerWidth,
     offset,
 } from '../../../js/utility/vanillaFunction.js';
 import { useSpring } from '.../../../js/animation/spring/useSpring.js';
+import { useResize } from '.../../../js/events/resizeUtils/useResize.js';
+import { useScroll } from '.../../../js/events/scrollUtils/useScroll.js';
+import { useMouseMove } from '.../../../js/events/mouseUtils/useMouse.js';
 
 export class MouseParallaxItemClass {
     constructor(data) {
@@ -20,22 +21,62 @@ export class MouseParallaxItemClass {
         this.smooth = 10;
         this.spring = new useSpring();
         this.unsubscribeSpring = () => {};
+
+        // MOUSE COORD
+        this.pageCoord = { x: 0, y: 0 };
+        this.clientCoord = { x: 0, y: 0 };
+        this.lastScrolledTop = 0;
+
+        this.unsubscribeScroll = () => {};
+        this.unsubscribeMouseMove = () => {};
+        this.unsubscribeResize = () => {};
     }
 
     init() {
         this.getDimension();
 
-        if (!Modernizr.touchevents) {
-            mouseManager.push('mousemove', () => this.onMove());
-            eventManager.push('resize', () => this.getDimension());
-            mouseManager.push('scroll', () => this.onMove());
-        }
+        this.unsubscribeMouseMove = useMouseMove(({ page, client }) => {
+            this.setGlobalCoord({ page, client });
+            this.onMove();
+        });
+
+        this.unsubscribeResize = useResize(() => {
+            this.getDimension();
+        });
+
+        this.unsubscribeScroll = useScroll(({ scrolY }) => {
+            this.onScroll(scrolY);
+        });
 
         this.spring.setData({ ax: 0, ay: 0 });
 
         this.unsubscribeSpring = this.spring.subscribe(({ ax, ay }) => {
             this.item.style.transform = `translate3D(${ax}px, ${ay}px, 0)`;
         });
+    }
+
+    destroy() {
+        this.unsubscribeSpring();
+        this.unsubscribeScroll();
+        this.unsubscribeMouseMove();
+        this.unsubscribeResize();
+    }
+
+    setGlobalCoord({ page, client }) {
+        this.pageCoord = { x: page.x, y: page.y };
+        this.clientCoord = { x: client.x, y: client.y };
+    }
+
+    onScroll(scrolY) {
+        const scrollTop = window.pageYOffset;
+
+        if (this.lastScrolledTop != scrollTop) {
+            this.pageCoord.y -= this.lastScrolledTop;
+            this.lastScrolledTop = scrollTop;
+            this.pageCoord.y += this.lastScrolledTop;
+        }
+
+        this.onMove();
     }
 
     getDimension() {
@@ -49,8 +90,8 @@ export class MouseParallaxItemClass {
         const { vw, vh } = (() => {
             if (this.centerToViewoport) {
                 return {
-                    vw: eventManager.windowsWidth(),
-                    vh: eventManager.windowsHeight(),
+                    vw: window.innerWidth,
+                    vh: window.innerHeight,
                 };
             } else {
                 return {
@@ -60,10 +101,10 @@ export class MouseParallaxItemClass {
             }
         })();
 
-        const x = mouseManager.clientX();
+        const x = this.clientCoord.x;
         const y = !this.centerToViewoport
-            ? mouseManager.pageY()
-            : mouseManager.clientY();
+            ? this.pageCoord.y
+            : this.clientCoord.y;
 
         const { ax, ay } = (() => {
             if (this.centerToViewoport) {

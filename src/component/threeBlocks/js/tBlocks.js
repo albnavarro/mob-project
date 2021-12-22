@@ -1,4 +1,3 @@
-import { eventManager } from '../../../js/base/eventManager.js';
 import { tBlocksItemClass } from './tBlocksItem.js';
 
 class tBlocksClass {
@@ -10,7 +9,7 @@ class tBlocksClass {
     }
 
     init() {
-        eventManager.push('load', this.inzializeData.bind(this));
+        this.inzializeData();
     }
 
     inzializeData() {

@@ -1,4 +1,3 @@
-import { eventManager } from '../../../js/base/eventManager.js';
 import { AccordionItemClass } from './accordionItem.js';
 
 class AccordionClass {
@@ -10,7 +9,7 @@ class AccordionClass {
     }
 
     init() {
-        eventManager.push('load', this.inzializeData.bind(this));
+        this.inzializeData();
     }
 
     inzializeData() {

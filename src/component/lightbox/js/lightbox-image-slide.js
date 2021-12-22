@@ -1,4 +1,3 @@
-import { eventManager } from '../../../js/base/eventManager.js';
 import { lightboxUtils } from './lightbox-utils.js';
 import { lightBoxImage } from './lightbox-image.js';
 

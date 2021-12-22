@@ -1,4 +1,3 @@
-import { eventManager } from '../../../js/base/eventManager.js';
 import { DraggerItemClass } from './draggerItem.js';
 
 class DraggerClass {
@@ -10,7 +9,7 @@ class DraggerClass {
     }
 
     init() {
-        eventManager.push('load', this.inzializeData.bind(this));
+        this.inzializeData();
     }
 
     inzializeData() {

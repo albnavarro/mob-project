@@ -1,10 +1,19 @@
-import { eventManager } from '../../../js/base/eventManager.js';
-import { mouseManager } from '../../../js/base/mouseManager.js';
 import {
     outerHeight,
     outerWidth,
     offset,
 } from '../../../js/utility/vanillaFunction.js';
+import { useResize } from '.../../../js/events/resizeUtils/useResize.js';
+import {
+    useTouchStart,
+    useTouchEnd,
+    useMouseDown,
+    useMouseUp,
+    useMouseMove,
+    useTouchMove,
+    useMouseWheel,
+} from '.../../../js/events/mouseUtils/useMouse.js';
+import { useFrame } from '.../../../js/events/rafutils/rafUtils.js';
 
 class LightPichZoomClass {
     constructor() {
@@ -21,8 +30,17 @@ class LightPichZoomClass {
         this.itemHeight = 0;
         this.limitX = 0;
         this.limitY = 0;
-        this.contWidth = eventManager.windowsWidth();
-        this.contHeight = eventManager.windowsHeight();
+        this.contWidth = window.innerWidth;
+        this.contHeight = window.innerHeight;
+
+        this.unsubscribeTouchStart = () => {};
+        this.unsubscribeTouchEnd = () => {};
+        this.unsubscribeMouseDown = () => {};
+        this.unsubscribeMouseUp = () => {};
+        this.unsubscribeMouseMove = () => {};
+        this.unsubscribeTouchMove = () => {};
+        this.unsubscribeWheel = () => {};
+        this.unsubscribeResize = () => {};
     }
 
     init({ image, wrapper }) {
@@ -48,36 +66,43 @@ class LightPichZoomClass {
         zoom.appendChild(zoomOut);
         this.setZoomBtnhandler();
 
-        this.image.addEventListener(
-            'mousedown',
-            (e) => e.preventDefault(),
-            false
+        this.unsubscribeWheel = useMouseWheel(({ spinY, target }) => {
+            this.onWeel({ spinY, target });
+        });
+
+        this.unsubscribeTouchStart = useTouchStart(
+            ({ page, target, preventDefault }) => {
+                this.onMouseDown({ target });
+                preventDefault();
+            }
         );
-        this.wrapper.addEventListener(
-            'mousedown',
-            (e) => e.preventDefault(),
-            false
+
+        this.unsubscribeMouseDown = useMouseDown(
+            ({ page, target, preventDefault }) => {
+                this.onMouseDown({ target });
+                preventDefault();
+            }
         );
 
-        this.image.addEventListener('wheel', (e) => this.onWeel(e));
+        this.unsubscribeTouchEnd = useTouchEnd(() => {
+            this.onMouseUp();
+        });
 
-        if (Modernizr.touchevents) {
-            this.touchstart = mouseManager.push('touchstart', () =>
-                this.onMouseDown()
-            );
-            this.touchend = mouseManager.push('touchend', () =>
-                this.onMouseUp()
-            );
-        } else {
-            this.mousedown = mouseManager.push('mousedown', () =>
-                this.onMouseDown()
-            );
-            this.mouseup = mouseManager.push('mouseup', () => this.onMouseUp());
-        }
+        this.unsubscribeMouseUp = useMouseUp(() => {
+            this.onMouseUp();
+        });
 
-        this.touchmove = mouseManager.push('touchmove', () => this.onMove());
-        this.mousemove = mouseManager.push('mousemove', () => this.onMove());
-        this.onresize = eventManager.push('resizeW', () => this.resetZoom());
+        this.unsubscribeMouseMove = useMouseMove(({ page }) => {
+            this.onMove(false, page.x, page.y);
+        });
+
+        this.unsubscribeTouchMove = useTouchMove(({ page }) => {
+            this.onMove(false, page.x, page.y);
+        });
+
+        this.unsubscribeResize = useResize(() => {
+            this.resetZoom();
+        });
     }
 
     setZoomBtnhandler() {
@@ -91,8 +116,8 @@ class LightPichZoomClass {
     setDimension() {
         this.itemWidth = outerWidth(this.image) * this.scale;
         this.itemHeight = outerHeight(this.image) * this.scale;
-        this.limitX = (this.itemWidth - eventManager.windowsWidth()) / 2;
-        this.limitY = (this.itemHeight - eventManager.windowsHeight()) / 2;
+        this.limitX = (this.itemWidth - window.innerWidth) / 2;
+        this.limitY = (this.itemHeight - window.innerHeight) / 2;
     }
 
     resetData() {
@@ -108,17 +133,14 @@ class LightPichZoomClass {
         this.limitX = 0;
         this.limitY = 0;
 
-        if (Modernizr.touchevents) {
-            mouseManager.remove('touchstart', this.touchstart);
-            mouseManager.remove('touchend', this.touchend);
-        } else {
-            mouseManager.remove('mousedown', this.mousedown);
-            mouseManager.remove('mouseup', this.mouseup);
-        }
-
-        mouseManager.remove('touchmove', this.touchmove);
-        mouseManager.remove('mousemove', this.mousemove);
-        eventManager.remove('resize', this.onresize);
+        this.unsubscribeTouchStart();
+        this.unsubscribeTouchEnd();
+        this.unsubscribeMouseDown();
+        this.unsubscribeMouseUp();
+        this.unsubscribeMouseMove();
+        this.unsubscribeTouchMove();
+        this.unsubscribeResize();
+        this.unsubscribeWheel();
 
         if (typeof this.wrapper != 'undefined' && this.wrapper != null) {
             const lightbox = this.wrapper.closest('.lightbox');
@@ -150,8 +172,8 @@ class LightPichZoomClass {
 
         // Center image when needed
         if (
-            this.itemWidth * this.scale < eventManager.windowsWidth() ||
-            this.itemHeight * this.scale < eventManager.windowsHeight()
+            this.itemWidth * this.scale < window.innerWidth ||
+            this.itemHeight * this.scale < window.innerHeight
         ) {
             this.dragY = 0;
             this.dragX = 0;
@@ -166,9 +188,7 @@ class LightPichZoomClass {
         this.afterZoom();
     }
 
-    onMouseDown() {
-        const target = mouseManager.getTarget();
-
+    onMouseDown({ target }) {
         if (target.classList.contains('lightbox__img')) {
             this.image.classList.remove('transition');
             this.onDrag = true;
@@ -180,16 +200,8 @@ class LightPichZoomClass {
         this.onDrag = false;
     }
 
-    onWeel(e) {
-        const delta = ((e) => {
-            if (e.deltaY !== 0) {
-                return e.deltaY > 0 ? -0.2 : 0.2;
-            } else {
-                return 0;
-            }
-        })(e);
-
-        this.scale = this.clamp(this.scale + delta, 1, this.maxZoom);
+    onWeel({ spinY, target }) {
+        this.scale = this.clamp(this.scale + spinY / 20, 1, this.maxZoom);
 
         if (this.scale > 1) {
             this.image.classList.add('drag-cursor');
@@ -204,22 +216,8 @@ class LightPichZoomClass {
         return Math.min(Math.max(num, min), max);
     }
 
-    onMove(force = false) {
+    onMove(force = false, x, y) {
         if (this.scale == 1) this.onDrag = false;
-
-        const { x, y } = (() => {
-            if (Modernizr.touchevents) {
-                return {
-                    x: mouseManager.pageX(),
-                    y: mouseManager.pageY(),
-                };
-            } else {
-                return {
-                    x: mouseManager.clientX(),
-                    y: mouseManager.clientY(),
-                };
-            }
-        })();
 
         const { xgap, ygap } = (() => {
             if (!this.onDrag) return { xgap: 0, ygap: 0 };
@@ -284,10 +282,10 @@ class LightPichZoomClass {
         this.lastY = y;
 
         if (this.onDrag || force) {
-            const style = {
-                transform: `translateX(${xValue}px) translateY(${yValue}px) scale(${this.scale})`,
-            };
-            Object.assign(this.image.style, style);
+            // this.image.style.transform = `translateX(${xValue}px) translateY(${yValue}px) scale(${this.scale})`;
+            useFrame(() => {
+                this.image.style.transform = `translateX(${xValue}px) translateY(${yValue}px) scale(${this.scale})`;
+            });
         }
     }
 }

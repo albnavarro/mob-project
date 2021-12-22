@@ -1,5 +1,3 @@
-import { eventManager } from '../../../js/base/eventManager.js';
-
 export const parallaxUtils = {
     normalizeVelocity(value) {
         if (value < 1) {

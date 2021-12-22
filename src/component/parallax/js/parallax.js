@@ -1,4 +1,3 @@
-import { eventManager } from '../../../js/base/eventManager.js';
 import { ParallaxItemClass } from './parallaxItem.js';
 
 class ParallaxClass {
@@ -11,7 +10,7 @@ class ParallaxClass {
     }
 
     init() {
-        eventManager.push('load', this.inzializeData.bind(this));
+        this.inzializeData();
     }
 
     inzializeData() {
@@ -44,7 +43,7 @@ class ParallaxClass {
     add(istance) {
         this.id++;
         this.instances.push({ id: this.id, istance: istance });
-        return (() => this.remove(this.id))
+        return () => this.remove(this.id);
     }
 
     remove(id) {

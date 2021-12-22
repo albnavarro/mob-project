@@ -1,4 +1,3 @@
-import { eventManager } from '../../../js/base/eventManager.js';
 import { showElementItemClass } from './ShowElementItem.js';
 
 class showElementClass {
@@ -10,7 +9,7 @@ class showElementClass {
     }
 
     init() {
-        eventManager.push('load', this.inzializeData.bind(this));
+        this.inzializeData();
     }
 
     inzializeData() {

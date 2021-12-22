@@ -1,10 +1,10 @@
-import { eventManager } from '../../../js/base/eventManager.js';
 import { lightDescription } from './lightbox-description.js';
 import { lightboxUtils } from './lightbox-utils.js';
+import { useResize } from '.../../../js/events/resizeUtils/useResize.js';
 
 class LightBoxVideoClass {
     constructor() {
-        this.onResizeId = -1;
+        this.unsubscribeResize = () => {};
     }
 
     init({
@@ -18,7 +18,7 @@ class LightBoxVideoClass {
         ratioW,
         ratioH,
     }) {
-        eventManager.remove('resize', this.onResizeId);
+        this.unsubscribeResize();
 
         const videoEl = document.createElement('div');
         videoEl.classList.add('lightbox__video');
@@ -57,18 +57,19 @@ class LightBoxVideoClass {
             videoWrapper.classList.add('visible');
         }, 200);
 
-        this.onResizeId = eventManager.push('resize', () =>
-            this.setVideoSize(wrapper, hGap, wGap, ratioW, ratioH)
-        );
+        this.unsubscribeResize = useResize(() => {
+            this.setVideoSize(wrapper, hGap, wGap, ratioW, ratioH);
+        });
+
         this.openDescription(title, description, wrapper);
     }
 
     setVideoSize(wrapper, hGap, wGap, ratioW, ratioH) {
         // WW and WH gap
-        const newHGap = (eventManager.windowsHeight() / 100) * parseInt(hGap);
-        const newWGap = (eventManager.windowsWidth() / 100) * parseInt(wGap);
-        const maxHeight = eventManager.windowsHeight() - newHGap;
-        const maxWidth = eventManager.windowsWidth() - newWGap;
+        const newHGap = (window.innerHeight / 100) * parseInt(hGap);
+        const newWGap = (window.innerWidth / 100) * parseInt(wGap);
+        const maxHeight = window.innerHeight - newHGap;
+        const maxWidth = window.innerWidth - newWGap;
         const width = ratioW;
         const height = ratioH;
         const { ratioWidth, ratioHeight } =

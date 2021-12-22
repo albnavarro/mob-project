@@ -1,4 +1,3 @@
-import { eventManager } from '../../../js/base/eventManager.js';
 import { GlitchItemClass } from './glitchItem.js';
 
 class GlitchClass {
@@ -10,7 +9,7 @@ class GlitchClass {
     }
 
     init() {
-        eventManager.push('load', this.inzializeData.bind(this));
+        this.inzializeData();
     }
 
     inzializeData() {
@@ -25,7 +24,6 @@ class GlitchClass {
             glitchItem.init();
         }
     }
-
 
     getItemData(item, i) {
         const data = {};

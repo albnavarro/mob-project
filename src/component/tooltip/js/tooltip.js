@@ -1,4 +1,3 @@
-import { eventManager } from '../../../js/base/eventManager.js';
 import { modernzier } from '../../../js/utility/modernizr.js';
 import {
     outerWidth,
@@ -163,14 +162,11 @@ class toolTipClass {
                 const toolTipPosY = offset(toolTip).top;
                 const toolTipPosWidth = outerWidth(toolTip);
 
-                if (
-                    toolTipPosX + toolTipPosWidth >=
-                    eventManager.windowsWidth()
-                ) {
+                if (toolTipPosX + toolTipPosWidth >= window.innerWidth) {
                     toolTip.classList.add('tooltip-pop--is-right');
                 }
 
-                if (toolTipPosY - eventManager.scrollTop() < 0) {
+                if (toolTipPosY - window.pageYOffset < 0) {
                     toolTip.classList.add('tooltip-pop--is-bottom');
                 }
 

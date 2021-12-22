@@ -1,5 +1,3 @@
-import { mouseManager } from '../../../js/base/mouseManager.js';
-import { eventManager } from '../../../js/base/eventManager.js';
 import { move3DitemClass } from './move3Ditem.js';
 import {
     outerHeight,
@@ -7,6 +5,16 @@ import {
     offset,
 } from '../../../js/utility/vanillaFunction.js';
 import { useSpring } from '.../../../js/animation/spring/useSpring.js';
+import { useResize } from '.../../../js/events/resizeUtils/useResize.js';
+import { useScroll } from '.../../../js/events/scrollUtils/useScroll.js';
+import {
+    useTouchStart,
+    useTouchEnd,
+    useMouseDown,
+    useMouseUp,
+    useMouseMove,
+    useTouchMove,
+} from '.../../../js/events/mouseUtils/useMouse.js';
 
 export class move3DContainerClass {
     constructor(data) {
@@ -38,16 +46,28 @@ export class move3DContainerClass {
 
         this.spring = new useSpring();
         this.unsubscribeSpring = () => {};
+
+        // MOUSE COORD
+        this.pageCoord = { x: 0, y: 0 };
+        this.lastScrolledTop = 0;
+
+        this.unsubscribeScroll = () => {};
+        this.unsubscribeTouchStart = () => {};
+        this.unsubscribeTouchEnd = () => {};
+        this.unsubscribeMouseDown = () => {};
+        this.unsubscribeMouseUp = () => {};
+        this.unsubscribeMouseMove = () => {};
+        this.unsubscribeTouchMove = () => {};
+        this.unsubscribeResize = () => {};
     }
 
     init() {
+        console.log('test');
         this.spring.setData({ ax: 0, ay: 0 });
 
         this.unsubscribeSpring = this.spring.subscribe(({ ax, ay }) => {
             this.container.style.transform = `rotateY(${ax}deg) rotateX(${ay}deg) translateZ(0)`;
         });
-
-        if (Modernizr.touchevents && !this.drag) return;
 
         if (!this.centerToViewoport && !this.drag) this.pageY = true;
 
@@ -65,28 +85,58 @@ export class move3DContainerClass {
         this.setDepth();
         this.getDimension();
 
-        mouseManager.push('mousemove', () => this.onMove());
-        eventManager.push('resize', () => this.getDimension());
+        this.unsubscribeMouseMove = useMouseMove(({ page }) => {
+            this.setGlobalCoord({ page });
+            this.onMove();
+        });
+
+        this.unsubscribeResize = useResize(() => {
+            this.getDimension();
+        });
 
         if (this.pageY) {
-            mouseManager.push('scroll', () => this.onMove());
+            this.unsubscribeScroll = useScroll(({ scrolY }) => {
+                this.onScroll(scrolY);
+            });
         }
 
         if (this.drag) {
-            this.dragX = eventManager.windowsWidth() / 2;
-            this.dragY = eventManager.windowsHeight() / 2;
+            this.dragX = window.innerWidth / 2;
+            this.dragY = window.innerHeight / 2;
             this.item.classList.add('move3D--drag');
 
-            if (Modernizr.touchevents) {
-                mouseManager.push('touchstart', () => this.onMouseDown());
-                mouseManager.push('touchend', () => this.onMouseUp());
-            } else {
-                mouseManager.push('mousedown', () => this.onMouseDown());
-                mouseManager.push('mouseup', () => this.onMouseUp());
-            }
+            this.unsubscribeTouchMove = useTouchStart(({ page }) => {
+                this.onMouseDown({ page });
+            });
 
-            mouseManager.push('touchmove', () => this.onMove());
+            this.unsubscribeTouchMove = useTouchEnd(() => {
+                this.onMouseUp();
+            });
+
+            this.unsubscribeTouchMove = useMouseDown(({ page }) => {
+                this.onMouseDown({ page });
+            });
+
+            this.unsubscribeTouchMove = useMouseUp(() => {
+                this.onMouseUp();
+            });
+
+            this.unsubscribeTouchMove = useTouchMove(({ page }) => {
+                this.setGlobalCoord({ page });
+                this.onMove();
+            });
         }
+    }
+
+    destroy() {
+        this.unsubscribeScroll();
+        this.unsubscribeTouchStart();
+        this.unsubscribeTouchEnd();
+        this.unsubscribeMouseDown();
+        this.unsubscribeMouseUp();
+        this.unsubscribeMouseMove();
+        this.unsubscribeTouchMove();
+        this.unsubscribeResize();
     }
 
     getDimension() {
@@ -118,12 +168,28 @@ export class move3DContainerClass {
         Object.assign(this.scene.style, style);
     }
 
+    onScroll(scrolY) {
+        const scrollTop = window.pageYOffset;
+
+        if (this.lastScrolledTop != scrollTop) {
+            this.pageCoord.y -= this.lastScrolledTop;
+            this.lastScrolledTop = scrollTop;
+            this.pageCoord.y += this.lastScrolledTop;
+        }
+
+        this.onMove();
+    }
+
+    setGlobalCoord({ page }) {
+        this.pageCoord = { x: page.x, y: page.y };
+    }
+
     onMove() {
         const { vw, vh } = (() => {
             if (this.centerToViewoport || this.drag) {
                 return {
-                    vw: eventManager.windowsWidth(),
-                    vh: eventManager.windowsHeight(),
+                    vw: window.innerWidth,
+                    vh: window.innerHeight,
                 };
             } else {
                 return {
@@ -133,14 +199,8 @@ export class move3DContainerClass {
             }
         })();
 
-        const x = Modernizr.touchevents
-            ? mouseManager.pageX()
-            : mouseManager.clientX();
-
-        const y =
-            Modernizr.touchevents || this.pageY
-                ? mouseManager.pageY()
-                : mouseManager.clientY();
+        const x = this.pageCoord.x;
+        const y = this.pageCoord.y;
 
         const { xgap, ygap } = (() => {
             if (!this.onDrag) return { xgap: 0, ygap: 0 };
@@ -243,17 +303,17 @@ export class move3DContainerClass {
         }
     }
 
-    draggable() {
+    draggable({ page }) {
         return (
-            mouseManager.pageY() > this.offSetTop &&
-            mouseManager.pageY() < this.offSetTop + this.height &&
-            mouseManager.pageX() > this.offSetLeft &&
-            mouseManager.pageX() < this.offSetLeft + this.width
+            page.y > this.offSetTop &&
+            page.y < this.offSetTop + this.height &&
+            page.x > this.offSetLeft &&
+            page.x < this.offSetLeft + this.width
         );
     }
 
-    onMouseDown() {
-        if (this.draggable()) {
+    onMouseDown({ page }) {
+        if (this.draggable({ page })) {
             this.onDrag = true;
             this.firstDrag = true;
         }

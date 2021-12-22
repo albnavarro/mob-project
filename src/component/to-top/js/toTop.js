@@ -1,5 +1,5 @@
-import { eventManager } from '../../../js/base/eventManager.js';
 import { bodyScrollTo } from '../../../js/utility/animation.js';
+import { useScroll } from '.../../../js/events/scrollUtils/useScroll.js';
 
 class totopClass {
     constructor() {
@@ -10,7 +10,7 @@ class totopClass {
     init() {
         this.addHandler();
         this.showArrow();
-        eventManager.push('scroll', this.showArrow.bind(this));
+        useScroll(() => this.showArrow());
     }
 
     addHandler() {
@@ -20,20 +20,13 @@ class totopClass {
     onClick(event) {
         event.preventDefault();
         bodyScrollTo(0);
-        console.log('cluckkk');
     }
 
     showArrow() {
-        if (
-            eventManager.scrollTop() >= eventManager.windowsWidth() &&
-            this.hide
-        ) {
+        if (window.pageYOffset >= window.innerWidth && this.hide) {
             this.$totop.classList.add('visible');
             this.hide = false;
-        } else if (
-            eventManager.scrollTop() < eventManager.windowsWidth() &&
-            !this.hide
-        ) {
+        } else if (window.pageYOffset < window.innerWidth && !this.hide) {
             this.$totop.classList.remove('visible');
             this.hide = true;
         }

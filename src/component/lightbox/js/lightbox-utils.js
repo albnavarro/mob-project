@@ -1,5 +1,3 @@
-import { eventManager } from '../../../js/base/eventManager.js';
-
 class LightboxUtilsClass {
     // RESETTO IL CONTENUTO DELLA DESCRIZIONE LIGHTBOX SE TALE ELEMENTO ESISTE
     // ALLA CHIUSURA DELLA LIGHTBOX O AL CAMBIO LIOGHTBOX
