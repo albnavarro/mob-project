@@ -11,8 +11,6 @@
 // import { objEntriesPolyfill } from './polyfill/entries.js';
 
 // BASE MODULE
-import { eventManager } from './base/eventManager.js';
-import { mouseManager } from './base/mouseManager.js';
 import { vh } from './utility/vh.js';
 import { findElement } from './utility/findElement.js';
 
@@ -33,7 +31,7 @@ import { glitch } from '../component/glitch/js/glitch.js';
 import { wave } from '../component/wave/js/wave.js';
 import { predictiveTurbolence } from '../component/predictiveTurbolence/js/predictiveTurbolence.js';
 import { animate } from '../component/animate/js/animate.js';
-// import { pageScroll } from '../component/pageScroll/js/pageScroll.js';
+import { pageScroll } from '../component/pageScroll/js/pageScroll.js';
 import { SmoothScrollClass } from '../component/smoothScroll/js/smoothScroll.js';
 import { dragger } from '../component/dragger/js/dragger.js';
 import { GsapHorizontalCustomClass } from '../component/gsapHorizontalCustom/js/gsapHorizontalCustom.js';
@@ -48,7 +46,6 @@ import { tweenTest } from './test/tweenTest.js';
 import { lerpTest } from './test/lerpTest.js';
 
 const body = document.querySelector('body');
-eventManager.init(true, true);
 
 if (body.classList.contains('page-index')) {
     springTest();
@@ -77,8 +74,7 @@ if (body.classList.contains('page-gsapHorizontal2')) {
     gsapHorizontalCustom2.init();
 }
 
-mouseManager.init();
-// pageScroll.init();
+pageScroll.init();
 parallax.init();
 tBlocks.init();
 showElement.init();
@@ -182,9 +178,10 @@ const sidebarMenu = new menuClass({
 });
 
 // Provvisorio
-const forceResize = () => {
-    setTimeout(() => {
-        window.dispatchEvent(new Event('resize'));
-    }, 500);
-};
-eventManager.push('load', forceResize);
+// const forceResize = () => {
+//     setTimeout(() => {
+//         console.log('resize');
+//         window.dispatchEvent(new Event('resize'));
+//     }, 2000);
+// };
+// forceResize();

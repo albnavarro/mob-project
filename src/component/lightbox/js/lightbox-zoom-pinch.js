@@ -3,7 +3,7 @@ import {
     outerWidth,
     offset,
 } from '../../../js/utility/vanillaFunction.js';
-import { useResize } from '.../../../js/events/resizeUtils/useResize.js';
+import { useResize } from '.../../../js/core/events/resizeUtils/useResize.js';
 import {
     useTouchStart,
     useTouchEnd,
@@ -12,8 +12,8 @@ import {
     useMouseMove,
     useTouchMove,
     useMouseWheel,
-} from '.../../../js/events/mouseUtils/useMouse.js';
-import { useFrame } from '.../../../js/events/rafutils/rafUtils.js';
+} from '.../../../js/core/events/mouseUtils/useMouse.js';
+import { useFrame } from '.../../../js/core/events/rafutils/rafUtils.js';
 
 class LightPichZoomClass {
     constructor() {

@@ -1,8 +1,8 @@
 import { lightDescription } from './lightbox-description.js';
-import { loadImages } from '../../../js/utility/loadImages.js';
+import { loadImages } from '../../../js/core/loader/loadImages.js';
 import { lightboxUtils } from './lightbox-utils.js';
 import { lightPichZoom } from './lightbox-zoom-pinch.js';
-import { useResize } from '.../../../js/events/resizeUtils/useResize.js';
+import { useResize } from '.../../../js/core/events/resizeUtils/useResize.js';
 
 class LightBoxImageClass {
     constructor() {

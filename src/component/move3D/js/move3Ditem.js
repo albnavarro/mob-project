@@ -1,5 +1,5 @@
 import { move3DUtils } from './move3Dutils.js';
-import { useLerp } from '.../../../js/animation/lerp/useLerp.js';
+import { useLerp } from '.../../../js/core/animation/lerp/useLerp.js';
 
 export class move3DitemClass {
     constructor(data) {

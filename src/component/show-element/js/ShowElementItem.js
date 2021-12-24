@@ -1,6 +1,6 @@
 import { offset } from '../../../js/utility/vanillaFunction.js';
-import { useResize } from '.../../../js/events/resizeUtils/useResize.js';
-import { useScroll } from '.../../../js/events/scrollUtils/useScroll.js';
+import { useResize } from '.../../../js/core/events/resizeUtils/useResize.js';
+import { useScroll } from '.../../../js/core/events/scrollUtils/useScroll.js';
 
 export class showElementItemClass {
     constructor(data) {

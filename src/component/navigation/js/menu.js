@@ -3,7 +3,7 @@ import {
     enableBodyScroll,
     clearAllBodyScrollLocks,
 } from 'body-scroll-lock';
-import { mq } from '../../../js/base/mediaManager.js';
+import { mq } from '../../../js/core/mediaManager.js';
 import {
     outerHeight,
     outerWidth,
@@ -16,7 +16,7 @@ import {
     slideUp,
     slideDown,
 } from '../../../js/utility/animation.js';
-import { useResize } from '.../../../js/events/resizeUtils/useResize.js';
+import { useResize } from '.../../../js/core/events/resizeUtils/useResize.js';
 
 export class menuClass {
     constructor(data) {

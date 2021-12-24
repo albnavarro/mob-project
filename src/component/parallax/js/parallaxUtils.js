@@ -87,24 +87,24 @@ export const parallaxUtils = {
         };
     },
 
-    getValueOnSwitch({ switchPropierties, isReverse, value }) {
+    getValueOnSwitch({ switchPropierties, isReverse, value, prop }) {
         switch (switchPropierties) {
-            case 'in-stop':
+            case prop.inStop:
                 return (!isReverse && value > 0) || (isReverse && value < 0)
                     ? 0
                     : value;
 
-            case 'in-back':
+            case prop.inBack:
                 return (!isReverse && value > 0) || (isReverse && value < 0)
                     ? -value
                     : value;
 
-            case 'out-stop':
+            case prop.outStop:
                 return (!isReverse && value < 0) || (isReverse && value > 0)
                     ? 0
                     : value;
 
-            case 'out-back':
+            case prop.outBack:
                 return (!isReverse && value < 0) || (isReverse && value > 0)
                     ? -value
                     : value;
@@ -114,9 +114,9 @@ export const parallaxUtils = {
         }
     },
 
-    getRetReverseValue(propierties, val) {
+    getRetReverseValue(propierties, val, opacity) {
         switch (propierties) {
-            case 'opacity':
+            case opacity:
                 return 1 - val;
 
             default:

@@ -1,4 +1,4 @@
-import { mq } from '../../../js/base/mediaManager.js';
+import { mq } from '../../../js/core/mediaManager.js';
 import { forceRedraw } from '../../../js/utility/redrowNode.js';
 import { detectSafari } from '../../../js/utility/isSafari.js';
 
@@ -20,11 +20,11 @@ export class WaveItemClass {
 
         setTimeout(() => {
             this.redRawItem();
-        }, 100)
+        }, 100);
     }
 
     redRawItem() {
-        if(detectSafari()) {
+        if (detectSafari()) {
             forceRedraw(this.item);
         }
     }
@@ -66,7 +66,7 @@ export class WaveItemClass {
         const style = {
             filter: `url(#wave${this.counter})`,
             transform: 'translate3D(0, 0, 0)',
-        }
+        };
         Object.assign(this.item.style, style);
     }
 }

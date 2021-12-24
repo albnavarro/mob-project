@@ -104,12 +104,6 @@ class ParallaxClass {
         // start animation form opposite side ( top in vetical, right in horizontal)
         data.fixedInvertSide = item.hasAttribute('data-fixedInvertSide');
 
-        // LINEAR PROPS
-        // String
-        // Mandatory computationType = 'default'
-        // 1 - 10
-        data.range = item.getAttribute('data-range');
-
         // String: in-stop - in-back - out-stop - out-back
         // Mandatory computationType = 'default' doasn't work with opacity
         // in-stop: stop the calculation reached zero
@@ -139,6 +133,19 @@ class ParallaxClass {
         data.opacityEnd = item.getAttribute('data-opacityEnd');
 
         // COMMON PROPS
+
+        // Any
+        // Range of movement
+        // computationType = 'default'
+        // 1 - 10
+        // computationType = 'fixed'
+        // '100h%' => percent of item height
+        // '100w%' => percent of item width
+        // '100px  => pixel value
+        // '100vw' => pervent of viewport width
+        // '100wh' => pervent of viewport height
+        // negative number is valid es: '-100px' or '-100h%'
+        data.range = item.getAttribute('data-range');
 
         data.perspective = item.getAttribute('data-perspective');
 

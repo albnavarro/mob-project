@@ -1,52 +1,51 @@
-import { eventManager } from "../../../js/base/eventManager.js";
-import { PageScrollItemClass } from "./pageScrollItem.js";
+import { PageScrollItemClass } from './pageScrollItem.js';
 
 class PageScrollClass {
-  constructor() {
-    this.pageScrollItem = document.querySelectorAll(
-      "*[data-conponent='m-comp--pageScroller']"
-    );
-    this.instances = [];
-  }
-
-  init() {
-    eventManager.push("load", this.inzializeData.bind(this));
-  }
-
-  inzializeData() {
-    const itemArray = Array.from(this.pageScrollItem);
-    const dataArray = itemArray.map((item) => {
-      return this.getItemData(item);
-    });
-
-    for (const item of dataArray) {
-      const pageScrollItem = new PageScrollItemClass(item);
-      this.instances.push(pageScrollItem);
-      pageScrollItem.init();
+    constructor() {
+        this.pageScrollItem = document.querySelectorAll(
+            "*[data-conponent='m-comp--pageScroller']"
+        );
+        this.instances = [];
     }
-  }
 
-  refresh() {
-    for (const item of this.instances) {
-      item.refresh();
+    init() {
+        this.inzializeData();
     }
-  }
 
-  getItemData(item) {
-    const data = {};
-    data.item = item;
+    inzializeData() {
+        const itemArray = Array.from(this.pageScrollItem);
+        const dataArray = itemArray.map((item) => {
+            return this.getItemData(item);
+        });
 
-    data.speed = item.getAttribute("data-speed") || 15;
+        for (const item of dataArray) {
+            const pageScrollItem = new PageScrollItemClass(item);
+            this.instances.push(pageScrollItem);
+            pageScrollItem.init();
+        }
+    }
 
-    // String
-    data.breackpoint = item.getAttribute("data-breackpoint") || "desktop";
+    refresh() {
+        for (const item of this.instances) {
+            item.refresh();
+        }
+    }
 
-    // String
-    // refer to mediaManager obj
-    data.queryType = item.getAttribute("data-queryType") || "min";
+    getItemData(item) {
+        const data = {};
+        data.item = item;
 
-    return data;
-  }
+        data.speed = item.getAttribute('data-speed') || 15;
+
+        // String
+        data.breackpoint = item.getAttribute('data-breackpoint') || 'desktop';
+
+        // String
+        // refer to mediaManager obj
+        data.queryType = item.getAttribute('data-queryType') || 'min';
+
+        return data;
+    }
 }
 
 export const pageScroll = new PageScrollClass();

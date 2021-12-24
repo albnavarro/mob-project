@@ -1,5 +1,3 @@
-import { eventManager } from '../base/eventManager.js';
-
 export function outerHeight(el) {
     let height = el.offsetHeight;
     const style = getComputedStyle(el);
@@ -19,7 +17,7 @@ export function outerWidth(el) {
 export function offset(el) {
     const rect = el.getBoundingClientRect();
     const offset = {
-        top: rect.top + eventManager.scrollTop(),
+        top: rect.top + window.pageYOffset,
         left: rect.left + window.pageXOffset,
     };
 

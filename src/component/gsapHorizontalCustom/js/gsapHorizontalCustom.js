@@ -1,14 +1,14 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { eventManager } from '../../../js/base/eventManager.js';
-import { mq } from '../../../js/base/mediaManager.js';
-import { SimpleStore } from '../../../js/utility/simpleStore.js';
+import { mq } from '../../../js/core/mediaManager.js';
+import { SimpleStore } from '../../../js/core/store/simpleStore.js';
 import {
     offset,
     outerHeight,
     outerWidth,
 } from '../../../js/utility/vanillaFunction.js';
 import { getTranslateValues } from '../../../js/utility/getTranslateValues.js';
+import { useResize } from '.../../../js/core/events/resizeUtils/useResize.js';
 
 export class GsapHorizontalCustomClass {
     constructor(data = {}) {
@@ -39,10 +39,10 @@ export class GsapHorizontalCustomClass {
     init() {
         // GSAP
         gsap.registerPlugin(ScrollTrigger);
-        eventManager.push('load', () => this.getWidth());
-        eventManager.push('load', () => this.createShadow());
-        eventManager.push('load', () => this.initGsap());
-        eventManager.push('resize', () => this.onResize());
+        this.getWidth();
+        this.createShadow();
+        this.initGsap();
+        useResize(() => this.onResize());
     }
 
     onTick(fn) {
@@ -52,8 +52,7 @@ export class GsapHorizontalCustomClass {
     setDimension() {
         const width = this.store.getProp('horizontalWidth');
 
-        const percentRange =
-            (100 * (width - eventManager.windowsWidth())) / width;
+        const percentRange = (100 * (width - window.innerWidth)) / width;
 
         this.triggerContainer.style.height = `${width}px`;
         this.row.style.width = `${width}px`;
@@ -136,10 +135,8 @@ export class GsapHorizontalCustomClass {
             const height = outerHeight(this.row);
             const { x } = getTranslateValues(this.row);
             const offset = item.getBoundingClientRect().left - x;
-            const screenRatio =
-                eventManager.windowsWidth() / eventManager.windowsHeight();
-            const windowDifference =
-                eventManager.windowsWidth() - eventManager.windowsHeight();
+            const screenRatio = window.innerWidth / window.innerHeight;
+            const windowDifference = window.innerWidth - window.innerHeight;
             const widthAmount = offset / screenRatio;
             const diffAmount = offset - offset / screenRatio;
             const shadowTransitionEl = this.mainContainer.querySelector(
@@ -160,14 +157,12 @@ export class GsapHorizontalCustomClass {
 
             // Strengh shadow end item to bottom of page
             const plusFull =
-                eventManager.windowsWidth() > eventManager.windowsHeight()
-                    ? eventManager.windowsHeight()
-                    : 0;
+                window.innerWidth > window.innerHeight ? window.innerHeight : 0;
 
             // Strengh center in out item to bottom of page
             const plusHalf =
-                eventManager.windowsWidth() > eventManager.windowsHeight()
-                    ? eventManager.windowsHeight() / 2
+                window.innerWidth > window.innerHeight
+                    ? window.innerHeight / 2
                     : 0;
 
             const start = (() => {
@@ -186,10 +181,10 @@ export class GsapHorizontalCustomClass {
 
             const left = (() => {
                 const val =
-                    eventManager.windowsWidth() > eventManager.windowsHeight()
+                    window.innerWidth > window.innerHeight
                         ? windowDifference / percentrange
                         : windowDifference / percentrange +
-                          eventManager.windowsWidth() / screenRatio;
+                          window.innerWidth / screenRatio;
 
                 switch (offset) {
                     case 0:

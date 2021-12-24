@@ -1,4 +1,4 @@
-import { useLerp } from '../animation/lerp/useLerp.js';
+import { useLerp } from '../core/animation/lerp/useLerp.js';
 
 export function lerpTest() {
     const btnStart = document.querySelector('.lerp-btn-start');

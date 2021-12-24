@@ -1,41 +1,32 @@
-import { eventManager } from "../base/eventManager.js";
+import { useScroll } from '../core/events/scrollUtils/useScroll.js';
+import { useResize } from '../core/events/resizeUtils/useResize.js';
 
 class vhClass {
+    constructor(images, callback) {
+        this.lastWw = 0;
+    }
 
-	constructor(images, callback) {
-		this.lastWw = 0
-	}
+    init() {
+        this.calcVh();
 
+        useScroll(() => this.onScroll());
+        useResize(() => this.calcVh());
+    }
 
-	init() {
-		this.lastWw = eventManager.windowsWidth()
-		this.calcVh()
-		eventManager.push('resize', this.onResize.bind(this))
-		eventManager.push('scroll', this.onScroll.bind(this))
-	}
+    calcVh() {
+        let vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+        console.log('calc vh');
+    }
 
-	calcVh() {
-		let vh = window.innerHeight * 0.01
-		document.documentElement.style.setProperty('--vh', `${vh}px`)
-        console.log('calc vh')
-	}
-
-	onResize() {
-		// if (eventManager.windowsWidth() != this.lastWw) {
-			this.calcVh()
-			this.lastWw = eventManager.windowsWidth();
-		// }
-	}
-
-	onScroll() {
-		if (eventManager.scrollTop() == 0) {
-			this.calcVh();
-		}
-	}
-
+    onScroll() {
+        if (window.pageYOffset == 0) {
+            this.calcVh();
+        }
+    }
 }
 
-export const vh = new vhClass()
+export const vh = new vhClass();
 
 // USAGE
 // .my-element {

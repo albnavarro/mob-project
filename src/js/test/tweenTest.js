@@ -1,4 +1,4 @@
-import { useTween } from '../animation/tween/useTween.js';
+import { useTween } from '../core/animation/tween/useTween.js';
 
 export function tweenTest() {
     const btnStart = document.querySelector('.tween-btn-start');

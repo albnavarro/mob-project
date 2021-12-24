@@ -6,8 +6,8 @@ import {
 } from '../../../js/utility/vanillaFunction.js';
 import { bodyScrollTo } from '../../../js/utility/animation.js';
 import { modernzier } from '../../../js/utility/modernizr.js';
-import { SimpleStore } from '../../../js/utility/simpleStore.js';
-import { useResize } from '.../../../js/events/resizeUtils/useResize.js';
+import { SimpleStore } from '../../../js/core/store/simpleStore.js';
+import { useResize } from '.../../../js/core/events/resizeUtils/useResize.js';
 
 export class tBlocksItemClass {
     constructor(container) {

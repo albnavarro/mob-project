@@ -1,4 +1,4 @@
-import { mq } from '../../../js/base/mediaManager.js';
+import { mq } from '../../../js/core/mediaManager.js';
 import {
     outerHeight,
     outerWidth,
@@ -7,11 +7,11 @@ import {
 import { forceRedraw } from '../../../js/utility/redrowNode.js';
 import { detectSafari } from '../../../js/utility/isSafari.js';
 import { tUtils } from './predictiveTurbolenceUtils.js';
-import { useSpring } from '.../../../js/animation/spring/useSpring.js';
-import { springConfig } from '.../../../js/animation/spring/springConfig.js';
-import { useResize } from '.../../../js/events/resizeUtils/useResize.js';
-import { useScroll } from '.../../../js/events/scrollUtils/useScroll.js';
-import { useMouseMove } from '.../../../js/events/mouseUtils/useMouse.js';
+import { useSpring } from '.../../../js/core/animation/spring/useSpring.js';
+import { springConfig } from '.../../../js/core/animation/spring/springConfig.js';
+import { useResize } from '.../../../js/core/events/resizeUtils/useResize.js';
+import { useScroll } from '.../../../js/core/events/scrollUtils/useScroll.js';
+import { useMouseMove } from '.../../../js/core/events/mouseUtils/useMouse.js';
 
 export class PredictiveTurbolenceItemClass {
     constructor(data) {

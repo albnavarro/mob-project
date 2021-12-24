@@ -21,8 +21,8 @@ export const hScroller = () => {
         scrollTrigger: '.pluto3',
         direction: 'horizontal',
         computationType: 'fixed',
+        range: '100w%',
         ease: true,
-        reverse: true,
         propierties: 'horizontal',
     });
     parallaxIn.init();
@@ -34,8 +34,8 @@ export const hScroller = () => {
         scrollTrigger: '.pluto4',
         direction: 'horizontal',
         computationType: 'fixed',
+        range: '-100w%',
         fixedInvertSide: true,
-        // ease: true,
         propierties: 'horizontal',
     });
     parallaxOut.init();

@@ -1,10 +1,10 @@
 import { getTranslateValues } from '../../../js/utility/getTranslateValues.js';
-import { useResize } from '.../../../js/events/resizeUtils/useResize.js';
-import { useScroll } from '.../../../js/events/scrollUtils/useScroll.js';
+import { useResize } from '.../../../js/core/events/resizeUtils/useResize.js';
+import { useScroll } from '.../../../js/core/events/scrollUtils/useScroll.js';
 import {
     useScrollStart,
     useScrollEnd,
-} from '.../../../js/events/scrollUtils/useScrollUtils.js';
+} from '.../../../js/core/events/scrollUtils/useScrollUtils.js';
 import {
     useTouchStart,
     useTouchEnd,
@@ -14,10 +14,10 @@ import {
     useTouchMove,
     useMouseWheel,
     useMouseClick,
-} from '.../../../js/events/mouseUtils/useMouse.js';
+} from '.../../../js/core/events/mouseUtils/useMouse.js';
 import { isDescendant } from '../../../js/utility/vanillaFunction.js';
-import { useLerp } from '.../../../js/animation/lerp/useLerp.js';
-import { useSpring } from '.../../../js/animation/spring/useSpring.js';
+import { useLerp } from '.../../../js/core/animation/lerp/useLerp.js';
+import { useSpring } from '.../../../js/core/animation/spring/useSpring.js';
 
 export class SmoothScrollClass {
     constructor(data = {}) {

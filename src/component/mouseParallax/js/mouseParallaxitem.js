@@ -3,10 +3,10 @@ import {
     outerWidth,
     offset,
 } from '../../../js/utility/vanillaFunction.js';
-import { useSpring } from '.../../../js/animation/spring/useSpring.js';
-import { useResize } from '.../../../js/events/resizeUtils/useResize.js';
-import { useScroll } from '.../../../js/events/scrollUtils/useScroll.js';
-import { useMouseMove } from '.../../../js/events/mouseUtils/useMouse.js';
+import { useSpring } from '.../../../js/core/animation/spring/useSpring.js';
+import { useResize } from '.../../../js/core/events/resizeUtils/useResize.js';
+import { useScroll } from '.../../../js/core/events/scrollUtils/useScroll.js';
+import { useMouseMove } from '.../../../js/core/events/mouseUtils/useMouse.js';
 
 export class MouseParallaxItemClass {
     constructor(data) {

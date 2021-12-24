@@ -1,5 +1,5 @@
 import { bodyScrollTo } from '../../../js/utility/animation.js';
-import { useScroll } from '.../../../js/events/scrollUtils/useScroll.js';
+import { useScroll } from '.../../../js/core/events/scrollUtils/useScroll.js';
 
 class totopClass {
     constructor() {

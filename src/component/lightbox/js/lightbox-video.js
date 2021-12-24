@@ -1,6 +1,6 @@
 import { lightDescription } from './lightbox-description.js';
 import { lightboxUtils } from './lightbox-utils.js';
-import { useResize } from '.../../../js/events/resizeUtils/useResize.js';
+import { useResize } from '.../../../js/core/events/resizeUtils/useResize.js';
 
 class LightBoxVideoClass {
     constructor() {
