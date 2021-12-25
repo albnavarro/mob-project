@@ -17,6 +17,7 @@ import {
     slideDown,
 } from '../../../js/utility/animation.js';
 import { useResize } from '.../../../js/core/events/resizeUtils/useResize.js';
+import { modernzier } from '../../../js/utility/modernizr.js';
 
 export class menuClass {
     constructor(data) {

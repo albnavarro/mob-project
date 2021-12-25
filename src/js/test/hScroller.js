@@ -22,6 +22,7 @@ export const hScroller = () => {
         direction: 'horizontal',
         computationType: 'fixed',
         range: '100w%',
+        start: 20,
         ease: true,
         propierties: 'horizontal',
     });

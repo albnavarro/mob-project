@@ -176,11 +176,11 @@ block content
         
             .index-timeline
                 .index-timeline__dummy.index-timeline__dummy--1
-                .index-timeline__dummy.index-timeline__dummy--2
                 div.inlineBLock(
                     data-conponent='m-comp--parallax'
                     data-computationType="fixed"
-                    data-fixedOffset='30'
+                    data-start='120px'
+                    data-end='20'
                     data-propierties="vertical"
                     data-range="100h%"
                     data-scrollTrigger=".index-timeline__dummy--1")
@@ -188,9 +188,10 @@ block content
                         data-conponent='m-comp--parallax'
                         data-computationType="fixed"
                         data-propierties="horizontal"
-                        data-fixedOffset='30'
+                        data-start='80'
+                        data-end='0'
                         data-range="50w%"
-                        data-scrollTrigger=".index-timeline__dummy--2")
+                        data-scrollTrigger=".index-timeline__dummy--1")
                         .parallax__item-test
                             
             .parallax__item-test.inlineBLock(
@@ -198,7 +199,7 @@ block content
                 data-computationType="fixed"
                 data-propierties="rotate"
                 data-range="90"
-                data-fixedOffset="20")
+                data-start="20")
                 
                     
             .flex.justify-center

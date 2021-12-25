@@ -84,9 +84,15 @@ class ParallaxClass {
         // Inverts the calculated minimum and maximum values
         data.fixedFromTo = item.hasAttribute('data-fixedFromTo');
 
-        // String: 0 to infinite
-        // shilft animation start 0 - 100 -> vh value
-        data.fixedOffset = item.getAttribute('data-fixedOffset');
+        // any:
+        // data-start="20" -> start from 20vw form bottom
+        // data-start="20px" -> start from 20px form bottom
+        data.start = item.getAttribute('data-start');
+
+        // any:
+        // data-end="20" -> end at 20vw form top
+        // data-end="20px" -> end at 20px form top
+        data.end = item.getAttribute('data-end');
 
         // Boolean
         // Mandatory computationType = 'fixed'

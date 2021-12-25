@@ -31,11 +31,11 @@ export const parallaxUtils = {
         windowsHeight,
         startPoint,
         offset,
-        height,
+        endPoint,
     }) {
         if (scrollTop + windowsHeight - startPoint < offset) {
             return 'OVER';
-        } else if (scrollTop + windowsHeight - startPoint > offset + height) {
+        } else if (scrollTop + windowsHeight - startPoint > offset + endPoint) {
             return 'DOWN';
         } else {
             return 'INSIDE';
@@ -47,11 +47,11 @@ export const parallaxUtils = {
         windowsHeight,
         startPoint,
         offset,
-        height,
+        endPoint,
     }) {
         if (scrollTop + startPoint < offset) {
             return 'OVER';
-        } else if (scrollTop + startPoint > offset + height) {
+        } else if (scrollTop + startPoint > offset + endPoint) {
             return 'DOWN';
         } else {
             return 'INSIDE';

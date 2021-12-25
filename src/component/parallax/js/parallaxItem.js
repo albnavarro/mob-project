@@ -80,7 +80,8 @@ export class ParallaxItemClass {
 
         //Fixed prop
         this.fixedFromTo = data.fixedFromTo || false;
-        this.fixedOffset = data.fixedOffset || 0;
+        this.start = data.start || 0;
+        this.end = data.end || null;
         this.fixedEndOff = data.fixedEndOff || false;
         this.fixedStartOff = data.fixedStartOff || false;
         this.fixedInvertSide = data.fixedInvertSide || false;
@@ -136,9 +137,29 @@ export class ParallaxItemClass {
         this.unsubscribeSpring = () => {};
 
         this.unitMisure = '';
+
+        this.startPoint = 0;
+        this.endPoint = 0;
     }
 
     init() {
+        this.spring.setData({ val: 0 });
+
+        this.unsubscribeSpring = this.spring.subscribe(({ val }) => {
+            this.updateStyle(val);
+        });
+
+        if (this.springConfig && this.springConfig in springConfig) {
+            const config = springConfig[this.springConfig];
+            this.spring.updateConfig(config);
+        }
+
+        this.item.classList.add('parallax__item');
+        this.calcOffset();
+        this.calcHeight();
+        this.calcWidth();
+        this.getScreenHeight();
+
         if (this.computationType == this.TYPE_FIXED) {
             this.numericRange = parseFloat(
                 this.range.toString().replace(/^[^-]\D+/g, '')
@@ -156,24 +177,8 @@ export class ParallaxItemClass {
             })();
 
             this.limiterOff = true;
+            this.calcFixedLimit();
         }
-
-        this.spring.setData({ val: 0 });
-
-        this.unsubscribeSpring = this.spring.subscribe(({ val }) => {
-            this.updateStyle(val);
-        });
-
-        if (this.springConfig && this.springConfig in springConfig) {
-            const config = springConfig[this.springConfig];
-            this.spring.updateConfig(config);
-        }
-
-        this.item.classList.add('parallax__item');
-        this.calcOffset();
-        this.calcHeight();
-        this.calcWidth();
-        this.getScreenHeight();
 
         if (this.computationType !== this.TYPE_FIXED)
             this.range = parallaxUtils.normalizeRange(this.range);
@@ -213,6 +218,36 @@ export class ParallaxItemClass {
         }
 
         this.unsubscribeResize = useResize(() => this.refresh());
+    }
+
+    calcFixedLimit() {
+        const screenUnit = this.scrollerHeight / 100;
+
+        this.startPoint = (() => {
+            const startValInNumber = parseFloat(
+                this.start.toString().replace(/^[^-]\D+/g, '')
+            );
+
+            if (this.start.toString().includes('px')) {
+                return startValInNumber;
+            } else {
+                return screenUnit * this.start;
+            }
+        })();
+
+        this.endPoint = (() => {
+            if (!this.end) return this.height;
+
+            const startValInNumber = parseFloat(
+                this.end.toString().replace(/^[^-]\D+/g, '')
+            );
+
+            if (this.end.toString().includes('px')) {
+                return this.scrollerHeight - startValInNumber - this.startPoint;
+            } else {
+                return screenUnit * (100 - this.end) - this.startPoint;
+            }
+        })();
     }
 
     calcOffset() {
@@ -295,6 +330,7 @@ export class ParallaxItemClass {
         this.calcHeight();
         this.calcWidth();
         this.getScreenHeight();
+        if (this.computationType == this.TYPE_FIXED) this.calcFixedLimit();
         this.move();
     }
 
@@ -387,14 +423,14 @@ export class ParallaxItemClass {
         const fixedStartOff = this.fixedStartOff;
         const fixedEndOff = this.fixedEndOff;
         const range = this.range;
-        const fixedOffset = this.fixedOffset;
-        const startPoint = (windowsHeight / 100) * fixedOffset; //sp = Start point calculated in vh
+        const startPoint = this.startPoint;
+        const endPoint = this.endPoint;
 
         const partials = !invertEnterSide
-            ? -(scrollTop + windowsHeight - startPoint - (offset + height))
-            : -(scrollTop + startPoint - (offset + height));
+            ? -(scrollTop + windowsHeight - startPoint - (offset + endPoint))
+            : -(scrollTop + startPoint - (offset + endPoint));
 
-        const maxVal = (height / 100) * this.numericRange;
+        const maxVal = (endPoint / 100) * this.numericRange;
         const partialVal = (partials / 100) * this.numericRange;
 
         const elementAlign = !invertEnterSide
@@ -403,14 +439,14 @@ export class ParallaxItemClass {
                   windowsHeight,
                   startPoint,
                   offset,
-                  height,
+                  endPoint,
               })
             : parallaxUtils.getFixedElementAlignInvert({
                   scrollTop,
                   windowsHeight,
                   startPoint,
                   offset,
-                  height,
+                  endPoint,
               });
 
         const { value, applyStyleComputed } =
@@ -423,7 +459,7 @@ export class ParallaxItemClass {
                 partialVal,
             });
 
-        const percent = (value * 100) / height;
+        const percent = (value * 100) / endPoint;
 
         switch (this.propierties) {
             case this.PROP_HORIZONTAL:
