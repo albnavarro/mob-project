@@ -26,67 +26,6 @@ export const parallaxUtils = {
         );
     },
 
-    getFixedElementAlignNatural({
-        scrollTop,
-        windowsHeight,
-        startPoint,
-        offset,
-        endPoint,
-    }) {
-        if (scrollTop + windowsHeight - startPoint < offset) {
-            return 'OVER';
-        } else if (scrollTop + windowsHeight - startPoint > offset + endPoint) {
-            return 'DOWN';
-        } else {
-            return 'INSIDE';
-        }
-    },
-
-    getFixedElementAlignInvert({
-        scrollTop,
-        windowsHeight,
-        startPoint,
-        offset,
-        endPoint,
-    }) {
-        if (scrollTop + startPoint < offset) {
-            return 'OVER';
-        } else if (scrollTop + startPoint > offset + endPoint) {
-            return 'DOWN';
-        } else {
-            return 'INSIDE';
-        }
-    },
-
-    getFixedValueByAlign(elementAlign) {
-        return ({
-            fixedFromTo,
-            maxVal,
-            fixedStartOff,
-            applyStyle,
-            fixedEndOff,
-            partialVal,
-        }) => {
-            switch (elementAlign) {
-                case 'OVER':
-                    return {
-                        value: fixedFromTo ? maxVal : 0,
-                        applyStyleComputed: fixedStartOff ? false : applyStyle,
-                    };
-                case 'DOWN':
-                    return {
-                        value: fixedFromTo ? 0 : -maxVal,
-                        applyStyleComputed: fixedEndOff ? false : applyStyle,
-                    };
-                case 'INSIDE':
-                    return {
-                        value: fixedFromTo ? partialVal : partialVal - maxVal,
-                        applyStyleComputed: applyStyle,
-                    };
-            }
-        };
-    },
-
     getValueOnSwitch({ switchPropierties, isReverse, value, prop }) {
         switch (switchPropierties) {
             case prop.inStop:

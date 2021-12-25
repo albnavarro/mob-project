@@ -79,12 +79,10 @@ export class ParallaxItemClass {
             : window;
 
         //Fixed prop
-        this.fixedFromTo = data.fixedFromTo || false;
+        this.fromTo = data.fromTo || false;
         this.start = data.start || 0;
         this.end = data.end || null;
-        this.fixedEndOff = data.fixedEndOff || false;
-        this.fixedStartOff = data.fixedStartOff || false;
-        this.fixedInvertSide = data.fixedInvertSide || false;
+        this.invertSide = data.invertSide || false;
 
         //Lienar prop
         this.align = (() => {
@@ -383,10 +381,7 @@ export class ParallaxItemClass {
 
         switch (this.computationType) {
             case this.TYPE_FIXED:
-                const { applyStyleComputed, value } =
-                    this.getFixedValue(applyStyle);
-                applyStyle = applyStyleComputed;
-                this.endValue = value;
+                this.endValue = this.getFixedValue();
                 break;
 
             default:
@@ -412,54 +407,39 @@ export class ParallaxItemClass {
         });
     }
 
-    getFixedValue(applyStyle) {
+    getFixedValue() {
         const scrollTop = this.scrollerScroll;
         const windowsHeight = this.scrollerHeight;
-        const invertEnterSide = this.fixedInvertSide;
+        const invertEnterSide = this.invertSide;
         const height = this.height;
         const width = this.width;
         const offset = this.offset;
-        const fixedFromTo = this.fixedFromTo;
-        const fixedStartOff = this.fixedStartOff;
-        const fixedEndOff = this.fixedEndOff;
+        const fromTo = this.fromTo;
         const range = this.range;
         const startPoint = this.startPoint;
         const endPoint = this.endPoint;
 
         const partials = !invertEnterSide
             ? -(scrollTop + windowsHeight - startPoint - (offset + endPoint))
-            : -(scrollTop + startPoint - (offset + endPoint));
+            : -(scrollTop + startPoint + endPoint - (offset + endPoint));
 
         const maxVal = (endPoint / 100) * this.numericRange;
         const partialVal = (partials / 100) * this.numericRange;
 
-        const elementAlign = !invertEnterSide
-            ? parallaxUtils.getFixedElementAlignNatural({
-                  scrollTop,
-                  windowsHeight,
-                  startPoint,
-                  offset,
-                  endPoint,
-              })
-            : parallaxUtils.getFixedElementAlignInvert({
-                  scrollTop,
-                  windowsHeight,
-                  startPoint,
-                  offset,
-                  endPoint,
-              });
+        const valPerDirection = (() => {
+            if (fromTo) {
+                return !invertEnterSide ? partialVal : maxVal - partialVal;
+            } else {
+                return !invertEnterSide ? maxVal - partialVal : partialVal;
+            }
+        })();
 
-        const { value, applyStyleComputed } =
-            parallaxUtils.getFixedValueByAlign(elementAlign)({
-                fixedFromTo,
-                maxVal,
-                fixedStartOff,
-                applyStyle,
-                fixedEndOff,
-                partialVal,
-            });
+        const clamp =
+            maxVal > 0
+                ? -parallaxUtils.clamp(valPerDirection, 0, maxVal)
+                : -parallaxUtils.clamp(valPerDirection, maxVal, 0);
 
-        const percent = (value * 100) / endPoint;
+        const percent = (clamp * 100) / endPoint;
 
         switch (this.propierties) {
             case this.PROP_HORIZONTAL:
@@ -487,28 +467,16 @@ export class ParallaxItemClass {
                             return -percent;
                     }
                 })();
-                return {
-                    applyStyleComputed,
-                    value,
-                };
+                return value;
 
             case this.PROP_SCALE:
-                return {
-                    applyStyleComputed,
-                    value: -percent * 10,
-                };
+                return -percent * 10;
 
             case this.PROP_OPACITY:
-                return {
-                    applyStyleComputed,
-                    value: -percent / 100,
-                };
+                return -percent / 100;
 
             default:
-                return {
-                    applyStyleComputed,
-                    value: -percent,
-                };
+                return -percent;
         }
     }
 

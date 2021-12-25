@@ -82,7 +82,7 @@ class ParallaxClass {
         // Boolean
         // Mandatory computationType = 'fixed'
         // Inverts the calculated minimum and maximum values
-        data.fixedFromTo = item.hasAttribute('data-fixedFromTo');
+        data.fromTo = item.hasAttribute('data-fromTo');
 
         // any:
         // data-start="20" -> start from 20vw form bottom
@@ -95,20 +95,8 @@ class ParallaxClass {
         data.end = item.getAttribute('data-end');
 
         // Boolean
-        // Mandatory computationType = 'fixed'
-        // Inhibits the application of the maximum value
-        // Dont use with ease === 'smooth'
-        data.fixedEndOff = item.hasAttribute('data-fixedEndOff');
-
-        // Boolean
-        // Mandatory computationType = 'fixed'
-        // Inhibits the application of the minimum value
-        // Dont use with ease === 'smooth'
-        data.fixedStartOff = item.hasAttribute('data-fixedStartOff');
-
-        // Boolean
         // start animation form opposite side ( top in vetical, right in horizontal)
-        data.fixedInvertSide = item.hasAttribute('data-fixedInvertSide');
+        data.invertSide = item.hasAttribute('data-invertSide');
 
         // String: in-stop - in-back - out-stop - out-back
         // Mandatory computationType = 'default' doasn't work with opacity
@@ -145,12 +133,15 @@ class ParallaxClass {
         // computationType = 'default'
         // 1 - 10
         // computationType = 'fixed'
+        // horzontal / vertical:
         // '100h%' => percent of item height
         // '100w%' => percent of item width
         // '100px  => pixel value
         // '100vw' => pervent of viewport width
         // '100wh' => pervent of viewport height
         // negative number is valid es: '-100px' or '-100h%'
+        // other ( scale rotate margin etcc..)
+        // '90' -> 90 deg etc..
         data.range = item.getAttribute('data-range');
 
         data.perspective = item.getAttribute('data-perspective');

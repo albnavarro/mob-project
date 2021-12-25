@@ -22,7 +22,6 @@ export const hScroller = () => {
         direction: 'horizontal',
         computationType: 'fixed',
         range: '100w%',
-        start: 20,
         ease: true,
         propierties: 'horizontal',
     });
@@ -32,11 +31,12 @@ export const hScroller = () => {
     let parallaxOut = new ParallaxItemClass({
         item: document.querySelector('.parallax-via-js-out'),
         scroller: '.scrollerH-container .scrollerH',
-        scrollTrigger: '.pluto4',
+        scrollTrigger: '.pluto3',
         direction: 'horizontal',
         computationType: 'fixed',
         range: '-100w%',
-        fixedInvertSide: true,
+        invertSide: true,
+        fromTo: true,
         propierties: 'horizontal',
     });
     parallaxOut.init();

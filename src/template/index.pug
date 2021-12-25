@@ -174,24 +174,23 @@ block content
             .interceptObserver.interceptObserver-2(
                 data-conponent='m-comp--animate')
         
-            .index-timeline
-                .index-timeline__dummy.index-timeline__dummy--1
+            .index-timeline(style="border:1px #ccc solid;")
                 div.inlineBLock(
                     data-conponent='m-comp--parallax'
                     data-computationType="fixed"
-                    data-start='120px'
-                    data-end='20'
+                    data-start='30'
+                    data-end="40"
                     data-propierties="vertical"
-                    data-range="100h%"
-                    data-scrollTrigger=".index-timeline__dummy--1")
+                    data-scrollTrigger=".index-timeline"
+                    data-range="100h%")
                     div(
                         data-conponent='m-comp--parallax'
                         data-computationType="fixed"
                         data-propierties="horizontal"
-                        data-start='80'
+                        data-start='60'
                         data-end='0'
                         data-range="50w%"
-                        data-scrollTrigger=".index-timeline__dummy--1")
+                        data-scrollTrigger=".index-timeline")
                         .parallax__item-test
                             
             .parallax__item-test.inlineBLock(
@@ -202,16 +201,16 @@ block content
                 data-start="20")
                 
                     
-            .flex.justify-center
-                div(
-                    data-conponent='m-comp--parallax'
-                    data-perspective="400"
-                    data-propierties="rotateX"
-                    data-range="6")
-                    div(
-                        data-conponent='m-comp--parallax'
-                        data-range="6")
-                        .parallax__item-test
+            //- .flex.justify-center
+            //-     div(
+            //-         data-conponent='m-comp--parallax'
+            //-         data-perspective="400"
+            //-         data-propierties="rotateX"
+            //-         data-range="6")
+            //-         div(
+            //-             data-conponent='m-comp--parallax'
+            //-             data-range="6")
+            //-             .parallax__item-test
 
 
             .parallax__item-test(
