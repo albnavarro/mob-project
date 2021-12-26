@@ -1,29 +1,49 @@
 export const parallaxUtils = {
-    normalizeVelocity(value) {
-        if (value < 1) {
-            return 1;
-        } else if (value >= 10) {
-            return 9.9;
-        } else {
-            return (10 - value) * 10;
-        }
-    },
-
-    normalizeRange(value) {
-        if (value < 0) {
-            return 9.9;
-        } else if (value >= 10) {
-            return 0.1;
-        } else {
-            return 10 - value;
-        }
-    },
-
     isInViewport({ offset, height, gap, wScrollTop, wHeight }) {
         return (
             offset + height > wScrollTop - gap &&
             offset < wScrollTop + (wHeight + gap)
         );
+    },
+
+    processFixedLimit(value, stringValue, height, width) {
+        const str = String(stringValue);
+
+        // plus
+        if (str.includes('+h/2')) {
+            return value + height / 2;
+        }
+
+        if (str.includes('+h')) {
+            return value + height;
+        }
+
+        if (str.includes('+w/2')) {
+            return value + width / 2;
+        }
+
+        if (str.includes('+w')) {
+            return value + width;
+        }
+
+        // minus
+        if (str.includes('-h/2')) {
+            return value - height / 2;
+        }
+
+        if (str.includes('-h')) {
+            return value - height;
+        }
+
+        if (str.includes('-w/2')) {
+            return value - width / 2;
+        }
+
+        if (str.includes('-w')) {
+            return value - width;
+        }
+
+        return value;
     },
 
     getValueOnSwitch({ switchPropierties, isReverse, value, prop }) {

@@ -6,6 +6,7 @@ import { useResize } from '.../../../js/core/events/resizeUtils/useResize.js';
 import { useScroll } from '.../../../js/core/events/scrollUtils/useScroll.js';
 import { useSpring } from '.../../../js/core/animation/spring/useSpring.js';
 import { springConfig } from '.../../../js/core/animation/spring/springConfig.js';
+import { useLerp } from '.../../../js/core/animation/lerp/useLerp.js';
 
 export class ParallaxItemClass {
     constructor(data) {
@@ -59,8 +60,8 @@ export class ParallaxItemClass {
         this.OUT_BACK = 'OUT-BACK';
 
         // Ease type constant
-        this.EASE_JS = 'JS';
-        this.EASE_CSS = 'CSS';
+        this.EASE_SPRING = 'SPRING';
+        this.EASE_LERP = 'LERP';
 
         // 'PROPS'
         this.item = data.item;
@@ -106,7 +107,7 @@ export class ParallaxItemClass {
 
         this.range =
             data.range ||
-            (() => (this.computationType === this.TYPE_DEFAULT ? 8 : 100))();
+            (() => (this.computationType === this.TYPE_DEFAULT ? 2 : 100))();
         this.numericRange = 0;
         this.perspective = data.perspective || false;
         this.applyTo = data.applyTo || false;
@@ -116,7 +117,6 @@ export class ParallaxItemClass {
         this.breackpoint = data.breackpoint || 'desktop';
         this.queryType = data.queryType || 'min';
         this.limiterOff = data.limiterOff || false;
-        this.scrub = data.scrub || 8;
         this.reverse = data.reverse || false;
         this.ease = data.ease || false;
         this.propierties = (() => {
@@ -126,30 +126,50 @@ export class ParallaxItemClass {
         })();
 
         this.easeType = (() => {
-            return data.easeType ? data.easeType.toUpperCase() : this.EASE_JS;
+            return data.easeType
+                ? data.easeType.toUpperCase()
+                : this.EASE_SPRING;
         })();
 
         //
         this.springConfig = data.springConfig || null;
-        this.spring = new useSpring();
-        this.unsubscribeSpring = () => {};
+        this.lerpConfig = data.lerpConfig || null;
+        this.motion = (() => {
+            return this.easeType === this.EASE_LERP
+                ? new useLerp()
+                : new useSpring();
+        })();
+        this.unsubscribeMotion = () => {};
 
+        //
         this.unitMisure = '';
-
         this.startPoint = 0;
         this.endPoint = 0;
     }
 
     init() {
-        this.spring.setData({ val: 0 });
+        this.motion.setData({ val: 0 });
 
-        this.unsubscribeSpring = this.spring.subscribe(({ val }) => {
+        this.unsubscribeMotion = this.motion.subscribe(({ val }) => {
             this.updateStyle(val);
         });
 
-        if (this.springConfig && this.springConfig in springConfig) {
-            const config = springConfig[this.springConfig];
-            this.spring.updateConfig(config);
+        switch (this.easeType) {
+            case this.EASE_LERP:
+                if (
+                    this.lerpConfig &&
+                    !Number.isNaN(parseFloat(this.lerpConfig))
+                ) {
+                    this.motion.updateVelocity(this.lerpConfig);
+                }
+                break;
+            case this.EASE_SPRING:
+            default:
+                if (this.springConfig && this.springConfig in springConfig) {
+                    const config = springConfig[this.springConfig];
+                    this.motion.updateConfig(config);
+                }
+                break;
         }
 
         this.item.classList.add('parallax__item');
@@ -159,29 +179,24 @@ export class ParallaxItemClass {
         this.getScreenHeight();
 
         if (this.computationType == this.TYPE_FIXED) {
-            this.numericRange = parseFloat(
-                this.range.toString().replace(/^[^-]\D+/g, '')
-            );
+            const str = String(this.range);
+            const firstChar = str.charAt(0);
+            const isNegative = firstChar === '-' ? -1 : 1;
+            this.numericRange =
+                parseFloat(str.replace(/^\D+/g, '')) * isNegative;
 
             this.unitMisure = (() => {
-                if (this.range.toString().includes('px')) return this.PX;
-                else if (this.range.toString().includes('vh')) return this.VH;
-                else if (this.range.toString().includes('vw')) return this.VW;
-                else if (this.range.toString().includes('w%'))
-                    return this.Wpercent;
-                else if (this.range.toString().includes('h%'))
-                    return this.Hpercent;
+                if (str.includes('px')) return this.PX;
+                else if (str.includes('vh')) return this.VH;
+                else if (str.includes('vw')) return this.VW;
+                else if (str.includes('w%')) return this.Wpercent;
+                else if (str.includes('h%')) return this.Hpercent;
                 else return '';
             })();
 
             this.limiterOff = true;
             this.calcFixedLimit();
         }
-
-        if (this.computationType !== this.TYPE_FIXED)
-            this.range = parallaxUtils.normalizeRange(this.range);
-
-        this.scrub = parallaxUtils.normalizeVelocity(this.scrub);
 
         if (this.perspective) {
             const style = {
@@ -193,23 +208,8 @@ export class ParallaxItemClass {
         }
 
         if (this.ease) {
-            switch (this.easeType) {
-                case this.EASE_CSS:
-                    this.item.style.transition =
-                        'transform 1s cubic-bezier(0.305, 0.55, 0.47, 1.015)';
-                    this.unsubscribeScroll = useScroll(() =>
-                        this.executeParallax()
-                    );
-
-                    break;
-                case this.EASE_JS:
-                    this.unsubscribeScroll = useScroll(() =>
-                        this.smoothParallaxJs()
-                    );
-
-                    this.smoothParallaxJs();
-                    break;
-            }
+            this.unsubscribeScroll = useScroll(() => this.smoothParallaxJs());
+            this.smoothParallaxJs();
         } else {
             this.unsubscribeScroll = useScroll(() => this.executeParallax());
             this.executeParallax();
@@ -222,30 +222,63 @@ export class ParallaxItemClass {
         const screenUnit = this.scrollerHeight / 100;
 
         this.startPoint = (() => {
-            const startValInNumber = parseFloat(
-                this.start.toString().replace(/^[^-]\D+/g, '')
-            );
+            const str = String(this.start);
+            const firstChar = str.charAt(0);
+            const isNegative = firstChar === '-' ? -1 : 1;
+            const number = parseFloat(str.replace(/^\D+/g, ''));
+            const startValInNumber = number ? number : 0;
 
-            if (this.start.toString().includes('px')) {
-                return startValInNumber;
+            if (str.includes('px')) {
+                return startValInNumber * isNegative;
             } else {
-                return screenUnit * this.start;
+                return screenUnit * startValInNumber * isNegative;
             }
         })();
+
+        this.startPoint = parallaxUtils.processFixedLimit(
+            this.startPoint,
+            this.start,
+            this.direction === this.DIRECTION_VERTICAL
+                ? this.height
+                : this.width,
+            this.direction === this.DIRECTION_VERTICAL
+                ? this.width
+                : this.height
+        );
 
         this.endPoint = (() => {
             if (!this.end) return this.height;
 
-            const startValInNumber = parseFloat(
-                this.end.toString().replace(/^[^-]\D+/g, '')
-            );
+            const str = String(this.end);
+            const firstChar = str.charAt(0);
+            const isNegative = firstChar === '-' ? -1 : 1;
+            const number = parseFloat(str.replace(/^\D+/g, ''));
+            const endValInNumber = number ? number : 0;
 
-            if (this.end.toString().includes('px')) {
-                return this.scrollerHeight - startValInNumber - this.startPoint;
+            if (str.includes('px')) {
+                return (
+                    this.scrollerHeight -
+                    endValInNumber -
+                    this.startPoint * isNegative
+                );
             } else {
-                return screenUnit * (100 - this.end) - this.startPoint;
+                return (
+                    screenUnit * (100 - endValInNumber) -
+                    this.startPoint * isNegative
+                );
             }
         })();
+
+        this.endPoint = parallaxUtils.processFixedLimit(
+            this.endPoint,
+            this.end,
+            this.direction === this.DIRECTION_VERTICAL
+                ? this.height * -1
+                : this.width * -1,
+            this.direction === this.DIRECTION_VERTICAL
+                ? this.width * -1
+                : this.height * -1
+        );
     }
 
     calcOffset() {
@@ -320,7 +353,7 @@ export class ParallaxItemClass {
     unsubscribe() {
         this.unsubscribeScroll();
         this.unsubscribeResize();
-        this.unsubscribeSpring();
+        this.unsubscribeMotion();
     }
 
     refresh() {
@@ -334,14 +367,7 @@ export class ParallaxItemClass {
 
     move() {
         if (this.ease) {
-            switch (this.easeType) {
-                case this.EASE_CSS:
-                    this.executeParallax();
-                    break;
-                case this.EASE_JS:
-                    this.smoothParallaxJs();
-                    break;
-            }
+            this.smoothParallaxJs();
         } else {
             this.executeParallax();
         }
@@ -349,7 +375,7 @@ export class ParallaxItemClass {
 
     smoothParallaxJs() {
         this.executeParallax(false);
-        this.spring.goTo({ val: this.endValue }).catch((err) => {});
+        this.motion.goTo({ val: this.endValue }).catch((err) => {});
     }
 
     updateStyle(val) {

@@ -87,11 +87,20 @@ class ParallaxClass {
         // any:
         // data-start="20" -> start from 20vw form bottom
         // data-start="20px" -> start from 20px form bottom
+        // add special keyword:
+        // h = height -> +h -h +h/2 -h/2
+        // w = width- > +w -w +w/2 -w/2
+        // "20px +h" || "20px +h/2" || "20 -w/2" || "-h" || "-w/2" etc..
         data.start = item.getAttribute('data-start');
 
         // any:
-        // data-end="20" -> end at 20vw form top
+        // data-end="20" || -> end at 20vw form top
         // data-end="20px" -> end at 20px form top
+        // add special keyword:
+        // h = height -> +h -h +h/2 -h/2
+        // w = width- > +w -w +w/2 -w/2
+        // "20px +h" || "20px +h/2" || "20 -w/2" || "-h" || "-w/2" etc..
+        // with no value animation end at height or width ( depend by scrolldirection ) from start value
         data.end = item.getAttribute('data-end');
 
         // Boolean
@@ -131,7 +140,7 @@ class ParallaxClass {
         // Any
         // Range of movement
         // computationType = 'default'
-        // 1 - 10
+        // form .1 to up less is the number bigger is the movement
         // computationType = 'fixed'
         // horzontal / vertical:
         // '100h%' => percent of item height
@@ -173,6 +182,10 @@ class ParallaxClass {
         // use string form spingConfig.js definition
         data.springConfig = item.getAttribute('data-springConfig');
 
+        // spring config
+        // use string form spingConfig.js definition
+        data.lerpConfig = item.getAttribute('data-lerpConfig');
+
         // Boolean
         // Mandatory computationType = 'default'
         // inverts the calculated value
@@ -187,7 +200,7 @@ class ParallaxClass {
         data.propierties = item.getAttribute('data-propierties');
 
         // String
-        // ccs || js
+        // SPRING || LERP
         // Ease calculated in css or js
         data.easeType = item.getAttribute('data-easeType');
 

@@ -145,21 +145,25 @@ block content
 
                 include ../component/lightbox/pug/button.pug
                 
-                div(data-conponent='m-comp--pageScroller')
-                    .pageScroller__content
-                        include ../component/tooltip/pug/tooltip.pug
+                //- div(data-conponent='m-comp--pageScroller')
+                //-     .pageScroller__content
+                include ../component/tooltip/pug/tooltip.pug
                 
 
                 .parallax__item-test(
                     data-conponent='m-comp--parallax',
-                    data-range='8',
+                    data-range='1.5',
                     data-align='center',
                     data-ease
-                    data-easeType="css")
+                    data-easeType="lerp"
+                    data-lerpConfig ="200")
 
                 .parallax__item-test(
                     data-conponent='m-comp--parallax',
-                    data-align='start',
+                    data-opacityStart='110'
+                    data-opacityEnd='50'
+                    data-ease
+                    data-easeType="lerp"
                     data-propierties="opacity")
 
         include ../component/threeBlocks/pug/tBlocks.pug
@@ -181,15 +185,21 @@ block content
                     data-start='30'
                     data-end="40"
                     data-propierties="vertical"
+                    data-ease
+                    data-easeType="lerp"
+                    data-lerpConfig ="100"
                     data-scrollTrigger=".index-timeline"
-                    data-range="100h%")
+                    data-range="200h%")
                     div(
                         data-conponent='m-comp--parallax'
                         data-computationType="fixed"
                         data-propierties="horizontal"
                         data-start='60'
-                        data-end='0'
-                        data-range="50w%"
+                        data-end='0 -h'
+                        data-range="350px"
+                        data-ease
+                        data-easeType="lerp"
+                        data-lerpConfig ="100"
                         data-scrollTrigger=".index-timeline")
                         .parallax__item-test
                             
@@ -201,20 +211,22 @@ block content
                 data-start="20")
                 
                     
-            //- .flex.justify-center
-            //-     div(
-            //-         data-conponent='m-comp--parallax'
-            //-         data-perspective="400"
-            //-         data-propierties="rotateX"
-            //-         data-range="6")
-            //-         div(
-            //-             data-conponent='m-comp--parallax'
-            //-             data-range="6")
-            //-             .parallax__item-test
+            .flex.justify-center
+                div(
+                    data-conponent='m-comp--parallax'
+                    data-perspective="400"
+                    data-propierties="rotateX"
+                    data-range="3")
+                    div(
+                        data-conponent='m-comp--parallax'
+                        data-range="3")
+                        .parallax__item-test
 
 
             .parallax__item-test(
                 data-conponent='m-comp--parallax',
+                data-ease
+                data-easeType='lerp'
                 data-propierties="opacity"
                 data-opacityStart="100"
                 data-opacityEnd="45")
@@ -223,7 +235,7 @@ block content
             .clearfix
                 .inlineBLock(
                     data-conponent='m-comp--parallax',
-                    data-range='9.5',
+                    data-range='.7',
                     data-ease
                     data-onSwitch="in-back",
                     data-propierties="scale")
@@ -247,16 +259,16 @@ block content
             .flex
                 div(
                     data-conponent='m-comp--parallax',
-                    data-range='8',
+                    data-range='2',
                     data-onSwitch="in-stop"
                     data-ease)
                     .parallax__item-test.parallax__item-test--float
 
                 div(
                     data-conponent='m-comp--parallax',
-                    data-range='8',
+                    data-range='1.5',
                     data-onSwitch="out-stop"
-                    data-springConfig="wobbly"
+                    data-springConfig="linearMedium"
                     data-ease)
                     .parallax__item-test.parallax__item-test--float
 
@@ -270,7 +282,7 @@ block content
             .flex
                 .parallax__item-test.inlineBLock(
                     data-conponent='m-comp--parallax',
-                    data-range='8',
+                    data-range='2',
                     data-align='bottom',
                     data-ease,
                     data-propierties="rotate")

@@ -18,7 +18,6 @@ block content
                             data-direction='horizontal'
                             data-scroller='.scrollerH-container .scrollerH'
                             data-align='start',
-                            data-smoothType = 'linear'
                             data-propierties='horizontal')
                             a(href="https://www.google.com/" target="_blank")
                                 |button
@@ -28,32 +27,31 @@ block content
                             data-direction='horizontal'
                             data-scroller='.scrollerH-container .scrollerH'
                             data-onSwitch='out-stop'
-                            data-range='4'
-                            data-reverse
-                            data-smoothType='linear'
+                            data-range='-4'
                             data-propierties='horizontal')
                             .div(
                                 data-conponent='m-comp--parallax',
                                 data-direction='horizontal'
                                 data-scroller='.scrollerH-container .scrollerH'
                                 data-onSwitch='in-stop'
-                                data-range='9'
-                                data-reverse
-                                data-smoothType='linear'
+                                data-range='-2'
                                 data-propierties='horizontal')
                                 |test
                     .scrollerH__item
                         .parallax-via-js-opacity
                             |test
                     .scrollerH__item
-                        .pluto(style='width:200px;height:150px;border:1px #000 solid;')
+                        .pluto(style='width:200px;height:150px;border:1px #000 solid;text-align:center;')
                             div(style="display:inline-block;border:1px #000 solid;"
                                 data-conponent='m-comp--parallax',
                                 data-direction='horizontal'
                                 data-scroller='.scrollerH-container .scrollerH'
                                 data-computationType='fixed'
                                 data-scrollTrigger='.pluto'
-                                data-range='100h%')
+                                data-propierties='vertical'
+                                data-range='100h%'
+                                data-start="+w"
+                                data-end="50 -w/2")
                                 |test
                     .scrollerH__item
                         .pluto3(style='width:300px;height:100px;border:1px #000 solid;')
