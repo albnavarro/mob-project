@@ -10,7 +10,7 @@ export const parallaxUtils = {
         const str = String(stringValue);
 
         // plus
-        if (str.includes('+h/2')) {
+        if (str.includes('+h/')) {
             return value + height / 2;
         }
 
@@ -18,7 +18,7 @@ export const parallaxUtils = {
             return value + height;
         }
 
-        if (str.includes('+w/2')) {
+        if (str.includes('+w/')) {
             return value + width / 2;
         }
 
@@ -27,7 +27,7 @@ export const parallaxUtils = {
         }
 
         // minus
-        if (str.includes('-h/2')) {
+        if (str.includes('-h/')) {
             return value - height / 2;
         }
 
@@ -35,7 +35,7 @@ export const parallaxUtils = {
             return value - height;
         }
 
-        if (str.includes('-w/2')) {
+        if (str.includes('-w/')) {
             return value - width / 2;
         }
 

@@ -88,18 +88,22 @@ class ParallaxClass {
         // data-start="20" -> start from 20vw form bottom
         // data-start="20px" -> start from 20px form bottom
         // add special keyword:
-        // h = height -> +h -h +h/2 -h/2
-        // w = width- > +w -w +w/2 -w/2
-        // "20px +h" || "20px +h/2" || "20 -w/2" || "-h" || "-w/2" etc..
+        // h = height -> +h -h +h/ -h/
+        // w = width- > +w -w +w/ -w/
+        // h/ = height -> height/2
+        // w/ = width- > width/2
+        // "20px +h" || "20px +h/" || "20 -w/" || "-h" || "-w" etc..
         data.start = item.getAttribute('data-start');
 
         // any:
         // data-end="20" || -> end at 20vw form top
         // data-end="20px" -> end at 20px form top
         // add special keyword:
-        // h = height -> +h -h +h/2 -h/2
-        // w = width- > +w -w +w/2 -w/2
-        // "20px +h" || "20px +h/2" || "20 -w/2" || "-h" || "-w/2" etc..
+        // h = height -> +h -h +h/ -h/
+        // w = width- > +w -w +w/ -w/
+        // h/ = height -> height/2
+        // w/ = width- > width/2
+        // "20px +h" || "20px +h/" || "20 -w/" || "-h" || "-w/" etc..
         // with no value animation end at height or width ( depend by scrolldirection ) from start value
         data.end = item.getAttribute('data-end');
 
