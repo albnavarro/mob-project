@@ -25,8 +25,8 @@ export class ParallaxItemClass {
         this.PX = 'PX';
         this.VH = 'VH';
         this.VW = 'VW';
-        this.Wpercent = 'W%';
-        this.Hpercent = 'H%';
+        this.Wpercent = 'W';
+        this.Hpercent = 'H';
 
         // Constant direction
         this.DIRECTION_VERTICAL = 'VERTICAL';
@@ -189,8 +189,8 @@ export class ParallaxItemClass {
                 if (str.includes('px')) return this.PX;
                 else if (str.includes('vh')) return this.VH;
                 else if (str.includes('vw')) return this.VW;
-                else if (str.includes('w%')) return this.Wpercent;
-                else if (str.includes('h%')) return this.Hpercent;
+                else if (str.includes('w')) return this.Wpercent;
+                else if (str.includes('h')) return this.Hpercent;
                 else return '';
             })();
 

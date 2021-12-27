@@ -22,7 +22,7 @@ export const hScroller = () => {
         direction: 'horizontal',
         computationType: 'fixed',
         start: '+w/',
-        range: '100w%',
+        range: '100w',
         ease: true,
         propierties: 'horizontal',
     });
@@ -37,7 +37,7 @@ export const hScroller = () => {
         computationType: 'fixed',
         start: '100',
         end: '0 -w',
-        range: '-100w%',
+        range: '-100w',
         propierties: 'horizontal',
     });
     parallaxOut.init();

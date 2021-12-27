@@ -147,8 +147,8 @@ class ParallaxClass {
         // form .1 to up less is the number bigger is the movement
         // computationType = 'fixed'
         // horzontal / vertical:
-        // '100h%' => percent of item height
-        // '100w%' => percent of item width
+        // '100h' => percent of item height
+        // '100w' => percent of item width
         // '100px  => pixel value
         // '100vw' => pervent of viewport width
         // '100wh' => pervent of viewport height
