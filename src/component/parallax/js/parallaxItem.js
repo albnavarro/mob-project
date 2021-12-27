@@ -73,7 +73,7 @@ export class ParallaxItemClass {
         this.EASE_SPRING = 'SPRING';
         this.EASE_LERP = 'LERP';
 
-        // 'PROPS'
+        // Base props
         this.item = data.item;
         this.direction = (() => {
             return data.direction
@@ -100,13 +100,13 @@ export class ParallaxItemClass {
             return data.align ? data.align.toUpperCase() : this.ALIGN_CENTER;
         })();
 
-        // Opacity Prop
-        this.opacityStart = data.opacityStart || 100;
-        this.opacityEnd = data.opacityEnd || 0;
-
         this.onSwitch = (() => {
             return data.onSwitch ? data.onSwitch.toUpperCase() : false;
         })();
+
+        // Opacity Prop
+        this.opacityStart = data.opacityStart || 100;
+        this.opacityEnd = data.opacityEnd || 0;
 
         // Common prop
         this.computationType = (() => {

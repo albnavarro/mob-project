@@ -6,32 +6,38 @@ export const parallaxUtils = {
         );
     },
 
-    // Divide from start or end value number from additional data ( height or with)
+    /**
+     * getStartEndValue - Filter input value with number in value and additonal value
+     *
+     * @param  {array}  values spitted inut value es: 100px +h => ['100px','+h']
+     * @param  {Object} additionalConstant constant : { plus_height: '+h', plus_height_half: '+h/' ...
+     * @return {Object} return object with values or default { numberVal: '100px', additionalVal: '+h' }
+     */
     getStartEndValue(values, additionalConstant) {
-        let numberVal = 0;
-        let additionalVal = '';
-
-        values.forEach((item, i) => {
-            // IF NUMBER VALUE EXIST TAKE IT
-            const number = [...item].some((c) => !Number.isNaN(parseFloat(c)));
-            if (number) numberVal = item;
-
-            // ADDTIONAL HEIGHT/WIDTH MISURE TO ADD OR SUBSTRACT
-            const additionaChoice = [
-                additionalConstant.plus_height.toLowerCase(),
-                additionalConstant.plus_height_half.toLowerCase(),
-                additionalConstant.plus_width.toLowerCase(),
-                additionalConstant.plus_width_half.toLowerCase(),
-                additionalConstant.minus_height.toLowerCase(),
-                additionalConstant.minus_height_half.toLowerCase(),
-                additionalConstant.minus_width.toLowerCase(),
-                additionalConstant.minus_width_half.toLowerCase(),
-            ];
-            const additional = additionaChoice.includes(item);
-            if (additional) additionalVal = item;
+        // Get number value if exist, check values array to find a item wih almost 1 number ad get it
+        const getNumberVal = values.find((item) => {
+            return [...item].some((c) => !Number.isNaN(parseFloat(c)));
         });
 
-        return { numberVal, additionalVal };
+        // Get aditonal value +h +h/ -h -h/ etc... if exist
+        const additionaChoice = [
+            additionalConstant.plus_height.toLowerCase(),
+            additionalConstant.plus_height_half.toLowerCase(),
+            additionalConstant.plus_width.toLowerCase(),
+            additionalConstant.plus_width_half.toLowerCase(),
+            additionalConstant.minus_height.toLowerCase(),
+            additionalConstant.minus_height_half.toLowerCase(),
+            additionalConstant.minus_width.toLowerCase(),
+            additionalConstant.minus_width_half.toLowerCase(),
+        ];
+        const getAdditionalVal = values.find((item) => {
+            return additionaChoice.includes(item);
+        });
+
+        return {
+            numberVal: getNumberVal ? getNumberVal : 0,
+            additionalVal: getAdditionalVal ? getAdditionalVal : '',
+        };
     },
 
     // Get start point withuot addition value
