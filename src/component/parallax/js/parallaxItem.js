@@ -28,6 +28,16 @@ export class ParallaxItemClass {
         this.Wpercent = 'W';
         this.Hpercent = 'H';
 
+        // AdditionalChoiceContant
+        this.PLUS_HEIGHT = '+H';
+        this.PLUS_HEIGHT_HALF = '+H/';
+        this.PLUS_WIDTH = '+W';
+        this.PLUS_WIDTH_HALF = '+W/';
+        this.MINUS_HEIGHT = '-H';
+        this.MINUS_HEIGHT_HALF = '-H/';
+        this.MINUS_WIDTH = '-W';
+        this.MINUS_WIDTH_HALF = '-W/';
+
         // Constant direction
         this.DIRECTION_VERTICAL = 'VERTICAL';
         this.DIRECTION_HORIZONTAL = 'HORIZONTAL';
@@ -221,64 +231,61 @@ export class ParallaxItemClass {
     calcFixedLimit() {
         const screenUnit = this.scrollerHeight / 100;
 
-        this.startPoint = (() => {
-            const str = String(this.start);
-            const firstChar = str.charAt(0);
-            const isNegative = firstChar === '-' ? -1 : 1;
-            const number = parseFloat(str.replace(/^\D+/g, ''));
-            const startValInNumber = number ? number : 0;
+        const additionalConstant = {
+            plus_height: this.PLUS_HEIGHT.toLowerCase(),
+            plus_height_half: this.PLUS_HEIGHT_HALF.toLowerCase(),
+            plus_width: this.PLUS_WIDTH.toLowerCase(),
+            plus_width_half: this.PLUS_WIDTH_HALF.toLowerCase(),
+            minus_height: this.MINUS_HEIGHT.toLowerCase(),
+            minus_height_half: this.MINUS_HEIGHT_HALF.toLowerCase(),
+            minus_width: this.MINUS_WIDTH.toLowerCase(),
+            minus_width_half: this.MINUS_WIDTH_HALF.toLowerCase(),
+        };
 
-            if (str.includes('px')) {
-                return startValInNumber * isNegative;
-            } else {
-                return screenUnit * startValInNumber * isNegative;
-            }
-        })();
+        const { value: startPoint, additionalVal: additionalStartVal } =
+            parallaxUtils.getStartPoint(
+                screenUnit,
+                this.start,
+                additionalConstant
+            );
 
+        // ADD ADDITONAL VALUE
         this.startPoint = parallaxUtils.processFixedLimit(
-            this.startPoint,
-            this.start,
+            startPoint,
+            additionalStartVal,
             this.direction === this.DIRECTION_VERTICAL
                 ? this.height
                 : this.width,
             this.direction === this.DIRECTION_VERTICAL
                 ? this.width
-                : this.height
+                : this.height,
+            additionalConstant
         );
 
-        this.endPoint = (() => {
-            if (!this.end) return this.height;
-
-            const str = String(this.end);
-            const firstChar = str.charAt(0);
-            const isNegative = firstChar === '-' ? -1 : 1;
-            const number = parseFloat(str.replace(/^\D+/g, ''));
-            const endValInNumber = number ? number : 0;
-
-            if (str.includes('px')) {
-                return (
-                    this.scrollerHeight -
-                    endValInNumber -
-                    this.startPoint * isNegative
+        if (this.end) {
+            const { value: endPoint, additionalVal: additionalEndVal } =
+                parallaxUtils.getEndPoint(
+                    screenUnit,
+                    this.end,
+                    additionalConstant,
+                    this.startPoint,
+                    this.scrollerHeight
                 );
-            } else {
-                return (
-                    screenUnit * (100 - endValInNumber) -
-                    this.startPoint * isNegative
-                );
-            }
-        })();
 
-        this.endPoint = parallaxUtils.processFixedLimit(
-            this.endPoint,
-            this.end,
-            this.direction === this.DIRECTION_VERTICAL
-                ? this.height * -1
-                : this.width * -1,
-            this.direction === this.DIRECTION_VERTICAL
-                ? this.width * -1
-                : this.height * -1
-        );
+            this.endPoint = parallaxUtils.processFixedLimit(
+                endPoint,
+                additionalEndVal,
+                this.direction === this.DIRECTION_VERTICAL
+                    ? this.height * -1
+                    : this.width * -1,
+                this.direction === this.DIRECTION_VERTICAL
+                    ? this.width * -1
+                    : this.height * -1,
+                additionalConstant
+            );
+        } else {
+            this.endPoint = this.height;
+        }
     }
 
     calcOffset() {
