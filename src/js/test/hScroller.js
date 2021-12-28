@@ -36,9 +36,10 @@ export const hScroller = () => {
         scrollTrigger: '.pluto3',
         direction: 'horizontal',
         computationType: 'fixed',
-        start: 'left',
-        end: 'left -width',
+        start: 'left -width',
+        end: 'left',
         range: '-100w',
+        fromTo: true,
         propierties: 'x',
     });
     parallaxOut.init();
