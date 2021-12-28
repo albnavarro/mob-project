@@ -18,7 +18,7 @@ block content
                             data-direction='horizontal'
                             data-scroller='.scrollerH-container .scrollerH'
                             data-align='start',
-                            data-propierties='horizontal')
+                            data-propierties='x')
                             a(href="https://www.google.com/" target="_blank")
                                 |button
                     .scrollerH__item
@@ -27,15 +27,15 @@ block content
                             data-direction='horizontal'
                             data-scroller='.scrollerH-container .scrollerH'
                             data-onSwitch='out-stop'
-                            data-range='-4'
-                            data-propierties='horizontal')
+                            data-range='-1.5'
+                            data-propierties='x')
                             .div(
                                 data-conponent='m-comp--parallax',
                                 data-direction='horizontal'
                                 data-scroller='.scrollerH-container .scrollerH'
                                 data-onSwitch='in-stop'
-                                data-range='-2'
-                                data-propierties='horizontal')
+                                data-range='-6'
+                                data-propierties='x')
                                 |test
                     .scrollerH__item
                         .parallax-via-js-opacity
@@ -48,10 +48,10 @@ block content
                                 data-scroller='.scrollerH-container .scrollerH'
                                 data-computationType='fixed'
                                 data-scrollTrigger='.pluto'
-                                data-propierties='vertical'
+                                data-propierties='y'
                                 data-range='100h'
-                                data-start="+w"
-                                data-end="50 -w/")
+                                data-start="right +width"
+                                data-end="right 50 +width/")
                                 |test
                     .scrollerH__item
                         .pluto3(style='width:300px;height:100px;border:1px #000 solid;')
@@ -74,7 +74,7 @@ block content
                             data-screen='.scrollerH-container2'
                             data-reverse
                             data-onSwitch='in-stop'
-                            data-propierties='horizontal')
+                            data-propierties='x')
                             |test
                     .scrollerH2__item
                         .pluto2(style='width:300px;height:100px;border:1px #000 solid;')
@@ -85,8 +85,10 @@ block content
                                 data-screen='.scrollerH-container2'
                                 data-computationType='fixed'
                                 data-scrollTrigger='.pluto2'
+                                data-start="right"
+                                data-end='right +width'
                                 data-range='80px'
-                                data-propierties='horizontal'
+                                data-propierties='x'
                                 data-smoothType='linear')
                                 |test
                     .scrollerH2__item
@@ -103,18 +105,20 @@ block content
                                 data-screen='.scrollerH-container3'
                                 data-computationType='fixed'
                                 data-scrollTrigger='.pluto5'
-                                data-propierties="horizontal"
-                                data-range='100h')
+                                data-end='bottom +height'
+                                data-propierties="x"
+                                data-range='100w')
                                 .div(
                                     data-conponent='m-comp--parallax',
                                     data-scroller='.scrollerH-container3 .scrollerH3'
                                     data-screen='.scrollerH-container3'
                                     data-computationType='fixed'
-                                    data-propierties="horizontal"
+                                    data-propierties="x"
                                     data-scrollTrigger='.pluto5'
-                                    data-invertSide
+                                    data-start='top'
+                                    data-end='top +height'
                                     data-fromTo
-                                    data-range='-100h')
+                                    data-range='-100w')
                                     div(style="display:inline-block;border:1px #000 solid;")
                                         |test
                     .scrollerH3__item
@@ -124,7 +128,7 @@ block content
                             data-scroller='.scrollerH-container3 .scrollerH3'
                             data-screen='.scrollerH-container3'
                             data-onSwitch='out-stop'
-                            data-propierties='horizontal')
+                            data-propierties='x')
                             |test
                     .scrollerH3__item
                     .scrollerH3__item

@@ -182,20 +182,20 @@ block content
                 div.inlineBLock(
                     data-conponent='m-comp--parallax'
                     data-computationType="fixed"
-                    data-start='30'
-                    data-end="40"
-                    data-propierties="vertical"
+                    data-start='bottom 30vh'
+                    data-end="bottom 60vh"
+                    data-propierties="y"
                     data-ease
                     data-easeType="lerp"
                     data-lerpConfig ="100"
                     data-scrollTrigger=".index-timeline"
-                    data-range="200h%")
+                    data-range="200h")
                     div(
                         data-conponent='m-comp--parallax'
                         data-computationType="fixed"
-                        data-propierties="horizontal"
-                        data-start='60'
-                        data-end='0 -h'
+                        data-propierties="x"
+                        data-start='bottom 60vh'
+                        data-end='top -height'
                         data-range="350px"
                         data-ease
                         data-easeType="lerp"
@@ -247,7 +247,7 @@ block content
                 data-align='90',
                 data-onSwitch="in-back",
                 data-reverse,
-                data-propierties="horizontal")
+                data-propierties="x")
                 
 
             .clipath-start(
@@ -298,7 +298,7 @@ block content
                 data-conponent='m-comp--parallax',
                 data-range='2',
                 data-align='end',
-                data-propierties="horizontal")
+                data-propierties="x")
                 
 
             div(style="height:200px;")

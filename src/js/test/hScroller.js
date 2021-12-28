@@ -21,10 +21,11 @@ export const hScroller = () => {
         scrollTrigger: '.pluto3',
         direction: 'horizontal',
         computationType: 'fixed',
-        start: '+w/',
+        start: 'right +halfWidth',
+        end: 'right +width',
         range: '100w',
         ease: true,
-        propierties: 'horizontal',
+        propierties: 'x',
     });
     parallaxIn.init();
     parallax.add(parallaxIn);
@@ -35,10 +36,10 @@ export const hScroller = () => {
         scrollTrigger: '.pluto3',
         direction: 'horizontal',
         computationType: 'fixed',
-        start: '100',
-        end: '0 -w',
+        start: 'left',
+        end: 'left -width',
         range: '-100w',
-        propierties: 'horizontal',
+        propierties: 'x',
     });
     parallaxOut.init();
     const unsubscribe = parallax.add(parallaxOut);

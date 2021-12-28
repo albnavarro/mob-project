@@ -1,3 +1,5 @@
+import { parallaxConstant } from './parallaxConstant.js';
+
 export const parallaxUtils = {
     isInViewport({ offset, height, gap, wScrollTop, wHeight }) {
         return (
@@ -6,50 +8,78 @@ export const parallaxUtils = {
         );
     },
 
+    getRangeUnitMisure(string) {
+        if (string.includes(parallaxConstant.PX)) return parallaxConstant.PX;
+        else if (string.includes(parallaxConstant.VH))
+            return parallaxConstant.VH;
+        else if (string.includes(parallaxConstant.VW))
+            return parallaxConstant.VW;
+        else if (string.includes(parallaxConstant.Wpercent))
+            return parallaxConstant.Wpercent;
+        else if (string.includes(parallaxConstant.Hpercent))
+            return parallaxConstant.Hpercent;
+        else return '';
+    },
+
     /**
      * getStartEndValue - Filter input value with number in value and additonal value
      *
-     * @param  {array}  values spitted inut value es: 100px +h => ['100px','+h']
-     * @param  {Object} additionalConstant constant : { plus_height: '+h', plus_height_half: '+h/' ...
-     * @return {Object} return object with values or default { numberVal: '100px', additionalVal: '+h' }
+     * @param  {array}  values spitted inut value es: 100px +h => ['100px','+height', 'top']
+     * @return {Object} return object with values or default
+     *
+     * @example
+     *  { numberVal: '100px', additionalVal: '+height', position:"top" }
+     *  default:  { numberVal: '0', additionalVal: '', position:"bottom" }
      */
-    getStartEndValue(values, additionalConstant) {
+    getStartEndValue(values) {
         // Get number value if exist, check values array to find a item wih almost 1 number ad get it
         const getNumberVal = values.find((item) => {
             return [...item].some((c) => !Number.isNaN(parseFloat(c)));
         });
 
-        // Get aditonal value +h +h/ -h -h/ etc... if exist
+        // Get aditonal value +height +halfHeight -height -etc... if exist
         const additionaChoice = [
-            additionalConstant.plus_height.toLowerCase(),
-            additionalConstant.plus_height_half.toLowerCase(),
-            additionalConstant.plus_width.toLowerCase(),
-            additionalConstant.plus_width_half.toLowerCase(),
-            additionalConstant.minus_height.toLowerCase(),
-            additionalConstant.minus_height_half.toLowerCase(),
-            additionalConstant.minus_width.toLowerCase(),
-            additionalConstant.minus_width_half.toLowerCase(),
+            parallaxConstant.PLUS_HEIGHT,
+            parallaxConstant.PLUS_HEIGHT_HALF,
+            parallaxConstant.PLUS_WIDTH,
+            parallaxConstant.PLUS_WIDTH_HALF,
+            parallaxConstant.MINUS_HEIGHT,
+            parallaxConstant.MINUS_HEIGHT_HALF,
+            parallaxConstant.MINUS_WIDTH,
+            parallaxConstant.MINUS_WIDTH_HALF,
         ];
         const getAdditionalVal = values.find((item) => {
             return additionaChoice.includes(item);
         });
 
+        // Get position top || bottom || left || right
+        const positionMap = [
+            parallaxConstant.POSITION_BOTTOM,
+            parallaxConstant.POSITION_TOP,
+            parallaxConstant.POSITION_LEFT,
+            parallaxConstant.POSITION_RIGHT,
+        ];
+        const getPosition = values.find((item) => {
+            return positionMap.includes(item);
+        });
+
         return {
             numberVal: getNumberVal ? getNumberVal : 0,
             additionalVal: getAdditionalVal ? getAdditionalVal : '',
+            position: getPosition
+                ? getPosition
+                : parallaxConstant.POSITION_BOTTOM,
         };
     },
 
     // Get start point withuot addition value
-    getStartPoint(screenUnit, data, additionalConstant) {
+    getStartPoint(screenUnit, data) {
         // SPLIT INTO CHUNK DATA
         const str = String(data);
         const values = str.split(' ');
 
-        const { numberVal, additionalVal } = parallaxUtils.getStartEndValue(
-            values,
-            additionalConstant
-        );
+        const { numberVal, additionalVal, position } =
+            parallaxUtils.getStartEndValue(values);
 
         // CHECK IF NUMBER IS NEGATIVE
         const firstChar = String(numberVal).charAt(0);
@@ -64,30 +94,24 @@ export const parallaxUtils = {
             return {
                 value: startValInNumber * isNegative,
                 additionalVal,
+                position,
             };
         } else {
             return {
                 value: screenUnit * startValInNumber * isNegative,
                 additionalVal,
+                position,
             };
         }
     },
 
     // Get end point withuot addition value
-    getEndPoint(
-        screenUnit,
-        data,
-        additionalConstant,
-        startPoint,
-        scrollerHeight
-    ) {
+    getEndPoint(screenUnit, data, startPoint, scrollerHeight, invertSide) {
         // SPLIT INTO CHUNK DATA
         const str = String(data);
         const values = str.split(' ');
-        const { numberVal, additionalVal } = parallaxUtils.getStartEndValue(
-            values,
-            additionalConstant
-        );
+        const { numberVal, additionalVal, position } =
+            parallaxUtils.getStartEndValue(values);
 
         // CHECK IF NUMBER IS NEGATIVE
         const firstChar = String(numberVal).charAt(0);
@@ -99,79 +123,112 @@ export const parallaxUtils = {
 
         // GET FINAL VLAUE
         if (str.includes('px')) {
+            const valueFromTop = endValInNumber - startPoint * isNegative;
+            const valueFromBottom =
+                scrollerHeight - endValInNumber - startPoint * isNegative;
+
             return {
-                value:
-                    scrollerHeight - endValInNumber - startPoint * isNegative,
+                value: invertSide
+                    ? (() => {
+                          return position === parallaxConstant.POSITION_TOP ||
+                              position === parallaxConstant.POSITION_LEFT
+                              ? valueFromTop
+                              : valueFromBottom;
+                      })()
+                    : (() => {
+                          return position === parallaxConstant.POSITION_TOP ||
+                              position === parallaxConstant.POSITION_LEFT
+                              ? valueFromBottom
+                              : valueFromTop;
+                      })(),
                 additionalVal,
+                position,
             };
         } else {
             return {
-                value:
-                    screenUnit * (100 - endValInNumber) -
-                    startPoint * isNegative,
+                value: invertSide
+                    ? (() => {
+                          return position === parallaxConstant.POSITION_TOP ||
+                              position === parallaxConstant.POSITION_LEFT
+                              ? scrollerHeight -
+                                    screenUnit * (100 - endValInNumber) -
+                                    startPoint * isNegative
+                              : screenUnit * (100 - endValInNumber) -
+                                    startPoint * isNegative;
+                      })()
+                    : (() => {
+                          return position === parallaxConstant.POSITION_TOP ||
+                              position === parallaxConstant.POSITION_LEFT
+                              ? scrollerHeight -
+                                    screenUnit * endValInNumber -
+                                    startPoint * isNegative
+                              : screenUnit * endValInNumber -
+                                    startPoint * isNegative;
+                      })(),
                 additionalVal,
+                position,
             };
         }
     },
 
-    processFixedLimit(value, stringValue, height, width, additionalConstant) {
+    processFixedLimit(value, stringValue, height, width) {
         const str = String(stringValue);
 
         // plus
-        if (str.includes(additionalConstant.plus_height_half)) {
+        if (str.includes(parallaxConstant.PLUS_HEIGHT_HALF)) {
             return value + height / 2;
         }
 
-        if (str.includes(additionalConstant.plus_height)) {
+        if (str.includes(parallaxConstant.PLUS_HEIGHT)) {
             return value + height;
         }
 
-        if (str.includes(additionalConstant.plus_width_half)) {
+        if (str.includes(parallaxConstant.PLUS_WIDTH_HALF)) {
             return value + width / 2;
         }
 
-        if (str.includes(additionalConstant.plus_width)) {
+        if (str.includes(parallaxConstant.PLUS_WIDTH)) {
             return value + width;
         }
 
         // minus
-        if (str.includes(additionalConstant.minus_height_half)) {
+        if (str.includes(parallaxConstant.MINUS_HEIGHT_HALF)) {
             return value - height / 2;
         }
 
-        if (str.includes(additionalConstant.minus_height)) {
+        if (str.includes(parallaxConstant.MINUS_HEIGHT)) {
             return value - height;
         }
 
-        if (str.includes(additionalConstant.minus_width_half)) {
+        if (str.includes(parallaxConstant.MINUS_WIDTH_HALF)) {
             return value - width / 2;
         }
 
-        if (str.includes(additionalConstant.minus_width)) {
+        if (str.includes(parallaxConstant.MINUS_WIDTH)) {
             return value - width;
         }
 
         return value;
     },
 
-    getValueOnSwitch({ switchPropierties, isReverse, value, prop }) {
+    getValueOnSwitch({ switchPropierties, isReverse, value }) {
         switch (switchPropierties) {
-            case prop.inStop:
+            case parallaxConstant.IN_STOP:
                 return (!isReverse && value > 0) || (isReverse && value < 0)
                     ? 0
                     : value;
 
-            case prop.inBack:
+            case parallaxConstant.IN_BACK:
                 return (!isReverse && value > 0) || (isReverse && value < 0)
                     ? -value
                     : value;
 
-            case prop.outStop:
+            case parallaxConstant.OUT_STOP:
                 return (!isReverse && value < 0) || (isReverse && value > 0)
                     ? 0
                     : value;
 
-            case prop.outBack:
+            case parallaxConstant.OUT_BACK:
                 return (!isReverse && value < 0) || (isReverse && value > 0)
                     ? -value
                     : value;
@@ -183,7 +240,7 @@ export const parallaxUtils = {
 
     getRetReverseValue(propierties, val, opacity) {
         switch (propierties) {
-            case opacity:
+            case parallaxConstant.PROP_OPACITY:
                 return 1 - val;
 
             default:

@@ -68,10 +68,10 @@ class ParallaxClass {
         data.computationType =
             item.getAttribute('data-computationType') || 'default';
 
-        // String: 'VERTICAL' || 'HORIZONTAL'
+        // String: 'vertical' || 'horizontal'
         data.direction = item.getAttribute('data-direction');
 
-        // Custom container with a transate movement
+        // Custom container with a translate movement
         data.scroller = item.getAttribute('data-scroller');
 
         // Custom screen
@@ -81,35 +81,30 @@ class ParallaxClass {
 
         // Boolean
         // Mandatory computationType = 'fixed'
-        // Inverts the calculated minimum and maximum values
+        // Start from maximum value
         data.fromTo = item.hasAttribute('data-fromTo');
 
         // any:
-        // data-start="20" -> start from 20vw form bottom
-        // data-start="20px" -> start from 20px form bottom
+        // data-start="bottom 20" -> start 20vw from bottom
+        // data-start="top 20px" -> start 20px from top
         // add special keyword:
-        // h = height -> +h -h +h/ -h/
-        // w = width- > +w -w +w/ -w/
-        // h/ = height -> height/2
-        // w/ = width- > width/2
-        // "20px +h" || "20px +h/" || "20 -w/" || "-h" || "-w" etc..
+        // +height -height
+        // +halfHeight -halfHeight
+        // +width -width
+        // +halfWidth -halfWidth
+        // "top 20px +height" || "bottom 20px +halfHeigh" || "bottom 20vh -halfWidth" || "bottom -halfWidth" etc..
         data.start = item.getAttribute('data-start');
 
         // any:
-        // data-end="20" || -> end at 20vw form top
-        // data-end="20px" -> end at 20px form top
+        // data-end="bottom 20" -> end 20vw from bottom
+        // data-end="top 20px" -> end 20px from top
         // add special keyword:
-        // h = height -> +h -h +h/ -h/
-        // w = width- > +w -w +w/ -w/
-        // h/ = height -> height/2
-        // w/ = width- > width/2
-        // "20px +h" || "20px +h/" || "20 -w/" || "-h" || "-w/" etc..
-        // with no value animation end at height or width ( depend by scrolldirection ) from start value
+        // +height -height
+        // +halfHeight -halfHeight
+        // +width -width
+        // +halfWidth -halfWidth
+        // "top 20px +height" || "bottom 20px +halfHeigh" || "bottom 20vh -halfWidth" || "bottom -halfWidth" etc..
         data.end = item.getAttribute('data-end');
-
-        // Boolean
-        // start animation form opposite side ( top in vetical, right in horizontal)
-        data.invertSide = item.hasAttribute('data-invertSide');
 
         // String: in-stop - in-back - out-stop - out-back
         // Mandatory computationType = 'default' doasn't work with opacity
@@ -119,7 +114,7 @@ class ParallaxClass {
         // out-back
         data.onSwitch = item.getAttribute('data-onSwitch');
 
-        // String
+        // String || number
         // Mandatory computationType = 'default'
         // start - top - center - bottom - end  || 1-100
         // start = zero at top of the document
@@ -128,6 +123,8 @@ class ParallaxClass {
         // bottom = zero at bottom of the viewport
         // end = zero at bottom of the document
         data.align = item.getAttribute('data-align');
+
+        // OPACITY PROPS
 
         // String
         // Mandatory propierties = 'opacity'
@@ -200,7 +197,7 @@ class ParallaxClass {
         data.ease = item.hasAttribute('data-ease');
 
         // String
-        // vertical , horizontal , rotate , border-width , opacity, scale
+        // y , x , rotate , rotateX, rotateY, border-width , opacity, scale, custom
         data.propierties = item.getAttribute('data-propierties');
 
         // String
