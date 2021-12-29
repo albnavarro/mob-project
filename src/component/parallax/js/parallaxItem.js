@@ -23,6 +23,7 @@ export class ParallaxItemClass {
         this.numericRange = 0;
         this.unsubscribeResize = () => {};
         this.unsubscribeScroll = () => {};
+        this.unsubscribeMarker = () => {};
         this.startMarker = null;
         this.endMarker = null;
 
@@ -101,8 +102,51 @@ export class ParallaxItemClass {
     }
 
     init() {
-        this.motion.setData({ val: 0 });
+        this.item.classList.add('parallax__item');
+        this.setMotion();
+        this.calcOffset();
+        this.calcHeight();
+        this.calcWidth();
+        this.getScreenHeight();
+        this.setPerspective();
 
+        if (this.computationType == parallaxConstant.TYPE_FIXED) {
+            this.limiterOff = true;
+            this.calcRangeAndUnitMiusure();
+            this.calcFixedLimit();
+        }
+
+        if (this.ease) {
+            this.unsubscribeScroll = useScroll(() => this.smoothParallaxJs());
+            this.smoothParallaxJs();
+        } else {
+            this.unsubscribeScroll = useScroll(() => this.executeParallax());
+            this.executeParallax();
+        }
+
+        if (this.scroller !== window) {
+            this.unsubscribeMarker = useScroll(() => {
+                // Refresh marker
+                if (this.marker) this.calcFixedLimit();
+            });
+        }
+
+        this.unsubscribeResize = useResize(() => this.refresh());
+    }
+
+    setPerspective() {
+        if (this.perspective) {
+            const style = {
+                perspective: `${this.perspective}px`,
+                'transform-style': 'preserve-3d',
+            };
+            const parent = this.item.parentNode;
+            Object.assign(parent.style, style);
+        }
+    }
+
+    setMotion() {
+        this.motion.setData({ val: 0 });
         this.unsubscribeMotion = this.motion.subscribe(({ val }) => {
             this.updateStyle(val);
         });
@@ -124,51 +168,14 @@ export class ParallaxItemClass {
                 }
                 break;
         }
+    }
 
-        this.item.classList.add('parallax__item');
-        this.calcOffset();
-        this.calcHeight();
-        this.calcWidth();
-        this.getScreenHeight();
-
-        if (this.computationType == parallaxConstant.TYPE_FIXED) {
-            const str = String(this.range);
-            const firstChar = str.charAt(0);
-            const isNegative = firstChar === '-' ? -1 : 1;
-            this.numericRange =
-                parseFloat(str.replace(/^\D+/g, '')) * isNegative;
-
-            this.unitMisure = parallaxUtils.getRangeUnitMisure(str);
-
-            this.limiterOff = true;
-            this.calcFixedLimit();
-        }
-
-        if (this.perspective) {
-            const style = {
-                perspective: `${this.perspective}px`,
-                'transform-style': 'preserve-3d',
-            };
-            const parent = this.item.parentNode;
-            Object.assign(parent.style, style);
-        }
-
-        if (this.ease) {
-            this.unsubscribeScroll = useScroll(() => this.smoothParallaxJs());
-            this.smoothParallaxJs();
-        } else {
-            this.unsubscribeScroll = useScroll(() => this.executeParallax());
-            this.executeParallax();
-        }
-
-        if (this.scroller !== window) {
-            useScroll(() => {
-                // Refresh marker
-                if (this.marker) this.calcFixedLimit();
-            });
-        }
-
-        this.unsubscribeResize = useResize(() => this.refresh());
+    calcRangeAndUnitMiusure() {
+        const str = String(this.range);
+        const firstChar = str.charAt(0);
+        const isNegative = firstChar === '-' ? -1 : 1;
+        this.numericRange = parseFloat(str.replace(/^\D+/g, '')) * isNegative;
+        this.unitMisure = parallaxUtils.getRangeUnitMisure(str);
     }
 
     calcFixedLimit() {
@@ -332,6 +339,7 @@ export class ParallaxItemClass {
         this.unsubscribeScroll();
         this.unsubscribeResize();
         this.unsubscribeMotion();
+        this.unsubscribeMarker();
     }
 
     refresh() {
