@@ -221,6 +221,10 @@ export class ParallaxItemClass {
                 ? this.width * multiplier
                 : this.height * multiplier
         );
+
+        // From left to right or top to bottom
+        // the botom or right side of item sollide with start point
+        if (this.invertSide) this.startPoint -= this.height;
     }
 
     calcOffset() {
