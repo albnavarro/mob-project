@@ -87,8 +87,12 @@ class ParallaxClass {
         data.fromTo = item.hasAttribute('data-fromTo');
 
         // any:
-        // data-start="bottom 20" -> start 20vw from bottom
+        // data-start="bottom 20vh" -> start 20vh from bottom
         // data-start="top 20px" -> start 20px from top
+        // vh is valid only in vertical mode
+        // vw is valid ony in horzontal mode
+        // value without misure unit is not allowed
+        //
         // add special keyword:
         // +height -height
         // +halfHeight -halfHeight
@@ -98,8 +102,12 @@ class ParallaxClass {
         data.start = item.getAttribute('data-start');
 
         // any:
-        // data-end="bottom 20" -> end 20vw from bottom
+        // data-end="bottom 20h" -> end 20vh from bottom
         // data-end="top 20px" -> end 20px from top
+        // vh is valid only in vertical mode
+        // vw is valid ony in horzontal mode
+        // value without misure unit is not allowed
+        //
         // add special keyword:
         // +height -height
         // +halfHeight -halfHeight

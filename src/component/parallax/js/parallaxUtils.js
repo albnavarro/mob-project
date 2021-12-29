@@ -31,11 +31,66 @@ export const parallaxUtils = {
      *  { numberVal: '100px', additionalVal: '+height', position:"top" }
      *  default:  { numberVal: '0', additionalVal: '', position:"bottom" }
      */
-    getStartEndValue(values) {
+    getStartEndValue(values, direction) {
         // Get number value if exist, check values array to find a item wih almost 1 number ad get it
         const getNumberVal = values.find((item) => {
             return [...item].some((c) => !Number.isNaN(parseFloat(c)));
         });
+
+        // Get unit misure from nunmber
+        const unitMisure = (() => {
+            if (getNumberVal) {
+                if (getNumberVal.includes(parallaxConstant.PX))
+                    return parallaxConstant.PX;
+                if (getNumberVal.includes(parallaxConstant.VH))
+                    return parallaxConstant.VH;
+                if (getNumberVal.includes(parallaxConstant.VW))
+                    return parallaxConstant.VW;
+            }
+        })();
+
+        // fail return with bad data
+        const returnWhenFail = () => {
+            return {
+                numberVal: 0,
+                unitMisure: '',
+                additionalVal: '',
+                position: '',
+            };
+        };
+
+        // Number without unit misure is not allowed
+        if (getNumberVal && !unitMisure) {
+            console.warn(
+                `value in start or end prop with no unit misure is not allowed,
+                 failed operation, use vh in vertical mode or vw in horzontal, or px animation failed`
+            );
+            return returnWhenFail();
+        }
+
+        // Number in vh is not allowed in horizontal mode
+        if (
+            getNumberVal &&
+            unitMisure === parallaxConstant.VH &&
+            direction === parallaxConstant.DIRECTION_HORIZONTAL
+        ) {
+            console.warn(
+                `value in start or end in vh is not allowed in horizontal mode, animation failed`
+            );
+            return returnWhenFail();
+        }
+
+        // Number in vw is not allowed in vertical mode
+        if (
+            getNumberVal &&
+            unitMisure === parallaxConstant.VW &&
+            direction === parallaxConstant.DIRECTION_VERTICAL
+        ) {
+            console.warn(
+                `value in start or end in vw is not allowed in vertical mode, animation failed`
+            );
+            return returnWhenFail();
+        }
 
         // Get aditonal value +height +halfHeight -height -etc... if exist
         const additionaChoice = [
@@ -65,6 +120,7 @@ export const parallaxUtils = {
 
         return {
             numberVal: getNumberVal ? getNumberVal : 0,
+            unitMisure,
             additionalVal: getAdditionalVal ? getAdditionalVal : '',
             position: getPosition
                 ? getPosition
@@ -73,13 +129,13 @@ export const parallaxUtils = {
     },
 
     // Get start point withuot addition value
-    getStartPoint(screenUnit, data) {
+    getStartPoint(screenUnit, data, direction) {
         // SPLIT INTO CHUNK DATA
         const str = String(data);
         const values = str.split(' ');
 
-        const { numberVal, additionalVal, position } =
-            parallaxUtils.getStartEndValue(values);
+        const { numberVal, unitMisure, additionalVal, position } =
+            parallaxUtils.getStartEndValue(values, direction);
 
         // CHECK IF NUMBER IS NEGATIVE
         const firstChar = String(numberVal).charAt(0);
@@ -90,7 +146,7 @@ export const parallaxUtils = {
         const startValInNumber = number ? number : 0;
 
         // GET FINAL VLAUE
-        if (str.includes('px')) {
+        if (unitMisure === parallaxConstant.PX) {
             return {
                 value: startValInNumber * isNegative,
                 additionalVal,
@@ -106,12 +162,19 @@ export const parallaxUtils = {
     },
 
     // Get end point withuot addition value
-    getEndPoint(screenUnit, data, startPoint, scrollerHeight, invertSide) {
+    getEndPoint(
+        screenUnit,
+        data,
+        startPoint,
+        scrollerHeight,
+        invertSide,
+        direction
+    ) {
         // SPLIT INTO CHUNK DATA
         const str = String(data);
         const values = str.split(' ');
-        const { numberVal, additionalVal, position } =
-            parallaxUtils.getStartEndValue(values);
+        const { numberVal, unitMisure, additionalVal, position } =
+            parallaxUtils.getStartEndValue(values, direction);
 
         // CHECK IF NUMBER IS NEGATIVE
         const firstChar = String(numberVal).charAt(0);
@@ -122,7 +185,7 @@ export const parallaxUtils = {
         const endValInNumber = number ? number : 0;
 
         // GET FINAL VLAUE
-        if (str.includes('px')) {
+        if (unitMisure === parallaxConstant.PX) {
             const valueFromTop = endValInNumber - startPoint * isNegative;
             const valueFromBottom =
                 scrollerHeight - endValInNumber - startPoint * isNegative;

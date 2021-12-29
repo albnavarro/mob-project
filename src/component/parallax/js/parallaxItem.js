@@ -43,7 +43,7 @@ export class ParallaxItemClass {
 
         //Fixed prop
         this.fromTo = data.fromTo || false;
-        this.start = data.start || 0;
+        this.start = data.start || '0px';
         this.end = data.end || null;
         this.invertSide = data.invertSide || false;
         this.marker = data.marker || null;
@@ -195,7 +195,7 @@ export class ParallaxItemClass {
             value: startPoint,
             additionalVal: additionalStartVal,
             position: startPosition,
-        } = parallaxUtils.getStartPoint(screenUnit, this.start);
+        } = parallaxUtils.getStartPoint(screenUnit, this.start, this.direction);
 
         this.invertSide =
             startPosition === parallaxConstant.POSITION_TOP ||
@@ -222,7 +222,8 @@ export class ParallaxItemClass {
             this.end,
             this.startPoint,
             this.scrollerHeight,
-            this.invertSide
+            this.invertSide,
+            this.direction
         );
 
         const multiplier = (() => {
