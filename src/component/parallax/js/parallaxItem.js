@@ -2,6 +2,7 @@ import { mq } from '../../../js/core/mediaManager.js';
 import { offset, position } from '../../../js/utility/vanillaFunction.js';
 import { parallaxUtils } from './parallaxUtils.js';
 import { parallaxConstant } from './parallaxConstant.js';
+import { parallaxMarker } from './parallaxMarker.js';
 import { useFrame } from '.../../../js/core/events/rafutils/rafUtils.js';
 import { useResize } from '.../../../js/core/events/resizeUtils/useResize.js';
 import { useScroll } from '.../../../js/core/events/scrollUtils/useScroll.js';
@@ -22,6 +23,8 @@ export class ParallaxItemClass {
         this.numericRange = 0;
         this.unsubscribeResize = () => {};
         this.unsubscribeScroll = () => {};
+        this.startMarker = null;
+        this.endMarker = null;
 
         // Base props
         this.item = data.item;
@@ -42,6 +45,7 @@ export class ParallaxItemClass {
         this.start = data.start || 0;
         this.end = data.end || null;
         this.invertSide = data.invertSide || false;
+        this.marker = data.marker || null;
 
         //Lienar prop
         this.align = data.align ? data.align : parallaxConstant.ALIGN_CENTER;
@@ -157,6 +161,13 @@ export class ParallaxItemClass {
             this.executeParallax();
         }
 
+        if (this.scroller !== window) {
+            useScroll(() => {
+                // Refresh marker
+                if (this.marker) this.calcFixedLimit();
+            });
+        }
+
         this.unsubscribeResize = useResize(() => this.refresh());
     }
 
@@ -222,9 +233,30 @@ export class ParallaxItemClass {
                 : this.height * multiplier
         );
 
+        this.setMarker();
+
         // From left to right or top to bottom
         // the botom or right side of item sollide with start point
         if (this.invertSide) this.startPoint -= this.height;
+    }
+
+    setMarker() {
+        if (this.marker) {
+            // Add Marker
+            const { startMarker, endMarker } = parallaxMarker({
+                startMarker: this.startMarker,
+                endMarker: this.endMarker,
+                startPoint: this.startPoint,
+                endPoint: this.endPoint,
+                screen: this.screen,
+                direction: this.direction,
+                invertSide: this.invertSide,
+                label: this.marker,
+            });
+
+            this.startMarker = startMarker;
+            this.endMarker = endMarker;
+        }
     }
 
     calcOffset() {

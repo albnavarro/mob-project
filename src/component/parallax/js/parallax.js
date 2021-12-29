@@ -78,6 +78,8 @@ class ParallaxClass {
         data.screen = item.getAttribute('data-screen');
 
         // FIXED PROPS
+        // string marker id
+        data.marker = item.getAttribute('data-marker');
 
         // Boolean
         // Mandatory computationType = 'fixed'
