@@ -23,7 +23,10 @@ export const hScroller = () => {
         computationType: 'fixed',
         start: 'right +halfWidth',
         end: 'right +width',
-        range: '100w',
+        dynamicRange: () => {
+            const test = document.querySelector('.pluto3');
+            return test.offsetWidth;
+        },
         ease: true,
         propierties: 'x',
     });

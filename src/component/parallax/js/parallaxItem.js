@@ -61,12 +61,15 @@ export class ParallaxItemClass {
             ? data.computationType
             : parallaxConstant.TYPE_DEFAULT;
 
+        // Base range
         this.range =
             data.range ||
             (() =>
                 this.computationType === parallaxConstant.TYPE_DEFAULT
                     ? 2
-                    : 100)();
+                    : 0)();
+        // Function that return a range value
+        this.dynamicRange = data.dynamicRange || null;
         this.perspective = data.perspective || false;
         this.applyTo = data.applyTo || false;
         this.scrollTrigger = data.scrollTrigger
@@ -171,11 +174,18 @@ export class ParallaxItemClass {
     }
 
     calcRangeAndUnitMiusure() {
-        const str = String(this.range);
-        const firstChar = str.charAt(0);
-        const isNegative = firstChar === '-' ? -1 : 1;
-        this.numericRange = parseFloat(str.replace(/^\D+/g, '')) * isNegative;
-        this.unitMisure = parallaxUtils.getRangeUnitMisure(str);
+        if (this.dynamicRange) {
+            const range = this.dynamicRange();
+            this.numericRange = Number.isNaN(range) ? 0 : parseFloat(range);
+            this.unitMisure = parallaxConstant.PX;
+        } else {
+            const str = String(this.range);
+            const firstChar = str.charAt(0);
+            const isNegative = firstChar === '-' ? -1 : 1;
+            this.numericRange =
+                parseFloat(str.replace(/^\D+/g, '')) * isNegative;
+            this.unitMisure = parallaxUtils.getRangeUnitMisure(str);
+        }
     }
 
     calcFixedLimit() {
@@ -340,6 +350,7 @@ export class ParallaxItemClass {
         this.unsubscribeResize();
         this.unsubscribeMotion();
         this.unsubscribeMarker();
+        this.dynamicRange = null;
     }
 
     refresh() {
@@ -347,8 +358,11 @@ export class ParallaxItemClass {
         this.calcHeight();
         this.calcWidth();
         this.getScreenHeight();
-        if (this.computationType == parallaxConstant.TYPE_FIXED)
+        if (this.computationType == parallaxConstant.TYPE_FIXED) {
             this.calcFixedLimit();
+            if (this.dynamicRange) this.calcRangeAndUnitMiusure();
+        }
+
         this.move();
     }
 
