@@ -480,19 +480,20 @@ export class ParallaxItemClass {
                         case parallaxConstant.VH:
                             return (window.innerHeight / 100) * -percent;
 
-                        case parallaxConstant.Wpercent:
+                        case parallaxConstant.WPERCENT:
                             return this.direction ===
                                 parallaxConstant.DIRECTION_VERTICAL
                                 ? (width / 100) * -percent
                                 : (height / 100) * -percent;
 
-                        case parallaxConstant.Hpercent:
+                        case parallaxConstant.HPERCENT:
                             return this.direction ===
                                 parallaxConstant.DIRECTION_VERTICAL
                                 ? (height / 100) * -percent
                                 : (width / 100) * -percent;
 
                         case parallaxConstant.PX:
+                        case parallaxConstant.DEGREE:
                         default:
                             return -percent;
                     }

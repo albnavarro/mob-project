@@ -14,11 +14,14 @@ export const parallaxUtils = {
             return parallaxConstant.VH;
         else if (string.includes(parallaxConstant.VW))
             return parallaxConstant.VW;
-        else if (string.includes(parallaxConstant.Wpercent))
-            return parallaxConstant.Wpercent;
-        else if (string.includes(parallaxConstant.Hpercent))
-            return parallaxConstant.Hpercent;
-        else return '';
+        else if (string.includes(parallaxConstant.WPERCENT))
+            return parallaxConstant.WPERCENT;
+        else if (string.includes(parallaxConstant.HPERCENT))
+            return parallaxConstant.HPERCENT;
+        else if (string.includes(parallaxConstant.DEGREE))
+            return parallaxConstant.DEGREE;
+
+        return parallaxConstant.PX;
     },
 
     /**
@@ -62,7 +65,7 @@ export const parallaxUtils = {
         // Number without unit misure is not allowed
         if (getNumberVal && !unitMisure) {
             console.warn(
-                `value in start or end prop with no unit misure is not allowed,
+                `parallax prop checker: value in start or end prop with no unit misure is not allowed,
                  failed operation, use vh in vertical mode or vw in horzontal, or px animation failed`
             );
             return returnWhenFail();
@@ -75,7 +78,7 @@ export const parallaxUtils = {
             direction === parallaxConstant.DIRECTION_HORIZONTAL
         ) {
             console.warn(
-                `value in start or end in vh is not allowed in horizontal mode, animation failed`
+                `parallax prop checker: value in start or end in vh is not allowed in horizontal mode, animation failed`
             );
             return returnWhenFail();
         }
@@ -87,7 +90,7 @@ export const parallaxUtils = {
             direction === parallaxConstant.DIRECTION_VERTICAL
         ) {
             console.warn(
-                `value in start or end in vw is not allowed in vertical mode, animation failed`
+                `parallax prop checker: value in start or end in vw is not allowed in vertical mode, animation failed`
             );
             return returnWhenFail();
         }
@@ -186,9 +189,9 @@ export const parallaxUtils = {
 
         // GET FINAL VLAUE
         if (unitMisure === parallaxConstant.PX) {
-            const valueFromTop = endValInNumber - startPoint * isNegative;
+            const valueFromTop = endValInNumber * isNegative - startPoint;
             const valueFromBottom =
-                scrollerHeight - endValInNumber - startPoint * isNegative;
+                scrollerHeight - endValInNumber * isNegative - startPoint;
 
             return {
                 value: invertSide
@@ -214,19 +217,21 @@ export const parallaxUtils = {
                           return position === parallaxConstant.POSITION_TOP ||
                               position === parallaxConstant.POSITION_LEFT
                               ? scrollerHeight -
-                                    screenUnit * (100 - endValInNumber) -
-                                    startPoint * isNegative
-                              : screenUnit * (100 - endValInNumber) -
-                                    startPoint * isNegative;
+                                    screenUnit *
+                                        (100 - endValInNumber * isNegative) -
+                                    startPoint
+                              : screenUnit *
+                                    (100 - endValInNumber * isNegative) -
+                                    startPoint;
                       })()
                     : (() => {
                           return position === parallaxConstant.POSITION_TOP ||
                               position === parallaxConstant.POSITION_LEFT
                               ? scrollerHeight -
-                                    screenUnit * endValInNumber -
-                                    startPoint * isNegative
-                              : screenUnit * endValInNumber -
-                                    startPoint * isNegative;
+                                    screenUnit * endValInNumber * isNegative -
+                                    startPoint
+                              : screenUnit * endValInNumber * isNegative -
+                                    startPoint;
                       })(),
                 additionalVal,
                 position,

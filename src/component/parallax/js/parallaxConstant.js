@@ -3,8 +3,9 @@ export const parallaxConstant = {
     PX: 'px',
     VH: 'vh',
     VW: 'vw',
-    Wpercent: 'w',
-    Hpercent: 'h',
+    WPERCENT: 'w',
+    HPERCENT: 'h',
+    DEGREE: 'deg',
 
     // AdditionalChoiceContant
     PLUS_HEIGHT: '+height',
