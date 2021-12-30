@@ -15,20 +15,49 @@ export const hScroller = () => {
     parallaxOpacity.init();
     parallax.add(parallaxOpacity);
 
+    const pluto = document.querySelector('.pluto3');
+    pluto.style.webkitTransition = 'background-color .35s';
     const parallaxIn = new ParallaxItemClass({
         item: document.querySelector('.parallax-via-js-in'),
         scroller: '.scrollerH-container .scrollerH',
         scrollTrigger: '.pluto3',
         direction: 'horizontal',
         computationType: 'fixed',
-        start: 'right +halfWidth',
-        end: 'right +width',
-        dynamicRange: () => {
-            const test = document.querySelector('.pluto3');
-            return test.offsetWidth;
-        },
+        marker: 't',
         ease: true,
         propierties: 'x',
+        // start: 'right +halfWidth',
+        // end: 'right +width',
+        // range: '100w',
+        dynamicStart: {
+            position: 'right',
+            value: () => {
+                return pluto.offsetWidth / 2;
+            },
+        },
+        dynamicEnd: {
+            position: 'right',
+            value: () => {
+                return pluto.offsetWidth;
+            },
+        },
+        dynamicRange: () => {
+            return pluto.offsetWidth;
+        },
+        onEnter: () => {
+            console.log('onEnter');
+        },
+        onEnterBack: () => {
+            console.log('onEnterBack');
+        },
+        onLeave: () => {
+            console.log('onLeave');
+            return (pluto.style['background-color'] = 'red');
+        },
+        onLeaveBack: () => {
+            console.log('onLeaveBack');
+            return (pluto.style['background-color'] = 'white');
+        },
     });
     parallaxIn.init();
     parallax.add(parallaxIn);

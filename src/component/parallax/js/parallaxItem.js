@@ -3,6 +3,7 @@ import { offset, position } from '../../../js/utility/vanillaFunction.js';
 import { parallaxUtils } from './parallaxUtils.js';
 import { parallaxConstant } from './parallaxConstant.js';
 import { parallaxMarker } from './parallaxMarker.js';
+import { parallaxEmitter } from './parallaxEmitter.js';
 import { useFrame } from '.../../../js/core/events/rafutils/rafUtils.js';
 import { useResize } from '.../../../js/core/events/resizeUtils/useResize.js';
 import { useScroll } from '.../../../js/core/events/scrollUtils/useScroll.js';
@@ -26,6 +27,7 @@ export class ParallaxItemClass {
         this.unsubscribeMarker = () => {};
         this.startMarker = null;
         this.endMarker = null;
+        this.prevValue = null;
 
         // Base props
         this.item = data.item;
@@ -44,7 +46,9 @@ export class ParallaxItemClass {
         //Fixed prop
         this.fromTo = data.fromTo || false;
         this.start = data.start || '0px';
+        this.dynamicStart = data.dynamicStart || null;
         this.end = data.end || null;
+        this.dynamicEnd = data.dynamicEnd || null;
         this.invertSide = data.invertSide || false;
         this.marker = data.marker || null;
 
@@ -102,6 +106,12 @@ export class ParallaxItemClass {
         this.unitMisure = '';
         this.startPoint = 0;
         this.endPoint = 0;
+
+        // Event
+        this.onEnter = data.onEnter || null;
+        this.onEnterBack = data.onEnterBack || null;
+        this.onLeave = data.onLeave || null;
+        this.onLeaveBack = data.onLeaveBack || null;
     }
 
     init() {
@@ -191,17 +201,34 @@ export class ParallaxItemClass {
     calcFixedLimit() {
         const screenUnit = this.scrollerHeight / 100;
 
+        // Check if there is a function that return a start value dinamically
+        if (
+            this.dynamicStart &&
+            this.dynamicStart?.position &&
+            this.dynamicStart?.value
+        ) {
+            const { position, value: fn } = this.dynamicStart;
+            const valueResult = fn();
+            if (!Number.isNaN(valueResult)) {
+                this.start = `${position} ${valueResult}px`;
+            }
+        }
+
+        // Get postion ( es: 'bottom'),
+        // Get processed value ( based on px || vh || vw)
+        // Get addtional val ( +height -halfHeight etc ..)
         const {
             value: startPoint,
             additionalVal: additionalStartVal,
             position: startPosition,
         } = parallaxUtils.getStartPoint(screenUnit, this.start, this.direction);
 
+        // Chek if come from top or left
         this.invertSide =
             startPosition === parallaxConstant.POSITION_TOP ||
             startPosition === parallaxConstant.POSITION_LEFT;
 
-        // ADD ADDITONAL VALUE
+        // Add/substract with height or half value
         this.startPoint = parallaxUtils.processFixedLimit(
             startPoint,
             additionalStartVal,
@@ -213,6 +240,22 @@ export class ParallaxItemClass {
                 : this.height
         );
 
+        // Check if there is a function that return a end value dinamically
+        if (
+            this.dynamicEnd &&
+            this.dynamicEnd?.position &&
+            this.dynamicEnd?.value
+        ) {
+            const { position, value: fn } = this.dynamicEnd;
+            const valueResult = fn();
+            if (!Number.isNaN(valueResult)) {
+                this.end = `${position} ${valueResult}px`;
+            }
+        }
+
+        // Get postion ( es: 'bottom'),
+        // Get processed value ( based on px || vh || vw)
+        // Get addtional val ( +height -halfHeight etc ..)
         const {
             value: endPoint,
             additionalVal: additionalEndVal,
@@ -226,6 +269,7 @@ export class ParallaxItemClass {
             this.direction
         );
 
+        // Get positive or negative multiplier to add or substract value basedto the position
         const multiplier = (() => {
             if (!this.invertSide) {
                 return endPosition === parallaxConstant.POSITION_BOTTOM ||
@@ -240,6 +284,7 @@ export class ParallaxItemClass {
             }
         })();
 
+        // Add/substract with height or half value
         this.endPoint = parallaxUtils.processFixedLimit(
             endPoint,
             additionalEndVal,
@@ -352,6 +397,10 @@ export class ParallaxItemClass {
         this.unsubscribeMotion();
         this.unsubscribeMarker();
         this.dynamicRange = null;
+        this.onEnter = () => {};
+        this.onEnterBack = () => {};
+        this.onLeave = () => {};
+        this.onLeaveBack = () => {};
     }
 
     refresh() {
@@ -443,7 +492,6 @@ export class ParallaxItemClass {
         const width = this.width;
         const offset = this.offset;
         const fromTo = this.fromTo;
-        const range = this.range;
         const startPoint = this.startPoint;
         const endPoint = this.endPoint;
 
@@ -468,6 +516,26 @@ export class ParallaxItemClass {
                 : -parallaxUtils.clamp(valPerDirection, maxVal, 0);
 
         const percent = (clamp * 100) / endPoint;
+
+        // Fire callback if there is
+        if (
+            this.onEnter ||
+            this.onEnterBack ||
+            this.onLeave ||
+            this.onLeaveBack
+        ) {
+            parallaxEmitter({
+                prevValue: this.prevValue,
+                value: valPerDirection,
+                maxVal,
+                onEnter: this.onEnter,
+                onEnterBack: this.onEnterBack,
+                onLeave: this.onLeave,
+                onLeaveBack: this.onLeaveBack,
+            });
+        }
+
+        this.prevValue = valPerDirection;
 
         switch (this.propierties) {
             case parallaxConstant.PROP_HORIZONTAL:
