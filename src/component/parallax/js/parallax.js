@@ -64,6 +64,8 @@ class ParallaxClass {
         const data = {};
         data.item = item;
 
+        data.pin = item.hasAttribute('data-pin');
+
         // String: fixed || default
         data.computationType =
             item.getAttribute('data-computationType') || 'default';

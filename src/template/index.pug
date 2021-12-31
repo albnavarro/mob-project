@@ -184,12 +184,12 @@ block content
                     data-computationType="fixed"
                     data-start='bottom 30vh'
                     data-end="bottom 60vh"
-                    data-propierties="y"
+                    data-propierties="rotate"
                     data-ease
                     data-easeType="lerp"
                     data-lerpConfig ="100"
                     data-scrollTrigger=".index-timeline"
-                    data-range="200h")
+                    data-range="180deg")
                     div(
                         data-conponent='m-comp--parallax'
                         data-computationType="fixed"
@@ -204,12 +204,14 @@ block content
                         .parallax__item-test
                             
             .parallax__item-test.inlineBLock(
+                style="background:black;"
                 data-conponent='m-comp--parallax'
                 data-computationType="fixed"
                 data-propierties="rotate"
                 data-range="90deg"
                 data-start="bottom 20vh"
-                data-end="bottom 50vh +halfHeight"
+                data-end="bottom 60vh +halfHeight"
+                data-pin
                 data-marker='rotate'
                 )
                 

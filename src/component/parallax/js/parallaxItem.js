@@ -4,6 +4,7 @@ import { parallaxUtils } from './parallaxUtils.js';
 import { parallaxConstant } from './parallaxConstant.js';
 import { parallaxMarker } from './parallaxMarker.js';
 import { parallaxEmitter } from './parallaxEmitter.js';
+import { ParallaxPin } from './parallaxPin.js';
 import { useFrame } from '.../../../js/core/events/rafutils/rafUtils.js';
 import { useResize } from '.../../../js/core/events/resizeUtils/useResize.js';
 import { useScroll } from '.../../../js/core/events/scrollUtils/useScroll.js';
@@ -42,6 +43,9 @@ export class ParallaxItemClass {
         this.screen = data.screen
             ? document.querySelector(data.screen)
             : window;
+
+        this.pin = data.pin || false;
+        this.pinInstance = null;
 
         //Fixed prop
         this.fromTo = data.fromTo || false;
@@ -145,6 +149,11 @@ export class ParallaxItemClass {
         }
 
         this.unsubscribeResize = useResize(() => this.refresh());
+
+        if (this.pin) {
+            this.pinInstance = new ParallaxPin({ instance: this });
+            this.pinInstance.init();
+        }
     }
 
     setPerspective() {
@@ -401,9 +410,11 @@ export class ParallaxItemClass {
         this.onEnterBack = () => {};
         this.onLeave = () => {};
         this.onLeaveBack = () => {};
+        if (this.pin) this.pinInstance.destroy();
     }
 
     refresh() {
+        if (this.pin) this.pinInstance.reset();
         this.calcOffset();
         this.calcHeight();
         this.calcWidth();
@@ -411,6 +422,9 @@ export class ParallaxItemClass {
         if (this.computationType == parallaxConstant.TYPE_FIXED) {
             this.calcFixedLimit();
             if (this.dynamicRange) this.calcRangeAndUnitMiusure();
+            if (this.pin) {
+                this.pinInstance.refresh();
+            }
         }
 
         this.move();
