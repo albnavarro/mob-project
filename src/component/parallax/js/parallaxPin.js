@@ -20,6 +20,9 @@ export class ParallaxPin {
         this.isUnder = false;
         this.lastPosition = 0;
         this.lastTop = 0;
+        this.lastLeft = 0;
+        this.lastWidth = null;
+        this.lastHeight = null;
         this.unsubscribeScroll = () => {};
         this.unsubscribeSpring = () => {};
     }
@@ -47,12 +50,7 @@ export class ParallaxPin {
         this.wrapper = this.item.closest('.pin-wrapper');
         this.pin = this.item.closest('.pin');
         // Set misure to pin lement and wrap element
-        const height = this.pin.offsetHeight;
-        const width = this.pin.offsetWidth;
-        this.wrapper.style.height = `${height}px`;
-        this.wrapper.style.width = `${width}px`;
-        this.pin.style.height = `${height}px`;
-        this.pin.style.width = `${width}px`;
+        this.setPinSize();
 
         // Set up motion
         this.spring = new useSpring('wobbly');
@@ -77,6 +75,9 @@ export class ParallaxPin {
         if (this.pin) {
             this.lastPosition = this.pin.style.position;
             this.lastTop = this.pin.style.top;
+            this.lastLeft = this.pin.getBoundingClientRect().left;
+            this.lastWidth = this.pin.offsetWidth;
+            this.lastHeight = this.pin.offsetHeight;
             this.pin.style.position = '';
             this.pin.style.top = ``;
             this.pin.style.left = ``;
@@ -102,7 +103,24 @@ export class ParallaxPin {
         if (this.pin) {
             this.pin.style.position = this.lastPosition;
             this.pin.style.top = this.lastTop;
+            this.pin.style.left = this.lastLeft;
+            this.setPinSize();
         }
+    }
+
+    setPinSize() {
+        this.wrapper.style.height = '';
+        this.wrapper.style.width = '';
+        this.pin.style.height = '';
+        this.pin.style.width = '';
+        const height = this.lastHeight
+            ? this.lastHeight
+            : this.pin.offsetHeight;
+        const width = this.lastWidth ? this.lastWidth : this.pin.offsetWidth;
+        this.wrapper.style.height = `${height}px`;
+        this.wrapper.style.width = `${width}px`;
+        this.pin.style.height = `${height}px`;
+        this.pin.style.width = `${width}px`;
     }
 
     destroy() {
