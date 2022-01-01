@@ -18,6 +18,7 @@ export class ParallaxPin {
         this.trigger = null;
         this.item = null;
         this.spring = new useSpring('wobbly');
+        this.springIsRunning = false;
         this.wrapper = null;
         this.pin = null;
         this.isOver = false;
@@ -118,6 +119,15 @@ export class ParallaxPin {
         this.compesateValue = this.invertSide
             ? -parseInt(this.end)
             : parseInt(this.end);
+        this.collisionTranslateProp =
+            this.orientation === parallaxConstant.DIRECTION_VERTICAL
+                ? 'Y'
+                : 'X';
+
+        this.collisionStyleProp =
+            this.orientation === parallaxConstant.DIRECTION_VERTICAL
+                ? 'top'
+                : 'left';
 
         if (this.pin) {
             useFrame(() => {
@@ -162,38 +172,34 @@ export class ParallaxPin {
             : position(this.wrapper).left - this.startFromTop;
     }
 
-    animateCollision(gap) {
-        const style =
-            this.orientation === parallaxConstant.DIRECTION_VERTICAL
-                ? 'top'
-                : 'left';
+    animateCollision() {
+        const gap = this.getGap();
+        this.tween(gap);
+    }
 
-        const translateProp =
-            this.orientation === parallaxConstant.DIRECTION_VERTICAL
-                ? 'Y'
-                : 'X';
+    animateCollisionBack() {
+        const gap = this.invertSide
+            ? this.getGap() - this.end
+            : this.getGap() + this.end;
 
+        this.tween(gap);
+    }
+
+    tween(gap) {
         useFrame(() => {
-            this.pin.style[style] = `${this.startFromTop}px`;
+            this.pin.style[this.collisionStyleProp] = `${this.startFromTop}px`;
         });
 
+        if (this.springIsRunning) return;
+
+        this.springIsRunning = true;
         this.spring
             .goFrom({ val: gap })
             .then(() => {
-                this.pin.style.transform = `translate${translateProp}(0px)`;
+                this.pin.style.transform = `translate${this.collisionTranslateProp}(0px)`;
+                this.springIsRunning = false;
             })
             .catch((err) => {});
-    }
-
-    staticCollision() {
-        const style =
-            this.orientation === parallaxConstant.DIRECTION_VERTICAL
-                ? 'top'
-                : 'left';
-
-        useFrame(() => {
-            this.pin.style[style] = `${this.startFromTop}px`;
-        });
     }
 
     resetStyleWhenUnder() {
@@ -324,12 +330,10 @@ export class ParallaxPin {
                         this.invertSide);
 
                 this.addClone();
-
                 if (fireSpring) {
-                    const gap = this.getGap();
-                    this.animateCollision(gap);
+                    this.animateCollision();
                 } else {
-                    this.staticCollision();
+                    this.animateCollisionBack();
                 }
 
                 this.isUnder = false;

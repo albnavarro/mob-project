@@ -421,6 +421,26 @@ export class useLerp {
     }
 
     /**
+     * get - get current value
+     *
+     * @return {Object} current value obj { prop: value, prop2: value2 }
+     *
+     * @example
+     * const { prop } = mySpring.get();
+     */
+    get() {
+        return this.values
+            .map((item) => {
+                return {
+                    [item.prop]: parseFloat(item.currentValue),
+                };
+            })
+            .reduce((p, c) => {
+                return { ...p, ...c };
+            }, {});
+    }
+
+    /**
      * updatePreset - Update config object with new preset
      *
      * @param  {String} preset new preset

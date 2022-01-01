@@ -423,6 +423,26 @@ export class useSpring {
     }
 
     /**
+     * get - get current value
+     *
+     * @return {Object} current value obj { prop: value, prop2: value2 }
+     *
+     * @example
+     * const { prop } = mySpring.get();
+     */
+    get() {
+        return this.values
+            .map((item) => {
+                return {
+                    [item.prop]: parseFloat(item.currentValue),
+                };
+            })
+            .reduce((p, c) => {
+                return { ...p, ...c };
+            }, {});
+    }
+
+    /**
      * updateConfig - Update config object
      *
      * @param  {Object} config udate single prop of config object
