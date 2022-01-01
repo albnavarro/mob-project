@@ -246,14 +246,18 @@ export class ParallaxPin {
                 additionalStyle = { ...additionalStyle, ...textAlign };
 
             Object.assign(this.pin.style, additionalStyle);
-            document.body.appendChild(this.pin);
+            useFrame(() => {
+                document.body.appendChild(this.pin);
+            });
             this.cloneActive = true;
         }
     }
 
     removeClone() {
         if (this.scroller !== window && this.cloneActive) {
-            this.wrapper.appendChild(this.pin);
+            useFrame(() => {
+                this.wrapper.appendChild(this.pin);
+            });
             this.cloneActive = false;
         }
     }
