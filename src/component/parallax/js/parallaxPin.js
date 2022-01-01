@@ -1,7 +1,7 @@
 import { useSpring } from '.../../../js/core/animation/spring/useSpring.js';
 import { useFrame } from '.../../../js/core/events/rafutils/rafUtils.js';
 import { parallaxConstant } from './parallaxConstant.js';
-import { offset, position } from '../../../js/utility/vanillaFunction.js';
+import { position } from '../../../js/utility/vanillaFunction.js';
 
 export class ParallaxPin {
     constructor(data) {
@@ -31,6 +31,7 @@ export class ParallaxPin {
         this.lastScroll = 0;
         this.unsubscribeScroll = () => {};
         this.unsubscribeSpring = () => {};
+        this.parentRequireStyle = ['text-align'];
     }
 
     init() {
@@ -91,8 +92,11 @@ export class ParallaxPin {
             this.lastWidth = this.pin.offsetWidth;
             this.lastHeight = this.pin.offsetHeight;
             this.pin.style.position = '';
-            this.pin.style.top = ``;
-            this.pin.style.left = ``;
+
+            if (this.scroller === window) {
+                this.pin.style.left = ``;
+                this.pin.style.top = ``;
+            }
         }
     }
 
@@ -118,8 +122,11 @@ export class ParallaxPin {
         if (this.pin) {
             useFrame(() => {
                 this.pin.style.position = this.lastPosition;
-                this.pin.style.top = this.lastTop;
-                this.pin.style.left = this.lastLeft;
+
+                if (this.scroller === window) {
+                    this.pin.style.top = this.lastTop;
+                    this.pin.style.left = this.lastLeft;
+                }
             });
             this.setPinSize();
         }
@@ -155,18 +162,6 @@ export class ParallaxPin {
             : position(this.wrapper).left - this.startFromTop;
     }
 
-    findStyle(target, rule) {
-        let node = target.parentNode;
-
-        while (node != null) {
-            if (node.style[rule]) {
-                return { [rule]: node.style[rule] };
-            }
-            node = node.parentNode;
-        }
-        return null;
-    }
-
     animateCollision(gap) {
         const style =
             this.orientation === parallaxConstant.DIRECTION_VERTICAL
@@ -182,9 +177,12 @@ export class ParallaxPin {
             this.pin.style[style] = `${this.startFromTop}px`;
         });
 
-        this.spring.goFrom({ val: gap }).then(() => {
-            this.pin.style.transform = `translate${translateProp}(0px)`;
-        });
+        this.spring
+            .goFrom({ val: gap })
+            .then(() => {
+                this.pin.style.transform = `translate${translateProp}(0px)`;
+            })
+            .catch((err) => {});
     }
 
     staticCollision() {
@@ -237,18 +235,36 @@ export class ParallaxPin {
         });
     }
 
+    findStyle(target, rule) {
+        let node = target.parentNode;
+
+        while (node != null) {
+            if (node?.style && node.style[rule]) {
+                return { [rule]: node.style[rule] };
+            }
+            node = node.parentNode;
+        }
+        return null;
+    }
+
     addClone() {
         if (this.scroller !== window && !this.cloneActive) {
             // Find specific style inherit by parents to fix clone position
-            let additionalStyle = {};
-            const textAlign = this.findStyle(this.pin, 'text-align');
-            if (textAlign)
-                additionalStyle = { ...additionalStyle, ...textAlign };
+            const additionalStyle = this.parentRequireStyle
+                .map((item) => {
+                    return this.findStyle(this.pin, item);
+                })
+                .filter((item) => item !== null)
+                .reduce((p, c) => {
+                    return { ...p, ...c };
+                }, {});
 
             Object.assign(this.pin.style, additionalStyle);
+
             useFrame(() => {
                 document.body.appendChild(this.pin);
             });
+
             this.cloneActive = true;
         }
     }
