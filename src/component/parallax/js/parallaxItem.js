@@ -470,6 +470,10 @@ export class ParallaxItemClass {
         )
             return;
 
+        if (this.pinInstance) {
+            this.pinInstance.onScroll(scrollTop);
+        }
+
         switch (this.computationType) {
             case parallaxConstant.TYPE_FIXED:
                 this.endValue = this.getFixedValue();

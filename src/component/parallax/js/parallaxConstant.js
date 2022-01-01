@@ -57,4 +57,7 @@ export const parallaxConstant = {
     // Ease type constant
     EASE_SPRING: 'spring',
     EASE_LERP: 'lerp',
+
+    SCROLL_UP: 'up',
+    SCROLL_DOWN: 'down',
 };
