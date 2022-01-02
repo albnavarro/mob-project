@@ -443,7 +443,12 @@ export class ParallaxItemClass {
 
     smoothParallaxJs() {
         this.executeParallax(false);
-        if (!this.fixedShouldRender && !this.firstTime) return;
+        if (
+            !this.fixedShouldRender &&
+            !this.firstTime &&
+            this.computationType == parallaxConstant.TYPE_FIXED
+        )
+            return;
 
         this.motion.goTo({ val: this.endValue }).catch((err) => {});
     }
