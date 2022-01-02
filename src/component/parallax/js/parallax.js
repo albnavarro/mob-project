@@ -64,8 +64,6 @@ class ParallaxClass {
         const data = {};
         data.item = item;
 
-        data.pin = item.hasAttribute('data-pin');
-
         // String: fixed || default
         data.computationType =
             item.getAttribute('data-computationType') || 'default';
@@ -82,6 +80,9 @@ class ParallaxClass {
         // FIXED PROPS
         // string marker id
         data.marker = item.getAttribute('data-marker');
+
+        // string pin id
+        data.pin = item.hasAttribute('data-pin');
 
         // Boolean
         // Mandatory computationType = 'fixed'

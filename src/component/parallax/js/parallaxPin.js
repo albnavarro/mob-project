@@ -34,6 +34,8 @@ export class ParallaxPin {
         this.unsubscribeScroll = () => {};
         this.unsubscribeSpring = () => {};
         this.parentRequireStyle = ['text-align', 'box-sizing'];
+        this.styleToTranspond = ['transform', 'position'];
+        this.nonRelevantRule = ['none', 'static'];
     }
 
     init() {
@@ -79,6 +81,7 @@ export class ParallaxPin {
         // Set misure to pin lement and wrap element
 
         this.addRquiredStyle();
+        this.checkIfShouldTranspond();
     }
 
     setPinSize() {
@@ -105,8 +108,7 @@ export class ParallaxPin {
 
         while (node != null && node !== document) {
             const style = getComputedStyle(node);
-
-            if (style[rule]) {
+            if (style[rule] && !this.nonRelevantRule.includes(style[rule])) {
                 return { [rule]: style[rule] };
             }
             node = node.parentNode;
@@ -127,6 +129,26 @@ export class ParallaxPin {
         Object.assign(this.pin.style, additionalStyle);
     }
 
+    checkIfShouldTranspond() {
+        this.shoulTranspond = this.styleToTranspond
+            .map((item) => {
+                const style = this.findStyle(this.wrapper, item);
+                if (!style) return false;
+
+                const [key] = Object.keys(style);
+                const [value] = Object.values(style);
+
+                if (key === 'position') {
+                    return value === 'fixed' || value === 'absolute'
+                        ? true
+                        : false;
+                } else {
+                    return true;
+                }
+            })
+            .some((item) => item === true);
+    }
+
     /**
      * reset - on parallax refresh reset pin postion to permit parallax get right offset value
      * this before any aother operation in parallax reresh methods
@@ -137,7 +159,7 @@ export class ParallaxPin {
         if (this.pin) {
             this.lastPosition = this.pin.style.position;
             this.lastTop = this.pin.style.top;
-            this.lastLeft = position(this.pin).left;
+            this.lastLeft = this.pin.style.left;
             this.lastWidth = this.pin.offsetWidth;
             this.lastHeight = this.pin.offsetHeight;
             this.pin.style.position = '';
@@ -187,7 +209,7 @@ export class ParallaxPin {
                 }
             });
             this.setPinSize();
-            this.addRquiredStyle();
+            this.checkIfShouldTranspond();
         }
     }
 
@@ -274,7 +296,8 @@ export class ParallaxPin {
     }
 
     activateTrasponder() {
-        if (this.scroller !== window && !this.trasponderActive) {
+        if (this.shoulTranspond) {
+            this.addRquiredStyle();
             useFrame(() => {
                 document.body.appendChild(this.pin);
             });
@@ -284,7 +307,7 @@ export class ParallaxPin {
     }
 
     deactivateTrasponder() {
-        if (this.scroller !== window && this.trasponderActive) {
+        if (this.shoulTranspond) {
             useFrame(() => {
                 this.wrapper.appendChild(this.pin);
             });

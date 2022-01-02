@@ -430,6 +430,9 @@ export class ParallaxItemClass {
             }
         }
 
+        // reset value to update animation after resize
+        this.lastValue = 0;
+        this.firstTime = true;
         this.move();
     }
 
