@@ -16,7 +16,6 @@ export class ParallaxItemClass {
     constructor(data) {
         this.offset = 0;
         this.endValue = 0;
-        this.currentValue = 0;
         this.height = 0;
         this.width = 0;
         this.scrollerScroll = 0;
@@ -28,7 +27,11 @@ export class ParallaxItemClass {
         this.unsubscribeMarker = () => {};
         this.startMarker = null;
         this.endMarker = null;
-        this.prevValue = null;
+        this.lastValue = null;
+        this.prevFixedRawValue = 0;
+        this.fixedShouldRender = null;
+        this.prevFixedClamp = null;
+        this.firstTime = true;
 
         // Base props
         this.item = data.item;
@@ -440,15 +443,22 @@ export class ParallaxItemClass {
 
     smoothParallaxJs() {
         this.executeParallax(false);
+        if (!this.fixedShouldRender && !this.firstTime) return;
+
         this.motion.goTo({ val: this.endValue }).catch((err) => {});
     }
 
     updateStyle(val) {
+        if (val === this.lastValue) return;
+
         if (this.applyTo) {
             Object.assign(this.applyTo.style, this.getStyle(val));
         } else {
             Object.assign(this.item.style, this.getStyle(val));
         }
+
+        this.lastValue = val;
+        this.firstTime = false;
     }
 
     executeParallax(applyStyle = true) {
@@ -533,6 +543,10 @@ export class ParallaxItemClass {
                 ? -parallaxUtils.clamp(valPerDirection, 0, maxVal)
                 : -parallaxUtils.clamp(valPerDirection, maxVal, 0);
 
+        this.fixedShouldRender = this.prevFixedClamp === clamp ? false : true;
+        this.prevFixedClamp = clamp;
+        if (!this.fixedShouldRender && !this.firstTime) return;
+
         const percent = (clamp * 100) / endPoint;
 
         // Fire callback if there is
@@ -543,7 +557,7 @@ export class ParallaxItemClass {
             this.onLeaveBack
         ) {
             parallaxEmitter({
-                prevValue: this.prevValue,
+                prevValue: this.prevFixedRawValue,
                 value: valPerDirection,
                 maxVal,
                 onEnter: this.onEnter,
@@ -553,7 +567,7 @@ export class ParallaxItemClass {
             });
         }
 
-        this.prevValue = valPerDirection;
+        this.prevFixedRawValue = valPerDirection;
 
         switch (this.propierties) {
             case parallaxConstant.PROP_HORIZONTAL:

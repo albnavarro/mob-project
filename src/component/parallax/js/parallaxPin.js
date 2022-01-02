@@ -6,6 +6,7 @@ import { position } from '../../../js/utility/vanillaFunction.js';
 export class ParallaxPin {
     constructor(data) {
         this.parallaxInstance = data.instance;
+        this.trasponderActive = false;
         this.isScrolling = false;
         this.scrollerHeight = 0;
         this.start = 0;
@@ -32,7 +33,7 @@ export class ParallaxPin {
         this.lastScroll = 0;
         this.unsubscribeScroll = () => {};
         this.unsubscribeSpring = () => {};
-        this.parentRequireStyle = ['text-align'];
+        this.parentRequireStyle = ['text-align', 'box-sizing'];
     }
 
     init() {
@@ -76,7 +77,54 @@ export class ParallaxPin {
         this.wrapper = this.item.closest('.pin-wrapper');
         this.pin = this.item.closest('.pin');
         // Set misure to pin lement and wrap element
-        //
+
+        this.addRquiredStyle();
+    }
+
+    setPinSize() {
+        useFrame(() => {
+            this.wrapper.style.height = '';
+            this.wrapper.style.width = '';
+            this.pin.style.height = '';
+            this.pin.style.width = '';
+            const height = this.lastHeight
+                ? this.lastHeight
+                : this.pin.offsetHeight;
+            const width = this.lastWidth
+                ? this.lastWidth
+                : this.pin.offsetWidth;
+            this.wrapper.style.height = `${height}px`;
+            this.wrapper.style.width = `${width}px`;
+            this.pin.style.height = `${height}px`;
+            this.pin.style.width = `${width}px`;
+        });
+    }
+
+    findStyle(target, rule) {
+        let node = target.parentNode;
+
+        while (node != null && node !== document) {
+            const style = getComputedStyle(node);
+
+            if (style[rule]) {
+                return { [rule]: style[rule] };
+            }
+            node = node.parentNode;
+        }
+        return null;
+    }
+
+    addRquiredStyle() {
+        const additionalStyle = this.parentRequireStyle
+            .map((item) => {
+                return this.findStyle(this.pin, item);
+            })
+            .filter((item) => item !== null)
+            .reduce((p, c) => {
+                return { ...p, ...c };
+            }, {});
+
+        Object.assign(this.pin.style, additionalStyle);
     }
 
     /**
@@ -139,26 +187,8 @@ export class ParallaxPin {
                 }
             });
             this.setPinSize();
+            this.addRquiredStyle();
         }
-    }
-
-    setPinSize() {
-        useFrame(() => {
-            this.wrapper.style.height = '';
-            this.wrapper.style.width = '';
-            this.pin.style.height = '';
-            this.pin.style.width = '';
-            const height = this.lastHeight
-                ? this.lastHeight
-                : this.pin.offsetHeight;
-            const width = this.lastWidth
-                ? this.lastWidth
-                : this.pin.offsetWidth;
-            this.wrapper.style.height = `${height}px`;
-            this.wrapper.style.width = `${width}px`;
-            this.pin.style.height = `${height}px`;
-            this.pin.style.width = `${width}px`;
-        });
     }
 
     destroy() {
@@ -196,8 +226,10 @@ export class ParallaxPin {
         this.spring
             .goFrom({ val: gap })
             .then(() => {
-                this.pin.style.transform = `translate${this.collisionTranslateProp}(0px)`;
-                this.springIsRunning = false;
+                useFrame(() => {
+                    this.pin.style.transform = `translate${this.collisionTranslateProp}(0px)`;
+                    this.springIsRunning = false;
+                });
             })
             .catch((err) => {});
     }
@@ -241,46 +273,22 @@ export class ParallaxPin {
         });
     }
 
-    findStyle(target, rule) {
-        let node = target.parentNode;
-
-        while (node != null) {
-            if (node?.style && node.style[rule]) {
-                return { [rule]: node.style[rule] };
-            }
-            node = node.parentNode;
-        }
-        return null;
-    }
-
-    addClone() {
-        if (this.scroller !== window && !this.cloneActive) {
-            // Find specific style inherit by parents to fix clone position
-            const additionalStyle = this.parentRequireStyle
-                .map((item) => {
-                    return this.findStyle(this.pin, item);
-                })
-                .filter((item) => item !== null)
-                .reduce((p, c) => {
-                    return { ...p, ...c };
-                }, {});
-
-            Object.assign(this.pin.style, additionalStyle);
-
+    activateTrasponder() {
+        if (this.scroller !== window && !this.trasponderActive) {
             useFrame(() => {
                 document.body.appendChild(this.pin);
             });
 
-            this.cloneActive = true;
+            this.trasponderActive = true;
         }
     }
 
-    removeClone() {
-        if (this.scroller !== window && this.cloneActive) {
+    deactivateTrasponder() {
+        if (this.scroller !== window && this.trasponderActive) {
             useFrame(() => {
                 this.wrapper.appendChild(this.pin);
             });
-            this.cloneActive = false;
+            this.trasponderActive = false;
         }
     }
 
@@ -313,7 +321,7 @@ export class ParallaxPin {
             if (!this.isUnder) {
                 // Reset style
                 this.resetStyleWhenUnder();
-                this.removeClone();
+                this.deactivateTrasponder();
 
                 this.isUnder = true;
                 this.isInner = false;
@@ -329,7 +337,7 @@ export class ParallaxPin {
                     (scrollDirection === parallaxConstant.SCROLL_UP &&
                         this.invertSide);
 
-                this.addClone();
+                this.activateTrasponder();
                 if (fireSpring) {
                     this.animateCollision();
                 } else {
@@ -343,7 +351,7 @@ export class ParallaxPin {
         } else if (topCondition) {
             if (!this.isOver) {
                 this.resetStyleWhenOver();
-                this.removeClone();
+                this.deactivateTrasponder();
                 this.isUnder = false;
                 this.isInner = false;
                 this.isOver = true;
