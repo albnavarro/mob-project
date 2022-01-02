@@ -7,7 +7,6 @@ export class ParallaxPin {
     constructor(data) {
         this.parallaxInstance = data.instance;
         this.trasponderActive = false;
-        this.isScrolling = false;
         this.scrollerHeight = 0;
         this.start = 0;
         this.startFromTop = 0;
