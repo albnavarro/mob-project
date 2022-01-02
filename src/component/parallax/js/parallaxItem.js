@@ -32,6 +32,7 @@ export class ParallaxItemClass {
         this.fixedShouldRender = null;
         this.prevFixedClamp = null;
         this.firstTime = true;
+        this.isInViewport = false;
 
         // Base props
         this.item = data.item;
@@ -431,7 +432,7 @@ export class ParallaxItemClass {
         }
 
         // reset value to update animation after resize
-        this.lastValue = 0;
+        this.lastValue = null;
         this.firstTime = true;
         this.move();
     }
@@ -446,10 +447,20 @@ export class ParallaxItemClass {
 
     smoothParallaxJs() {
         this.executeParallax(false);
+
+        // Skip motion fixed type
         if (
             !this.fixedShouldRender &&
             !this.firstTime &&
-            this.computationType == parallaxConstant.TYPE_FIXED
+            this.computationType === parallaxConstant.TYPE_FIXED
+        )
+            return;
+
+        // Skip motion deafault type
+        if (
+            !this.isInViewport &&
+            !this.firstTime &&
+            !this.computationType !== parallaxConstant.TYPE_FIXED
         )
             return;
 
@@ -458,7 +469,6 @@ export class ParallaxItemClass {
 
     updateStyle(val) {
         if (val === this.lastValue) return;
-
         if (this.applyTo) {
             Object.assign(this.applyTo.style, this.getStyle(val));
         } else {
@@ -475,16 +485,19 @@ export class ParallaxItemClass {
         this.getScrollerOffset();
         const scrollTop = this.scrollerScroll;
         const windowsHeight = this.scrollerHeight;
+        this.isInViewport = parallaxUtils.isInViewport({
+            offset: this.offset,
+            height: this.height,
+            gap: this.gap,
+            wScrollTop: scrollTop,
+            wHeight: windowsHeight,
+        });
 
+        // Skip motion deafult with limiterOff not active
         if (
-            !parallaxUtils.isInViewport({
-                offset: this.offset,
-                height: this.height,
-                gap: this.gap,
-                wScrollTop: scrollTop,
-                wHeight: windowsHeight,
-            }) &&
-            !this.limiterOff
+            !this.isInViewport &&
+            !this.limiterOff &&
+            !this.computationType !== parallaxConstant.TYPE_FIXED
         )
             return;
 
