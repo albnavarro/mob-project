@@ -191,6 +191,7 @@ export class ParallaxPin {
             this.lastWidth = this.pin.offsetWidth;
             this.lastHeight = this.pin.offsetHeight;
             this.pin.style.position = '';
+            this.pin.style.transform = `translate(0px,0px)`;
 
             if (this.scroller === window) {
                 this.pin.style.left = ``;
