@@ -50,7 +50,7 @@ block content
                                 data-scrollTrigger='.pluto'
                                 data-propierties='x'
                                 data-pin
-                                data-marker='pin'
+                        
                                 data-range='0px'
                                 data-start="right 10vw +width"
                                 data-end="right 50vw +halfWidth")
@@ -87,9 +87,11 @@ block content
                                 data-screen='.scrollerH-container2'
                                 data-computationType='fixed'
                                 data-scrollTrigger='.pluto2'
-                                data-start="right"
-                                data-end='right +width'
-                                data-range='80px'
+                                data-start="right 100px"
+                                data-marker='pin'
+                                data-pin
+                                data-end='right +100px +width'
+                                data-range='0px'
                                 data-propierties='x'
                                 data-smoothType='linear')
                                 |test
@@ -126,6 +128,20 @@ block content
                                     div(style="display:inline-block;border:1px #000 solid;")
                                         |test
                     .scrollerH3__item
+                        div(style="display:inline-block;"
+                            data-conponent='m-comp--parallax',
+                            data-direction='vertical'
+                            data-scroller='.scrollerH-container3 .scrollerH3'
+                            data-screen='.scrollerH-container3'
+                            data-computationType='fixed'
+                            data-marker='pin2'
+                            data-pin
+                            data-start="bottom 100px"
+                            data-end="bottom 300px"
+                            data-range='0px'
+                            data-propierties='x'
+                            data-smoothType='linear')
+                            |test
                     .scrollerH3__item
                         div(style="display:inline-block;"
                             data-conponent='m-comp--parallax',

@@ -26,7 +26,7 @@ export const hScroller = () => {
         // marker: 't',
         ease: true,
         propierties: 'x',
-        marker: 'parallax',
+        // marker: 'parallax',
         // start: 'right +halfWidth',
         // end: 'right +width',
         // range: '100w',

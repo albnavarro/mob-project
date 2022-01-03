@@ -2,6 +2,8 @@ import { useSpring } from '.../../../js/core/animation/spring/useSpring.js';
 import { useFrame } from '.../../../js/core/events/rafutils/rafUtils.js';
 import { parallaxConstant } from './parallaxConstant.js';
 import { position } from '../../../js/utility/vanillaFunction.js';
+import { useScroll } from '.../../../js/core/events/scrollUtils/useScroll.js';
+import { getTranslateValues } from '../../../js/utility/getTranslateValues.js';
 
 export class ParallaxPin {
     constructor(data) {
@@ -13,6 +15,7 @@ export class ParallaxPin {
         this.scroller = window;
         this.invertSide = null;
         this.end = 0;
+        this.pippo = 0;
         this.orientation = parallaxConstant.DIRECTION_VERTICAL;
         this.compesateValue = 0;
         this.trigger = null;
@@ -43,25 +46,51 @@ export class ParallaxPin {
         this.trigger =
             this.parallaxInstance.scrollTrigger || this.parallaxInstance.item;
         this.scroller = this.parallaxInstance.scroller;
+        this.screen = this.parallaxInstance.screen;
+        this.prevScrolY = window.pageYOffset;
 
         this.refresh();
         this.createPin();
         this.setPinSize();
         this.setUpMotion();
+
+        // Update pix top position when use custom screen ad scroll outside on window
+        useScroll(({ scrolY }) => {
+            if (this.screen !== window) {
+                // Update end point
+                this.refresh();
+                const gap = scrolY - this.prevScrolY;
+                this.prevScrolY = scrolY;
+
+                if (this.isInner && this.pin) {
+                    const { verticalGap } = this.spring.get();
+                    this.spring.stop();
+                    this.spring
+                        .set({ verticalGap: verticalGap - gap })
+                        .catch((err) => {});
+                }
+            }
+        });
     }
 
     setUpMotion() {
         this.spring = new useSpring('wobbly');
-        this.spring.setData({ val: 0 });
+        this.spring.setData({ collision: 0, verticalGap: 0 });
 
-        const translateProp =
-            this.orientation === parallaxConstant.DIRECTION_VERTICAL
-                ? 'Y'
-                : 'X';
+        this.unsubscribeSpring = this.spring.subscribe(
+            ({ collision, verticalGap }) => {
+                if (this.orientation === parallaxConstant.DIRECTION_VERTICAL) {
+                    // TODO: capire come gestire verticale in custom screen
+                    this.pin.style.transform = `translate(${verticalGap}px, ${collision}px)`;
+                } else {
+                    this.pin.style.transform = `translate(${collision}px, ${verticalGap}px)`;
+                }
+            }
+        );
+    }
 
-        this.unsubscribeSpring = this.spring.subscribe(({ val }) => {
-            this.pin.style.transform = `translate${translateProp}(${val}px)`;
-        });
+    resetSpring() {
+        this.spring.set({ collision: 0, verticalGap: 0 }).catch((err) => {});
     }
 
     createPin() {
@@ -181,6 +210,19 @@ export class ParallaxPin {
         this.orientation = this.parallaxInstance.direction;
         this.scrollerHeight = this.parallaxInstance.scrollerHeight;
         this.start = this.parallaxInstance.startPoint;
+
+        // Update start position when use custom screen ad scroll outside on window
+        if (this.screen !== window) {
+            if (
+                this.parallaxInstance.direction ===
+                parallaxConstant.DIRECTION_VERTICAL
+            ) {
+                this.start -= position(this.screen).top;
+            } else {
+                this.start -= position(this.screen).left;
+            }
+        }
+
         this.startFromTop = this.invertSide
             ? this.start
             : this.scrollerHeight - this.start;
@@ -241,21 +283,23 @@ export class ParallaxPin {
             this.pin.style[this.collisionStyleProp] = `${this.startFromTop}px`;
         });
 
-        if (this.springIsRunning) return;
-
-        this.springIsRunning = true;
         this.spring
-            .goFrom({ val: gap })
+            .goFrom({ collision: gap })
             .then(() => {
-                useFrame(() => {
-                    this.pin.style.transform = `translate${this.collisionTranslateProp}(0px)`;
-                    this.springIsRunning = false;
-                });
+                this.resetPinTransform();
             })
             .catch((err) => {});
     }
 
+    resetPinTransform() {
+        useFrame(() => {
+            this.pin.style.transform = `translate(0px, 0px)`;
+        });
+    }
+
     resetStyleWhenUnder() {
+        this.resetSpring();
+
         useFrame(() => {
             this.pin.style.position = 'relative';
             this.pin.style.top = ``;
@@ -264,6 +308,8 @@ export class ParallaxPin {
     }
 
     resetStyleWhenOver() {
+        this.resetSpring();
+
         useFrame(() => {
             this.pin.style.position = 'relative';
 
