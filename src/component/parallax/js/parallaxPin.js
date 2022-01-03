@@ -57,8 +57,6 @@ export class ParallaxPin {
         // Update pix top position when use custom screen ad scroll outside on window
         useScroll(({ scrolY }) => {
             if (this.screen !== window) {
-                // Update end point
-                this.refresh();
                 const gap = scrolY - this.prevScrolY;
                 this.prevScrolY = scrolY;
 
