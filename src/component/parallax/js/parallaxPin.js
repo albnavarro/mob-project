@@ -99,7 +99,10 @@ export class ParallaxPin {
         this.unsubscribeSpring = this.spring.subscribe(
             ({ collision, verticalGap }) => {
                 if (this.orientation === parallaxConstant.DIRECTION_VERTICAL) {
-                    this.pin.style.transform = `translate(${verticalGap}px, ${collision}px)`;
+                    // In vertical mode gap to translate when pin is in fixed position
+                    // on window scroll is the same of collision
+                    // The same axis reset the two prop
+                    this.pin.style.transform = `translate(0px, ${collision}px)`;
                 } else {
                     this.pin.style.transform = `translate(${collision}px, ${verticalGap}px)`;
                 }
