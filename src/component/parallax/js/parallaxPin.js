@@ -3,6 +3,7 @@ import { useFrame } from '.../../../js/core/events/rafutils/rafUtils.js';
 import { parallaxConstant } from './parallaxConstant.js';
 import { position } from '../../../js/utility/vanillaFunction.js';
 import { useScroll } from '.../../../js/core/events/scrollUtils/useScroll.js';
+import { useScrollStart } from '.../../../js/core/events/scrollUtils/useScrollUtils.js';
 import { getTranslateValues } from '../../../js/utility/getTranslateValues.js';
 
 export class ParallaxPin {
@@ -34,6 +35,7 @@ export class ParallaxPin {
         this.lastHeight = null;
         this.lastScroll = 0;
         this.unsubscribeScroll = () => {};
+        this.unsubscribeScrollStart = () => {};
         this.unsubscribeSpring = () => {};
         this.parentRequireStyle = ['text-align', 'box-sizing'];
         this.styleToTranspond = ['transform', 'position'];
@@ -55,17 +57,36 @@ export class ParallaxPin {
         this.setUpMotion();
 
         // Update pix top position when use custom screen ad scroll outside on window
-        useScroll(({ scrolY }) => {
+        this.unsubscribeScrollStart = useScrollStart(() => {
+            if (this.screen !== window && this.isInner && this.pin) {
+                useFrame(() => {
+                    this.pin.style.transition = `transform .85s cubic-bezier(0, 0.68, 0.45, 1.1)`;
+                });
+            }
+        });
+
+        this.unsubscribeScroll = useScroll(({ scrolY }) => {
             if (this.screen !== window) {
+                if (this.orientation === parallaxConstant.DIRECTION_VERTICAL) {
+                    this.refreshCollisionPoint();
+                }
+
                 const gap = scrolY - this.prevScrolY;
                 this.prevScrolY = scrolY;
 
                 if (this.isInner && this.pin) {
                     const { verticalGap } = this.spring.get();
-                    this.spring.stop();
-                    this.spring
-                        .set({ verticalGap: verticalGap - gap })
-                        .catch((err) => {});
+                    const translateValue = verticalGap - gap;
+
+                    // No need animation update data and apply style directly
+                    this.spring.setData({
+                        collision: 0,
+                        verticalGap: translateValue,
+                    });
+
+                    useFrame(() => {
+                        this.pin.style.transform = `translate(0px,${translateValue}px)`;
+                    });
                 }
             }
         });
@@ -78,7 +99,6 @@ export class ParallaxPin {
         this.unsubscribeSpring = this.spring.subscribe(
             ({ collision, verticalGap }) => {
                 if (this.orientation === parallaxConstant.DIRECTION_VERTICAL) {
-                    // TODO: capire come gestire verticale in custom screen
                     this.pin.style.transform = `translate(${verticalGap}px, ${collision}px)`;
                 } else {
                     this.pin.style.transform = `translate(${collision}px, ${verticalGap}px)`;
@@ -189,7 +209,7 @@ export class ParallaxPin {
             this.lastWidth = this.pin.offsetWidth;
             this.lastHeight = this.pin.offsetHeight;
             this.pin.style.position = '';
-            this.pin.style.transform = `translate(0px,0px)`;
+            // this.pin.style.transform = `translate(0px,0px)`;
 
             if (this.scroller === window) {
                 this.pin.style.left = ``;
@@ -198,16 +218,7 @@ export class ParallaxPin {
         }
     }
 
-    /**
-     * refresh - on parallax refresh after all opration restore pin tp and position values
-     * and get fresh data
-     *
-     * @return {void}
-     */
-    refresh() {
-        this.invertSide = this.parallaxInstance.invertSide;
-        this.orientation = this.parallaxInstance.direction;
-        this.scrollerHeight = this.parallaxInstance.scrollerHeight;
+    refreshCollisionPoint() {
         this.start = this.parallaxInstance.startPoint;
 
         // Update start position when use custom screen ad scroll outside on window
@@ -229,6 +240,20 @@ export class ParallaxPin {
         this.compesateValue = this.invertSide
             ? -parseInt(this.end)
             : parseInt(this.end);
+    }
+
+    /**
+     * refresh - on parallax refresh after all opration restore pin tp and position values
+     * and get fresh data
+     *
+     * @return {void}
+     */
+    refresh() {
+        this.invertSide = this.parallaxInstance.invertSide;
+        this.orientation = this.parallaxInstance.direction;
+        this.scrollerHeight = this.parallaxInstance.scrollerHeight;
+        this.refreshCollisionPoint();
+
         this.collisionTranslateProp =
             this.orientation === parallaxConstant.DIRECTION_VERTICAL
                 ? 'Y'
@@ -255,6 +280,8 @@ export class ParallaxPin {
 
     destroy() {
         this.unsubscribeSpring();
+        this.unsubscribeScroll();
+        this.unsubscribeScrollStart();
         this.spring = null;
     }
 
@@ -300,6 +327,7 @@ export class ParallaxPin {
         this.resetSpring();
 
         useFrame(() => {
+            this.pin.style.transition = '';
             this.pin.style.position = 'relative';
             this.pin.style.top = ``;
             this.pin.style.left = ``;
@@ -310,6 +338,7 @@ export class ParallaxPin {
         this.resetSpring();
 
         useFrame(() => {
+            this.pin.style.transition = '';
             this.pin.style.position = 'relative';
 
             if (this.orientation === parallaxConstant.DIRECTION_VERTICAL) {

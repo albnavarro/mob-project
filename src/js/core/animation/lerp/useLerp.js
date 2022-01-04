@@ -103,9 +103,20 @@ export class useLerp {
                     item.fromValue = item.toValue;
                 });
 
+                // Prepare an obj to pass to the callback with rounded value ( end user value)
+                const cbObjectSettled = this.values
+                    .map((item) => {
+                        return {
+                            [item.prop]: parseFloat(item.toValue),
+                        };
+                    })
+                    .reduce((p, c) => {
+                        return { ...p, ...c };
+                    }, {});
+
                 // Fire callback with exact end value
                 this.callback.forEach(({ cb }) => {
-                    cb(cbObject);
+                    cb(cbObjectSettled);
                 });
 
                 // On complete
@@ -231,11 +242,11 @@ export class useLerp {
             const [prop, value] = item;
             return {
                 prop: prop,
-                toValue: 0,
-                toValueOnPause: 0,
+                toValue: value,
+                toValueOnPause: value,
                 fromValue: value,
                 velocity: this.config.velocity,
-                currentValue: 0,
+                currentValue: value,
                 previousValue: 0,
                 settled: false,
                 onPause: false,
@@ -325,6 +336,7 @@ export class useLerp {
             return {
                 prop: item,
                 fromValue: obj[item],
+                currentValue: obj[item],
                 settled: false,
             };
         });
@@ -365,6 +377,7 @@ export class useLerp {
             return {
                 prop: item,
                 fromValue: fromObj[item],
+                currentValue: fromObj[item],
                 toValue: toObj[item],
                 settled: false,
             };
@@ -401,6 +414,7 @@ export class useLerp {
             return {
                 prop: item,
                 fromValue: obj[item],
+                currentValue: obj[item],
                 toValue: obj[item],
                 settled: false,
             };
