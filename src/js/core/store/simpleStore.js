@@ -1,28 +1,10 @@
 export function SimpleStore(data) {
     // Private function
 
-    /**
-     * Set propierities value of store item
-     * Fire all the callback associate to the prop
-     * Usage:
-     * this.store.setProp("prop", val);
-     *
-     * @param  {object} Obj target
-     * @param  {Boolean} true if Onj is a Object
-     */
     const isObject = (obj) => {
         return Object.prototype.toString.call(obj) === '[object Object]';
     };
 
-    /**
-     * Set propierities value of store item
-     * Fire all the callback associate to the prop
-     * Usage:
-     * this.store.setProp("prop", val);
-     *
-     * @param  {object} Obj target
-     * @param  {Number} max number of nested levels
-     */
     const maxDepth = (object) => {
         if (!isObject(object)) return 0;
         const values = Object.values(object);
@@ -39,11 +21,9 @@ export function SimpleStore(data) {
     let logStyle = 'background: #222; color: yellow; padding: 10px;';
 
     /**
-     * Set propierities value of store item
-     * Fire all the callback associate to the prop
+     * Fire computed if some prop associated change
      *
-     * @param  {string} prop keys of obj in store to update
-     * @param  {void}
+     * @param  {string} prop keys of prop changed
      */
     function fireComputed(prop) {
         fnComputed.forEach((item, i) => {
@@ -81,13 +61,40 @@ export function SimpleStore(data) {
         });
     }
 
-    // Public function
+    /**
+     * Update propierities of store item by prop keys
+     * Fire all the callback associate to the prop
+     * Usage:
+     * myStore.set("prop", {prop: val});
+     * myStore.setProp("prop", val);
+     *
+     * @param  {string} prop keys of obj in store to update
+     * @param  {object} val object or value to merge with the corresponding in store
+     */
+    const set = (prop, val, fireCallback = true) => {
+        /**
+         * Check if prop exist in store
+         */
+        if (!(prop in store)) {
+            console.warn(
+                `%c trying to execute set method: store.${prop} not exist`,
+                logStyle
+            );
+            return;
+        }
+
+        if (isObject(store[prop])) {
+            setObj(prop, val, fireCallback);
+        } else {
+            setProp(prop, val, fireCallback);
+        }
+    };
+
+    // Private function
 
     /**
      * Set propierities value of store item
      * Fire all the callback associate to the prop
-     * Usage:
-     * this.store.setProp("prop", val);
      *
      * @param  {string} prop keys of obj in store to update
      * @param  {any} val object to merge with the corresponding in store
@@ -101,17 +108,6 @@ export function SimpleStore(data) {
                 `%c trying to execute setProp method on '${prop}' propierties: setProp methods doasn't allow objects as value, ${JSON.stringify(
                     val
                 )} is an Object`,
-                logStyle
-            );
-            return;
-        }
-
-        /**
-         * Check if prop exist in store
-         */
-        if (!(prop in store)) {
-            console.warn(
-                `%c trying to execute setProp method: store.${prop} not exist`,
                 logStyle
             );
             return;
@@ -154,8 +150,6 @@ export function SimpleStore(data) {
     /**
      * Update propierities of store item by prop keys, only if store item is an object
      * Fire all the callback associate to the prop
-     * Usage:
-     * this.store.setObj("prop", {prop: val});
      *
      * @param  {string} prop keys of obj in store to update
      * @param  {object} val object to merge with the corresponding in store
@@ -167,17 +161,6 @@ export function SimpleStore(data) {
         if (!isObject(val)) {
             console.warn(
                 `%c trying to execute setObj method on '${prop}' propierties: setObj methods allow only objects as value, ${val} is not an Object`,
-                logStyle
-            );
-            return;
-        }
-
-        /**
-         * Check if prop exist in store
-         */
-        if (!(prop in store)) {
-            console.warn(
-                `%c trying to execute set setObj method: store.${prop} not exist`,
                 logStyle
             );
             return;
@@ -253,9 +236,22 @@ export function SimpleStore(data) {
     };
 
     /**
-     * Get value of propierties in store
+     * Get all store object, use decostructing to get specific prop valu
      * Usage:
-     * this.store.getProp("prop");
+     * const { prop } = myStore.get();
+     *
+     * @return { Object } return store object
+     */
+    const get = () => {
+        return store;
+    };
+
+    /**
+     * Get value of propierties in store
+     * Useful if prop is array ( es2)
+     * Usage:
+     * es1: const prop = myStore.getProp("prop");
+     * es2: const [prop] = myStore.getProp("prop");
      *
      * @param  {string} prop keys of obj in store
      * @return {any} return prop value
@@ -272,32 +268,24 @@ export function SimpleStore(data) {
     };
 
     /**
-     * Get validation value of propierties in validateError obj
+     * Get validation store object, use decostructing to get specific prop value
      * Usage:
-     * this.store.getValidation("prop");
+     * const { prop } = myStore.getValidation();
      *
-     * @param  {string} prop keys of obj in store
-     * @return {Boolean} return validation status
+     * @return {Object} return validation store object
      */
-    const getValidation = (prop) => {
-        if (prop in validateError) {
-            return validateError[prop];
-        } else {
-            console.warn(
-                `%c trying to execute getValidation method: validateError.${prop} not exist`,
-                logStyle
-            );
-        }
+    const getValidation = () => {
+        return validateError;
     };
 
     /**
      * Add callback for specific propierties in store
      * Usage:
-     * const id2 =  this.store.watch('prop', (newVal, oldVal, validate) => {})
+     * const id2 =  myStore.watch('prop', (newVal, oldVal, validate) => {})
      *
      * @param  {string} prop keys of obj in store
      * @param  {function} fn callback Function, fired on prop value change
-     * @return {number} return a reference to watcher ( for unwatch )
+     * @return {function} unsubscribe function
      */
     const watch = (prop, fn) => {
         fnStore.push({
@@ -306,20 +294,12 @@ export function SimpleStore(data) {
             id: counterId,
         });
 
+        const cbId = counterId;
         counterId++;
-        return counterId;
-    };
 
-    // store.unWatch(id);
-    /**
-     * Remove watcher by reference
-     * Usage:
-     * store.unWatch(id);
-     *
-     * @param  {id} number reference to watcher
-     */
-    const unWatch = (id) => {
-        fnStore = fnStore.filter((item) => item.id !== id);
+        return () => {
+            fnStore = fnStore.filter((item) => item.id !== cbId);
+        };
     };
 
     /**
@@ -345,7 +325,7 @@ export function SimpleStore(data) {
     /**
      * Set validate array
      * Usage:
-     *   this.store.validate({
+     *   myStore.validate({
      *       prop: (val) => {
      *           return ....
      *       },
@@ -410,22 +390,22 @@ export function SimpleStore(data) {
      * @example:
      *
      *  Prop target not Object, and not Object keys:
-     *  store.addComputed('prop', ['key', 'key'], (val1, val2) => {
+     *  store.computed('prop', ['key', 'key'], (val1, val2) => {
      *      return val1 + val2;
      *  });
      *
      *  Prop target not Object and Object keys (obj.val1 , obj.val2)
-     *  store.addComputed('prop', ['obj'], (obj) => {
+     *  store.computed('prop', ['obj'], (obj) => {
      *       return obj.val1 + obj.val2;
      *  })
      *
      *  Prop target Object ( obj.sum ), and not Object keys:
-     *  store.addComputed('obj', ['key', 'key'], (val1, val2) => {
+     *  store.computed('obj', ['key', 'key'], (val1, val2) => {
      *      return { sum: val1 + val2 };
      *  });
      *
      *  Prop target Object ( obj.sum ), and Object keys (obj.val1 , obj.val2):
-     *  store.addComputed('obj', ['obj'], (obj) => {
+     *  store.computed('obj', ['obj'], (obj) => {
      *      return { sum: obj.val1 + obj.val2 };
      *  });
      *
@@ -433,7 +413,7 @@ export function SimpleStore(data) {
      * @param  {keys} Array of keys to watch
      * @param  {fn} Function Callback
      */
-    const addComputed = (prop, keys, fn) => {
+    const computed = (prop, keys, fn) => {
         // Create a temp array with the fuiture computeda added to check
         const tempComputedArray = [...fnComputed, ...[{ prop, keys, fn }]];
 
@@ -456,7 +436,7 @@ export function SimpleStore(data) {
          */
         if (keysIsusedInSomeComputed) {
             console.warn(
-                `%c una delel chiavi [${keys}] é gia usata come target di una mutazione`,
+                `%c una delel chiavi [${keys}] é gia usata come target di una computed`,
                 logStyle
             );
             return;
@@ -520,15 +500,14 @@ export function SimpleStore(data) {
     }
 
     return {
-        setProp,
-        setObj,
+        set,
+        get,
         getProp,
         getValidation,
         watch,
-        unWatch,
         emit,
         validate,
-        addComputed,
+        computed,
         debugStore,
         debugValidate,
         setStyle,
