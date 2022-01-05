@@ -80,9 +80,9 @@ export class tBlocksItemClass {
         const unsubscribeResize = useResize(() => {
             this.setWidth();
             this.calcCenter();
-            this.store.setObj('clone', { action: this.REMOVE });
+            this.store.set('clone', { action: this.REMOVE });
         });
-        this.store.setProp('unsubscribeResize', unsubscribeResize);
+        this.store.set('unsubscribeResize', unsubscribeResize);
 
         // SET WATCHER
         this.store.watch('activeItem', (newVal, oldVal) => {
@@ -109,7 +109,7 @@ export class tBlocksItemClass {
     }
 
     destroy() {
-        const unsubscribeResize = this.store.getProp('unsubscribeResize');
+        const { unsubscribeResize } = this.store.get();
         unsubscribeResize();
     }
 
@@ -118,7 +118,7 @@ export class tBlocksItemClass {
      */
     onClick(event) {
         const item = event.currentTarget;
-        this.store.setProp('activeItem', item);
+        this.store.set('activeItem', item);
     }
 
     /**
@@ -128,7 +128,7 @@ export class tBlocksItemClass {
         const center =
             position(this.container).left + outerWidth(this.container) / 2;
 
-        this.store.setProp('center', center);
+        this.store.set('center', center);
     }
 
     setWidth() {
@@ -154,7 +154,7 @@ export class tBlocksItemClass {
     }
 
     setActiveitemStyle() {
-        const activeItem = this.store.getProp('activeItem');
+        const { activeItem } = this.store.get();
         const child = activeItem.querySelector('.tBlocks__item__wrap');
         const itemH = outerHeight(activeItem);
         const childH = outerHeight(child);
@@ -169,19 +169,17 @@ export class tBlocksItemClass {
     }
 
     setActiveitemTransformOrigin() {
-        const activeItem = this.store.getProp('activeItem');
-        const offsetLeft = this.store.getProp('offsetLeft');
-        const center = this.store.getProp('center');
+        const { activeItem, offsetLeft, center } = this.store.get();
         const child = activeItem.querySelector('.tBlocks__item__wrap');
 
         if (offsetLeft > center - 20) {
             child.classList.add('tg-form-right');
             child.classList.remove('tg-form-left');
-            this.store.setProp('horizontalDirection', this.SX);
+            this.store.set('horizontalDirection', this.SX);
         } else {
             child.classList.add('tg-form-left');
             child.classList.remove('tg-form-right');
-            this.store.setProp('horizontalDirection', this.DX);
+            this.store.set('horizontalDirection', this.DX);
         }
     }
 
@@ -197,10 +195,7 @@ export class tBlocksItemClass {
 
         if (action === this.ADD) {
             // ADD CLONE
-            const verticalDirection = this.store.getProp('verticalDirection');
-            const horizontalDirection = this.store.getProp(
-                'horizontalDirection'
-            );
+            const { verticalDirection, horizontalDirection } = this.store.get();
 
             item.classList.add('t-clone');
             horizontalDirection == this.SX
@@ -225,9 +220,7 @@ export class tBlocksItemClass {
 
         if (action === this.UPDATE) {
             // Set swap item prop
-            const horizontalDirection = this.store.getProp(
-                'horizontalDirection'
-            );
+            const { horizontalDirection } = this.store.get();
             item.classList.add('t-swap-item');
 
             if (horizontalDirection == this.SX) {
@@ -252,29 +245,28 @@ export class tBlocksItemClass {
     }
 
     onItemChange(item, prevItem) {
-        const verticalDirection = this.store.getProp('verticalDirection');
-        const horizontalDirection = this.store.getProp('horizontalDirection');
+        const { verticalDirection, horizontalDirection } = this.store.get();
 
         // Reset clone
-        this.store.setObj('clone', { action: this.REMOVE });
+        this.store.set('clone', { action: this.REMOVE });
 
         // Reset swap Item
-        this.store.setObj('swapItem', { action: this.REMOVE });
+        this.store.set('swapItem', { action: this.REMOVE });
 
         // Get new offset value
-        this.store.setProp('offsetLeft', offset(item).left);
+        this.store.set('offsetLeft', offset(item).left);
 
         // Set non active item order style
         const itemNotActive = this.container.querySelectorAll(
             '.tBlocks__item:not(.tBlocks__item--active)'
         );
-        this.store.setProp('itemNotActive', itemNotActive);
+        this.store.set('itemNotActive', itemNotActive);
 
         // Set item that change layout position
         const swapItem = [...itemNotActive].find((el) => {
             return el !== item;
         });
-        this.store.setObj('swapItem', { item: swapItem, action: this.UPDATE });
+        this.store.set('swapItem', { item: swapItem, action: this.UPDATE });
 
         // Position the previous active element on the right or left
         prevItem.style.order = horizontalDirection === this.SX ? 3 : 1;
@@ -284,13 +276,13 @@ export class tBlocksItemClass {
 
         // create Clone
         const clone = swapItem.cloneNode(true);
-        this.store.setObj('clone', { item: clone, action: this.ADD });
+        this.store.set('clone', { item: clone, action: this.ADD });
 
         // Update top/bottom value
         const newVerticalDirection =
             verticalDirection === this.UP ? this.DOWN : this.UP;
         this.container.dataset.diretction = newVerticalDirection.toLowerCase();
-        this.store.setProp('verticalDirection', newVerticalDirection);
+        this.store.set('verticalDirection', newVerticalDirection);
 
         // Get active id
         const activeId = item.dataset.id;
