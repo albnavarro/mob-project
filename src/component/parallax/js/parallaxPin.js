@@ -1,6 +1,7 @@
 import { useSpring } from '.../../../js/core/animation/spring/useSpring.js';
 import { useFrame } from '.../../../js/core/events/rafutils/rafUtils.js';
 import { parallaxConstant } from './parallaxConstant.js';
+import { parallaxUtils } from './parallaxUtils.js';
 import { position } from '../../../js/utility/vanillaFunction.js';
 import { useScroll } from '.../../../js/core/events/scrollUtils/useScroll.js';
 import { useScrollStart } from '.../../../js/core/events/scrollUtils/useScrollUtils.js';
@@ -40,6 +41,10 @@ export class ParallaxPin {
         this.parentRequireStyle = ['text-align', 'box-sizing'];
         this.styleToTranspond = ['transform', 'position'];
         this.nonRelevantRule = ['none', 'static'];
+        this.isInizialized = false;
+        this.prevScroll = 0;
+        this.prevTime = 0;
+        this.animatePin = false;
     }
 
     init() {
@@ -50,6 +55,7 @@ export class ParallaxPin {
         this.scroller = this.parallaxInstance.scroller;
         this.screen = this.parallaxInstance.screen;
         this.prevScrolY = window.pageYOffset;
+        this.isInizialized = true;
 
         this.refresh();
         this.createPin();
@@ -58,6 +64,8 @@ export class ParallaxPin {
 
         // Update pix top position when use custom screen ad scroll outside on window
         this.unsubscribeScrollStart = useScrollStart(() => {
+            if (!this.isInizialized) return;
+
             if (this.screen !== window && this.isInner && this.pin) {
                 useFrame(() => {
                     this.pin.style.transition = `transform .85s cubic-bezier(0, 0.68, 0.45, 1.1)`;
@@ -66,6 +74,8 @@ export class ParallaxPin {
         });
 
         this.unsubscribeScroll = useScroll(({ scrolY }) => {
+            if (!this.isInizialized) return;
+
             if (this.screen !== window) {
                 if (this.orientation === parallaxConstant.DIRECTION_VERTICAL) {
                     this.refreshCollisionPoint();
@@ -205,7 +215,7 @@ export class ParallaxPin {
      * @return {void}
      */
     reset() {
-        if (this.pin) {
+        if (this.pin && this.isInizialized) {
             this.lastPosition = this.pin.style.position;
             this.lastTop = this.pin.style.top;
             this.lastLeft = this.pin.style.left;
@@ -252,6 +262,8 @@ export class ParallaxPin {
      * @return {void}
      */
     refresh() {
+        if (!this.isInizialized) return;
+
         this.invertSide = this.parallaxInstance.invertSide;
         this.orientation = this.parallaxInstance.direction;
         this.scrollerHeight = this.parallaxInstance.scrollerHeight;
@@ -282,10 +294,23 @@ export class ParallaxPin {
     }
 
     destroy() {
+        if (!this.isInizialized) return;
+
         this.unsubscribeSpring();
         this.unsubscribeScroll();
         this.unsubscribeScrollStart();
         this.spring = null;
+
+        if (this.pin && this.wrapper) {
+            useFrame(() => {
+                this.wrapper.parentNode.insertBefore(this.item, this.wrapper);
+                this.pin.remove();
+                this.wrapper.remove();
+                this.wrapper = null;
+                this.pin = null;
+                this.isInizialized = false;
+            });
+        }
     }
 
     getGap() {
@@ -312,12 +337,14 @@ export class ParallaxPin {
             this.pin.style[this.collisionStyleProp] = `${this.startFromTop}px`;
         });
 
-        this.spring
-            .goFrom({ collision: gap })
-            .then(() => {
-                this.resetPinTransform();
-            })
-            .catch((err) => {});
+        if (this.animatePin) {
+            this.spring
+                .goFrom({ collision: gap })
+                .then(() => {
+                    this.resetPinTransform();
+                })
+                .catch((err) => {});
+        }
     }
 
     resetPinTransform() {
@@ -391,7 +418,79 @@ export class ParallaxPin {
         }
     }
 
+    getVelocity(scrollTop) {
+        const now = window.performance.now();
+        const vel =
+            ((scrollTop - this.lastScroll) / (now - this.prevTime)) * 1000 || 0;
+        this.prevTime = now;
+
+        const velocity = Math.abs((vel * scrollTop) / this.lastScroll / 60);
+
+        // Exclude inifinity and NaN beause prev value is at first non conform
+        const velocityParsed = isFinite(velocity) ? velocity : 0;
+        // then clam the result to have max 100px of anticipate
+        return parallaxUtils.clamp(velocity, 0, 100);
+    }
+
+    getAnticipateValue(scrollTop, scrollDirection) {
+        if (this.animatePin) {
+            return {
+                anticipateBottom: 0,
+                anticipateInnerIn: 0,
+                anticipateInnerOut: 0,
+                anticipateTop: 0,
+            };
+        }
+
+        const velocity = this.getVelocity(scrollTop);
+        const anticipateBottom =
+            scrollDirection === parallaxConstant.SCROLL_UP ? 0 : velocity;
+        const anticipateInnerIn =
+            scrollDirection === parallaxConstant.SCROLL_UP ? 0 : velocity * 2;
+        const anticipateInnerOut =
+            scrollDirection === parallaxConstant.SCROLL_UP ? velocity : 0;
+        const anticipateTop =
+            scrollDirection === parallaxConstant.SCROLL_UP ? velocity * 2 : 0;
+
+        return {
+            anticipateBottom,
+            anticipateInnerIn,
+            anticipateInnerOut,
+            anticipateTop,
+        };
+    }
+
+    getAnticipateValueInverted(scrollTop, scrollDirection) {
+        if (this.animatePin) {
+            return {
+                anticipateBottom: 0,
+                anticipateInnerIn: 0,
+                anticipateInnerOut: 0,
+                anticipateTop: 0,
+            };
+        }
+
+        const velocity = this.getVelocity(scrollTop);
+        const anticipateBottom =
+            scrollDirection === parallaxConstant.SCROLL_UP ? velocity : 0;
+        const anticipateInnerIn =
+            scrollDirection === parallaxConstant.SCROLL_UP ? velocity * 2 : 0;
+        const anticipateInnerOut =
+            scrollDirection === parallaxConstant.SCROLL_UP ? 0 : velocity;
+        const anticipateTop =
+            scrollDirection === parallaxConstant.SCROLL_UP ? 0 : velocity * 2;
+
+        return {
+            anticipateBottom,
+            anticipateInnerIn,
+            anticipateInnerOut,
+            anticipateTop,
+        };
+    }
+
     onScroll(scrollTop) {
+        if (!this.isInizialized) return;
+
         const scrollDirection =
             this.lastScroll > scrollTop
                 ? parallaxConstant.SCROLL_UP
@@ -403,18 +502,32 @@ export class ParallaxPin {
                 ? position(this.wrapper).top
                 : position(this.wrapper).left;
 
+        // Get anticipate value
+        const {
+            anticipateBottom,
+            anticipateInnerIn,
+            anticipateInnerOut,
+            anticipateTop,
+        } = !this.invertSide
+            ? this.getAnticipateValue(scrollTop, scrollDirection)
+            : this.getAnticipateValueInverted(scrollTop, scrollDirection);
+
         const bottomCondition = !this.invertSide
-            ? offsetTop > this.scrollerHeight - this.start
-            : offsetTop < this.start;
+            ? offsetTop > this.scrollerHeight - this.start + anticipateBottom
+            : offsetTop < this.start - anticipateBottom;
 
         const innerCondition = !this.invertSide
-            ? offsetTop < this.scrollerHeight - this.start &&
-              this.scrollerHeight - offsetTop < this.end + this.start
-            : offsetTop > this.start && offsetTop < this.start + this.end;
+            ? offsetTop <
+                  this.scrollerHeight - this.start + anticipateInnerIn &&
+              this.scrollerHeight - offsetTop <
+                  this.end + anticipateInnerOut + this.start
+            : offsetTop > this.start - anticipateInnerIn &&
+              offsetTop < this.start + anticipateInnerOut + this.end;
 
         const topCondition = !this.invertSide
-            ? this.scrollerHeight - offsetTop > this.start + this.end
-            : offsetTop > this.start + this.end;
+            ? this.scrollerHeight + offsetTop >
+              this.start + anticipateTop + this.end
+            : offsetTop > this.start + anticipateTop + this.end;
 
         if (bottomCondition) {
             if (!this.isUnder) {

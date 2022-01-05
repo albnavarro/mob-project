@@ -156,7 +156,10 @@ export class ParallaxItemClass {
 
         if (this.pin) {
             this.pinInstance = new ParallaxPin({ instance: this });
-            this.pinInstance.init();
+
+            if (mq[this.queryType](this.breackpoint)) {
+                this.pinInstance.init();
+            }
         }
     }
 
@@ -418,16 +421,27 @@ export class ParallaxItemClass {
     }
 
     refresh() {
-        if (this.pin) this.pinInstance.reset();
+        if (this.pin && this.pinInstance) this.pinInstance.reset();
+
         this.calcOffset();
         this.calcHeight();
         this.calcWidth();
         this.getScreenHeight();
+
         if (this.computationType == parallaxConstant.TYPE_FIXED) {
             this.calcFixedLimit();
             if (this.dynamicRange) this.calcRangeAndUnitMiusure();
-            if (this.pin) {
-                this.pinInstance.refresh();
+
+            if (this.pin && this.pinInstance) {
+                if (!mq[this.queryType](this.breackpoint)) {
+                    this.pinInstance.destroy();
+                } else {
+                    if (this.pinInstance.isInizialized) {
+                        this.pinInstance.refresh();
+                    } else {
+                        this.pinInstance.init();
+                    }
+                }
             }
         }
 
@@ -501,7 +515,7 @@ export class ParallaxItemClass {
         )
             return;
 
-        if (this.pinInstance) {
+        if (this.pin && this.pinInstance) {
             this.pinInstance.onScroll(scrollTop);
         }
 
