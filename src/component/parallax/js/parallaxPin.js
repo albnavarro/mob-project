@@ -22,7 +22,7 @@ export class ParallaxPin {
         this.compesateValue = 0;
         this.trigger = null;
         this.item = null;
-        this.spring = new useSpring('wobbly');
+        this.spring = null;
         this.springIsRunning = false;
         this.wrapper = null;
         this.pin = null;
@@ -419,23 +419,27 @@ export class ParallaxPin {
         }
     }
 
-    getVelocity(scrollTop) {
-        const now = window.performance.now();
-        const vel =
-            ((this.prevScroll1 - this.prevScroll2) /
-                (this.prevTime1 - this.prevTime2)) *
-                1000 || 0;
-        this.prevTime2 = this.prevTime1;
-        this.prevTime1 = now;
+    // getAnticipate(scrollTop) {
+    //     const now = window.performance.now();
+    //     const vel =
+    //         ((this.prevScroll1 - this.prevScroll2) /
+    //             (this.prevTime1 - this.prevTime2)) *
+    //             1000 || 0;
+    //     this.prevTime2 = this.prevTime1;
+    //     this.prevTime1 = now;
+    //
+    //     const velocity = Math.abs(
+    //         (vel / Math.abs(this.start - scrollTop)) * 60
+    //     );
+    //
+    //     // Exclude inifinity and NaN beause prev value is at first non conform
+    //     const velocityParsed = isFinite(velocity) ? velocity.toFixed(1) : 0;
+    //     // then clam the result to have max 200px of anticipate
+    //     return parallaxUtils.clamp(velocity, 0, 200);
+    // }
 
-        const velocity = Math.abs(
-            (vel / Math.abs(this.start - scrollTop)) * 60
-        );
-
-        // Exclude inifinity and NaN beause prev value is at first non conform
-        const velocityParsed = isFinite(velocity) ? velocity.toFixed(1) : 0;
-        // then clam the result to have max 200px of anticipate
-        return parallaxUtils.clamp(velocity, 0, 200);
+    getAnticipate(scrollTop) {
+        return Math.abs(scrollTop - this.prevScroll1);
     }
 
     getAnticipateValue(scrollTop, scrollDirection) {
@@ -448,7 +452,7 @@ export class ParallaxPin {
             };
         }
 
-        const velocity = this.getVelocity(scrollTop);
+        const velocity = this.getAnticipate(scrollTop);
         const anticipateBottom =
             scrollDirection === parallaxConstant.SCROLL_UP ? 0 : velocity;
         const anticipateInnerIn =
@@ -476,7 +480,7 @@ export class ParallaxPin {
             };
         }
 
-        const velocity = this.getVelocity(scrollTop);
+        const velocity = this.getAnticipate(scrollTop);
         const anticipateBottom =
             scrollDirection === parallaxConstant.SCROLL_UP ? velocity : 0;
         const anticipateInnerIn =
