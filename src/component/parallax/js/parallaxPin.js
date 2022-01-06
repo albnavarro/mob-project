@@ -41,10 +41,7 @@ export class ParallaxPin {
         this.styleToTranspond = ['transform', 'position'];
         this.nonRelevantRule = ['none', 'static'];
         this.isInizialized = false;
-        this.prevScroll1 = 0;
-        this.prevScroll2 = 0;
-        this.prevTime1 = 0;
-        this.prevTime2 = 0;
+        this.prevScroll = 0;
         this.animatePin = false;
     }
 
@@ -419,27 +416,10 @@ export class ParallaxPin {
         }
     }
 
-    // getAnticipate(scrollTop) {
-    //     const now = window.performance.now();
-    //     const vel =
-    //         ((this.prevScroll1 - this.prevScroll2) /
-    //             (this.prevTime1 - this.prevTime2)) *
-    //             1000 || 0;
-    //     this.prevTime2 = this.prevTime1;
-    //     this.prevTime1 = now;
-    //
-    //     const velocity = Math.abs(
-    //         (vel / Math.abs(this.start - scrollTop)) * 60
-    //     );
-    //
-    //     // Exclude inifinity and NaN beause prev value is at first non conform
-    //     const velocityParsed = isFinite(velocity) ? velocity.toFixed(1) : 0;
-    //     // then clam the result to have max 200px of anticipate
-    //     return parallaxUtils.clamp(velocity, 0, 200);
-    // }
-
     getAnticipate(scrollTop) {
-        return Math.abs(scrollTop - this.prevScroll1);
+        const a = Math.abs(scrollTop - this.prevScroll);
+        const b = Math.abs(this.startFromTop - scrollTop);
+        return a > b ? Math.abs(a - b) - 1 : a;
     }
 
     getAnticipateValue(scrollTop, scrollDirection) {
@@ -502,7 +482,7 @@ export class ParallaxPin {
         if (!this.isInizialized) return;
 
         const scrollDirection =
-            this.prevScroll1 > scrollTop
+            this.prevScroll > scrollTop
                 ? parallaxConstant.SCROLL_UP
                 : parallaxConstant.SCROLL_DOWN;
 
@@ -580,7 +560,6 @@ export class ParallaxPin {
             }
         }
 
-        this.prevScroll2 = this.prevScroll1;
-        this.prevScroll1 = scrollTop;
+        this.prevScroll = scrollTop;
     }
 }
