@@ -43,6 +43,7 @@ export class ParallaxPin {
         this.isInizialized = false;
         this.prevScroll = 0;
         this.animatePin = false;
+        this.anticipateFactor = 1.2;
     }
 
     init() {
@@ -53,6 +54,7 @@ export class ParallaxPin {
         this.scroller = this.parallaxInstance.scroller;
         this.screen = this.parallaxInstance.screen;
         this.prevScrolY = window.pageYOffset;
+        this.animatePin = this.parallaxInstance.animatePin;
         this.isInizialized = true;
 
         this.refresh();
@@ -417,9 +419,11 @@ export class ParallaxPin {
     }
 
     getAnticipate(scrollTop) {
-        const a = Math.abs(scrollTop - this.prevScroll);
-        const b = Math.abs(this.startFromTop - scrollTop);
-        return a > b ? Math.abs(a - b) - 1 : a;
+        const step = Math.abs(scrollTop - this.prevScroll);
+        const remaining = Math.abs(this.startFromTop - scrollTop);
+        return step > remaining
+            ? Math.abs(step - remaining) * this.anticipateFactor
+            : step * this.anticipateFactor;
     }
 
     getAnticipateValue(scrollTop, scrollDirection) {
@@ -432,15 +436,15 @@ export class ParallaxPin {
             };
         }
 
-        const velocity = this.getAnticipate(scrollTop);
+        const anticipate = this.getAnticipate(scrollTop);
         const anticipateBottom =
-            scrollDirection === parallaxConstant.SCROLL_UP ? 0 : velocity;
+            scrollDirection === parallaxConstant.SCROLL_UP ? 0 : anticipate;
         const anticipateInnerIn =
-            scrollDirection === parallaxConstant.SCROLL_UP ? 0 : velocity * 2;
+            scrollDirection === parallaxConstant.SCROLL_UP ? 0 : anticipate * 2;
         const anticipateInnerOut =
-            scrollDirection === parallaxConstant.SCROLL_UP ? velocity : 0;
+            scrollDirection === parallaxConstant.SCROLL_UP ? anticipate : 0;
         const anticipateTop =
-            scrollDirection === parallaxConstant.SCROLL_UP ? velocity * 2 : 0;
+            scrollDirection === parallaxConstant.SCROLL_UP ? anticipate * 2 : 0;
 
         return {
             anticipateBottom,
@@ -460,15 +464,15 @@ export class ParallaxPin {
             };
         }
 
-        const velocity = this.getAnticipate(scrollTop);
+        const anticipate = this.getAnticipate(scrollTop);
         const anticipateBottom =
-            scrollDirection === parallaxConstant.SCROLL_UP ? velocity : 0;
+            scrollDirection === parallaxConstant.SCROLL_UP ? anticipate : 0;
         const anticipateInnerIn =
-            scrollDirection === parallaxConstant.SCROLL_UP ? velocity * 2 : 0;
+            scrollDirection === parallaxConstant.SCROLL_UP ? anticipate * 2 : 0;
         const anticipateInnerOut =
-            scrollDirection === parallaxConstant.SCROLL_UP ? 0 : velocity;
+            scrollDirection === parallaxConstant.SCROLL_UP ? 0 : anticipate;
         const anticipateTop =
-            scrollDirection === parallaxConstant.SCROLL_UP ? 0 : velocity * 2;
+            scrollDirection === parallaxConstant.SCROLL_UP ? 0 : anticipate * 2;
 
         return {
             anticipateBottom,

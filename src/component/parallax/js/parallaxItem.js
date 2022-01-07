@@ -49,6 +49,7 @@ export class ParallaxItemClass {
             : window;
 
         this.pin = data.pin || false;
+        this.animatePin = data.animatePin || false;
         this.pinInstance = null;
 
         //Fixed prop

@@ -81,8 +81,11 @@ class ParallaxClass {
         // string marker id
         data.marker = item.getAttribute('data-marker');
 
-        // string pin id
+        // enable pin
         data.pin = item.hasAttribute('data-pin');
+
+        // use animation on pin collision
+        data.animatePin = item.hasAttribute('data-animatePin');
 
         // Boolean
         // Mandatory computationType = 'fixed'
