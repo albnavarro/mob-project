@@ -4,7 +4,7 @@ import {
     offset,
     getParents,
     getSiblings,
-} from '../../../js/utility/vanillaFunction.js';
+} from '../../../js/core/utils/vanillaFunction.js';
 
 class toolTipClass {
     constructor() {

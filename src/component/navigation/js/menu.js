@@ -3,20 +3,20 @@ import {
     enableBodyScroll,
     clearAllBodyScrollLocks,
 } from 'body-scroll-lock';
-import { mq } from '../../../js/core/mediaManager.js';
+import { mq } from '../../../js/core/utils/mediaManager.js';
 import {
     outerHeight,
     outerWidth,
     offset,
     getParents,
     getSiblings,
-} from '../../../js/utility/vanillaFunction.js';
+} from '../../../js/core/utils/vanillaFunction.js';
 import {
     slideUpDownReset,
     slideUp,
     slideDown,
 } from '../../../js/utility/animation.js';
-import { useResize } from '.../../../js/core/events/resizeUtils/useResize.js';
+import { mobResize } from '.../../../js/core/events/resizeUtils/mobResize.js';
 import { modernzier } from '../../../js/utility/modernizr.js';
 
 export class menuClass {
@@ -124,7 +124,7 @@ export class menuClass {
         this.addHandler();
         this.resetSubmenuHeight();
 
-        useResize(() => {
+        mobResize(() => {
             this.getSubmenuWidth();
             this.getToggleWrapHeight();
             this.resizeMenu();
@@ -134,7 +134,7 @@ export class menuClass {
         if (this.direction == 'horizontal') {
             this.SetPosition();
 
-            useResize(() => {
+            mobResize(() => {
                 this.SetPosition();
             });
         }

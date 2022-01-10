@@ -1,5 +1,5 @@
 import { move3DUtils } from './move3Dutils.js';
-import { useLerp } from '.../../../js/core/animation/lerp/useLerp.js';
+import { mobLerp } from '.../../../js/core/animation/lerp/mobLerp.js';
 
 export class move3DitemClass {
     constructor(data) {
@@ -10,7 +10,7 @@ export class move3DitemClass {
         this.range = data.range;
         this.initialRotate = data.initialRotate;
         this.animate = data.animate;
-        this.lerp = new useLerp();
+        this.lerp = new mobLerp();
         this.unsubscribelerp = () => {};
     }
 

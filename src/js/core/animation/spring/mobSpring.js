@@ -1,14 +1,14 @@
-const getLerpTime = () => {
+import { springConfig } from './springConfig.js';
+
+const getSpringTime = () => {
     return typeof window !== 'undefined'
         ? window.performance.now()
         : Date.now();
 };
 
-export class useLerp {
-    constructor(velocity = 200) {
-        this.config = {};
-        this.config.velocity = velocity;
-        this.config.precision = 0.1;
+export class mobSpring {
+    constructor(config = 'default') {
+        this.config = springConfig[config];
         this.req = null;
         this.previousResolve = null;
         this.previousReject = null;
@@ -24,12 +24,13 @@ export class useLerp {
         let cbObject = {};
 
         this.values.forEach((item, i) => {
+            item.velocity = this.config.velocity;
             item.currentValue = item.fromValue;
         });
 
         const draw = () => {
             // Get current time
-            const time = getLerpTime();
+            const time = getSpringTime();
 
             // lastTime is set to now the first time.
             // then check the difference from now and last time to check if we lost frame
@@ -44,23 +45,25 @@ export class useLerp {
             // Get lost frame, update vales until time is now
             for (let i = 0; i < numSteps; ++i) {
                 this.values.forEach((item, i) => {
-                    if (item.settled) return;
+                    const tensionForce =
+                        -this.config.tension *
+                        (item.currentValue - item.toValue);
+                    const dampingForce = -this.config.friction * item.velocity;
+                    const acceleration =
+                        (tensionForce + dampingForce) / this.config.mass;
+                    item.velocity = item.velocity + (acceleration * 1) / 1000;
+                    item.currentValue =
+                        item.currentValue + (item.velocity * 1) / 1000;
 
-                    item.previousValue = item.currentValue;
+                    // If tension == 0 linear movement
+                    const isRunning =
+                        this.config.tension !== 0
+                            ? Math.abs(item.currentValue - item.toValue) >
+                                  this.config.precision &&
+                              Math.abs(item.velocity) > this.config.precision
+                            : false;
 
-                    const s = item.currentValue;
-                    const f = item.toValue;
-                    const v = this.config.velocity;
-                    const val = (f - s) / v + s * 1;
-                    item.currentValue = val;
-
-                    item.settled =
-                        parseFloat(item.previousValue).toFixed(4) ===
-                        parseFloat(item.currentValue).toFixed(4);
-
-                    if (item.settled) {
-                        item.currentValue = item.toValue;
-                    }
+                    item.settled = !isRunning;
                 });
             }
 
@@ -183,7 +186,7 @@ export class useLerp {
      *
      * @return {void}  description
      */
-    pause(decay = 20) {
+    pause(decay = 0.01) {
         if (this.pauseStatus) return;
         this.pauseStatus = true;
 
@@ -247,7 +250,6 @@ export class useLerp {
                 fromValue: value,
                 velocity: this.config.velocity,
                 currentValue: value,
-                previousValue: 0,
                 settled: false,
                 onPause: false,
             };
@@ -455,14 +457,27 @@ export class useLerp {
     }
 
     /**
+     * updateConfig - Update config object
+     *
+     * @param  {Object} config udate single prop of config object
+     * @return {void}
+     *
+     */
+    updateConfig(config) {
+        this.config = { ...this.config, ...config };
+    }
+
+    /**
      * updatePreset - Update config object with new preset
      *
      * @param  {String} preset new preset
      * @return {void}
      *
      */
-    updateVelocity(velocity) {
-        this.config.velocity = velocity;
+    updatePreset(preset) {
+        if (preset in springConfig) {
+            this.config = springConfig[preset];
+        }
     }
 
     /**

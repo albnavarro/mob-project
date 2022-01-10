@@ -1,14 +1,14 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { mq } from '../../../js/core/mediaManager.js';
+import { mq } from '../../../js/core/utils/mediaManager.js';
 import { SimpleStore } from '../../../js/core/store/simpleStore.js';
 import {
     offset,
     outerHeight,
     outerWidth,
-} from '../../../js/utility/vanillaFunction.js';
-import { getTranslateValues } from '../../../js/utility/getTranslateValues.js';
-import { useResize } from '.../../../js/core/events/resizeUtils/useResize.js';
+    getTranslateValues,
+} from '../../../js/core/utils/vanillaFunction.js';
+import { mobResize } from '.../../../js/core/events/resizeUtils/mobResize.js';
 
 export class GsapHorizontalCustomClass {
     constructor(data = {}) {
@@ -42,7 +42,7 @@ export class GsapHorizontalCustomClass {
         this.getWidth();
         this.createShadow();
         this.initGsap();
-        useResize(() => this.onResize());
+        mobResize(() => this.onResize());
     }
 
     onTick(fn) {
@@ -57,7 +57,7 @@ export class GsapHorizontalCustomClass {
         this.triggerContainer.style.height = `${width}px`;
         this.row.style.width = `${width}px`;
 
-        this.store.setProp('percentRange', percentRange);
+        this.store.set('percentRange', percentRange);
     }
 
     getWidth() {
@@ -69,7 +69,7 @@ export class GsapHorizontalCustomClass {
             })
             .reduce((a, b) => a + b, 0);
 
-        this.store.setProp('horizontalWidth', horizontalWidth);
+        this.store.set('horizontalWidth', horizontalWidth);
     }
 
     createShadow() {
@@ -242,8 +242,8 @@ export class GsapHorizontalCustomClass {
                 },
             },
         });
-        this.store.setProp('gsapisActive', true);
-        this.store.setProp('tl', [tl]);
+        this.store.set('gsapisActive', true);
+        this.store.set('tl', [tl]);
     }
 
     killGsap() {
@@ -252,8 +252,8 @@ export class GsapHorizontalCustomClass {
 
         if (gsapisActive) {
             tl.scrollTrigger.kill();
-            this.store.setProp('tl', []);
-            this.store.setProp('gsapisActive', false);
+            this.store.set('tl', []);
+            this.store.set('gsapisActive', false);
         }
     }
 

@@ -3,11 +3,11 @@ import {
     outerWidth,
     outerHeight,
     offset,
-} from '../../../js/utility/vanillaFunction.js';
+} from '../../../js/core/utils/vanillaFunction.js';
 import { bodyScrollTo } from '../../../js/utility/animation.js';
 import { modernzier } from '../../../js/utility/modernizr.js';
 import { SimpleStore } from '../../../js/core/store/simpleStore.js';
-import { useResize } from '.../../../js/core/events/resizeUtils/useResize.js';
+import { mobResize } from '.../../../js/core/events/resizeUtils/mobResize.js';
 
 export class tBlocksItemClass {
     constructor(container) {
@@ -77,7 +77,7 @@ export class tBlocksItemClass {
         this.setActiveitemTransformOrigin();
         this.setActiveitemStyle();
 
-        const unsubscribeResize = useResize(() => {
+        const unsubscribeResize = mobResize(() => {
             this.setWidth();
             this.calcCenter();
             this.store.set('clone', { action: this.REMOVE });

@@ -1,11 +1,11 @@
-import { useSpring } from '.../../../js/core/animation/spring/useSpring.js';
-import { useFrame } from '.../../../js/core/events/rafutils/rafUtils.js';
+import { mobSpring } from '.../../../js/core/animation/spring/mobSpring.js';
+import { mobFrame } from '.../../../js/core/events/rafutils/rafUtils.js';
 import { parallaxConstant } from './parallaxConstant.js';
 import { parallaxUtils } from './parallaxUtils.js';
-import { position } from '../../../js/utility/vanillaFunction.js';
-import { useScroll } from '.../../../js/core/events/scrollUtils/useScroll.js';
-import { useScrollStart } from '.../../../js/core/events/scrollUtils/useScrollUtils.js';
-import { getTranslateValues } from '../../../js/utility/getTranslateValues.js';
+import { position } from '../../../js/core/utils/vanillaFunction.js';
+import { mobScroll } from '.../../../js/core/events/scrollUtils/mobScroll.js';
+import { mobScrollStart } from '.../../../js/core/events/scrollUtils/mobScrollUtils.js';
+import { getTranslateValues } from '../../../js/core/utils/vanillaFunction.js';
 
 export class ParallaxPin {
     constructor(data) {
@@ -63,17 +63,17 @@ export class ParallaxPin {
         this.setUpMotion();
 
         // Update pix top position when use custom screen ad scroll outside on window
-        this.unsubscribeScrollStart = useScrollStart(() => {
+        this.unsubscribeScrollStart = mobScrollStart(() => {
             if (!this.isInizialized) return;
 
             if (this.screen !== window && this.isInner && this.pin) {
-                useFrame(() => {
+                mobFrame(() => {
                     this.pin.style.transition = `transform .85s cubic-bezier(0, 0.68, 0.45, 1.1)`;
                 });
             }
         });
 
-        this.unsubscribeScroll = useScroll(({ scrolY }) => {
+        this.unsubscribeScroll = mobScroll(({ scrolY }) => {
             if (!this.isInizialized) return;
 
             if (this.screen !== window) {
@@ -94,7 +94,7 @@ export class ParallaxPin {
                         verticalGap: translateValue,
                     });
 
-                    useFrame(() => {
+                    mobFrame(() => {
                         this.pin.style.transform = `translate(0px,${translateValue}px)`;
                     });
                 }
@@ -103,7 +103,7 @@ export class ParallaxPin {
     }
 
     setUpMotion() {
-        this.spring = new useSpring('wobbly');
+        this.spring = new mobSpring('wobbly');
         this.spring.setData({ collision: 0, verticalGap: 0 });
 
         this.unsubscribeSpring = this.spring.subscribe(
@@ -144,7 +144,7 @@ export class ParallaxPin {
     }
 
     setPinSize() {
-        useFrame(() => {
+        mobFrame(() => {
             this.wrapper.style.height = '';
             this.wrapper.style.width = '';
             this.pin.style.height = '';
@@ -280,7 +280,7 @@ export class ParallaxPin {
                 : 'left';
 
         if (this.pin) {
-            useFrame(() => {
+            mobFrame(() => {
                 this.pin.style.position = this.lastPosition;
 
                 if (this.scroller === window) {
@@ -302,7 +302,7 @@ export class ParallaxPin {
         this.spring = null;
 
         if (this.pin && this.wrapper) {
-            useFrame(() => {
+            mobFrame(() => {
                 this.wrapper.parentNode.insertBefore(this.item, this.wrapper);
                 this.pin.remove();
                 this.wrapper.remove();
@@ -333,7 +333,7 @@ export class ParallaxPin {
     }
 
     tween(gap) {
-        useFrame(() => {
+        mobFrame(() => {
             this.pin.style[this.collisionStyleProp] = `${this.startFromTop}px`;
         });
 
@@ -348,7 +348,7 @@ export class ParallaxPin {
     }
 
     resetPinTransform() {
-        useFrame(() => {
+        mobFrame(() => {
             this.pin.style.transform = `translate(0px, 0px)`;
         });
     }
@@ -356,7 +356,7 @@ export class ParallaxPin {
     resetStyleWhenUnder() {
         this.resetSpring();
 
-        useFrame(() => {
+        mobFrame(() => {
             this.pin.style.transition = '';
             this.pin.style.position = 'relative';
             this.pin.style.top = ``;
@@ -367,7 +367,7 @@ export class ParallaxPin {
     resetStyleWhenOver() {
         this.resetSpring();
 
-        useFrame(() => {
+        mobFrame(() => {
             this.pin.style.transition = '';
             this.pin.style.position = 'relative';
 
@@ -392,7 +392,7 @@ export class ParallaxPin {
                 ? 'left'
                 : 'top';
 
-        useFrame(() => {
+        mobFrame(() => {
             this.pin.style.position = 'fixed';
             this.pin.style[style] = `${left}px`;
         });
@@ -401,7 +401,7 @@ export class ParallaxPin {
     activateTrasponder() {
         if (this.shoulTranspond) {
             this.addRquiredStyle();
-            useFrame(() => {
+            mobFrame(() => {
                 document.body.appendChild(this.pin);
             });
 
@@ -411,7 +411,7 @@ export class ParallaxPin {
 
     deactivateTrasponder() {
         if (this.shoulTranspond) {
-            useFrame(() => {
+            mobFrame(() => {
                 this.wrapper.appendChild(this.pin);
             });
             this.trasponderActive = false;

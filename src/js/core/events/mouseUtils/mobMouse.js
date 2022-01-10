@@ -10,13 +10,13 @@ import { normalizeWheel } from './normalizeWhell.js';
  *
  * @example:
  * onMount(() => {
- *   const unsubscribe = useMouseMove(({client}) => console.log(client.x));
+ *   const unsubscribe = mobMouseMove(({client}) => console.log(client.x));
  *   return(() => unsubscribe())
  * }
  *
  */
 
-function useMouse(event) {
+function mobMouse(event) {
     let inizialized = false;
     let callback = [];
     let id = 0;
@@ -126,11 +126,11 @@ function useMouse(event) {
     return addCb;
 }
 
-export const useMouseClick = new useMouse(['click']);
-export const useMouseDown = new useMouse(['mousedown']);
-export const useTouchStart = new useMouse(['touchstart']);
-export const useMouseMove = new useMouse(['mousemove']);
-export const useTouchMove = new useMouse(['touchmove']);
-export const useMouseUp = new useMouse(['mouseup']);
-export const useTouchEnd = new useMouse(['touchend']);
-export const useMouseWheel = new useMouse(['wheel']);
+export const mobMouseClick = new mobMouse(['click']);
+export const mobMouseDown = new mobMouse(['mousedown']);
+export const mobTouchStart = new mobMouse(['touchstart']);
+export const mobMouseMove = new mobMouse(['mousemove']);
+export const mobTouchMove = new mobMouse(['touchmove']);
+export const mobMouseUp = new mobMouse(['mouseup']);
+export const mobTouchEnd = new mobMouse(['touchend']);
+export const mobMouseWheel = new mobMouse(['wheel']);

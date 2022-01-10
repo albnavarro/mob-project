@@ -1,24 +1,24 @@
 /**
  * Utils to centralize all action form all components in one Request Animation Frame,
  * All subsciber use the same frame
- * useFrame run once then delete all subscriber
+ * mobFrame run once then delete all subscriber
  * Use inside a loop or inside eventListener like scroll or mousemove
  *
  * @example:
  *
  * Default 60fps
- * useFrame(() => {
+ * mobFrame(() => {
  *     myFunction()
  * });
  *
  * Custom fps
- * useFrame(() => {
+ * mobFrame(() => {
  *     myFunction()
  * }, 20);
  *
  */
 
-export const useFrame = (() => {
+export const mobFrame = (() => {
     let inizialized = false;
     let callback = [];
 
@@ -57,7 +57,7 @@ export const useFrame = (() => {
             callback.forEach((item) => {
                 item();
             });
-        } else if (!framRate){
+        } else if (!framRate) {
             callback.forEach((item) => {
                 item();
             });

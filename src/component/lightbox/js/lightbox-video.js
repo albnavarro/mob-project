@@ -1,6 +1,6 @@
 import { lightDescription } from './lightbox-description.js';
 import { lightboxUtils } from './lightbox-utils.js';
-import { useResize } from '.../../../js/core/events/resizeUtils/useResize.js';
+import { mobResize } from '.../../../js/core/events/resizeUtils/mobResize.js';
 
 class LightBoxVideoClass {
     constructor() {
@@ -57,7 +57,7 @@ class LightBoxVideoClass {
             videoWrapper.classList.add('visible');
         }, 200);
 
-        this.unsubscribeResize = useResize(() => {
+        this.unsubscribeResize = mobResize(() => {
             this.setVideoSize(wrapper, hGap, wGap, ratioW, ratioH);
         });
 

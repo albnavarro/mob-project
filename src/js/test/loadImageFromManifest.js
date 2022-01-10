@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { loadImages } from '../core/loader/loadImages.js';
+import { loadImages } from '../core/utils/loadImages.js';
 
 class loadImageFromManifestClass {
     constructor() {

@@ -2,18 +2,18 @@ import {
     outerHeight,
     outerWidth,
     offset,
-} from '../../../js/utility/vanillaFunction.js';
-import { useResize } from '.../../../js/core/events/resizeUtils/useResize.js';
+} from '../../../js/core/utils/vanillaFunction.js';
+import { mobResize } from '.../../../js/core/events/resizeUtils/mobResize.js';
 import {
-    useTouchStart,
-    useTouchEnd,
-    useMouseDown,
-    useMouseUp,
-    useMouseMove,
-    useTouchMove,
-    useMouseWheel,
-} from '.../../../js/core/events/mouseUtils/useMouse.js';
-import { useFrame } from '.../../../js/core/events/rafutils/rafUtils.js';
+    mobTouchStart,
+    mobTouchEnd,
+    mobMouseDown,
+    mobMouseUp,
+    mobMouseMove,
+    mobTouchMove,
+    mobMouseWheel,
+} from '.../../../js/core/events/mouseUtils/mobMouse.js';
+import { mobFrame } from '.../../../js/core/events/rafutils/rafUtils.js';
 
 class LightPichZoomClass {
     constructor() {
@@ -66,41 +66,41 @@ class LightPichZoomClass {
         zoom.appendChild(zoomOut);
         this.setZoomBtnhandler();
 
-        this.unsubscribeWheel = useMouseWheel(({ spinY, target }) => {
+        this.unsubscribeWheel = mobMouseWheel(({ spinY, target }) => {
             this.onWeel({ spinY, target });
         });
 
-        this.unsubscribeTouchStart = useTouchStart(
+        this.unsubscribeTouchStart = mobTouchStart(
             ({ page, target, preventDefault }) => {
                 this.onMouseDown({ target });
                 preventDefault();
             }
         );
 
-        this.unsubscribeMouseDown = useMouseDown(
+        this.unsubscribeMouseDown = mobMouseDown(
             ({ page, target, preventDefault }) => {
                 this.onMouseDown({ target });
                 preventDefault();
             }
         );
 
-        this.unsubscribeTouchEnd = useTouchEnd(() => {
+        this.unsubscribeTouchEnd = mobTouchEnd(() => {
             this.onMouseUp();
         });
 
-        this.unsubscribeMouseUp = useMouseUp(() => {
+        this.unsubscribeMouseUp = mobMouseUp(() => {
             this.onMouseUp();
         });
 
-        this.unsubscribeMouseMove = useMouseMove(({ page }) => {
+        this.unsubscribeMouseMove = mobMouseMove(({ page }) => {
             this.onMove(false, page.x, page.y);
         });
 
-        this.unsubscribeTouchMove = useTouchMove(({ page }) => {
+        this.unsubscribeTouchMove = mobTouchMove(({ page }) => {
             this.onMove(false, page.x, page.y);
         });
 
-        this.unsubscribeResize = useResize(() => {
+        this.unsubscribeResize = mobResize(() => {
             this.resetZoom();
         });
     }
@@ -283,7 +283,7 @@ class LightPichZoomClass {
 
         if (this.onDrag || force) {
             // this.image.style.transform = `translateX(${xValue}px) translateY(${yValue}px) scale(${this.scale})`;
-            useFrame(() => {
+            mobFrame(() => {
                 this.image.style.transform = `translateX(${xValue}px) translateY(${yValue}px) scale(${this.scale})`;
             });
         }

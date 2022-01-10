@@ -1,4 +1,4 @@
-import { useSpring } from '../core/animation/spring/useSpring.js';
+import { mobSpring } from '../core/animation/spring/mobSpring.js';
 
 export function springTest() {
     const btnStart = document.querySelector('.spring-btn-start');
@@ -8,7 +8,7 @@ export function springTest() {
     const btnPlay = document.querySelector('.spring-btn-play');
     const target = document.querySelector('.spring-target');
 
-    const mySpring = new useSpring();
+    const mySpring = new mobSpring();
     mySpring.setData({ x: 0, y: 0, rotate: 0 });
     mySpring.subscribe(({ x, y, rotate }) => {
         target.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg)`;

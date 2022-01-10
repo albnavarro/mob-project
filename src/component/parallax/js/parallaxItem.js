@@ -1,16 +1,16 @@
-import { mq } from '../../../js/core/mediaManager.js';
-import { offset, position } from '../../../js/utility/vanillaFunction.js';
+import { mq } from '../../../js/core/utils/mediaManager.js';
+import { offset, position } from '../../../js/core/utils/vanillaFunction.js';
 import { parallaxUtils } from './parallaxUtils.js';
 import { parallaxConstant } from './parallaxConstant.js';
 import { parallaxMarker } from './parallaxMarker.js';
 import { parallaxEmitter } from './parallaxEmitter.js';
 import { ParallaxPin } from './parallaxPin.js';
-import { useFrame } from '.../../../js/core/events/rafutils/rafUtils.js';
-import { useResize } from '.../../../js/core/events/resizeUtils/useResize.js';
-import { useScroll } from '.../../../js/core/events/scrollUtils/useScroll.js';
-import { useSpring } from '.../../../js/core/animation/spring/useSpring.js';
+import { mobFrame } from '.../../../js/core/events/rafutils/rafUtils.js';
+import { mobResize } from '.../../../js/core/events/resizeUtils/mobResize.js';
+import { mobScroll } from '.../../../js/core/events/scrollUtils/mobScroll.js';
+import { mobSpring } from '.../../../js/core/animation/spring/mobSpring.js';
+import { mobLerp } from '.../../../js/core/animation/lerp/mobLerp.js';
 import { springConfig } from '.../../../js/core/animation/spring/springConfig.js';
-import { useLerp } from '.../../../js/core/animation/lerp/useLerp.js';
 
 export class ParallaxItemClass {
     constructor(data) {
@@ -85,9 +85,15 @@ export class ParallaxItemClass {
         this.dynamicRange = data.dynamicRange || null;
         this.perspective = data.perspective || false;
         this.applyTo = data.applyTo || false;
-        this.scrollTrigger = data.scrollTrigger
-            ? document.querySelector(data.scrollTrigger)
-            : null;
+        this.scrollTrigger = (() => {
+            if (data.scrollTrigger) {
+                return typeof data.scrollTrigger === 'string'
+                    ? document.querySelector(data.scrollTrigger)
+                    : data.scrollTrigger;
+            } else {
+                return null;
+            }
+        })();
         this.breackpoint = data.breackpoint || 'desktop';
         this.queryType = data.queryType || 'min';
         this.limiterOff = data.limiterOff || false;
@@ -106,8 +112,8 @@ export class ParallaxItemClass {
         this.lerpConfig = data.lerpConfig || null;
         this.motion = (() => {
             return this.easeType === parallaxConstant.EASE_LERP
-                ? new useLerp()
-                : new useSpring();
+                ? new mobLerp()
+                : new mobSpring();
         })();
         this.unsubscribeMotion = () => {};
 
@@ -139,21 +145,21 @@ export class ParallaxItemClass {
         }
 
         if (this.ease) {
-            this.unsubscribeScroll = useScroll(() => this.smoothParallaxJs());
+            this.unsubscribeScroll = mobScroll(() => this.smoothParallaxJs());
             this.smoothParallaxJs();
         } else {
-            this.unsubscribeScroll = useScroll(() => this.executeParallax());
+            this.unsubscribeScroll = mobScroll(() => this.executeParallax());
             this.executeParallax();
         }
 
         if (this.scroller !== window) {
-            this.unsubscribeMarker = useScroll(() => {
+            this.unsubscribeMarker = mobScroll(() => {
                 // Refresh marker
                 if (this.marker) this.calcFixedLimit();
             });
         }
 
-        this.unsubscribeResize = useResize(() => this.refresh());
+        this.unsubscribeResize = mobResize(() => this.refresh());
 
         if (this.pin) {
             this.pinInstance = new ParallaxPin({ instance: this });
@@ -419,6 +425,10 @@ export class ParallaxItemClass {
         this.onLeave = () => {};
         this.onLeaveBack = () => {};
         if (this.pin) this.pinInstance.destroy();
+        if (this.startMarker) this.startMarker.remove();
+        if (this.endMarker) this.endMarker.remove();
+        this.startMarker = null;
+        this.endMarker = null;
     }
 
     refresh() {
@@ -543,7 +553,7 @@ export class ParallaxItemClass {
 
         if (!applyStyle) return;
 
-        useFrame(() => {
+        mobFrame(() => {
             this.updateStyle(this.endValue);
         });
     }

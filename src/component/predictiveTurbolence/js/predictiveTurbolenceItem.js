@@ -1,17 +1,17 @@
-import { mq } from '../../../js/core/mediaManager.js';
+import { mq } from '../../../js/core/utils/mediaManager.js';
 import {
     outerHeight,
     outerWidth,
     offset,
-} from '../../../js/utility/vanillaFunction.js';
+} from '../../../js/core/utils/vanillaFunction.js';
 import { forceRedraw } from '../../../js/utility/redrowNode.js';
 import { detectSafari } from '../../../js/utility/isSafari.js';
 import { tUtils } from './predictiveTurbolenceUtils.js';
-import { useSpring } from '.../../../js/core/animation/spring/useSpring.js';
+import { mobSpring } from '.../../../js/core/animation/spring/mobSpring.js';
+import { mobResize } from '.../../../js/core/events/resizeUtils/mobResize.js';
+import { mobScroll } from '.../../../js/core/events/scrollUtils/mobScroll.js';
+import { mobMouseMove } from '.../../../js/core/events/mouseUtils/mobMouse.js';
 import { springConfig } from '.../../../js/core/animation/spring/springConfig.js';
-import { useResize } from '.../../../js/core/events/resizeUtils/useResize.js';
-import { useScroll } from '.../../../js/core/events/scrollUtils/useScroll.js';
-import { useMouseMove } from '.../../../js/core/events/mouseUtils/useMouse.js';
 
 export class PredictiveTurbolenceItemClass {
     constructor(data) {
@@ -34,7 +34,7 @@ export class PredictiveTurbolenceItemClass {
         this.offsetX = 0;
         this.width = 0;
         this.height = 0;
-        this.spring = new useSpring();
+        this.spring = new mobSpring();
         this.unsubscribeSpring = () => {};
         this.unsubscribeScroll = () => {};
         this.unsubscribeResize = () => {};
@@ -67,14 +67,14 @@ export class PredictiveTurbolenceItemClass {
         this.inzializeSvg();
         this.onResize();
 
-        this.unsubscribeMouseMove = useMouseMove(({ page }) => {
+        this.unsubscribeMouseMove = mobMouseMove(({ page }) => {
             this.setGlobalCoord({ page });
             this.onMove();
         });
-        this.unsubscribeScroll = useScroll(({ scrolY }) => {
+        this.unsubscribeScroll = mobScroll(({ scrolY }) => {
             this.onScroll({ scrolY });
         });
-        this.unsubscribeResize = useResize(() => {
+        this.unsubscribeResize = mobResize(() => {
             this.onResize();
         });
 

@@ -1,4 +1,4 @@
-import { mq } from '../../../js/core/mediaManager.js';
+import { mq } from '../../../js/core/utils/mediaManager.js';
 import {
     slideUpDownReset,
     slideUp,

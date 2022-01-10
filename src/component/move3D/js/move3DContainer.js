@@ -3,18 +3,18 @@ import {
     outerHeight,
     outerWidth,
     offset,
-} from '../../../js/utility/vanillaFunction.js';
-import { useSpring } from '.../../../js/core/animation/spring/useSpring.js';
-import { useResize } from '.../../../js/core/events/resizeUtils/useResize.js';
-import { useScroll } from '.../../../js/core/events/scrollUtils/useScroll.js';
+} from '../../../js/core/utils/vanillaFunction.js';
+import { mobSpring } from '.../../../js/core/animation/spring/mobSpring.js';
+import { mobResize } from '.../../../js/core/events/resizeUtils/mobResize.js';
+import { mobScroll } from '.../../../js/core/events/scrollUtils/mobScroll.js';
 import {
-    useTouchStart,
-    useTouchEnd,
-    useMouseDown,
-    useMouseUp,
-    useMouseMove,
-    useTouchMove,
-} from '.../../../js/core/events/mouseUtils/useMouse.js';
+    mobTouchStart,
+    mobTouchEnd,
+    mobMouseDown,
+    mobMouseUp,
+    mobMouseMove,
+    mobTouchMove,
+} from '.../../../js/core/events/mouseUtils/mobMouse.js';
 
 export class move3DContainerClass {
     constructor(data) {
@@ -44,7 +44,7 @@ export class move3DContainerClass {
         this.pageY = false;
         this.childrenInstances = [];
 
-        this.spring = new useSpring();
+        this.spring = new mobSpring();
         this.unsubscribeSpring = () => {};
 
         // MOUSE COORD
@@ -85,17 +85,17 @@ export class move3DContainerClass {
         this.setDepth();
         this.getDimension();
 
-        this.unsubscribeMouseMove = useMouseMove(({ page }) => {
+        this.unsubscribeMouseMove = mobMouseMove(({ page }) => {
             this.setGlobalCoord({ page });
             this.onMove();
         });
 
-        this.unsubscribeResize = useResize(() => {
+        this.unsubscribeResize = mobResize(() => {
             this.getDimension();
         });
 
         if (this.pageY) {
-            this.unsubscribeScroll = useScroll(({ scrolY }) => {
+            this.unsubscribeScroll = mobScroll(({ scrolY }) => {
                 this.onScroll(scrolY);
             });
         }
@@ -105,23 +105,23 @@ export class move3DContainerClass {
             this.dragY = window.innerHeight / 2;
             this.item.classList.add('move3D--drag');
 
-            this.unsubscribeTouchMove = useTouchStart(({ page }) => {
+            this.unsubscribeTouchMove = mobTouchStart(({ page }) => {
                 this.onMouseDown({ page });
             });
 
-            this.unsubscribeTouchMove = useTouchEnd(() => {
+            this.unsubscribeTouchMove = mobTouchEnd(() => {
                 this.onMouseUp();
             });
 
-            this.unsubscribeTouchMove = useMouseDown(({ page }) => {
+            this.unsubscribeTouchMove = mobMouseDown(({ page }) => {
                 this.onMouseDown({ page });
             });
 
-            this.unsubscribeTouchMove = useMouseUp(() => {
+            this.unsubscribeTouchMove = mobMouseUp(() => {
                 this.onMouseUp();
             });
 
-            this.unsubscribeTouchMove = useTouchMove(({ page }) => {
+            this.unsubscribeTouchMove = mobTouchMove(({ page }) => {
                 this.setGlobalCoord({ page });
                 this.onMove();
             });

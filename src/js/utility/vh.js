@@ -1,5 +1,5 @@
-import { useScroll } from '../core/events/scrollUtils/useScroll.js';
-import { useResize } from '../core/events/resizeUtils/useResize.js';
+import { mobScroll } from '../core/events/scrollUtils/mobScroll.js';
+import { mobResize } from '../core/events/resizeUtils/mobResize.js';
 
 class vhClass {
     constructor(images, callback) {
@@ -9,8 +9,8 @@ class vhClass {
     init() {
         this.calcVh();
 
-        useScroll(() => this.onScroll());
-        useResize(() => this.calcVh());
+        mobScroll(() => this.onScroll());
+        mobResize(() => this.calcVh());
     }
 
     calcVh() {

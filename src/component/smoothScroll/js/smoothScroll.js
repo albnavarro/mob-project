@@ -1,23 +1,25 @@
-import { getTranslateValues } from '../../../js/utility/getTranslateValues.js';
-import { useResize } from '.../../../js/core/events/resizeUtils/useResize.js';
-import { useScroll } from '.../../../js/core/events/scrollUtils/useScroll.js';
+import { mobResize } from '.../../../js/core/events/resizeUtils/mobResize.js';
+import { mobScroll } from '.../../../js/core/events/scrollUtils/mobScroll.js';
 import {
-    useScrollStart,
-    useScrollEnd,
-} from '.../../../js/core/events/scrollUtils/useScrollUtils.js';
+    mobScrollStart,
+    mobScrollEnd,
+} from '.../../../js/core/events/scrollUtils/mobScrollUtils.js';
 import {
-    useTouchStart,
-    useTouchEnd,
-    useMouseDown,
-    useMouseUp,
-    useMouseMove,
-    useTouchMove,
-    useMouseWheel,
-    useMouseClick,
-} from '.../../../js/core/events/mouseUtils/useMouse.js';
-import { isDescendant } from '../../../js/utility/vanillaFunction.js';
-import { useLerp } from '.../../../js/core/animation/lerp/useLerp.js';
-import { useSpring } from '.../../../js/core/animation/spring/useSpring.js';
+    mobTouchStart,
+    mobTouchEnd,
+    mobMouseDown,
+    mobMouseUp,
+    mobMouseMove,
+    mobTouchMove,
+    mobMouseWheel,
+    mobMouseClick,
+} from '.../../../js/core/events/mouseUtils/mobMouse.js';
+import {
+    isDescendant,
+    getTranslateValues,
+} from '../../../js/core/utils/vanillaFunction.js';
+import { mobLerp } from '.../../../js/core/animation/lerp/mobLerp.js';
+import { mobSpring } from '.../../../js/core/animation/spring/mobSpring.js';
 
 export class SmoothScrollClass {
     constructor(data = {}) {
@@ -78,40 +80,40 @@ export class SmoothScrollClass {
     init() {
         switch (this.motionType) {
             case this.SPRING:
-                this.motion = new useSpring('gentle');
+                this.motion = new mobSpring('gentle');
                 break;
 
             default:
-                this.motion = new useLerp(160);
+                this.motion = new mobLerp(160);
                 break;
         }
 
         this.reset();
-        this.subscribeResize = useResize(() => this.reset());
-        this.subscribeScrollStart = useScrollStart(() => this.reset());
-        this.subscribeScrollEnd = useScrollEnd(() => this.reset());
-        this.subscribeTouchStart = useTouchStart((data) =>
+        this.subscribeResize = mobResize(() => this.reset());
+        this.subscribeScrollStart = mobScrollStart(() => this.reset());
+        this.subscribeScrollEnd = mobScrollEnd(() => this.reset());
+        this.subscribeTouchStart = mobTouchStart((data) =>
             this.onMouseDown(data)
         );
-        this.subscribeTouchEnd = useTouchEnd((data) => this.onMouseUp(data));
-        this.subscribeMouseDown = useMouseDown((data) =>
+        this.subscribeTouchEnd = mobTouchEnd((data) => this.onMouseUp(data));
+        this.subscribeMouseDown = mobMouseDown((data) =>
             this.onMouseDown(data)
         );
-        this.subscribeMouseUp = useMouseUp((data) => this.onMouseUp(data));
-        this.subscribeMouseWheel = useMouseWheel((data) => this.onWhell(data));
+        this.subscribeMouseUp = mobMouseUp((data) => this.onMouseUp(data));
+        this.subscribeMouseWheel = mobMouseWheel((data) => this.onWhell(data));
 
         if (this.target !== document.documentElement) {
-            this.subscribeMouseMove = useMouseMove((data) =>
+            this.subscribeMouseMove = mobMouseMove((data) =>
                 this.onTouchMove(data)
             );
-            this.subscribeTouchMove = useTouchMove((data) =>
+            this.subscribeTouchMove = mobTouchMove((data) =>
                 this.onTouchMove(data)
             );
         }
 
         // DRAG LISTENER
         if (this.drag) {
-            this.subscribeMouseClick = useMouseClick(
+            this.subscribeMouseClick = mobMouseClick(
                 ({ target, preventDefault }) => {
                     this.preventChecker({ target, preventDefault });
                 }

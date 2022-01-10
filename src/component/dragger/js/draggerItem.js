@@ -1,15 +1,15 @@
-import { isDescendant } from '../../../js/utility/vanillaFunction.js';
-import { useSpring } from '.../../../js/core/animation/spring/useSpring.js';
-import { useResize } from '.../../../js/core/events/resizeUtils/useResize.js';
-import { useScroll } from '.../../../js/core/events/scrollUtils/useScroll.js';
+import { isDescendant } from '../../../js/core/utils/vanillaFunction.js';
+import { mobSpring } from '.../../../js/core/animation/spring/mobSpring.js';
+import { mobResize } from '.../../../js/core/events/resizeUtils/mobResize.js';
+import { mobScroll } from '.../../../js/core/events/scrollUtils/mobScroll.js';
 import {
-    useTouchStart,
-    useTouchEnd,
-    useMouseDown,
-    useMouseUp,
-    useMouseMove,
-    useTouchMove,
-} from '.../../../js/core/events/mouseUtils/useMouse.js';
+    mobTouchStart,
+    mobTouchEnd,
+    mobMouseDown,
+    mobMouseUp,
+    mobMouseMove,
+    mobTouchMove,
+} from '.../../../js/core/events/mouseUtils/mobMouse.js';
 
 export class DraggerItemClass {
     constructor(data) {
@@ -49,7 +49,7 @@ export class DraggerItemClass {
 
         // Animation
         this.endValue = { xValue: 0, yValue: 0 };
-        this.spring = new useSpring();
+        this.spring = new mobSpring();
         this.unsubscribeSpring = () => {};
 
         this.unsubscribeResize = () => {};
@@ -63,31 +63,31 @@ export class DraggerItemClass {
     }
 
     init() {
-        this.unsubscribeTouchStart = useTouchStart(({ page, target }) => {
+        this.unsubscribeTouchStart = mobTouchStart(({ page, target }) => {
             this.onMouseDown({ page, target });
         });
 
-        this.unsubscribeMouseDown = useMouseDown(({ page, target }) => {
+        this.unsubscribeMouseDown = mobMouseDown(({ page, target }) => {
             this.onMouseDown({ page, target });
         });
 
-        this.unsubscribeTouchEnd = useTouchEnd(() => {
+        this.unsubscribeTouchEnd = mobTouchEnd(() => {
             this.onMouseUp();
         });
 
-        this.unsubscribeMouseUp = useMouseUp(() => {
+        this.unsubscribeMouseUp = mobMouseUp(() => {
             this.onMouseUp();
         });
 
-        this.unsubscribeMouseMove = useMouseMove(({ page }) => {
+        this.unsubscribeMouseMove = mobMouseMove(({ page }) => {
             this.onMove({ page });
         });
 
-        this.unsubscribeTouchMove = useTouchMove(({ page }) => {
+        this.unsubscribeTouchMove = mobTouchMove(({ page }) => {
             this.onMove({ page });
         });
 
-        this.unsubscribeResize = useResize(() => {
+        this.unsubscribeResize = mobResize(() => {
             this.onResize();
         });
 

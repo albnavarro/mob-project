@@ -1,8 +1,8 @@
 import { lightDescription } from './lightbox-description.js';
-import { loadImages } from '../../../js/core/loader/loadImages.js';
+import { loadImages } from '../../../js/core/utils/loadImages.js';
 import { lightboxUtils } from './lightbox-utils.js';
 import { lightPichZoom } from './lightbox-zoom-pinch.js';
-import { useResize } from '.../../../js/core/events/resizeUtils/useResize.js';
+import { mobResize } from '.../../../js/core/events/resizeUtils/mobResize.js';
 
 class LightBoxImageClass {
     constructor() {
@@ -45,7 +45,7 @@ class LightBoxImageClass {
 
                 this.removeLoder(wrapper);
 
-                this.unsubscribeResize = useResize(() => {
+                this.unsubscribeResize = mobResize(() => {
                     this.onResizeLightboxImage(wrapper, hGap, wGap, zoom);
                 });
 

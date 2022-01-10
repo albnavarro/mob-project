@@ -1,7 +1,11 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { offset, outerHeight, outerWidth } from '../utility/vanillaFunction.js';
-import { useResize } from '../core/events/resizeUtils/useResize.js';
+import {
+    offset,
+    outerHeight,
+    outerWidth,
+} from '../core/utils/vanillaFunction.js';
+import { mobResize } from '../core/events/resizeUtils/mobResize.js';
 
 class gsapTestClass {
     constructor() {}
@@ -217,7 +221,7 @@ class gsapTestClass {
             },
         });
 
-        useResize(() => {
+        mobResize(() => {
             width = this.cardWidth(card);
             this.applyStyle(width, container, itemToScroll);
             percentRange = this.getPercentMaxScroll();
@@ -258,7 +262,7 @@ class gsapTestClass {
             },
         });
 
-        useResize(() => {
+        mobResize(() => {
             width = this.cardWidth(card);
             this.applyStyle(width, container, itemToScroll);
             tl.scrollTrigger.refresh();

@@ -1,4 +1,4 @@
-import { useTween } from '../core/animation/tween/useTween.js';
+import { mobTween } from '../core/animation/tween/mobTween.js';
 
 export function tweenTest() {
     const btnStart = document.querySelector('.tween-btn-start');
@@ -8,7 +8,7 @@ export function tweenTest() {
     const btnPlay = document.querySelector('.tween-btn-play');
     const target = document.querySelector('.tween-target');
 
-    const myTween = new useTween();
+    const myTween = new mobTween();
     myTween.setData({ x: 0, y: 0, rotate: 0 });
     myTween.subscribe(({ x, y, rotate }) => {
         target.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg)`;
