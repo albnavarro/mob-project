@@ -1,5 +1,5 @@
 import { parallaxConstant } from './parallaxConstant.js';
-import { mobFrame } from '.../../../js/core/events/rafutils/rafUtils.js';
+import { handleFrame } from '.../../../js/core/events/rafutils/rafUtils.js';
 
 export const parallaxMarker = ({
     startMarker,
@@ -144,7 +144,7 @@ export const parallaxMarker = ({
         }
     })();
 
-    mobFrame(() => {
+    handleFrame(() => {
         Object.assign(lastStartMarker.style, { ...style, ...startStyle });
         Object.assign(lastEndMarkerEl.style, { ...style, ...endStyle });
     });

@@ -7,10 +7,10 @@ import {
 import { forceRedraw } from '../../../js/utility/redrowNode.js';
 import { detectSafari } from '../../../js/utility/isSafari.js';
 import { tUtils } from './predictiveTurbolenceUtils.js';
-import { mobSpring } from '.../../../js/core/animation/spring/mobSpring.js';
-import { mobResize } from '.../../../js/core/events/resizeUtils/mobResize.js';
-import { mobScroll } from '.../../../js/core/events/scrollUtils/mobScroll.js';
-import { mobMouseMove } from '.../../../js/core/events/mouseUtils/mobMouse.js';
+import { handleSpring } from '.../../../js/core/animation/spring/handleSpring.js';
+import { handleResize } from '.../../../js/core/events/resizeUtils/handleResize.js';
+import { handleScroll } from '.../../../js/core/events/scrollUtils/handleScroll.js';
+import { handleMouseMove } from '.../../../js/core/events/mouseUtils/handleMouse.js';
 import { springConfig } from '.../../../js/core/animation/spring/springConfig.js';
 
 export class PredictiveTurbolenceItemClass {
@@ -34,7 +34,7 @@ export class PredictiveTurbolenceItemClass {
         this.offsetX = 0;
         this.width = 0;
         this.height = 0;
-        this.spring = new mobSpring();
+        this.spring = new handleSpring();
         this.unsubscribeSpring = () => {};
         this.unsubscribeScroll = () => {};
         this.unsubscribeResize = () => {};
@@ -67,14 +67,14 @@ export class PredictiveTurbolenceItemClass {
         this.inzializeSvg();
         this.onResize();
 
-        this.unsubscribeMouseMove = mobMouseMove(({ page }) => {
+        this.unsubscribeMouseMove = handleMouseMove(({ page }) => {
             this.setGlobalCoord({ page });
             this.onMove();
         });
-        this.unsubscribeScroll = mobScroll(({ scrolY }) => {
+        this.unsubscribeScroll = handleScroll(({ scrolY }) => {
             this.onScroll({ scrolY });
         });
-        this.unsubscribeResize = mobResize(() => {
+        this.unsubscribeResize = handleResize(() => {
             this.onResize();
         });
 

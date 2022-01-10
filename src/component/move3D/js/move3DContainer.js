@@ -4,17 +4,17 @@ import {
     outerWidth,
     offset,
 } from '../../../js/core/utils/vanillaFunction.js';
-import { mobSpring } from '.../../../js/core/animation/spring/mobSpring.js';
-import { mobResize } from '.../../../js/core/events/resizeUtils/mobResize.js';
-import { mobScroll } from '.../../../js/core/events/scrollUtils/mobScroll.js';
+import { handleSpring } from '.../../../js/core/animation/spring/handleSpring.js';
+import { handleResize } from '.../../../js/core/events/resizeUtils/handleResize.js';
+import { handleScroll } from '.../../../js/core/events/scrollUtils/handleScroll.js';
 import {
-    mobTouchStart,
-    mobTouchEnd,
-    mobMouseDown,
-    mobMouseUp,
-    mobMouseMove,
-    mobTouchMove,
-} from '.../../../js/core/events/mouseUtils/mobMouse.js';
+    handleTouchStart,
+    handleTouchEnd,
+    handleMouseDown,
+    handleMouseUp,
+    handleMouseMove,
+    handleTouchMove,
+} from '.../../../js/core/events/mouseUtils/handleMouse.js';
 
 export class move3DContainerClass {
     constructor(data) {
@@ -44,7 +44,7 @@ export class move3DContainerClass {
         this.pageY = false;
         this.childrenInstances = [];
 
-        this.spring = new mobSpring();
+        this.spring = new handleSpring();
         this.unsubscribeSpring = () => {};
 
         // MOUSE COORD
@@ -85,17 +85,17 @@ export class move3DContainerClass {
         this.setDepth();
         this.getDimension();
 
-        this.unsubscribeMouseMove = mobMouseMove(({ page }) => {
+        this.unsubscribeMouseMove = handleMouseMove(({ page }) => {
             this.setGlobalCoord({ page });
             this.onMove();
         });
 
-        this.unsubscribeResize = mobResize(() => {
+        this.unsubscribeResize = handleResize(() => {
             this.getDimension();
         });
 
         if (this.pageY) {
-            this.unsubscribeScroll = mobScroll(({ scrolY }) => {
+            this.unsubscribeScroll = handleScroll(({ scrolY }) => {
                 this.onScroll(scrolY);
             });
         }
@@ -105,23 +105,23 @@ export class move3DContainerClass {
             this.dragY = window.innerHeight / 2;
             this.item.classList.add('move3D--drag');
 
-            this.unsubscribeTouchMove = mobTouchStart(({ page }) => {
+            this.unsubscribeTouchMove = handleTouchStart(({ page }) => {
                 this.onMouseDown({ page });
             });
 
-            this.unsubscribeTouchMove = mobTouchEnd(() => {
+            this.unsubscribeTouchMove = handleTouchEnd(() => {
                 this.onMouseUp();
             });
 
-            this.unsubscribeTouchMove = mobMouseDown(({ page }) => {
+            this.unsubscribeTouchMove = handleMouseDown(({ page }) => {
                 this.onMouseDown({ page });
             });
 
-            this.unsubscribeTouchMove = mobMouseUp(() => {
+            this.unsubscribeTouchMove = handleMouseUp(() => {
                 this.onMouseUp();
             });
 
-            this.unsubscribeTouchMove = mobTouchMove(({ page }) => {
+            this.unsubscribeTouchMove = handleTouchMove(({ page }) => {
                 this.setGlobalCoord({ page });
                 this.onMove();
             });

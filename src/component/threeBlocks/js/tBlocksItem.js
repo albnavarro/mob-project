@@ -7,7 +7,7 @@ import {
 import { bodyScrollTo } from '../../../js/utility/animation.js';
 import { modernzier } from '../../../js/utility/modernizr.js';
 import { SimpleStore } from '../../../js/core/store/simpleStore.js';
-import { mobResize } from '.../../../js/core/events/resizeUtils/mobResize.js';
+import { handleResize } from '.../../../js/core/events/resizeUtils/handleResize.js';
 
 export class tBlocksItemClass {
     constructor(container) {
@@ -77,7 +77,7 @@ export class tBlocksItemClass {
         this.setActiveitemTransformOrigin();
         this.setActiveitemStyle();
 
-        const unsubscribeResize = mobResize(() => {
+        const unsubscribeResize = handleResize(() => {
             this.setWidth();
             this.calcCenter();
             this.store.set('clone', { action: this.REMOVE });

@@ -8,7 +8,7 @@ import {
     outerWidth,
     getTranslateValues,
 } from '../../../js/core/utils/vanillaFunction.js';
-import { mobResize } from '.../../../js/core/events/resizeUtils/mobResize.js';
+import { handleResize } from '.../../../js/core/events/resizeUtils/handleResize.js';
 
 export class GsapHorizontalCustomClass {
     constructor(data = {}) {
@@ -42,7 +42,7 @@ export class GsapHorizontalCustomClass {
         this.getWidth();
         this.createShadow();
         this.initGsap();
-        mobResize(() => this.onResize());
+        handleResize(() => this.onResize());
     }
 
     onTick(fn) {

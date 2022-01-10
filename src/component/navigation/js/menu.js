@@ -16,7 +16,7 @@ import {
     slideUp,
     slideDown,
 } from '../../../js/utility/animation.js';
-import { mobResize } from '.../../../js/core/events/resizeUtils/mobResize.js';
+import { handleResize } from '.../../../js/core/events/resizeUtils/handleResize.js';
 import { modernzier } from '../../../js/utility/modernizr.js';
 
 export class menuClass {
@@ -124,7 +124,7 @@ export class menuClass {
         this.addHandler();
         this.resetSubmenuHeight();
 
-        mobResize(() => {
+        handleResize(() => {
             this.getSubmenuWidth();
             this.getToggleWrapHeight();
             this.resizeMenu();
@@ -134,7 +134,7 @@ export class menuClass {
         if (this.direction == 'horizontal') {
             this.SetPosition();
 
-            mobResize(() => {
+            handleResize(() => {
                 this.SetPosition();
             });
         }

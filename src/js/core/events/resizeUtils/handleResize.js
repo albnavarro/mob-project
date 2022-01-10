@@ -1,6 +1,6 @@
 import { debounceFuncion } from '../debounce.js';
 
-export const mobResize = (() => {
+export const handleResize = (() => {
     let inizialized = false;
     let callback = [];
     let id = 0;

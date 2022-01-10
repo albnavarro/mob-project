@@ -1,8 +1,14 @@
-import { tweenConfig } from './tweenConfig.js';
+import { springConfig } from './springConfig.js';
 
-export class mobTween {
-    constructor(ease = 'easeOutBack') {
-        this.ease = tweenConfig[ease];
+const getSpringTime = () => {
+    return typeof window !== 'undefined'
+        ? window.performance.now()
+        : Date.now();
+};
+
+export class handleSpring {
+    constructor(config = 'default') {
+        this.config = springConfig[config];
         this.req = null;
         this.previousResolve = null;
         this.previousReject = null;
@@ -11,43 +17,55 @@ export class mobTween {
         this.id = 0;
         this.callback = [];
         this.pauseStatus = false;
-        this.comeFromResume = false;
-        this.duration = 1000;
-        this.startTime = null;
-        this.isRunning = false;
-        this.timeElapsed = 0;
-        this.pauseTime = 0;
     }
 
-    onReuqestAnim(timestamp, res) {
+    onReuqestAnim(res) {
+        let animationLastTime = 0;
         let cbObject = {};
 
-        this.startTime = timestamp;
+        this.values.forEach((item, i) => {
+            item.velocity = this.config.velocity;
+            item.currentValue = item.fromValue;
+        });
 
-        const draw = (timestamp) => {
-            if (this.pauseStatus) {
-                this.pauseTime = timestamp - this.startTime - this.timeElapsed;
+        const draw = () => {
+            // Get current time
+            const time = getSpringTime();
+
+            // lastTime is set to now the first time.
+            // then check the difference from now and last time to check if we lost frame
+            let lastTime = animationLastTime !== 0 ? animationLastTime : time;
+
+            // If we lost a lot of frames just jump to the end.
+            if (time > lastTime + 64) lastTime = time;
+
+            // http://gafferongames.com/game-physics/fix-your-timestep/
+            let numSteps = Math.floor(time - lastTime);
+
+            // Get lost frame, update vales until time is now
+            for (let i = 0; i < numSteps; ++i) {
+                this.values.forEach((item, i) => {
+                    const tensionForce =
+                        -this.config.tension *
+                        (item.currentValue - item.toValue);
+                    const dampingForce = -this.config.friction * item.velocity;
+                    const acceleration =
+                        (tensionForce + dampingForce) / this.config.mass;
+                    item.velocity = item.velocity + (acceleration * 1) / 1000;
+                    item.currentValue =
+                        item.currentValue + (item.velocity * 1) / 1000;
+
+                    // If tension == 0 linear movement
+                    const isRunning =
+                        this.config.tension !== 0
+                            ? Math.abs(item.currentValue - item.toValue) >
+                                  this.config.precision &&
+                              Math.abs(item.velocity) > this.config.precision
+                            : false;
+
+                    item.settled = !isRunning;
+                });
             }
-            this.timeElapsed = timestamp - this.startTime - this.pauseTime;
-
-            if (this.isRunning && parseInt(this.timeElapsed) >= this.duration) {
-                this.timeElapsed = this.duration;
-            }
-
-            this.values.forEach((item, i) => {
-                if (item.update) {
-                    item.currentValue = this.ease(
-                        this.timeElapsed,
-                        item.fromValue,
-                        item.toValProcessed,
-                        this.duration
-                    );
-                } else {
-                    item.currentValue = item.fromValue;
-                }
-            });
-
-            const isSettled = parseInt(this.timeElapsed) === this.duration;
 
             // Prepare an obj to pass to the callback
             // 1- Seta an array of object: [{prop: value},{prop2: value2} ...
@@ -67,29 +85,41 @@ export class mobTween {
                 cb(cbObject);
             });
 
-            this.isRunning = true;
+            // Update last time
+            animationLastTime = time;
 
-            if (!isSettled) {
+            // Check if all values is completed
+            const allSettled = this.values.every(
+                (item) => item.settled === true
+            );
+
+            if (!allSettled) {
                 this.req = requestAnimationFrame(draw);
             } else {
                 cancelAnimationFrame(this.req);
                 this.req = null;
-                this.isRunning = false;
-                this.pauseTime = 0;
 
                 // End of animation
                 // Set fromValue with ended value
                 // At the next call fromValue become the start value
                 this.values.forEach((item, i) => {
-                    if (item.update) {
-                        item.toValue = item.currentValue;
-                        item.fromValue = item.currentValue;
-                    }
+                    item.fromValue = item.toValue;
                 });
+
+                // Prepare an obj to pass to the callback with rounded value ( end user value)
+                const cbObjectSettled = this.values
+                    .map((item) => {
+                        return {
+                            [item.prop]: parseFloat(item.toValue),
+                        };
+                    })
+                    .reduce((p, c) => {
+                        return { ...p, ...c };
+                    }, {});
 
                 // Fire callback with exact end value
                 this.callback.forEach(({ cb }) => {
-                    cb(cbObject);
+                    cb(cbObjectSettled);
                 });
 
                 // On complete
@@ -104,11 +134,11 @@ export class mobTween {
             }
         };
 
-        draw(timestamp);
+        draw();
     }
 
     /**
-     * this.compareKeys - Compare fromObj, toObj in goFromTo methods
+     * compareKeys - Compare fromObj, toObj in goFromTo methods
      * Check if has the same keys
      *
      * @param  {Object} a fromObj Object
@@ -127,9 +157,7 @@ export class mobTween {
      * @return {void}  description
      */
     stop() {
-        this.pauseTime = 0;
-        this.pauseStatus = false;
-        this.comeFromResume = false;
+        this.resetValueOnResume();
 
         // Update local values with last
         this.values.forEach((item, i) => {
@@ -158,9 +186,32 @@ export class mobTween {
      *
      * @return {void}  description
      */
-    pause() {
+    pause(decay = 0.01) {
         if (this.pauseStatus) return;
         this.pauseStatus = true;
+
+        this.values.forEach((item, i) => {
+            if (!item.settled) {
+                item.toValueOnPause = item.toValue;
+                item.toValue = item.currentValue + decay;
+                item.onPause = true;
+            } else {
+                item.onPause = false;
+            }
+        });
+    }
+
+    resetValueOnResume() {
+        this.values.forEach((item, i) => {
+            if (item.onPause) {
+                item.toValue = item.toValueOnPause;
+                item.velocity = this.config.velocity;
+                item.onPause = false;
+                item.settled = false;
+            }
+        });
+
+        this.pauseStatus = false;
     }
 
     /**
@@ -170,8 +221,13 @@ export class mobTween {
      */
     resume() {
         if (!this.pauseStatus) return;
-        this.pauseStatus = false;
-        this.comeFromResume = true;
+        this.resetValueOnResume();
+
+        if (!this.req && this.previousResolve) {
+            this.req = requestAnimationFrame(() => {
+                this.onReuqestAnim(this.previousResolve);
+            });
+        }
     }
 
     /**
@@ -180,7 +236,7 @@ export class mobTween {
      * @return {void}  description
      *
      * @example
-     * myTween.setData({ val: 100 });
+     * mySpring.setData({ val: 100 });
      */
     setData(obj) {
         const valToArray = Object.entries(obj);
@@ -189,12 +245,13 @@ export class mobTween {
             const [prop, value] = item;
             return {
                 prop: prop,
-                toValue: 0,
-                toValueOnPause: 0,
-                toValProcessed: 0,
+                toValue: value,
+                toValueOnPause: value,
                 fromValue: value,
-                currentValue: 0,
-                update: false,
+                velocity: this.config.velocity,
+                currentValue: value,
+                settled: false,
+                onPause: false,
             };
         });
     }
@@ -214,48 +271,20 @@ export class mobTween {
             });
 
             // If exist merge
-            return itemToMerge
-                ? { ...item, ...itemToMerge, ...{ update: true } }
-                : { ...item, ...{ update: false } };
+            return itemToMerge ? { ...item, ...itemToMerge } : item;
         });
     }
 
     /**
-     * updateDataWhileRunning - Cancel RAF when event fire while is isRunning
-     * update form value
+     * Force fail primse when new event is call while running, so clear che promise chain
      *
      * @return {void}
      */
     updateDataWhileRunning() {
-        cancelAnimationFrame(this.req);
-        this.req = null;
-
         // Abort promise
         if (this.previousReject) {
             this.previousReject();
-            this.promise = null;
         }
-
-        this.values.forEach((item, i) => {
-            if (item.update) {
-                item.fromValue = item.currentValue;
-                // item.currentValue = 0;
-            }
-        });
-    }
-
-    /**
-     * setToValProcessed - Update to value to match an absolute destination
-     *
-     * @return {void}  onComplete promise
-     *
-     */
-    setToValProcessed() {
-        this.values.forEach((item, i) => {
-            if (item.update) {
-                item.toValProcessed = item.toValue - item.fromValue;
-            }
-        });
     }
 
     /**
@@ -265,30 +294,27 @@ export class mobTween {
      * @return {promise}  onComplete promise
      *
      * @example
-     * myTween.goTo({ val: 100 }).catch((err) => {});
+     * mySpring.goTo({ val: 100 }).catch((err) => {});
      */
-    goTo(obj, duration = 1000) {
-        this.duration = duration;
-        if (this.pauseStatus || this.comeFromResume) this.stop();
+    goTo(obj) {
+        if (this.pauseStatus) this.resetValueOnResume();
 
         const newDataArray = Object.keys(obj).map((item) => {
             return {
                 prop: item,
                 toValue: obj[item],
+                settled: false,
             };
         });
 
         this.mergeData(newDataArray);
         if (this.req) this.updateDataWhileRunning();
-        this.setToValProcessed();
 
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
                 this.previousReject = reject;
                 this.previousResolve = res;
-                this.req = requestAnimationFrame((timestamp) => {
-                    this.onReuqestAnim(timestamp, res);
-                });
+                this.req = requestAnimationFrame(() => this.onReuqestAnim(res));
             });
         }
 
@@ -303,30 +329,28 @@ export class mobTween {
      * @return {promise}  onComplete promise
      *
      * @example
-     * myTween.goFrom({ val: 100 }).catch((err) => {});
+     * mySpring.goFrom({ val: 100 }).catch((err) => {});
      */
-    goFrom(obj, duration = 1000) {
-        this.duration = duration;
-        if (this.pauseStatus || this.comeFromResume) this.stop();
+    goFrom(obj) {
+        if (this.pauseStatus) this.resetValueOnResume();
 
         const newDataArray = Object.keys(obj).map((item) => {
             return {
                 prop: item,
                 fromValue: obj[item],
+                currentValue: obj[item],
+                settled: false,
             };
         });
 
         this.mergeData(newDataArray);
         if (this.req) this.updateDataWhileRunning();
-        this.setToValProcessed();
 
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
                 this.previousReject = reject;
                 this.previousResolve = res;
-                this.req = requestAnimationFrame((timestamp) => {
-                    this.onReuqestAnim(timestamp, res);
-                });
+                this.req = requestAnimationFrame(() => this.onReuqestAnim(res));
             });
         }
 
@@ -342,11 +366,10 @@ export class mobTween {
      * @return {promise}  onComplete promise
      *
      * @example
-     * myTween.goFromTo({ val: 0 },{ val: 100 }).catch((err) => {});
+     * mySpring.goFromTo({ val: 0 },{ val: 100 }).catch((err) => {});
      */
-    goFromTo(fromObj, toObj, duration = 1000) {
-        this.duration = duration;
-        if (this.pauseStatus || this.comeFromResume) this.stop();
+    goFromTo(fromObj, toObj) {
+        if (this.pauseStatus) this.resetValueOnResume();
 
         // Check if fromObj has the same keys of toObj
         const dataIsValid = this.compareKeys(fromObj, toObj);
@@ -356,21 +379,20 @@ export class mobTween {
             return {
                 prop: item,
                 fromValue: fromObj[item],
+                currentValue: fromObj[item],
                 toValue: toObj[item],
+                settled: false,
             };
         });
 
         this.mergeData(newDataArray);
         if (this.req) this.updateDataWhileRunning();
-        this.setToValProcessed();
 
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
                 this.previousReject = reject;
                 this.previousResolve = res;
-                this.req = requestAnimationFrame((timestamp) => {
-                    this.onReuqestAnim(timestamp, res);
-                });
+                this.req = requestAnimationFrame(() => this.onReuqestAnim(res));
             });
         }
 
@@ -385,31 +407,29 @@ export class mobTween {
      *
      *
      * @example
-     * myTween.set({ val: 100 }).catch((err) => {});
+     * mySpring.set({ val: 100 }).catch((err) => {});
      */
-    set(obj, duration = 1000) {
-        this.duration = duration;
-        if (this.pauseStatus || this.comeFromResume) this.stop();
+    set(obj) {
+        if (this.pauseStatus) this.resetValueOnResume();
 
         const newDataArray = Object.keys(obj).map((item) => {
             return {
                 prop: item,
                 fromValue: obj[item],
+                currentValue: obj[item],
                 toValue: obj[item],
+                settled: false,
             };
         });
 
         this.mergeData(newDataArray);
         if (this.req) this.updateDataWhileRunning();
-        this.setToValProcessed();
 
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
                 this.previousReject = reject;
                 this.previousResolve = res;
-                this.req = requestAnimationFrame((timestamp) => {
-                    this.onReuqestAnim(timestamp, res);
-                });
+                this.req = requestAnimationFrame(() => this.onReuqestAnim(res));
             });
         }
 
@@ -437,6 +457,17 @@ export class mobTween {
     }
 
     /**
+     * updateConfig - Update config object
+     *
+     * @param  {Object} config udate single prop of config object
+     * @return {void}
+     *
+     */
+    updateConfig(config) {
+        this.config = { ...this.config, ...config };
+    }
+
+    /**
      * updatePreset - Update config object with new preset
      *
      * @param  {String} preset new preset
@@ -444,8 +475,8 @@ export class mobTween {
      *
      */
     updatePreset(preset) {
-        if (preset in tweenConfig) {
-            this.ease = tweenConfig[preset];
+        if (preset in springConfig) {
+            this.config = springConfig[preset];
         }
     }
 

@@ -4,9 +4,9 @@ import {
     outerWidth,
     offset,
 } from '../../../js/core/utils/vanillaFunction.js';
-import { mobResize } from '.../../../js/core/events/resizeUtils/mobResize.js';
-import { mobScroll } from '.../../../js/core/events/scrollUtils/mobScroll.js';
-import { mobLerp } from '.../../../js/core/animation/lerp/mobLerp.js';
+import { handleResize } from '.../../../js/core/events/resizeUtils/handleResize.js';
+import { handleScroll } from '.../../../js/core/events/scrollUtils/handleScroll.js';
+import { handleLerp } from '.../../../js/core/animation/lerp/handleLerp.js';
 
 export class PageScrollItemClass {
     constructor(data) {
@@ -21,7 +21,7 @@ export class PageScrollItemClass {
         this.endValue = 0;
         this.prevValue = 0;
         this.firstTime = true;
-        this.lerp = new mobLerp(80);
+        this.lerp = new handleLerp(80);
         this.unsubscribeResize = () => {};
         this.unsubscribeScroll = () => {};
         this.unsubscribeLerp = () => {};
@@ -36,13 +36,13 @@ export class PageScrollItemClass {
         this.setShadow();
         this.setOffset();
         this.setContent();
-        this.unsubscribeResize = mobResize(() => {
+        this.unsubscribeResize = handleResize(() => {
             this.firstTime = true;
             this.setShadow();
             this.setOffset();
             this.setContent();
         });
-        this.unsubscribeScroll = mobScroll(() => this.onScroll());
+        this.unsubscribeScroll = handleScroll(() => this.onScroll());
     }
 
     destroy() {

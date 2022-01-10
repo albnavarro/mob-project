@@ -1,12 +1,12 @@
-import { mobScroll } from './mobScroll.js';
+import { handleScroll } from './handleScroll.js';
 import { debounceFuncion } from '../debounce.js';
 
 /**
- * Same of mobScroll but trigger scrollEnd and scrollStart event
+ * Same of handleScroll but trigger scrollEnd and scrollStart event
  *
  */
 
-function mobScrollUtils(type) {
+function handleScrollUtils(type) {
     let inizialized = false;
     let callback = [];
     let id = 0;
@@ -68,7 +68,7 @@ function mobScrollUtils(type) {
 
         // Use normal scroll event ( no debuonce ) to detect if page is scrolling
         if (type === 'START') {
-            unsubscribeScroll = mobScroll(() => {
+            unsubscribeScroll = handleScroll(() => {
                 const scrollData = {
                     scrolY: window.pageYOffset,
                 };
@@ -109,5 +109,5 @@ function mobScrollUtils(type) {
     return addCb;
 }
 
-export const mobScrollStart = new mobScrollUtils('START');
-export const mobScrollEnd = new mobScrollUtils('END');
+export const handleScrollStart = new handleScrollUtils('START');
+export const handleScrollEnd = new handleScrollUtils('END');

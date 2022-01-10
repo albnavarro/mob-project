@@ -1,24 +1,24 @@
 /**
  * Utils to centralize all action form all components in one Request Animation Frame,
  * All subsciber use the same frame
- * mobFrame run once then delete all subscriber
+ * handleFrame run once then delete all subscriber
  * Use inside a loop or inside eventListener like scroll or mousemove
  *
  * @example:
  *
  * Default 60fps
- * mobFrame(() => {
+ * handleFrame(() => {
  *     myFunction()
  * });
  *
  * Custom fps
- * mobFrame(() => {
+ * handleFrame(() => {
  *     myFunction()
  * }, 20);
  *
  */
 
-export const mobFrame = (() => {
+export const handleFrame = (() => {
     let inizialized = false;
     let callback = [];
 

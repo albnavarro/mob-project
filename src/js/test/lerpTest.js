@@ -1,4 +1,4 @@
-import { mobLerp } from '../core/animation/lerp/mobLerp.js';
+import { handleLerp } from '../core/animation/lerp/handleLerp.js';
 
 export function lerpTest() {
     const btnStart = document.querySelector('.lerp-btn-start');
@@ -8,7 +8,7 @@ export function lerpTest() {
     const btnPlay = document.querySelector('.lerp-btn-play');
     const target = document.querySelector('.lerp-target');
 
-    const myLerp = new mobLerp();
+    const myLerp = new handleLerp();
     myLerp.setData({ x: 0, y: 0, rotate: 0 });
     myLerp.subscribe(({ x, y, rotate }) => {
         target.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg)`;

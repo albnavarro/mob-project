@@ -4,7 +4,7 @@ const getLerpTime = () => {
         : Date.now();
 };
 
-export class mobLerp {
+export class handleLerp {
     constructor(velocity = 200) {
         this.config = {};
         this.config.velocity = velocity;

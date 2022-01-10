@@ -8,13 +8,13 @@
  *
  * @example:
  * onMount(() => {
- *   const unsubscribe = mobScroll(({scrolY, direction}) => console.log(scrolY,direction));
+ *   const unsubscribe = handleScroll(({scrolY, direction}) => console.log(scrolY,direction));
  *   return(() => unsubscribe())
  * }
  *
  */
 
-export const mobScroll = (() => {
+export const handleScroll = (() => {
     let inizialized = false;
     let callback = [];
     let id = 0;

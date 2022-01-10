@@ -3,10 +3,10 @@ import {
     outerWidth,
     offset,
 } from '../../../js/core/utils/vanillaFunction.js';
-import { mobSpring } from '.../../../js/core/animation/spring/mobSpring.js';
-import { mobResize } from '.../../../js/core/events/resizeUtils/mobResize.js';
-import { mobScroll } from '.../../../js/core/events/scrollUtils/mobScroll.js';
-import { mobMouseMove } from '.../../../js/core/events/mouseUtils/mobMouse.js';
+import { handleSpring } from '.../../../js/core/animation/spring/handleSpring.js';
+import { handleResize } from '.../../../js/core/events/resizeUtils/handleResize.js';
+import { handleScroll } from '.../../../js/core/events/scrollUtils/handleScroll.js';
+import { handleMouseMove } from '.../../../js/core/events/mouseUtils/handleMouse.js';
 
 export class MouseParallaxItemClass {
     constructor(data) {
@@ -19,7 +19,7 @@ export class MouseParallaxItemClass {
         this.offSetTop = 0;
         this.offSetLeft = 0;
         this.smooth = 10;
-        this.spring = new mobSpring();
+        this.spring = new handleSpring();
         this.unsubscribeSpring = () => {};
 
         // MOUSE COORD
@@ -35,16 +35,16 @@ export class MouseParallaxItemClass {
     init() {
         this.getDimension();
 
-        this.unsubscribeMouseMove = mobMouseMove(({ page, client }) => {
+        this.unsubscribeMouseMove = handleMouseMove(({ page, client }) => {
             this.setGlobalCoord({ page, client });
             this.onMove();
         });
 
-        this.unsubscribeResize = mobResize(() => {
+        this.unsubscribeResize = handleResize(() => {
             this.getDimension();
         });
 
-        this.unsubscribeScroll = mobScroll(({ scrolY }) => {
+        this.unsubscribeScroll = handleScroll(({ scrolY }) => {
             this.onScroll(scrolY);
         });
 

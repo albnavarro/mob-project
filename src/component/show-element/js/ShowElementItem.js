@@ -1,6 +1,6 @@
 import { offset } from '../../../js/core/utils/vanillaFunction.js';
-import { mobResize } from '.../../../js/core/events/resizeUtils/mobResize.js';
-import { mobScroll } from '.../../../js/core/events/scrollUtils/mobScroll.js';
+import { handleResize } from '.../../../js/core/events/resizeUtils/handleResize.js';
+import { handleScroll } from '.../../../js/core/events/scrollUtils/handleScroll.js';
 
 export class showElementItemClass {
     constructor(data) {
@@ -23,10 +23,10 @@ export class showElementItemClass {
         this.calcOffset();
         this.checkPosition();
 
-        this.unsubscribeScroll = mobScroll(() => {
+        this.unsubscribeScroll = handleScroll(() => {
             this.checkPosition();
         });
-        this.unsubscribeResize = mobResize(() => {
+        this.unsubscribeResize = handleResize(() => {
             this.refresh();
         });
     }

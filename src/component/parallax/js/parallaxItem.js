@@ -5,11 +5,11 @@ import { parallaxConstant } from './parallaxConstant.js';
 import { parallaxMarker } from './parallaxMarker.js';
 import { parallaxEmitter } from './parallaxEmitter.js';
 import { ParallaxPin } from './parallaxPin.js';
-import { mobFrame } from '.../../../js/core/events/rafutils/rafUtils.js';
-import { mobResize } from '.../../../js/core/events/resizeUtils/mobResize.js';
-import { mobScroll } from '.../../../js/core/events/scrollUtils/mobScroll.js';
-import { mobSpring } from '.../../../js/core/animation/spring/mobSpring.js';
-import { mobLerp } from '.../../../js/core/animation/lerp/mobLerp.js';
+import { handleFrame } from '.../../../js/core/events/rafutils/rafUtils.js';
+import { handleResize } from '.../../../js/core/events/resizeUtils/handleResize.js';
+import { handleScroll } from '.../../../js/core/events/scrollUtils/handleScroll.js';
+import { handleSpring } from '.../../../js/core/animation/spring/handleSpring.js';
+import { handleLerp } from '.../../../js/core/animation/lerp/handleLerp.js';
 import { springConfig } from '.../../../js/core/animation/spring/springConfig.js';
 
 export class ParallaxItemClass {
@@ -112,8 +112,8 @@ export class ParallaxItemClass {
         this.lerpConfig = data.lerpConfig || null;
         this.motion = (() => {
             return this.easeType === parallaxConstant.EASE_LERP
-                ? new mobLerp()
-                : new mobSpring();
+                ? new handleLerp()
+                : new handleSpring();
         })();
         this.unsubscribeMotion = () => {};
 
@@ -145,21 +145,21 @@ export class ParallaxItemClass {
         }
 
         if (this.ease) {
-            this.unsubscribeScroll = mobScroll(() => this.smoothParallaxJs());
+            this.unsubscribeScroll = handleScroll(() => this.smoothParallaxJs());
             this.smoothParallaxJs();
         } else {
-            this.unsubscribeScroll = mobScroll(() => this.executeParallax());
+            this.unsubscribeScroll = handleScroll(() => this.executeParallax());
             this.executeParallax();
         }
 
         if (this.scroller !== window) {
-            this.unsubscribeMarker = mobScroll(() => {
+            this.unsubscribeMarker = handleScroll(() => {
                 // Refresh marker
                 if (this.marker) this.calcFixedLimit();
             });
         }
 
-        this.unsubscribeResize = mobResize(() => this.refresh());
+        this.unsubscribeResize = handleResize(() => this.refresh());
 
         if (this.pin) {
             this.pinInstance = new ParallaxPin({ instance: this });
@@ -553,7 +553,7 @@ export class ParallaxItemClass {
 
         if (!applyStyle) return;
 
-        mobFrame(() => {
+        handleFrame(() => {
             this.updateStyle(this.endValue);
         });
     }

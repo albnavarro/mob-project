@@ -1,5 +1,5 @@
 import { bodyScrollTo } from '../../../js/utility/animation.js';
-import { mobScroll } from '.../../../js/core/events/scrollUtils/mobScroll.js';
+import { handleScroll } from '.../../../js/core/events/scrollUtils/handleScroll.js';
 
 class totopClass {
     constructor() {
@@ -10,7 +10,7 @@ class totopClass {
     init() {
         this.addHandler();
         this.showArrow();
-        mobScroll(() => this.showArrow());
+        handleScroll(() => this.showArrow());
     }
 
     addHandler() {

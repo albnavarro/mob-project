@@ -5,7 +5,7 @@ import {
     outerHeight,
     outerWidth,
 } from '../core/utils/vanillaFunction.js';
-import { mobResize } from '../core/events/resizeUtils/mobResize.js';
+import { handleResize } from '../core/events/resizeUtils/handleResize.js';
 
 class gsapTestClass {
     constructor() {}
@@ -221,7 +221,7 @@ class gsapTestClass {
             },
         });
 
-        mobResize(() => {
+        handleResize(() => {
             width = this.cardWidth(card);
             this.applyStyle(width, container, itemToScroll);
             percentRange = this.getPercentMaxScroll();
@@ -262,7 +262,7 @@ class gsapTestClass {
             },
         });
 
-        mobResize(() => {
+        handleResize(() => {
             width = this.cardWidth(card);
             this.applyStyle(width, container, itemToScroll);
             tl.scrollTrigger.refresh();
