@@ -4,10 +4,10 @@ import {
     outerHeight,
     offset,
 } from '../../../js/core/utils/vanillaFunction.js';
-import { bodyScrollTo } from '../../../js/utility/animation.js';
 import { modernzier } from '../../../js/utility/modernizr.js';
 import { SimpleStore } from '../../../js/core/store/simpleStore.js';
 import { handleResize } from '.../../../js/core/events/resizeUtils/handleResize.js';
+import { bodyScroll } from '../../../js/core/animation/bodyScroll/bodyScroll.js';
 
 export class tBlocksItemClass {
     constructor(container) {
@@ -308,8 +308,7 @@ export class tBlocksItemClass {
         );
 
         setTimeout(() => {
-            const scrollDestination = offset(this.container).top;
-            bodyScrollTo(scrollDestination);
+            bodyScroll.to({ target: this.container });
         }, 500);
     }
 }

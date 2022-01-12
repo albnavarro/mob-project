@@ -1,4 +1,4 @@
-import { bodyScrollTo } from '../../../js/utility/animation.js';
+import { bodyScroll } from '../../../js/core/animation/bodyScroll/bodyScroll.js';
 import { handleScroll } from '.../../../js/core/events/scrollUtils/handleScroll.js';
 
 class totopClass {
@@ -19,7 +19,7 @@ class totopClass {
 
     onClick(event) {
         event.preventDefault();
-        bodyScrollTo(0);
+        bodyScroll.to({ val: 0 });
     }
 
     showArrow() {
