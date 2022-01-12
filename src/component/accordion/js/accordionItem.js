@@ -49,25 +49,40 @@ export class AccordionItemClass {
             const targetArray = Array.from(this.target);
             for (const el of targetArray) {
                 if (el !== target) {
-                    slide.up(el).then(() => {
-                        window.dispatchEvent(new Event('resize'));
-                    });
+                    slide
+                        .up(el)
+                        .then(() => {
+                            window.dispatchEvent(new Event('resize'));
+                        })
+                        .catch((err) => {
+                            console.warn(err);
+                        });
                 }
             }
         }
 
         if (!btn.classList.contains('active')) {
             btn.classList.add('active');
-            slide.down(target).then(() => {
-                window.dispatchEvent(new Event('resize'));
-                this.dispatch();
-            });
+            slide
+                .down(target)
+                .then(() => {
+                    window.dispatchEvent(new Event('resize'));
+                    this.dispatch();
+                })
+                .catch((err) => {
+                    console.warn(err);
+                });
         } else if (!this.notAllClose && btn.classList.contains('active')) {
             btn.classList.remove('active');
-            slide.up(target).then(() => {
-                window.dispatchEvent(new Event('resize'));
-                this.dispatch();
-            });
+            slide
+                .up(target)
+                .then(() => {
+                    window.dispatchEvent(new Event('resize'));
+                    this.dispatch();
+                })
+                .catch((err) => {
+                    console.warn(err);
+                });
         }
     }
 

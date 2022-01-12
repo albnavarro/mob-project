@@ -54,11 +54,19 @@ export const slide = (() => {
     }
 
     function up(target) {
-        const { item, tween } = slideItems.find(({ item }) => item === target);
-
         return new Promise((res, reject) => {
+            // Reject of target not exist in store
+            const currentItem = slideItems.find(({ item }) => item === target);
+            if (!currentItem)
+                reject(new Error('slide element not exist in slide store'));
+
+            // height of item may be chenge once opened outside tween control
+            // use fromTo in this case
+            const { item, tween } = currentItem;
+            const currentHeight = outerHeight(item);
+
             tween
-                .goTo({ val: 0 }, 400)
+                .goFromTo({ val: currentHeight }, { val: 0 }, 500)
                 .then((value) => {
                     res();
                 })
@@ -67,16 +75,20 @@ export const slide = (() => {
     }
 
     function down(target) {
-        const { item, tween } = slideItems.find(({ item }) => item === target);
-
-        const { currentHeight } = tween.get();
-        item.style.height = `auto`;
-        const height = outerHeight(item);
-        item.style.height = `${currentHeight}px`;
-
         return new Promise((res, reject) => {
+            // Reject of target not exist in store
+            const currentItem = slideItems.find(({ item }) => item === target);
+            if (!currentItem)
+                reject(new Error('slide element not exist in slide store'));
+
+            const { item, tween } = currentItem;
+            const { val: currentHeight } = tween.get();
+            item.style.height = `auto`;
+            const height = outerHeight(item);
+            item.style.height = `${currentHeight}px`;
+
             tween
-                .goTo({ val: height }, 400)
+                .goTo({ val: height }, 500)
                 .then((value) => {
                     item.style.height = `auto`;
                     res();
