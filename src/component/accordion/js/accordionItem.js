@@ -1,9 +1,5 @@
 import { mq } from '../../../js/core/utils/mediaManager.js';
-import {
-    slideUpDownReset,
-    slideUp,
-    slideDown,
-} from '../../../js/utility/animation.js';
+import { slide } from '../../../js/core/animation/slide/slide.js';
 
 export class AccordionItemClass {
     constructor(data) {
@@ -30,10 +26,10 @@ export class AccordionItemClass {
             button.addEventListener('click', this.openItem.bind(this));
         }
 
-        /// GASP INITIAL STATE
         const targetArray = Array.from(this.target);
         for (const el of targetArray) {
-            slideUpDownReset(el);
+            slide.subscribe(el);
+            slide.reset(el);
         }
     }
 
@@ -53,7 +49,7 @@ export class AccordionItemClass {
             const targetArray = Array.from(this.target);
             for (const el of targetArray) {
                 if (el !== target) {
-                    slideUp(el).then(() => {
+                    slide.up(el).then(() => {
                         window.dispatchEvent(new Event('resize'));
                     });
                 }
@@ -62,13 +58,13 @@ export class AccordionItemClass {
 
         if (!btn.classList.contains('active')) {
             btn.classList.add('active');
-            slideDown(target).then(() => {
+            slide.down(target).then(() => {
                 window.dispatchEvent(new Event('resize'));
                 this.dispatch();
             });
         } else if (!this.notAllClose && btn.classList.contains('active')) {
             btn.classList.remove('active');
-            slideUp(target).then(() => {
+            slide.up(target).then(() => {
                 window.dispatchEvent(new Event('resize'));
                 this.dispatch();
             });
