@@ -17,6 +17,7 @@ export class handleTween {
         this.isRunning = false;
         this.timeElapsed = 0;
         this.pauseTime = 0;
+        this.defaultProps = { duration: 1000, reverse: false };
     }
 
     onReuqestAnim(timestamp, res) {
@@ -267,8 +268,7 @@ export class handleTween {
      * @example
      * myTween.goTo({ val: 100 }).catch((err) => {});
      */
-    goTo(obj, duration = 1000) {
-        this.duration = duration;
+    goTo(obj, props = {}) {
         if (this.pauseStatus || this.comeFromResume) this.stop();
 
         const newDataArray = Object.keys(obj).map((item) => {
@@ -280,6 +280,15 @@ export class handleTween {
 
         this.mergeData(newDataArray);
         if (this.req) this.updateDataWhileRunning();
+
+        // merge special props with default
+        const newProps = { ...this.defaultProps, ...props };
+        // if revert switch fromValue and toValue
+        const { reverse, duration } = newProps;
+        // Update duration
+        this.duration = duration;
+        if (reverse) this.reverse(obj);
+
         this.setToValProcessed();
 
         if (!this.req) {
@@ -305,8 +314,7 @@ export class handleTween {
      * @example
      * myTween.goFrom({ val: 100 }).catch((err) => {});
      */
-    goFrom(obj, duration = 1000) {
-        this.duration = duration;
+    goFrom(obj, props = {}) {
         if (this.pauseStatus || this.comeFromResume) this.stop();
 
         const newDataArray = Object.keys(obj).map((item) => {
@@ -318,6 +326,15 @@ export class handleTween {
 
         this.mergeData(newDataArray);
         if (this.req) this.updateDataWhileRunning();
+
+        // merge special props with default
+        const newProps = { ...this.defaultProps, ...props };
+        // if revert switch fromValue and toValue
+        const { reverse, duration } = newProps;
+        // Update duration
+        this.duration = duration;
+        if (reverse) this.reverse(obj);
+
         this.setToValProcessed();
 
         if (!this.req) {
@@ -344,8 +361,7 @@ export class handleTween {
      * @example
      * myTween.goFromTo({ val: 0 },{ val: 100 }).catch((err) => {});
      */
-    goFromTo(fromObj, toObj, duration = 1000) {
-        this.duration = duration;
+    goFromTo(fromObj, toObj, props = {}) {
         if (this.pauseStatus || this.comeFromResume) this.stop();
 
         // Check if fromObj has the same keys of toObj
@@ -362,6 +378,15 @@ export class handleTween {
 
         this.mergeData(newDataArray);
         if (this.req) this.updateDataWhileRunning();
+
+        // merge special props with default
+        const newProps = { ...this.defaultProps, ...props };
+        // if revert switch fromValue and toValue
+        const { reverse, duration } = newProps;
+        // Update duration
+        this.duration = duration;
+        if (reverse) this.reverse(fromObj);
+
         this.setToValProcessed();
 
         if (!this.req) {
@@ -387,8 +412,7 @@ export class handleTween {
      * @example
      * myTween.set({ val: 100 }).catch((err) => {});
      */
-    set(obj, duration = 1000) {
-        this.duration = duration;
+    set(obj, props = {}) {
         if (this.pauseStatus || this.comeFromResume) this.stop();
 
         const newDataArray = Object.keys(obj).map((item) => {
@@ -401,6 +425,19 @@ export class handleTween {
 
         this.mergeData(newDataArray);
         if (this.req) this.updateDataWhileRunning();
+
+        // merge special props with default
+        const newProps = {
+            ...{ reverse: this.defaultProps.reverse },
+            ...{ duration: 1 },
+            ...props,
+        };
+        // if revert switch fromValue and toValue
+        const { reverse, duration } = newProps;
+        // Update duration
+        this.duration = duration;
+        if (reverse) this.reverse(obj);
+
         this.setToValProcessed();
 
         if (!this.req) {
@@ -447,6 +484,24 @@ export class handleTween {
         if (preset in tweenConfig) {
             this.ease = tweenConfig[preset];
         }
+    }
+
+    /**
+     * reverse - sitch fromValue and ToValue for specific input value
+     *
+     * @return {void}
+     *
+     */
+    reverse(obj) {
+        const keysTorevert = Object.keys(obj);
+        this.values.forEach((item, i) => {
+            if (keysTorevert.includes(item.prop)) {
+                const fromValue = item.fromValue;
+                const toValue = item.toValue;
+                item.fromValue = toValue;
+                item.toValue = fromValue;
+            }
+        });
     }
 
     /**

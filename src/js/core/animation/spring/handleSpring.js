@@ -17,6 +17,7 @@ export class handleSpring {
         this.id = 0;
         this.callback = [];
         this.pauseStatus = false;
+        this.defaultProps = { reverse: false, config: this.config };
     }
 
     onReuqestAnim(res) {
@@ -296,7 +297,7 @@ export class handleSpring {
      * @example
      * mySpring.goTo({ val: 100 }).catch((err) => {});
      */
-    goTo(obj) {
+    goTo(obj, props = {}) {
         if (this.pauseStatus) this.resetValueOnResume();
 
         const newDataArray = Object.keys(obj).map((item) => {
@@ -309,6 +310,17 @@ export class handleSpring {
 
         this.mergeData(newDataArray);
         if (this.req) this.updateDataWhileRunning();
+
+        // merge special props with default
+        const newProps = { ...this.defaultProps, ...props };
+        // if revert switch fromValue and toValue
+        const { reverse } = newProps;
+
+        // Merge news config prop if there is some
+        const config = props?.config ? props.config : {};
+        this.config = { ...this.config, ...config };
+
+        if (reverse) this.reverse(obj);
 
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
@@ -331,7 +343,7 @@ export class handleSpring {
      * @example
      * mySpring.goFrom({ val: 100 }).catch((err) => {});
      */
-    goFrom(obj) {
+    goFrom(obj, props = {}) {
         if (this.pauseStatus) this.resetValueOnResume();
 
         const newDataArray = Object.keys(obj).map((item) => {
@@ -345,6 +357,17 @@ export class handleSpring {
 
         this.mergeData(newDataArray);
         if (this.req) this.updateDataWhileRunning();
+
+        // merge special props with default
+        const newProps = { ...this.defaultProps, ...props };
+        // if revert switch fromValue and toValue
+        const { reverse } = newProps;
+
+        // Merge news config prop if there is some
+        const config = props?.config ? props.config : {};
+        this.config = { ...this.config, ...config };
+
+        if (reverse) this.reverse(obj);
 
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
@@ -368,7 +391,7 @@ export class handleSpring {
      * @example
      * mySpring.goFromTo({ val: 0 },{ val: 100 }).catch((err) => {});
      */
-    goFromTo(fromObj, toObj) {
+    goFromTo(fromObj, toObj, props = {}) {
         if (this.pauseStatus) this.resetValueOnResume();
 
         // Check if fromObj has the same keys of toObj
@@ -387,6 +410,17 @@ export class handleSpring {
 
         this.mergeData(newDataArray);
         if (this.req) this.updateDataWhileRunning();
+
+        // merge special props with default
+        const newProps = { ...this.defaultProps, ...props };
+        // if revert switch fromValue and toValue
+        const { reverse } = newProps;
+
+        // Merge news config prop if there is some
+        const config = props?.config ? props.config : {};
+        this.config = { ...this.config, ...config };
+
+        if (reverse) this.reverse(fromObj);
 
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
@@ -409,7 +443,7 @@ export class handleSpring {
      * @example
      * mySpring.set({ val: 100 }).catch((err) => {});
      */
-    set(obj) {
+    set(obj, props = {}) {
         if (this.pauseStatus) this.resetValueOnResume();
 
         const newDataArray = Object.keys(obj).map((item) => {
@@ -424,6 +458,16 @@ export class handleSpring {
 
         this.mergeData(newDataArray);
         if (this.req) this.updateDataWhileRunning();
+
+        // merge special props with default
+        const newProps = { ...this.defaultProps, ...props };
+        const { reverse } = newProps;
+
+        // Merge news config prop if there is some
+        const config = props?.config ? props.config : {};
+        this.config = { ...this.config, ...config };
+
+        if (reverse) this.reverse(obj);
 
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
@@ -465,6 +509,25 @@ export class handleSpring {
      */
     updateConfig(config) {
         this.config = { ...this.config, ...config };
+    }
+
+    /**
+     * reverse - sitch fromValue and ToValue for specific input value
+     *
+     * @return {void}
+     *
+     */
+    reverse(obj) {
+        const keysTorevert = Object.keys(obj);
+
+        this.values.forEach((item, i) => {
+            if (keysTorevert.includes(item.prop)) {
+                const fromValue = item.fromValue;
+                const toValue = item.toValue;
+                item.fromValue = toValue;
+                item.toValue = fromValue;
+            }
+        });
     }
 
     /**

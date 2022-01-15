@@ -22,7 +22,7 @@ export function tweenTest() {
     function intialTween() {
         myTween.stop();
         myTween.updatePreset('easeInOutQuint');
-        return myTween.set({ x: 0, y: 0, rotate: 0 }, 10);
+        return myTween.set({ x: 0, y: 0, rotate: 0 });
     }
 
     function tween1() {

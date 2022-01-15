@@ -15,14 +15,12 @@ export function lerpTest() {
     });
 
     function tweenback() {
-        myLerp.updateVelocity(150);
-        return myLerp.goTo({ x: 0, y: 0, rotate: 180 });
+        return myLerp.goTo({ x: 0, y: 0, rotate: 180 }, { velocity: 150 });
     }
 
     function intialTween() {
         myLerp.stop();
-        myLerp.updateVelocity(250);
-        return myLerp.set({ x: 0, y: 0, rotate: 0 });
+        return myLerp.set({ x: 0, y: 0, rotate: 0 }, { velocity: 250 });
     }
 
     function tween1() {
@@ -30,18 +28,15 @@ export function lerpTest() {
     }
 
     function tween2() {
-        myLerp.updateVelocity(300);
-        return myLerp.goTo({ y: 400 });
+        return myLerp.goTo({ y: 400 }, { velocity: 50 });
     }
 
     function tween3() {
-        myLerp.updateVelocity(200);
-        return myLerp.goTo({ x: -100, rotate: 90 });
+        return myLerp.goTo({ x: -100, rotate: 90 }, { velocity: 200 });
     }
 
     function tween4() {
-        myLerp.updateVelocity(80);
-        return myLerp.goTo({ x: 0, y: 0, rotate: 0 });
+        return myLerp.goTo({ x: 0, y: 0, rotate: 0 }, { velocity: 80 });
     }
 
     btnStart.addEventListener('click', () => {

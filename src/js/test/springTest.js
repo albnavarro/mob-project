@@ -31,12 +31,15 @@ export function springTest() {
 
     function tween2() {
         mySpring.updatePreset('default');
-        return mySpring.goTo({ y: 400 });
+        return mySpring.goTo({ y: 400 }, { config: { mass: 2 } });
     }
 
     function tween3() {
         mySpring.updatePreset('bounce');
-        return mySpring.goTo({ x: -100, rotate: 90 });
+        return mySpring.goTo(
+            { x: -100, rotate: 90 },
+            { config: { tension: 50 } }
+        );
     }
 
     function tween4() {

@@ -7,8 +7,7 @@ const getLerpTime = () => {
 export class handleLerp {
     constructor(velocity = 200) {
         this.config = {};
-        this.config.velocity = velocity;
-        this.config.precision = 0.1;
+        this.velocity = velocity;
         this.req = null;
         this.previousResolve = null;
         this.previousReject = null;
@@ -17,6 +16,7 @@ export class handleLerp {
         this.id = 0;
         this.callback = [];
         this.pauseStatus = false;
+        this.defaultProps = { reverse: false, velocity: 200 };
     }
 
     onReuqestAnim(res) {
@@ -50,7 +50,7 @@ export class handleLerp {
 
                     const s = item.currentValue;
                     const f = item.toValue;
-                    const v = this.config.velocity;
+                    const v = this.velocity;
                     const val = (f - s) / v + s * 1;
                     item.currentValue = val;
 
@@ -202,7 +202,7 @@ export class handleLerp {
         this.values.forEach((item, i) => {
             if (item.onPause) {
                 item.toValue = item.toValueOnPause;
-                item.velocity = this.config.velocity;
+                item.velocity = this.velocity;
                 item.onPause = false;
                 item.settled = false;
             }
@@ -245,7 +245,7 @@ export class handleLerp {
                 toValue: value,
                 toValueOnPause: value,
                 fromValue: value,
-                velocity: this.config.velocity,
+                velocity: this.velocity,
                 currentValue: value,
                 previousValue: 0,
                 settled: false,
@@ -294,7 +294,7 @@ export class handleLerp {
      * @example
      * mySpring.goTo({ val: 100 }).catch((err) => {});
      */
-    goTo(obj) {
+    goTo(obj, props = {}) {
         if (this.pauseStatus) this.resetValueOnResume();
 
         const newDataArray = Object.keys(obj).map((item) => {
@@ -307,6 +307,14 @@ export class handleLerp {
 
         this.mergeData(newDataArray);
         if (this.req) this.updateDataWhileRunning();
+
+        // merge special props with default
+        const newProps = { ...this.defaultProps, ...props };
+        // if revert switch fromValue and toValue
+        const { reverse, velocity } = newProps;
+        this.velocity = velocity;
+
+        if (reverse) this.reverse(obj);
 
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
@@ -329,7 +337,7 @@ export class handleLerp {
      * @example
      * mySpring.goFrom({ val: 100 }).catch((err) => {});
      */
-    goFrom(obj) {
+    goFrom(obj, props = {}) {
         if (this.pauseStatus) this.resetValueOnResume();
 
         const newDataArray = Object.keys(obj).map((item) => {
@@ -343,6 +351,14 @@ export class handleLerp {
 
         this.mergeData(newDataArray);
         if (this.req) this.updateDataWhileRunning();
+
+        // merge special props with default
+        const newProps = { ...this.defaultProps, ...props };
+        // if revert switch fromValue and toValue
+        const { reverse, velocity } = newProps;
+        this.velocity = velocity;
+
+        if (reverse) this.reverse(obj);
 
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
@@ -366,7 +382,7 @@ export class handleLerp {
      * @example
      * mySpring.goFromTo({ val: 0 },{ val: 100 }).catch((err) => {});
      */
-    goFromTo(fromObj, toObj) {
+    goFromTo(fromObj, toObj, props = {}) {
         if (this.pauseStatus) this.resetValueOnResume();
 
         // Check if fromObj has the same keys of toObj
@@ -385,6 +401,14 @@ export class handleLerp {
 
         this.mergeData(newDataArray);
         if (this.req) this.updateDataWhileRunning();
+
+        // merge special props with default
+        const newProps = { ...this.defaultProps, ...props };
+        // if revert switch fromValue and toValue
+        const { reverse, velocity } = newProps;
+        this.velocity = velocity;
+
+        if (reverse) this.reverse(fromObj);
 
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
@@ -407,7 +431,7 @@ export class handleLerp {
      * @example
      * mySpring.set({ val: 100 }).catch((err) => {});
      */
-    set(obj) {
+    set(obj, props = {}) {
         if (this.pauseStatus) this.resetValueOnResume();
 
         const newDataArray = Object.keys(obj).map((item) => {
@@ -422,6 +446,13 @@ export class handleLerp {
 
         this.mergeData(newDataArray);
         if (this.req) this.updateDataWhileRunning();
+
+        // merge special props with default
+        const newProps = { ...this.defaultProps, ...props };
+        const { reverse, velocity } = newProps;
+        this.velocity = velocity;
+
+        if (reverse) this.reverse(obj);
 
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
@@ -462,7 +493,26 @@ export class handleLerp {
      *
      */
     updateVelocity(velocity) {
-        this.config.velocity = velocity;
+        this.velocity = velocity;
+    }
+
+    /**
+     * reverse - sitch fromValue and ToValue for specific input value
+     *
+     * @return {void}
+     *
+     */
+    reverse(obj) {
+        const keysTorevert = Object.keys(obj);
+
+        this.values.forEach((item, i) => {
+            if (keysTorevert.includes(item.prop)) {
+                const fromValue = item.fromValue;
+                const toValue = item.toValue;
+                item.fromValue = toValue;
+                item.toValue = fromValue;
+            }
+        });
     }
 
     /**

@@ -66,7 +66,7 @@ export const slide = (() => {
             const currentHeight = outerHeight(item);
 
             tween
-                .goFromTo({ val: currentHeight }, { val: 0 }, 500)
+                .goFromTo({ val: currentHeight }, { val: 0 }, { duration: 500 })
                 .then((value) => {
                     res();
                 })
@@ -88,7 +88,7 @@ export const slide = (() => {
             item.style.height = `${currentHeight}px`;
 
             tween
-                .goTo({ val: height }, 500)
+                .goTo({ val: height }, { duration: 500 })
                 .then((value) => {
                     item.style.height = `auto`;
                     res();
