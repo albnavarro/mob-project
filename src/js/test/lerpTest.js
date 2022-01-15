@@ -1,4 +1,5 @@
 import { handleLerp } from '../core/animation/lerp/handleLerp.js';
+import { HandleTimeline } from '../core/animation/timeline/handleTimeline.js';
 
 export function lerpTest() {
     const btnStart = document.querySelector('.lerp-btn-start');
@@ -8,59 +9,48 @@ export function lerpTest() {
     const btnPlay = document.querySelector('.lerp-btn-play');
     const target = document.querySelector('.lerp-target');
 
-    const myLerp = new handleLerp();
-    myLerp.setData({ x: 0, y: 0, rotate: 0 });
-    myLerp.subscribe(({ x, y, rotate }) => {
+    // DEFINE SPRING
+    const mylerp = new handleLerp();
+    mylerp.setData({ x: 0, y: 0, rotate: 0 });
+    mylerp.subscribe(({ x, y, rotate }) => {
         target.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg)`;
     });
 
-    function tweenback() {
-        return myLerp.goTo({ x: 0, y: 0, rotate: 180 }, { velocity: 150 });
+    // BACK TWEEN
+    function lerpBack() {
+        timeline.stop();
+        return mylerp.goTo({ x: 0, y: 0, rotate: 180 }, { velocity: 150 });
     }
 
-    function intialTween() {
-        myLerp.stop();
-        return myLerp.set({ x: 0, y: 0, rotate: 0 }, { velocity: 250 });
-    }
+    // DEFINE TIMELINE
+    const timeline = new HandleTimeline({ repeat: 2 })
+        .set(mylerp, { x: 0, y: 0, rotate: 0 })
+        .goTo(mylerp, { x: -200 }, { velocity: 250 })
+        .goFromTo(mylerp, { x: -200 }, { x: 400 })
+        .add(() => console.log('custom function'))
+        .goTo(mylerp, { y: 400 }, { velocity: 50 })
+        .add(() => console.log('custom function'))
+        .goTo(mylerp, { x: -100, rotate: 90 }, { velocity: 200 })
+        .goTo(mylerp, { x: 0, y: 0, rotate: 0 }, { velocity: 80 });
 
-    function tween1() {
-        return myLerp.goTo({ x: 400 });
-    }
-
-    function tween2() {
-        return myLerp.goTo({ y: 400 }, { velocity: 50 });
-    }
-
-    function tween3() {
-        return myLerp.goTo({ x: -100, rotate: 90 }, { velocity: 200 });
-    }
-
-    function tween4() {
-        return myLerp.goTo({ x: 0, y: 0, rotate: 0 }, { velocity: 80 });
-    }
-
+    // LISTNER
     btnStart.addEventListener('click', () => {
-        intialTween()
-            .then(() => tween1())
-            .then(() => tween2())
-            .then(() => tween3())
-            .then(() => tween4())
-            .catch(() => {});
+        timeline.play();
     });
 
     btnBack.addEventListener('click', () => {
-        tweenback().catch(() => {});
+        lerpBack().catch(() => {});
     });
 
     btnStop.addEventListener('click', () => {
-        myLerp.stop();
+        timeline.stop();
     });
 
     btnPause.addEventListener('click', () => {
-        myLerp.pause();
+        timeline.pause();
     });
 
     btnPlay.addEventListener('click', () => {
-        myLerp.resume();
+        timeline.resume();
     });
 }

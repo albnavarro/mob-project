@@ -1,4 +1,5 @@
 import { handleTween } from '../core/animation/tween/handleTween.js';
+import { HandleTimeline } from '../core/animation/timeline/handleTimeline.js';
 
 export function tweenTest() {
     const btnStart = document.querySelector('.tween-btn-start');
@@ -8,12 +9,14 @@ export function tweenTest() {
     const btnPlay = document.querySelector('.tween-btn-play');
     const target = document.querySelector('.tween-target');
 
+    // DEFINE SPRING
     const myTween = new handleTween();
     myTween.setData({ x: 0, y: 0, rotate: 0 });
     myTween.subscribe(({ x, y, rotate }) => {
         target.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg)`;
     });
 
+    // BACK TWEEN
     function tweenback() {
         return myTween.goTo(
             { x: 0, y: 0, rotate: 180 },
@@ -21,43 +24,20 @@ export function tweenTest() {
         );
     }
 
-    function intialTween() {
-        myTween.stop();
-        return myTween.set(
-            { x: 0, y: 0, rotate: 0 },
-            { ease: 'easeInOutQuint' }
-        );
-    }
+    // DEFINE TIMELINE
+    const timeline = new HandleTimeline({ repeat: 2 })
+        .set(myTween, { x: 0, y: 0, rotate: 0 })
+        .goTo(myTween, { x: -200 })
+        .goFromTo(myTween, { x: -200 }, { x: 400 }, { duration: 800 })
+        .add(() => console.log('custom function'))
+        .goTo(myTween, { y: 400 }, { duration: 350 })
+        .goTo(myTween, { x: -100, rotate: 90 }, { ease: 'easeInQuint' })
+        .add(() => console.log('custom function'))
+        .goTo(myTween, { x: 0, y: 0, rotate: 0 }, { duration: 2000 });
 
-    function tween1() {
-        return myTween.goTo({ x: 400 });
-    }
-
-    function tween2() {
-        return myTween.goTo(
-            { y: 400 },
-            { ease: 'easeOutCubic', duration: 350 }
-        );
-    }
-
-    function tween3() {
-        return myTween.goTo({ x: -100, rotate: 90 }, { ease: 'easeInQuint' });
-    }
-
-    function tween4() {
-        return myTween.goTo(
-            { x: 0, y: 0, rotate: 0 },
-            { ease: 'easeInOutQuart', duration: 2000 }
-        );
-    }
-
+    // LISTNER
     btnStart.addEventListener('click', () => {
-        intialTween()
-            .then(() => tween1())
-            .then(() => tween2())
-            .then(() => tween3())
-            .then(() => tween4())
-            .catch(() => {});
+        timeline.play();
     });
 
     btnBack.addEventListener('click', () => {
@@ -65,14 +45,14 @@ export function tweenTest() {
     });
 
     btnStop.addEventListener('click', () => {
-        myTween.stop();
+        timeline.stop();
     });
 
     btnPause.addEventListener('click', () => {
-        myTween.pause();
+        timeline.pause();
     });
 
     btnPlay.addEventListener('click', () => {
-        myTween.resume();
+        timeline.resume();
     });
 }

@@ -1,4 +1,5 @@
 import { handleSpring } from '../core/animation/spring/handleSpring.js';
+import { HandleTimeline } from '../core/animation/timeline/handleTimeline.js';
 
 export function springTest() {
     const btnStart = document.querySelector('.spring-btn-start');
@@ -8,67 +9,54 @@ export function springTest() {
     const btnPlay = document.querySelector('.spring-btn-play');
     const target = document.querySelector('.spring-target');
 
+    // DEFINE SPRING
     const mySpring = new handleSpring();
     mySpring.setData({ x: 0, y: 0, rotate: 0 });
     mySpring.subscribe(({ x, y, rotate }) => {
         target.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg)`;
     });
 
-    function tweenback() {
+    // BACK TWEEN
+    function springBack() {
+        timeline.stop();
         mySpring.updatePreset('gentle');
-        return mySpring.goTo({ x: 0, y: 0, rotate: 180 });
-    }
-
-    function intialTween() {
-        mySpring.stop();
-        mySpring.updatePreset('wobbly');
-        return mySpring.set({ x: 0, y: 0, rotate: 0 });
-    }
-
-    function tween1() {
-        return mySpring.goTo({ x: 400 });
-    }
-
-    function tween2() {
-        mySpring.updatePreset('default');
-        return mySpring.goTo({ y: 400 }, { config: { mass: 2 } });
-    }
-
-    function tween3() {
-        mySpring.updatePreset('bounce');
         return mySpring.goTo(
-            { x: -100, rotate: 90 },
-            { config: { tension: 50 } }
+            { x: 0, y: 0, rotate: 180 },
+            { ease: 'easeOutBack' }
         );
     }
 
-    function tween4() {
-        mySpring.updatePreset('gentle');
-        return mySpring.goTo({ x: 0, y: 0, rotate: 0 });
-    }
+    // DEFINE TIMELINE
+    const timeline = new HandleTimeline({ repeat: 2 })
+        .add(() => mySpring.updatePreset('wobbly'))
+        .set(mySpring, { x: 0, y: 0, rotate: 0 })
+        .goTo(mySpring, { x: -200 })
+        .goFromTo(mySpring, { x: -200 }, { x: 400 })
+        .add(() => mySpring.updatePreset('default'))
+        .goTo(mySpring, { y: 400 }, { config: { mass: 2 } })
+        .add(() => mySpring.updatePreset('bounce'))
+        .goTo(mySpring, { x: -100, rotate: 90 })
+        .add(() => mySpring.updatePreset('gentle'))
+        .goTo(mySpring, { x: 0, y: 0, rotate: 0 });
 
+    // LISTNER
     btnStart.addEventListener('click', () => {
-        intialTween()
-            .then(() => tween1())
-            .then(() => tween2())
-            .then(() => tween3())
-            .then(() => tween4())
-            .catch(() => {});
+        timeline.play();
     });
 
     btnBack.addEventListener('click', () => {
-        tweenback().catch(() => {});
+        springBack().catch(() => {});
     });
 
     btnStop.addEventListener('click', () => {
-        mySpring.stop();
+        timeline.stop();
     });
 
     btnPause.addEventListener('click', () => {
-        mySpring.pause();
+        timeline.pause();
     });
 
     btnPlay.addEventListener('click', () => {
-        mySpring.resume();
+        timeline.resume();
     });
 }
