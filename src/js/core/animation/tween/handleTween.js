@@ -17,7 +17,11 @@ export class handleTween {
         this.isRunning = false;
         this.timeElapsed = 0;
         this.pauseTime = 0;
-        this.defaultProps = { duration: 1000, reverse: false };
+        this.defaultProps = {
+            duration: 1000,
+            ease,
+            reverse: false,
+        };
     }
 
     onReuqestAnim(timestamp, res) {
@@ -283,10 +287,13 @@ export class handleTween {
 
         // merge special props with default
         const newProps = { ...this.defaultProps, ...props };
-        // if revert switch fromValue and toValue
-        const { reverse, duration } = newProps;
-        // Update duration
+        const { reverse, duration, ease } = newProps;
+
+        // Update duration and ease function
+        this.ease = tweenConfig[ease];
         this.duration = duration;
+
+        // if revert switch fromValue and toValue
         if (reverse) this.reverse(obj);
 
         this.setToValProcessed();
@@ -329,10 +336,13 @@ export class handleTween {
 
         // merge special props with default
         const newProps = { ...this.defaultProps, ...props };
-        // if revert switch fromValue and toValue
-        const { reverse, duration } = newProps;
-        // Update duration
+        const { reverse, duration, ease } = newProps;
+
+        // Update duration and ease function
+        this.ease = tweenConfig[ease];
         this.duration = duration;
+
+        // if revert switch fromValue and toValue
         if (reverse) this.reverse(obj);
 
         this.setToValProcessed();
@@ -381,10 +391,13 @@ export class handleTween {
 
         // merge special props with default
         const newProps = { ...this.defaultProps, ...props };
-        // if revert switch fromValue and toValue
-        const { reverse, duration } = newProps;
-        // Update duration
+        const { reverse, duration, ease } = newProps;
+
+        // Update duration and ease function
+        this.ease = tweenConfig[ease];
         this.duration = duration;
+
+        // if revert switch fromValue and toValue
         if (reverse) this.reverse(fromObj);
 
         this.setToValProcessed();
@@ -429,13 +442,18 @@ export class handleTween {
         // merge special props with default
         const newProps = {
             ...{ reverse: this.defaultProps.reverse },
+            ...{ ease: this.defaultProps.ease },
             ...{ duration: 1 },
             ...props,
         };
         // if revert switch fromValue and toValue
-        const { reverse, duration } = newProps;
-        // Update duration
+        const { reverse, duration, ease } = newProps;
+
+        // Update duration and ease function
+        this.ease = tweenConfig[ease];
         this.duration = duration;
+
+        // if revert switch fromValue and toValue
         if (reverse) this.reverse(obj);
 
         this.setToValProcessed();

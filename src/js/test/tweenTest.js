@@ -15,14 +15,18 @@ export function tweenTest() {
     });
 
     function tweenback() {
-        myTween.updatePreset('easeOutBack');
-        return myTween.goTo({ x: 0, y: 0, rotate: 180 });
+        return myTween.goTo(
+            { x: 0, y: 0, rotate: 180 },
+            { ease: 'easeOutBack' }
+        );
     }
 
     function intialTween() {
         myTween.stop();
-        myTween.updatePreset('easeInOutQuint');
-        return myTween.set({ x: 0, y: 0, rotate: 0 });
+        return myTween.set(
+            { x: 0, y: 0, rotate: 0 },
+            { ease: 'easeInOutQuint' }
+        );
     }
 
     function tween1() {
@@ -30,18 +34,21 @@ export function tweenTest() {
     }
 
     function tween2() {
-        myTween.updatePreset('easeOutCubic');
-        return myTween.goTo({ y: 400 }, 1500);
+        return myTween.goTo(
+            { y: 400 },
+            { ease: 'easeOutCubic', duration: 350 }
+        );
     }
 
     function tween3() {
-        myTween.updatePreset('easeInQuint');
-        return myTween.goTo({ x: -100, rotate: 90 });
+        return myTween.goTo({ x: -100, rotate: 90 }, { ease: 'easeInQuint' });
     }
 
     function tween4() {
-        myTween.updatePreset('easeInOutQuart');
-        return myTween.goTo({ x: 0, y: 0, rotate: 0 });
+        return myTween.goTo(
+            { x: 0, y: 0, rotate: 0 },
+            { ease: 'easeInOutQuart', duration: 2000 }
+        );
     }
 
     btnStart.addEventListener('click', () => {
