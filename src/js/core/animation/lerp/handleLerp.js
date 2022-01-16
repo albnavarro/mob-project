@@ -5,7 +5,7 @@ const getLerpTime = () => {
 };
 
 export class handleLerp {
-    constructor(velocity = 200) {
+    constructor(velocity = 15) {
         this.config = {};
         this.velocity = velocity;
         this.req = null;
@@ -16,58 +16,39 @@ export class handleLerp {
         this.id = 0;
         this.callback = [];
         this.pauseStatus = false;
-        this.defaultProps = { reverse: false, velocity: 200 };
+        this.defaultProps = { reverse: false, velocity: 15 };
     }
 
     onReuqestAnim(res) {
-        let animationLastTime = 0;
-        let cbObject = {};
-
         this.values.forEach((item, i) => {
             item.currentValue = item.fromValue;
         });
 
         const draw = () => {
-            // Get current time
-            const time = getLerpTime();
+            this.values.forEach((item, i) => {
+                if (item.settled) return;
 
-            // lastTime is set to now the first time.
-            // then check the difference from now and last time to check if we lost frame
-            let lastTime = animationLastTime !== 0 ? animationLastTime : time;
+                item.previousValue = item.currentValue;
 
-            // If we lost a lot of frames just jump to the end.
-            if (time > lastTime + 64) lastTime = time;
+                const s = item.currentValue;
+                const f = item.toValue;
+                const v = this.velocity;
+                const val = (f - s) / v + s * 1;
+                item.currentValue = val;
 
-            // http://gafferongames.com/game-physics/fix-your-timestep/
-            let numSteps = Math.floor(time - lastTime);
+                item.settled =
+                    parseFloat(item.previousValue).toFixed(4) ===
+                    parseFloat(item.currentValue).toFixed(4);
 
-            // Get lost frame, update vales until time is now
-            for (let i = 0; i < numSteps; ++i) {
-                this.values.forEach((item, i) => {
-                    if (item.settled) return;
-
-                    item.previousValue = item.currentValue;
-
-                    const s = item.currentValue;
-                    const f = item.toValue;
-                    const v = this.velocity;
-                    const val = (f - s) / v + s * 1;
-                    item.currentValue = val;
-
-                    item.settled =
-                        parseFloat(item.previousValue).toFixed(4) ===
-                        parseFloat(item.currentValue).toFixed(4);
-
-                    if (item.settled) {
-                        item.currentValue = item.toValue;
-                    }
-                });
-            }
+                if (item.settled) {
+                    item.currentValue = item.toValue;
+                }
+            });
 
             // Prepare an obj to pass to the callback
             // 1- Seta an array of object: [{prop: value},{prop2: value2} ...
             // 1- Reduce to a Object: { prop: value, prop2: value2 } ...
-            cbObject = this.values
+            const cbObject = this.values
                 .map((item) => {
                     return {
                         [item.prop]: parseFloat(item.currentValue),
@@ -81,9 +62,6 @@ export class handleLerp {
             this.callback.forEach(({ cb }) => {
                 cb(cbObject);
             });
-
-            // Update last time
-            animationLastTime = time;
 
             // Check if all values is completed
             const allSettled = this.values.every(
@@ -154,7 +132,7 @@ export class handleLerp {
      * @return {void}  description
      */
     stop() {
-        this.resetValueOnResume();
+        if (this.pauseStatus) this.pauseStatus = false;
 
         // Update local values with last
         this.values.forEach((item, i) => {
@@ -183,32 +161,21 @@ export class handleLerp {
      *
      * @return {void}  description
      */
-    pause(decay = 20) {
+    pause() {
         if (this.pauseStatus) return;
         this.pauseStatus = true;
 
+        // Reset RAF
+        if (this.req) {
+            cancelAnimationFrame(this.req);
+            this.req = null;
+        }
+
         this.values.forEach((item, i) => {
             if (!item.settled) {
-                item.toValueOnPause = item.toValue;
-                item.toValue = item.currentValue + decay;
-                item.onPause = true;
-            } else {
-                item.onPause = false;
+                item.fromValue = item.currentValue;
             }
         });
-    }
-
-    resetValueOnResume() {
-        this.values.forEach((item, i) => {
-            if (item.onPause) {
-                item.toValue = item.toValueOnPause;
-                item.velocity = this.velocity;
-                item.onPause = false;
-                item.settled = false;
-            }
-        });
-
-        this.pauseStatus = false;
     }
 
     /**
@@ -218,7 +185,7 @@ export class handleLerp {
      */
     resume() {
         if (!this.pauseStatus) return;
-        this.resetValueOnResume();
+        this.pauseStatus = false;
 
         if (!this.req && this.previousResolve) {
             this.req = requestAnimationFrame(() => {
@@ -243,7 +210,6 @@ export class handleLerp {
             return {
                 prop: prop,
                 toValue: value,
-                toValueOnPause: value,
                 fromValue: value,
                 velocity: this.velocity,
                 currentValue: value,
@@ -295,7 +261,7 @@ export class handleLerp {
      * mySpring.goTo({ val: 100 }).catch((err) => {});
      */
     goTo(obj, props = {}) {
-        if (this.pauseStatus) this.resetValueOnResume();
+        if (this.pauseStatus) return;
 
         const newDataArray = Object.keys(obj).map((item) => {
             return {
@@ -338,7 +304,7 @@ export class handleLerp {
      * mySpring.goFrom({ val: 100 }).catch((err) => {});
      */
     goFrom(obj, props = {}) {
-        if (this.pauseStatus) this.resetValueOnResume();
+        if (this.pauseStatus) return;
 
         const newDataArray = Object.keys(obj).map((item) => {
             return {
@@ -383,7 +349,7 @@ export class handleLerp {
      * mySpring.goFromTo({ val: 0 },{ val: 100 }).catch((err) => {});
      */
     goFromTo(fromObj, toObj, props = {}) {
-        if (this.pauseStatus) this.resetValueOnResume();
+        if (this.pauseStatus) return;
 
         // Check if fromObj has the same keys of toObj
         const dataIsValid = this.compareKeys(fromObj, toObj);
@@ -432,7 +398,7 @@ export class handleLerp {
      * mySpring.set({ val: 100 }).catch((err) => {});
      */
     set(obj, props = {}) {
-        if (this.pauseStatus) this.resetValueOnResume();
+        if (this.pauseStatus) return;
 
         const newDataArray = Object.keys(obj).map((item) => {
             return {

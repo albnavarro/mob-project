@@ -19,19 +19,19 @@ export function lerpTest() {
     // BACK TWEEN
     function lerpBack() {
         timeline.stop();
-        return mylerp.goTo({ x: 0, y: 0, rotate: 180 }, { velocity: 150 });
+        return mylerp.goTo({ x: 0, y: 0, rotate: 180 }, { velocity: 5 });
     }
 
     // DEFINE TIMELINE
     const timeline = new HandleTimeline({ repeat: 2 })
         .set(mylerp, { x: 0, y: 0, rotate: 0 })
-        .goTo(mylerp, { x: -200 }, { velocity: 250 })
+        .goTo(mylerp, { x: -200 }, { velocity: 10 })
         .goFromTo(mylerp, { x: -200 }, { x: 400 })
         .add(() => console.log('custom function'))
-        .goTo(mylerp, { y: 400 }, { velocity: 50 })
+        .goTo(mylerp, { y: 400 }, { velocity: 10 })
         .add(() => console.log('custom function'))
-        .goTo(mylerp, { x: -100, rotate: 90 }, { velocity: 200 })
-        .goTo(mylerp, { x: 0, y: 0, rotate: 0 }, { velocity: 80 });
+        .goTo(mylerp, { x: -100, rotate: 90 }, { velocity: 6 })
+        .goTo(mylerp, { x: 0, y: 0, rotate: 0 }, { velocity: 15 });
 
     // LISTNER
     btnStart.addEventListener('click', () => {

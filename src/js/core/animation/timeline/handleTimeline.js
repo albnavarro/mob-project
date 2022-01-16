@@ -1,3 +1,5 @@
+import { requestTimeout } from '../../utils/requestTimeOut.js';
+
 export class HandleTimeline {
     constructor(config = {}) {
         this.tweenList = [];
@@ -24,11 +26,17 @@ export class HandleTimeline {
 
             this.currentTween.push(tween);
 
+            // Clone teen prop and clean from timeline props
+            const newTweenProps = { ...tweenProps };
+            delete newTweenProps.group;
+            delete newTweenProps.delay;
+
             const fn = {
-                set: () => tween[action](valuesFrom, tweenProps),
-                goTo: () => tween[action](valuesTo, tweenProps),
-                goFrom: () => tween[action](valuesFrom, tweenProps),
-                goFromTo: () => tween[action](valuesFrom, valuesTo, tweenProps),
+                set: () => tween[action](valuesFrom, newTweenProps),
+                goTo: () => tween[action](valuesTo, newTweenProps),
+                goFrom: () => tween[action](valuesFrom, newTweenProps),
+                goFromTo: () =>
+                    tween[action](valuesFrom, valuesTo, newTweenProps),
                 sync: () => {
                     return new Promise((res, reject) => {
                         const { from, to } = syncProp;
@@ -45,9 +53,21 @@ export class HandleTimeline {
             };
 
             return new Promise((res) => {
-                fn[action]()
-                    .then(() => res())
-                    .catch((err) => {});
+                // Get delay
+                const delay = tweenProps?.delay;
+
+                const cb = () =>
+                    fn[action]()
+                        .then(() => res())
+                        .catch((err) => {});
+
+                if (delay) {
+                    let t = null;
+                    requestTimeout(cb, delay, (id) => (t = id));
+                    cancelAnimationFrame(t);
+                } else {
+                    cb();
+                }
             });
         });
 
@@ -76,7 +96,6 @@ export class HandleTimeline {
 
     addToMainArray(tweenProps, obj) {
         const group = 'group' in tweenProps ? tweenProps.group : null;
-        delete tweenProps.group;
 
         const rowIndex = this.tweenList.findIndex((item) => {
             return (

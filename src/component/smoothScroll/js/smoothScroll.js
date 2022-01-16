@@ -84,7 +84,7 @@ export class SmoothScrollClass {
                 break;
 
             default:
-                this.motion = new handleLerp(160);
+                this.motion = new handleLerp();
                 break;
         }
 
@@ -100,7 +100,9 @@ export class SmoothScrollClass {
             this.onMouseDown(data)
         );
         this.subscribeMouseUp = handleMouseUp((data) => this.onMouseUp(data));
-        this.subscribeMouseWheel = handleMouseWheel((data) => this.onWhell(data));
+        this.subscribeMouseWheel = handleMouseWheel((data) =>
+            this.onWhell(data)
+        );
 
         if (this.target !== document.documentElement) {
             this.subscribeMouseMove = handleMouseMove((data) =>

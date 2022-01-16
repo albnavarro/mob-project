@@ -21,57 +21,37 @@ export class handleSpring {
     }
 
     onReuqestAnim(res) {
-        let animationLastTime = 0;
-        let cbObject = {};
-
         this.values.forEach((item, i) => {
             item.velocity = this.config.velocity;
             item.currentValue = item.fromValue;
         });
 
         const draw = () => {
-            // Get current time
-            const time = getSpringTime();
+            this.values.forEach((item, i) => {
+                const tensionForce =
+                    -this.config.tension * (item.currentValue - item.toValue);
+                const dampingForce = -this.config.friction * item.velocity;
+                const acceleration =
+                    (tensionForce + dampingForce) / this.config.mass;
+                item.velocity = item.velocity + (acceleration * 1) / 60;
+                item.currentValue =
+                    item.currentValue + (item.velocity * 1) / 60;
 
-            // lastTime is set to now the first time.
-            // then check the difference from now and last time to check if we lost frame
-            let lastTime = animationLastTime !== 0 ? animationLastTime : time;
+                // If tension == 0 linear movement
+                const isRunning =
+                    this.config.tension !== 0
+                        ? Math.abs(item.currentValue - item.toValue) >
+                              this.config.precision &&
+                          Math.abs(item.velocity) > this.config.precision
+                        : false;
 
-            // If we lost a lot of frames just jump to the end.
-            if (time > lastTime + 64) lastTime = time;
-
-            // http://gafferongames.com/game-physics/fix-your-timestep/
-            let numSteps = Math.floor(time - lastTime);
-
-            // Get lost frame, update vales until time is now
-            for (let i = 0; i < numSteps; ++i) {
-                this.values.forEach((item, i) => {
-                    const tensionForce =
-                        -this.config.tension *
-                        (item.currentValue - item.toValue);
-                    const dampingForce = -this.config.friction * item.velocity;
-                    const acceleration =
-                        (tensionForce + dampingForce) / this.config.mass;
-                    item.velocity = item.velocity + (acceleration * 1) / 1000;
-                    item.currentValue =
-                        item.currentValue + (item.velocity * 1) / 1000;
-
-                    // If tension == 0 linear movement
-                    const isRunning =
-                        this.config.tension !== 0
-                            ? Math.abs(item.currentValue - item.toValue) >
-                                  this.config.precision &&
-                              Math.abs(item.velocity) > this.config.precision
-                            : false;
-
-                    item.settled = !isRunning;
-                });
-            }
+                item.settled = !isRunning;
+            });
 
             // Prepare an obj to pass to the callback
             // 1- Seta an array of object: [{prop: value},{prop2: value2} ...
             // 1- Reduce to a Object: { prop: value, prop2: value2 } ...
-            cbObject = this.values
+            const cbObject = this.values
                 .map((item) => {
                     return {
                         [item.prop]: parseFloat(item.currentValue),
@@ -85,9 +65,6 @@ export class handleSpring {
             this.callback.forEach(({ cb }) => {
                 cb(cbObject);
             });
-
-            // Update last time
-            animationLastTime = time;
 
             // Check if all values is completed
             const allSettled = this.values.every(
@@ -158,7 +135,7 @@ export class handleSpring {
      * @return {void}  description
      */
     stop() {
-        this.resetValueOnResume();
+        if (this.pauseStatus) this.pauseStatus = false;
 
         // Update local values with last
         this.values.forEach((item, i) => {
@@ -187,32 +164,21 @@ export class handleSpring {
      *
      * @return {void}  description
      */
-    pause(decay = 0.01) {
+    pause() {
         if (this.pauseStatus) return;
         this.pauseStatus = true;
 
+        // Reset RAF
+        if (this.req) {
+            cancelAnimationFrame(this.req);
+            this.req = null;
+        }
+
         this.values.forEach((item, i) => {
             if (!item.settled) {
-                item.toValueOnPause = item.toValue;
-                item.toValue = item.currentValue + decay;
-                item.onPause = true;
-            } else {
-                item.onPause = false;
+                item.fromValue = item.currentValue;
             }
         });
-    }
-
-    resetValueOnResume() {
-        this.values.forEach((item, i) => {
-            if (item.onPause) {
-                item.toValue = item.toValueOnPause;
-                item.velocity = this.config.velocity;
-                item.onPause = false;
-                item.settled = false;
-            }
-        });
-
-        this.pauseStatus = false;
     }
 
     /**
@@ -222,7 +188,7 @@ export class handleSpring {
      */
     resume() {
         if (!this.pauseStatus) return;
-        this.resetValueOnResume();
+        this.pauseStatus = false;
 
         if (!this.req && this.previousResolve) {
             this.req = requestAnimationFrame(() => {
@@ -247,12 +213,10 @@ export class handleSpring {
             return {
                 prop: prop,
                 toValue: value,
-                toValueOnPause: value,
                 fromValue: value,
                 velocity: this.config.velocity,
                 currentValue: value,
                 settled: false,
-                onPause: false,
             };
         });
     }
@@ -298,7 +262,7 @@ export class handleSpring {
      * mySpring.goTo({ val: 100 }).catch((err) => {});
      */
     goTo(obj, props = {}) {
-        if (this.pauseStatus) this.resetValueOnResume();
+        if (this.pauseStatus) return;
 
         const newDataArray = Object.keys(obj).map((item) => {
             return {
@@ -344,7 +308,7 @@ export class handleSpring {
      * mySpring.goFrom({ val: 100 }).catch((err) => {});
      */
     goFrom(obj, props = {}) {
-        if (this.pauseStatus) this.resetValueOnResume();
+        if (this.pauseStatus) return;
 
         const newDataArray = Object.keys(obj).map((item) => {
             return {
@@ -392,7 +356,7 @@ export class handleSpring {
      * mySpring.goFromTo({ val: 0 },{ val: 100 }).catch((err) => {});
      */
     goFromTo(fromObj, toObj, props = {}) {
-        if (this.pauseStatus) this.resetValueOnResume();
+        if (this.pauseStatus) return;
 
         // Check if fromObj has the same keys of toObj
         const dataIsValid = this.compareKeys(fromObj, toObj);
@@ -444,7 +408,7 @@ export class handleSpring {
      * mySpring.set({ val: 100 }).catch((err) => {});
      */
     set(obj, props = {}) {
-        if (this.pauseStatus) this.resetValueOnResume();
+        if (this.pauseStatus) return;
 
         const newDataArray = Object.keys(obj).map((item) => {
             return {
