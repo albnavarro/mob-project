@@ -44,13 +44,15 @@ import { loadImageFromManifest } from './test/loadImageFromManifest.js';
 import { springTest } from './test/springTest.js';
 import { tweenTest } from './test/tweenTest.js';
 import { lerpTest } from './test/lerpTest.js';
+import { timlineMixTest } from './test/timlineMixTest.js';
 
 const body = document.querySelector('body');
 
-if (body.classList.contains('page-index')) {
+if (body.classList.contains('page-tween')) {
     springTest();
     tweenTest();
     lerpTest();
+    timlineMixTest();
 }
 
 if (body.classList.contains('template-fixed')) {

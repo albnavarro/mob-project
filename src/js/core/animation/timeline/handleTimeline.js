@@ -8,7 +8,7 @@ export class HandleTimeline {
     }
 
     run() {
-        const { tween, action, valuesFrom, valuesTo, props } =
+        const { tween, action, valuesFrom, valuesTo, props, syncProp } =
             this.tweenList[this.currentIndex];
 
         this.currentTween = tween;
@@ -17,6 +17,13 @@ export class HandleTimeline {
             goTo: () => tween[action](valuesTo, props),
             goFrom: () => tween[action](valuesFrom, props),
             goFromTo: () => tween[action](valuesFrom, valuesTo, props),
+            sync: () => {
+                return new Promise((res, reject) => {
+                    const { from, to } = syncProp;
+                    to.setData(from.get());
+                    res();
+                });
+            },
             add: () => {
                 return new Promise((res, reject) => {
                     tween();
@@ -46,7 +53,14 @@ export class HandleTimeline {
     }
 
     goTo(tween, valuesTo, props = {}) {
-        const obj = { tween, action: 'goTo', valuesFrom: {}, valuesTo, props };
+        const obj = {
+            tween,
+            action: 'goTo',
+            valuesFrom: {},
+            valuesTo,
+            props,
+            syncProp: {},
+        };
         this.tweenList.push(obj);
 
         return this;
@@ -59,6 +73,7 @@ export class HandleTimeline {
             valuesFrom,
             valuesTo: {},
             props,
+            syncProp: {},
         };
         this.tweenList.push(obj);
 
@@ -79,6 +94,7 @@ export class HandleTimeline {
             valuesFrom: {},
             valuesTo: {},
             props: {},
+            syncProp: {},
         };
         this.tweenList.push(obj);
 
@@ -92,7 +108,19 @@ export class HandleTimeline {
         return this;
     }
 
-    sync() {}
+    sync(syncProp) {
+        const obj = {
+            tween: null,
+            action: 'sync',
+            valuesFrom: {},
+            valuesTo: {},
+            props: {},
+            syncProp,
+        };
+        this.tweenList.push(obj);
+
+        return this;
+    }
 
     play() {
         this.stop();
@@ -114,6 +142,10 @@ export class HandleTimeline {
     resume() {
         if (!this.currentTween) return;
         this.currentTween.resume();
+    }
+
+    get() {
+        return this.currentTween;
     }
 
     destroy() {

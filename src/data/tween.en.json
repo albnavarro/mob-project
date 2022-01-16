@@ -1,0 +1,7 @@
+{
+    "template": "tween",
+    "pageTitle": "tween",
+    "description": "custom description",
+    "additionalData": ["string/en.json", "nav.json"],
+    "registerComponent": ["to-top/pug/toTop.pug"]
+}

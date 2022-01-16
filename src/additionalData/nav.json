@@ -58,6 +58,10 @@
                 },
                 {
                     "label": "",
+                    "univoqueId": "tween"
+                },
+                {
+                    "label": "",
                     "univoqueId": "store",
                     "children": [
                         {
