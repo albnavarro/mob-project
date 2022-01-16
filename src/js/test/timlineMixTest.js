@@ -9,6 +9,7 @@ export function timlineMixTest() {
     const btnPause = document.querySelector('.mix-btn-pause');
     const btnPlay = document.querySelector('.mix-btn-play');
     const target = document.querySelector('.mix-target');
+    const target2 = document.querySelector('.mix-target2');
 
     // DEFINE SPRING
     const mySpring = new handleSpring();
@@ -24,17 +25,19 @@ export function timlineMixTest() {
         target.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg)`;
     });
 
-    // BACK TWEEN
-    function motionBack() {
-        const currentTween = timeline.get();
-        if (!currentTween)
-            return new Promise((res, reject) => {
-                res();
-            });
+    // DEFINE TWEEN 2
+    const myTween2 = new handleTween();
+    myTween2.setData({ rotate: 0 });
+    // mySpring.updatePreset('wobbly');
+    myTween2.subscribe(({ rotate }) => {
+        target2.style.transform = `rotate(${rotate}deg)`;
+    });
 
-        timeline.stop();
-        return currentTween.goTo({ x: 0, y: 0, rotate: 180 });
-    }
+    // // BACK TWEEN
+    // function motionBack() {
+    //     timeline.stop();
+    //     return mySpring.goTo({ x: 0, y: 0, rotate: 180 });
+    // }
 
     // DEFINE TIMELINE
     const timeline = new HandleTimeline({ repeat: 2 })
@@ -44,20 +47,22 @@ export function timlineMixTest() {
         .add(() => mySpring.updatePreset('default'))
         .goFromTo(mySpring, { x: -200 }, { x: 400 }, { config: { mass: 2 } })
         .sync({ from: mySpring, to: myTween })
-        .goTo(myTween, { y: 400 }, { duration: 350 })
-        .goTo(myTween, { x: -100, rotate: 90 }, { ease: 'easeInQuint' })
+        .goTo(myTween, { y: 400 }, { duration: 350, group: 'scaleUp' })
+        .goTo(myTween2, { rotate: 90 }, { duration: 3000, group: 'scaleUp' })
+        .goTo(myTween, { x: -100, rotate: 190 }, { ease: 'easeInQuint' })
         .sync({ from: myTween, to: mySpring })
         .add(() => mySpring.updatePreset('gentle'))
-        .goTo(mySpring, { x: 0, y: 0, rotate: 0 });
+        .goTo(mySpring, { x: 0, y: 0, rotate: 0 }, { group: 'scaleDown' })
+        .goTo(myTween2, { rotate: 0 }, { duration: 1000, group: 'scaleDown' });
 
     // LISTNER
     btnStart.addEventListener('click', () => {
         timeline.play();
     });
 
-    btnBack.addEventListener('click', () => {
-        motionBack().catch(() => {});
-    });
+    // btnBack.addEventListener('click', () => {
+    //     motionBack().catch(() => {});
+    // });
 
     btnStop.addEventListener('click', () => {
         timeline.stop();

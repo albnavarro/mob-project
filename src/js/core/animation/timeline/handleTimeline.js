@@ -1,38 +1,60 @@
 export class HandleTimeline {
     constructor(config = {}) {
         this.tweenList = [];
-        this.currentTween = null;
+        this.currentTween = [];
         this.currentIndex = 0;
         this.repeat = config.repeat || 1;
         this.loopCounter = 1;
     }
 
     run() {
-        const { tween, action, valuesFrom, valuesTo, props, syncProp } =
-            this.tweenList[this.currentIndex];
+        this.currentTween = [];
 
-        this.currentTween = tween;
-        const fn = {
-            set: () => tween[action](valuesFrom, props),
-            goTo: () => tween[action](valuesTo, props),
-            goFrom: () => tween[action](valuesFrom, props),
-            goFromTo: () => tween[action](valuesFrom, valuesTo, props),
-            sync: () => {
-                return new Promise((res, reject) => {
-                    const { from, to } = syncProp;
-                    to.setData(from.get());
-                    res();
-                });
-            },
-            add: () => {
-                return new Promise((res, reject) => {
-                    tween();
-                    res();
-                });
-            },
-        };
+        const twenList = this.tweenList[this.currentIndex].map((item) => {
+            const { group, data } = item;
 
-        fn[action]()
+            const {
+                tween,
+                action,
+                valuesFrom,
+                valuesTo,
+                tweenProps,
+                syncProp,
+            } = data;
+
+            this.currentTween.push(tween);
+
+            const fn = {
+                set: () => tween[action](valuesFrom, tweenProps),
+                goTo: () => tween[action](valuesTo, tweenProps),
+                goFrom: () => tween[action](valuesFrom, tweenProps),
+                goFromTo: () => tween[action](valuesFrom, valuesTo, tweenProps),
+                sync: () => {
+                    return new Promise((res, reject) => {
+                        const { from, to } = syncProp;
+                        to.setData(from.get());
+                        res();
+                    });
+                },
+                add: () => {
+                    return new Promise((res, reject) => {
+                        tween();
+                        res();
+                    });
+                },
+            };
+
+            return new Promise((res) => {
+                fn[action]()
+                    .then(() => res())
+                    .catch((err) => {});
+            });
+        });
+
+        const promiseType =
+            this.currentIndex === this.tweenList.length - 1 ? 'all' : 'race';
+
+        Promise[promiseType](twenList)
             .then(() => {
                 if (this.currentIndex < this.tweenList.length - 1) {
                     this.currentIndex++;
@@ -52,72 +74,110 @@ export class HandleTimeline {
             .catch((err) => {});
     }
 
-    goTo(tween, valuesTo, props = {}) {
+    addToMainArray(tweenProps, obj) {
+        const group = 'group' in tweenProps ? tweenProps.group : null;
+        delete tweenProps.group;
+
+        const rowIndex = this.tweenList.findIndex((item) => {
+            return (
+                item[0].group === group &&
+                item[0].group !== null &&
+                item[0].group !== undefined
+            );
+        });
+
+        if (rowIndex >= 0) {
+            this.tweenList[rowIndex].push({ group, data: obj });
+        } else {
+            this.tweenList.push([{ group, data: obj }]);
+        }
+    }
+
+    set(tween, valuesFrom, tweenProps = {}) {
+        const obj = {
+            tween,
+            action: 'set',
+            valuesFrom,
+            valuesTo: {},
+            tweenProps,
+            syncProp: {},
+        };
+
+        this.addToMainArray(tweenProps, obj);
+        return this;
+    }
+
+    goTo(tween, valuesTo, tweenProps = {}) {
         const obj = {
             tween,
             action: 'goTo',
             valuesFrom: {},
             valuesTo,
-            props,
+            tweenProps,
             syncProp: {},
         };
-        this.tweenList.push(obj);
+
+        this.addToMainArray(tweenProps, obj);
 
         return this;
     }
 
-    goFrom(tween, valuesFrom, props = {}) {
+    goFrom(tween, valuesFrom, tweenProps = {}) {
         const obj = {
             tween,
             action: 'goFrom',
             valuesFrom,
             valuesTo: {},
-            props,
+            tweenProps,
             syncProp: {},
         };
-        this.tweenList.push(obj);
+
+        this.addToMainArray(tweenProps, obj);
 
         return this;
     }
 
-    goFromTo(tween, valuesFrom, valuesTo, props = {}) {
-        const obj = { tween, action: 'goFromTo', valuesFrom, valuesTo, props };
-        this.tweenList.push(obj);
+    goFromTo(tween, valuesFrom, valuesTo, tweenProps = {}) {
+        const obj = {
+            tween,
+            action: 'goFromTo',
+            valuesFrom,
+            valuesTo,
+            tweenProps,
+            syncProp: {},
+        };
+
+        this.addToMainArray(tweenProps, obj);
 
         return this;
     }
 
-    add(fn) {
+    add(fn, tweenProps = {}) {
         const obj = {
             tween: fn,
             action: 'add',
             valuesFrom: {},
             valuesTo: {},
-            props: {},
+            tweenProps: {},
             syncProp: {},
         };
-        this.tweenList.push(obj);
+
+        this.addToMainArray(tweenProps, obj);
 
         return this;
     }
 
-    set(tween, valuesFrom, props = {}) {
-        const obj = { tween, action: 'set', valuesFrom, valuesTo: {}, props };
-        this.tweenList.push(obj);
-
-        return this;
-    }
-
-    sync(syncProp) {
+    sync(syncProp, tweenProps = {}) {
         const obj = {
             tween: null,
             action: 'sync',
             valuesFrom: {},
             valuesTo: {},
-            props: {},
+            tweenProps: {},
             syncProp,
         };
-        this.tweenList.push(obj);
+
+        this.addToMainArray(tweenProps, obj);
 
         return this;
     }
@@ -130,18 +190,20 @@ export class HandleTimeline {
     }
 
     stop() {
-        if (!this.currentTween) return;
-        this.currentTween.stop();
+        if (this.currentTween.length === 0) return;
+        this.currentTween.forEach((item) => item.stop());
     }
 
     pause() {
-        if (!this.currentTween) return;
-        this.currentTween.pause();
+        if (this.currentTween.length === 0) return;
+        this.currentTween.forEach((item) => {
+            item.pause();
+        });
     }
 
     resume() {
-        if (!this.currentTween) return;
-        this.currentTween.resume();
+        if (this.currentTween.length === 0) return;
+        this.currentTween.forEach((item) => item.resume());
     }
 
     get() {
@@ -150,7 +212,7 @@ export class HandleTimeline {
 
     destroy() {
         this.tweenList = [];
-        this.currentTween = null;
+        this.currentTween = [];
         this.currentIndex = 0;
     }
 }

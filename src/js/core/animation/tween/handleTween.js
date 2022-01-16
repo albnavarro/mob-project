@@ -194,11 +194,11 @@ export class handleTween {
             const [prop, value] = item;
             return {
                 prop: prop,
-                toValue: 0,
-                toValueOnPause: 0,
-                toValProcessed: 0,
+                toValue: value,
+                toValueOnPause: value,
+                toValProcessed: value,
                 fromValue: value,
-                currentValue: 0,
+                currentValue: value,
                 update: false,
             };
         });
