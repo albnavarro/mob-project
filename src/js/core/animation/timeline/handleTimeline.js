@@ -2,11 +2,16 @@ import { requestTimeout } from '../../utils/requestTimeOut.js';
 
 export class HandleTimeline {
     constructor(config = {}) {
+        // Secure check timeline start with a close gruop action
         this.tweenList = [];
         this.currentTween = [];
         this.currentIndex = 0;
         this.repeat = config.repeat || 1;
         this.loopCounter = 1;
+        this.groupId = null;
+        // group "name" star from 1 to avoid 0 = falsa
+        this.groupCounter = 1;
+        this.waitComplete = false;
     }
 
     run() {
@@ -21,6 +26,7 @@ export class HandleTimeline {
                 valuesFrom,
                 valuesTo,
                 tweenProps,
+                groupProps,
                 syncProp,
             } = data;
 
@@ -28,7 +34,6 @@ export class HandleTimeline {
 
             // Clone teen prop and clean from timeline props
             const newTweenProps = { ...tweenProps };
-            delete newTweenProps.group;
             delete newTweenProps.delay;
 
             const fn = {
@@ -49,6 +54,12 @@ export class HandleTimeline {
                         tween();
                         res();
                     });
+                },
+                createGroup: () => {
+                    return new Promise((res, reject) => res());
+                },
+                closeGroup: () => {
+                    return new Promise((res, reject) => res());
                 },
             };
 
@@ -71,8 +82,12 @@ export class HandleTimeline {
             });
         });
 
-        const promiseType =
-            this.currentIndex === this.tweenList.length - 1 ? 'all' : 'race';
+        // When gruop have waitComplete === true, all the teen in group have the same props
+        // so, check if the griup item is seted to waitComplete or not
+        const waitComplete = this.tweenList[this.currentIndex].some((item) => {
+            return item.data.groupProps?.waitComplete;
+        });
+        const promiseType = waitComplete ? 'all' : 'race';
 
         Promise[promiseType](twenList)
             .then(() => {
@@ -95,20 +110,14 @@ export class HandleTimeline {
     }
 
     addToMainArray(tweenProps, obj) {
-        const group = 'group' in tweenProps ? tweenProps.group : null;
-
         const rowIndex = this.tweenList.findIndex((item) => {
-            return (
-                item[0].group === group &&
-                item[0].group !== null &&
-                item[0].group !== undefined
-            );
+            return item[0]?.group && item[0].group === this.groupId;
         });
 
         if (rowIndex >= 0) {
-            this.tweenList[rowIndex].push({ group, data: obj });
+            this.tweenList[rowIndex].push({ group: this.groupId, data: obj });
         } else {
-            this.tweenList.push([{ group, data: obj }]);
+            this.tweenList.push([{ group: this.groupId, data: obj }]);
         }
     }
 
@@ -119,6 +128,7 @@ export class HandleTimeline {
             valuesFrom,
             valuesTo: {},
             tweenProps,
+            groupProps: { waitComplete: this.waitComplete },
             syncProp: {},
         };
 
@@ -133,11 +143,11 @@ export class HandleTimeline {
             valuesFrom: {},
             valuesTo,
             tweenProps,
+            groupProps: { waitComplete: this.waitComplete },
             syncProp: {},
         };
 
         this.addToMainArray(tweenProps, obj);
-
         return this;
     }
 
@@ -148,11 +158,11 @@ export class HandleTimeline {
             valuesFrom,
             valuesTo: {},
             tweenProps,
+            groupProps: { waitComplete: this.waitComplete },
             syncProp: {},
         };
 
         this.addToMainArray(tweenProps, obj);
-
         return this;
     }
 
@@ -163,11 +173,11 @@ export class HandleTimeline {
             valuesFrom,
             valuesTo,
             tweenProps,
+            groupProps: { waitComplete: this.waitComplete },
             syncProp: {},
         };
 
         this.addToMainArray(tweenProps, obj);
-
         return this;
     }
 
@@ -178,11 +188,11 @@ export class HandleTimeline {
             valuesFrom: {},
             valuesTo: {},
             tweenProps: {},
+            groupProps: { waitComplete: this.waitComplete },
             syncProp: {},
         };
 
         this.addToMainArray(tweenProps, obj);
-
         return this;
     }
 
@@ -193,11 +203,47 @@ export class HandleTimeline {
             valuesFrom: {},
             valuesTo: {},
             tweenProps: {},
+            groupProps: { waitComplete: this.waitComplete },
             syncProp,
         };
 
         this.addToMainArray(tweenProps, obj);
+        return this;
+    }
 
+    createGroup(groupProps = {}, tweenProps = {}) {
+        const obj = {
+            tween: null,
+            action: 'createGroup',
+            valuesFrom: {},
+            valuesTo: {},
+            tweenProps: {},
+            groupProps,
+            syncProp: {},
+        };
+
+        this.addToMainArray(tweenProps, obj);
+        this.waitComplete = groupProps?.waitComplete
+            ? groupProps.waitComplete
+            : false;
+        this.groupId = this.groupCounter++;
+        return this;
+    }
+
+    closeGroup(tweenProps = {}) {
+        this.groupId = null;
+        const obj = {
+            tween: null,
+            action: 'closeGroup',
+            valuesFrom: {},
+            valuesTo: {},
+            tweenProps: {},
+            groupProps: {},
+            syncProp: {},
+        };
+
+        this.addToMainArray(tweenProps, obj);
+        this.waitComplete = false;
         return this;
     }
 

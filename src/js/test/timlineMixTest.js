@@ -12,45 +12,45 @@ export function timlineMixTest() {
     const target2 = document.querySelector('.mix-target2');
 
     // DEFINE SPRING
-    const mySpring = new handleSpring();
-    mySpring.setData({ x: 0, y: 0, rotate: 0 });
-    mySpring.subscribe(({ x, y, rotate }) => {
+    const springBox1 = new handleSpring();
+    springBox1.setData({ x: 0, y: 0, rotate: 0 });
+    springBox1.subscribe(({ x, y, rotate }) => {
         target.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg)`;
     });
 
     // DEFINE TWEEN
-    const myTween = new handleTween();
-    myTween.setData({ x: 0, y: 0, rotate: 0 });
-    myTween.subscribe(({ x, y, rotate }) => {
+    const tweenBox1 = new handleTween();
+    tweenBox1.setData({ x: 0, y: 0, rotate: 0 });
+    tweenBox1.subscribe(({ x, y, rotate }) => {
         target.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg)`;
     });
 
     // DEFINE TWEEN 2
-    const myTween2 = new handleTween();
-    myTween2.setData({ rotate: 0 });
-    myTween2.subscribe(({ rotate }) => {
+    const tweenBox2 = new handleTween();
+    tweenBox2.setData({ rotate: 0 });
+    tweenBox2.subscribe(({ rotate }) => {
         target2.style.transform = `rotate(${rotate}deg)`;
     });
 
     // DEFINE TIMELINE
     const timeline = new HandleTimeline({ repeat: -1 })
-        .add(() => mySpring.updatePreset('wobbly'))
-        .set(mySpring, { x: 0, y: 0, rotate: 0 })
-        .goTo(mySpring, { x: -200 })
-        .add(() => mySpring.updatePreset('default'))
-        .goFromTo(mySpring, { x: -200 }, { x: 400 }, { config: { mass: 2 } })
-        .sync({ from: mySpring, to: myTween })
-        .goTo(myTween, { y: 400 }, { duration: 350, group: 'scaleUp' })
-        .goTo(
-            myTween2,
-            { rotate: 360 },
-            { duration: 2000, delay: 150, group: 'scaleUp' }
-        )
-        .goTo(myTween, { x: -100, rotate: 180 }, { ease: 'easeInQuint' })
-        .sync({ from: myTween, to: mySpring })
-        .add(() => mySpring.updatePreset('gentle'))
-        .goTo(mySpring, { x: 0, y: 0, rotate: 0 }, { group: 'scaleDown' })
-        .goTo(myTween2, { rotate: 0 }, { duration: 1000, group: 'scaleDown' });
+        .add(() => springBox1.updatePreset('wobbly'))
+        .set(springBox1, { x: 0, y: 0, rotate: 0 })
+        .goTo(springBox1, { x: -200 })
+        .add(() => springBox1.updatePreset('default'))
+        .goFromTo(springBox1, { x: -200 }, { x: 400 }, { config: { mass: 2 } })
+        .sync({ from: springBox1, to: tweenBox1 })
+        .createGroup()
+        .goTo(tweenBox1, { y: 400 }, { duration: 350 })
+        .goTo(tweenBox2, { rotate: 360 }, { duration: 2000, delay: 150 })
+        .closeGroup()
+        .goTo(tweenBox1, { x: -100, rotate: 180 }, { ease: 'easeInQuint' })
+        .sync({ from: tweenBox1, to: springBox1 })
+        .add(() => springBox1.updatePreset('gentle'))
+        .createGroup({ waitComplete: true })
+        .goTo(springBox1, { x: 0, y: 0, rotate: 0 })
+        .goTo(tweenBox2, { rotate: -180 }, { duration: 5000 })
+        .closeGroup();
 
     // LISTNER
     btnStart.addEventListener('click', () => {
