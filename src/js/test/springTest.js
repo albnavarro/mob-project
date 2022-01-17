@@ -27,7 +27,7 @@ export function springTest() {
     }
 
     // DEFINE TIMELINE
-    const timeline = new HandleTimeline({ repeat: 2 })
+    const timeline = new HandleTimeline({ repeat: 2, yoyo: true })
         .add(() => mySpring.updatePreset('wobbly'))
         .set(mySpring, { x: 0, y: 0, rotate: 0 })
         .goTo(mySpring, { x: -200 })

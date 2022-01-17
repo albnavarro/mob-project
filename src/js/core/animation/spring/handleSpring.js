@@ -240,18 +240,6 @@ export class handleSpring {
         });
     }
 
-    // /**
-    //  * Force fail primse when new event is call while running, so clear che promise chain
-    //  *
-    //  * @return {void}
-    //  */
-    // updateDataWhileRunning() {
-    //     // Abort promise
-    //     if (this.previousReject) {
-    //         this.previousReject();
-    //     }
-    // }
-
     /**
      * goTo - go from fromValue stored to new toValue
      *
@@ -273,7 +261,6 @@ export class handleSpring {
         });
 
         this.mergeData(newDataArray);
-        // if (this.req) this.updateDataWhileRunning();
 
         // merge special props with default
         const newProps = { ...this.defaultProps, ...props };
@@ -320,7 +307,6 @@ export class handleSpring {
         });
 
         this.mergeData(newDataArray);
-        // if (this.req) this.updateDataWhileRunning();
 
         // merge special props with default
         const newProps = { ...this.defaultProps, ...props };
@@ -373,7 +359,6 @@ export class handleSpring {
         });
 
         this.mergeData(newDataArray);
-        // if (this.req) this.updateDataWhileRunning();
 
         // merge special props with default
         const newProps = { ...this.defaultProps, ...props };
@@ -421,7 +406,6 @@ export class handleSpring {
         });
 
         this.mergeData(newDataArray);
-        // if (this.req) this.updateDataWhileRunning();
 
         // merge special props with default
         const newProps = { ...this.defaultProps, ...props };

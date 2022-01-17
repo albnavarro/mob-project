@@ -33,9 +33,11 @@ export function timlineMixTest() {
     });
 
     // DEFINE TIMELINE
-    const timeline = new HandleTimeline({ repeat: -1 })
+    const timeline = new HandleTimeline({ repeat: -1, yoyo: true })
         .add(() => springBox1.updatePreset('wobbly'))
         .set(springBox1, { x: 0, y: 0, rotate: 0 })
+        .set(tweenBox2, { rotate: 0 })
+        // .goFrom(springBox1, { x: 200 })
         .goTo(springBox1, { x: -200 })
         .add(() => springBox1.updatePreset('default'))
         .goFromTo(springBox1, { x: -200 }, { x: 400 }, { config: { mass: 2 } })
@@ -47,7 +49,7 @@ export function timlineMixTest() {
         .goTo(tweenBox1, { x: -100, rotate: 180 }, { ease: 'easeInQuint' })
         .sync({ from: tweenBox1, to: springBox1 })
         .add(() => springBox1.updatePreset('gentle'))
-        .createGroup({ waitComplete: true })
+        .createGroup({ waitComplete: false })
         .goTo(springBox1, { x: 0, y: 0, rotate: 0 })
         .goTo(tweenBox2, { rotate: -180 }, { duration: 5000 })
         .closeGroup();

@@ -5,18 +5,19 @@ export class HandleTimeline {
         // Secure check timeline start with a close gruop action
         this.tweenList = [];
         this.currentTween = [];
+        this.currentTweenCounter = 0;
         this.currentIndex = 0;
         this.repeat = config.repeat || 1;
+        this.yoyo = config.yoyo || false;
         this.loopCounter = 1;
         this.groupId = null;
         // group "name" star from 1 to avoid 0 = falsa
         this.groupCounter = 1;
         this.waitComplete = false;
+        this.reverse = false;
     }
 
     run() {
-        this.currentTween = [];
-
         const twenList = this.tweenList[this.currentIndex].map((item) => {
             const { group, data } = item;
 
@@ -30,15 +31,16 @@ export class HandleTimeline {
                 syncProp,
             } = data;
 
-            this.currentTween.push(tween);
-
             // Clone teen prop and clean from timeline props
             const newTweenProps = { ...tweenProps };
             delete newTweenProps.delay;
 
             const fn = {
                 set: () => tween[action](valuesFrom, newTweenProps),
-                goTo: () => tween[action](valuesTo, newTweenProps),
+                goTo: () => {
+                    item.data.prevValueTo = tween.get();
+                    return tween[action](valuesTo, newTweenProps);
+                },
                 goFrom: () => tween[action](valuesFrom, newTweenProps),
                 goFromTo: () =>
                     tween[action](valuesFrom, valuesTo, newTweenProps),
@@ -67,10 +69,23 @@ export class HandleTimeline {
                 // Get delay
                 const delay = tweenProps?.delay;
 
-                const cb = () =>
+                const cb = () => {
+                    this.currentTween.push({
+                        id: this.currentTweenCounter,
+                        tween,
+                    });
+                    const cbId = this.currentTweenCounter;
+                    this.currentTweenCounter++;
+
                     fn[action]()
-                        .then(() => res())
-                        .catch((err) => {});
+                        .then(() => {
+                            this.unsubscribeTween(cbId);
+                            res();
+                        })
+                        .catch((err) => {
+                            this.unsubscribeTween(cbId);
+                        });
+                };
 
                 if (delay) {
                     let t = null;
@@ -100,6 +115,7 @@ export class HandleTimeline {
                 ) {
                     this.loopCounter++;
                     this.currentIndex = 0;
+                    if (this.yoyo) this.revertTween();
                     this.run();
                 } else {
                     this.currentIndex = 0;
@@ -107,6 +123,44 @@ export class HandleTimeline {
                 }
             })
             .catch((err) => {});
+    }
+
+    unsubscribeTween(cbId) {
+        this.currentTween = this.currentTween.filter(({ id }) => id !== cbId);
+    }
+
+    revertTween() {
+        this.reverse = !this.reverse;
+        this.tweenList.reverse();
+        this.tweenList.forEach((group) => {
+            group.reverse();
+            group.forEach((item) => {
+                const { data } = item;
+                const { tween, action, valuesFrom, valuesTo, syncProp } = data;
+
+                if (action === 'goTo') {
+                    const prevValueTo = item.data.prevValueTo;
+                    const currentValueTo = item.data.valuesTo;
+                    item.data.valuesTo = prevValueTo;
+                    item.data.prevValueTo = currentValueTo;
+                }
+
+                if (action === 'goFrom') {
+                    // item.data.valuesTo = tween.get();
+                }
+
+                if (action === 'goFromTo') {
+                    item.data.valuesFrom = valuesTo;
+                    item.data.valuesTo = valuesFrom;
+                }
+
+                if (action === 'sync') {
+                    const { from, to } = syncProp;
+                    item.data.syncProp.from = to;
+                    item.data.syncProp.to = from;
+                }
+            });
+        });
     }
 
     addToMainArray(tweenProps, obj) {
@@ -127,6 +181,7 @@ export class HandleTimeline {
             action: 'set',
             valuesFrom,
             valuesTo: {},
+            prevValueTo: {},
             tweenProps,
             groupProps: { waitComplete: this.waitComplete },
             syncProp: {},
@@ -142,6 +197,7 @@ export class HandleTimeline {
             action: 'goTo',
             valuesFrom: {},
             valuesTo,
+            prevValueTo: {},
             tweenProps,
             groupProps: { waitComplete: this.waitComplete },
             syncProp: {},
@@ -157,6 +213,7 @@ export class HandleTimeline {
             action: 'goFrom',
             valuesFrom,
             valuesTo: {},
+            prevValueTo: {},
             tweenProps,
             groupProps: { waitComplete: this.waitComplete },
             syncProp: {},
@@ -172,6 +229,7 @@ export class HandleTimeline {
             action: 'goFromTo',
             valuesFrom,
             valuesTo,
+            prevValueTo: {},
             tweenProps,
             groupProps: { waitComplete: this.waitComplete },
             syncProp: {},
@@ -187,6 +245,7 @@ export class HandleTimeline {
             action: 'add',
             valuesFrom: {},
             valuesTo: {},
+            prevValueTo: {},
             tweenProps: {},
             groupProps: { waitComplete: this.waitComplete },
             syncProp: {},
@@ -202,6 +261,7 @@ export class HandleTimeline {
             action: 'sync',
             valuesFrom: {},
             valuesTo: {},
+            prevValueTo: {},
             tweenProps: {},
             groupProps: { waitComplete: this.waitComplete },
             syncProp,
@@ -217,6 +277,7 @@ export class HandleTimeline {
             action: 'createGroup',
             valuesFrom: {},
             valuesTo: {},
+            prevValueTo: {},
             tweenProps: {},
             groupProps,
             syncProp: {},
@@ -237,6 +298,7 @@ export class HandleTimeline {
             action: 'closeGroup',
             valuesFrom: {},
             valuesTo: {},
+            prevValueTo: {},
             tweenProps: {},
             groupProps: {},
             syncProp: {},
@@ -256,19 +318,35 @@ export class HandleTimeline {
 
     stop() {
         if (this.currentTween.length === 0) return;
-        this.currentTween.forEach((item) => item.stop());
+
+        // Reset
+        if (this.reverse) this.revertTween();
+        this.tweenList.forEach((group) => {
+            group.forEach((item) => {
+                const { data } = item;
+                const { action } = data;
+
+                if (action === 'goTo') {
+                    item.data.prevValueTo = {};
+                }
+            });
+        });
+
+        // Stop all Tween
+        this.currentTween.forEach(({ tween }) => tween.stop());
+        this.reverse = false;
     }
 
     pause() {
         if (this.currentTween.length === 0) return;
-        this.currentTween.forEach((item) => {
-            item.pause();
+        this.currentTween.forEach(({ tween }) => {
+            tween.pause();
         });
     }
 
     resume() {
         if (this.currentTween.length === 0) return;
-        this.currentTween.forEach((item) => item.resume());
+        this.currentTween.forEach(({ tween }) => tween.resume());
     }
 
     get() {

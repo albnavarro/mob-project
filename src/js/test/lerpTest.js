@@ -23,7 +23,7 @@ export function lerpTest() {
     }
 
     // DEFINE TIMELINE
-    const timeline = new HandleTimeline({ repeat: 2 })
+    const timeline = new HandleTimeline({ repeat: 2, yoyo: true })
         .set(mylerp, { x: 0, y: 0, rotate: 0 })
         .goTo(mylerp, { x: -200 }, { velocity: 10 })
         .goFromTo(mylerp, { x: -200 }, { x: 400 })
