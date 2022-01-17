@@ -26,7 +26,7 @@ export function timlineMixTest() {
     });
 
     // DEFINE TWEEN 2
-    const tweenBox2 = new handleSpring();
+    const tweenBox2 = new handleTween();
     tweenBox2.setData({ rotate: 0 });
     tweenBox2.subscribe(({ rotate }) => {
         target2.style.transform = `rotate(${rotate}deg)`;
