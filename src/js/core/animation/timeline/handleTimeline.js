@@ -15,10 +15,13 @@ export class HandleTimeline {
         this.groupCounter = 1;
         this.waitComplete = false;
         this.reverse = false;
+        this.isRunning = false;
+        this.isInPause = false;
+        this.tweenResolveInPause = false;
     }
 
-    run() {
-        const twenList = this.tweenList[this.currentIndex].map((item) => {
+    run(index = this.currentIndex) {
+        const tweenPromises = this.tweenList[index].map((item) => {
             const { group, data } = item;
 
             const {
@@ -38,7 +41,12 @@ export class HandleTimeline {
             const fn = {
                 set: () => tween[action](valuesFrom, newTweenProps),
                 goTo: () => {
-                    item.data.prevValueTo = tween.get();
+                    if (!this.tweenResolveInPause) {
+                        item.data.prevValueTo = this.reverse
+                            ? tween.getTo()
+                            : tween.get();
+                    }
+
                     return tween[action](valuesTo, newTweenProps);
                 },
                 goFrom: () => tween[action](valuesFrom, newTweenProps),
@@ -53,7 +61,7 @@ export class HandleTimeline {
                 },
                 add: () => {
                     return new Promise((res, reject) => {
-                        tween();
+                        tween(this);
                         res();
                     });
                 },
@@ -63,9 +71,16 @@ export class HandleTimeline {
                 closeGroup: () => {
                     return new Promise((res, reject) => res());
                 },
+                suspend: () => {
+                    return new Promise((res, reject) => {
+                        tweenPromises.resolve();
+                        this.pause();
+                        res();
+                    });
+                },
             };
 
-            return new Promise((res) => {
+            return new Promise((res, reject) => {
                 // Get delay
                 const delay = tweenProps?.delay;
 
@@ -77,13 +92,29 @@ export class HandleTimeline {
                     const cbId = this.currentTweenCounter;
                     this.currentTweenCounter++;
 
+                    if (this.isInPause) {
+                        this.unsubscribeTween(cbId);
+                        reject(Error('Run tween in pause, delay sideEffect'));
+                        return;
+                    }
+
                     fn[action]()
                         .then(() => {
                             this.unsubscribeTween(cbId);
-                            res();
+
+                            if (!this.isInPause) {
+                                res();
+                            } else {
+                                reject(
+                                    Error(
+                                        'Run tween in pause, delay sideEffect'
+                                    )
+                                );
+                            }
                         })
-                        .catch((err) => {
+                        .catch((error) => {
                             this.unsubscribeTween(cbId);
+                            return error;
                         });
                 };
 
@@ -104,8 +135,10 @@ export class HandleTimeline {
         });
         const promiseType = waitComplete ? 'all' : 'race';
 
-        Promise[promiseType](twenList)
+        Promise[promiseType](tweenPromises)
             .then(() => {
+                this.tweenResolveInPause = false;
+
                 if (this.currentIndex < this.tweenList.length - 1) {
                     this.currentIndex++;
                     this.run();
@@ -120,9 +153,16 @@ export class HandleTimeline {
                 } else {
                     this.currentIndex = 0;
                     this.loopCounter = 1;
+                    this.isRunning = false;
                 }
             })
-            .catch((err) => {});
+            .catch((error) => {
+                // Tween ws rolverd in pause , probable delay sideEffect
+                if (this.isInPause) {
+                    console.log(error);
+                    this.tweenResolveInPause = true;
+                }
+            });
     }
 
     unsubscribeTween(cbId) {
@@ -309,15 +349,34 @@ export class HandleTimeline {
         return this;
     }
 
+    // Don't use inside group
+    suspend(tweenProps = {}) {
+        const obj = {
+            tween: null,
+            action: 'suspend',
+            valuesFrom: {},
+            valuesTo: {},
+            prevValueTo: {},
+            tweenProps: {},
+            groupProps: {},
+            syncProp: {},
+        };
+
+        this.addToMainArray(tweenProps, obj);
+        return this;
+    }
+
     play() {
         this.stop();
         this.currentIndex = 0;
         this.loopCounter = 1;
         this.run();
+        this.isRunning = true;
     }
 
     stop() {
         if (this.currentTween.length === 0) return;
+        this.isRunning = false;
 
         // Reset
         if (this.reverse) this.revertTween();
@@ -339,14 +398,43 @@ export class HandleTimeline {
 
     pause() {
         if (this.currentTween.length === 0) return;
+
+        this.isInPause = true;
         this.currentTween.forEach(({ tween }) => {
             tween.pause();
         });
     }
 
+    /**
+     * resume - if there is no tween active ( pause settend by add methods )
+     * run next pipe element, otherwise resume current tween
+     *
+     * @return {type}  description
+     */
     resume() {
-        if (this.currentTween.length === 0) return;
-        this.currentTween.forEach(({ tween }) => tween.resume());
+        if (this.tweenResolveInPause) {
+            this.isInPause = false;
+            this.run();
+            return;
+        }
+
+        if (!this.isRunning) return;
+
+        this.isInPause = false;
+        if (this.currentTween.length === 0) {
+            if (this.currentIndex <= this.tweenList.length - 2) {
+                this.currentIndex++;
+                this.run(this.currentIndex);
+            } else if (this.currentIndex === this.tweenList.length - 1) {
+                // At the end suspend become item in pipe first ro skip it
+                this.currentIndex = this.yoyo && !this.reverse ? 1 : 0;
+                if (this.yoyo) this.revertTween();
+                this.loopCounter++;
+                this.run();
+            }
+        } else {
+            this.currentTween.forEach(({ tween }) => tween.resume());
+        }
     }
 
     get() {

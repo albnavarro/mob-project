@@ -33,7 +33,9 @@ export function timlineMixTest() {
     });
 
     // DEFINE TIMELINE
-    const timeline = new HandleTimeline({ repeat: -1, yoyo: true })
+    const timeline = new HandleTimeline({ repeat: -1, yoyo: true });
+
+    timeline
         .add(() => springBox1.updatePreset('wobbly'))
         .set(springBox1, { x: 0, y: 0, rotate: 0 })
         .set(tweenBox2, { rotate: 0 })
@@ -52,7 +54,8 @@ export function timlineMixTest() {
         .createGroup({ waitComplete: false })
         .goTo(springBox1, { x: 0, y: 0, rotate: 0 })
         .goTo(tweenBox2, { rotate: -180 }, { duration: 5000 })
-        .closeGroup();
+        .closeGroup()
+        .suspend();
 
     // LISTNER
     btnStart.addEventListener('click', () => {

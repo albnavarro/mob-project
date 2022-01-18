@@ -449,6 +449,50 @@ export class handleSpring {
     }
 
     /**
+     * getFrom - get fromValue value
+     *
+     * @return {Object} fromValue value obj { prop: value, prop2: value2 }
+     *
+     * @example
+     * const { prop } = mySpring.get();
+     */
+    getFrom() {
+        return this.values
+            .map((item) => {
+                return {
+                    [item.prop]: parseFloat(item.fromValue),
+                };
+            })
+            .reduce((p, c) => {
+                return { ...p, ...c };
+            }, {});
+    }
+
+    /**
+     * getFrom - get toValue value
+     *
+     * @return {Object} toValue value obj { prop: value, prop2: value2 }
+     *
+     * @example
+     * const { prop } = mySpring.get();
+     */
+    getTo() {
+        return this.values
+            .map((item) => {
+                return {
+                    [item.prop]: parseFloat(item.toValue),
+                };
+            })
+            .reduce((p, c) => {
+                return { ...p, ...c };
+            }, {});
+    }
+
+    getType() {
+        return 'SPRING';
+    }
+
+    /**
      * updateConfig - Update config object
      *
      * @param  {Object} config udate single prop of config object

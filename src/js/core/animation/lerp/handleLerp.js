@@ -436,6 +436,50 @@ export class handleLerp {
     }
 
     /**
+     * getFrom - get fromValue value
+     *
+     * @return {Object} fromValue value obj { prop: value, prop2: value2 }
+     *
+     * @example
+     * const { prop } = mySpring.get();
+     */
+    getFrom() {
+        return this.values
+            .map((item) => {
+                return {
+                    [item.prop]: parseFloat(item.fromValue),
+                };
+            })
+            .reduce((p, c) => {
+                return { ...p, ...c };
+            }, {});
+    }
+
+    /**
+     * getFrom - get toValue value
+     *
+     * @return {Object} toValue value obj { prop: value, prop2: value2 }
+     *
+     * @example
+     * const { prop } = mySpring.get();
+     */
+    getTo() {
+        return this.values
+            .map((item) => {
+                return {
+                    [item.prop]: parseFloat(item.toValue),
+                };
+            })
+            .reduce((p, c) => {
+                return { ...p, ...c };
+            }, {});
+    }
+
+    getType() {
+        return 'LERP';
+    }
+
+    /**
      * updatePreset - Update config object with new preset
      *
      * @param  {String} preset new preset
