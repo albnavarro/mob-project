@@ -90,7 +90,7 @@ export class HandleTimeline {
 
             return new Promise((res, reject) => {
                 // Get delay
-                const delay = tweenProps?.delay;
+                const delay = isImmediate ? false : tweenProps?.delay;
 
                 const cb = () => {
                     this.currentTween.push({
