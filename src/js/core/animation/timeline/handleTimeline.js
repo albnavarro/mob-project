@@ -41,11 +41,8 @@ export class HandleTimeline {
             const fn = {
                 set: () => tween[action](valuesFrom, newTweenProps),
                 goTo: () => {
-                    if (!this.tweenResolveInPause) {
-                        item.data.prevValueTo = this.reverse
-                            ? tween.getTo()
-                            : tween.get();
-                    }
+                    if (!this.tweenResolveInPause)
+                        item.data.prevValueTo = tween.getTo();
 
                     return tween[action](valuesTo, newTweenProps);
                 },
