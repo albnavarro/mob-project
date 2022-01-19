@@ -264,6 +264,31 @@ export class handleTween {
     }
 
     /**
+     * immediate - Jump immaediate to the end of tween
+     *
+     */
+    immediate() {
+        this.values.forEach((item, i) => {
+            item.fromValue = item.toValue;
+            item.currentValue = item.toValue;
+        });
+
+        const cbValues = this.values
+            .map((item) => {
+                return {
+                    [item.prop]: parseFloat(item.toValue),
+                };
+            })
+            .reduce((p, c) => {
+                return { ...p, ...c };
+            }, {});
+
+        this.callback.forEach(({ cb }) => {
+            cb(cbValues);
+        });
+    }
+
+    /**
      * goTo - go from fromValue stored to new toValue
      *
      * @param  {number} to new toValue
@@ -287,7 +312,7 @@ export class handleTween {
 
         // merge special props with default
         const newProps = { ...this.defaultProps, ...props };
-        const { reverse, duration, ease } = newProps;
+        const { reverse, duration, ease, immediate } = newProps;
 
         // Update duration and ease function
         this.ease = tweenConfig[ease];
@@ -297,6 +322,11 @@ export class handleTween {
         if (reverse) this.reverse(obj);
 
         this.setToValProcessed();
+
+        if (immediate) {
+            this.immediate();
+            return new Promise((res) => res());
+        }
 
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
@@ -336,7 +366,7 @@ export class handleTween {
 
         // merge special props with default
         const newProps = { ...this.defaultProps, ...props };
-        const { reverse, duration, ease } = newProps;
+        const { reverse, duration, ease, immediate } = newProps;
 
         // Update duration and ease function
         this.ease = tweenConfig[ease];
@@ -346,6 +376,11 @@ export class handleTween {
         if (reverse) this.reverse(obj);
 
         this.setToValProcessed();
+
+        if (immediate) {
+            this.immediate();
+            return new Promise((res) => res());
+        }
 
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
@@ -391,7 +426,7 @@ export class handleTween {
 
         // merge special props with default
         const newProps = { ...this.defaultProps, ...props };
-        const { reverse, duration, ease } = newProps;
+        const { reverse, duration, ease, immediate } = newProps;
 
         // Update duration and ease function
         this.ease = tweenConfig[ease];
@@ -401,6 +436,11 @@ export class handleTween {
         if (reverse) this.reverse(fromObj);
 
         this.setToValProcessed();
+
+        if (immediate) {
+            this.immediate();
+            return new Promise((res) => res());
+        }
 
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
@@ -447,7 +487,7 @@ export class handleTween {
             ...props,
         };
         // if revert switch fromValue and toValue
-        const { reverse, duration, ease } = newProps;
+        const { reverse, duration, ease, immediate } = newProps;
 
         // Update duration and ease function
         this.ease = tweenConfig[ease];
@@ -457,6 +497,11 @@ export class handleTween {
         if (reverse) this.reverse(obj);
 
         this.setToValProcessed();
+
+        if (immediate) {
+            this.immediate();
+            return new Promise((res) => res());
+        }
 
         if (!this.req) {
             this.promise = new Promise((res, reject) => {

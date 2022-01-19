@@ -8,6 +8,7 @@ export function timlineMixTest() {
     const btnStop = document.querySelector('.mix-btn-stop');
     const btnPause = document.querySelector('.mix-btn-pause');
     const btnPlay = document.querySelector('.mix-btn-play');
+    const btnFrom = document.querySelector('.mix-btn-playFrom');
     const target = document.querySelector('.mix-target');
     const target2 = document.querySelector('.mix-target2');
 
@@ -39,7 +40,6 @@ export function timlineMixTest() {
         .add(() => springBox1.updatePreset('wobbly'))
         .set(springBox1, { x: 0, y: 0, rotate: 0 })
         .set(tweenBox2, { rotate: 0 })
-        // .goFrom(springBox1, { x: 200 })
         .goTo(springBox1, { x: -200 })
         .add(() => springBox1.updatePreset('default'))
         .goFromTo(springBox1, { x: -200 }, { x: 400 }, { config: { mass: 2 } })
@@ -48,6 +48,7 @@ export function timlineMixTest() {
         .goTo(tweenBox1, { y: 400 }, { duration: 350 })
         .goTo(tweenBox2, { rotate: 360 }, { duration: 2000, delay: 150 })
         .closeGroup()
+        .label({ name: 'label1' })
         .goTo(tweenBox1, { x: -100, rotate: 180 }, { ease: 'easeInQuint' })
         .sync({ from: tweenBox1, to: springBox1 })
         .add(() => springBox1.updatePreset('gentle'))
@@ -72,5 +73,9 @@ export function timlineMixTest() {
 
     btnPlay.addEventListener('click', () => {
         timeline.resume();
+    });
+
+    btnFrom.addEventListener('click', () => {
+        timeline.playFrom('label1');
     });
 }

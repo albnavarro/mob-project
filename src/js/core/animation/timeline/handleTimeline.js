@@ -18,6 +18,7 @@ export class HandleTimeline {
         this.isRunning = false;
         this.isInPause = false;
         this.tweenResolveInPause = false;
+        this.fromLabelIndex = null;
     }
 
     run(index = this.currentIndex) {
@@ -37,6 +38,11 @@ export class HandleTimeline {
             // Clone teen prop and clean from timeline props
             const newTweenProps = { ...tweenProps };
             delete newTweenProps.delay;
+
+            const isImmediate =
+                this.fromLabelIndex && index < this.fromLabelIndex;
+
+            if (isImmediate) newTweenProps.immediate = true;
 
             const fn = {
                 set: () => tween[action](valuesFrom, newTweenProps),
@@ -68,10 +74,15 @@ export class HandleTimeline {
                 closeGroup: () => {
                     return new Promise((res, reject) => res());
                 },
+                label: () => {
+                    return new Promise((res, reject) => res());
+                },
                 suspend: () => {
                     return new Promise((res, reject) => {
-                        tweenPromises.resolve();
-                        this.pause();
+                        if (!isImmediate) {
+                            tweenPromises.resolve();
+                            this.pause();
+                        }
                         res();
                     });
                 },
@@ -145,11 +156,13 @@ export class HandleTimeline {
                 ) {
                     this.loopCounter++;
                     this.currentIndex = 0;
+                    this.fromLabelIndex = null;
                     if (this.yoyo) this.revertTween();
                     this.run();
                 } else {
                     this.currentIndex = 0;
                     this.loopCounter = 1;
+                    this.fromLabelIndex = null;
                     this.isRunning = false;
                 }
             })
@@ -222,6 +235,7 @@ export class HandleTimeline {
             tweenProps,
             groupProps: { waitComplete: this.waitComplete },
             syncProp: {},
+            labelProps: {},
         };
 
         this.addToMainArray(tweenProps, obj);
@@ -238,6 +252,7 @@ export class HandleTimeline {
             tweenProps,
             groupProps: { waitComplete: this.waitComplete },
             syncProp: {},
+            labelProps: {},
         };
 
         this.addToMainArray(tweenProps, obj);
@@ -254,6 +269,7 @@ export class HandleTimeline {
             tweenProps,
             groupProps: { waitComplete: this.waitComplete },
             syncProp: {},
+            labelProps: {},
         };
 
         this.addToMainArray(tweenProps, obj);
@@ -270,6 +286,7 @@ export class HandleTimeline {
             tweenProps,
             groupProps: { waitComplete: this.waitComplete },
             syncProp: {},
+            labelProps: {},
         };
 
         this.addToMainArray(tweenProps, obj);
@@ -286,6 +303,7 @@ export class HandleTimeline {
             tweenProps: {},
             groupProps: { waitComplete: this.waitComplete },
             syncProp: {},
+            labelProps: {},
         };
 
         this.addToMainArray(tweenProps, obj);
@@ -302,6 +320,7 @@ export class HandleTimeline {
             tweenProps: {},
             groupProps: { waitComplete: this.waitComplete },
             syncProp,
+            labelProps: {},
         };
 
         this.addToMainArray(tweenProps, obj);
@@ -318,6 +337,7 @@ export class HandleTimeline {
             tweenProps: {},
             groupProps,
             syncProp: {},
+            labelProps: {},
         };
 
         this.addToMainArray(tweenProps, obj);
@@ -339,6 +359,7 @@ export class HandleTimeline {
             tweenProps: {},
             groupProps: {},
             syncProp: {},
+            labelProps: {},
         };
 
         this.addToMainArray(tweenProps, obj);
@@ -357,6 +378,25 @@ export class HandleTimeline {
             tweenProps: {},
             groupProps: {},
             syncProp: {},
+            labelProps: {},
+        };
+
+        this.addToMainArray(tweenProps, obj);
+        return this;
+    }
+
+    // Don't use inside group
+    label(labelProps = {}, tweenProps = {}) {
+        const obj = {
+            tween: null,
+            action: 'label',
+            valuesFrom: {},
+            valuesTo: {},
+            prevValueTo: {},
+            tweenProps: {},
+            groupProps: {},
+            syncProp: {},
+            labelProps,
         };
 
         this.addToMainArray(tweenProps, obj);
@@ -367,6 +407,25 @@ export class HandleTimeline {
         this.stop();
         this.currentIndex = 0;
         this.loopCounter = 1;
+        this.fromLabelIndex = null;
+        if (this.reverse) this.revertTween();
+        this.run();
+        this.isRunning = true;
+    }
+
+    playFrom(label) {
+        this.stop();
+        this.currentIndex = 0;
+        this.loopCounter = 1;
+        if (this.reverse) this.revertTween();
+
+        this.fromLabelIndex = this.tweenList.findIndex((item) => {
+            // Get first item of group, unnecessary use of label inside a group becouse is parallel
+            const [firstItem] = item;
+            const labelCheck = firstItem.data.labelProps?.name;
+            return labelCheck === label;
+        });
+
         this.run();
         this.isRunning = true;
     }
@@ -374,6 +433,7 @@ export class HandleTimeline {
     stop() {
         if (this.currentTween.length === 0) return;
         this.isRunning = false;
+        this.fromLabelIndex = null;
 
         // Reset
         if (this.reverse) this.revertTween();
@@ -426,6 +486,7 @@ export class HandleTimeline {
             } else if (this.currentIndex === this.tweenList.length - 1) {
                 // At the end suspend become item in pipe first ro skip it
                 this.currentIndex = this.yoyo && !this.reverse ? 1 : 0;
+                this.fromLabelIndex = null;
                 if (this.yoyo) this.revertTween();
                 this.loopCounter++;
                 this.run();

@@ -240,6 +240,31 @@ export class handleLerp {
     }
 
     /**
+     * immediate - Jump immaediate to the end of tween
+     *
+     */
+    immediate() {
+        this.values.forEach((item, i) => {
+            item.fromValue = item.toValue;
+            item.currentValue = item.toValue;
+        });
+
+        const cbValues = this.values
+            .map((item) => {
+                return {
+                    [item.prop]: parseFloat(item.toValue),
+                };
+            })
+            .reduce((p, c) => {
+                return { ...p, ...c };
+            }, {});
+
+        this.callback.forEach(({ cb }) => {
+            cb(cbValues);
+        });
+    }
+
+    /**
      * goTo - go from fromValue stored to new toValue
      *
      * @param  {number} to new toValue
@@ -264,10 +289,15 @@ export class handleLerp {
         // merge special props with default
         const newProps = { ...this.defaultProps, ...props };
         // if revert switch fromValue and toValue
-        const { reverse, velocity } = newProps;
+        const { reverse, velocity, immediate } = newProps;
         this.velocity = velocity;
 
         if (reverse) this.reverse(obj);
+
+        if (immediate) {
+            this.immediate();
+            return new Promise((res) => res());
+        }
 
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
@@ -307,10 +337,15 @@ export class handleLerp {
         // merge special props with default
         const newProps = { ...this.defaultProps, ...props };
         // if revert switch fromValue and toValue
-        const { reverse, velocity } = newProps;
+        const { reverse, velocity, immediate } = newProps;
         this.velocity = velocity;
 
         if (reverse) this.reverse(obj);
+
+        if (immediate) {
+            this.immediate();
+            return new Promise((res) => res());
+        }
 
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
@@ -356,10 +391,15 @@ export class handleLerp {
         // merge special props with default
         const newProps = { ...this.defaultProps, ...props };
         // if revert switch fromValue and toValue
-        const { reverse, velocity } = newProps;
+        const { reverse, velocity, immediate } = newProps;
         this.velocity = velocity;
 
         if (reverse) this.reverse(fromObj);
+
+        if (immediate) {
+            this.immediate();
+            return new Promise((res) => res());
+        }
 
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
@@ -399,10 +439,15 @@ export class handleLerp {
 
         // merge special props with default
         const newProps = { ...this.defaultProps, ...props };
-        const { reverse, velocity } = newProps;
+        const { reverse, velocity, immediate } = newProps;
         this.velocity = velocity;
 
         if (reverse) this.reverse(obj);
+
+        if (immediate) {
+            this.immediate();
+            return new Promise((res) => res());
+        }
 
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
