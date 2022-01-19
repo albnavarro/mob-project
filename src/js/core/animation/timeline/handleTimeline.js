@@ -411,6 +411,7 @@ export class HandleTimeline {
     resume() {
         if (this.tweenResolveInPause) {
             this.isInPause = false;
+            this.resumeEachTween();
             this.run();
             return;
         }
@@ -430,8 +431,12 @@ export class HandleTimeline {
                 this.run();
             }
         } else {
-            this.currentTween.forEach(({ tween }) => tween.resume());
+            this.resumeEachTween();
         }
+    }
+
+    resumeEachTween() {
+        this.currentTween.forEach(({ tween }) => tween.resume());
     }
 
     get() {
