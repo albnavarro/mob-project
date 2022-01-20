@@ -42,11 +42,16 @@ export function timlineMixTest() {
         .set(tweenBox2, { rotate: 0 })
         .goTo(springBox1, { x: -200 })
         .add(() => springBox1.updatePreset('default'))
-        .goFromTo(springBox1, { x: -200 }, { x: 400 }, { config: { mass: 2 } })
+        .goFromTo(
+            springBox1,
+            { x: -200 },
+            { x: 400 },
+            { config: { mass: 2 }, delay: 500 }
+        )
         .sync({ from: springBox1, to: tweenBox1 })
         .createGroup()
         .goTo(tweenBox1, { y: 400 }, { duration: 350 })
-        .goTo(tweenBox2, { rotate: 360 }, { duration: 2000, delay: 150 })
+        .goTo(tweenBox2, { rotate: 360 }, { duration: 2000, delay: 1000 })
         .closeGroup()
         .label({ name: 'label1' })
         .goTo(tweenBox1, { x: -100, rotate: 180 }, { ease: 'easeInQuint' })

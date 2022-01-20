@@ -1,4 +1,5 @@
 import { requestTimeout } from '../../utils/requestTimeOut.js';
+import { handleFrame } from '../../events/rafutils/rafUtils.js';
 
 export class HandleTimeline {
     constructor(config = {}) {
@@ -15,10 +16,20 @@ export class HandleTimeline {
         this.groupCounter = 1;
         this.waitComplete = false;
         this.reverse = false;
-        this.isRunning = false;
         this.isInPause = false;
-        this.tweenResolveInPause = false;
+        this.isSuspended = false;
         this.fromLabelIndex = null;
+        this.defaultObj = {
+            tween: null,
+            action: null,
+            valuesFrom: {},
+            valuesTo: {},
+            prevValueTo: {},
+            tweenProps: {},
+            groupProps: {},
+            syncProp: {},
+            labelProps: {},
+        };
     }
 
     run(index = this.currentIndex) {
@@ -47,14 +58,14 @@ export class HandleTimeline {
             const fn = {
                 set: () => tween[action](valuesFrom, newTweenProps),
                 goTo: () => {
-                    if (!this.tweenResolveInPause)
-                        item.data.prevValueTo = tween.getTo();
-
+                    item.data.prevValueTo = tween.getTo();
                     return tween[action](valuesTo, newTweenProps);
                 },
                 goFrom: () => tween[action](valuesFrom, newTweenProps),
-                goFromTo: () =>
-                    tween[action](valuesFrom, valuesTo, newTweenProps),
+                goFromTo: () => {
+                    return tween[action](valuesFrom, valuesTo, newTweenProps);
+                },
+
                 sync: () => {
                     return new Promise((res, reject) => {
                         const { from, to } = syncProp;
@@ -80,8 +91,8 @@ export class HandleTimeline {
                 suspend: () => {
                     return new Promise((res, reject) => {
                         if (!isImmediate) {
-                            tweenPromises.resolve();
-                            this.pause();
+                            console.log('fire suspend');
+                            this.isSuspended = true;
                         }
                         res();
                     });
@@ -100,30 +111,25 @@ export class HandleTimeline {
                     const cbId = this.currentTweenCounter;
                     this.currentTweenCounter++;
 
-                    if (this.isInPause) {
-                        this.unsubscribeTween(cbId);
-                        reject(Error('Run tween in pause, delay sideEffect'));
-                        return;
-                    }
-
                     fn[action]()
                         .then(() => {
                             this.unsubscribeTween(cbId);
-
-                            if (!this.isInPause) {
-                                res();
-                            } else {
-                                reject(
-                                    Error(
-                                        'Run tween in pause, delay sideEffect'
-                                    )
-                                );
-                            }
+                            res();
                         })
                         .catch((error) => {
                             this.unsubscribeTween(cbId);
                             return error;
                         });
+
+                    // If tween is fired after delay and user trigger pause inside
+                    // reun puase at next frame
+                    if (this.isInPause) {
+                        handleFrame(() => {
+                            console.log('tween fired in pause');
+                            this.isInPause = false;
+                            this.pause();
+                        });
+                    }
                 };
 
                 if (delay) {
@@ -145,7 +151,8 @@ export class HandleTimeline {
 
         Promise[promiseType](tweenPromises)
             .then(() => {
-                this.tweenResolveInPause = false;
+                console.log('resolve promise group');
+                if (this.isSuspended) return;
 
                 if (this.currentIndex < this.tweenList.length - 1) {
                     this.currentIndex++;
@@ -163,15 +170,10 @@ export class HandleTimeline {
                     this.currentIndex = 0;
                     this.loopCounter = 1;
                     this.fromLabelIndex = null;
-                    this.isRunning = false;
                 }
             })
             .catch((error) => {
-                // Tween ws rolverd in pause , probable delay sideEffect
-                if (this.isInPause) {
-                    console.log(error);
-                    this.tweenResolveInPause = true;
-                }
+                console.log(error);
             });
     }
 
@@ -230,15 +232,12 @@ export class HandleTimeline {
             tween,
             action: 'set',
             valuesFrom,
-            valuesTo: {},
-            prevValueTo: {},
             tweenProps,
             groupProps: { waitComplete: this.waitComplete },
-            syncProp: {},
-            labelProps: {},
         };
 
-        this.addToMainArray(tweenProps, obj);
+        const mergedObj = { ...this.defaultObj, ...obj };
+        this.addToMainArray(tweenProps, mergedObj);
         return this;
     }
 
@@ -246,16 +245,13 @@ export class HandleTimeline {
         const obj = {
             tween,
             action: 'goTo',
-            valuesFrom: {},
             valuesTo,
-            prevValueTo: {},
             tweenProps,
             groupProps: { waitComplete: this.waitComplete },
-            syncProp: {},
-            labelProps: {},
         };
 
-        this.addToMainArray(tweenProps, obj);
+        const mergedObj = { ...this.defaultObj, ...obj };
+        this.addToMainArray(tweenProps, mergedObj);
         return this;
     }
 
@@ -264,15 +260,12 @@ export class HandleTimeline {
             tween,
             action: 'goFrom',
             valuesFrom,
-            valuesTo: {},
-            prevValueTo: {},
             tweenProps,
             groupProps: { waitComplete: this.waitComplete },
-            syncProp: {},
-            labelProps: {},
         };
 
-        this.addToMainArray(tweenProps, obj);
+        const mergedObj = { ...this.defaultObj, ...obj };
+        this.addToMainArray(tweenProps, mergedObj);
         return this;
     }
 
@@ -282,14 +275,12 @@ export class HandleTimeline {
             action: 'goFromTo',
             valuesFrom,
             valuesTo,
-            prevValueTo: {},
             tweenProps,
             groupProps: { waitComplete: this.waitComplete },
-            syncProp: {},
-            labelProps: {},
         };
 
-        this.addToMainArray(tweenProps, obj);
+        const mergedObj = { ...this.defaultObj, ...obj };
+        this.addToMainArray(tweenProps, mergedObj);
         return this;
     }
 
@@ -297,50 +288,34 @@ export class HandleTimeline {
         const obj = {
             tween: fn,
             action: 'add',
-            valuesFrom: {},
-            valuesTo: {},
-            prevValueTo: {},
-            tweenProps: {},
             groupProps: { waitComplete: this.waitComplete },
-            syncProp: {},
-            labelProps: {},
         };
 
-        this.addToMainArray(tweenProps, obj);
+        const mergedObj = { ...this.defaultObj, ...obj };
+        this.addToMainArray(tweenProps, mergedObj);
         return this;
     }
 
     sync(syncProp, tweenProps = {}) {
         const obj = {
-            tween: null,
             action: 'sync',
-            valuesFrom: {},
-            valuesTo: {},
-            prevValueTo: {},
-            tweenProps: {},
             groupProps: { waitComplete: this.waitComplete },
             syncProp,
-            labelProps: {},
         };
 
-        this.addToMainArray(tweenProps, obj);
+        const mergedObj = { ...this.defaultObj, ...obj };
+        this.addToMainArray(tweenProps, mergedObj);
         return this;
     }
 
     createGroup(groupProps = {}, tweenProps = {}) {
         const obj = {
-            tween: null,
             action: 'createGroup',
-            valuesFrom: {},
-            valuesTo: {},
-            prevValueTo: {},
-            tweenProps: {},
             groupProps,
-            syncProp: {},
-            labelProps: {},
         };
 
-        this.addToMainArray(tweenProps, obj);
+        const mergedObj = { ...this.defaultObj, ...obj };
+        this.addToMainArray(tweenProps, mergedObj);
         this.waitComplete = groupProps?.waitComplete
             ? groupProps.waitComplete
             : false;
@@ -351,18 +326,11 @@ export class HandleTimeline {
     closeGroup(tweenProps = {}) {
         this.groupId = null;
         const obj = {
-            tween: null,
             action: 'closeGroup',
-            valuesFrom: {},
-            valuesTo: {},
-            prevValueTo: {},
-            tweenProps: {},
-            groupProps: {},
-            syncProp: {},
-            labelProps: {},
         };
 
-        this.addToMainArray(tweenProps, obj);
+        const mergedObj = { ...this.defaultObj, ...obj };
+        this.addToMainArray(tweenProps, mergedObj);
         this.waitComplete = false;
         return this;
     }
@@ -370,53 +338,34 @@ export class HandleTimeline {
     // Don't use inside group
     suspend(tweenProps = {}) {
         const obj = {
-            tween: null,
             action: 'suspend',
-            valuesFrom: {},
-            valuesTo: {},
-            prevValueTo: {},
-            tweenProps: {},
-            groupProps: {},
-            syncProp: {},
-            labelProps: {},
         };
 
-        this.addToMainArray(tweenProps, obj);
+        const mergedObj = { ...this.defaultObj, ...obj };
+        this.addToMainArray(tweenProps, mergedObj);
         return this;
     }
 
     // Don't use inside group
     label(labelProps = {}, tweenProps = {}) {
         const obj = {
-            tween: null,
             action: 'label',
-            valuesFrom: {},
-            valuesTo: {},
-            prevValueTo: {},
-            tweenProps: {},
-            groupProps: {},
-            syncProp: {},
             labelProps,
         };
 
+        const mergedObj = { ...this.defaultObj, ...mergedObj };
         this.addToMainArray(tweenProps, obj);
         return this;
     }
 
     play() {
         this.stop();
-        this.currentIndex = 0;
-        this.loopCounter = 1;
-        this.fromLabelIndex = null;
         if (this.reverse) this.revertTween();
         this.run();
-        this.isRunning = true;
     }
 
     playFrom(label) {
         this.stop();
-        this.currentIndex = 0;
-        this.loopCounter = 1;
         if (this.reverse) this.revertTween();
 
         this.fromLabelIndex = this.tweenList.findIndex((item) => {
@@ -427,12 +376,15 @@ export class HandleTimeline {
         });
 
         this.run();
-        this.isRunning = true;
     }
 
     stop() {
         if (this.currentTween.length === 0) return;
-        this.isRunning = false;
+        this.fromLabelIndex = null;
+        this.isSuspended = false;
+        this.isInPause = false;
+        this.currentIndex = 0;
+        this.loopCounter = 1;
         this.fromLabelIndex = null;
 
         // Reset
@@ -454,9 +406,8 @@ export class HandleTimeline {
     }
 
     pause() {
-        if (this.currentTween.length === 0) return;
-
         this.isInPause = true;
+        console.log('call pause', this.isInPause);
         this.currentTween.forEach(({ tween }) => {
             tween.pause();
         });
@@ -469,17 +420,16 @@ export class HandleTimeline {
      * @return {type}  description
      */
     resume() {
-        if (this.tweenResolveInPause) {
+        console.log('call resume check');
+
+        if (this.isInPause) {
             this.isInPause = false;
             this.resumeEachTween();
-            this.run();
-            return;
         }
 
-        if (!this.isRunning) return;
+        if (this.isSuspended) {
+            this.isSuspended = false;
 
-        this.isInPause = false;
-        if (this.currentTween.length === 0) {
             if (this.currentIndex <= this.tweenList.length - 2) {
                 this.currentIndex++;
                 this.run(this.currentIndex);
@@ -491,8 +441,6 @@ export class HandleTimeline {
                 this.loopCounter++;
                 this.run();
             }
-        } else {
-            this.resumeEachTween();
         }
     }
 
