@@ -1,4 +1,5 @@
 import { tweenConfig } from './tweenConfig.js';
+import { getValueObj } from '../utils/animationUtils.js';
 
 export class handleTween {
     constructor(ease = 'easeOutBack') {
@@ -55,17 +56,7 @@ export class handleTween {
             const isSettled = parseInt(this.timeElapsed) === this.duration;
 
             // Prepare an obj to pass to the callback
-            // 1- Seta an array of object: [{prop: value},{prop2: value2} ...
-            // 1- Reduce to a Object: { prop: value, prop2: value2 } ...
-            cbObject = this.values
-                .map((item) => {
-                    return {
-                        [item.prop]: parseFloat(item.currentValue),
-                    };
-                })
-                .reduce((p, c) => {
-                    return { ...p, ...c };
-                }, {});
+            const cbObject = getValueObj(this.values, 'currentValue');
 
             // Fire callback
             this.callback.forEach(({ cb }) => {
@@ -124,6 +115,14 @@ export class handleTween {
         var aKeys = Object.keys(a).sort();
         var bKeys = Object.keys(b).sort();
         return JSON.stringify(aKeys) === JSON.stringify(bKeys);
+    }
+
+    startRaf(res, reject) {
+        this.previousReject = reject;
+        this.previousResolve = res;
+        this.req = requestAnimationFrame((timestamp) => {
+            this.onReuqestAnim(timestamp, res);
+        });
     }
 
     /**
@@ -273,16 +272,7 @@ export class handleTween {
             item.currentValue = item.toValue;
         });
 
-        const cbValues = this.values
-            .map((item) => {
-                return {
-                    [item.prop]: parseFloat(item.toValue),
-                };
-            })
-            .reduce((p, c) => {
-                return { ...p, ...c };
-            }, {});
-
+        const cbValues = getValueObj(this.values, 'toValue');
         this.callback.forEach(({ cb }) => {
             cb(cbValues);
         });
@@ -330,11 +320,7 @@ export class handleTween {
 
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
-                this.previousReject = reject;
-                this.previousResolve = res;
-                this.req = requestAnimationFrame((timestamp) => {
-                    this.onReuqestAnim(timestamp, res);
-                });
+                this.startRaf(res, reject);
             });
         }
 
@@ -384,11 +370,7 @@ export class handleTween {
 
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
-                this.previousReject = reject;
-                this.previousResolve = res;
-                this.req = requestAnimationFrame((timestamp) => {
-                    this.onReuqestAnim(timestamp, res);
-                });
+                this.startRaf(res, reject);
             });
         }
 
@@ -444,11 +426,7 @@ export class handleTween {
 
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
-                this.previousReject = reject;
-                this.previousResolve = res;
-                this.req = requestAnimationFrame((timestamp) => {
-                    this.onReuqestAnim(timestamp, res);
-                });
+                this.startRaf(res, reject);
             });
         }
 
@@ -505,11 +483,7 @@ export class handleTween {
 
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
-                this.previousReject = reject;
-                this.previousResolve = res;
-                this.req = requestAnimationFrame((timestamp) => {
-                    this.onReuqestAnim(timestamp, res);
-                });
+                this.startRaf(res, reject);
             });
         }
 
@@ -525,15 +499,7 @@ export class handleTween {
      * const { prop } = mySpring.get();
      */
     get() {
-        return this.values
-            .map((item) => {
-                return {
-                    [item.prop]: parseFloat(item.currentValue),
-                };
-            })
-            .reduce((p, c) => {
-                return { ...p, ...c };
-            }, {});
+        return getValueObj(this.values, 'currentValue');
     }
 
     /**
@@ -545,15 +511,7 @@ export class handleTween {
      * const { prop } = mySpring.get();
      */
     getFrom() {
-        return this.values
-            .map((item) => {
-                return {
-                    [item.prop]: parseFloat(item.fromValue),
-                };
-            })
-            .reduce((p, c) => {
-                return { ...p, ...c };
-            }, {});
+        return getValueObj(this.values, 'fromValue');
     }
 
     /**
@@ -565,15 +523,7 @@ export class handleTween {
      * const { prop } = mySpring.get();
      */
     getTo() {
-        return this.values
-            .map((item) => {
-                return {
-                    [item.prop]: parseFloat(item.toValue),
-                };
-            })
-            .reduce((p, c) => {
-                return { ...p, ...c };
-            }, {});
+        return getValueObj(this.values, 'toValue');
     }
 
     getType() {

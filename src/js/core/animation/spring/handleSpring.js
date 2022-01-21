@@ -1,4 +1,5 @@
 import { springConfig } from './springConfig.js';
+import { getValueObj } from '../utils/animationUtils.js';
 
 const getSpringTime = () => {
     return typeof window !== 'undefined'
@@ -49,17 +50,7 @@ export class handleSpring {
             });
 
             // Prepare an obj to pass to the callback
-            // 1- Seta an array of object: [{prop: value},{prop2: value2} ...
-            // 1- Reduce to a Object: { prop: value, prop2: value2 } ...
-            const cbObject = this.values
-                .map((item) => {
-                    return {
-                        [item.prop]: parseFloat(item.currentValue),
-                    };
-                })
-                .reduce((p, c) => {
-                    return { ...p, ...c };
-                }, {});
+            const cbObject = getValueObj(this.values, 'currentValue');
 
             // Fire callback
             this.callback.forEach(({ cb }) => {
@@ -85,15 +76,7 @@ export class handleSpring {
                 });
 
                 // Prepare an obj to pass to the callback with rounded value ( end user value)
-                const cbObjectSettled = this.values
-                    .map((item) => {
-                        return {
-                            [item.prop]: parseFloat(item.toValue),
-                        };
-                    })
-                    .reduce((p, c) => {
-                        return { ...p, ...c };
-                    }, {});
+                const cbObjectSettled = getValueObj(this.values, 'toValue');
 
                 // Fire callback with exact end value
                 this.callback.forEach(({ cb }) => {
@@ -127,6 +110,14 @@ export class handleSpring {
         var aKeys = Object.keys(a).sort();
         var bKeys = Object.keys(b).sort();
         return JSON.stringify(aKeys) === JSON.stringify(bKeys);
+    }
+
+    startRaf(res, reject) {
+        this.previousReject = reject;
+        this.previousResolve = res;
+        this.req = requestAnimationFrame(() => {
+            this.onReuqestAnim(res);
+        });
     }
 
     /**
@@ -250,16 +241,7 @@ export class handleSpring {
             item.currentValue = item.toValue;
         });
 
-        const cbValues = this.values
-            .map((item) => {
-                return {
-                    [item.prop]: parseFloat(item.toValue),
-                };
-            })
-            .reduce((p, c) => {
-                return { ...p, ...c };
-            }, {});
-
+        const cbValues = getValueObj(this.values, 'toValue');
         this.callback.forEach(({ cb }) => {
             cb(cbValues);
         });
@@ -305,9 +287,7 @@ export class handleSpring {
 
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
-                this.previousReject = reject;
-                this.previousResolve = res;
-                this.req = requestAnimationFrame(() => this.onReuqestAnim(res));
+                this.startRaf(res, reject);
             });
         }
 
@@ -356,9 +336,7 @@ export class handleSpring {
 
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
-                this.previousReject = reject;
-                this.previousResolve = res;
-                this.req = requestAnimationFrame(() => this.onReuqestAnim(res));
+                this.startRaf(res, reject);
             });
         }
 
@@ -413,9 +391,7 @@ export class handleSpring {
 
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
-                this.previousReject = reject;
-                this.previousResolve = res;
-                this.req = requestAnimationFrame(() => this.onReuqestAnim(res));
+                this.startRaf(res, reject);
             });
         }
 
@@ -464,9 +440,7 @@ export class handleSpring {
 
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
-                this.previousReject = reject;
-                this.previousResolve = res;
-                this.req = requestAnimationFrame(() => this.onReuqestAnim(res));
+                this.startRaf(res, reject);
             });
         }
 
@@ -482,15 +456,7 @@ export class handleSpring {
      * const { prop } = mySpring.get();
      */
     get() {
-        return this.values
-            .map((item) => {
-                return {
-                    [item.prop]: parseFloat(item.currentValue),
-                };
-            })
-            .reduce((p, c) => {
-                return { ...p, ...c };
-            }, {});
+        return getValueObj(this.values, 'currentValue');
     }
 
     /**
@@ -502,15 +468,7 @@ export class handleSpring {
      * const { prop } = mySpring.get();
      */
     getFrom() {
-        return this.values
-            .map((item) => {
-                return {
-                    [item.prop]: parseFloat(item.fromValue),
-                };
-            })
-            .reduce((p, c) => {
-                return { ...p, ...c };
-            }, {});
+        return getValueObj(this.values, 'fromValue');
     }
 
     /**
@@ -522,15 +480,7 @@ export class handleSpring {
      * const { prop } = mySpring.get();
      */
     getTo() {
-        return this.values
-            .map((item) => {
-                return {
-                    [item.prop]: parseFloat(item.toValue),
-                };
-            })
-            .reduce((p, c) => {
-                return { ...p, ...c };
-            }, {});
+        return getValueObj(this.values, 'toValue');
     }
 
     getType() {
