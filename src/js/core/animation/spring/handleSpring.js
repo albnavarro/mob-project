@@ -17,6 +17,7 @@ export class handleSpring {
         this.values = [];
         this.id = 0;
         this.callback = [];
+        this.callbackStartInPause = [];
         this.pauseStatus = false;
         this.defaultProps = { reverse: false, config: this.config };
     }
@@ -116,7 +117,12 @@ export class handleSpring {
         this.previousReject = reject;
         this.previousResolve = res;
         this.req = requestAnimationFrame(() => {
+            const prevent = this.callbackStartInPause
+                .map(({ cb }) => cb())
+                .some((item) => item === true);
+
             this.onReuqestAnim(res);
+            if (prevent) this.pause();
         });
     }
 
@@ -544,6 +550,25 @@ export class handleSpring {
 
         return () => {
             this.callback = this.callback.filter((item) => item.id !== cbId);
+        };
+    }
+
+    /**
+     * subscribe - add callback to start in pause to stack
+     *
+     * @param  {function} cb cal function
+     * @return {function} unsubscribe callback
+     *
+     */
+    onStartInPause(cb) {
+        this.callbackStartInPause.push({ cb, id: this.id });
+        const cbId = this.id;
+        this.id++;
+
+        return () => {
+            this.callbackStartInPause = this.callbackStartInPause.filter(
+                (item) => item.id !== cbId
+            );
         };
     }
 }

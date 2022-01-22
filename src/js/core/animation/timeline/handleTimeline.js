@@ -15,9 +15,6 @@ export class HandleTimeline {
         // group "name" star from 1 to avoid 0 = falsa
         this.groupCounter = 1;
         this.waitComplete = false;
-        this.reverse = false;
-        this.isInPause = false;
-        this.isSuspended = false;
         this.fromLabelIndex = null;
         this.defaultObj = {
             tween: null,
@@ -30,6 +27,12 @@ export class HandleTimeline {
             syncProp: {},
             labelProps: {},
         };
+        this.NOOP = () => {};
+
+        // Timeline state
+        this.isReverse = false;
+        this.isInPause = false;
+        this.isSuspended = false;
     }
 
     run(index = this.currentIndex) {
@@ -104,6 +107,16 @@ export class HandleTimeline {
                 const delay = isImmediate ? false : tweenProps?.delay;
 
                 const cb = () => {
+                    // Pause the tween when try to start when timeline is isInPause
+                    // pause was triggered in delay status
+                    const unsubscribePrevent =
+                        tween && tween?.onStartInPause
+                            ? tween.onStartInPause(() =>
+                                  this.isInPause ? true : false
+                              )
+                            : this.NOOP;
+
+                    // Add tween to stack to pause it when necessary
                     this.currentTween.push({
                         id: this.currentTweenCounter,
                         tween,
@@ -113,23 +126,19 @@ export class HandleTimeline {
 
                     fn[action]()
                         .then(() => {
+                            // Remove tween from active tween store
                             this.unsubscribeTween(cbId);
+                            // Unsubscribe from pause on start
+                            unsubscribePrevent();
                             res();
                         })
                         .catch((error) => {
+                            // Remove tween from active tween store
                             this.unsubscribeTween(cbId);
+                            // Unsubscribe from pause on start
+                            unsubscribePrevent();
                             return error;
                         });
-
-                    // If tween is fired after delay and user trigger pause inside
-                    // reun puase at next frame
-                    if (this.isInPause) {
-                        handleFrame(() => {
-                            console.log('tween fired in pause');
-                            this.isInPause = false;
-                            this.pause();
-                        });
-                    }
                 };
 
                 if (delay) {
@@ -182,7 +191,7 @@ export class HandleTimeline {
     }
 
     revertTween() {
-        this.reverse = !this.reverse;
+        this.isReverse = !this.isReverse;
         this.tweenList.reverse();
         this.tweenList.forEach((group) => {
             group.reverse();
@@ -360,13 +369,13 @@ export class HandleTimeline {
 
     play() {
         this.stop();
-        if (this.reverse) this.revertTween();
+        if (this.isReverse) this.revertTween();
         this.run();
     }
 
     playFrom(label) {
         this.stop();
-        if (this.reverse) this.revertTween();
+        if (this.isReverse) this.revertTween();
 
         this.fromLabelIndex = this.tweenList.findIndex((item) => {
             // Get first item of group, unnecessary use of label inside a group becouse is parallel
@@ -388,7 +397,7 @@ export class HandleTimeline {
         this.fromLabelIndex = null;
 
         // Reset
-        if (this.reverse) this.revertTween();
+        if (this.isReverse) this.revertTween();
         this.tweenList.forEach((group) => {
             group.forEach((item) => {
                 const { data } = item;
@@ -402,7 +411,7 @@ export class HandleTimeline {
 
         // Stop all Tween
         this.currentTween.forEach(({ tween }) => tween.stop());
-        this.reverse = false;
+        this.isReverse = false;
     }
 
     pause() {
@@ -435,7 +444,7 @@ export class HandleTimeline {
                 this.run(this.currentIndex);
             } else if (this.currentIndex === this.tweenList.length - 1) {
                 // At the end suspend become item in pipe first ro skip it
-                this.currentIndex = this.yoyo && !this.reverse ? 1 : 0;
+                this.currentIndex = this.yoyo && !this.isReverse ? 1 : 0;
                 this.fromLabelIndex = null;
                 if (this.yoyo) this.revertTween();
                 this.loopCounter++;

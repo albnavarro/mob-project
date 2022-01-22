@@ -11,6 +11,7 @@ export class handleTween {
         this.values = [];
         this.id = 0;
         this.callback = [];
+        this.callbackStartInPause = [];
         this.pauseStatus = false;
         this.comeFromResume = false;
         this.duration = 1000;
@@ -121,7 +122,12 @@ export class handleTween {
         this.previousReject = reject;
         this.previousResolve = res;
         this.req = requestAnimationFrame((timestamp) => {
+            const prevent = this.callbackStartInPause
+                .map(({ cb }) => cb())
+                .some((item) => item === true);
+
             this.onReuqestAnim(timestamp, res);
+            if (prevent) this.pause();
         });
     }
 
@@ -575,6 +581,25 @@ export class handleTween {
 
         return () => {
             this.callback = this.callback.filter((item) => item.id !== cbId);
+        };
+    }
+
+    /**
+     * subscribe - add callback to start in pause to stack
+     *
+     * @param  {function} cb cal function
+     * @return {function} unsubscribe callback
+     *
+     */
+    onStartInPause(cb) {
+        this.callbackStartInPause.push({ cb, id: this.id });
+        const cbId = this.id;
+        this.id++;
+
+        return () => {
+            this.callbackStartInPause = this.callbackStartInPause.filter(
+                (item) => item.id !== cbId
+            );
         };
     }
 }
