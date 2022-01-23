@@ -467,13 +467,14 @@ export class HandleTimeline {
         // Back current tween
         const reverseTweenPrmises = this.currentTween.map(
             ({ tween, id, current }) => {
-                const currentFromValues = tween.getFrom();
-                const currentFromValues2 = tween.get();
+                // getTo => go the end of current pipe and then go back, maybe easiest way and better
+                // getFrom => go back dirwctily but some probem to check
+                const currentValuesTo = tween.getTo();
                 const currentKeys = Object.keys(current);
 
                 // Get key of current tween based to vale stored in tween
                 // Get only key used in current pipe
-                const toValues = Object.entries(currentFromValues).reduce(
+                const toValues = Object.entries(currentValuesTo).reduce(
                     (p, c) => {
                         const [key, val] = c;
                         return currentKeys.includes(key)
@@ -505,7 +506,8 @@ export class HandleTimeline {
             this.currentIndex = this.tweenList.length - this.currentIndex - 1;
             this.fromLabelIndex = null;
             this.revertTween();
-            this.currentIndex++;
+            // use with goFrom
+            // this.currentIndex++;
             this.run();
         });
     }
