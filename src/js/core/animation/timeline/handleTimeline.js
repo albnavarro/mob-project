@@ -478,7 +478,7 @@ export class HandleTimeline {
 
                 // Get key of current tween based to vale stored in tween
                 // Get only key used in current pipe
-                const currentTween = Object.entries(currentFromValues).reduce(
+                const toValues = Object.entries(currentFromValues).reduce(
                     (p, c) => {
                         const [key, val] = c;
                         return currentKeys.includes(key)
@@ -490,10 +490,10 @@ export class HandleTimeline {
 
                 return new Promise((res, reject) => {
                     this.addToActiveTween(tween, id, current);
-
+                    tween.stop();
                     tween
-                        .goTo(currentTween)
-                        .then((value) => {
+                        .goTo(toValues)
+                        .then(() => {
                             this.unsubscribeTween(id);
                             res();
                         })
@@ -506,14 +506,13 @@ export class HandleTimeline {
 
         // Resolved new tween group restar pipe
         Promise.all(reverseTweenPrmises).then((value) => {
+            this.isRunninReverseRealtime = true;
+            this.currentIndex = this.tweenList.length - this.currentIndex - 1;
+            this.fromLabelIndex = null;
+            this.revertTween();
             this.currentIndex++;
             this.run();
         });
-
-        this.isRunninReverseRealtime = true;
-        this.currentIndex = this.tweenList.length - this.currentIndex - 1;
-        this.fromLabelIndex = null;
-        this.revertTween();
     }
 
     /**
