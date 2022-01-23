@@ -525,16 +525,6 @@ export class handleSpring {
     }
 
     /**
-     * reject - Reject primises
-     *
-     * @return {void}
-     *
-     */
-    reject() {
-        if (this.previousReject) this.previousReject();
-    }
-
-    /**
      * updatePreset - Update config object with new preset
      *
      * @param  {String} preset new preset

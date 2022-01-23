@@ -464,11 +464,6 @@ export class HandleTimeline {
         if (this.isRunninReverseRealtime || this.currentTween.length === 0)
             return;
 
-        // Reject current tween primise
-        this.currentTween.forEach(({ tween }) => {
-            tween.reject();
-        });
-
         // Back current tween
         const reverseTweenPrmises = this.currentTween.map(
             ({ tween, id, current }) => {

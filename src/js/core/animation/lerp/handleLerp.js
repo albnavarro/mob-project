@@ -513,16 +513,6 @@ export class handleLerp {
     }
 
     /**
-     * reject - Reject primises
-     *
-     * @return {void}
-     *
-     */
-    reject() {
-        if (this.previousReject) this.previousReject();
-    }
-
-    /**
      * subscribe - add callback to stack
      *
      * @param  {function} cb cal function
