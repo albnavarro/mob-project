@@ -8,6 +8,7 @@ const getLerpTime = () => {
 
 export class handleLerp {
     constructor(velocity = 15) {
+        this.uniqueId = '_' + Math.random().toString(36).substr(2, 9);
         this.config = {};
         this.velocity = velocity;
         this.req = null;
@@ -509,6 +510,16 @@ export class handleLerp {
                 item.toValue = fromValue;
             }
         });
+    }
+
+    /**
+     * reject - Reject primises
+     *
+     * @return {void}
+     *
+     */
+    reject() {
+        if (this.previousReject) this.previousReject();
     }
 
     /**

@@ -3,6 +3,7 @@ import { getValueObj } from '../utils/animationUtils.js';
 
 export class handleTween {
     constructor(ease = 'easeOutBack') {
+        this.uniqueId = '_' + Math.random().toString(36).substr(2, 9);
         this.ease = tweenConfig[ease];
         this.req = null;
         this.previousResolve = null;
@@ -565,6 +566,16 @@ export class handleTween {
                 item.toValue = fromValue;
             }
         });
+    }
+
+    /**
+     * reject - Reject primises
+     *
+     * @return {void}
+     *
+     */
+    reject() {
+        if (this.previousReject) this.previousReject();
     }
 
     /**

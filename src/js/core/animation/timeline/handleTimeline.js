@@ -17,6 +17,7 @@ export class HandleTimeline {
         this.waitComplete = false;
         this.fromLabelIndex = null;
         this.defaultObj = {
+            id: null,
             tween: null,
             action: null,
             valuesFrom: {},
@@ -33,6 +34,7 @@ export class HandleTimeline {
         this.isReverse = false;
         this.isInPause = false;
         this.isSuspended = false;
+        this.isRunninReverseRealtime = false;
     }
 
     run(index = this.currentIndex) {
@@ -40,6 +42,7 @@ export class HandleTimeline {
             const { group, data } = item;
 
             const {
+                id,
                 tween,
                 action,
                 valuesFrom,
@@ -107,36 +110,32 @@ export class HandleTimeline {
                 const delay = isImmediate ? false : tweenProps?.delay;
 
                 const cb = () => {
-                    // Pause the tween when try to start when timeline is isInPause
-                    // pause was triggered in delay status
-                    const unsubscribePrevent =
-                        tween && tween?.onStartInPause
-                            ? tween.onStartInPause(() =>
-                                  this.isInPause ? true : false
-                              )
-                            : this.NOOP;
+                    // Add tween to active stack
+                    this.addToActiveTween(tween, id, valuesTo);
 
-                    // Add tween to stack to pause it when necessary
-                    this.currentTween.push({
-                        id: this.currentTweenCounter,
-                        tween,
-                    });
-                    const cbId = this.currentTweenCounter;
-                    this.currentTweenCounter++;
+                    // Add tween to active stack, if timelienstatus is in pause
+                    //  onStartInPause methids trigger pause status inside
+                    const unsubscribeOnStartTween =
+                        tween && tween?.onStartInPause
+                            ? tween.onStartInPause(() => {
+                                  this.addToActiveTween(tween, id, valuesTo);
+                                  return this.isInPause ? true : false;
+                              })
+                            : this.NOOP;
 
                     fn[action]()
                         .then(() => {
                             // Remove tween from active tween store
-                            this.unsubscribeTween(cbId);
+                            this.unsubscribeTween(id);
                             // Unsubscribe from pause on start
-                            unsubscribePrevent();
+                            unsubscribeOnStartTween();
                             res();
                         })
                         .catch((error) => {
                             // Remove tween from active tween store
-                            this.unsubscribeTween(cbId);
+                            this.unsubscribeTween(id);
                             // Unsubscribe from pause on start
-                            unsubscribePrevent();
+                            unsubscribeOnStartTween();
                             return error;
                         });
                 };
@@ -163,6 +162,7 @@ export class HandleTimeline {
                 console.log('resolve promise group');
                 if (this.isSuspended) return;
 
+                this.isRunninReverseRealtime = false;
                 if (this.currentIndex < this.tweenList.length - 1) {
                     this.currentIndex++;
                     this.run();
@@ -186,8 +186,33 @@ export class HandleTimeline {
             });
     }
 
-    unsubscribeTween(cbId) {
-        this.currentTween = this.currentTween.filter(({ id }) => id !== cbId);
+    addToActiveTween(tween, id, valuesTo) {
+        // Add tween tif is not present in tack
+        const tweenIsAleadyTrackedId = this.currentTween.findIndex(
+            ({ tween: currentTween }) => {
+                if (!currentTween || !tween) return -1;
+                return currentTween.uniqueId === tween.uniqueId;
+            }
+        );
+
+        // If tween is in stack update current value in use
+        if (tweenIsAleadyTrackedId === -1) {
+            this.currentTween.push({
+                id,
+                current: valuesTo,
+                tween,
+            });
+        } else {
+            this.currentTween[tweenIsAleadyTrackedId].current = valuesTo;
+        }
+
+        console.log(this.currentTween);
+    }
+
+    unsubscribeTween(idToCheck) {
+        this.currentTween = this.currentTween.filter(
+            ({ id }) => id !== idToCheck
+        );
     }
 
     revertTween() {
@@ -238,12 +263,15 @@ export class HandleTimeline {
 
     set(tween, valuesFrom, tweenProps = {}) {
         const obj = {
+            id: this.currentTweenCounter,
             tween,
             action: 'set',
             valuesFrom,
             tweenProps,
             groupProps: { waitComplete: this.waitComplete },
         };
+
+        this.currentTweenCounter++;
 
         const mergedObj = { ...this.defaultObj, ...obj };
         this.addToMainArray(tweenProps, mergedObj);
@@ -252,12 +280,15 @@ export class HandleTimeline {
 
     goTo(tween, valuesTo, tweenProps = {}) {
         const obj = {
+            id: this.currentTweenCounter,
             tween,
             action: 'goTo',
             valuesTo,
             tweenProps,
             groupProps: { waitComplete: this.waitComplete },
         };
+
+        this.currentTweenCounter++;
 
         const mergedObj = { ...this.defaultObj, ...obj };
         this.addToMainArray(tweenProps, mergedObj);
@@ -266,12 +297,15 @@ export class HandleTimeline {
 
     goFrom(tween, valuesFrom, tweenProps = {}) {
         const obj = {
+            id: this.currentTweenCounter,
             tween,
             action: 'goFrom',
             valuesFrom,
             tweenProps,
             groupProps: { waitComplete: this.waitComplete },
         };
+
+        this.currentTweenCounter++;
 
         const mergedObj = { ...this.defaultObj, ...obj };
         this.addToMainArray(tweenProps, mergedObj);
@@ -280,6 +314,7 @@ export class HandleTimeline {
 
     goFromTo(tween, valuesFrom, valuesTo, tweenProps = {}) {
         const obj = {
+            id: this.currentTweenCounter,
             tween,
             action: 'goFromTo',
             valuesFrom,
@@ -287,6 +322,8 @@ export class HandleTimeline {
             tweenProps,
             groupProps: { waitComplete: this.waitComplete },
         };
+
+        this.currentTweenCounter++;
 
         const mergedObj = { ...this.defaultObj, ...obj };
         this.addToMainArray(tweenProps, mergedObj);
@@ -420,6 +457,63 @@ export class HandleTimeline {
         this.currentTween.forEach(({ tween }) => {
             tween.pause();
         });
+    }
+
+    doReverse() {
+        // Secure check only one reverse for pipe
+        if (this.isRunninReverseRealtime || this.currentTween.length === 0)
+            return;
+
+        // Reject current tween primise
+        this.currentTween.forEach(({ tween }) => {
+            tween.reject();
+        });
+
+        // Back current tween
+        const reverseTweenPrmises = this.currentTween.map(
+            ({ tween, id, current }) => {
+                const currentFromValues = tween.getFrom();
+                const currentFromValues2 = tween.get();
+                const currentKeys = Object.keys(current);
+
+                // Get key of current tween based to vale stored in tween
+                // Get only key used in current pipe
+                const currentTween = Object.entries(currentFromValues).reduce(
+                    (p, c) => {
+                        const [key, val] = c;
+                        return currentKeys.includes(key)
+                            ? { ...p, ...{ [key]: val } }
+                            : p;
+                    },
+                    {}
+                );
+
+                return new Promise((res, reject) => {
+                    this.addToActiveTween(tween, id, current);
+
+                    tween
+                        .goTo(currentTween)
+                        .then((value) => {
+                            this.unsubscribeTween(id);
+                            res();
+                        })
+                        .catch((err) => {
+                            this.unsubscribeTween(id);
+                        });
+                });
+            }
+        );
+
+        // Resolved new tween group restar pipe
+        Promise.all(reverseTweenPrmises).then((value) => {
+            this.currentIndex++;
+            this.run();
+        });
+
+        this.isRunninReverseRealtime = true;
+        this.currentIndex = this.tweenList.length - this.currentIndex - 1;
+        this.fromLabelIndex = null;
+        this.revertTween();
     }
 
     /**

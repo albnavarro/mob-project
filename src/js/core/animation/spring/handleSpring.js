@@ -9,6 +9,7 @@ const getSpringTime = () => {
 
 export class handleSpring {
     constructor(config = 'default') {
+        this.uniqueId = '_' + Math.random().toString(36).substr(2, 9);
         this.config = springConfig[config];
         this.req = null;
         this.previousResolve = null;
@@ -521,6 +522,16 @@ export class handleSpring {
                 item.toValue = fromValue;
             }
         });
+    }
+
+    /**
+     * reject - Reject primises
+     *
+     * @return {void}
+     *
+     */
+    reject() {
+        if (this.previousReject) this.previousReject();
     }
 
     /**
