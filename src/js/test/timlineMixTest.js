@@ -10,6 +10,7 @@ export function timlineMixTest() {
     const btnPlay = document.querySelector('.mix-btn-play');
     const btnFrom = document.querySelector('.mix-btn-playFrom');
     const btnReverse = document.querySelector('.mix-btn-reverse');
+    const btnReverseNext = document.querySelector('.mix-btn-reverseNext');
     const target = document.querySelector('.mix-target');
     const target2 = document.querySelector('.mix-target2');
 
@@ -86,7 +87,10 @@ export function timlineMixTest() {
     });
 
     btnReverse.addEventListener('click', () => {
-        console.log('click');
         timeline.doReverse();
+    });
+
+    btnReverseNext.addEventListener('click', () => {
+        timeline.doReverseNext();
     });
 }

@@ -162,6 +162,16 @@ export class HandleTimeline {
                 console.log('resolve promise group');
                 if (this.isSuspended) return;
 
+                if (this.isReverseNext) {
+                    this.isReverseNext = false;
+                    this.currentIndex =
+                        this.tweenList.length - this.currentIndex - 1;
+                    this.fromLabelIndex = null;
+                    this.revertTween();
+                    this.run();
+                    return;
+                }
+
                 this.isRunninReverseRealtime = false;
                 if (this.currentIndex < this.tweenList.length - 1) {
                     this.currentIndex++;
@@ -459,6 +469,10 @@ export class HandleTimeline {
         });
     }
 
+    doReverseNext() {
+        this.isReverseNext = true;
+    }
+
     doReverse() {
         // Secure check only one reverse for pipe
         if (this.isRunninReverseRealtime || this.currentTween.length === 0)
@@ -467,9 +481,7 @@ export class HandleTimeline {
         // Back current tween
         const reverseTweenPrmises = this.currentTween.map(
             ({ tween, id, current }) => {
-                // getTo => go the end of current pipe and then go back, maybe easiest way and better
-                // getFrom => go back dirwctily but some probem to check
-                const currentValuesTo = tween.getTo();
+                const currentValuesTo = tween.getFrom();
                 const currentKeys = Object.keys(current);
 
                 // Get key of current tween based to vale stored in tween
@@ -506,8 +518,7 @@ export class HandleTimeline {
             this.currentIndex = this.tweenList.length - this.currentIndex - 1;
             this.fromLabelIndex = null;
             this.revertTween();
-            // use with goFrom
-            // this.currentIndex++;
+            this.currentIndex++;
             this.run();
         });
     }
