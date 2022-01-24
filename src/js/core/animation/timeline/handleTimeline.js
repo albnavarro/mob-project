@@ -196,7 +196,7 @@ export class HandleTimeline {
             });
     }
 
-    addToActiveTween(tween, id, valuesTo) {
+    addToActiveTween(tween, id, valuesTo = {}) {
         // Add tween tif is not present in tack
         const tweenIsAleadyTrackedId = this.currentTween.findIndex(
             ({ tween: currentTween }) => {
@@ -512,8 +512,14 @@ export class HandleTimeline {
             }
         );
 
+        const waitComplete = this.tweenList[this.currentIndex].some((item) => {
+            return item.data.groupProps?.waitComplete;
+        });
+        const promiseType = waitComplete ? 'all' : 'race';
+        console.log(promiseType);
+
         // Resolved new tween group restar pipe
-        Promise.all(reverseTweenPrmises).then((value) => {
+        Promise[promiseType](reverseTweenPrmises).then((value) => {
             this.isRunninReverseRealtime = true;
             this.currentIndex = this.tweenList.length - this.currentIndex - 1;
             this.fromLabelIndex = null;
