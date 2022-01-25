@@ -51,8 +51,8 @@ export function timlineMixTest() {
             { config: { mass: 2 }, delay: 500 }
         )
         .sync({ from: springBox1, to: tweenBox1 })
-        .createGroup()
-        .goTo(tweenBox1, { y: 400 }, { duration: 350 })
+        .createGroup({ waitComplete: true })
+        .goTo(tweenBox1, { y: 400 }, { duration: 850 })
         .goTo(tweenBox2, { rotate: 360 }, { duration: 2000, delay: 1000 })
         .closeGroup()
         .label({ name: 'label1' })
