@@ -34,6 +34,7 @@ export class HandleTimeline {
         this.isReverse = false;
         this.isInPause = false;
         this.isSuspended = false;
+        this.isStopped = false;
         this.isRunninReverseRealtime = false;
     }
 
@@ -122,6 +123,12 @@ export class HandleTimeline {
                                   return this.isInPause ? true : false;
                               })
                             : this.NOOP;
+
+                    // Prevent tween start after stop because have some delay
+                    if (this.isStopped) {
+                        reject();
+                        return;
+                    }
 
                     fn[action]()
                         .then(() => {
@@ -415,12 +422,14 @@ export class HandleTimeline {
 
     play() {
         this.stop();
+        this.isStopped = false;
         if (this.isReverse) this.revertTween();
         this.run();
     }
 
     playFrom(label) {
         this.stop();
+        this.isStopped = false;
         if (this.isReverse) this.revertTween();
 
         this.fromLabelIndex = this.tweenList.findIndex((item) => {
@@ -434,13 +443,13 @@ export class HandleTimeline {
     }
 
     stop() {
-        if (this.currentTween.length === 0) return;
         this.fromLabelIndex = null;
         this.isSuspended = false;
         this.isInPause = false;
         this.currentIndex = 0;
         this.loopCounter = 1;
         this.fromLabelIndex = null;
+        this.isStopped = true;
 
         // Reset
         if (this.isReverse) this.revertTween();
