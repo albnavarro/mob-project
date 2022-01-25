@@ -136,7 +136,7 @@ export class HandleTimeline {
                             this.unsubscribeTween(id);
                             // Unsubscribe from pause on start
                             unsubscribeOnStartTween();
-                            return error;
+                            reject();
                         });
                 };
 
@@ -505,6 +505,7 @@ export class HandleTimeline {
                         })
                         .catch((err) => {
                             this.unsubscribeTween(id);
+                            reject();
                         });
                 });
             }
@@ -517,14 +518,19 @@ export class HandleTimeline {
         console.log(promiseType);
 
         // Resolved new tween group restar pipe
-        Promise[promiseType](reverseTweenPrmises).then((value) => {
-            this.isRunninReverseRealtime = false;
-            this.currentIndex = this.tweenList.length - this.currentIndex - 1;
-            this.fromLabelIndex = null;
-            this.revertTween();
-            this.currentIndex++;
-            this.run();
-        });
+        Promise[promiseType](reverseTweenPrmises)
+            .then((value) => {
+                this.isRunninReverseRealtime = false;
+                this.currentIndex =
+                    this.tweenList.length - this.currentIndex - 1;
+                this.fromLabelIndex = null;
+                this.revertTween();
+                this.currentIndex++;
+                this.run();
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     }
 
     /**
