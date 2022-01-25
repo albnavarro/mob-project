@@ -172,7 +172,6 @@ export class HandleTimeline {
                     return;
                 }
 
-                this.isRunninReverseRealtime = false;
                 if (this.currentIndex < this.tweenList.length - 1) {
                     this.currentIndex++;
                     this.run();
@@ -474,9 +473,8 @@ export class HandleTimeline {
     }
 
     doReverse() {
-        // Secure check only one reverse for pipe
-        if (this.isRunninReverseRealtime || this.currentTween.length === 0)
-            return;
+        if (this.isRunninReverseRealtime) return;
+        this.isRunninReverseRealtime = true;
 
         // Back current tween
         const reverseTweenPrmises = this.currentTween.map(
@@ -520,7 +518,7 @@ export class HandleTimeline {
 
         // Resolved new tween group restar pipe
         Promise[promiseType](reverseTweenPrmises).then((value) => {
-            this.isRunninReverseRealtime = true;
+            this.isRunninReverseRealtime = false;
             this.currentIndex = this.tweenList.length - this.currentIndex - 1;
             this.fromLabelIndex = null;
             this.revertTween();
