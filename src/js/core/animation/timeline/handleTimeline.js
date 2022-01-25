@@ -215,11 +215,9 @@ export class HandleTimeline {
         if (tweenIsAleadyTrackedId === -1) {
             this.currentTween.push({
                 id,
-                current: valuesTo,
+                currentGoToKey: Object.keys(valuesTo),
                 tween,
             });
-        } else {
-            this.currentTween[tweenIsAleadyTrackedId].current = valuesTo;
         }
 
         console.log(this.currentTween);
@@ -487,16 +485,15 @@ export class HandleTimeline {
 
         // Back current tween
         const reverseTweenPrmises = this.currentTween.map(
-            ({ tween, id, current }) => {
-                const currentValuesTo = tween.getFrom();
-                const currentKeys = Object.keys(current);
+            ({ tween, id, currentGoToKey }) => {
+                const currentValuesFrom = tween.getFrom();
 
                 // Get key of current tween based to vale stored in tween
                 // Get only key used in current pipe
-                const toValues = Object.entries(currentValuesTo).reduce(
+                const toValues = Object.entries(currentValuesFrom).reduce(
                     (p, c) => {
                         const [key, val] = c;
-                        return currentKeys.includes(key)
+                        return currentGoToKey.includes(key)
                             ? { ...p, ...{ [key]: val } }
                             : p;
                     },
@@ -504,7 +501,7 @@ export class HandleTimeline {
                 );
 
                 return new Promise((res, reject) => {
-                    this.addToActiveTween(tween, id, current);
+                    this.addToActiveTween(tween, id, currentGoToKey);
                     tween.stop();
                     tween
                         .goTo(toValues)
