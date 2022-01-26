@@ -167,6 +167,7 @@ export class HandleTimeline {
         Promise[promiseType](tweenPromises)
             .then(() => {
                 this.currentTween = [];
+                this.isRunninReverseRealtime = false;
 
                 console.log('resolve promise group');
                 if (this.isSuspended) return;
@@ -536,15 +537,16 @@ export class HandleTimeline {
         Promise[promiseType](reverseTweenPrmises)
             .then((value) => {
                 this.currentTween = [];
-                this.isRunninReverseRealtime = false;
                 this.currentIndex =
                     this.tweenList.length - this.currentIndex - 1;
                 this.fromLabelIndex = null;
                 this.revertTween();
-                this.currentIndex++;
+                if (this.currentIndex < this.tweenList.length - 1)
+                    this.currentIndex++;
                 this.run();
             })
             .catch((err) => {
+                this.currentTween = [];
                 console.log(err);
             });
     }
