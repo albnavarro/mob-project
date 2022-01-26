@@ -503,20 +503,11 @@ export class HandleTimeline {
                 // otherview if tween is in motion go to current form position
                 const targetValue = completed ? valuesFrom : valuesTo;
 
-                // Get key of current tween based to vale stored in tween
-                // Get only key used in current pipe
-                const toValues = Object.entries(targetValue).reduce((p, c) => {
-                    const [key, val] = c;
-                    return propiertiesInUse.includes(key)
-                        ? { ...p, ...{ [key]: val } }
-                        : p;
-                }, {});
-
                 return new Promise((res, reject) => {
                     this.addToActiveTween(tween, propiertiesInUse);
                     tween.stop();
                     tween
-                        .goTo(toValues)
+                        .goTo(targetValue)
                         .then(() => {
                             res();
                         })
@@ -536,7 +527,6 @@ export class HandleTimeline {
         // Resolved new tween group restar pipe
         Promise[promiseType](reverseTweenPrmises)
             .then((value) => {
-                this.currentTween = [];
                 this.currentIndex =
                     this.tweenList.length - this.currentIndex - 1;
                 this.fromLabelIndex = null;
@@ -546,7 +536,6 @@ export class HandleTimeline {
                 this.run();
             })
             .catch((err) => {
-                this.currentTween = [];
                 console.log(err);
             });
     }
