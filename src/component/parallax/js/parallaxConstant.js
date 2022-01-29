@@ -40,6 +40,7 @@ export const parallaxConstant = {
     PROP_ROTATEZ: 'rotateZ',
     PROP_OPACITY: 'opacity',
     PROP_SCALE: 'scale',
+    PROP_TWEEN: 'tween',
 
     // Align constant
     ALIGN_START: 'start',

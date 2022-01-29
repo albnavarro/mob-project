@@ -1,4 +1,5 @@
 import { parallax } from '../../component/parallax/js/parallax.js';
+import { ParallaxTween } from '../../component/parallax/js/parallaxTween.js';
 import { ParallaxItemClass } from '../../component/parallax/js/parallaxItem.js';
 import { SmoothScrollClass } from '../../component/smoothScroll/js/smoothScroll.js';
 
@@ -15,36 +16,42 @@ export const hScroller = () => {
     parallaxOpacity.init();
     parallax.add(parallaxOpacity);
 
+    const target = document.querySelector('.parallax-via-js-in');
     const pluto = document.querySelector('.pluto3');
     pluto.style.webkitTransition = 'background-color .35s';
+
+    const myParallaxTween = new ParallaxTween();
+    myParallaxTween.setData({ x: 0, y: 0 });
+    myParallaxTween.goTo({ x: pluto.offsetWidth, y: pluto.offsetHeight });
+    myParallaxTween.subscribe(({ x, y }) => {
+        target.style.transform = `translate3D(0,0,0) translate(${x}px, ${y}px)`;
+    });
+
     const parallaxIn = new ParallaxItemClass({
-        item: document.querySelector('.parallax-via-js-in'),
+        item: target,
         scroller: '.scrollerH-container .scrollerH',
         scrollTrigger: '.pluto3',
         direction: 'horizontal',
         computationType: 'fixed',
-        // marker: 't',
         ease: true,
-        propierties: 'x',
+        propierties: 'tween',
+        tween: myParallaxTween,
         // marker: 'parallax',
-        // start: 'right +halfWidth',
-        // end: 'right +width',
-        // range: '100w',
         dynamicStart: {
-            position: 'right',
-            value: () => {
-                return pluto.offsetWidth / 2;
-            },
-        },
-        dynamicEnd: {
             position: 'right',
             value: () => {
                 return pluto.offsetWidth;
             },
         },
-        dynamicRange: () => {
-            return pluto.offsetWidth;
+        dynamicEnd: {
+            position: 'right',
+            value: () => {
+                return pluto.offsetWidth * 2;
+            },
         },
+        // dynamicRange: () => {
+        //     return pluto.offsetWidth;
+        // },
         onEnter: () => {
             console.log('onEnter');
         },
@@ -63,17 +70,34 @@ export const hScroller = () => {
     parallaxIn.init();
     parallax.add(parallaxIn);
 
+    const target2 = document.querySelector('.parallax-via-js-out');
+    const myParallaxTween2 = new ParallaxTween();
+    myParallaxTween2.setData({ x: 0, y: 0 });
+    myParallaxTween2.goTo({ x: -pluto.offsetWidth, y: -pluto.offsetHeight });
+    myParallaxTween2.subscribe(({ x, y }) => {
+        target2.style.transform = `translate3D(0,0,0) translate(${x}px, ${y}px)`;
+    });
     let parallaxOut = new ParallaxItemClass({
-        item: document.querySelector('.parallax-via-js-out'),
+        item: target2,
         scroller: '.scrollerH-container .scrollerH',
         scrollTrigger: '.pluto3',
-        direction: 'horizontal',
+        direction: 'tween',
         computationType: 'fixed',
-        start: 'left',
-        end: 'left +width',
-        range: '-100w',
+        dynamicStart: {
+            position: 'left',
+            value: () => {
+                return pluto.offsetWidth;
+            },
+        },
+        dynamicEnd: {
+            position: 'left',
+            value: () => {
+                return pluto.offsetWidth * 2;
+            },
+        },
         fromTo: true,
-        propierties: 'x',
+        propierties: 'tween',
+        tween: myParallaxTween2,
     });
     parallaxOut.init();
     const unsubscribe = parallax.add(parallaxOut);

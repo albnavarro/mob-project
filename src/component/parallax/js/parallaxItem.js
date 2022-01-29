@@ -5,12 +5,12 @@ import { parallaxConstant } from './parallaxConstant.js';
 import { parallaxMarker } from './parallaxMarker.js';
 import { parallaxEmitter } from './parallaxEmitter.js';
 import { ParallaxPin } from './parallaxPin.js';
-import { handleFrame } from '.../../../js/core/events/rafutils/rafUtils.js';
-import { handleResize } from '.../../../js/core/events/resizeUtils/handleResize.js';
-import { handleScroll } from '.../../../js/core/events/scrollUtils/handleScroll.js';
-import { handleSpring } from '.../../../js/core/animation/spring/handleSpring.js';
-import { handleLerp } from '.../../../js/core/animation/lerp/handleLerp.js';
-import { springConfig } from '.../../../js/core/animation/spring/springConfig.js';
+import { handleFrame } from '../../../js/core/events/rafutils/rafUtils.js';
+import { handleResize } from '../../../js/core/events/resizeUtils/handleResize.js';
+import { handleScroll } from '../../../js/core/events/scrollUtils/handleScroll.js';
+import { handleSpring } from '../../../js/core/animation/spring/handleSpring.js';
+import { handleLerp } from '../../../js/core/animation/lerp/handleLerp.js';
+import { springConfig } from '../../../js/core/animation/spring/springConfig.js';
 
 export class ParallaxItemClass {
     constructor(data) {
@@ -60,6 +60,7 @@ export class ParallaxItemClass {
         this.dynamicEnd = data.dynamicEnd || null;
         this.invertSide = data.invertSide || false;
         this.marker = data.marker || null;
+        this.tween = data.tween || null;
 
         //Lienar prop
         this.align = data.align ? data.align : parallaxConstant.ALIGN_CENTER;
@@ -140,12 +141,17 @@ export class ParallaxItemClass {
 
         if (this.computationType == parallaxConstant.TYPE_FIXED) {
             this.limiterOff = true;
+            if (this.propierties === parallaxConstant.PROP_TWEEN) {
+                this.range = this.tween.duration;
+            }
             this.calcRangeAndUnitMiusure();
             this.calcFixedLimit();
         }
 
         if (this.ease) {
-            this.unsubscribeScroll = handleScroll(() => this.smoothParallaxJs());
+            this.unsubscribeScroll = handleScroll(() =>
+                this.smoothParallaxJs()
+            );
             this.smoothParallaxJs();
         } else {
             this.unsubscribeScroll = handleScroll(() => this.executeParallax());
@@ -184,7 +190,14 @@ export class ParallaxItemClass {
     setMotion() {
         this.motion.setData({ val: 0 });
         this.unsubscribeMotion = this.motion.subscribe(({ val }) => {
-            this.updateStyle(val);
+            if (this.propierties === parallaxConstant.PROP_TWEEN) {
+                if (val === this.lastValue) return;
+                this.tween.draw(val);
+                this.lastValue = val;
+                this.firstTime = false;
+            } else {
+                this.updateStyle(val);
+            }
         });
 
         switch (this.easeType) {
@@ -554,7 +567,14 @@ export class ParallaxItemClass {
         if (!applyStyle) return;
 
         handleFrame(() => {
-            this.updateStyle(this.endValue);
+            if (this.propierties === parallaxConstant.PROP_TWEEN) {
+                if (this.endValue === this.lastValue) return;
+                this.tween.draw(this.endValue);
+                this.lastValue = this.endValue;
+                this.firstTime = false;
+            } else {
+                this.updateStyle(this.endValue);
+            }
         });
     }
 
@@ -640,6 +660,7 @@ export class ParallaxItemClass {
 
                         case parallaxConstant.PX:
                         case parallaxConstant.DEGREE:
+                        case parallaxConstant.PROP_TWEEN:
                         default:
                             return -percent;
                     }
