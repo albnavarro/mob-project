@@ -23,8 +23,10 @@ export const hScroller = () => {
 
     const myParallaxTimeline = new ParallaxTimeline();
     myParallaxTimeline.setData({ x: 0, y: 0 });
-    myParallaxTimeline.goTo({ x: pluto.offsetWidth }, { start: 0, end: 5 });
-    myParallaxTimeline.goTo({ y: pluto.offsetHeight }, { start: 5, end: 10 });
+    myParallaxTimeline.goTo({ x: pluto.offsetWidth / 2 }, { start: 0, end: 2 });
+    myParallaxTimeline.goTo({ y: pluto.offsetHeight }, { start: 2.5, end: 5 });
+    myParallaxTimeline.goTo({ x: pluto.offsetWidth }, { start: 5, end: 7.5 });
+    myParallaxTimeline.goTo({ y: 0 }, { start: 7.5, end: 10 });
     myParallaxTimeline.subscribe(({ x, y }) => {
         target.style.transform = `translate3D(0,0,0) translate(${x}px, ${y}px)`;
     });
@@ -75,7 +77,7 @@ export const hScroller = () => {
     const target2 = document.querySelector('.parallax-via-js-out');
     const myParallaxTween = new ParallaxTween();
     myParallaxTween.setData({ x: 0, y: 0 });
-    myParallaxTween.goTo({ x: -pluto.offsetWidth, y: -pluto.offsetHeight });
+    myParallaxTween.goTo({ x: -pluto.offsetWidth, y: pluto.offsetHeight });
     myParallaxTween.subscribe(({ x, y }) => {
         target2.style.transform = `translate3D(0,0,0) translate(${x}px, ${y}px)`;
     });

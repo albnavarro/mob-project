@@ -1,5 +1,6 @@
 import { tweenConfig } from '.../../../js/core/animation/tween/tweenConfig.js';
 import { parallaxUtils } from './parallaxUtils.js';
+import { getValueObj } from '.../../../js/core/animation/utils/animationUtils.js';
 
 export class ParallaxTimeline {
     constructor(ease = 'easeLinear') {
@@ -31,28 +32,40 @@ export class ParallaxTimeline {
                           this.ease(
                               partial - start,
                               item.fromValue,
-                              item.toValue,
+                              item.toValue - item.fromValue,
                               duration
                           ),
                           minVal,
                           maxVal
                       )
                     : item.toValue;
+
+                // The right prop to check is the prop that canche theit current value
+                if (
+                    item.active &&
+                    item.prevCurrent &&
+                    item.prevCurrent !== item.currentValue
+                ) {
+                    const index = this.values.findIndex(
+                        ({ prop }) => prop === item.prop
+                    );
+
+                    // Update last active value in main array
+                    this.values[index].currentValue = item.currentValue;
+                }
+
+                // Store last current
+                item.prevCurrent = item.currentValue;
+
+                // Reset prevCurrent outSide active range
+                if (partial >= this.duration || partial <= 0)
+                    item.prevCurrent = null;
             });
         });
 
-        // Get last active prop current value
-        const cbObject = this.timeline.reduce((p, { values }) => {
-            const activeVal = values.filter(({ active }) => active === true);
-            const { prop, currentValue } = activeVal[activeVal.length - 1];
-            return { ...p, ...{ [prop]: currentValue } };
-        }, {});
+        const cbObject = getValueObj(this.values, 'currentValue');
 
-        // If there is not active prop get default current value
-        this.values.forEach(({ prop, currentValue }, i) => {
-            if (!(prop in cbObject)) cbObject[prop] = currentValue;
-        });
-
+        // Fire callback
         this.callback.forEach(({ cb }) => {
             cb(cbObject);
         });
@@ -90,20 +103,32 @@ export class ParallaxTimeline {
                 toValue: value,
                 fromValue: value,
                 currentValue: value,
+                prevCurrent: null,
                 active: false,
             };
         });
     }
 
     /**
-     * mergeData - Update values array with new data form methods
-     * Check if newData has new value for each prop
-     * If yes merge new value
-     *
      * @param  {Array} newData description
      * @return {void}         description
      */
     getNewValues(newData) {
+        // When find item we store the toValue into main Array
+        // Next item ith same prop will use last toValue as fromValue
+        // so the next item start form last toValue
+        this.values.forEach((item, i) => {
+            const currentItem = newData.find((newItem) => {
+                return newItem.prop === item.prop;
+            });
+
+            if (currentItem) {
+                item.fromValue = item.toValue;
+                item.toValue = currentItem.toValue;
+            }
+        });
+
+        // Return the new array maeged with main array created in setData
         return this.values.map((item, i) => {
             const itemToMerge = newData.find((newItem) => {
                 return newItem.prop === item.prop;
@@ -115,6 +140,7 @@ export class ParallaxTimeline {
                 : { ...item, ...{ active: false } };
         });
     }
+    //
 
     /**
      * goTo - go from fromValue stored to new toValue
