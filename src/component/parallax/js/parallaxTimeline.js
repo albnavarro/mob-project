@@ -18,12 +18,12 @@ export class ParallaxTimeline {
 
             values.forEach((item, i) => {
                 const minVal =
-                    item.toValProcessed > item.fromValue
+                    item.toValue > item.fromValue
                         ? item.fromValue
-                        : item.toValProcessed;
+                        : item.toValue;
                 const maxVal =
-                    item.toValProcessed > item.fromValue
-                        ? item.toValProcessed
+                    item.toValue > item.fromValue
+                        ? item.toValue
                         : item.fromValue;
 
                 item.currentValue = item.active
@@ -31,7 +31,7 @@ export class ParallaxTimeline {
                           this.ease(
                               partial - start,
                               item.fromValue,
-                              item.toValProcessed,
+                              item.toValue,
                               duration
                           ),
                           minVal,
@@ -88,7 +88,6 @@ export class ParallaxTimeline {
             return {
                 prop: prop,
                 toValue: value,
-                toValProcessed: value,
                 fromValue: value,
                 currentValue: value,
                 active: false,
@@ -104,8 +103,8 @@ export class ParallaxTimeline {
      * @param  {Array} newData description
      * @return {void}         description
      */
-    mergeData(newData) {
-        this.values = this.values.map((item, i) => {
+    getNewValues(newData) {
+        return this.values.map((item, i) => {
             const itemToMerge = newData.find((newItem) => {
                 return newItem.prop === item.prop;
             });
@@ -114,18 +113,6 @@ export class ParallaxTimeline {
             return itemToMerge
                 ? { ...item, ...itemToMerge, ...{ active: true } }
                 : { ...item, ...{ active: false } };
-        });
-    }
-
-    /**
-     * setToValProcessed - Update to value to match an absolute destination
-     *
-     * @return {void}  onComplete promise
-     *
-     */
-    setToValProcessed() {
-        this.values.forEach((item, i) => {
-            item.toValProcessed = item.toValue - item.fromValue;
         });
     }
 
@@ -147,13 +134,12 @@ export class ParallaxTimeline {
             };
         });
 
-        this.mergeData(newDataArray);
+        const newValues = this.getNewValues(newDataArray);
         this.timeline.push({
-            values: this.values,
+            values: newValues,
             start,
             end,
         });
-        this.setToValProcessed();
     }
 
     /**

@@ -23,8 +23,8 @@ export const hScroller = () => {
 
     const myParallaxTimeline = new ParallaxTimeline();
     myParallaxTimeline.setData({ x: 0, y: 0 });
-    myParallaxTimeline.goTo({ x: pluto.offsetWidth }, { start: 1, end: 7 });
-    myParallaxTimeline.goTo({ y: pluto.offsetHeight }, { start: 4, end: 10 });
+    myParallaxTimeline.goTo({ x: pluto.offsetWidth }, { start: 0, end: 5 });
+    myParallaxTimeline.goTo({ y: pluto.offsetHeight }, { start: 5, end: 10 });
     myParallaxTimeline.subscribe(({ x, y }) => {
         target.style.transform = `translate3D(0,0,0) translate(${x}px, ${y}px)`;
     });
