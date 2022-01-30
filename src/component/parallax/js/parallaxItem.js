@@ -142,7 +142,12 @@ export class ParallaxItemClass {
         if (this.computationType == parallaxConstant.TYPE_FIXED) {
             this.limiterOff = true;
             if (this.propierties === parallaxConstant.PROP_TWEEN) {
-                this.range = this.tween.duration;
+                this.range = this.tween.getDuration();
+                if (
+                    this.tween.getType() === parallaxConstant.TWEEN_TIMELINE &&
+                    this.ease
+                )
+                    this.easeType = parallaxConstant.EASE_LERP;
             }
             this.calcRangeAndUnitMiusure();
             this.calcFixedLimit();

@@ -1,30 +1,58 @@
 import { tweenConfig } from '.../../../js/core/animation/tween/tweenConfig.js';
-import { getValueObj } from '.../../../js/core/animation/utils/animationUtils.js';
+import { parallaxUtils } from './parallaxUtils.js';
 
-export class ParallaxTween {
+export class ParallaxTimeline {
     constructor(ease = 'easeLinear') {
         this.ease = tweenConfig[ease];
         this.values = [];
+        this.timeline = [];
         this.id = 0;
         this.callback = [];
-        this.duration = 1000;
-        this.type = 'tween';
+        this.duration = 10;
+        this.type = 'timeline';
     }
 
     draw(partial) {
-        this.values.forEach((item, i) => {
-            item.currentValue = this.ease(
-                partial,
-                item.fromValue,
-                item.toValProcessed,
-                this.duration
-            );
+        this.timeline.forEach(({ start, end, values }, i) => {
+            const duration = end - start;
+
+            values.forEach((item, i) => {
+                const minVal =
+                    item.toValProcessed > item.fromValue
+                        ? item.fromValue
+                        : item.toValProcessed;
+                const maxVal =
+                    item.toValProcessed > item.fromValue
+                        ? item.toValProcessed
+                        : item.fromValue;
+
+                item.currentValue = item.active
+                    ? parallaxUtils.clamp(
+                          this.ease(
+                              partial - start,
+                              item.fromValue,
+                              item.toValProcessed,
+                              duration
+                          ),
+                          minVal,
+                          maxVal
+                      )
+                    : item.toValue;
+            });
         });
 
-        // Prepare an obj to pass to the callback
-        const cbObject = getValueObj(this.values, 'currentValue');
+        // Get last active prop current value
+        const cbObject = this.timeline.reduce((p, { values }) => {
+            const activeVal = values.filter(({ active }) => active === true);
+            const { prop, currentValue } = activeVal[activeVal.length - 1];
+            return { ...p, ...{ [prop]: currentValue } };
+        }, {});
 
-        // Fire callback
+        // If there is not active prop get default current value
+        this.values.forEach(({ prop, currentValue }, i) => {
+            if (!(prop in cbObject)) cbObject[prop] = currentValue;
+        });
+
         this.callback.forEach(({ cb }) => {
             cb(cbObject);
         });
@@ -63,7 +91,7 @@ export class ParallaxTween {
                 toValProcessed: value,
                 fromValue: value,
                 currentValue: value,
-                update: false,
+                active: false,
             };
         });
     }
@@ -77,15 +105,15 @@ export class ParallaxTween {
      * @return {void}         description
      */
     mergeData(newData) {
-        this.values = this.values.map((item) => {
+        this.values = this.values.map((item, i) => {
             const itemToMerge = newData.find((newItem) => {
                 return newItem.prop === item.prop;
             });
 
             // If exist merge
             return itemToMerge
-                ? { ...item, ...itemToMerge, ...{ update: true } }
-                : { ...item, ...{ update: false } };
+                ? { ...item, ...itemToMerge, ...{ active: true } }
+                : { ...item, ...{ active: false } };
         });
     }
 
@@ -97,9 +125,7 @@ export class ParallaxTween {
      */
     setToValProcessed() {
         this.values.forEach((item, i) => {
-            if (item.update) {
-                item.toValProcessed = item.toValue - item.fromValue;
-            }
+            item.toValProcessed = item.toValue - item.fromValue;
         });
     }
 
@@ -111,7 +137,9 @@ export class ParallaxTween {
      * @example
      * myTween.goTo({ val: 100 });
      */
-    goTo(obj) {
+    goTo(obj, props = { start: 0, end: 10 }) {
+        const { start, end } = props;
+
         const newDataArray = Object.keys(obj).map((item) => {
             return {
                 prop: item,
@@ -120,54 +148,11 @@ export class ParallaxTween {
         });
 
         this.mergeData(newDataArray);
-        this.setToValProcessed();
-    }
-
-    /**
-     * goFrom - go from new fromValue ( manually update fromValue )  to toValue sored
-     *
-     * @param  {number} from new fromValue
-     *
-     * @example
-     * myTween.goFrom({ val: 100 });
-     */
-    goFrom(obj) {
-        const newDataArray = Object.keys(obj).map((item) => {
-            return {
-                prop: item,
-                fromValue: obj[item],
-            };
+        this.timeline.push({
+            values: this.values,
+            start,
+            end,
         });
-
-        this.mergeData(newDataArray);
-        this.setToValProcessed();
-    }
-
-    /**
-     * goFromTo - Go From new fromValue to new toValue
-     *
-     * @param  {number} from new fromValue
-     * @param  {number} to new toValue
-     *
-     * @example
-     * myTween.goFromTo({ val: 0 },{ val: 100 })
-     */
-    goFromTo(fromObj, toObj) {
-        if (this.pauseStatus || this.comeFromResume) this.stop();
-
-        // Check if fromObj has the same keys of toObj
-        const dataIsValid = this.compareKeys(fromObj, toObj);
-        if (!dataIsValid) return;
-
-        const newDataArray = Object.keys(fromObj).map((item) => {
-            return {
-                prop: item,
-                fromValue: fromObj[item],
-                toValue: toObj[item],
-            };
-        });
-
-        this.mergeData(newDataArray);
         this.setToValProcessed();
     }
 

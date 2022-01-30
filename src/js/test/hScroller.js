@@ -1,4 +1,5 @@
 import { parallax } from '../../component/parallax/js/parallax.js';
+import { ParallaxTimeline } from '../../component/parallax/js/parallaxTimeline.js';
 import { ParallaxTween } from '../../component/parallax/js/parallaxTween.js';
 import { ParallaxItemClass } from '../../component/parallax/js/parallaxItem.js';
 import { SmoothScrollClass } from '../../component/smoothScroll/js/smoothScroll.js';
@@ -20,10 +21,11 @@ export const hScroller = () => {
     const pluto = document.querySelector('.pluto3');
     pluto.style.webkitTransition = 'background-color .35s';
 
-    const myParallaxTween = new ParallaxTween();
-    myParallaxTween.setData({ x: 0, y: 0 });
-    myParallaxTween.goTo({ x: pluto.offsetWidth, y: pluto.offsetHeight });
-    myParallaxTween.subscribe(({ x, y }) => {
+    const myParallaxTimeline = new ParallaxTimeline();
+    myParallaxTimeline.setData({ x: 0, y: 0 });
+    myParallaxTimeline.goTo({ x: pluto.offsetWidth }, { start: 1, end: 7 });
+    myParallaxTimeline.goTo({ y: pluto.offsetHeight }, { start: 4, end: 10 });
+    myParallaxTimeline.subscribe(({ x, y }) => {
         target.style.transform = `translate3D(0,0,0) translate(${x}px, ${y}px)`;
     });
 
@@ -35,8 +37,8 @@ export const hScroller = () => {
         computationType: 'fixed',
         ease: true,
         propierties: 'tween',
-        tween: myParallaxTween,
-        // marker: 'parallax',
+        tween: myParallaxTimeline,
+        marker: 'parallax',
         dynamicStart: {
             position: 'right',
             value: () => {
@@ -71,10 +73,10 @@ export const hScroller = () => {
     parallax.add(parallaxIn);
 
     const target2 = document.querySelector('.parallax-via-js-out');
-    const myParallaxTween2 = new ParallaxTween();
-    myParallaxTween2.setData({ x: 0, y: 0 });
-    myParallaxTween2.goTo({ x: -pluto.offsetWidth, y: -pluto.offsetHeight });
-    myParallaxTween2.subscribe(({ x, y }) => {
+    const myParallaxTween = new ParallaxTween();
+    myParallaxTween.setData({ x: 0, y: 0 });
+    myParallaxTween.goTo({ x: -pluto.offsetWidth, y: -pluto.offsetHeight });
+    myParallaxTween.subscribe(({ x, y }) => {
         target2.style.transform = `translate3D(0,0,0) translate(${x}px, ${y}px)`;
     });
     let parallaxOut = new ParallaxItemClass({
@@ -83,6 +85,7 @@ export const hScroller = () => {
         scrollTrigger: '.pluto3',
         direction: 'tween',
         computationType: 'fixed',
+        ease: true,
         dynamicStart: {
             position: 'left',
             value: () => {
@@ -97,7 +100,7 @@ export const hScroller = () => {
         },
         fromTo: true,
         propierties: 'tween',
-        tween: myParallaxTween2,
+        tween: myParallaxTween,
     });
     parallaxOut.init();
     const unsubscribe = parallax.add(parallaxOut);
