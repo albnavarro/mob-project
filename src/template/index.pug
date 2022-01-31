@@ -133,35 +133,10 @@ block content
                 data-conponent='m-comp--animate')
         
             .index-timeline(style="border:1px #ccc solid;position: relative;height:140px;")
-                div(style='position:absolute;left:50%;transform:translateX(-50%)')
-                  div.inlineBLock(
-                      data-conponent='m-comp--parallax'
-                      data-computationType="fixed"
-                      data-scrollTrigger=".index-timeline"
-                      data-start='bottom 30vh'
-                      data-end="bottom 80vh"
-                      data-propierties="x"
-                      data-range="180px"
-                      data-ease
-                      data-easeType="lerp"
-                      data-fromTo
-                      data-pin
-                      data-animatepin
-                      data-marker='center-tween-from-bottom'
-                      data-lerpConfig ="100")
-                      div(
-                          data-conponent='m-comp--parallax'
-                          data-computationType="fixed"
-                          data-scrollTrigger=".index-timeline"
-                          data-propierties="rotate"
-                          data-start='bottom 30vh'
-                          data-end="bottom 80vh"
-                          data-range="-180deg"
-                          data-ease
-                          data-fromTo
-                          data-easeType="lerp"
-                          data-lerpConfig ="20")
-                          .parallax__item-test
+                //- div(style='position:absolute;left:50%;transform:translateX(-50%)')
+                div
+                  .index-parallax-1.inlineBLock
+                    .parallax__item-test
                             
             .parallax__item-test.inlineBLock(
                 style="background:black;"
@@ -181,10 +156,14 @@ block content
                     data-conponent='m-comp--parallax'
                     data-perspective="400"
                     data-propierties="rotateX"
-                    data-range="3")
+                    data-reverse
+                    data-ease
+                    data-range="6")
                     div(
                         data-conponent='m-comp--parallax'
-                        data-range="3")
+                        data-reverse
+                        data-ease
+                        data-range="6")
                         .parallax__item-test
 
 

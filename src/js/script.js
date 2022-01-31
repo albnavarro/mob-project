@@ -45,8 +45,13 @@ import { springTest } from './test/springTest.js';
 import { tweenTest } from './test/tweenTest.js';
 import { lerpTest } from './test/lerpTest.js';
 import { timlineMixTest } from './test/timlineMixTest.js';
+import { indexParallax } from './test/indexParallax.js';
 
 const body = document.querySelector('body');
+
+if (body.classList.contains('page-index')) {
+    indexParallax();
+}
 
 if (body.classList.contains('page-tween')) {
     springTest();
