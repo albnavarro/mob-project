@@ -46,12 +46,12 @@ export class ParallaxTimeline {
                     item.prevCurrent &&
                     item.prevCurrent !== item.currentValue
                 ) {
-                    const index = this.values.findIndex(
+                    const activeEl = this.values.find(
                         ({ prop }) => prop === item.prop
                     );
 
                     // Update last active value in main array
-                    this.values[index].currentValue = item.currentValue;
+                    activeEl.currentValue = item.currentValue;
                 }
 
                 // Store last current
