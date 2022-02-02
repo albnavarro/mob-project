@@ -114,20 +114,6 @@ export class ParallaxTimeline {
      * @return {void}         description
      */
     getNewValues(newData) {
-        // When find item we store the toValue into main Array
-        // Next item ith same prop will use last toValue as fromValue
-        // so the next item start form last toValue
-        this.values.forEach((item, i) => {
-            const currentItem = newData.find((newItem) => {
-                return newItem.prop === item.prop;
-            });
-
-            if (currentItem) {
-                item.fromValue = item.toValue;
-                item.toValue = currentItem.toValue;
-            }
-        });
-
         // Return the new array maeged with main array created in setData
         return this.values.map((item, i) => {
             const itemToMerge = newData.find((newItem) => {
@@ -140,7 +126,50 @@ export class ParallaxTimeline {
                 : { ...item, ...{ active: false } };
         });
     }
-    //
+
+    orderByStart(arr) {
+        return arr.sort((a, b) => {
+            return a.start - b.start;
+        });
+    }
+
+    setFromValue() {
+        this.timeline.forEach(({ values }, iTimeline) => {
+            values.forEach(({ prop, active }, iValues) => {
+                if (active) {
+                    let continueLoop = true;
+
+                    // TODO: find a better way to write this, use reduceRight()
+                    // Go forward to match the first active prop and set fromValue from previous toValue
+                    for (
+                        var iForward = iTimeline - 1;
+                        iForward >= 0;
+                        iForward--
+                    ) {
+                        if (continueLoop) {
+                            const valuesForward =
+                                this.timeline[iForward].values;
+
+                            valuesForward.forEach(
+                                ({
+                                    prop: propForward,
+                                    active: activeForward,
+                                    toValue,
+                                }) => {
+                                    if (activeForward && propForward === prop) {
+                                        this.timeline[iTimeline].values[
+                                            iValues
+                                        ].fromValue = toValue;
+                                        continueLoop = false;
+                                    }
+                                }
+                            );
+                        }
+                    }
+                }
+            });
+        });
+    }
 
     /**
      * goTo - go from fromValue stored to new toValue
@@ -166,6 +195,11 @@ export class ParallaxTimeline {
             start,
             end,
         });
+
+        this.timeline = this.orderByStart(this.timeline);
+        this.setFromValue();
+
+        console.log(this.timeline);
     }
 
     /**

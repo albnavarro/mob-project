@@ -29,7 +29,7 @@ export function indexParallax() {
         ease: true,
         easeType: 'lerp',
         pin: true,
-        animatepin: true,
+        animatePin: true,
         marker: 'parallax-timeline',
         lerpConfig: '100',
     });
