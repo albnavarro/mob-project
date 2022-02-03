@@ -14,10 +14,14 @@ export class ParallaxTimeline {
     }
 
     draw(partial) {
+        this.values.forEach((item, i) => {
+            item.settled = false;
+        });
+
         this.timeline.forEach(({ start, end, values }, i) => {
             const duration = end - start;
 
-            values.forEach((item, i) => {
+            values.forEach((item) => {
                 const minVal =
                     item.toValue > item.fromValue
                         ? item.fromValue
@@ -27,39 +31,48 @@ export class ParallaxTimeline {
                         ? item.toValue
                         : item.fromValue;
 
-                item.currentValue = item.active
-                    ? parallaxUtils.clamp(
-                          this.ease(
-                              partial - start,
-                              item.fromValue,
-                              item.toValue - item.fromValue,
-                              duration
-                          ),
-                          minVal,
-                          maxVal
-                      )
-                    : item.toValue;
+                item.currentValue = parallaxUtils.clamp(
+                    this.ease(
+                        partial - start,
+                        item.fromValue,
+                        item.toValue - item.fromValue,
+                        duration
+                    ),
+                    minVal,
+                    maxVal
+                );
 
-                // The right prop to check is the prop that canche theit current value
-                if (
-                    item.active &&
-                    item.prevCurrent &&
-                    item.prevCurrent !== item.currentValue
-                ) {
-                    const activeEl = this.values.find(
-                        ({ prop }) => prop === item.prop
-                    );
+                const isLastActiveProp = (() => {
+                    return this.timeline
+                        .slice(i + 1, this.timeline.length)
+                        .reduce(
+                            (p, { start: nextStart, values: nextValues }) => {
+                                const activeItem = nextValues.find(
+                                    (nextItem) => {
+                                        return (
+                                            nextItem.prop === item.prop &&
+                                            nextItem.active
+                                        );
+                                    }
+                                );
+                                if (activeItem && nextStart <= partial) {
+                                    return false;
+                                } else {
+                                    return p;
+                                }
+                            },
+                            true
+                        );
+                })();
 
-                    // Update last active value in main array
-                    activeEl.currentValue = item.currentValue;
+                const currentEl = this.values.find(
+                    ({ prop }) => prop === item.prop
+                );
+
+                if (isLastActiveProp && item.active && !currentEl.settled) {
+                    currentEl.currentValue = item.currentValue;
+                    currentEl.settled = true;
                 }
-
-                // Store last current
-                item.prevCurrent = item.currentValue;
-
-                // Reset prevCurrent outSide active range
-                if (partial >= this.duration || partial <= 0)
-                    item.prevCurrent = null;
             });
         });
 
@@ -103,8 +116,8 @@ export class ParallaxTimeline {
                 toValue: value,
                 fromValue: value,
                 currentValue: value,
-                prevCurrent: null,
                 active: false,
+                settled: false,
             };
         });
     }
@@ -158,8 +171,6 @@ export class ParallaxTimeline {
                     }, null);
 
                 if (prevToValue) {
-                    // this.timeline[iTimeline].values[iValues].fromValue =
-                    //     prevToValue;
                     values[iValues].fromValue = prevToValue;
                 }
             });
