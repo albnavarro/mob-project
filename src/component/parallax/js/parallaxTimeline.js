@@ -120,10 +120,15 @@ export class ParallaxTimeline {
                 return newItem.prop === item.prop;
             });
 
+            const inactiveItem = {
+                prop: item.prop,
+                active: false,
+            };
+
             // If exist merge
             return itemToMerge
                 ? { ...item, ...itemToMerge, ...{ active: true } }
-                : { ...item, ...{ active: false } };
+                : inactiveItem;
         });
     }
 
@@ -136,36 +141,26 @@ export class ParallaxTimeline {
     setFromValue() {
         this.timeline.forEach(({ values }, iTimeline) => {
             values.forEach(({ prop, active }, iValues) => {
-                if (active) {
-                    let continueLoop = true;
+                if (!active) return;
 
-                    // TODO: find a better way to write this, use reduceRight()
-                    // Go forward to match the first active prop and set fromValue from previous toValue
-                    for (
-                        var iForward = iTimeline - 1;
-                        iForward >= 0;
-                        iForward--
-                    ) {
-                        if (continueLoop) {
-                            const valuesForward =
-                                this.timeline[iForward].values;
+                const prevToValue = this.timeline
+                    .slice(0, iTimeline)
+                    .reduceRight((p, { values: valuesForward }) => {
+                        // Find active prop if exist
+                        const result = valuesForward.find(
+                            ({ prop: propForward, active: activeForward }) => {
+                                return activeForward && propForward === prop;
+                            }
+                        );
 
-                            valuesForward.forEach(
-                                ({
-                                    prop: propForward,
-                                    active: activeForward,
-                                    toValue,
-                                }) => {
-                                    if (activeForward && propForward === prop) {
-                                        this.timeline[iTimeline].values[
-                                            iValues
-                                        ].fromValue = toValue;
-                                        continueLoop = false;
-                                    }
-                                }
-                            );
-                        }
-                    }
+                        // Return only first valid value then skip ( p === null)
+                        return result && p === null ? result.toValue : p;
+                    }, null);
+
+                if (prevToValue) {
+                    // this.timeline[iTimeline].values[iValues].fromValue =
+                    //     prevToValue;
+                    values[iValues].fromValue = prevToValue;
                 }
             });
         });

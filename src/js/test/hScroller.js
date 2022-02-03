@@ -37,7 +37,6 @@ export const hScroller = () => {
         scrollTrigger: '.pluto3',
         direction: 'horizontal',
         computationType: 'fixed',
-        ease: true,
         propierties: 'tween',
         tween: myParallaxTimeline,
         marker: 'parallax',
