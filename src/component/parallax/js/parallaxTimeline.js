@@ -3,14 +3,14 @@ import { parallaxUtils } from './parallaxUtils.js';
 import { getValueObj } from '.../../../js/core/animation/utils/animationUtils.js';
 
 export class ParallaxTimeline {
-    constructor(ease = 'easeLinear') {
-        this.ease = tweenConfig[ease];
+    constructor() {
         this.values = [];
         this.timeline = [];
         this.id = 0;
         this.callback = [];
         this.duration = 10;
         this.type = 'timeline';
+        this.defaultProp = { start: 0, end: 10, ease: 'easeLinear' };
     }
 
     draw(partial) {
@@ -19,57 +19,57 @@ export class ParallaxTimeline {
         });
 
         this.timeline.forEach(({ start, end, values }, i) => {
-            const duration = end - start;
-
             values.forEach((item) => {
-                const minVal =
-                    item.toValue > item.fromValue
-                        ? item.fromValue
-                        : item.toValue;
-                const maxVal =
-                    item.toValue > item.fromValue
-                        ? item.toValue
-                        : item.fromValue;
-
-                item.currentValue = parallaxUtils.clamp(
-                    this.ease(
-                        partial - start,
-                        item.fromValue,
-                        item.toValue - item.fromValue,
-                        duration
-                    ),
-                    minVal,
-                    maxVal
-                );
-
-                const isLastActiveProp = (() => {
-                    return this.timeline
-                        .slice(i + 1, this.timeline.length)
-                        .reduce(
-                            (p, { start: nextStart, values: nextValues }) => {
-                                const activeItem = nextValues.find(
-                                    (nextItem) => {
-                                        return (
-                                            nextItem.prop === item.prop &&
-                                            nextItem.active
-                                        );
-                                    }
-                                );
-                                if (activeItem && nextStart <= partial) {
-                                    return false;
-                                } else {
-                                    return p;
-                                }
-                            },
-                            true
-                        );
-                })();
-
                 const currentEl = this.values.find(
                     ({ prop }) => prop === item.prop
                 );
 
-                if (isLastActiveProp && item.active && !currentEl.settled) {
+                const isLastUsableProp = this.timeline
+                    .slice(i + 1, this.timeline.length)
+                    .reduce((p, { start: nextStart, values: nextValues }) => {
+                        const activeItem = nextValues.find((nextItem) => {
+                            return (
+                                nextItem.prop === item.prop && nextItem.active
+                            );
+                        });
+                        if (activeItem && nextStart <= partial) {
+                            return false;
+                        } else {
+                            return p;
+                        }
+                    }, true);
+
+                if (isLastUsableProp && item.active && !currentEl.settled) {
+                    const duration = end - start;
+
+                    const minVal =
+                        item.toValue > item.fromValue
+                            ? item.fromValue
+                            : item.toValue;
+                    const maxVal =
+                        item.toValue > item.fromValue
+                            ? item.toValue
+                            : item.fromValue;
+
+                    item.currentValue =
+                        partial >= start && partial <= end
+                            ? item.ease(
+                                  partial - start,
+                                  item.fromValue,
+                                  item.toValue - item.fromValue,
+                                  duration
+                              )
+                            : parallaxUtils.clamp(
+                                  item.ease(
+                                      partial - start,
+                                      item.fromValue,
+                                      item.toValue - item.fromValue,
+                                      duration
+                                  ),
+                                  minVal,
+                                  maxVal
+                              );
+
                     currentEl.currentValue = item.currentValue;
                     currentEl.settled = true;
                 }
@@ -118,6 +118,7 @@ export class ParallaxTimeline {
                 currentValue: value,
                 active: false,
                 settled: false,
+                ease: tweenConfig['easeLinear'],
             };
         });
     }
@@ -185,13 +186,15 @@ export class ParallaxTimeline {
      * @example
      * myTween.goTo({ val: 100 });
      */
-    goTo(obj, props = { start: 0, end: 10 }) {
-        const { start, end } = props;
+    goTo(obj, props) {
+        const propMerged = { ...this.defaultProp, ...props };
+        const { start, end, ease } = propMerged;
 
         const newDataArray = Object.keys(obj).map((item) => {
             return {
                 prop: item,
                 toValue: obj[item],
+                ease: tweenConfig[ease],
             };
         });
 
