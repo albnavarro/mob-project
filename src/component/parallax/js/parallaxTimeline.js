@@ -166,12 +166,11 @@ export class ParallaxTimeline {
                                 return activeForward && propForward === prop;
                             }
                         );
-
                         // Return only first valid value then skip ( p === null)
                         return result && p === null ? result.toValue : p;
                     }, null);
 
-                if (prevToValue) {
+                if (prevToValue !== null) {
                     values[iValues].fromValue = prevToValue;
                 }
             });
