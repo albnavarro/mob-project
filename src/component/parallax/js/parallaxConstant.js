@@ -43,7 +43,7 @@ export const parallaxConstant = {
     PROP_TWEEN: 'tween',
 
     TWEEN_TWEEN: 'tween',
-    TWEEN_TIMELINE: 'timeline',
+    TWEEN_TIMELINE: 'sequencer',
 
     // Align constant
     ALIGN_START: 'start',

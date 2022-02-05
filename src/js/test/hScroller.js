@@ -1,5 +1,5 @@
 import { parallax } from '../../component/parallax/js/parallax.js';
-import { ParallaxTimeline } from '../../component/parallax/js/parallaxTimeline.js';
+import { HandleSequencer } from '../core/animation/sequencer/handleSequencer.js';
 import { ParallaxTween } from '../../component/parallax/js/parallaxTween.js';
 import { ParallaxItemClass } from '../../component/parallax/js/parallaxItem.js';
 import { SmoothScrollClass } from '../../component/smoothScroll/js/smoothScroll.js';
@@ -21,12 +21,14 @@ export const hScroller = () => {
     const pluto = document.querySelector('.pluto3');
     pluto.style.webkitTransition = 'background-color .35s';
 
-    const myParallaxTimeline = new ParallaxTimeline();
-    myParallaxTimeline.setData({ x: 0, y: 0 });
-    myParallaxTimeline.goTo({ x: pluto.offsetWidth / 2 }, { start: 0, end: 2 });
-    myParallaxTimeline.goTo({ y: pluto.offsetHeight }, { start: 2.5, end: 5 });
-    myParallaxTimeline.goTo({ x: pluto.offsetWidth }, { start: 5, end: 7.5 });
-    myParallaxTimeline.goTo({ y: 0 }, { start: 7.5, end: 10 });
+    const myParallaxTimeline = new HandleSequencer();
+    myParallaxTimeline
+        .setData({ x: 0, y: 0 })
+        .goTo({ x: pluto.offsetWidth / 2 }, { start: 0, end: 2 })
+        .goTo({ y: pluto.offsetHeight }, { start: 2.5, end: 5 })
+        .goTo({ x: pluto.offsetWidth }, { start: 5, end: 7.5 })
+        .goTo({ y: 0 }, { start: 7.5, end: 10 });
+
     myParallaxTimeline.subscribe(({ x, y }) => {
         target.style.transform = `translate3D(0,0,0) translate(${x}px, ${y}px)`;
     });

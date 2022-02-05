@@ -1,15 +1,14 @@
-import { tweenConfig } from '.../../../js/core/animation/tween/tweenConfig.js';
-import { parallaxUtils } from './parallaxUtils.js';
-import { getValueObj } from '.../../../js/core/animation/utils/animationUtils.js';
+import { tweenConfig } from '../tween/tweenConfig.js';
+import { clamp, getValueObj } from '../utils/animationUtils.js';
 
-export class ParallaxTimeline {
+export class HandleSequencer {
     constructor() {
         this.values = [];
         this.timeline = [];
         this.id = 0;
         this.callback = [];
         this.duration = 10;
-        this.type = 'timeline';
+        this.type = 'sequencer';
         this.defaultProp = { start: 0, end: 10, ease: 'easeLinear' };
     }
 
@@ -59,7 +58,7 @@ export class ParallaxTimeline {
                                   item.toValue - item.fromValue,
                                   duration
                               )
-                            : parallaxUtils.clamp(
+                            : clamp(
                                   item.ease(
                                       partial - start,
                                       item.fromValue,
@@ -121,6 +120,8 @@ export class ParallaxTimeline {
                 ease: tweenConfig['easeLinear'],
             };
         });
+
+        return this;
     }
 
     /**
@@ -207,7 +208,7 @@ export class ParallaxTimeline {
         this.timeline = this.orderByStart(this.timeline);
         this.setFromValue();
 
-        console.log(this.timeline);
+        return this;
     }
 
     /**

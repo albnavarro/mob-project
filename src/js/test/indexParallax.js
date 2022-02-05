@@ -1,19 +1,34 @@
 import { parallax } from '../../component/parallax/js/parallax.js';
-import { ParallaxTimeline } from '../../component/parallax/js/parallaxTimeline.js';
+import { HandleSequencer } from '../core/animation/sequencer/handleSequencer.js';
 import { ParallaxItemClass } from '../../component/parallax/js/parallaxItem.js';
 
 export function indexParallax() {
     const item = document.querySelector('.index-parallax-1');
     const trigger = document.querySelector('.index-timeline');
 
-    const myParallaxTimeline = new ParallaxTimeline();
-    myParallaxTimeline.setData({ rotate: 0, scale: 1, opacity: 1, y: 0 });
-    myParallaxTimeline.goTo({ rotate: 180 }, { start: 0, end: 5 });
-    myParallaxTimeline.goTo({ scale: 2 }, { start: 3, end: 7 });
-    myParallaxTimeline.goTo({ rotate: 0, scale: 1.5 }, { start: 7, end: 10 });
-    myParallaxTimeline.goTo({ y: -100, opacity: 0 }, { start: 8, end: 10 });
-    myParallaxTimeline.subscribe(({ scale, rotate, opacity, y }) => {
-        item.style.transform = `translate3D(0,0,0) scale(${scale}) translateY(${y}px) rotate(${rotate}deg)`;
+    const myParallaxTimeline = new HandleSequencer();
+    myParallaxTimeline
+        .setData({
+            x: 0,
+            rotate: 0,
+            scale: 1,
+            opacity: 0,
+            y: 100,
+        })
+        .goTo({ y: 0, opacity: 1 }, { start: 0, end: 3 })
+        .goTo(
+            { rotate: 90, scale: 2, x: 10 },
+            { start: 2, end: 5, ease: 'easeInOutBack' }
+        )
+        .goTo(
+            { rotate: 0, scale: 1, x: 0 },
+            { start: 5, end: 8, ease: 'easeInOutBack' }
+        )
+        .goTo({ y: -100, opacity: 0 }, { start: 7, end: 10 });
+
+    myParallaxTimeline.subscribe(({ scale, rotate, opacity, y, x }) => {
+        const xW = (x * window.innerWidth) / 100;
+        item.style.transform = `translate3D(0,0,0) scale(${scale}) translate(${xW}px, ${y}px) rotate(${rotate}deg)`;
         item.style.opacity = opacity;
     });
 
@@ -24,14 +39,12 @@ export function indexParallax() {
         propierties: 'tween',
         tween: myParallaxTimeline,
         marker: 'parallax',
-        start: 'bottom 30vh',
-        end: 'top +50px',
+        start: 'bottom',
+        end: 'top -height',
         ease: true,
-        easeType: 'lerp',
-        pin: true,
-        animatePin: true,
+        // pin: true,
+        // animatePin: true,
         marker: 'parallax-timeline',
-        lerpConfig: '100',
     });
     parallaxIn.init();
     parallax.add(parallaxIn);

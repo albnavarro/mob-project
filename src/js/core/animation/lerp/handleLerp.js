@@ -491,6 +491,7 @@ export class handleLerp {
      */
     updateVelocity(velocity) {
         this.velocity = velocity;
+        this.defaultProps = { reverse: false, velocity: velocity };
     }
 
     /**

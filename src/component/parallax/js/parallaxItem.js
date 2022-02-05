@@ -112,6 +112,13 @@ export class ParallaxItemClass {
         this.springConfig = data.springConfig || null;
         this.lerpConfig = data.lerpConfig || null;
         this.motion = (() => {
+            if (
+                this.tween &&
+                this.tween.getType() === parallaxConstant.TWEEN_TIMELINE
+            ) {
+                this.easeType = parallaxConstant.EASE_LERP;
+            }
+
             return this.easeType === parallaxConstant.EASE_LERP
                 ? new handleLerp()
                 : new handleSpring();
@@ -143,11 +150,6 @@ export class ParallaxItemClass {
             this.limiterOff = true;
             if (this.propierties === parallaxConstant.PROP_TWEEN) {
                 this.range = this.tween.getDuration();
-                if (
-                    this.tween.getType() === parallaxConstant.TWEEN_TIMELINE &&
-                    this.ease
-                )
-                    this.easeType = parallaxConstant.EASE_LERP;
             }
             this.calcRangeAndUnitMiusure();
             this.calcFixedLimit();
