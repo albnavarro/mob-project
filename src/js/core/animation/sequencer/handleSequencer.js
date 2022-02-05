@@ -69,8 +69,10 @@ export class HandleSequencer {
                                   maxVal
                               );
 
-                    currentEl.currentValue = item.currentValue;
-                    currentEl.settled = true;
+                    if (!Number.isNaN(item.currentValue)) {
+                        currentEl.currentValue = item.currentValue.toFixed(4);
+                        currentEl.settled = true;
+                    }
                 }
             });
         });
@@ -153,7 +155,18 @@ export class HandleSequencer {
         });
     }
 
-    setFromValue() {
+    setPropFormAncestor(propToFind) {
+        const pairing = {
+            fromValue: {
+                get: 'toValue',
+                set: 'fromValue',
+            },
+            toValue: {
+                get: 'fromValue',
+                set: 'toValue',
+            },
+        };
+
         this.timeline.forEach(({ values }, iTimeline) => {
             values.forEach(({ prop, active }, iValues) => {
                 if (!active) return;
@@ -167,12 +180,15 @@ export class HandleSequencer {
                                 return activeForward && propForward === prop;
                             }
                         );
+
                         // Return only first valid value then skip ( p === null)
-                        return result && p === null ? result.toValue : p;
+                        return result && p === null
+                            ? result[pairing[propToFind].get]
+                            : p;
                     }, null);
 
                 if (prevToValue !== null) {
-                    values[iValues].fromValue = prevToValue;
+                    values[iValues][pairing[propToFind].set] = prevToValue;
                 }
             });
         });
@@ -206,7 +222,80 @@ export class HandleSequencer {
         });
 
         this.timeline = this.orderByStart(this.timeline);
-        this.setFromValue();
+        this.setPropFormAncestor('fromValue');
+
+        return this;
+    }
+
+    /**
+     * goFrom - go from fromValue stored to new toValue
+     *
+     * @param  {number} to new toValue
+     *
+     * @example
+     * myTween.goTo({ val: 100 });
+     */
+    goFrom(obj, props) {
+        const propMerged = { ...this.defaultProp, ...props };
+        const { start, end, ease } = propMerged;
+
+        const newDataArray = Object.keys(obj).map((item) => {
+            return {
+                prop: item,
+                fromValue: obj[item],
+                ease: tweenConfig[ease],
+            };
+        });
+
+        const newValues = this.getNewValues(newDataArray);
+        this.timeline.push({
+            values: newValues,
+            start,
+            end,
+        });
+
+        this.timeline = this.orderByStart(this.timeline);
+        this.setPropFormAncestor('toValue');
+
+        return this;
+    }
+
+    /**
+     * goFromTo - Go From new fromValue to new toValue
+     *
+     * @param  {number} to new fromValue
+     * @param  {number} to new toValue
+     *
+     * @example
+     * myTween.goFromTo({ val: 0 }, { val: 100 });
+     */
+    goFromTo(fromObj, toObj, props) {
+        const propMerged = { ...this.defaultProp, ...props };
+        const { start, end, ease } = propMerged;
+
+        const dataIsValid = this.compareKeys(fromObj, toObj);
+        if (!dataIsValid) {
+            console.warn('sequencer: fromValue and toValue is different');
+            return;
+        }
+
+        const newDataArray = Object.keys(fromObj).map((item) => {
+            return {
+                prop: item,
+                fromValue: fromObj[item],
+                toValue: toObj[item],
+                ease: tweenConfig[ease],
+            };
+        });
+
+        const newValues = this.getNewValues(newDataArray);
+        this.timeline.push({
+            values: newValues,
+            start,
+            end,
+        });
+
+        this.timeline = this.orderByStart(this.timeline);
 
         return this;
     }

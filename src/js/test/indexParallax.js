@@ -12,19 +12,19 @@ export function indexParallax() {
             x: 0,
             rotate: 0,
             scale: 1,
-            opacity: 0,
-            y: 100,
+            opacity: 1,
+            y: 0,
         })
-        .goTo({ y: 0, opacity: 1 }, { start: 0, end: 3 })
+        .goFrom({ y: -100, opacity: 0 }, { start: 0, end: 3 })
         .goTo(
             { rotate: 90, scale: 2, x: 10 },
-            { start: 2, end: 5, ease: 'easeInOutBack' }
+            { start: 2, end: 5, ease: 'easeInBack' }
         )
         .goTo(
             { rotate: 0, scale: 1, x: 0 },
-            { start: 5, end: 8, ease: 'easeInOutBack' }
+            { start: 5, end: 8, ease: 'easeInBack' }
         )
-        .goTo({ y: -100, opacity: 0 }, { start: 7, end: 10 });
+        .goTo({ y: 100, opacity: 0 }, { start: 7, end: 10 });
 
     myParallaxTimeline.subscribe(({ scale, rotate, opacity, y, x }) => {
         const xW = (x * window.innerWidth) / 100;
