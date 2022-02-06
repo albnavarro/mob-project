@@ -172,7 +172,7 @@ export class HandleSequencer {
             values.forEach(({ prop, active }, iValues) => {
                 if (!active) return;
 
-                const prevToValue = this.timeline
+                const propToFindValue = this.timeline
                     .slice(0, iTimeline)
                     .reduceRight((p, { values: valuesForward }) => {
                         // Find active prop if exist
@@ -188,8 +188,8 @@ export class HandleSequencer {
                             : p;
                     }, null);
 
-                if (prevToValue !== null) {
-                    values[iValues][pairing[propToFind].set] = prevToValue;
+                if (propToFindValue !== null) {
+                    values[iValues][pairing[propToFind].set] = propToFindValue;
                 }
             });
         });
