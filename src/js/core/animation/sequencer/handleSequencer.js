@@ -23,22 +23,24 @@ export class HandleSequencer {
                     ({ prop }) => prop === item.prop
                 );
 
+                if (currentEl.settled) return;
+
                 const isLastUsableProp = this.timeline
                     .slice(i + 1, this.timeline.length)
                     .reduce((p, { start: nextStart, values: nextValues }) => {
-                        const activeItem = nextValues.find((nextItem) => {
+                        const nextActiveItem = nextValues.find((nextItem) => {
                             return (
                                 nextItem.prop === item.prop && nextItem.active
                             );
                         });
-                        if (activeItem && nextStart <= partial) {
+                        if (nextActiveItem && nextStart <= partial) {
                             return false;
                         } else {
                             return p;
                         }
                     }, true);
 
-                if (isLastUsableProp && item.active && !currentEl.settled) {
+                if (isLastUsableProp && item.active) {
                     const duration = end - start;
 
                     const minVal =
