@@ -9,7 +9,7 @@ export class HandleSequencer {
         this.callback = [];
         this.duration = 10;
         this.type = 'sequencer';
-        this.defaultProp = { start: 0, end: 10, ease: 'easeLinear' };
+        this.defaultProp = { start: 0, end: this.duration, ease: 'easeLinear' };
     }
 
     draw(partial) {
@@ -23,7 +23,7 @@ export class HandleSequencer {
                     ({ prop }) => prop === item.prop
                 );
 
-                if (currentEl.settled) return;
+                if (currentEl.settled || !item.active) return;
 
                 const isLastUsableProp = this.timeline
                     .slice(i + 1, this.timeline.length)
@@ -40,41 +40,40 @@ export class HandleSequencer {
                         }
                     }, true);
 
-                if (isLastUsableProp && item.active) {
-                    const duration = end - start;
+                if (!isLastUsableProp) return;
 
-                    const minVal =
-                        item.toValue > item.fromValue
-                            ? item.fromValue
-                            : item.toValue;
-                    const maxVal =
-                        item.toValue > item.fromValue
-                            ? item.toValue
-                            : item.fromValue;
+                const duration = end - start;
+                const minVal =
+                    item.toValue > item.fromValue
+                        ? item.fromValue
+                        : item.toValue;
+                const maxVal =
+                    item.toValue > item.fromValue
+                        ? item.toValue
+                        : item.fromValue;
 
-                    item.currentValue =
-                        partial >= start && partial <= end
-                            ? item.ease(
+                item.currentValue =
+                    partial >= start && partial <= end
+                        ? item.ease(
+                              partial - start,
+                              item.fromValue,
+                              item.toValue - item.fromValue,
+                              duration
+                          )
+                        : clamp(
+                              item.ease(
                                   partial - start,
                                   item.fromValue,
                                   item.toValue - item.fromValue,
                                   duration
-                              )
-                            : clamp(
-                                  item.ease(
-                                      partial - start,
-                                      item.fromValue,
-                                      item.toValue - item.fromValue,
-                                      duration
-                                  ),
-                                  minVal,
-                                  maxVal
-                              );
+                              ),
+                              minVal,
+                              maxVal
+                          );
 
-                    if (!Number.isNaN(item.currentValue)) {
-                        currentEl.currentValue = item.currentValue.toFixed(4);
-                        currentEl.settled = true;
-                    }
+                if (!Number.isNaN(item.currentValue)) {
+                    currentEl.currentValue = item.currentValue.toFixed(4);
+                    currentEl.settled = true;
                 }
             });
         });
