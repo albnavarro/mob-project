@@ -24,32 +24,51 @@ export class handleSpring {
     }
 
     onReuqestAnim(res) {
+        let animationLastTime = 0;
+
         this.values.forEach((item, i) => {
             item.velocity = this.config.velocity;
             item.currentValue = item.fromValue;
         });
 
         const draw = () => {
-            this.values.forEach((item, i) => {
-                const tensionForce =
-                    -this.config.tension * (item.currentValue - item.toValue);
-                const dampingForce = -this.config.friction * item.velocity;
-                const acceleration =
-                    (tensionForce + dampingForce) / this.config.mass;
-                item.velocity = item.velocity + (acceleration * 1) / 60;
-                item.currentValue =
-                    item.currentValue + (item.velocity * 1) / 60;
+            // Get current time
+            const time = getSpringTime();
 
-                // If tension == 0 linear movement
-                const isRunning =
-                    this.config.tension !== 0
-                        ? Math.abs(item.currentValue - item.toValue) >
-                              this.config.precision &&
-                          Math.abs(item.velocity) > this.config.precision
-                        : false;
+            // lastTime is set to now the first time.
+            // then check the difference from now and last time to check if we lost frame
+            let lastTime = animationLastTime !== 0 ? animationLastTime : time;
 
-                item.settled = !isRunning;
-            });
+            // If we lost a lot of frames just jump to the end.
+            if (time > lastTime + 64) lastTime = time;
+
+            // http://gafferongames.com/game-physics/fix-your-timestep/
+            let numSteps = Math.floor(time - lastTime);
+
+            // Get lost frame, update vales until time is now
+            for (let i = 0; i < numSteps; ++i) {
+                this.values.forEach((item, i) => {
+                    const tensionForce =
+                        -this.config.tension *
+                        (item.currentValue - item.toValue);
+                    const dampingForce = -this.config.friction * item.velocity;
+                    const acceleration =
+                        (tensionForce + dampingForce) / this.config.mass;
+                    item.velocity = item.velocity + (acceleration * 1) / 1000;
+                    item.currentValue =
+                        item.currentValue + (item.velocity * 1) / 1000;
+
+                    // If tension == 0 linear movement
+                    const isRunning =
+                        this.config.tension !== 0
+                            ? Math.abs(item.currentValue - item.toValue) >
+                                  this.config.precision &&
+                              Math.abs(item.velocity) > this.config.precision
+                            : false;
+
+                    item.settled = !isRunning;
+                });
+            }
 
             // Prepare an obj to pass to the callback
             const cbObject = getValueObj(this.values, 'currentValue');
@@ -58,6 +77,9 @@ export class handleSpring {
             this.callback.forEach(({ cb }) => {
                 cb(cbObject);
             });
+
+            // Update last time
+            animationLastTime = time;
 
             // Check if all values is completed
             const allSettled = this.values.every(

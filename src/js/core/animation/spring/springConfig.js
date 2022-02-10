@@ -6,6 +6,27 @@ export const springConfig = {
         velocity: 0,
         precision: 0.01,
     },
+    linearFast: {
+        tension: 300,
+        mass: 0.1,
+        friction: 26,
+        velocity: 0,
+        precision: 0.1,
+    },
+    linearMedium: {
+        tension: 150,
+        mass: 0.1,
+        friction: 26,
+        velocity: 0,
+        precision: 0.1,
+    },
+    linearSlow: {
+        tension: 80,
+        mass: 0.1,
+        friction: 26,
+        velocity: 0,
+        precision: 0.1,
+    },
     gentle: {
         tension: 120,
         mass: 1,
