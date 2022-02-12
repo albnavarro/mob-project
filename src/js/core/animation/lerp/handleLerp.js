@@ -1,26 +1,27 @@
-import { getValueObj } from '../utils/animationUtils.js';
+import { getValueObj, mergeArray } from '../utils/animationUtils.js';
 
-const getLerpTime = () => {
-    return typeof window !== 'undefined'
-        ? window.performance.now()
-        : Date.now();
-};
+const LERP_DEFAULT_PRECISION = 0.01;
 
 export class handleLerp {
     constructor(velocity = 15) {
         this.uniqueId = '_' + Math.random().toString(36).substr(2, 9);
         this.config = {};
         this.velocity = velocity;
+        this.precision = LERP_DEFAULT_PRECISION;
         this.req = null;
-        this.previousResolve = null;
-        this.previousReject = null;
+        this.currentResolve = null;
+        this.currentReject = null;
         this.promise = null;
         this.values = [];
         this.id = 0;
         this.callback = [];
         this.callbackStartInPause = [];
         this.pauseStatus = false;
-        this.defaultProps = { reverse: false, velocity: 15 };
+        this.defaultProps = {
+            reverse: false,
+            velocity,
+            precision: LERP_DEFAULT_PRECISION,
+        };
     }
 
     onReuqestAnim(res) {
@@ -32,17 +33,15 @@ export class handleLerp {
             this.values.forEach((item, i) => {
                 if (item.settled) return;
 
-                item.previousValue = item.currentValue;
-
                 const s = item.currentValue;
                 const f = item.toValue;
                 const v = this.velocity;
                 const val = (f - s) / v + s * 1;
-                item.currentValue = val;
+                item.currentValue = parseFloat(val).toFixed(4);
 
                 item.settled =
-                    parseFloat(item.previousValue).toFixed(4) ===
-                    parseFloat(item.currentValue).toFixed(4);
+                    Math.abs(item.toValue - item.currentValue) <=
+                    this.precision;
 
                 if (item.settled) {
                     item.currentValue = item.toValue;
@@ -89,8 +88,8 @@ export class handleLerp {
 
                     // Set promise reference to null once resolved
                     this.promise = null;
-                    this.previousReject = null;
-                    this.previousResolve = null;
+                    this.currentReject = null;
+                    this.currentResolve = null;
                 }
             }
         };
@@ -113,8 +112,8 @@ export class handleLerp {
     }
 
     startRaf(res, reject) {
-        this.previousReject = reject;
-        this.previousResolve = res;
+        this.currentReject = reject;
+        this.currentResolve = res;
         this.req = requestAnimationFrame(() => {
             const prevent = this.callbackStartInPause
                 .map(({ cb }) => cb())
@@ -140,11 +139,11 @@ export class handleLerp {
         });
 
         // Abort promise
-        if (this.previousReject) {
-            this.previousReject();
+        if (this.currentReject) {
+            this.currentReject();
             this.promise = null;
-            this.previousReject = null;
-            this.previousResolve = null;
+            this.currentReject = null;
+            this.currentResolve = null;
         }
 
         // Reset RAF
@@ -186,9 +185,9 @@ export class handleLerp {
         if (!this.pauseStatus) return;
         this.pauseStatus = false;
 
-        if (!this.req && this.previousResolve) {
+        if (!this.req && this.currentResolve) {
             this.req = requestAnimationFrame(() => {
-                this.onReuqestAnim(this.previousResolve);
+                this.onReuqestAnim(this.currentResolve);
             });
         }
     }
@@ -210,31 +209,10 @@ export class handleLerp {
                 prop: prop,
                 toValue: value,
                 fromValue: value,
-                velocity: this.velocity,
                 currentValue: value,
-                previousValue: 0,
                 settled: false,
                 onPause: false,
             };
-        });
-    }
-
-    /**
-     * mergeData - Update values array with new data form methods
-     * Check if newData has new value for each prop
-     * If yes merge new value
-     *
-     * @param  {Array} newData description
-     * @return {void}         description
-     */
-    mergeData(newData) {
-        this.values = this.values.map((item) => {
-            const itemToMerge = newData.find((newItem) => {
-                return newItem.prop === item.prop;
-            });
-
-            // If exist merge
-            return itemToMerge ? { ...item, ...itemToMerge } : item;
         });
     }
 
@@ -261,12 +239,12 @@ export class handleLerp {
      * @return {promise}  onComplete promise
      *
      * @example
-     * mySpring.goTo({ val: 100 }).catch((err) => {});
+     * mySpring.goTo({ val: 100 }, { velocity: 30 }).catch((err) => {});
      */
     goTo(obj, props = {}) {
         if (this.pauseStatus) return;
 
-        const newDataArray = Object.keys(obj).map((item) => {
+        const newData = Object.keys(obj).map((item) => {
             return {
                 prop: item,
                 toValue: obj[item],
@@ -274,13 +252,14 @@ export class handleLerp {
             };
         });
 
-        this.mergeData(newDataArray);
+        this.values = mergeArray(newData, this.values);
 
         // merge special props with default
         const newProps = { ...this.defaultProps, ...props };
         // if revert switch fromValue and toValue
-        const { reverse, velocity, immediate } = newProps;
+        const { reverse, velocity, immediate, precision } = newProps;
         this.velocity = velocity;
+        this.precision = precision;
 
         if (reverse) this.reverse(obj);
 
@@ -306,12 +285,12 @@ export class handleLerp {
      * @return {promise}  onComplete promise
      *
      * @example
-     * mySpring.goFrom({ val: 100 }).catch((err) => {});
+     * mySpring.goFrom({ val: 100 }, { velocity: 30 }).catch((err) => {});
      */
     goFrom(obj, props = {}) {
         if (this.pauseStatus) return;
 
-        const newDataArray = Object.keys(obj).map((item) => {
+        const newData = Object.keys(obj).map((item) => {
             return {
                 prop: item,
                 fromValue: obj[item],
@@ -320,13 +299,14 @@ export class handleLerp {
             };
         });
 
-        this.mergeData(newDataArray);
+        this.values = mergeArray(newData, this.values);
 
         // merge special props with default
         const newProps = { ...this.defaultProps, ...props };
         // if revert switch fromValue and toValue
-        const { reverse, velocity, immediate } = newProps;
+        const { reverse, velocity, immediate, precision } = newProps;
         this.velocity = velocity;
+        this.precision = precision;
 
         if (reverse) this.reverse(obj);
 
@@ -353,7 +333,7 @@ export class handleLerp {
      * @return {promise}  onComplete promise
      *
      * @example
-     * mySpring.goFromTo({ val: 0 },{ val: 100 }).catch((err) => {});
+     * mySpring.goFromTo({ val: 0 },{ val: 100 }, { velocity: 30 }).catch((err) => {});
      */
     goFromTo(fromObj, toObj, props = {}) {
         if (this.pauseStatus) return;
@@ -362,7 +342,7 @@ export class handleLerp {
         const dataIsValid = this.compareKeys(fromObj, toObj);
         if (!dataIsValid) return this.promise;
 
-        const newDataArray = Object.keys(fromObj).map((item) => {
+        const newData = Object.keys(fromObj).map((item) => {
             return {
                 prop: item,
                 fromValue: fromObj[item],
@@ -372,13 +352,14 @@ export class handleLerp {
             };
         });
 
-        this.mergeData(newDataArray);
+        this.values = mergeArray(newData, this.values);
 
         // merge special props with default
         const newProps = { ...this.defaultProps, ...props };
         // if revert switch fromValue and toValue
-        const { reverse, velocity, immediate } = newProps;
+        const { reverse, velocity, immediate, precision } = newProps;
         this.velocity = velocity;
+        this.precision = precision;
 
         if (reverse) this.reverse(fromObj);
 
@@ -409,7 +390,7 @@ export class handleLerp {
     set(obj, props = {}) {
         if (this.pauseStatus) return;
 
-        const newDataArray = Object.keys(obj).map((item) => {
+        const newData = Object.keys(obj).map((item) => {
             return {
                 prop: item,
                 fromValue: obj[item],
@@ -419,12 +400,13 @@ export class handleLerp {
             };
         });
 
-        this.mergeData(newDataArray);
+        this.values = mergeArray(newData, this.values);
 
         // merge special props with default
         const newProps = { ...this.defaultProps, ...props };
-        const { reverse, velocity, immediate } = newProps;
+        const { reverse, velocity, immediate, precision } = newProps;
         this.velocity = velocity;
+        this.precision = precision;
 
         if (reverse) this.reverse(obj);
 
@@ -491,7 +473,11 @@ export class handleLerp {
      */
     updateVelocity(velocity) {
         this.velocity = velocity;
-        this.defaultProps = { reverse: false, velocity: velocity };
+        this.defaultProps = {
+            reverse: false,
+            velocity: velocity,
+            precision: LERP_DEFAULT_PRECISION,
+        };
     }
 
     /**

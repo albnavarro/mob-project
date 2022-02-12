@@ -1,19 +1,13 @@
 import { springConfig } from './springConfig.js';
-import { getValueObj } from '../utils/animationUtils.js';
-
-const getSpringTime = () => {
-    return typeof window !== 'undefined'
-        ? window.performance.now()
-        : Date.now();
-};
+import { getValueObj, mergeArray, getTime } from '../utils/animationUtils.js';
 
 export class handleSpring {
     constructor(config = 'default') {
         this.uniqueId = '_' + Math.random().toString(36).substr(2, 9);
         this.config = springConfig[config];
         this.req = null;
-        this.previousResolve = null;
-        this.previousReject = null;
+        this.currentResolve = null;
+        this.currentReject = null;
         this.promise = null;
         this.values = [];
         this.id = 0;
@@ -33,7 +27,7 @@ export class handleSpring {
 
         const draw = () => {
             // Get current time
-            const time = getSpringTime();
+            const time = getTime();
 
             // lastTime is set to now the first time.
             // then check the difference from now and last time to check if we lost frame
@@ -115,8 +109,8 @@ export class handleSpring {
 
                     // Set promise reference to null once resolved
                     this.promise = null;
-                    this.previousReject = null;
-                    this.previousResolve = null;
+                    this.currentReject = null;
+                    this.currentResolve = null;
                 }
             }
         };
@@ -139,8 +133,8 @@ export class handleSpring {
     }
 
     startRaf(res, reject) {
-        this.previousReject = reject;
-        this.previousResolve = res;
+        this.currentReject = reject;
+        this.currentResolve = res;
         this.req = requestAnimationFrame(() => {
             const prevent = this.callbackStartInPause
                 .map(({ cb }) => cb())
@@ -166,11 +160,11 @@ export class handleSpring {
         });
 
         // Abort promise
-        if (this.previousReject) {
-            this.previousReject();
+        if (this.currentReject) {
+            this.currentReject();
             this.promise = null;
-            this.previousReject = null;
-            this.previousResolve = null;
+            this.currentReject = null;
+            this.currentResolve = null;
         }
 
         // Reset RAF
@@ -212,9 +206,9 @@ export class handleSpring {
         if (!this.pauseStatus) return;
         this.pauseStatus = false;
 
-        if (!this.req && this.previousResolve) {
+        if (!this.req && this.currentResolve) {
             this.req = requestAnimationFrame(() => {
-                this.onReuqestAnim(this.previousResolve);
+                this.onReuqestAnim(this.currentResolve);
             });
         }
     }
@@ -228,9 +222,7 @@ export class handleSpring {
      * mySpring.setData({ val: 100 });
      */
     setData(obj) {
-        const valToArray = Object.entries(obj);
-
-        this.values = valToArray.map((item) => {
+        this.values = Object.entries(obj).map((item) => {
             const [prop, value] = item;
             return {
                 prop: prop,
@@ -240,25 +232,6 @@ export class handleSpring {
                 currentValue: value,
                 settled: false,
             };
-        });
-    }
-
-    /**
-     * mergeData - Update values array with new data form methods
-     * Check if newData has new value for each prop
-     * If yes merge new value
-     *
-     * @param  {Array} newData description
-     * @return {void}         description
-     */
-    mergeData(newData) {
-        this.values = this.values.map((item) => {
-            const itemToMerge = newData.find((newItem) => {
-                return newItem.prop === item.prop;
-            });
-
-            // If exist merge
-            return itemToMerge ? { ...item, ...itemToMerge } : item;
         });
     }
 
@@ -281,16 +254,17 @@ export class handleSpring {
     /**
      * goTo - go from fromValue stored to new toValue
      *
-     * @param  {number} to new toValue
+     * @param  {object} obj new toValue
+     * @param  {object} props : config: [object], reverse [boolean], immediate [boolean]
      * @return {promise}  onComplete promise
      *
      * @example
-     * mySpring.goTo({ val: 100 }).catch((err) => {});
+     * mySpring.goTo({ val: 100 }, { config: { mass: 2 }, reverse: true }).catch((err) => {});
      */
     goTo(obj, props = {}) {
         if (this.pauseStatus) return;
 
-        const newDataArray = Object.keys(obj).map((item) => {
+        const newData = Object.keys(obj).map((item) => {
             return {
                 prop: item,
                 toValue: obj[item],
@@ -298,7 +272,7 @@ export class handleSpring {
             };
         });
 
-        this.mergeData(newDataArray);
+        this.values = mergeArray(newData, this.values);
 
         // merge special props with default
         const newProps = { ...this.defaultProps, ...props };
@@ -328,17 +302,17 @@ export class handleSpring {
     /**
      * goFrom - go from new fromValue ( manually update fromValue )  to toValue sored
      *
-     * @param  {number} from new fromValue
-     * @param  {boolean} force force cancel FAR and restart
+     * @param  {object} obj new fromValue
+     * @param  {object} props : config: [object], reverse [boolean], immediate [boolean]
      * @return {promise}  onComplete promise
      *
      * @example
-     * mySpring.goFrom({ val: 100 }).catch((err) => {});
+     * mySpring.goFrom({ val: 100 }, { config: { mass: 2 }, reverse: true }).catch((err) => {});
      */
     goFrom(obj, props = {}) {
         if (this.pauseStatus) return;
 
-        const newDataArray = Object.keys(obj).map((item) => {
+        const newData = Object.keys(obj).map((item) => {
             return {
                 prop: item,
                 fromValue: obj[item],
@@ -347,7 +321,7 @@ export class handleSpring {
             };
         });
 
-        this.mergeData(newDataArray);
+        this.values = mergeArray(newData, this.values);
 
         // merge special props with default
         const newProps = { ...this.defaultProps, ...props };
@@ -377,13 +351,13 @@ export class handleSpring {
     /**
      * goFromTo - Go From new fromValue to new toValue
      *
-     * @param  {number} from new fromValue
-     * @param  {number} to new toValue
-     * @param  {boolean} force force cancel FAR and restart
+     * @param  {object} fromObj new fromValue
+     * @param  {object} toObj new toValue
+     * @param  {object} props : config: [object], reverse [boolean], immediate [boolean]
      * @return {promise}  onComplete promise
      *
      * @example
-     * mySpring.goFromTo({ val: 0 },{ val: 100 }).catch((err) => {});
+     * mySpring.goFromTo({ val: 0 },{ val: 100 }, { config: { mass: 2 }, reverse: true }).catch((err) => {});
      */
     goFromTo(fromObj, toObj, props = {}) {
         if (this.pauseStatus) return;
@@ -392,7 +366,7 @@ export class handleSpring {
         const dataIsValid = this.compareKeys(fromObj, toObj);
         if (!dataIsValid) return this.promise;
 
-        const newDataArray = Object.keys(fromObj).map((item) => {
+        const newData = Object.keys(fromObj).map((item) => {
             return {
                 prop: item,
                 fromValue: fromObj[item],
@@ -402,7 +376,7 @@ export class handleSpring {
             };
         });
 
-        this.mergeData(newDataArray);
+        this.values = mergeArray(newData, this.values);
 
         // merge special props with default
         const newProps = { ...this.defaultProps, ...props };
@@ -442,7 +416,7 @@ export class handleSpring {
     set(obj, props = {}) {
         if (this.pauseStatus) return;
 
-        const newDataArray = Object.keys(obj).map((item) => {
+        const newData = Object.keys(obj).map((item) => {
             return {
                 prop: item,
                 fromValue: obj[item],
@@ -452,7 +426,7 @@ export class handleSpring {
             };
         });
 
-        this.mergeData(newDataArray);
+        this.values = mergeArray(newData, this.values);
 
         // merge special props with default
         const newProps = { ...this.defaultProps, ...props };

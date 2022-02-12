@@ -29,15 +29,28 @@ export function springTest() {
     // DEFINE TIMELINE
     const timeline = new HandleTimeline({ repeat: 2, yoyo: true })
         .add(() => mySpring.updatePreset('wobbly'))
-        .set(mySpring, { x: 0, y: 0, rotate: 0 })
-        .goTo(mySpring, { x: -200 })
-        .goFromTo(mySpring, { x: -200 }, { x: 400 })
+        .set(
+            mySpring,
+            { x: 0, y: 0, rotate: 0 },
+            { config: { precision: 0.5 } }
+        )
+        .goTo(mySpring, { x: -200 }, { config: { precision: 0.5 } })
+        .goFromTo(
+            mySpring,
+            { x: -200 },
+            { x: 400 },
+            { config: { precision: 0.5 } }
+        )
         .add(() => mySpring.updatePreset('default'))
-        .goTo(mySpring, { y: 400 }, { config: { mass: 2 } })
+        .goTo(mySpring, { y: 400 }, { config: { mass: 2, precision: 0.5 } })
         .add(() => mySpring.updatePreset('bounce'))
-        .goTo(mySpring, { x: -100, rotate: 90 })
+        .goTo(mySpring, { x: -100, rotate: 90 }, { config: { precision: 0.5 } })
         .add(() => mySpring.updatePreset('gentle'))
-        .goTo(mySpring, { x: 0, y: 0, rotate: 0 });
+        .goTo(
+            mySpring,
+            { x: 0, y: 0, rotate: 0 },
+            { config: { precision: 0.5 } }
+        );
 
     // LISTNER
     btnStart.addEventListener('click', () => {

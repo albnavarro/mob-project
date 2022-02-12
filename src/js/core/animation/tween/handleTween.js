@@ -1,13 +1,13 @@
 import { tweenConfig } from './tweenConfig.js';
-import { getValueObj } from '../utils/animationUtils.js';
+import { getValueObj, mergeArrayTween } from '../utils/animationUtils.js';
 
 export class handleTween {
     constructor(ease = 'easeOutBack') {
         this.uniqueId = '_' + Math.random().toString(36).substr(2, 9);
         this.ease = tweenConfig[ease];
         this.req = null;
-        this.previousResolve = null;
-        this.previousReject = null;
+        this.currentResolve = null;
+        this.currentReject = null;
         this.promise = null;
         this.values = [];
         this.id = 0;
@@ -28,8 +28,6 @@ export class handleTween {
     }
 
     onReuqestAnim(timestamp, res) {
-        let cbObject = {};
-
         this.startTime = timestamp;
 
         const draw = (timestamp) => {
@@ -43,7 +41,7 @@ export class handleTween {
             }
 
             this.values.forEach((item, i) => {
-                if (item.update) {
+                if (item.shouldUpdate) {
                     item.currentValue = this.ease(
                         this.timeElapsed,
                         item.fromValue,
@@ -79,7 +77,7 @@ export class handleTween {
                 // Set fromValue with ended value
                 // At the next call fromValue become the start value
                 this.values.forEach((item, i) => {
-                    if (item.update) {
+                    if (item.shouldUpdate) {
                         item.toValue = item.currentValue;
                         item.fromValue = item.currentValue;
                     }
@@ -96,8 +94,8 @@ export class handleTween {
 
                     // Set promise reference to null once resolved
                     this.promise = null;
-                    this.previousReject = null;
-                    this.previousResolve = null;
+                    this.currentReject = null;
+                    this.currentResolve = null;
                 }
             }
         };
@@ -120,8 +118,8 @@ export class handleTween {
     }
 
     startRaf(res, reject) {
-        this.previousReject = reject;
-        this.previousResolve = res;
+        this.currentReject = reject;
+        this.currentResolve = res;
         this.req = requestAnimationFrame((timestamp) => {
             const prevent = this.callbackStartInPause
                 .map(({ cb }) => cb())
@@ -149,11 +147,11 @@ export class handleTween {
         });
 
         // Abort promise
-        if (this.previousReject) {
-            this.previousReject();
+        if (this.currentReject) {
+            this.currentReject();
             this.promise = null;
-            this.previousReject = null;
-            this.previousResolve = null;
+            this.currentReject = null;
+            this.currentResolve = null;
         }
 
         // Reset RAF
@@ -205,29 +203,8 @@ export class handleTween {
                 toValProcessed: value,
                 fromValue: value,
                 currentValue: value,
-                update: false,
+                shouldUpdate: false,
             };
-        });
-    }
-
-    /**
-     * mergeData - Update values array with new data form methods
-     * Check if newData has new value for each prop
-     * If yes merge new value
-     *
-     * @param  {Array} newData description
-     * @return {void}         description
-     */
-    mergeData(newData) {
-        this.values = this.values.map((item) => {
-            const itemToMerge = newData.find((newItem) => {
-                return newItem.prop === item.prop;
-            });
-
-            // If exist merge
-            return itemToMerge
-                ? { ...item, ...itemToMerge, ...{ update: true } }
-                : { ...item, ...{ update: false } };
         });
     }
 
@@ -242,15 +219,14 @@ export class handleTween {
         this.req = null;
 
         // Abort promise
-        if (this.previousReject) {
-            this.previousReject();
+        if (this.currentReject) {
+            this.currentReject();
             this.promise = null;
         }
 
         this.values.forEach((item, i) => {
-            if (item.update) {
+            if (item.shouldUpdate) {
                 item.fromValue = item.currentValue;
-                // item.currentValue = 0;
             }
         });
     }
@@ -263,7 +239,7 @@ export class handleTween {
      */
     setToValProcessed() {
         this.values.forEach((item, i) => {
-            if (item.update) {
+            if (item.shouldUpdate) {
                 item.toValProcessed = item.toValue - item.fromValue;
             }
         });
@@ -289,22 +265,23 @@ export class handleTween {
      * goTo - go from fromValue stored to new toValue
      *
      * @param  {number} to new toValue
+     * @param  {object} props : reverse [boolean], duration [number], ease [string], immediate [boolean]
      * @return {promise}  onComplete promise
      *
      * @example
-     * myTween.goTo({ val: 100 }).catch((err) => {});
+     * myTween.goTo({ val: 100 }, { duration: 3000,  ease: 'easeInQuint' }).catch((err) => {});
      */
     goTo(obj, props = {}) {
         if (this.pauseStatus || this.comeFromResume) this.stop();
 
-        const newDataArray = Object.keys(obj).map((item) => {
+        const newData = Object.keys(obj).map((item) => {
             return {
                 prop: item,
                 toValue: obj[item],
             };
         });
 
-        this.mergeData(newDataArray);
+        this.values = mergeArrayTween(newData, this.values);
         if (this.req) this.updateDataWhileRunning();
 
         // merge special props with default
@@ -338,23 +315,23 @@ export class handleTween {
      * goFrom - go from new fromValue ( manually update fromValue )  to toValue sored
      *
      * @param  {number} from new fromValue
-     * @param  {boolean} force force cancel FAR and restart
+     * @param  {object} props : reverse [boolean], duration [number], ease [string], immediate [boolean]
      * @return {promise}  onComplete promise
      *
      * @example
-     * myTween.goFrom({ val: 100 }).catch((err) => {});
+     * myTween.goFrom({ val: 100 }, { duration: 3000,  ease: 'easeInQuint' }).catch((err) => {});
      */
     goFrom(obj, props = {}) {
         if (this.pauseStatus || this.comeFromResume) this.stop();
 
-        const newDataArray = Object.keys(obj).map((item) => {
+        const newData = Object.keys(obj).map((item) => {
             return {
                 prop: item,
                 fromValue: obj[item],
             };
         });
 
-        this.mergeData(newDataArray);
+        this.values = mergeArrayTween(newData, this.values);
         if (this.req) this.updateDataWhileRunning();
 
         // merge special props with default
@@ -389,11 +366,11 @@ export class handleTween {
      *
      * @param  {number} from new fromValue
      * @param  {number} to new toValue
-     * @param  {boolean} force force cancel FAR and restart
+     * @param  {object} props : reverse [boolean], duration [number], ease [string], immediate [boolean]
      * @return {promise}  onComplete promise
      *
      * @example
-     * myTween.goFromTo({ val: 0 },{ val: 100 }).catch((err) => {});
+     * myTween.goFromTo({ val: 0 },{ val: 100 }, { duration: 3000,  ease: 'easeInQuint' }).catch((err) => {});
      */
     goFromTo(fromObj, toObj, props = {}) {
         if (this.pauseStatus || this.comeFromResume) this.stop();
@@ -402,7 +379,7 @@ export class handleTween {
         const dataIsValid = this.compareKeys(fromObj, toObj);
         if (!dataIsValid) return this.promise;
 
-        const newDataArray = Object.keys(fromObj).map((item) => {
+        const newData = Object.keys(fromObj).map((item) => {
             return {
                 prop: item,
                 fromValue: fromObj[item],
@@ -410,7 +387,7 @@ export class handleTween {
             };
         });
 
-        this.mergeData(newDataArray);
+        this.values = mergeArrayTween(newData, this.values);
         if (this.req) this.updateDataWhileRunning();
 
         // merge special props with default
@@ -444,6 +421,7 @@ export class handleTween {
      * set - set a a vlue without animation ( teleport )
      *
      * @param  {number} value new fromValue and new toValue
+     * @param  {object} props : reverse [boolean], duration [number], ease [string], immediate [boolean]
      * @return {promise}  onComplete promise
      *
      *
@@ -453,7 +431,7 @@ export class handleTween {
     set(obj, props = {}) {
         if (this.pauseStatus || this.comeFromResume) this.stop();
 
-        const newDataArray = Object.keys(obj).map((item) => {
+        const newData = Object.keys(obj).map((item) => {
             return {
                 prop: item,
                 fromValue: obj[item],
@@ -461,7 +439,7 @@ export class handleTween {
             };
         });
 
-        this.mergeData(newDataArray);
+        this.values = mergeArrayTween(newData, this.values);
         if (this.req) this.updateDataWhileRunning();
 
         // merge special props with default
