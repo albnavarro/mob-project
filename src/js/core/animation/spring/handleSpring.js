@@ -55,18 +55,20 @@ export class handleSpring {
                     const acceleration =
                         (tensionForce + dampingForce) / this.config.mass;
                     item.velocity = item.velocity + (acceleration * 1) / 1000;
-                    item.currentValue =
-                        item.currentValue + (item.velocity * 1) / 1000;
+                    item.currentValue = parseFloat(
+                        item.currentValue + (item.velocity * 1) / 1000
+                    );
 
-                    // If tension == 0 linear movement
-                    const isRunning =
+                    const isVelocity =
+                        Math.abs(item.velocity) <= this.config.precision;
+
+                    const isDisplacement =
                         this.config.tension !== 0
-                            ? Math.abs(item.currentValue - item.toValue) >
-                                  this.config.precision &&
-                              Math.abs(item.velocity) > this.config.precision
-                            : false;
+                            ? Math.abs(item.toValue - item.currentValue) <=
+                              this.config.precision
+                            : true;
 
-                    item.settled = !isRunning;
+                    item.settled = isVelocity && isDisplacement;
                 });
             }
 
