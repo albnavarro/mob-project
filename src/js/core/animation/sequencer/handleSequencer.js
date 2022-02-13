@@ -23,8 +23,10 @@ export class HandleSequencer {
                     ({ prop }) => prop === item.prop
                 );
 
+                // Id the prop is settled or is inactive skip
                 if (currentEl.settled || !item.active) return;
 
+                // Check if in the next step of timeline the same prop is active an start before partial
                 const isLastUsableProp = this.timeline
                     .slice(i + 1, this.timeline.length)
                     .reduce((p, { start: nextStart, values: nextValues }) => {
@@ -40,8 +42,10 @@ export class HandleSequencer {
                         }
                     }, true);
 
+                // If in the next step the same props is active and start before partial skip
                 if (!isLastUsableProp) return;
 
+                // At least we get the current value
                 const duration = end - start;
                 const minVal =
                     item.toValue > item.fromValue
@@ -103,15 +107,13 @@ export class HandleSequencer {
     /**
      * setData - Set initial data structure
      *
-     * @return {void}  description
+     * @return {Object}  this
      *
      * @example
      * myTween.setData({ val: 100 });
      */
     setData(obj) {
-        const valToArray = Object.entries(obj);
-
-        this.values = valToArray.map((item) => {
+        this.values = Object.entries(obj).map((item) => {
             const [prop, value] = item;
             return {
                 prop: prop,
@@ -128,12 +130,13 @@ export class HandleSequencer {
     }
 
     /**
-     * @param  {Array} newData description
-     * @return {void}         description
+     * Return the new array maeged with main array created in setData
+     *
+     * @param  {Array} data new datato merge
+     * @return {Array} main store Array merged with new data
      */
-    getNewValues(newData) {
-        // Return the new array maeged with main array created in setData
-        return this.values.map((item, i) => {
+    mergeArray(newData, data) {
+        return data.map((item, i) => {
             const itemToMerge = newData.find((newItem) => {
                 return newItem.prop === item.prop;
             });
@@ -156,7 +159,19 @@ export class HandleSequencer {
         });
     }
 
+    /**
+     * setPropFormAncestor
+     * - Example when we come from goTo methods:
+     *
+     *  When we define the toValue we have to associate the right fromValue value
+     *  ( ease methods need fromValue and toValue to calculate current value)
+     *  we search back into the array until we found an active item with the same prop ( for example: rotate )
+     *  we take the the first usable toValue and use we it as current fromValue
+     *
+     * @param  {string} propToFind first ancestor prop <toValue> || <fromValue>
+     */
     setPropFormAncestor(propToFind) {
+        // If we need fromValue take previuse usable toValue and aplly as fromValue
         const pairing = {
             fromValue: {
                 get: 'toValue',
@@ -172,6 +187,7 @@ export class HandleSequencer {
             values.forEach(({ prop, active }, iValues) => {
                 if (!active) return;
 
+                // Goback into the array
                 const propToFindValue = this.timeline
                     .slice(0, iTimeline)
                     .reduceRight((p, { values: valuesForward }) => {
@@ -182,12 +198,14 @@ export class HandleSequencer {
                             }
                         );
 
-                        // Return only first valid value then skip ( p === null)
+                        // Return only first valid value then skip the successive
+                        // we return the value only when the accumulatore is null, so the first time we fond a value
                         return result && p === null
                             ? result[pairing[propToFind].get]
                             : p;
                     }, null);
 
+                // If we found a value apply it
                 if (propToFindValue !== null) {
                     values[iValues][pairing[propToFind].set] = propToFindValue;
                 }
@@ -196,18 +214,18 @@ export class HandleSequencer {
     }
 
     /**
-     * goTo - go from fromValue stored to new toValue
+     * goTo - go from new toValue from last fromValue
      *
-     * @param  {number} to new toValue
+     * @param  {obj} obj new toValue Object
      *
      * @example
-     * myTween.goTo({ val: 100 });
+     * myTween.goTo({ val: 100 }, { start: 2, end: 5, ease: 'easeInBack' });
      */
     goTo(obj, props) {
         const propMerged = { ...this.defaultProp, ...props };
         const { start, end, ease } = propMerged;
 
-        const newDataArray = Object.keys(obj).map((item) => {
+        const data = Object.keys(obj).map((item) => {
             return {
                 prop: item,
                 toValue: obj[item],
@@ -215,7 +233,7 @@ export class HandleSequencer {
             };
         });
 
-        const newValues = this.getNewValues(newDataArray);
+        const newValues = this.mergeArray(data, this.values);
         this.timeline.push({
             values: newValues,
             start,
@@ -229,18 +247,18 @@ export class HandleSequencer {
     }
 
     /**
-     * goFrom - go from fromValue stored to new toValue
+     * goFrom - go from new goFrom from last toValue
      *
-     * @param  {number} to new toValue
+     * @param  {obj} obj new toValue Object
      *
      * @example
-     * myTween.goTo({ val: 100 });
+     * myTween.goFrom({ val: 100 }, { start: 2, end: 5, ease: 'easeInBack' });
      */
     goFrom(obj, props) {
         const propMerged = { ...this.defaultProp, ...props };
         const { start, end, ease } = propMerged;
 
-        const newDataArray = Object.keys(obj).map((item) => {
+        const data = Object.keys(obj).map((item) => {
             return {
                 prop: item,
                 fromValue: obj[item],
@@ -248,7 +266,7 @@ export class HandleSequencer {
             };
         });
 
-        const newValues = this.getNewValues(newDataArray);
+        const newValues = this.mergeArray(data, this.values);
         this.timeline.push({
             values: newValues,
             start,
@@ -262,13 +280,13 @@ export class HandleSequencer {
     }
 
     /**
-     * goFromTo - Go From new fromValue to new toValue
+     * goFrom - go from new fromValue to new toValue
      *
-     * @param  {number} to new fromValue
-     * @param  {number} to new toValue
+     * @param  {obj} fromObj new fromObj Object
+     * @param  {obj} toObj new toValue Object
      *
      * @example
-     * myTween.goFromTo({ val: 0 }, { val: 100 });
+     * myTween.goFrom({ val: 100 }, { start: 2, end: 5, ease: 'easeInBack' });
      */
     goFromTo(fromObj, toObj, props) {
         const propMerged = { ...this.defaultProp, ...props };
@@ -280,7 +298,7 @@ export class HandleSequencer {
             return;
         }
 
-        const newDataArray = Object.keys(fromObj).map((item) => {
+        const data = Object.keys(fromObj).map((item) => {
             return {
                 prop: item,
                 fromValue: fromObj[item],
@@ -289,7 +307,7 @@ export class HandleSequencer {
             };
         });
 
-        const newValues = this.getNewValues(newDataArray);
+        const newValues = this.mergeArray(data, this.values);
         this.timeline.push({
             values: newValues,
             start,
