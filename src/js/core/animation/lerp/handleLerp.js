@@ -21,6 +21,7 @@ export class handleLerp {
             reverse: false,
             velocity,
             precision: LERP_DEFAULT_PRECISION,
+            immediate: false,
         };
     }
 
@@ -201,9 +202,7 @@ export class handleLerp {
      * mySpring.setData({ val: 100 });
      */
     setData(obj) {
-        const valToArray = Object.entries(obj);
-
-        this.values = valToArray.map((item) => {
+        this.values = Object.entries(obj).map((item) => {
             const [prop, value] = item;
             return {
                 prop: prop,
@@ -233,6 +232,22 @@ export class handleLerp {
     }
 
     /**
+     * mergeProps - Mege special props with default props
+     *
+     * @param  {Object} props { reverse: <>, velocity: <> , precision <>, immediate <> }
+     * @return {Object} props merged
+     *
+     */
+    mergeProps(props) {
+        const newProps = { ...this.defaultProps, ...props };
+        const { velocity, precision } = newProps;
+        this.velocity = velocity;
+        this.precision = precision;
+
+        return newProps;
+    }
+
+    /**
      * goTo - go from fromValue stored to new toValue
      *
      * @param  {number} to new toValue
@@ -244,7 +259,7 @@ export class handleLerp {
     goTo(obj, props = {}) {
         if (this.pauseStatus) return;
 
-        const newData = Object.keys(obj).map((item) => {
+        const data = Object.keys(obj).map((item) => {
             return {
                 prop: item,
                 toValue: obj[item],
@@ -252,14 +267,8 @@ export class handleLerp {
             };
         });
 
-        this.values = mergeArray(newData, this.values);
-
-        // merge special props with default
-        const newProps = { ...this.defaultProps, ...props };
-        // if revert switch fromValue and toValue
-        const { reverse, velocity, immediate, precision } = newProps;
-        this.velocity = velocity;
-        this.precision = precision;
+        this.values = mergeArray(data, this.values);
+        const { reverse, immediate } = this.mergeProps(props);
 
         if (reverse) this.reverse(obj);
 
@@ -290,7 +299,7 @@ export class handleLerp {
     goFrom(obj, props = {}) {
         if (this.pauseStatus) return;
 
-        const newData = Object.keys(obj).map((item) => {
+        const data = Object.keys(obj).map((item) => {
             return {
                 prop: item,
                 fromValue: obj[item],
@@ -299,14 +308,8 @@ export class handleLerp {
             };
         });
 
-        this.values = mergeArray(newData, this.values);
-
-        // merge special props with default
-        const newProps = { ...this.defaultProps, ...props };
-        // if revert switch fromValue and toValue
-        const { reverse, velocity, immediate, precision } = newProps;
-        this.velocity = velocity;
-        this.precision = precision;
+        this.values = mergeArray(data, this.values);
+        const { reverse, immediate } = this.mergeProps(props);
 
         if (reverse) this.reverse(obj);
 
@@ -342,7 +345,7 @@ export class handleLerp {
         const dataIsValid = this.compareKeys(fromObj, toObj);
         if (!dataIsValid) return this.promise;
 
-        const newData = Object.keys(fromObj).map((item) => {
+        const data = Object.keys(fromObj).map((item) => {
             return {
                 prop: item,
                 fromValue: fromObj[item],
@@ -352,14 +355,8 @@ export class handleLerp {
             };
         });
 
-        this.values = mergeArray(newData, this.values);
-
-        // merge special props with default
-        const newProps = { ...this.defaultProps, ...props };
-        // if revert switch fromValue and toValue
-        const { reverse, velocity, immediate, precision } = newProps;
-        this.velocity = velocity;
-        this.precision = precision;
+        this.values = mergeArray(data, this.values);
+        const { reverse, immediate } = this.mergeProps(props);
 
         if (reverse) this.reverse(fromObj);
 
@@ -390,7 +387,7 @@ export class handleLerp {
     set(obj, props = {}) {
         if (this.pauseStatus) return;
 
-        const newData = Object.keys(obj).map((item) => {
+        const data = Object.keys(obj).map((item) => {
             return {
                 prop: item,
                 fromValue: obj[item],
@@ -400,13 +397,8 @@ export class handleLerp {
             };
         });
 
-        this.values = mergeArray(newData, this.values);
-
-        // merge special props with default
-        const newProps = { ...this.defaultProps, ...props };
-        const { reverse, velocity, immediate, precision } = newProps;
-        this.velocity = velocity;
-        this.precision = precision;
+        this.values = mergeArray(data, this.values);
+        const { reverse, immediate } = this.mergeProps(props);
 
         if (reverse) this.reverse(obj);
 

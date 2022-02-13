@@ -24,6 +24,7 @@ export class handleTween {
             duration: 1000,
             ease,
             reverse: false,
+            immediate: false,
         };
     }
 
@@ -192,9 +193,7 @@ export class handleTween {
      * myTween.setData({ val: 100 });
      */
     setData(obj) {
-        const valToArray = Object.entries(obj);
-
-        this.values = valToArray.map((item) => {
+        this.values = Object.entries(obj).map((item) => {
             const [prop, value] = item;
             return {
                 prop: prop,
@@ -262,6 +261,22 @@ export class handleTween {
     }
 
     /**
+     * mergeProps - Mege special props with default props
+     *
+     * @param  {Object} props { duration: <>, ease: <> , reverse <>, immediate <> }
+     * @return {Object} props merged
+     *
+     */
+    mergeProps(props) {
+        const newProps = { ...this.defaultProps, ...props };
+        const { ease, duration } = newProps;
+        this.ease = tweenConfig[ease];
+        this.duration = duration;
+
+        return newProps;
+    }
+
+    /**
      * goTo - go from fromValue stored to new toValue
      *
      * @param  {number} to new toValue
@@ -274,23 +289,16 @@ export class handleTween {
     goTo(obj, props = {}) {
         if (this.pauseStatus || this.comeFromResume) this.stop();
 
-        const newData = Object.keys(obj).map((item) => {
+        const data = Object.keys(obj).map((item) => {
             return {
                 prop: item,
                 toValue: obj[item],
             };
         });
 
-        this.values = mergeArrayTween(newData, this.values);
+        this.values = mergeArrayTween(data, this.values);
         if (this.req) this.updateDataWhileRunning();
-
-        // merge special props with default
-        const newProps = { ...this.defaultProps, ...props };
-        const { reverse, duration, ease, immediate } = newProps;
-
-        // Update duration and ease function
-        this.ease = tweenConfig[ease];
-        this.duration = duration;
+        const { reverse, immediate } = this.mergeProps(props);
 
         // if revert switch fromValue and toValue
         if (reverse) this.reverse(obj);
@@ -324,23 +332,16 @@ export class handleTween {
     goFrom(obj, props = {}) {
         if (this.pauseStatus || this.comeFromResume) this.stop();
 
-        const newData = Object.keys(obj).map((item) => {
+        const data = Object.keys(obj).map((item) => {
             return {
                 prop: item,
                 fromValue: obj[item],
             };
         });
 
-        this.values = mergeArrayTween(newData, this.values);
+        this.values = mergeArrayTween(data, this.values);
         if (this.req) this.updateDataWhileRunning();
-
-        // merge special props with default
-        const newProps = { ...this.defaultProps, ...props };
-        const { reverse, duration, ease, immediate } = newProps;
-
-        // Update duration and ease function
-        this.ease = tweenConfig[ease];
-        this.duration = duration;
+        const { reverse, immediate } = this.mergeProps(props);
 
         // if revert switch fromValue and toValue
         if (reverse) this.reverse(obj);
@@ -379,7 +380,7 @@ export class handleTween {
         const dataIsValid = this.compareKeys(fromObj, toObj);
         if (!dataIsValid) return this.promise;
 
-        const newData = Object.keys(fromObj).map((item) => {
+        const data = Object.keys(fromObj).map((item) => {
             return {
                 prop: item,
                 fromValue: fromObj[item],
@@ -387,16 +388,9 @@ export class handleTween {
             };
         });
 
-        this.values = mergeArrayTween(newData, this.values);
+        this.values = mergeArrayTween(data, this.values);
         if (this.req) this.updateDataWhileRunning();
-
-        // merge special props with default
-        const newProps = { ...this.defaultProps, ...props };
-        const { reverse, duration, ease, immediate } = newProps;
-
-        // Update duration and ease function
-        this.ease = tweenConfig[ease];
-        this.duration = duration;
+        const { reverse, immediate } = this.mergeProps(props);
 
         // if revert switch fromValue and toValue
         if (reverse) this.reverse(fromObj);
@@ -431,7 +425,7 @@ export class handleTween {
     set(obj, props = {}) {
         if (this.pauseStatus || this.comeFromResume) this.stop();
 
-        const newData = Object.keys(obj).map((item) => {
+        const data = Object.keys(obj).map((item) => {
             return {
                 prop: item,
                 fromValue: obj[item],
@@ -439,23 +433,12 @@ export class handleTween {
             };
         });
 
-        this.values = mergeArrayTween(newData, this.values);
+        this.values = mergeArrayTween(data, this.values);
         if (this.req) this.updateDataWhileRunning();
 
-        // merge special props with default
-        const newProps = {
-            ...{ reverse: this.defaultProps.reverse },
-            ...{ ease: this.defaultProps.ease },
-            ...{ duration: 1 },
-            ...props,
-        };
-        // if revert switch fromValue and toValue
-        const { reverse, duration, ease, immediate } = newProps;
-
-        // Update duration and ease function
-        this.ease = tweenConfig[ease];
-        this.duration = duration;
-
+        // In set mode duration is small as possible
+        props.duration = 1;
+        const { reverse, immediate } = this.mergeProps(props);
         // if revert switch fromValue and toValue
         if (reverse) this.reverse(obj);
 

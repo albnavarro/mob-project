@@ -14,7 +14,11 @@ export class handleSpring {
         this.callback = [];
         this.callbackStartInPause = [];
         this.pauseStatus = false;
-        this.defaultProps = { reverse: false, config: this.config };
+        this.defaultProps = {
+            reverse: false,
+            config: this.config,
+            immediate: false,
+        };
     }
 
     onReuqestAnim(res) {
@@ -252,6 +256,23 @@ export class handleSpring {
     }
 
     /**
+     * mergeProps - Mege special props with default props
+     *
+     * @param  {Object} props { reverse: <>, config: <> , immediate <> }
+     * @return {Object} props merged
+     *
+     */
+    mergeProps(props) {
+        const newProps = { ...this.defaultProps, ...props };
+
+        // Merge news config prop if there is some
+        const config = props?.config ? props.config : {};
+        this.config = { ...this.config, ...config };
+
+        return newProps;
+    }
+
+    /**
      * goTo - go from fromValue stored to new toValue
      *
      * @param  {object} obj new toValue
@@ -264,7 +285,7 @@ export class handleSpring {
     goTo(obj, props = {}) {
         if (this.pauseStatus) return;
 
-        const newData = Object.keys(obj).map((item) => {
+        const data = Object.keys(obj).map((item) => {
             return {
                 prop: item,
                 toValue: obj[item],
@@ -272,16 +293,8 @@ export class handleSpring {
             };
         });
 
-        this.values = mergeArray(newData, this.values);
-
-        // merge special props with default
-        const newProps = { ...this.defaultProps, ...props };
-        // if revert switch fromValue and toValue
-        const { reverse, immediate } = newProps;
-
-        // Merge news config prop if there is some
-        const config = props?.config ? props.config : {};
-        this.config = { ...this.config, ...config };
+        this.values = mergeArray(data, this.values);
+        const { reverse, immediate } = this.mergeProps(props);
 
         if (reverse) this.reverse(obj);
 
@@ -312,7 +325,7 @@ export class handleSpring {
     goFrom(obj, props = {}) {
         if (this.pauseStatus) return;
 
-        const newData = Object.keys(obj).map((item) => {
+        const data = Object.keys(obj).map((item) => {
             return {
                 prop: item,
                 fromValue: obj[item],
@@ -321,16 +334,8 @@ export class handleSpring {
             };
         });
 
-        this.values = mergeArray(newData, this.values);
-
-        // merge special props with default
-        const newProps = { ...this.defaultProps, ...props };
-        // if revert switch fromValue and toValue
-        const { reverse, immediate } = newProps;
-
-        // Merge news config prop if there is some
-        const config = props?.config ? props.config : {};
-        this.config = { ...this.config, ...config };
+        this.values = mergeArray(data, this.values);
+        const { reverse, immediate } = this.mergeProps(props);
 
         if (reverse) this.reverse(obj);
 
@@ -366,7 +371,7 @@ export class handleSpring {
         const dataIsValid = this.compareKeys(fromObj, toObj);
         if (!dataIsValid) return this.promise;
 
-        const newData = Object.keys(fromObj).map((item) => {
+        const data = Object.keys(fromObj).map((item) => {
             return {
                 prop: item,
                 fromValue: fromObj[item],
@@ -376,16 +381,8 @@ export class handleSpring {
             };
         });
 
-        this.values = mergeArray(newData, this.values);
-
-        // merge special props with default
-        const newProps = { ...this.defaultProps, ...props };
-        // if revert switch fromValue and toValue
-        const { reverse, immediate } = newProps;
-
-        // Merge news config prop if there is some
-        const config = props?.config ? props.config : {};
-        this.config = { ...this.config, ...config };
+        this.values = mergeArray(data, this.values);
+        const { reverse, immediate } = this.mergeProps(props);
 
         if (reverse) this.reverse(fromObj);
 
@@ -416,7 +413,7 @@ export class handleSpring {
     set(obj, props = {}) {
         if (this.pauseStatus) return;
 
-        const newData = Object.keys(obj).map((item) => {
+        const data = Object.keys(obj).map((item) => {
             return {
                 prop: item,
                 fromValue: obj[item],
@@ -426,15 +423,8 @@ export class handleSpring {
             };
         });
 
-        this.values = mergeArray(newData, this.values);
-
-        // merge special props with default
-        const newProps = { ...this.defaultProps, ...props };
-        const { reverse, immediate } = newProps;
-
-        // Merge news config prop if there is some
-        const config = props?.config ? props.config : {};
-        this.config = { ...this.config, ...config };
+        this.values = mergeArray(data, this.values);
+        const { reverse, immediate } = this.mergeProps(props);
 
         if (reverse) this.reverse(obj);
 
