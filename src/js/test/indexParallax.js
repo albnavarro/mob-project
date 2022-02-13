@@ -38,7 +38,6 @@ export function indexParallax() {
         computationType: 'fixed',
         propierties: 'tween',
         tween: myParallaxTimeline,
-        marker: 'parallax',
         start: 'bottom',
         end: 'top -height',
         ease: true,
