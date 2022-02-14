@@ -31,7 +31,6 @@ export class handleLerp {
         });
 
         const draw = () => {
-            console.log('draw');
             this.values.forEach((item, i) => {
                 if (item.settled) return;
 
