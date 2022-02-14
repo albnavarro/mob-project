@@ -25,9 +25,18 @@ export class handleSpring {
         let animationLastTime = 0;
 
         this.values.forEach((item, i) => {
-            item.velocity = this.config.velocity;
-            item.currentValue = item.fromValue;
+            item.velocity = parseFloat(this.config.velocity);
+            item.currentValue = parseFloat(item.fromValue);
+
+            // Normalize toValue in case is a string
+            item.toValue = parseFloat(item.toValue);
         });
+
+        // Normalize spring config props
+        const tension = parseFloat(this.config.tension);
+        const friction = parseFloat(this.config.friction);
+        const mass = parseFloat(this.config.mass);
+        const precision = parseFloat(this.config.precision);
 
         const draw = () => {
             // Get current time
@@ -47,23 +56,20 @@ export class handleSpring {
             for (let i = 0; i < numSteps; ++i) {
                 this.values.forEach((item, i) => {
                     const tensionForce =
-                        -this.config.tension *
-                        (item.currentValue - item.toValue);
-                    const dampingForce = -this.config.friction * item.velocity;
-                    const acceleration =
-                        (tensionForce + dampingForce) / this.config.mass;
-                    item.velocity = item.velocity + (acceleration * 1) / 1000;
-                    item.currentValue = parseFloat(
-                        item.currentValue + (item.velocity * 1) / 1000
-                    );
+                        -tension * (item.currentValue - item.toValue);
+                    const dampingForce = -friction * item.velocity;
+                    const acceleration = (tensionForce + dampingForce) / mass;
 
-                    const isVelocity =
-                        Math.abs(item.velocity) <= this.config.precision;
+                    item.velocity = item.velocity + (acceleration * 1) / 1000;
+                    item.currentValue =
+                        item.currentValue + (item.velocity * 1) / 1000;
+
+                    const isVelocity = Math.abs(item.velocity) <= precision;
 
                     const isDisplacement =
                         this.config.tension !== 0
                             ? Math.abs(item.toValue - item.currentValue) <=
-                              this.config.precision
+                              precision
                             : true;
 
                     item.settled = isVelocity && isDisplacement;

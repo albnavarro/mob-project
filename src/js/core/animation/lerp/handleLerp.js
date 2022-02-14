@@ -1,6 +1,6 @@
 import { getValueObj, mergeArray } from '../utils/animationUtils.js';
 
-const LERP_DEFAULT_PRECISION = 0.01;
+const LERP_DEFAULT_PRECISION = 0.001;
 
 export class handleLerp {
     constructor(velocity = 15) {
