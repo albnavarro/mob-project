@@ -3,8 +3,14 @@ import { clamp, getValueObj } from '../utils/animationUtils.js';
 
 export class HandleSequencer {
     constructor() {
+        // Basic array with all the propierties, is creted in setData methods
+        // in draw methods currentValue and settled will be updated for each prop
+        // it is used as a mock to create the array to add to the timeline
         this.values = [];
+
+        // Timeline array
         this.timeline = [];
+
         this.id = 0;
         this.callback = [];
         this.duration = 10;
@@ -344,3 +350,33 @@ export class HandleSequencer {
         return this.type;
     }
 }
+
+// Timeline array example:
+// [
+//     {
+//         "values": [
+//             {
+//                   "prop": "x",
+//                   "active": false
+//              },
+//              {
+//                   "prop": "y",
+//                   "toValue": 0,
+//                   "fromValue": -100,
+//                   "currentValue": -100,
+//                   "active": true,
+//                   "settled": false
+//              },
+//              ...
+//         ],
+//         "start": 0,
+//         "end": 3
+//     },
+//     {
+//         "values": [
+//             ...
+//         ],
+//         "start": 7,
+//         "end": 10
+//     }
+// ]
