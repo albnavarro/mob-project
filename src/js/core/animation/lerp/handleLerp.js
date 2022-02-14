@@ -1,13 +1,13 @@
 import { getValueObj, mergeArray } from '../utils/animationUtils.js';
 
-const LERP_DEFAULT_PRECISION = 0.001;
+// const LERP_DEFAULT_PRECISION = 0.001;
 
 export class handleLerp {
     constructor(velocity = 15) {
         this.uniqueId = '_' + Math.random().toString(36).substr(2, 9);
         this.config = {};
         this.velocity = velocity;
-        this.precision = LERP_DEFAULT_PRECISION;
+        // this.precision = LERP_DEFAULT_PRECISION;
         this.req = null;
         this.currentResolve = null;
         this.currentReject = null;
@@ -20,7 +20,7 @@ export class handleLerp {
         this.defaultProps = {
             reverse: false,
             velocity,
-            precision: LERP_DEFAULT_PRECISION,
+            // precision: LERP_DEFAULT_PRECISION,
             immediate: false,
         };
     }
@@ -31,8 +31,11 @@ export class handleLerp {
         });
 
         const draw = () => {
+            console.log('draw');
             this.values.forEach((item, i) => {
                 if (item.settled) return;
+
+                item.previousValue = item.currentValue;
 
                 const s = item.currentValue;
                 const f = item.toValue;
@@ -40,9 +43,13 @@ export class handleLerp {
                 const val = (f - s) / v + s * 1;
                 item.currentValue = parseFloat(val).toFixed(4);
 
+                // item.settled =
+                //     Math.abs(item.toValue - item.currentValue) <=
+                //     this.precision;
+
                 item.settled =
-                    Math.abs(item.toValue - item.currentValue) <=
-                    this.precision;
+                    parseFloat(item.previousValue).toFixed(4) ===
+                    parseFloat(item.currentValue).toFixed(4);
 
                 if (item.settled) {
                     item.currentValue = item.toValue;
@@ -209,6 +216,7 @@ export class handleLerp {
                 toValue: value,
                 fromValue: value,
                 currentValue: value,
+                previousValue: 0,
                 settled: false,
                 onPause: false,
             };
@@ -468,7 +476,7 @@ export class handleLerp {
         this.defaultProps = {
             reverse: false,
             velocity: velocity,
-            precision: LERP_DEFAULT_PRECISION,
+            // precision: LERP_DEFAULT_PRECISION,
         };
     }
 
