@@ -67,7 +67,7 @@ export class handleSpring {
                     const isVelocity = Math.abs(item.velocity) <= precision;
 
                     const isDisplacement =
-                        this.config.tension !== 0
+                        tension !== 0
                             ? Math.abs(item.toValue - item.currentValue) <=
                               precision
                             : true;
