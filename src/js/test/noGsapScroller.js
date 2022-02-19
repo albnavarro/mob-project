@@ -3,7 +3,9 @@ import { ParallaxItemClass } from '../../component/parallax/js/parallaxItem.js';
 
 export const noGsap = () => {
     const title = document.querySelector('.js-scroll-item');
-    const scroller = document.querySelector('.scroller .scroller__row');
+    const scroller = document.querySelector(
+        '.test-custom-scroller .scroller__row'
+    );
 
     const parallaxIn = new ParallaxItemClass({
         item: title,
