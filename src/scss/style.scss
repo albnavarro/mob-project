@@ -16,15 +16,15 @@
 @import 'utility/loader';
 
 // component vanilla
-@import '../component/to-top/scss/toTop',
-    '../component/tooltip/scss/tooltip', '../component/navigation/scss/menu',
-    '../component/lightbox/scss/lightbox',
+@import '../component/to-top/scss/toTop', '../component/tooltip/scss/tooltip',
+    '../component/navigation/scss/menu', '../component/lightbox/scss/lightbox',
     '../component/show-element/scss/ShowElement',
     '../component/threeBlocks/scss/tBlocks', '../component/move3D/scss/move3D',
     '../component/mouseParallax/scss/mouseParallax',
     '../component/pageScroll/scss/pageScroll.scss',
     '../component/dragger/scss/dragger.scss',
-    '../component/gsapHorizontalCustom/scss/gsapHorizontalCustom.scss';
+    '../component/gsapHorizontalCustom/scss/gsapHorizontalCustom.scss',
+    '../component/horizontalCustom/scss/horizontalCustom.scss';
 
 // layout
 @import 'layout/index', 'layout/footer', 'layout/fidex', 'layout/susy',

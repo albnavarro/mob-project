@@ -16,14 +16,7 @@ export function indexParallax() {
             y: 0,
         })
         .goFrom({ y: -100, opacity: 0 }, { start: 0, end: 3 })
-        .goTo(
-            { rotate: 90, scale: 2, x: 10 },
-            { start: 2, end: 5, ease: 'easeInBack' }
-        )
-        .goTo(
-            { rotate: 0, scale: 1, x: 0 },
-            { start: 5, end: 8, ease: 'easeInBack' }
-        )
+        .goTo({ rotate: 90, scale: 1.5 }, { start: 2, end: 8 })
         .goTo({ y: 100, opacity: 0 }, { start: 7, end: 10 });
 
     myParallaxTimeline.subscribe(({ scale, rotate, opacity, y, x }) => {

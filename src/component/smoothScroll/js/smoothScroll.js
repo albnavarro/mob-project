@@ -80,7 +80,7 @@ export class SmoothScrollClass {
     init() {
         switch (this.motionType) {
             case this.SPRING:
-                this.motion = new handleSpring('gentle');
+                this.motion = new handleSpring();
                 break;
 
             default:

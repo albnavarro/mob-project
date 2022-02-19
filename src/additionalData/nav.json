@@ -33,6 +33,10 @@
                 {
                     "label": "",
                     "univoqueId": "gsapHorizontal2"
+                },
+                {
+                    "label": "",
+                    "univoqueId": "noGsapHorizontal2"
                 }
             ]
         },

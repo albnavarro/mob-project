@@ -12,12 +12,10 @@ html {
 body {
     background-color: $white;
     overflow-x: hidden;
-
-    @include get-dot-bg(2, #ccc);
-
-    background-size: count-svg-item(100, 10);
-    background-attachment: fixed;
-    background-position: center;
+    // @include get-dot-bg(2, #ccc);
+    // background-size: count-svg-item(100, 10);
+    // background-attachment: fixed;
+    // background-position: center;
     width: 100vw;
 }
 

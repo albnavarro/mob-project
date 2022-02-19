@@ -42,7 +42,11 @@ export class ParallaxItemClass {
                 : parallaxConstant.DIRECTION_VERTICAL;
         })();
         this.scroller = data.scroller
-            ? document.querySelector(data.scroller)
+            ? (() => {
+                  return typeof data.scroller === 'string'
+                      ? document.querySelector(data.scroller)
+                      : data.scroller;
+              })()
             : window;
         this.screen = data.screen
             ? document.querySelector(data.screen)
@@ -135,6 +139,7 @@ export class ParallaxItemClass {
         this.onEnterBack = data.onEnterBack || null;
         this.onLeave = data.onLeave || null;
         this.onLeaveBack = data.onLeaveBack || null;
+        this.onTickCallback = data.onTick || null;
     }
 
     init() {
@@ -156,12 +161,18 @@ export class ParallaxItemClass {
         }
 
         if (this.ease) {
-            this.unsubscribeScroll = handleScroll(() =>
-                this.smoothParallaxJs()
-            );
+            if (this.scroller === window) {
+                this.unsubscribeScroll = handleScroll(() =>
+                    this.smoothParallaxJs()
+                );
+            }
             this.smoothParallaxJs();
         } else {
-            this.unsubscribeScroll = handleScroll(() => this.executeParallax());
+            if (this.scroller === window) {
+                this.unsubscribeScroll = handleScroll(() =>
+                    this.executeParallax()
+                );
+            }
             this.executeParallax();
         }
 
@@ -197,14 +208,17 @@ export class ParallaxItemClass {
     setMotion() {
         this.motion.setData({ val: 0 });
         this.unsubscribeMotion = this.motion.subscribe(({ val }) => {
+            if (val === this.lastValue) return;
+
             if (this.propierties === parallaxConstant.PROP_TWEEN) {
-                if (val === this.lastValue) return;
                 this.tween.draw(val);
                 this.lastValue = val;
                 this.firstTime = false;
             } else {
                 this.updateStyle(val);
             }
+
+            if (this.onTickCallback) this.onTickCallback(val);
         });
 
         switch (this.easeType) {
@@ -444,6 +458,7 @@ export class ParallaxItemClass {
         this.onEnterBack = () => {};
         this.onLeave = () => {};
         this.onLeaveBack = () => {};
+        this.onTickCallback = () => {};
         if (this.pin) this.pinInstance.destroy();
         if (this.startMarker) this.startMarker.remove();
         if (this.endMarker) this.endMarker.remove();
@@ -513,7 +528,6 @@ export class ParallaxItemClass {
     }
 
     updateStyle(val) {
-        if (val === this.lastValue) return;
         if (this.applyTo) {
             Object.assign(this.applyTo.style, this.getStyle(val));
         } else {
@@ -552,7 +566,8 @@ export class ParallaxItemClass {
 
         switch (this.computationType) {
             case parallaxConstant.TYPE_FIXED:
-                this.endValue = this.getFixedValue();
+                const val = this.getFixedValue();
+                this.endValue = parseFloat(val).toFixed(4);
                 break;
 
             default:
@@ -574,14 +589,17 @@ export class ParallaxItemClass {
         if (!applyStyle) return;
 
         handleFrame(() => {
+            if (this.endValue === this.lastValue) return;
+
             if (this.propierties === parallaxConstant.PROP_TWEEN) {
-                if (this.endValue === this.lastValue) return;
                 this.tween.draw(this.endValue);
                 this.lastValue = this.endValue;
                 this.firstTime = false;
             } else {
                 this.updateStyle(this.endValue);
             }
+
+            if (this.onTickCallback) this.onTickCallback(this.endValue);
         });
     }
 
@@ -618,7 +636,7 @@ export class ParallaxItemClass {
 
         this.fixedShouldRender = this.prevFixedClamp === clamp ? false : true;
         this.prevFixedClamp = clamp;
-        if (!this.fixedShouldRender && !this.firstTime) return;
+        if (!this.fixedShouldRender && !this.firstTime) return this.endValue;
 
         const percent = (clamp * 100) / endPoint;
 

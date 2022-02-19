@@ -1,0 +1,10 @@
+{
+    "template": "noGsapHorizontal2",
+    "pageTitle": "no gsap Horizontal2",
+    "description": "custom description2",
+    "additionalData": ["nav.json"],
+    "registerComponent": [
+        "to-top/pug/toTop.pug",
+        "horizontalCustom/pug/horizontalCustom.pug"
+    ]
+}

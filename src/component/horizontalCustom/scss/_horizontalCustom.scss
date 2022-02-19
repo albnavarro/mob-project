@@ -1,0 +1,99 @@
+$mediaQ: 'desktop';
+
+.scroller {
+    --sectionheight: 100vh;
+
+    &__trigger {
+        @include _mq($mediaQ) {
+            z-index: 10;
+            position: relative;
+            pointer-events: none;
+            overflow: hidden;
+        }
+    }
+
+    &__row {
+        @include _mq($mediaQ) {
+            display: flex;
+            position: sticky;
+            top: 0;
+            left: 0;
+            height: var(--sectionheight);
+        }
+    }
+
+    &__section {
+        height: var(--sectionheight);
+
+        @include _mq($mediaQ) {
+            flex: 0 0 auto;
+        }
+    }
+
+    &__shadowEl {
+        display: none;
+
+        @include _mq($mediaQ) {
+            width: 100%;
+            display: block;
+            pointer-events: none;
+        }
+    }
+
+    &__shadow {
+        display: none;
+
+        @include _mq($mediaQ) {
+            pointer-events: none;
+            display: block;
+            position: absolute;
+            left: 0;
+            right: 0;
+
+            &__in-center,
+            &__out-center,
+            &__left,
+            &__end {
+                opacity: 0;
+                border: 1px red dashed;
+                width: 25%;
+
+                &.debug {
+                    opacity: 1;
+                }
+            }
+
+            &__in-center {
+                position: absolute;
+                top: 0;
+                right: 0;
+                padding: 0 40px;
+                text-align: center;
+            }
+
+            &__out-center {
+                position: absolute;
+                top: 0;
+                right: 0;
+                padding: 0 40px;
+                text-align: center;
+            }
+
+            &__left {
+                position: absolute;
+                top: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                padding: 0 40px;
+                text-align: center;
+            }
+
+            &__end {
+                position: absolute;
+                top: 0;
+                left: 0;
+                padding-left: 40px;
+            }
+        }
+    }
+}

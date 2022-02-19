@@ -46,6 +46,7 @@ import { tweenTest } from './test/tweenTest.js';
 import { lerpTest } from './test/lerpTest.js';
 import { timlineMixTest } from './test/timlineMixTest.js';
 import { indexParallax } from './test/indexParallax.js';
+import { noGsap } from './test/noGsapScroller.js';
 
 const body = document.querySelector('body');
 
@@ -79,6 +80,10 @@ if (body.classList.contains('page-gsapHorizontal2')) {
         rootEl: '.test-custom-scroller2',
     });
     gsapHorizontalCustom2.init();
+}
+
+if (body.classList.contains('page-noGsapHorizontal2')) {
+    noGsap();
 }
 
 pageScroll.init();
