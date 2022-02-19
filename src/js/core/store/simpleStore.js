@@ -23,41 +23,49 @@ export function SimpleStore(data) {
     /**
      * Fire computed if some prop associated change
      *
-     * @param  {string} prop keys of prop changed
+     * @param  {string} propChanged keys of prop changed
      */
-    function fireComputed(prop) {
+    function fireComputed(propChanged) {
         fnComputed.forEach((item, i) => {
-            const { prop: propTarget, keys, fn: computedFn } = item;
+            const {
+                prop: propToUpdate,
+                keys: propsShouldChange,
+                fn: computedFn,
+            } = item;
 
             // Prendo la lista di tutte le chiavi dello store
             const storeKeys = Object.keys(store);
 
             // Controllo che tutte le chiavi da monitorare nella computed esistano nello store
-            const hasKeys = keys.every((item) => storeKeys.includes(item));
+            const propsShouldChangeIsInStore = propsShouldChange.every((item) =>
+                storeKeys.includes(item)
+            );
 
-            // Controllo se la prop principale esiste come chiave da monitorare e tutte le chiavi esistono nello store
-            if (keys.includes(prop) && hasKeys) {
-                // Prendo il valore di ogni propietá data la chiave
-                const props = keys.map((item) => {
-                    return store[item];
-                });
-
-                // Genero il valore dalla funzione di callback da passare ai setter per aggiornare la prop
-                const computedValue = computedFn(...props);
-
-                // Eseguo la funzione di call back passandogli tutti i valori delle props
-                if (!isObject(store[propTarget])) {
-                    setProp(propTarget, computedValue);
-                } else {
-                    setObj(propTarget, computedValue);
-                }
-            } else if (!hasKeys) {
-                // se una delle delle chiavi da monitoriare non esiste nello store
+            // Se una delle delle chiavi da monitoriare non esiste nello store skippo
+            if (!propsShouldChangeIsInStore) {
                 console.warn(
-                    `%c one of this key ${keys} defined in computed method of prop to monitor '${propTarget}' prop not exist`,
+                    `%c one of this key ${propsShouldChange} defined in computed method of prop to monitor '${propToUpdate}' prop not exist`,
                     logStyle
                 );
+
+                return;
             }
+
+            // Controllo che la prop in entrata sia una dipendenza del computed
+            // E' il controlo chiave che scatena il computed
+            const propChangedIsDependency =
+                propsShouldChange.includes(propChanged);
+
+            if (!propChangedIsDependency) return;
+
+            // Prendo il valore di ogni propietá data la chiave
+            const propValues = propsShouldChange.map((item) => {
+                return store[item];
+            });
+
+            // Genero il valore dalla funzione di callback da passare ai setter per aggiornare la prop
+            const computedValue = computedFn(...propValues);
+            set(propToUpdate, computedValue);
         });
     }
 
@@ -418,10 +426,10 @@ export function SimpleStore(data) {
         const tempComputedArray = [...fnComputed, ...[{ prop, keys, fn }]];
 
         // Get all prop stored in tempComputedArray
-        const keyList = tempComputedArray.map((item) => item.prop).flat();
+        const propList = tempComputedArray.map((item) => item.prop).flat();
 
         //  Keys can't be a prop used in some computed
-        const keysIsusedInSomeComputed = keyList.some((item) =>
+        const keysIsusedInSomeComputed = propList.some((item) =>
             keys.includes(item)
         );
 
