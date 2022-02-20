@@ -34,6 +34,7 @@ export class ParallaxItemClass {
         this.prevFixedClamp = null;
         this.firstTime = true;
         this.isInViewport = false;
+        this.dontUSeFrame = false;
 
         // Base props
         this.item = data.item;
@@ -168,15 +169,18 @@ export class ParallaxItemClass {
                     this.smoothParallaxJs()
                 );
             }
+
             this.smoothParallaxJs();
         } else {
             if (this.scroller === window) {
                 this.unsubscribeScroll = handleScroll(() => {
                     this.computeValue();
+                    this.dontUSeFrame = false;
                     this.noEasingRender();
                 });
             }
             this.computeValue();
+            this.dontUSeFrame = false;
             this.noEasingRender();
         }
 
@@ -512,6 +516,9 @@ export class ParallaxItemClass {
     }
 
     move(scrollVal = null) {
+        // Bypass request animation frame, is supposed that is used outside
+        this.dontUSeFrame = true;
+
         scrollVal =
             scrollVal !== null && this.screen !== window
                 ? scrollVal + this.screenPosition
@@ -602,19 +609,28 @@ export class ParallaxItemClass {
     }
 
     noEasingRender() {
+        if (this.dontUSeFrame) {
+            this.cleanRender();
+            return;
+        }
+
         handleFrame(() => {
-            if (this.endValue === this.lastValue) return;
-
-            if (this.propierties === parallaxConstant.PROP_TWEEN) {
-                this.tween.draw(this.endValue);
-                this.lastValue = this.endValue;
-                this.firstTime = false;
-            } else {
-                this.updateStyle(this.endValue);
-            }
-
-            if (this.onTickCallback) this.onTickCallback(this.endValue);
+            this.cleanRender();
         });
+    }
+
+    cleanRender() {
+        if (this.endValue === this.lastValue) return;
+
+        if (this.propierties === parallaxConstant.PROP_TWEEN) {
+            this.tween.draw(this.endValue);
+            this.lastValue = this.endValue;
+            this.firstTime = false;
+        } else {
+            this.updateStyle(this.endValue);
+        }
+
+        if (this.onTickCallback) this.onTickCallback(this.endValue);
     }
 
     updateStyle(val) {
