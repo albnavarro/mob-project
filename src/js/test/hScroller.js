@@ -5,6 +5,7 @@ import { ParallaxItemClass } from '../../component/parallax/js/parallaxItem.js';
 import { SmoothScrollClass } from '../../component/smoothScroll/js/smoothScroll.js';
 
 export const hScroller = () => {
+    // FIRST
     const parallaxOpacity = new ParallaxItemClass({
         item: document.querySelector('.parallax-via-js-opacity'),
         scroller: '.scrollerH-container .scrollerH',
@@ -15,7 +16,30 @@ export const hScroller = () => {
         opacityEnd: 50,
     });
     parallaxOpacity.init();
-    parallax.add(parallaxOpacity);
+
+    const parallax1 = new ParallaxItemClass({
+        item: document.querySelector('.parallax-js-1'),
+        scroller: '.scrollerH-container .scrollerH',
+        direction: 'horizontal',
+        ease: true,
+        propierties: 'x',
+        align: 'start',
+    });
+    parallax1.init();
+
+    const parallaxPin = new ParallaxItemClass({
+        item: document.querySelector('.parallax-js-pin'),
+        scroller: '.scrollerH-container .scrollerH',
+        direction: 'horizontal',
+        computationType: 'fixed',
+        scrollTrigger: '.pluto',
+        propierties: 'x',
+        pin: true,
+        range: '0px',
+        start: 'right 10vw +width',
+        end: 'right 50vw +halfWidth',
+    });
+    parallaxPin.init();
 
     const target = document.querySelector('.parallax-via-js-in');
     const pluto = document.querySelector('.pluto3');
@@ -54,9 +78,6 @@ export const hScroller = () => {
                 return pluto.offsetWidth * 2;
             },
         },
-        // dynamicRange: () => {
-        //     return pluto.offsetWidth;
-        // },
         onEnter: () => {
             console.log('onEnter');
         },
@@ -73,7 +94,6 @@ export const hScroller = () => {
         },
     });
     parallaxIn.init();
-    parallax.add(parallaxIn);
 
     const target2 = document.querySelector('.parallax-via-js-out');
     const myParallaxTween = new ParallaxTween();
@@ -106,9 +126,6 @@ export const hScroller = () => {
         tween: myParallaxTween,
     });
     parallaxOut.init();
-    const unsubscribe = parallax.add(parallaxOut);
-    // unsubscribe();
-    // parallaxOut = null;
 
     const smoothScrollFull = new SmoothScrollClass({
         target: '.scrollerH',
@@ -116,12 +133,45 @@ export const hScroller = () => {
         speed: 40,
         ease: 20,
         drag: true,
-        // motionType: 'spring',
     });
     smoothScrollFull.init();
-    smoothScrollFull.onTick(() => {
-        parallax.move();
+    smoothScrollFull.onTick((scrollVal) => {
+        parallax1.move(scrollVal);
+        parallaxOpacity.move(scrollVal);
+        parallaxPin.move(scrollVal);
+        parallaxIn.move(scrollVal);
+        parallaxOut.move(scrollVal);
     });
+    // END FIRST
+
+    // SECOND
+    const parallaxb1 = new ParallaxItemClass({
+        item: document.querySelector('.parallax-js-b1'),
+        direction: 'horizontal',
+        scroller: '.scrollerH-container2 .scrollerH2',
+        screen: '.scrollerH-container2',
+        reverse: true,
+        onSwitch: 'in-stop',
+        propierties: 'x',
+    });
+    parallaxb1.init();
+
+    const parallaxb2 = new ParallaxItemClass({
+        item: document.querySelector('.parallax-js-b2'),
+        direction: 'horizontal',
+        scroller: '.scrollerH-container2 .scrollerH2',
+        screen: '.scrollerH-container2',
+        computationType: 'fixed',
+        scrollTrigger: '.pluto2',
+        start: 'right 100px',
+        marker: 'pin',
+        pin: true,
+        end: 'right +100px +width',
+        range: '0px',
+        propierties: 'x',
+        smoothType: 'linear',
+    });
+    parallaxb2.init();
 
     const smoothScrollContiner = new SmoothScrollClass({
         target: '.scrollerH2',
@@ -132,7 +182,63 @@ export const hScroller = () => {
         drag: true,
     });
     smoothScrollContiner.init();
-    smoothScrollContiner.onTick(() => parallax.move());
+    smoothScrollContiner.onTick((scrollVal) => {
+        parallaxb1.move(scrollVal);
+        parallaxb2.move(scrollVal);
+    });
+
+    // THIRD
+    const parallaxC1 = new ParallaxItemClass({
+        item: document.querySelector('.parallax-js-c1'),
+        scroller: '.scrollerH-container3 .scrollerH3',
+        screen: '.scrollerH-container3',
+        computationType: 'fixed',
+        scrollTrigger: '.pluto5',
+        start: 'bottom',
+        end: 'bottom +height',
+        propierties: 'x',
+        range: '100w',
+    });
+    parallaxC1.init();
+
+    const parallaxC2 = new ParallaxItemClass({
+        item: document.querySelector('.parallax-js-c2'),
+        scroller: '.scrollerH-container3 .scrollerH3',
+        screen: '.scrollerH-container3',
+        computationType: 'fixed',
+        propierties: 'x',
+        scrollTrigger: '.pluto6',
+        start: 'top',
+        end: 'top +height',
+        fromTo: true,
+        range: '-100w',
+    });
+    parallaxC2.init();
+
+    const parallaxC3 = new ParallaxItemClass({
+        item: document.querySelector('.parallax-js-c3'),
+        scroller: '.scrollerH-container3 .scrollerH3',
+        screen: '.scrollerH-container3',
+        computationType: 'fixed',
+        marker: 'pin2',
+        pin: true,
+        start: 'bottom 100px',
+        end: 'bottom 300px',
+        range: '0px',
+        propierties: 'x',
+        smoothType: 'linear',
+    });
+    parallaxC3.init();
+
+    const parallaxC4 = new ParallaxItemClass({
+        item: document.querySelector('.parallax-js-c4'),
+        conponent: 'm-comp--parallax',
+        scroller: '.scrollerH-container3 .scrollerH3',
+        screen: '.scrollerH-container3',
+        onSwitch: 'out-stop',
+        propierties: 'x',
+    });
+    parallaxC4.init();
 
     const smoothScrollContiner2 = new SmoothScrollClass({
         target: '.scrollerH3',
@@ -143,5 +249,10 @@ export const hScroller = () => {
         drag: true,
     });
     smoothScrollContiner2.init();
-    smoothScrollContiner2.onTick(() => parallax.move());
+    smoothScrollContiner2.onTick((scrollVal) => {
+        parallaxC1.move(scrollVal);
+        parallaxC2.move(scrollVal);
+        parallaxC3.move(scrollVal);
+        parallaxC4.move(scrollVal);
+    });
 };

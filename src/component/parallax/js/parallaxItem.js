@@ -15,6 +15,7 @@ import { springConfig } from '../../../js/core/animation/spring/springConfig.js'
 export class ParallaxItemClass {
     constructor(data) {
         this.offset = 0;
+        this.screenPosition = 0;
         this.endValue = 0;
         this.height = 0;
         this.width = 0;
@@ -145,6 +146,7 @@ export class ParallaxItemClass {
     init() {
         this.item.classList.add('parallax__item');
         this.setMotion();
+        this.calcScreenPosition();
         this.calcOffset();
         this.calcHeight();
         this.calcWidth();
@@ -169,11 +171,13 @@ export class ParallaxItemClass {
             this.smoothParallaxJs();
         } else {
             if (this.scroller === window) {
-                this.unsubscribeScroll = handleScroll(() =>
-                    this.executeParallax()
-                );
+                this.unsubscribeScroll = handleScroll(() => {
+                    this.computeValue();
+                    this.noEasingRender();
+                });
             }
-            this.executeParallax();
+            this.computeValue();
+            this.noEasingRender();
         }
 
         if (this.scroller !== window) {
@@ -404,6 +408,15 @@ export class ParallaxItemClass {
         }
     }
 
+    calcScreenPosition() {
+        if (this.screen === window) return;
+
+        this.screenPosition =
+            this.direction === parallaxConstant.DIRECTION_VERTICAL
+                ? parseInt(offset(this.screen).top)
+                : parseInt(position(this.screen).left);
+    }
+
     calcHeight() {
         const el = this.scrollTrigger === null ? this.item : this.scrollTrigger;
         this.height =
@@ -469,6 +482,7 @@ export class ParallaxItemClass {
     refresh() {
         if (this.pin && this.pinInstance) this.pinInstance.reset();
 
+        this.calcScreenPosition();
         this.calcOffset();
         this.calcHeight();
         this.calcWidth();
@@ -497,16 +511,22 @@ export class ParallaxItemClass {
         this.move();
     }
 
-    move() {
+    move(scrollVal = null) {
+        scrollVal =
+            scrollVal !== null && this.screen !== window
+                ? scrollVal + this.screenPosition
+                : null;
+
         if (this.ease) {
-            this.smoothParallaxJs();
+            this.smoothParallaxJs(scrollVal);
         } else {
-            this.executeParallax();
+            this.computeValue(scrollVal);
+            this.noEasingRender();
         }
     }
 
-    smoothParallaxJs() {
-        this.executeParallax(false);
+    smoothParallaxJs(scrollVal = null) {
+        this.computeValue(scrollVal);
 
         // Skip motion fixed type
         if (
@@ -527,21 +547,15 @@ export class ParallaxItemClass {
         this.motion.goTo({ val: this.endValue }).catch((err) => {});
     }
 
-    updateStyle(val) {
-        if (this.applyTo) {
-            Object.assign(this.applyTo.style, this.getStyle(val));
-        } else {
-            Object.assign(this.item.style, this.getStyle(val));
-        }
-
-        this.lastValue = val;
-        this.firstTime = false;
-    }
-
-    executeParallax(applyStyle = true) {
+    computeValue(scrollVal = null) {
         if (!mq[this.queryType](this.breackpoint)) return;
 
-        this.getScrollerOffset();
+        if (scrollVal === null) {
+            this.getScrollerOffset();
+        } else {
+            this.scrollerScroll = -scrollVal;
+        }
+
         const scrollTop = this.scrollerScroll;
         const windowsHeight = this.scrollerHeight;
         this.isInViewport = parallaxUtils.isInViewport({
@@ -585,9 +599,9 @@ export class ParallaxItemClass {
                         break;
                 }
         }
+    }
 
-        if (!applyStyle) return;
-
+    noEasingRender() {
         handleFrame(() => {
             if (this.endValue === this.lastValue) return;
 
@@ -601,6 +615,17 @@ export class ParallaxItemClass {
 
             if (this.onTickCallback) this.onTickCallback(this.endValue);
         });
+    }
+
+    updateStyle(val) {
+        if (this.applyTo) {
+            Object.assign(this.applyTo.style, this.getStyle(val));
+        } else {
+            Object.assign(this.item.style, this.getStyle(val));
+        }
+
+        this.lastValue = val;
+        this.firstTime = false;
     }
 
     getFixedValue() {

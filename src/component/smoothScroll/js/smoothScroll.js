@@ -54,7 +54,7 @@ export class SmoothScrollClass {
         this.touchVal = 0;
 
         //
-        this.callback = [];
+        this.onTickCallback = [];
 
         // Unsubscribe event
         this.subscribeResize = () => {};
@@ -138,8 +138,8 @@ export class SmoothScrollClass {
                 }
             }
 
-            this.callback.forEach((item, i) => {
-                item();
+            this.onTickCallback.forEach((item, i) => {
+                item(-val);
             });
         });
 
@@ -172,7 +172,7 @@ export class SmoothScrollClass {
     }
 
     onTick(fn) {
-        this.callback.push(fn);
+        this.onTickCallback.push(fn);
     }
 
     /**

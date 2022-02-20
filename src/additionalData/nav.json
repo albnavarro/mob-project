@@ -10,11 +10,11 @@
             "children": [
                 {
                     "label": "",
-                    "univoqueId": "fixed"
+                    "univoqueId": "mouseParallax"
                 },
                 {
                     "label": "",
-                    "univoqueId": "mouseParallax"
+                    "univoqueId": "noGsapHorizontal2"
                 }
             ]
         },
@@ -33,10 +33,6 @@
                 {
                     "label": "",
                     "univoqueId": "gsapHorizontal2"
-                },
-                {
-                    "label": "",
-                    "univoqueId": "noGsapHorizontal2"
                 }
             ]
         },

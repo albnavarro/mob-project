@@ -17,13 +17,13 @@ export const noGsap = () => {
         dynamicStart: {
             position: 'right',
             value: () => {
-                return 0;
+                return -title.offsetWidth;
             },
         },
         dynamicEnd: {
-            position: 'right',
+            position: 'left',
             value: () => {
-                return window.innerWidth / 2;
+                return -title.offsetWidth;
             },
         },
         dynamicRange: () => {
@@ -35,8 +35,7 @@ export const noGsap = () => {
     const horizontalCustom = new horizontalCustomClass({
         rootEl: '.test-custom-scroller',
     });
-    horizontalCustom.onTick(() => parallaxIn.move());
-    horizontalCustom.onRefresh(() => parallaxIn.refresh());
+    horizontalCustom.onTick((scrollVal) => parallaxIn.move(scrollVal));
     horizontalCustom.init();
 
     const horizontalCustom2 = new horizontalCustomClass({

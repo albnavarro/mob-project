@@ -21,6 +21,11 @@ $mediaQ: 'desktop';
 
             &:nth-of-type(4) {
                 width: 400px;
+
+                h1 {
+                    font-size: 300px;
+                    white-space: nowrap;
+                }
             }
 
             &:nth-of-type(7) {
