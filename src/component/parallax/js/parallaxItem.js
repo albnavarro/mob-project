@@ -166,7 +166,7 @@ export class ParallaxItemClass {
 
         if (this.ease) {
             if (this.scroller === window) {
-                this.unsubscribeScroll = handleScrollThrottle(() => {
+                this.unsubscribeScroll = handleScroll(() => {
                     this.smoothParallaxJs();
                 });
             }

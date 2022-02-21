@@ -1,4 +1,9 @@
-import { getValueObj, mergeArray, lerp } from '../utils/animationUtils.js';
+import {
+    getValueObj,
+    mergeArray,
+    lerp,
+    getTime,
+} from '../utils/animationUtils.js';
 
 const LERP_DEFAULT_PRECISION = 0.01;
 
@@ -26,6 +31,8 @@ export class handleLerp {
     }
 
     onReuqestAnim(res) {
+        let animationLastTime = 0;
+
         this.values.forEach((item, i) => {
             item.currentValue = parseFloat(item.fromValue);
         });
@@ -34,22 +41,37 @@ export class handleLerp {
         const precision = this.precision;
 
         const draw = () => {
-            this.values.forEach((item, i) => {
-                if (item.settled) return;
+            // Get current time
+            const time = getTime();
 
-                item.currentValue = lerp(
-                    item.currentValue,
-                    item.toValue,
-                    velocity
-                );
+            // lastTime is set to now the first time.
+            // then check the difference from now and last time to check if we lost frame
+            let lastTime = animationLastTime !== 0 ? animationLastTime : time;
 
-                item.settled =
-                    Math.abs(item.toValue - item.currentValue) <= precision;
+            // If we lost a lot of frames just jump to the end.
+            if (time > lastTime + 64) lastTime = time;
 
-                if (item.settled) {
-                    item.currentValue = item.toValue;
-                }
-            });
+            // http://gafferongames.com/game-physics/fix-your-timestep/
+            let numSteps = Math.floor(time - lastTime);
+
+            for (let i = 0; i < numSteps; ++i) {
+                this.values.forEach((item, i) => {
+                    if (item.settled) return;
+
+                    item.currentValue = lerp(
+                        item.currentValue,
+                        item.toValue,
+                        velocity / 10
+                    );
+
+                    item.settled =
+                        Math.abs(item.toValue - item.currentValue) <= precision;
+
+                    if (item.settled) {
+                        item.currentValue = item.toValue;
+                    }
+                });
+            }
 
             // Prepare an obj to pass to the callback
             const cbObject = getValueObj(this.values, 'currentValue');
@@ -58,6 +80,9 @@ export class handleLerp {
             this.callback.forEach(({ cb }) => {
                 cb(cbObject);
             });
+
+            // Update last time
+            animationLastTime = time;
 
             // Check if all values is completed
             const allSettled = this.values.every(
