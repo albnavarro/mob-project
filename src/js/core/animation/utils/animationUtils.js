@@ -37,3 +37,7 @@ export const getTime = () => {
 export const clamp = (num, min, max) => {
     return Math.min(Math.max(num, min), max);
 };
+
+export const lerp = (start, end, amt) => {
+    return (1 - amt) * start + amt * end;
+};

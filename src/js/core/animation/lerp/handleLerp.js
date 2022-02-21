@@ -1,13 +1,13 @@
-import { getValueObj, mergeArray } from '../utils/animationUtils.js';
+import { getValueObj, mergeArray, lerp } from '../utils/animationUtils.js';
 
-// const LERP_DEFAULT_PRECISION = 0.001;
+const LERP_DEFAULT_PRECISION = 0.01;
 
 export class handleLerp {
-    constructor(velocity = 15) {
+    constructor(velocity = 0.06) {
         this.uniqueId = '_' + Math.random().toString(36).substr(2, 9);
         this.config = {};
         this.velocity = velocity;
-        // this.precision = LERP_DEFAULT_PRECISION;
+        this.precision = LERP_DEFAULT_PRECISION;
         this.req = null;
         this.currentResolve = null;
         this.currentReject = null;
@@ -20,35 +20,31 @@ export class handleLerp {
         this.defaultProps = {
             reverse: false,
             velocity,
-            // precision: LERP_DEFAULT_PRECISION,
+            precision: LERP_DEFAULT_PRECISION,
             immediate: false,
         };
     }
 
     onReuqestAnim(res) {
         this.values.forEach((item, i) => {
-            item.currentValue = item.fromValue;
+            item.currentValue = parseFloat(item.fromValue);
         });
+
+        const velocity = parseFloat(this.velocity);
+        const precision = this.precision;
 
         const draw = () => {
             this.values.forEach((item, i) => {
                 if (item.settled) return;
 
-                item.previousValue = item.currentValue;
-
-                const s = item.currentValue;
-                const f = item.toValue;
-                const v = this.velocity;
-                const val = (f - s) / v + s * 1;
-                item.currentValue = parseFloat(val).toFixed(4);
-
-                // item.settled =
-                //     Math.abs(item.toValue - item.currentValue) <=
-                //     this.precision;
+                item.currentValue = lerp(
+                    item.currentValue,
+                    item.toValue,
+                    velocity
+                );
 
                 item.settled =
-                    parseFloat(item.previousValue).toFixed(4) ===
-                    parseFloat(item.currentValue).toFixed(4);
+                    Math.abs(item.toValue - item.currentValue) <= precision;
 
                 if (item.settled) {
                     item.currentValue = item.toValue;

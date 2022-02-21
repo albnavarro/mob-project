@@ -282,7 +282,7 @@ export class horizontalCustomClass {
                 });
             },
             ease: true,
-            springConfig: 'scroller',
+            easeType: 'lerp',
         });
         scroller.init();
 

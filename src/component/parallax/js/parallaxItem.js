@@ -11,6 +11,7 @@ import { handleScroll } from '../../../js/core/events/scrollUtils/handleScroll.j
 import { handleSpring } from '../../../js/core/animation/spring/handleSpring.js';
 import { handleLerp } from '../../../js/core/animation/lerp/handleLerp.js';
 import { springConfig } from '../../../js/core/animation/spring/springConfig.js';
+import { handleScrollThrottle } from '../../../js/core/events/scrollUtils/handleScrollThrottle.js';
 
 export class ParallaxItemClass {
     constructor(data) {
@@ -165,9 +166,9 @@ export class ParallaxItemClass {
 
         if (this.ease) {
             if (this.scroller === window) {
-                this.unsubscribeScroll = handleScroll(() =>
-                    this.smoothParallaxJs()
-                );
+                this.unsubscribeScroll = handleScrollThrottle(() => {
+                    this.smoothParallaxJs();
+                });
             }
 
             this.smoothParallaxJs();
@@ -185,7 +186,7 @@ export class ParallaxItemClass {
         }
 
         if (this.scroller !== window) {
-            this.unsubscribeMarker = handleScroll(() => {
+            this.unsubscribeMarker = handleScrollThrottle(() => {
                 // Refresh marker
                 if (this.marker) this.calcFixedLimit();
             });
