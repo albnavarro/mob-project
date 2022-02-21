@@ -471,7 +471,7 @@ export class handleLerp {
         this.defaultProps = {
             reverse: false,
             velocity: velocity,
-            // precision: LERP_DEFAULT_PRECISION,
+            precision: LERP_DEFAULT_PRECISION,
         };
     }
 
