@@ -1,5 +1,3 @@
-import { throttle } from '../throttle.js';
-
 /**
  * Utils to centralize scroll listener, all subscriber use the same listener
  * First subscriber create a listener, when there are no more listeners the listern is removed
@@ -16,16 +14,10 @@ import { throttle } from '../throttle.js';
  *
  */
 
-export const handleScrollThrottle = (() => {
+export const handleVisibilityChange = (() => {
     let inizialized = false;
     let callback = [];
     let id = 0;
-    const UP = 'UP';
-    const DOWN = 'DOWN';
-    let prev = window.pageYOffset;
-    let val = window.pageYOffset;
-    let direction = DOWN;
-    let throttleFunctionReference = () => {};
 
     /**
      * handler - handler for mouse move
@@ -38,24 +30,19 @@ export const handleScrollThrottle = (() => {
          * if - if there is no subscritor remove handler
          */
         if (callback.length === 0) {
-            window.removeEventListener('scroll', throttleFunctionReference);
+            window.removeEventListener('visibilitychange', handler);
 
             inizialized = false;
             return;
         }
 
-        prev = val;
-        val = window.pageYOffset;
-        direction = val > prev ? DOWN : UP;
-
         // Prepare data to callback
-        const scrollData = {
-            scrolY: val,
-            direction,
+        const visibilityData = {
+            visibilityState: document.visibilityState,
         };
 
         callback.forEach(({ cb }) => {
-            cb(scrollData);
+            cb(visibilityData);
         });
     }
 
@@ -68,8 +55,7 @@ export const handleScrollThrottle = (() => {
         if (inizialized) return;
         inizialized = true;
 
-        throttleFunctionReference = throttle((e) => handler(e), 50);
-        window.addEventListener('scroll', throttleFunctionReference, {
+        window.addEventListener('visibilitychange', handler, {
             passive: false,
         });
     }

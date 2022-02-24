@@ -40,21 +40,23 @@ export class handleLerp {
         const velocity = parseFloat(this.velocity);
         const precision = this.precision;
 
+        const o = {};
+
         const draw = () => {
             // Get current time
-            const time = getTime();
+            o.time = getTime();
 
             // lastTime is set to now the first time.
             // then check the difference from now and last time to check if we lost frame
-            let lastTime = animationLastTime !== 0 ? animationLastTime : time;
+            o.lastTime = animationLastTime !== 0 ? animationLastTime : o.time;
 
             // If we lost a lot of frames just jump to the end.
-            if (time > lastTime + 64) lastTime = time;
+            if (o.time > o.lastTime + 64) o.lastTime = o.time;
 
             // http://gafferongames.com/game-physics/fix-your-timestep/
-            let numSteps = Math.floor(time - lastTime);
+            o.numSteps = Math.floor(o.time - o.lastTime);
 
-            for (let i = 0; i < numSteps; ++i) {
+            for (let i = 0; i < o.numSteps; ++i) {
                 this.values.forEach((item, i) => {
                     if (item.settled) return;
 
@@ -74,22 +76,20 @@ export class handleLerp {
             }
 
             // Prepare an obj to pass to the callback
-            const cbObject = getValueObj(this.values, 'currentValue');
+            o.cbObject = getValueObj(this.values, 'currentValue');
 
             // Fire callback
             this.callback.forEach(({ cb }) => {
-                cb(cbObject);
+                cb(o.cbObject);
             });
 
             // Update last time
-            animationLastTime = time;
+            animationLastTime = o.time;
 
             // Check if all values is completed
-            const allSettled = this.values.every(
-                (item) => item.settled === true
-            );
+            o.allSettled = this.values.every((item) => item.settled === true);
 
-            if (!allSettled) {
+            if (!o.allSettled) {
                 this.req = requestAnimationFrame(draw);
             } else {
                 cancelAnimationFrame(this.req);
