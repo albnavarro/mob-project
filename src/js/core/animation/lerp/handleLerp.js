@@ -20,8 +20,11 @@ export class handleLerp {
         this.values = [];
         this.id = 0;
         this.callback = [];
+        this.callbackOnLag = [];
         this.callbackStartInPause = [];
         this.pauseStatus = false;
+        this.lostFrameTreshold = 64;
+        this.lagTreshold = 33;
         this.defaultProps = {
             reverse: false,
             velocity,
@@ -51,10 +54,20 @@ export class handleLerp {
             o.lastTime = animationLastTime !== 0 ? animationLastTime : o.time;
 
             // If we lost a lot of frames just jump to the end.
-            if (o.time > o.lastTime + 64) o.lastTime = o.time;
+            if (o.time > o.lastTime + this.lostFrameTreshold)
+                o.lastTime = o.time;
 
             // http://gafferongames.com/game-physics/fix-your-timestep/
             o.numSteps = Math.floor(o.time - o.lastTime);
+
+            // Check if lost frame is Too much
+            o.isLagging = o.numSteps > this.lagTreshold;
+
+            if (o.isLagging) {
+                this.callbackOnLag.forEach(({ cb }) => {
+                    cb(o.numSteps);
+                });
+            }
 
             for (let i = 0; i < o.numSteps; ++i) {
                 this.values.forEach((item, i) => {
@@ -533,6 +546,25 @@ export class handleLerp {
 
         return () => {
             this.callback = this.callback.filter((item) => item.id !== cbId);
+        };
+    }
+
+    /**
+     * onLag - add onLag callback to stack
+     *
+     * @param  {function} cb cal function
+     * @return {function} unsubscribe callback
+     *
+     */
+    onLag(cb) {
+        this.callbackOnLag.push({ cb, id: this.id });
+        const cbId = this.id;
+        this.id++;
+
+        return () => {
+            this.callbackOnLag = this.callbackOnLag.filter(
+                (item) => item.id !== cbId
+            );
         };
     }
 
