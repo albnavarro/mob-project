@@ -1,5 +1,6 @@
 import { springConfig } from './springConfig.js';
 import { getValueObj, mergeArray, getTime } from '../utils/animationUtils.js';
+import { handleFrame } from '../../events/rafutils/rafUtils.js';
 
 export class handleSpring {
     constructor(config = 'default') {
@@ -268,9 +269,11 @@ export class handleSpring {
             item.currentValue = item.toValue;
         });
 
-        const cbValues = getValueObj(this.values, 'toValue');
-        this.callback.forEach(({ cb }) => {
-            cb(cbValues);
+        handleFrame(() => {
+            const cbValues = getValueObj(this.values, 'toValue');
+            this.callback.forEach(({ cb }) => {
+                cb(cbValues);
+            });
         });
     }
 

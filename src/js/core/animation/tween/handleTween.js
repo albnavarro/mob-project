@@ -1,5 +1,6 @@
 import { tweenConfig } from './tweenConfig.js';
 import { getValueObj, mergeArrayTween } from '../utils/animationUtils.js';
+import { handleFrame } from '../../events/rafutils/rafUtils.js';
 
 export class handleTween {
     constructor(ease = 'easeOutBack') {
@@ -254,9 +255,11 @@ export class handleTween {
             item.currentValue = item.toValue;
         });
 
-        const cbValues = getValueObj(this.values, 'toValue');
-        this.callback.forEach(({ cb }) => {
-            cb(cbValues);
+        handleFrame(() => {
+            const cbValues = getValueObj(this.values, 'toValue');
+            this.callback.forEach(({ cb }) => {
+                cb(cbValues);
+            });
         });
     }
 

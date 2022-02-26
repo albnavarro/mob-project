@@ -4,6 +4,7 @@ import {
     lerp,
     getTime,
 } from '../utils/animationUtils.js';
+import { handleFrame } from '../../events/rafutils/rafUtils.js';
 
 const LERP_DEFAULT_PRECISION = 0.01;
 
@@ -266,9 +267,11 @@ export class handleLerp {
             item.currentValue = item.toValue;
         });
 
-        const cbValues = getValueObj(this.values, 'toValue');
-        this.callback.forEach(({ cb }) => {
-            cb(cbValues);
+        handleFrame(() => {
+            const cbValues = getValueObj(this.values, 'toValue');
+            this.callback.forEach(({ cb }) => {
+                cb(cbValues);
+            });
         });
     }
 
