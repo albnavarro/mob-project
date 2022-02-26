@@ -180,14 +180,12 @@ export class ParallaxItemClass {
                 this.unsubscribeScroll = handleScroll(() => {
                     handleFrame(() => {
                         this.smoothParallaxJs();
-                        this.islagging = false;
                     });
                 });
             }
 
             handleFrame(() => {
                 this.smoothParallaxJs();
-                this.islagging = false;
             });
         } else {
             if (this.scroller === window) {
@@ -236,10 +234,17 @@ export class ParallaxItemClass {
 
         if (this.ease && this.fixlag) {
             this.unsubscribeLag = this.motion.onLag((val) => {
+                this.islagging = true;
+                this.motion.stop();
+
                 handleFrame(() => {
                     console.warn(`animation is lagging, lost ${val} ms`);
-                    this.motion.stop();
-                    this.islagging = true;
+                    this.motion
+                        .goTo({ val: this.endValue }, { immediate: true })
+                        .then(() => {
+                            this.islagging = false;
+                        })
+                        .catch((err) => {});
                 });
             });
         }
@@ -584,9 +589,8 @@ export class ParallaxItemClass {
         )
             return;
 
-        this.motion
-            .goTo({ val: this.endValue }, { immediate: this.islagging })
-            .catch((err) => {});
+        if (!this.islagging)
+            this.motion.goTo({ val: this.endValue }).catch((err) => {});
     }
 
     computeValue(scrollVal = null) {

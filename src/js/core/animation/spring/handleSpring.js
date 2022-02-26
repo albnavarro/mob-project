@@ -269,11 +269,9 @@ export class handleSpring {
             item.currentValue = item.toValue;
         });
 
-        handleFrame(() => {
-            const cbValues = getValueObj(this.values, 'toValue');
-            this.callback.forEach(({ cb }) => {
-                cb(cbValues);
-            });
+        const cbValues = getValueObj(this.values, 'toValue');
+        this.callback.forEach(({ cb }) => {
+            cb(cbValues);
         });
     }
 
