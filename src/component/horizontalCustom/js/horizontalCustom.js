@@ -261,6 +261,7 @@ export class horizontalCustomClass {
             computationType: 'fixed',
             propierties: 'x',
             breackpoint: 'x-small',
+            fixlag: true,
             dynamicRange: () => {
                 return -(this.horizontalWidth - window.innerWidth);
             },

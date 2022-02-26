@@ -39,6 +39,7 @@ export class ParallaxItemClass {
         this.isInViewport = false;
         this.dontUSeFrame = false;
         this.islagging = false;
+        this.fixlag = data.fixlag || false;
 
         // Base props
         this.item = data.item;
@@ -233,7 +234,7 @@ export class ParallaxItemClass {
     setMotion() {
         this.motion.setData({ val: 0 });
 
-        if (this.ease) {
+        if (this.ease && this.fixlag) {
             this.unsubscribeLag = this.motion.onLag((val) => {
                 handleFrame(() => {
                     console.warn(`animation is lagging, lost ${val} ms`);
