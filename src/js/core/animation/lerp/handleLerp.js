@@ -4,7 +4,6 @@ import {
     lerp,
     getTime,
 } from '../utils/animationUtils.js';
-import { handleFrame } from '../../events/rafutils/rafUtils.js';
 
 const LERP_DEFAULT_PRECISION = 0.01;
 
@@ -21,10 +20,10 @@ export class handleLerp {
         this.values = [];
         this.id = 0;
         this.callback = [];
-        this.callbackOnLag = [];
         this.callbackStartInPause = [];
         this.pauseStatus = false;
-        this.lostFrameTreshold = 64;
+        this.jumpOnLag = false;
+        this.lostFrameTresold = 64;
         this.lagTreshold = 33;
         this.defaultProps = {
             reverse: false,
@@ -55,30 +54,26 @@ export class handleLerp {
             o.lastTime = animationLastTime !== 0 ? animationLastTime : o.time;
 
             // If we lost a lot of frames just jump to the end.
-            if (o.time > o.lastTime + this.lostFrameTreshold)
+            if (o.time > o.lastTime + this.lostFrameTresold)
                 o.lastTime = o.time;
 
             // http://gafferongames.com/game-physics/fix-your-timestep/
             o.numSteps = Math.floor(o.time - o.lastTime);
 
-            // Check if lost frame is Too much
-            o.isLagging = o.numSteps > this.lagTreshold;
-
-            if (o.isLagging) {
-                this.callbackOnLag.forEach(({ cb }) => {
-                    cb(o.numSteps);
-                });
-            }
-
             for (let i = 0; i < o.numSteps; ++i) {
                 this.values.forEach((item, i) => {
                     if (item.settled) return;
 
-                    item.currentValue = lerp(
-                        item.currentValue,
-                        item.toValue,
-                        velocity / 10
-                    );
+                    // If lost too many frame jump to destination value directly
+                    if (o.numSteps > this.lagTreshold && this.jumpOnLag) {
+                        item.currentValue = item.toValue;
+                    } else {
+                        item.currentValue = lerp(
+                            item.currentValue,
+                            item.toValue,
+                            velocity / 10
+                        );
+                    }
 
                     item.settled =
                         Math.abs(item.toValue - item.currentValue) <= precision;
@@ -551,25 +546,6 @@ export class handleLerp {
     }
 
     /**
-     * onLag - add onLag callback to stack
-     *
-     * @param  {function} cb cal function
-     * @return {function} unsubscribe callback
-     *
-     */
-    onLag(cb) {
-        this.callbackOnLag.push({ cb, id: this.id });
-        const cbId = this.id;
-        this.id++;
-
-        return () => {
-            this.callbackOnLag = this.callbackOnLag.filter(
-                (item) => item.id !== cbId
-            );
-        };
-    }
-
-    /**
      * subscribe - add callback to start in pause to stack
      *
      * @param  {function} cb cal function
@@ -586,5 +562,9 @@ export class handleLerp {
                 (item) => item.id !== cbId
             );
         };
+    }
+
+    setJumpOnLag(val) {
+        this.jumpOnLag = val;
     }
 }

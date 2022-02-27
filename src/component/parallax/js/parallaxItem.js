@@ -38,8 +38,6 @@ export class ParallaxItemClass {
         this.firstTime = true;
         this.isInViewport = false;
         this.dontUSeFrame = false;
-        this.islagging = false;
-        this.fixlag = data.fixlag || false;
 
         // Base props
         this.item = data.item;
@@ -135,7 +133,7 @@ export class ParallaxItemClass {
                 : new handleSpring();
         })();
         this.unsubscribeMotion = () => {};
-        this.unsubscribeLag = () => {};
+        this.jumpOnLag = data.jumpOnLag || null;
 
         //
         this.unitMisure = '';
@@ -171,9 +169,7 @@ export class ParallaxItemClass {
 
         if (this.ease) {
             handleVisibilityChange(() => {
-                handleFrame(() => {
-                    this.motion.stop();
-                });
+                this.motion.stop();
             });
 
             if (this.scroller === window) {
@@ -232,22 +228,9 @@ export class ParallaxItemClass {
     setMotion() {
         this.motion.setData({ val: 0 });
 
-        if (this.ease && this.fixlag) {
-            this.unsubscribeLag = this.motion.onLag((val) => {
-                this.islagging = true;
-                this.motion.stop();
-
-                handleFrame(() => {
-                    console.warn(`animation is lagging, lost ${val} ms`);
-                    this.motion
-                        .goTo({ val: this.endValue }, { immediate: true })
-                        .then(() => {
-                            this.islagging = false;
-                        })
-                        .catch((err) => {});
-                });
-            });
-        }
+        // Lerp propierties jumpOnlag
+        if ('setJumpOnLag' in this.motion)
+            this.motion.setJumpOnLag(this.jumpOnLag);
 
         this.unsubscribeMotion = this.motion.subscribe(({ val }) => {
             if (val === this.lastValue) return;
@@ -506,7 +489,6 @@ export class ParallaxItemClass {
         this.unsubscribeScroll();
         this.unsubscribeResize();
         this.unsubscribeMotion();
-        this.unsubscribeLag();
         this.unsubscribeMarker();
         this.dynamicRange = null;
         this.onEnter = () => {};
@@ -589,8 +571,7 @@ export class ParallaxItemClass {
         )
             return;
 
-        if (!this.islagging)
-            this.motion.goTo({ val: this.endValue }).catch((err) => {});
+        this.motion.goTo({ val: this.endValue }).catch((err) => {});
     }
 
     computeValue(scrollVal = null) {

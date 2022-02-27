@@ -1,6 +1,5 @@
 import { tweenConfig } from './tweenConfig.js';
 import { getValueObj, mergeArrayTween } from '../utils/animationUtils.js';
-import { handleFrame } from '../../events/rafutils/rafUtils.js';
 
 export class handleTween {
     constructor(ease = 'easeOutBack') {
