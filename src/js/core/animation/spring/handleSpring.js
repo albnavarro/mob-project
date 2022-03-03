@@ -1,11 +1,15 @@
 import { springConfig } from './springConfig.js';
 import { getValueObj, mergeArray, getTime } from '../utils/animationUtils.js';
+import {
+    handleFrame,
+    handleNextFrame,
+} from '../../events/rafutils/rafUtils.js';
 
 export class handleSpring {
     constructor(config = 'default') {
         this.uniqueId = '_' + Math.random().toString(36).substr(2, 9);
         this.config = springConfig[config];
-        this.req = null;
+        this.req = false;
         this.currentResolve = null;
         this.currentReject = null;
         this.promise = null;
@@ -42,6 +46,8 @@ export class handleSpring {
         const o = {};
 
         const draw = () => {
+            this.req = true;
+
             // Get current time
             o.time = getTime();
 
@@ -95,10 +101,11 @@ export class handleSpring {
             o.allSettled = this.values.every((item) => item.settled === true);
 
             if (!o.allSettled) {
-                this.req = requestAnimationFrame(draw);
+                handleNextFrame(() => {
+                    if (this.req) draw();
+                });
             } else {
-                cancelAnimationFrame(this.req);
-                this.req = null;
+                this.req = false;
 
                 // End of animation
                 // Set fromValue with ended value
@@ -147,7 +154,8 @@ export class handleSpring {
     startRaf(res, reject) {
         this.currentReject = reject;
         this.currentResolve = res;
-        this.req = requestAnimationFrame(() => {
+
+        handleFrame(() => {
             const prevent = this.callbackStartInPause
                 .map(({ cb }) => cb())
                 .some((item) => item === true);
@@ -181,8 +189,7 @@ export class handleSpring {
 
         // Reset RAF
         if (this.req) {
-            cancelAnimationFrame(this.req);
-            this.req = null;
+            this.req = false;
         }
     }
 
@@ -198,8 +205,7 @@ export class handleSpring {
 
         // Reset RAF
         if (this.req) {
-            cancelAnimationFrame(this.req);
-            this.req = null;
+            this.req = false;
         }
 
         this.values.forEach((item, i) => {
@@ -219,7 +225,7 @@ export class handleSpring {
         this.pauseStatus = false;
 
         if (!this.req && this.currentResolve) {
-            this.req = requestAnimationFrame(() => {
+            handleFrame(() => {
                 this.onReuqestAnim(this.currentResolve);
             });
         }

@@ -22,19 +22,6 @@ export const handleFrame = (() => {
     let inizialized = false;
     let callback = [];
 
-    // Get 60 fps per seconds
-    let framRate = null;
-    let now;
-    let then;
-    let fpsInterval = 1000 / framRate;
-
-    // Get right time if server side or client side
-    const getTime = () => {
-        return typeof window !== 'undefined'
-            ? window.performance.now()
-            : Date.now();
-    };
-
     const render = () => {
         /**
          * if - exit form RAF if callback queque is empty
@@ -44,24 +31,9 @@ export const handleFrame = (() => {
             return;
         }
 
-        // Refresh date for fps
-        now = getTime();
-        const elapsed = now - then;
-
-        // If 60 fps
-        if (elapsed > fpsInterval && framRate) {
-            then = now - (elapsed % fpsInterval);
-            /**
-             * Ececute callback
-             */
-            callback.forEach((item) => {
-                item();
-            });
-        } else if (!framRate) {
-            callback.forEach((item) => {
-                item();
-            });
-        }
+        callback.forEach((item) => {
+            item();
+        });
 
         /**
          * Cler Callback
@@ -80,20 +52,24 @@ export const handleFrame = (() => {
     const initFrame = () => {
         if (inizialized === true) return;
         inizialized = true;
-        then = getTime();
-
         requestAnimationFrame(render);
     };
 
     /**
      *  Add callback
      */
-    const addCb = (cb, fps = null) => {
-        framRate = fps;
-        fpsInterval = 1000 / framRate;
+    const addCb = (cb) => {
         callback.push(cb);
         initFrame();
     };
 
     return addCb;
 })();
+
+export const handleNextFrame = (cb) => {
+    Promise.resolve().then(() => {
+        handleFrame(() => {
+            cb();
+        });
+    });
+};

@@ -35,7 +35,11 @@ export const noGsap = () => {
     const horizontalCustom = new horizontalCustomClass({
         rootEl: '.test-custom-scroller',
     });
-    horizontalCustom.onTick((scrollVal) => parallaxIn.move(scrollVal));
+    horizontalCustom.onTick((scrollVal) => {
+        Promise.resolve().then(() => {
+            parallaxIn.move(scrollVal);
+        });
+    });
     horizontalCustom.init();
 
     const horizontalCustom2 = new horizontalCustomClass({

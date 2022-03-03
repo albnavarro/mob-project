@@ -71,16 +71,14 @@ class LightPichZoomClass {
         });
 
         this.unsubscribeTouchStart = handleTouchStart(
-            ({ page, target, preventDefault }) => {
-                this.onMouseDown({ target });
-                preventDefault();
+            ({ target, preventDefault }) => {
+                this.onMouseDown({ target, preventDefault });
             }
         );
 
         this.unsubscribeMouseDown = handleMouseDown(
-            ({ page, target, preventDefault }) => {
-                this.onMouseDown({ target });
-                preventDefault();
+            ({ target, preventDefault }) => {
+                this.onMouseDown({ target, preventDefault });
             }
         );
 
@@ -188,11 +186,12 @@ class LightPichZoomClass {
         this.afterZoom();
     }
 
-    onMouseDown({ target }) {
+    onMouseDown({ target, preventDefault }) {
         if (target.classList.contains('lightbox__img')) {
             this.image.classList.remove('transition');
             this.onDrag = true;
             this.firstDrag = true;
+            preventDefault();
         }
     }
 

@@ -1,11 +1,19 @@
 import { tweenConfig } from './tweenConfig.js';
-import { getValueObj, mergeArrayTween } from '../utils/animationUtils.js';
+import {
+    getValueObj,
+    mergeArrayTween,
+    getTime,
+} from '../utils/animationUtils.js';
+import {
+    handleFrame,
+    handleNextFrame,
+} from '../../events/rafutils/rafUtils.js';
 
 export class handleTween {
     constructor(ease = 'easeOutBack') {
         this.uniqueId = '_' + Math.random().toString(36).substr(2, 9);
         this.ease = tweenConfig[ease];
-        this.req = null;
+        this.req = false;
         this.currentResolve = null;
         this.currentReject = null;
         this.promise = null;
@@ -32,6 +40,8 @@ export class handleTween {
         this.startTime = timestamp;
 
         const draw = (timestamp) => {
+            this.req = true;
+
             if (this.pauseStatus) {
                 this.pauseTime = timestamp - this.startTime - this.timeElapsed;
             }
@@ -67,10 +77,11 @@ export class handleTween {
             this.isRunning = true;
 
             if (!isSettled) {
-                this.req = requestAnimationFrame(draw);
+                handleNextFrame(() => {
+                    if (this.req) draw(getTime());
+                });
             } else {
-                cancelAnimationFrame(this.req);
-                this.req = null;
+                this.req = false;
                 this.isRunning = false;
                 this.pauseTime = 0;
 
@@ -121,12 +132,13 @@ export class handleTween {
     startRaf(res, reject) {
         this.currentReject = reject;
         this.currentResolve = res;
-        this.req = requestAnimationFrame((timestamp) => {
+
+        handleFrame(() => {
             const prevent = this.callbackStartInPause
                 .map(({ cb }) => cb())
                 .some((item) => item === true);
 
-            this.onReuqestAnim(timestamp, res);
+            this.onReuqestAnim(getTime(), res);
             if (prevent) this.pause();
         });
     }
@@ -156,10 +168,7 @@ export class handleTween {
         }
 
         // Reset RAF
-        if (this.req) {
-            cancelAnimationFrame(this.req);
-            this.req = null;
-        }
+        if (this.req) this.req = false;
     }
 
     /**
@@ -214,8 +223,7 @@ export class handleTween {
      * @return {void}
      */
     updateDataWhileRunning() {
-        cancelAnimationFrame(this.req);
-        this.req = null;
+        this.req = false;
 
         // Abort promise
         if (this.currentReject) {

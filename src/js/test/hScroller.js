@@ -136,11 +136,13 @@ export const hScroller = () => {
     });
     smoothScrollFull.init();
     smoothScrollFull.onTick((scrollVal) => {
-        parallax1.move(scrollVal);
-        parallaxOpacity.move(scrollVal);
-        parallaxPin.move(scrollVal);
-        parallaxIn.move(scrollVal);
-        parallaxOut.move(scrollVal);
+        Promise.resolve().then(() => {
+            parallax1.move(scrollVal);
+            parallaxOpacity.move(scrollVal);
+            parallaxPin.move(scrollVal);
+            parallaxIn.move(scrollVal);
+            parallaxOut.move(scrollVal);
+        });
     });
     // END FIRST
 
@@ -183,8 +185,10 @@ export const hScroller = () => {
     });
     smoothScrollContiner.init();
     smoothScrollContiner.onTick((scrollVal) => {
-        parallaxb1.move(scrollVal);
-        parallaxb2.move(scrollVal);
+        Promise.resolve().then(() => {
+            parallaxb1.move(scrollVal);
+            parallaxb2.move(scrollVal);
+        });
     });
 
     // THIRD
@@ -250,9 +254,11 @@ export const hScroller = () => {
     });
     smoothScrollContiner2.init();
     smoothScrollContiner2.onTick((scrollVal) => {
-        parallaxC1.move(scrollVal);
-        parallaxC2.move(scrollVal);
-        parallaxC3.move(scrollVal);
-        parallaxC4.move(scrollVal);
+        Promise.resolve().then(() => {
+            parallaxC1.move(scrollVal);
+            parallaxC2.move(scrollVal);
+            parallaxC3.move(scrollVal);
+            parallaxC4.move(scrollVal);
+        });
     });
 };

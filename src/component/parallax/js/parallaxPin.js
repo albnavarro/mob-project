@@ -44,6 +44,7 @@ export class ParallaxPin {
         this.prevScroll = 0;
         this.animatePin = false;
         this.anticipateFactor = 1.2;
+        this.dontUSeFrame = false;
     }
 
     init() {
@@ -67,9 +68,17 @@ export class ParallaxPin {
             if (!this.isInizialized) return;
 
             if (this.screen !== window && this.isInner && this.pin) {
-                handleFrame(() => {
+                const cb = () => {
                     this.pin.style.transition = `transform .85s cubic-bezier(0, 0.68, 0.45, 1.1)`;
-                });
+                };
+
+                if (this.dontUSeFrame) {
+                    cb();
+                } else {
+                    handleFrame(() => {
+                        cb();
+                    });
+                }
             }
         });
 
@@ -144,7 +153,7 @@ export class ParallaxPin {
     }
 
     setPinSize() {
-        handleFrame(() => {
+        const cb = () => {
             this.wrapper.style.height = '';
             this.wrapper.style.width = '';
             this.pin.style.height = '';
@@ -159,7 +168,15 @@ export class ParallaxPin {
             this.wrapper.style.width = `${width}px`;
             this.pin.style.height = `${height}px`;
             this.pin.style.width = `${width}px`;
-        });
+        };
+
+        if (this.dontUSeFrame) {
+            cb();
+        } else {
+            handleFrame(() => {
+                cb();
+            });
+        }
     }
 
     findStyle(target, rule) {
@@ -280,14 +297,22 @@ export class ParallaxPin {
                 : 'left';
 
         if (this.pin) {
-            handleFrame(() => {
+            const cb = () => {
                 this.pin.style.position = this.lastPosition;
 
                 if (this.scroller === window) {
                     this.pin.style.top = this.lastTop;
                     this.pin.style.left = this.lastLeft;
                 }
-            });
+            };
+
+            if (this.dontUSeFrame) {
+                cb();
+            } else {
+                handleFrame(() => {
+                    cb();
+                });
+            }
             this.setPinSize();
             this.checkIfShouldTranspond();
         }
@@ -302,14 +327,22 @@ export class ParallaxPin {
         this.spring = null;
 
         if (this.pin && this.wrapper) {
-            handleFrame(() => {
+            const cb = () => {
                 this.wrapper.parentNode.insertBefore(this.item, this.wrapper);
                 this.pin.remove();
                 this.wrapper.remove();
                 this.wrapper = null;
                 this.pin = null;
                 this.isInizialized = false;
-            });
+            };
+
+            if (this.dontUSeFrame) {
+                cb();
+            } else {
+                handleFrame(() => {
+                    cb();
+                });
+            }
         }
     }
 
@@ -333,9 +366,17 @@ export class ParallaxPin {
     }
 
     tween(gap) {
-        handleFrame(() => {
+        const cb = () => {
             this.pin.style[this.collisionStyleProp] = `${this.startFromTop}px`;
-        });
+        };
+
+        if (this.dontUSeFrame) {
+            cb();
+        } else {
+            handleFrame(() => {
+                cb();
+            });
+        }
 
         if (this.animatePin) {
             this.spring
@@ -348,26 +389,41 @@ export class ParallaxPin {
     }
 
     resetPinTransform() {
-        handleFrame(() => {
+        const cb = () => {
             this.pin.style.transform = `translate(0px, 0px)`;
-        });
+        };
+
+        if (this.dontUSeFrame) {
+            cb();
+        } else {
+            handleFrame(() => {
+                cb();
+            });
+        }
     }
 
     resetStyleWhenUnder() {
         this.resetSpring();
-
-        handleFrame(() => {
+        const cb = () => {
             this.pin.style.transition = '';
             this.pin.style.position = 'relative';
             this.pin.style.top = ``;
             this.pin.style.left = ``;
-        });
+        };
+
+        if (this.dontUSeFrame) {
+            cb();
+        } else {
+            handleFrame(() => {
+                cb();
+            });
+        }
     }
 
     resetStyleWhenOver() {
         this.resetSpring();
 
-        handleFrame(() => {
+        const cb = () => {
             this.pin.style.transition = '';
             this.pin.style.position = 'relative';
 
@@ -378,7 +434,15 @@ export class ParallaxPin {
                 this.pin.style.top = ``;
                 this.pin.style.left = `${this.compesateValue}px`;
             }
-        });
+        };
+
+        if (this.dontUSeFrame) {
+            cb();
+        } else {
+            handleFrame(() => {
+                cb();
+            });
+        }
     }
 
     setFixedPosition() {
@@ -392,18 +456,35 @@ export class ParallaxPin {
                 ? 'left'
                 : 'top';
 
-        handleFrame(() => {
+        const cb = () => {
             this.pin.style.position = 'fixed';
             this.pin.style[style] = `${left}px`;
-        });
+        };
+
+        if (this.dontUSeFrame) {
+            cb();
+        } else {
+            handleFrame(() => {
+                cb();
+            });
+        }
     }
 
     activateTrasponder() {
         if (this.shoulTranspond) {
             this.addRquiredStyle();
-            handleFrame(() => {
+
+            const cb = () => {
                 document.body.appendChild(this.pin);
-            });
+            };
+
+            if (this.dontUSeFrame) {
+                cb();
+            } else {
+                handleFrame(() => {
+                    cb();
+                });
+            }
 
             this.trasponderActive = true;
         }
@@ -411,9 +492,18 @@ export class ParallaxPin {
 
     deactivateTrasponder() {
         if (this.shoulTranspond) {
-            handleFrame(() => {
+            const cb = () => {
                 this.wrapper.appendChild(this.pin);
-            });
+            };
+
+            if (this.dontUSeFrame) {
+                cb();
+            } else {
+                handleFrame(() => {
+                    cb();
+                });
+            }
+
             this.trasponderActive = false;
         }
     }
@@ -482,8 +572,10 @@ export class ParallaxPin {
         };
     }
 
-    onScroll(scrollTop) {
+    onScroll(scrollTop, dontUSeFrame) {
         if (!this.isInizialized) return;
+
+        this.dontUSeFrame = dontUSeFrame;
 
         const scrollDirection =
             this.prevScroll > scrollTop

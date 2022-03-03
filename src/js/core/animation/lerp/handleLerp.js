@@ -5,6 +5,11 @@ import {
     getTime,
 } from '../utils/animationUtils.js';
 
+import {
+    handleFrame,
+    handleNextFrame,
+} from '../../events/rafutils/rafUtils.js';
+
 const LERP_DEFAULT_PRECISION = 0.01;
 
 export class handleLerp {
@@ -13,7 +18,7 @@ export class handleLerp {
         this.config = {};
         this.velocity = velocity;
         this.precision = LERP_DEFAULT_PRECISION;
-        this.req = null;
+        this.req = false;
         this.currentResolve = null;
         this.currentReject = null;
         this.promise = null;
@@ -22,9 +27,7 @@ export class handleLerp {
         this.callback = [];
         this.callbackStartInPause = [];
         this.pauseStatus = false;
-        this.jumpOnLag = false;
         this.lostFrameTresold = 64;
-        this.lagTreshold = 33;
         this.defaultProps = {
             reverse: false,
             velocity,
@@ -46,6 +49,8 @@ export class handleLerp {
         const o = {};
 
         const draw = () => {
+            this.req = true;
+
             // Get current time
             o.time = getTime();
 
@@ -64,16 +69,11 @@ export class handleLerp {
                 this.values.forEach((item, i) => {
                     if (item.settled) return;
 
-                    // If lost too many frame jump to destination value directly
-                    if (o.numSteps > this.lagTreshold && this.jumpOnLag) {
-                        item.currentValue = item.toValue;
-                    } else {
-                        item.currentValue = lerp(
-                            item.currentValue,
-                            item.toValue,
-                            velocity / 10
-                        );
-                    }
+                    item.currentValue = lerp(
+                        item.currentValue,
+                        item.toValue,
+                        velocity / 10
+                    );
 
                     item.settled =
                         Math.abs(item.toValue - item.currentValue) <= precision;
@@ -99,10 +99,11 @@ export class handleLerp {
             o.allSettled = this.values.every((item) => item.settled === true);
 
             if (!o.allSettled) {
-                this.req = requestAnimationFrame(draw);
+                handleNextFrame(() => {
+                    if (this.req) draw();
+                });
             } else {
-                cancelAnimationFrame(this.req);
-                this.req = null;
+                this.req = false;
 
                 // End of animation
                 // Set fromValue with ended value
@@ -151,7 +152,9 @@ export class handleLerp {
     startRaf(res, reject) {
         this.currentReject = reject;
         this.currentResolve = res;
-        this.req = requestAnimationFrame(() => {
+
+        handleFrame(() => {
+            // this.req = true;
             const prevent = this.callbackStartInPause
                 .map(({ cb }) => cb())
                 .some((item) => item === true);
@@ -184,10 +187,7 @@ export class handleLerp {
         }
 
         // Reset RAF
-        if (this.req) {
-            cancelAnimationFrame(this.req);
-            this.req = null;
-        }
+        if (this.req) this.req = false;
     }
 
     /**
@@ -201,10 +201,7 @@ export class handleLerp {
         this.pauseStatus = true;
 
         // Reset RAF
-        if (this.req) {
-            cancelAnimationFrame(this.req);
-            this.req = null;
-        }
+        if (this.req) this.req = false;
 
         this.values.forEach((item, i) => {
             if (!item.settled) {
@@ -223,7 +220,7 @@ export class handleLerp {
         this.pauseStatus = false;
 
         if (!this.req && this.currentResolve) {
-            this.req = requestAnimationFrame(() => {
+            handleFrame(() => {
                 this.onReuqestAnim(this.currentResolve);
             });
         }
@@ -257,6 +254,8 @@ export class handleLerp {
      *
      */
     immediate() {
+        this.req = false;
+
         this.values.forEach((item, i) => {
             item.fromValue = item.toValue;
             item.currentValue = item.toValue;
@@ -562,9 +561,5 @@ export class handleLerp {
                 (item) => item.id !== cbId
             );
         };
-    }
-
-    setJumpOnLag(val) {
-        this.jumpOnLag = val;
     }
 }

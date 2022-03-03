@@ -133,7 +133,6 @@ export class ParallaxItemClass {
                 : new handleSpring();
         })();
         this.unsubscribeMotion = () => {};
-        this.jumpOnLag = data.jumpOnLag || null;
 
         //
         this.unitMisure = '';
@@ -174,15 +173,11 @@ export class ParallaxItemClass {
 
             if (this.scroller === window) {
                 this.unsubscribeScroll = handleScroll(() => {
-                    handleFrame(() => {
-                        this.smoothParallaxJs();
-                    });
+                    this.smoothParallaxJs();
                 });
             }
 
-            handleFrame(() => {
-                this.smoothParallaxJs();
-            });
+            this.smoothParallaxJs();
         } else {
             if (this.scroller === window) {
                 this.unsubscribeScroll = handleScroll(() => {
@@ -227,11 +222,6 @@ export class ParallaxItemClass {
 
     setMotion() {
         this.motion.setData({ val: 0 });
-
-        // Lerp propierties jumpOnlag
-        if ('setJumpOnLag' in this.motion)
-            this.motion.setJumpOnLag(this.jumpOnLag);
-
         this.unsubscribeMotion = this.motion.subscribe(({ val }) => {
             if (val === this.lastValue) return;
 
@@ -600,7 +590,7 @@ export class ParallaxItemClass {
             return;
 
         if (this.pin && this.pinInstance) {
-            this.pinInstance.onScroll(this.scrollerScroll);
+            this.pinInstance.onScroll(this.scrollerScroll, this.dontUSeFrame);
         }
 
         switch (this.computationType) {
