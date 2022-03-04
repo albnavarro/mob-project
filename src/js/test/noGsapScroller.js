@@ -14,6 +14,7 @@ export const noGsap = () => {
         computationType: 'fixed',
         propierties: 'x',
         fromTo: true,
+        // ease: true,
         dynamicStart: {
             position: 'right',
             value: () => {
@@ -36,9 +37,7 @@ export const noGsap = () => {
         rootEl: '.test-custom-scroller',
     });
     horizontalCustom.onTick((scrollVal) => {
-        Promise.resolve().then(() => {
-            parallaxIn.move(scrollVal);
-        });
+        parallaxIn.move(scrollVal);
     });
     horizontalCustom.init();
 

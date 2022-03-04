@@ -1,13 +1,9 @@
-import {
-    getValueObj,
-    mergeArray,
-    lerp,
-    getTime,
-} from '../utils/animationUtils.js';
+import { getValueObj, mergeArray, lerp } from '../utils/animationUtils.js';
 
 import {
     handleFrame,
     handleNextFrame,
+    frameStore,
 } from '../../events/rafutils/rafUtils.js';
 
 const LERP_DEFAULT_PRECISION = 0.01;
@@ -52,7 +48,7 @@ export class handleLerp {
             this.req = true;
 
             // Get current time
-            o.time = getTime();
+            o.time = frameStore.getProp('timestamp');
 
             // lastTime is set to now the first time.
             // then check the difference from now and last time to check if we lost frame

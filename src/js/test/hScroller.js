@@ -3,6 +3,7 @@ import { HandleSequencer } from '../core/animation/sequencer/handleSequencer.js'
 import { ParallaxTween } from '../../component/parallax/js/parallaxTween.js';
 import { ParallaxItemClass } from '../../component/parallax/js/parallaxItem.js';
 import { SmoothScrollClass } from '../../component/smoothScroll/js/smoothScroll.js';
+import { handleNextTick } from '../core/events/rafutils/rafUtils.js';
 
 export const hScroller = () => {
     // FIRST
@@ -136,7 +137,7 @@ export const hScroller = () => {
     });
     smoothScrollFull.init();
     smoothScrollFull.onTick((scrollVal) => {
-        Promise.resolve().then(() => {
+        handleNextTick(() => {
             parallax1.move(scrollVal);
             parallaxOpacity.move(scrollVal);
             parallaxPin.move(scrollVal);
@@ -185,7 +186,7 @@ export const hScroller = () => {
     });
     smoothScrollContiner.init();
     smoothScrollContiner.onTick((scrollVal) => {
-        Promise.resolve().then(() => {
+        handleNextTick(() => {
             parallaxb1.move(scrollVal);
             parallaxb2.move(scrollVal);
         });
@@ -254,7 +255,7 @@ export const hScroller = () => {
     });
     smoothScrollContiner2.init();
     smoothScrollContiner2.onTick((scrollVal) => {
-        Promise.resolve().then(() => {
+        handleNextTick(() => {
             parallaxC1.move(scrollVal);
             parallaxC2.move(scrollVal);
             parallaxC3.move(scrollVal);

@@ -1,8 +1,9 @@
 import { springConfig } from './springConfig.js';
-import { getValueObj, mergeArray, getTime } from '../utils/animationUtils.js';
+import { getValueObj, mergeArray } from '../utils/animationUtils.js';
 import {
     handleFrame,
     handleNextFrame,
+    frameStore,
 } from '../../events/rafutils/rafUtils.js';
 
 export class handleSpring {
@@ -49,7 +50,7 @@ export class handleSpring {
             this.req = true;
 
             // Get current time
-            o.time = getTime();
+            o.time = frameStore.getProp('timestamp');
 
             // lastTime is set to now the first time.
             // then check the difference from now and last time to check if we lost frame
