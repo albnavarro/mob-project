@@ -20,16 +20,31 @@ export const handleFrame = (() => {
     let frame = null;
     let callback = [];
 
-    const render = (timestamp) => {
-        callback.forEach((item) => item(timestamp));
+    const lagThreshold = 500;
+    const adjustedLag = 33;
+    let time = 0;
+    let startTime = 0;
+    let lastUpdate = 0;
+    let elapsed = 0;
 
+    const render = (timestamp) => {
         /**
-         * Clear Callback
+         * Time start form last time when RAF is inactive ( elapsed more than 500ms )
          */
+
+        elapsed = timestamp - lastUpdate;
+
+        // When broswer stop for more of 500 ms the time reset to 33ms form last tick
+        // get from GSAP
+        if (elapsed > lagThreshold) startTime += elapsed - adjustedLag;
+        lastUpdate += elapsed;
+        time = lastUpdate - startTime;
+
+        callback.forEach((item) => item(time));
+
         callback = [];
-        cancelAnimationFrame(frame);
         frame = null;
-        frameStore.set('timestamp', timestamp);
+        frameStore.set('timestamp', time);
     };
 
     /**
@@ -65,7 +80,7 @@ export const handleNextFrame = ((cb) => {
 
     frameStore.watch('timestamp', (val, prevVal) => {
         if (val === prevVal) return;
-        callback.forEach((item) => handleFrame(() => item()));
+        callback.forEach((item) => handleFrame((timestamp) => item(timestamp)));
         callback = [];
     });
 

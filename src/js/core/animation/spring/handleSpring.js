@@ -27,7 +27,7 @@ export class handleSpring {
         };
     }
 
-    onReuqestAnim(res) {
+    onReuqestAnim(timestamp, res) {
         let animationLastTime = 0;
 
         this.values.forEach((item, i) => {
@@ -46,22 +46,20 @@ export class handleSpring {
 
         const o = {};
 
-        const draw = () => {
+        const draw = (timestamp) => {
             this.req = true;
-
-            // Get current time
-            o.time = frameStore.getProp('timestamp');
 
             // lastTime is set to now the first time.
             // then check the difference from now and last time to check if we lost frame
-            o.lastTime = animationLastTime !== 0 ? animationLastTime : o.time;
+            o.lastTime =
+                animationLastTime !== 0 ? animationLastTime : timestamp;
 
             // If we lost a lot of frames just jump to the end.
-            if (o.time > o.lastTime + this.lostFrameTresold)
-                o.lastTime = o.time;
+            if (timestamp > o.lastTime + this.lostFrameTresold)
+                o.lastTime = timestamp;
 
             // http://gafferongames.com/game-physics/fix-your-timestep/
-            o.numSteps = Math.floor(o.time - o.lastTime);
+            o.numSteps = Math.floor(timestamp - o.lastTime);
 
             // Get lost frame, update vales until time is now
             for (let i = 0; i < o.numSteps; ++i) {
@@ -96,14 +94,14 @@ export class handleSpring {
             });
 
             // Update last time
-            animationLastTime = o.time;
+            animationLastTime = timestamp;
 
             // Check if all values is completed
             o.allSettled = this.values.every((item) => item.settled === true);
 
             if (!o.allSettled) {
-                handleNextFrame(() => {
-                    if (this.req) draw();
+                handleNextFrame((timestamp) => {
+                    if (this.req) draw(timestamp);
                 });
             } else {
                 this.req = false;
@@ -135,7 +133,7 @@ export class handleSpring {
             }
         };
 
-        draw();
+        draw(timestamp);
     }
 
     /**
@@ -156,12 +154,12 @@ export class handleSpring {
         this.currentReject = reject;
         this.currentResolve = res;
 
-        handleFrame(() => {
+        handleFrame((timestamp) => {
             const prevent = this.callbackStartInPause
                 .map(({ cb }) => cb())
                 .some((item) => item === true);
 
-            this.onReuqestAnim(res);
+            this.onReuqestAnim(timestamp, res);
             if (prevent) this.pause();
         });
     }
@@ -226,8 +224,8 @@ export class handleSpring {
         this.pauseStatus = false;
 
         if (!this.req && this.currentResolve) {
-            handleFrame(() => {
-                this.onReuqestAnim(this.currentResolve);
+            handleFrame((timestamp) => {
+                this.onReuqestAnim(timestamp, this.currentResolve);
             });
         }
     }

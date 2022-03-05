@@ -32,7 +32,7 @@ export class handleLerp {
         };
     }
 
-    onReuqestAnim(res) {
+    onReuqestAnim(timestamp, res) {
         let animationLastTime = 0;
 
         this.values.forEach((item, i) => {
@@ -44,41 +44,37 @@ export class handleLerp {
 
         const o = {};
 
-        const draw = () => {
+        const draw = (timestamp) => {
             this.req = true;
-
-            // Get current time
-            o.time = frameStore.getProp('timestamp');
 
             // lastTime is set to now the first time.
             // then check the difference from now and last time to check if we lost frame
-            o.lastTime = animationLastTime !== 0 ? animationLastTime : o.time;
+            o.lastTime =
+                animationLastTime !== 0 ? animationLastTime : timestamp;
 
             // If we lost a lot of frames just jump to the end.
-            if (o.time > o.lastTime + this.lostFrameTresold)
-                o.lastTime = o.time;
+            if (timestamp > o.lastTime + this.lostFrameTresold)
+                o.lastTime = timestamp;
 
             // http://gafferongames.com/game-physics/fix-your-timestep/
-            o.numSteps = Math.floor(o.time - o.lastTime);
+            o.numSteps = Math.floor(timestamp - o.lastTime);
 
-            for (let i = 0; i < o.numSteps; ++i) {
-                this.values.forEach((item, i) => {
-                    if (item.settled) return;
+            this.values.forEach((item, i) => {
+                if (item.settled) return;
 
-                    item.currentValue = lerp(
-                        item.currentValue,
-                        item.toValue,
-                        velocity / 10
-                    );
+                item.currentValue = lerp(
+                    item.currentValue,
+                    item.toValue,
+                    (velocity / 10) * o.numSteps
+                );
 
-                    item.settled =
-                        Math.abs(item.toValue - item.currentValue) <= precision;
+                item.settled =
+                    Math.abs(item.toValue - item.currentValue) <= precision;
 
-                    if (item.settled) {
-                        item.currentValue = item.toValue;
-                    }
-                });
-            }
+                if (item.settled) {
+                    item.currentValue = item.toValue;
+                }
+            });
 
             // Prepare an obj to pass to the callback
             o.cbObject = getValueObj(this.values, 'currentValue');
@@ -89,14 +85,14 @@ export class handleLerp {
             });
 
             // Update last time
-            animationLastTime = o.time;
+            animationLastTime = timestamp;
 
             // Check if all values is completed
             o.allSettled = this.values.every((item) => item.settled === true);
 
             if (!o.allSettled) {
-                handleNextFrame(() => {
-                    if (this.req) draw();
+                handleNextFrame((timestamp) => {
+                    if (this.req) draw(timestamp);
                 });
             } else {
                 this.req = false;
@@ -128,7 +124,7 @@ export class handleLerp {
             }
         };
 
-        draw();
+        draw(timestamp);
     }
 
     /**
@@ -149,13 +145,13 @@ export class handleLerp {
         this.currentReject = reject;
         this.currentResolve = res;
 
-        handleFrame(() => {
+        handleFrame((timestamp) => {
             // this.req = true;
             const prevent = this.callbackStartInPause
                 .map(({ cb }) => cb())
                 .some((item) => item === true);
 
-            this.onReuqestAnim(res);
+            this.onReuqestAnim(timestamp, res);
             if (prevent) this.pause();
         });
     }
@@ -216,8 +212,8 @@ export class handleLerp {
         this.pauseStatus = false;
 
         if (!this.req && this.currentResolve) {
-            handleFrame(() => {
-                this.onReuqestAnim(this.currentResolve);
+            handleFrame((timestamp) => {
+                this.onReuqestAnim(timestamp, this.currentResolve);
             });
         }
     }

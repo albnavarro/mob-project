@@ -1,9 +1,5 @@
 import { tweenConfig } from './tweenConfig.js';
-import {
-    getValueObj,
-    mergeArrayTween,
-    getTime,
-} from '../utils/animationUtils.js';
+import { getValueObj, mergeArrayTween } from '../utils/animationUtils.js';
 import {
     handleFrame,
     handleNextFrame,
@@ -77,8 +73,8 @@ export class handleTween {
             this.isRunning = true;
 
             if (!isSettled) {
-                handleNextFrame(() => {
-                    if (this.req) draw(getTime());
+                handleNextFrame((timestamp) => {
+                    if (this.req) draw(timestamp);
                 });
             } else {
                 this.req = false;
@@ -133,12 +129,12 @@ export class handleTween {
         this.currentReject = reject;
         this.currentResolve = res;
 
-        handleFrame(() => {
+        handleFrame((timestamp) => {
             const prevent = this.callbackStartInPause
                 .map(({ cb }) => cb())
                 .some((item) => item === true);
 
-            this.onReuqestAnim(getTime(), res);
+            this.onReuqestAnim(timestamp, res);
             if (prevent) this.pause();
         });
     }
