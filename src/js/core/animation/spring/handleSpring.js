@@ -58,11 +58,10 @@ export class handleSpring {
             if (timestamp > o.lastTime + this.lostFrameTresold)
                 o.lastTime = timestamp;
 
-            // http://gafferongames.com/game-physics/fix-your-timestep/
-            o.numSteps = Math.floor(timestamp - o.lastTime);
+            o.deltaTime = Math.floor(timestamp - o.lastTime);
 
             // Get lost frame, update vales until time is now
-            for (let i = 0; i < o.numSteps; ++i) {
+            for (let i = 0; i < o.deltaTime; ++i) {
                 this.values.forEach((item, i) => {
                     o.tensionForce =
                         -tension * (item.currentValue - item.toValue);

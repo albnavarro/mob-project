@@ -32,9 +32,7 @@ export class handleLerp {
         };
     }
 
-    onReuqestAnim(timestamp, res) {
-        let animationLastTime = 0;
-
+    onReuqestAnim(timestamp, fps, res) {
         this.values.forEach((item, i) => {
             item.currentValue = parseFloat(item.fromValue);
         });
@@ -44,20 +42,8 @@ export class handleLerp {
 
         const o = {};
 
-        const draw = (timestamp) => {
+        const draw = (timestamp, fps) => {
             this.req = true;
-
-            // lastTime is set to now the first time.
-            // then check the difference from now and last time to check if we lost frame
-            o.lastTime =
-                animationLastTime !== 0 ? animationLastTime : timestamp;
-
-            // If we lost a lot of frames just jump to the end.
-            if (timestamp > o.lastTime + this.lostFrameTresold)
-                o.lastTime = timestamp;
-
-            // http://gafferongames.com/game-physics/fix-your-timestep/
-            o.numSteps = Math.floor(timestamp - o.lastTime);
 
             this.values.forEach((item, i) => {
                 if (item.settled) return;
@@ -65,7 +51,7 @@ export class handleLerp {
                 item.currentValue = lerp(
                     item.currentValue,
                     item.toValue,
-                    (velocity / 10) * o.numSteps
+                    (velocity * fps) / 60 // velocity : 60 = x : fps
                 );
 
                 item.settled =
@@ -84,15 +70,12 @@ export class handleLerp {
                 cb(o.cbObject);
             });
 
-            // Update last time
-            animationLastTime = timestamp;
-
             // Check if all values is completed
             o.allSettled = this.values.every((item) => item.settled === true);
 
             if (!o.allSettled) {
-                handleNextFrame((timestamp) => {
-                    if (this.req) draw(timestamp);
+                handleNextFrame((timestamp, fps) => {
+                    if (this.req) draw(timestamp, fps);
                 });
             } else {
                 this.req = false;
@@ -124,7 +107,7 @@ export class handleLerp {
             }
         };
 
-        draw(timestamp);
+        draw(timestamp, fps);
     }
 
     /**
@@ -145,13 +128,13 @@ export class handleLerp {
         this.currentReject = reject;
         this.currentResolve = res;
 
-        handleFrame((timestamp) => {
+        handleFrame((timestamp, fps) => {
             // this.req = true;
             const prevent = this.callbackStartInPause
                 .map(({ cb }) => cb())
                 .some((item) => item === true);
 
-            this.onReuqestAnim(timestamp, res);
+            this.onReuqestAnim(timestamp, fps, res);
             if (prevent) this.pause();
         });
     }
@@ -212,8 +195,8 @@ export class handleLerp {
         this.pauseStatus = false;
 
         if (!this.req && this.currentResolve) {
-            handleFrame((timestamp) => {
-                this.onReuqestAnim(timestamp, this.currentResolve);
+            handleFrame((timestamp, fps) => {
+                this.onReuqestAnim(timestamp, fps, this.currentResolve);
             });
         }
     }

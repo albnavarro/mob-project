@@ -25,23 +25,32 @@ export const handleFrame = (() => {
     let time = 0;
     let startTime = 0;
     let lastUpdate = 0;
+    let prevTime = 0;
     let elapsed = 0;
+    let fps = 0;
 
     const render = (timestamp) => {
+        prevTime = time;
+
         /**
          * Time start form last time when RAF is inactive ( elapsed more than 500ms )
          */
-
         elapsed = timestamp - lastUpdate;
 
-        // When broswer stop for more of 500 ms the time reset to 33ms form last tick
-        // get from GSAP
+        // When broswer stop for more of 500 ms the time reset to 33ms form last tick (GSAP trick)
         if (elapsed > lagThreshold) startTime += elapsed - adjustedLag;
         lastUpdate += elapsed;
+
+        // Update global time
         time = lastUpdate - startTime;
 
-        callback.forEach((item) => item(time));
+        // Get fps
+        fps = 1000 / (time - prevTime);
 
+        // Fire callback
+        callback.forEach((item) => item(time, fps));
+
+        // Reset
         callback = [];
         frame = null;
         frameStore.set('timestamp', time);
@@ -80,7 +89,9 @@ export const handleNextFrame = ((cb) => {
 
     frameStore.watch('timestamp', (val, prevVal) => {
         if (val === prevVal) return;
-        callback.forEach((item) => handleFrame((timestamp) => item(timestamp)));
+        callback.forEach((item) =>
+            handleFrame((timestamp, fps) => item(timestamp, fps))
+        );
         callback = [];
     });
 
