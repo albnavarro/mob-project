@@ -522,7 +522,6 @@ export class ParallaxPin {
                 anticipateBottom: 0,
                 anticipateInnerIn: 0,
                 anticipateInnerOut: 0,
-                anticipateTop: 0,
             };
         }
 
@@ -533,14 +532,11 @@ export class ParallaxPin {
             scrollDirection === parallaxConstant.SCROLL_UP ? 0 : anticipate * 2;
         const anticipateInnerOut =
             scrollDirection === parallaxConstant.SCROLL_UP ? anticipate : 0;
-        const anticipateTop =
-            scrollDirection === parallaxConstant.SCROLL_UP ? anticipate * 2 : 0;
 
         return {
             anticipateBottom,
             anticipateInnerIn,
             anticipateInnerOut,
-            anticipateTop,
         };
     }
 
@@ -550,7 +546,6 @@ export class ParallaxPin {
                 anticipateBottom: 0,
                 anticipateInnerIn: 0,
                 anticipateInnerOut: 0,
-                anticipateTop: 0,
             };
         }
 
@@ -561,14 +556,11 @@ export class ParallaxPin {
             scrollDirection === parallaxConstant.SCROLL_UP ? anticipate * 2 : 0;
         const anticipateInnerOut =
             scrollDirection === parallaxConstant.SCROLL_UP ? 0 : anticipate;
-        const anticipateTop =
-            scrollDirection === parallaxConstant.SCROLL_UP ? 0 : anticipate * 2;
 
         return {
             anticipateBottom,
             anticipateInnerIn,
             anticipateInnerOut,
-            anticipateTop,
         };
     }
 
@@ -589,14 +581,10 @@ export class ParallaxPin {
                 : position(this.wrapper).left;
 
         // Get anticipate value
-        const {
-            anticipateBottom,
-            anticipateInnerIn,
-            anticipateInnerOut,
-            anticipateTop,
-        } = !this.invertSide
-            ? this.getAnticipateValue(scrollTop, scrollDirection)
-            : this.getAnticipateValueInverted(scrollTop, scrollDirection);
+        const { anticipateBottom, anticipateInnerIn, anticipateInnerOut } =
+            !this.invertSide
+                ? this.getAnticipateValue(scrollTop, scrollDirection)
+                : this.getAnticipateValueInverted(scrollTop, scrollDirection);
 
         const bottomCondition = !this.invertSide
             ? offsetTop > this.scrollerHeight - this.start + anticipateBottom
@@ -609,11 +597,6 @@ export class ParallaxPin {
                   this.end + anticipateInnerOut + this.start
             : offsetTop >= this.start - anticipateInnerIn &&
               offsetTop <= this.start + anticipateInnerOut + this.end;
-
-        const topCondition = !this.invertSide
-            ? this.scrollerHeight + offsetTop >
-              this.start + anticipateTop + this.end
-            : offsetTop > this.start + anticipateTop + this.end;
 
         if (bottomCondition) {
             if (!this.isUnder) {
@@ -646,7 +629,7 @@ export class ParallaxPin {
                 this.isInner = true;
                 this.isOver = false;
             }
-        } else if (topCondition) {
+        } else {
             if (!this.isOver) {
                 this.resetStyleWhenOver();
                 this.deactivateTrasponder();
