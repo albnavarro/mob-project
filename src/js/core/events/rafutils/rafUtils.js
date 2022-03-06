@@ -1,4 +1,5 @@
 import { SimpleStore } from '../../store/simpleStore.js';
+import { getTime, defaultTimestep } from '../../utils/time.js';
 
 /**
  * Utils to centralize all action form all components in one Request Animation Frame,
@@ -8,7 +9,7 @@ import { SimpleStore } from '../../store/simpleStore.js';
  *
  * @example:
  *
- * handleFrame(() => {
+ * handleFrame.add(() => {
  *     myFunction()
  * });
  *
@@ -17,7 +18,7 @@ import { SimpleStore } from '../../store/simpleStore.js';
 export const frameStore = new SimpleStore({ timestamp: 0 });
 
 export const handleFrame = (() => {
-    let frame = null;
+    let frameIsRuning = false;
     let callback = [];
 
     const lagThreshold = 500;
@@ -52,7 +53,7 @@ export const handleFrame = (() => {
 
         // Reset
         callback = [];
-        frame = null;
+        frameIsRuning = false;
         frameStore.set('timestamp', time);
     };
 
@@ -60,26 +61,44 @@ export const handleFrame = (() => {
      * Init new frame if is not running
      */
     const initFrame = () => {
-        if (frame !== null) return;
-        frame = requestAnimationFrame(render);
+        if (frameIsRuning) return;
+
+        if (typeof window !== 'undefined') {
+            requestAnimationFrame(render);
+        } else {
+            setTimeout(() => render(getTime()), defaultTimestep);
+        }
+
+        frameIsRuning = true;
     };
 
     /**
      *  Add callback
      */
-    const addCb = (cb) => {
+    const add = (cb) => {
         callback.push(cb);
         initFrame();
     };
 
-    return addCb;
+    /**
+     *  Add multiple callback
+     */
+    const addMultiple = (arr) => {
+        callback = [...callback, ...arr];
+        initFrame();
+    };
+
+    return {
+        add,
+        addMultiple,
+    };
 })();
 
 /**
  *
  * @example:
  *
- * handleNextFrame(() => {
+ * handleNextFrame.add(() => {
  *     myFunction()
  * });
  *
@@ -88,25 +107,23 @@ export const handleNextFrame = ((cb) => {
     let callback = [];
 
     frameStore.watch('timestamp', (val, prevVal) => {
-        if (val === prevVal) return;
-        callback.forEach((item) =>
-            handleFrame((timestamp, fps) => item(timestamp, fps))
-        );
+        if (val === prevVal || callback.length === 0) return;
+        handleFrame.addMultiple(callback);
         callback = [];
     });
 
-    const addCb = (cb) => {
+    const add = (cb) => {
         callback.push(cb);
     };
 
-    return addCb;
+    return { add };
 })();
 
 /**
  *
  * @example:
  *
- * handleNextTick(() => {
+ * handleNextTick.add(() => {
  *     myFunction()
  * });
  *
@@ -115,14 +132,14 @@ export const handleNextTick = ((cb) => {
     let callback = [];
 
     frameStore.watch('timestamp', (val, prevVal) => {
-        if (val === prevVal) return;
+        if (val === prevVal || callback.length === 0) return;
         callback.forEach((item) => item());
         callback = [];
     });
 
-    const addCb = (cb) => {
+    const add = (cb) => {
         callback.push(cb);
     };
 
-    return addCb;
+    return { add };
 })();

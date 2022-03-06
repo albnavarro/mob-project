@@ -137,7 +137,7 @@ export const hScroller = () => {
     });
     smoothScrollFull.init();
     smoothScrollFull.onTick((scrollVal) => {
-        handleNextTick(() => {
+        handleNextTick.add(() => {
             parallax1.move(scrollVal);
             parallaxOpacity.move(scrollVal);
             parallaxPin.move(scrollVal);
@@ -186,7 +186,7 @@ export const hScroller = () => {
     });
     smoothScrollContiner.init();
     smoothScrollContiner.onTick((scrollVal) => {
-        handleNextTick(() => {
+        handleNextTick.add(() => {
             parallaxb1.move(scrollVal);
             parallaxb2.move(scrollVal);
         });
@@ -255,7 +255,7 @@ export const hScroller = () => {
     });
     smoothScrollContiner2.init();
     smoothScrollContiner2.onTick((scrollVal) => {
-        handleNextTick(() => {
+        handleNextTick.add(() => {
             parallaxC1.move(scrollVal);
             parallaxC2.move(scrollVal);
             parallaxC3.move(scrollVal);

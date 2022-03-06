@@ -3,7 +3,6 @@ import { getValueObj, mergeArray } from '../utils/animationUtils.js';
 import {
     handleFrame,
     handleNextFrame,
-    frameStore,
 } from '../../events/rafutils/rafUtils.js';
 
 export class handleSpring {
@@ -81,7 +80,7 @@ export class handleSpring {
             o.allSettled = this.values.every((item) => item.settled === true);
 
             if (!o.allSettled) {
-                handleNextFrame((timestamp, fps) => {
+                handleNextFrame.add((timestamp, fps) => {
                     if (this.req) draw(timestamp, fps);
                 });
             } else {
@@ -135,7 +134,7 @@ export class handleSpring {
         this.currentReject = reject;
         this.currentResolve = res;
 
-        handleFrame((timestamp, fps) => {
+        handleFrame.add((timestamp, fps) => {
             const prevent = this.callbackStartInPause
                 .map(({ cb }) => cb())
                 .some((item) => item === true);
@@ -205,7 +204,7 @@ export class handleSpring {
         this.pauseStatus = false;
 
         if (!this.req && this.currentResolve) {
-            handleFrame((timestamp, fps) => {
+            handleFrame.add((timestamp, fps) => {
                 this.onReuqestAnim(timestamp, fps, this.currentResolve);
             });
         }

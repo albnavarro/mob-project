@@ -4,3 +4,5 @@ export const getTime = () => {
         ? window.performance.now()
         : Date.now();
 };
+
+export const defaultTimestep = (1 / 60) * 1000;

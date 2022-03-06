@@ -144,7 +144,7 @@ export const parallaxMarker = ({
         }
     })();
 
-    handleFrame(() => {
+    handleFrame.add(() => {
         Object.assign(lastStartMarker.style, { ...style, ...startStyle });
         Object.assign(lastEndMarkerEl.style, { ...style, ...endStyle });
     });

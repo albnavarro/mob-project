@@ -8,7 +8,6 @@ import { ParallaxPin } from './parallaxPin.js';
 import { handleFrame } from '../../../js/core/events/rafutils/rafUtils.js';
 import { handleResize } from '../../../js/core/events/resizeUtils/handleResize.js';
 import { handleScroll } from '../../../js/core/events/scrollUtils/handleScroll.js';
-import { handleVisibilityChange } from '../../../js/core/events/visibilityChange/handleVisibilityChange.js';
 import { handleSpring } from '../../../js/core/animation/spring/handleSpring.js';
 import { handleLerp } from '../../../js/core/animation/lerp/handleLerp.js';
 import { springConfig } from '../../../js/core/animation/spring/springConfig.js';
@@ -167,10 +166,6 @@ export class ParallaxItemClass {
         }
 
         if (this.ease) {
-            handleVisibilityChange(() => {
-                this.motion.stop();
-            });
-
             if (this.scroller === window) {
                 this.unsubscribeScroll = handleScroll(() => {
                     this.smoothParallaxJs();
@@ -622,7 +617,7 @@ export class ParallaxItemClass {
             return;
         }
 
-        handleFrame(() => {
+        handleFrame.add(() => {
             this.cleanRender();
         });
     }

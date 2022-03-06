@@ -54,7 +54,7 @@ export class horizontalCustomClass {
 
     setDimension() {
         return new Promise((resolve, reject) => {
-            handleFrame(() => {
+            handleFrame.add(() => {
                 const width = this.horizontalWidth;
                 this.percentRange = (100 * (width - window.innerWidth)) / width;
                 this.triggerContainer.style.height = `${width}px`;
@@ -67,7 +67,7 @@ export class horizontalCustomClass {
 
     getWidth() {
         return new Promise((resolve, reject) => {
-            handleFrame(() => {
+            handleFrame.add(() => {
                 if (!mq[this.queryType](this.breackpoint)) {
                     resolve();
                     return;
@@ -86,7 +86,7 @@ export class horizontalCustomClass {
 
     createShadow() {
         return new Promise((resolve, reject) => {
-            handleFrame(() => {
+            handleFrame.add(() => {
                 if (!mq[this.queryType](this.breackpoint)) {
                     resolve();
                     return;
@@ -149,7 +149,7 @@ export class horizontalCustomClass {
                 return;
             }
 
-            handleFrame(() => {
+            handleFrame.add(() => {
                 const shadowEl = this.mainContainer.querySelectorAll(
                     `.${this.shadowMainClass}`
                 );

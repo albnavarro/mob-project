@@ -1,5 +1,4 @@
 import { requestTimeout } from '../../utils/requestTimeOut.js';
-import { handleFrame } from '../../events/rafutils/rafUtils.js';
 
 export class HandleTimeline {
     constructor(config = {}) {

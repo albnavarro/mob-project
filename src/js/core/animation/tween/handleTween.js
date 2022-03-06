@@ -73,7 +73,7 @@ export class handleTween {
             this.isRunning = true;
 
             if (!isSettled) {
-                handleNextFrame((timestamp, fps) => {
+                handleNextFrame.add((timestamp, fps) => {
                     if (this.req) draw(timestamp, fps);
                 });
             } else {
@@ -129,7 +129,7 @@ export class handleTween {
         this.currentReject = reject;
         this.currentResolve = res;
 
-        handleFrame((timestamp, fps) => {
+        handleFrame.add((timestamp, fps) => {
             const prevent = this.callbackStartInPause
                 .map(({ cb }) => cb())
                 .some((item) => item === true);

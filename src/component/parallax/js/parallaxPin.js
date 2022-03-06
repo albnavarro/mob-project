@@ -75,7 +75,7 @@ export class ParallaxPin {
                 if (this.dontUSeFrame) {
                     cb();
                 } else {
-                    handleFrame(() => {
+                    handleFrame.add(() => {
                         cb();
                     });
                 }
@@ -103,7 +103,7 @@ export class ParallaxPin {
                         verticalGap: translateValue,
                     });
 
-                    handleFrame(() => {
+                    handleFrame.add(() => {
                         this.pin.style.transform = `translate(0px,${translateValue}px)`;
                     });
                 }
@@ -173,7 +173,7 @@ export class ParallaxPin {
         if (this.dontUSeFrame) {
             cb();
         } else {
-            handleFrame(() => {
+            handleFrame.add(() => {
                 cb();
             });
         }
@@ -309,7 +309,7 @@ export class ParallaxPin {
             if (this.dontUSeFrame) {
                 cb();
             } else {
-                handleFrame(() => {
+                handleFrame.add(() => {
                     cb();
                 });
             }
@@ -339,7 +339,7 @@ export class ParallaxPin {
             if (this.dontUSeFrame) {
                 cb();
             } else {
-                handleFrame(() => {
+                handleFrame.add(() => {
                     cb();
                 });
             }
@@ -373,7 +373,7 @@ export class ParallaxPin {
         if (this.dontUSeFrame) {
             cb();
         } else {
-            handleFrame(() => {
+            handleFrame.add(() => {
                 cb();
             });
         }
@@ -396,7 +396,7 @@ export class ParallaxPin {
         if (this.dontUSeFrame) {
             cb();
         } else {
-            handleFrame(() => {
+            handleFrame.add(() => {
                 cb();
             });
         }
@@ -414,7 +414,7 @@ export class ParallaxPin {
         if (this.dontUSeFrame) {
             cb();
         } else {
-            handleFrame(() => {
+            handleFrame.add(() => {
                 cb();
             });
         }
@@ -439,7 +439,7 @@ export class ParallaxPin {
         if (this.dontUSeFrame) {
             cb();
         } else {
-            handleFrame(() => {
+            handleFrame.add(() => {
                 cb();
             });
         }
@@ -464,7 +464,7 @@ export class ParallaxPin {
         if (this.dontUSeFrame) {
             cb();
         } else {
-            handleFrame(() => {
+            handleFrame.add(() => {
                 cb();
             });
         }
@@ -481,7 +481,7 @@ export class ParallaxPin {
             if (this.dontUSeFrame) {
                 cb();
             } else {
-                handleFrame(() => {
+                handleFrame.add(() => {
                     cb();
                 });
             }
@@ -499,7 +499,7 @@ export class ParallaxPin {
             if (this.dontUSeFrame) {
                 cb();
             } else {
-                handleFrame(() => {
+                handleFrame.add(() => {
                     cb();
                 });
             }
