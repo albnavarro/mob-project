@@ -32,10 +32,10 @@ export class handleTween {
         };
     }
 
-    onReuqestAnim(timestamp, res) {
+    onReuqestAnim(timestamp, fps, res) {
         this.startTime = timestamp;
 
-        const draw = (timestamp) => {
+        const draw = (timestamp, fps) => {
             this.req = true;
 
             if (this.pauseStatus) {
@@ -73,8 +73,8 @@ export class handleTween {
             this.isRunning = true;
 
             if (!isSettled) {
-                handleNextFrame((timestamp) => {
-                    if (this.req) draw(timestamp);
+                handleNextFrame((timestamp, fps) => {
+                    if (this.req) draw(timestamp, fps);
                 });
             } else {
                 this.req = false;
@@ -108,7 +108,7 @@ export class handleTween {
             }
         };
 
-        draw(timestamp);
+        draw(timestamp, fps);
     }
 
     /**
@@ -129,12 +129,12 @@ export class handleTween {
         this.currentReject = reject;
         this.currentResolve = res;
 
-        handleFrame((timestamp) => {
+        handleFrame((timestamp, fps) => {
             const prevent = this.callbackStartInPause
                 .map(({ cb }) => cb())
                 .some((item) => item === true);
 
-            this.onReuqestAnim(timestamp, res);
+            this.onReuqestAnim(timestamp, fps, res);
             if (prevent) this.pause();
         });
     }
