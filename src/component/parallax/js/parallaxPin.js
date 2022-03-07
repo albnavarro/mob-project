@@ -236,9 +236,15 @@ export class ParallaxPin {
             this.lastPosition = this.pin.style.position;
             this.lastTop = this.pin.style.top;
             this.lastLeft = this.pin.style.left;
+
+            this.wrapper.style.height = '';
+            this.wrapper.style.width = '';
+            this.pin.style.height = '';
+            this.pin.style.width = '';
+            this.pin.style.position = '';
+
             this.lastWidth = this.pin.offsetWidth;
             this.lastHeight = this.pin.offsetHeight;
-            this.pin.style.position = '';
             // this.pin.style.transform = `translate(0px,0px)`;
 
             if (this.scroller === window) {

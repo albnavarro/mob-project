@@ -5,7 +5,10 @@ import { parallaxConstant } from './parallaxConstant.js';
 import { parallaxMarker } from './parallaxMarker.js';
 import { parallaxEmitter } from './parallaxEmitter.js';
 import { ParallaxPin } from './parallaxPin.js';
-import { handleFrame } from '../../../js/core/events/rafutils/rafUtils.js';
+import {
+    handleFrame,
+    handleNextTick,
+} from '../../../js/core/events/rafutils/rafUtils.js';
 import { handleResize } from '../../../js/core/events/resizeUtils/handleResize.js';
 import { handleScroll } from '../../../js/core/events/scrollUtils/handleScroll.js';
 import { handleSpring } from '../../../js/core/animation/spring/handleSpring.js';
@@ -199,7 +202,14 @@ export class ParallaxItemClass {
             this.pinInstance = new ParallaxPin({ instance: this });
 
             if (mq[this.queryType](this.breackpoint)) {
-                this.pinInstance.init();
+                handleNextTick.add(() => {
+                    this.getScrollerOffset();
+                    this.pinInstance.init();
+                    this.pinInstance.onScroll(
+                        this.scrollerScroll,
+                        this.dontUSeFrame
+                    );
+                });
             }
         }
     }
