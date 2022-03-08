@@ -332,23 +332,23 @@ export class ParallaxPin {
         this.unsubscribeScrollStart();
         this.spring = null;
 
-        if (this.pin && this.wrapper) {
-            const cb = () => {
+        const cb = () => {
+            if (this.pin && this.wrapper) {
                 this.wrapper.parentNode.insertBefore(this.item, this.wrapper);
                 this.pin.remove();
                 this.wrapper.remove();
                 this.wrapper = null;
                 this.pin = null;
                 this.isInizialized = false;
-            };
-
-            if (this.dontUSeFrame) {
-                cb();
-            } else {
-                handleFrame.add(() => {
-                    cb();
-                });
             }
+        };
+
+        if (this.dontUSeFrame) {
+            cb();
+        } else {
+            handleFrame.add(() => {
+                cb();
+            });
         }
     }
 

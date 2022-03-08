@@ -14,6 +14,7 @@ import { handleScroll } from '../../../js/core/events/scrollUtils/handleScroll.j
 import { handleSpring } from '../../../js/core/animation/spring/handleSpring.js';
 import { handleLerp } from '../../../js/core/animation/lerp/handleLerp.js';
 import { springConfig } from '../../../js/core/animation/spring/springConfig.js';
+import { getTranslateValues } from '../../../js/core/utils/vanillaFunction.js';
 
 export class ParallaxItemClass {
     constructor(data) {
@@ -402,8 +403,18 @@ export class ParallaxItemClass {
     calcOffset() {
         const el = this.scrollTrigger === null ? this.item : this.scrollTrigger;
 
+        let x = 0;
+        let y = 0;
+        let z = 0;
+
+        if (this.scrollTrigger) {
+            x = getTranslateValues(this.scrollTrigger).x;
+            y = getTranslateValues(this.scrollTrigger).y;
+            z = getTranslateValues(this.scrollTrigger).z;
+        }
+
         // Reset transofrm for get right offset value if transform is applyed itself
-        if (this.scrollTrigger === null) el.style.transform = '';
+        el.style.transform = '';
 
         if (this.direction === parallaxConstant.DIRECTION_VERTICAL) {
             this.offset =
@@ -421,6 +432,11 @@ export class ParallaxItemClass {
             this.direction === parallaxConstant.DIRECTION_VERTICAL
                 ? (this.offset -= parseInt(offset(this.screen).top))
                 : (this.offset -= parseInt(position(this.screen).left));
+        }
+
+        if (this.scrollTrigger && (x !== 0 || y !== 0 || z !== 0)) {
+            console.log('apply');
+            this.scrollTrigger.style.tranform = `translate3D(${x}px, ${y}px, ${z}px)`;
         }
     }
 
