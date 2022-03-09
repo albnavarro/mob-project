@@ -13,12 +13,13 @@ export class HandleSequencer {
 
         this.id = 0;
         this.callback = [];
+        this.callbackOnStop = [];
         this.duration = 10;
         this.type = 'sequencer';
         this.defaultProp = { start: 0, end: this.duration, ease: 'easeLinear' };
     }
 
-    draw(partial) {
+    draw({ partial, isLastDraw }) {
         this.values.forEach((item, i) => {
             item.settled = false;
         });
@@ -94,6 +95,12 @@ export class HandleSequencer {
         this.callback.forEach(({ cb }) => {
             cb(cbObject);
         });
+
+        if (isLastDraw) {
+            this.callbackOnStop.forEach(({ cb }) => {
+                cb(cbObject);
+            });
+        }
     }
 
     /**
@@ -339,6 +346,18 @@ export class HandleSequencer {
 
         return () => {
             this.callback = this.callback.filter((item) => item.id !== cbId);
+        };
+    }
+
+    onStop(cb) {
+        this.callbackOnStop.push({ cb, id: this.id });
+        const cbId = this.id;
+        this.id++;
+
+        return () => {
+            this.callbackOnStop = this.callbackOnStop.filter(
+                (item) => item.id !== cbId
+            );
         };
     }
 

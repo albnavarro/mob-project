@@ -75,6 +75,7 @@ export class SmoothScrollClass {
         this.motionType = data.motionType || this.LERP;
         this.motion = null;
         this.unsubscribeMotion = () => {};
+        this.unsubscribeOnComplete = () => {};
     }
 
     init() {
@@ -123,18 +124,39 @@ export class SmoothScrollClass {
         }
 
         this.motion.setData({ val: 0 });
+
         this.unsubscribeMotion = this.motion.subscribe(({ val }) => {
             if (this.direction == this.VERTICAL) {
                 if (this.target === document.documentElement) {
                     this.target.scrollTop = val;
                 } else {
-                    this.target.style.transform = `translate3d(0, ${-val}px, 0)`;
+                    this.target.style.transform = `translate3d(0px, 0px, 0px) translateY(${-val}px)`;
                 }
             } else {
                 if (this.target === document.documentElement) {
                     this.target.scrollleft = val;
                 } else {
-                    this.target.style.transform = `translate3d(${-val}px, 0, 0)`;
+                    this.target.style.transform = `translate3d(0px, 0px, 0px) translateX(${-val}px)`;
+                }
+            }
+
+            this.onTickCallback.forEach((item, i) => {
+                item(-val);
+            });
+        });
+
+        this.unsubscribeOnComplete = this.motion.onComplete(({ val }) => {
+            if (this.direction == this.VERTICAL) {
+                if (this.target === document.documentElement) {
+                    this.target.scrollTop = val;
+                } else {
+                    this.target.style.transform = `translateY(${-val}px)`;
+                }
+            } else {
+                if (this.target === document.documentElement) {
+                    this.target.scrollleft = val;
+                } else {
+                    this.target.style.transform = `translateX(${-val}px)`;
                 }
             }
 
@@ -169,6 +191,7 @@ export class SmoothScrollClass {
         this.subscribeTouchMove();
         this.subscribeMouseClick();
         this.unsubscribeMotion();
+        this.unsubscribeOnComplete();
     }
 
     onTick(fn) {

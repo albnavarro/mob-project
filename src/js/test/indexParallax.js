@@ -25,6 +25,12 @@ export function indexParallax() {
         item.style.opacity = opacity;
     });
 
+    myParallaxTimeline.onStop(({ scale, rotate, opacity, y, x }) => {
+        const xW = (x * window.innerWidth) / 100;
+        item.style.transform = `scale(${scale}) translate(${xW}px, ${y}px) rotate(${rotate}deg)`;
+        item.style.opacity = opacity;
+    });
+
     const parallaxIn = new ParallaxItemClass({
         item: item,
         scrollTrigger: trigger,

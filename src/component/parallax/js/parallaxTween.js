@@ -6,12 +6,13 @@ export class ParallaxTween {
         this.ease = tweenConfig[ease];
         this.values = [];
         this.id = 0;
+        this.callbackOnStop = [];
         this.callback = [];
         this.duration = 1000;
         this.type = 'tween';
     }
 
-    draw(partial) {
+    draw({ partial, isLastDraw }) {
         this.values.forEach((item, i) => {
             item.currentValue = this.ease(
                 partial,
@@ -28,6 +29,12 @@ export class ParallaxTween {
         this.callback.forEach(({ cb }) => {
             cb(cbObject);
         });
+
+        if (isLastDraw) {
+            this.callbackOnStop.forEach(({ cb }) => {
+                cb(cbObject);
+            });
+        }
     }
 
     /**
@@ -185,6 +192,18 @@ export class ParallaxTween {
 
         return () => {
             this.callback = this.callback.filter((item) => item.id !== cbId);
+        };
+    }
+
+    onStop(cb) {
+        this.callbackOnStop.push({ cb, id: this.id });
+        const cbId = this.id;
+        this.id++;
+
+        return () => {
+            this.callbackOnStop = this.callbackOnStop.filter(
+                (item) => item.id !== cbId
+            );
         };
     }
 

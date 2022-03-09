@@ -55,7 +55,7 @@ export const hScroller = () => {
         .goTo({ y: 0 }, { start: 7.5, end: 10 });
 
     myParallaxTimeline.subscribe(({ x, y }) => {
-        target.style.transform = `translate3D(0,0,0) translate(${x}px, ${y}px)`;
+        target.style.transform = `translate(${x}px, ${y}px)`;
     });
 
     const parallaxIn = new ParallaxItemClass({
@@ -100,9 +100,11 @@ export const hScroller = () => {
     const myParallaxTween = new ParallaxTween();
     myParallaxTween.setData({ x: 0, y: 0 });
     myParallaxTween.goTo({ x: -pluto.offsetWidth, y: pluto.offsetHeight });
+
     myParallaxTween.subscribe(({ x, y }) => {
-        target2.style.transform = `translate3D(0,0,0) translate(${x}px, ${y}px)`;
+        target2.style.transform = `translate(${x}px, ${y}px)`;
     });
+
     let parallaxOut = new ParallaxItemClass({
         item: target2,
         scroller: '.scrollerH-container .scrollerH',
