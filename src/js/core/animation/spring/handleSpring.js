@@ -16,6 +16,7 @@ export class handleSpring {
         this.values = [];
         this.id = 0;
         this.callback = [];
+        this.callbackOnComplete = [];
         this.callbackStartInPause = [];
         this.lostFrameTresold = 64;
         this.pauseStatus = false;
@@ -96,9 +97,15 @@ export class handleSpring {
                 // Prepare an obj to pass to the callback with rounded value ( end user value)
                 const cbObjectSettled = getValueObj(this.values, 'toValue');
 
-                // Fire callback with exact end value
-                this.callback.forEach(({ cb }) => {
-                    cb(cbObjectSettled);
+                handleNextFrame.add(() => {
+                    // Fire callback with exact end value
+                    this.callback.forEach(({ cb }) => {
+                        cb(cbObjectSettled);
+                    });
+
+                    this.callbackOnComplete.forEach(({ cb }) => {
+                        cb(cbObjectSettled);
+                    });
                 });
 
                 // On complete
@@ -549,6 +556,18 @@ export class handleSpring {
 
         return () => {
             this.callbackStartInPause = this.callbackStartInPause.filter(
+                (item) => item.id !== cbId
+            );
+        };
+    }
+
+    onComplete(cb) {
+        this.callbackOnComplete.push({ cb, id: this.id });
+        const cbId = this.id;
+        this.id++;
+
+        return () => {
+            this.callbackOnComplete = this.callbackOnComplete.filter(
                 (item) => item.id !== cbId
             );
         };

@@ -51,6 +51,7 @@ export class DraggerItemClass {
         this.endValue = { xValue: 0, yValue: 0 };
         this.spring = new handleSpring();
         this.unsubscribeSpring = () => {};
+        this.unsubscribeOnComplete = () => {};
 
         this.unsubscribeResize = () => {};
         this.unsubscribeTouchStart = () => {};
@@ -155,7 +156,11 @@ export class DraggerItemClass {
         });
 
         this.unsubscribeSpring = this.spring.subscribe(({ x, y }) => {
-            this.item.style.transform = `translate3D(${x}px, ${y}px, 0)`;
+            this.item.style.transform = `translate3D(0,0,0) translateX(${x}px) translateY(${y}px)`;
+        });
+
+        this.unsubscribeOnComplete = this.spring.onComplete(({ x, y }) => {
+            this.item.style.transform = ` translateX(${x}px) translateY(${y}px)`;
         });
 
         // Set link and button to draggable false, prevent mousemouve fail
@@ -176,6 +181,7 @@ export class DraggerItemClass {
         this.unsubscribeMouseMove();
         this.unsubscribeTouchMove();
         this.unsubscribeResize();
+        this.unsubscribeOnComplete();
     }
 
     onResize() {

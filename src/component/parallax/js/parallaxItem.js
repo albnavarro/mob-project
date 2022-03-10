@@ -11,6 +11,7 @@ import {
 } from '../../../js/core/events/rafutils/rafUtils.js';
 import { handleResize } from '../../../js/core/events/resizeUtils/handleResize.js';
 import { handleScroll } from '../../../js/core/events/scrollUtils/handleScroll.js';
+import { handleScrollStart } from '../../../js/core/events/scrollUtils/handleScrollUtils.js';
 import { handleSpring } from '../../../js/core/animation/spring/handleSpring.js';
 import { handleLerp } from '../../../js/core/animation/lerp/handleLerp.js';
 import { springConfig } from '../../../js/core/animation/spring/springConfig.js';
@@ -31,6 +32,7 @@ export class ParallaxItemClass {
         this.numericRange = 0;
         this.unsubscribeResize = () => {};
         this.unsubscribeScroll = () => {};
+        this.unsubscribeScrollStart = () => {};
         this.unsubscribeMarker = () => {};
         this.startMarker = null;
         this.endMarker = null;
@@ -41,6 +43,7 @@ export class ParallaxItemClass {
         this.firstTime = true;
         this.isInViewport = false;
         this.dontUSeFrame = false;
+        this.force3D = false;
 
         // Base props
         this.item = data.item;
@@ -170,6 +173,11 @@ export class ParallaxItemClass {
         }
 
         if (this.ease) {
+            // Force transform3D onscroll start
+            this.unsubscribeScrollStart = handleScrollStart(() => {
+                this.force3D = true;
+            });
+
             if (this.scroller === window) {
                 this.unsubscribeScroll = handleScroll(() => {
                     this.smoothParallaxJs();
@@ -232,7 +240,7 @@ export class ParallaxItemClass {
             if (val === this.lastValue) return;
 
             if (this.propierties === parallaxConstant.PROP_TWEEN) {
-                this.tween.draw(val);
+                this.tween.draw({ partial: val, isLastDraw: false });
                 this.lastValue = val;
                 this.firstTime = false;
             } else {
@@ -240,6 +248,16 @@ export class ParallaxItemClass {
             }
 
             if (this.onTickCallback) this.onTickCallback(val);
+        });
+
+        this.motion.onComplete(({ val }) => {
+            this.force3D = false;
+
+            if (this.propierties === parallaxConstant.PROP_TWEEN) {
+                this.tween.draw({ partial: val, isLastDraw: true });
+            } else {
+                this.updateStyle(val);
+            }
         });
 
         switch (this.easeType) {
@@ -498,6 +516,7 @@ export class ParallaxItemClass {
 
     unsubscribe() {
         this.unsubscribeScroll();
+        this.unsubscribeScrollStart();
         this.unsubscribeResize();
         this.unsubscribeMotion();
         this.unsubscribeMarker();
@@ -549,6 +568,9 @@ export class ParallaxItemClass {
     move(scrollVal = null) {
         // Bypass request animation frame, is supposed that is used outside
         this.dontUSeFrame = true;
+
+        // Bypass translate3D() if there is no easing
+        if (!this.ease) this.force3D = false;
 
         scrollVal =
             scrollVal !== null && this.screen !== window
@@ -652,7 +674,7 @@ export class ParallaxItemClass {
         if (this.endValue === this.lastValue) return;
 
         if (this.propierties === parallaxConstant.PROP_TWEEN) {
-            this.tween.draw(this.endValue);
+            this.tween.draw({ partial: this.endValue, isLastDraw: true });
             this.lastValue = this.endValue;
             this.firstTime = false;
         } else {
@@ -869,36 +891,38 @@ export class ParallaxItemClass {
                 ? this.getSwitchAfterZeroValue(o.reverseVal)
                 : o.reverseVal;
 
+        o.force3DStyle = this.force3D ? 'translate3D(0px, 0px, 0px)' : '';
+
         switch (this.propierties) {
             case parallaxConstant.PROP_VERTICAL:
                 return {
-                    transform: `translate3d(0,0,0) translateY(${o.typeVal}px)`,
+                    transform: `${o.force3DStyle} translateY(${o.typeVal}px)`,
                 };
 
             case parallaxConstant.PROP_HORIZONTAL:
                 return {
-                    transform: `translate3d(0,0,0) translateX(${o.typeVal}px)`,
+                    transform: `${o.force3DStyle} translateX(${o.typeVal}px)`,
                 };
 
             case parallaxConstant.PROP_ROTATE:
                 return {
-                    transform: `translate3d(0,0,0) rotate(${o.typeVal}deg)`,
+                    transform: `${o.force3DStyle} rotate(${o.typeVal}deg)`,
                 };
                 break;
 
             case parallaxConstant.PROP_ROTATEY:
                 return {
-                    transform: `translate3d(0,0,0) rotateY(${o.typeVal}deg)`,
+                    transform: `${o.force3DStyle} rotateY(${o.typeVal}deg)`,
                 };
 
             case parallaxConstant.PROP_ROTATEX:
                 return {
-                    transform: `translate3d(0,0,0) rotateX(${o.typeVal}deg)`,
+                    transform: `${o.force3DStyle} rotateX(${o.typeVal}deg)`,
                 };
 
             case parallaxConstant.PROP_ROTATEZ:
                 return {
-                    transform: `translate3d(0,0,0) rotateZ(${o.typeVal}deg)`,
+                    transform: `${o.force3DStyle} rotateZ(${o.typeVal}deg)`,
                 };
 
             case parallaxConstant.PROP_OPACITY:
@@ -907,7 +931,7 @@ export class ParallaxItemClass {
             case parallaxConstant.PROP_SCALE:
                 o.scaleVal = 1 + o.typeVal / 1000;
                 return {
-                    transform: `translate3d(0,0,0) scale(${o.scaleVal})`,
+                    transform: `${o.force3DStyle} scale(${o.scaleVal})`,
                 };
 
             default:

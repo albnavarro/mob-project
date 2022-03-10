@@ -21,6 +21,7 @@ export class MouseParallaxItemClass {
         this.smooth = 10;
         this.spring = new handleSpring();
         this.unsubscribeSpring = () => {};
+        this.unsubscribeOnComplete = () => {};
 
         // MOUSE COORD
         this.pageCoord = { x: 0, y: 0 };
@@ -51,15 +52,21 @@ export class MouseParallaxItemClass {
         this.spring.setData({ ax: 0, ay: 0 });
 
         this.unsubscribeSpring = this.spring.subscribe(({ ax, ay }) => {
-            this.item.style.transform = `translate3D(${ax}px, ${ay}px, 0)`;
+            this.item.style.transform = `translate3D(0,0,0) translateX(${ax}px) translateY(${ay}px)`;
+        });
+
+        this.unsubscribeOnComplete = this.spring.onComplete(({ ax, ay }) => {
+            this.item.style.transform = `translateX(${ax}px) translateY(${ay}px)`;
         });
     }
 
     destroy() {
-        this.unsubscribeSpring();
         this.unsubscribeScroll();
         this.unsubscribeMouseMove();
         this.unsubscribeResize();
+        this.unsubscribeSpring();
+        this.unsubscribeOnComplete();
+        this.spring = null;
     }
 
     setGlobalCoord({ page, client }) {

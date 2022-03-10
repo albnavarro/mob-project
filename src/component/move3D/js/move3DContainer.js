@@ -59,6 +59,7 @@ export class move3DContainerClass {
         this.unsubscribeMouseMove = () => {};
         this.unsubscribeTouchMove = () => {};
         this.unsubscribeResize = () => {};
+        this.unsubscribeOnComplete = () => {};
     }
 
     init() {
@@ -66,7 +67,11 @@ export class move3DContainerClass {
         this.spring.setData({ ax: 0, ay: 0 });
 
         this.unsubscribeSpring = this.spring.subscribe(({ ax, ay }) => {
-            this.container.style.transform = `rotateY(${ax}deg) rotateX(${ay}deg) translateZ(0)`;
+            this.container.style.transform = `translate3D(0,0,0) rotateY(${ax}deg) rotateX(${ay}deg)`;
+        });
+
+        this.unsubscribeOnComplete = this.spring.onComplete(({ ax, ay }) => {
+            this.container.style.transform = `rotateY(${ax}deg) rotateX(${ay}deg)`;
         });
 
         if (!this.centerToViewoport && !this.drag) this.pageY = true;
@@ -137,6 +142,11 @@ export class move3DContainerClass {
         this.unsubscribeMouseMove();
         this.unsubscribeTouchMove();
         this.unsubscribeResize();
+        this.unsubscribeOnComplete();
+
+        this.childrenInstances.forEach((item, i) => {
+            item.destroy();
+        });
     }
 
     getDimension() {

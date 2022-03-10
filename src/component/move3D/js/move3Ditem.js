@@ -12,6 +12,7 @@ export class move3DitemClass {
         this.animate = data.animate;
         this.lerp = new handleLerp();
         this.unsubscribelerp = () => {};
+        this.unsubscribeOnComplete = () => {};
     }
 
     init() {
@@ -20,6 +21,12 @@ export class move3DitemClass {
         this.unsubscribelerp = this.lerp.subscribe(
             ({ depth, rotateX, rotateY }) => {
                 this.item.style.transform = `translate3D(0,0,${depth}px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            }
+        );
+
+        this.unsubscribeOnComplete = this.lerp.onComplete(
+            ({ depth, rotateX, rotateY }) => {
+                this.item.style.transform = `translateZ(${depth}px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
             }
         );
 
@@ -54,5 +61,11 @@ export class move3DitemClass {
         );
 
         this.lerp.goTo({ depth, rotateX, rotateY }).catch((err) => {});
+    }
+
+    destroy() {
+        this.unsubscribelerp();
+        this.unsubscribeOnComplete();
+        this.lerp = null;
     }
 }

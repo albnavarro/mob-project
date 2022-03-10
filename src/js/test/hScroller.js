@@ -100,9 +100,15 @@ export const hScroller = () => {
     const myParallaxTween = new ParallaxTween();
     myParallaxTween.setData({ x: 0, y: 0 });
     myParallaxTween.goTo({ x: -pluto.offsetWidth, y: pluto.offsetHeight });
+
     myParallaxTween.subscribe(({ x, y }) => {
         target2.style.transform = `translate3D(0,0,0) translate(${x}px, ${y}px)`;
     });
+
+    myParallaxTween.onStop(({ x, y }) => {
+        target2.style.transform = `translate(${x}px, ${y}px)`;
+    });
+
     let parallaxOut = new ParallaxItemClass({
         item: target2,
         scroller: '.scrollerH-container .scrollerH',
