@@ -2,6 +2,7 @@ import {
     outerHeight,
     outerWidth,
     offset,
+    getTranslateValues,
 } from '../../../js/core/utils/vanillaFunction.js';
 import { handleSpring } from '.../../../js/core/animation/spring/handleSpring.js';
 import { handleResize } from '.../../../js/core/events/resizeUtils/handleResize.js';
@@ -12,8 +13,8 @@ export class MouseParallaxItemClass {
     constructor(data) {
         this.item = data.item;
         this.centerToViewoport = data.centerToViewoport;
-        this.range = data.range;
-        this.container = data.container;
+        this.rangex = data.rangex;
+        this.rangey = data.rangey;
         this.height = 0;
         this.width = 0;
         this.offSetTop = 0;
@@ -87,10 +88,14 @@ export class MouseParallaxItemClass {
     }
 
     getDimension() {
+        const { x, y } = getTranslateValues(this.item);
+        this.item.style.transform = '';
+
         this.height = outerHeight(this.item);
         this.width = outerWidth(this.item);
-        this.offSetTop = offset(this.container).top;
-        this.offSetLeft = offset(this.container).left;
+        this.offSetTop = offset(this.item).top;
+        this.offSetLeft = offset(this.item).left;
+        this.item.style.transform = `translate(${x}px, ${y}px)`;
     }
 
     onMove() {
@@ -116,13 +121,13 @@ export class MouseParallaxItemClass {
         const { ax, ay } = (() => {
             if (this.centerToViewoport) {
                 return {
-                    ax: (x - vw / 2) / this.range,
-                    ay: (y - vh / 2) / this.range,
+                    ax: (x - vw / 2) / this.rangex,
+                    ay: (y - vh / 2) / this.rangey,
                 };
             } else {
                 return {
-                    ax: (x - this.offSetLeft - vw / 2) / this.range,
-                    ay: (y - this.offSetTop - vh / 2) / this.range,
+                    ax: (x - this.offSetLeft - vw / 2) / this.rangex,
+                    ay: (y - this.offSetTop - vh / 2) / this.rangey,
                 };
             }
         })();
