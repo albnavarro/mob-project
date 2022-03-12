@@ -16,8 +16,7 @@ block content
                 h2
                     |#{hello()}
 
-                div(
-                    data-conponent='m-comp--parallax',
+                .js-parallax(
                     data-align='start',
                     data-propierties="opacity")
                     .parallax__item-test
@@ -25,51 +24,51 @@ block content
                 //- ACCORDION
                 h3
                     |accordion default
-                div(data-conponent='m-comp--accordion')
-                    .accrdion-item(data-item)
-                        button.accrdion-item__btn(data-toggle)
+                div.js-accordion
+                    .accrdion-item.js-accordion-item
+                        button.accrdion-item__btn.js-accordion-toggle
                             |item1
-                        .accrdion-item__content(data-content style="height:0;")
+                        .accrdion-item__content.js-accordion-content(style="height:0;")
                             span
                                 |content
-                    .accrdion-item(data-item)
-                        button.accrdion-item__btn(data-toggle)
+                    .accrdion-item.js-accordion-item
+                        button.accrdion-item__btn.js-accordion-toggle
                             span
                                 |item2
-                        .accrdion-item__content(data-content style="height:0;")
+                        .accrdion-item__content.js-accordion-content(style="height:0;")
                             span
                                 |content
-                    .accrdion-item(data-item)
-                        button.accrdion-item__btn(data-toggle)
+                    .accrdion-item.js-accordion-item
+                        button.accrdion-item__btn.js-accordion-toggle
                             |item2
-                        .accrdion-item__content(data-content style="height:0;")
+                        .accrdion-item__content.js-accordion-content(style="height:0;")
                             span
                                 |content
 
                 //- ACCORDION
                 h3
                     |accordion multiple max desktop
-                div(data-conponent='m-comp--accordion' 
+                .js-accordion(
                     data-multiple
                     data-queryType="max"
                     data-breackpoint="desktop")
-                    .accrdion-item(data-item)
-                        button.accrdion-item__btn(data-toggle)
+                    .accrdion-item.js-accordion-item
+                        button.accrdion-item__btn.js-accordion-toggle
                             |item1
-                        .accrdion-item__content(data-content style="height:0;")
+                        .accrdion-item__content.js-accordion-content(style="height:0;")
                             span
                                 |content
-                    .accrdion-item(data-item)
-                        button.accrdion-item__btn(data-toggle)
+                    .accrdion-item.js-accordion-item
+                        button.accrdion-item__btn.js-accordion-toggle
                             span
                                 |item2
-                        .accrdion-item__content(data-content style="height:0;")
+                        .accrdion-item__content.js-accordion-content(style="height:0;")
                             span
                                 |content
-                    .accrdion-item(data-item)
-                        button.accrdion-item__btn(data-toggle)
+                    .accrdion-item.js-accordion-item
+                        button.accrdion-item__btn.js-accordion-toggle
                             |item2
-                        .accrdion-item__content(data-content style="height:0;")
+                        .accrdion-item__content.js-accordion-content(style="height:0;")
                             span
                                 |content
                                 
@@ -104,15 +103,13 @@ block content
                 include ../component/tooltip/pug/tooltip.pug
                 
 
-                .parallax__item-test(
-                    data-conponent='m-comp--parallax',
+                .parallax__item-test.js-parallax(
                     data-range='1.5',
                     data-align='center',
                     data-ease
                     data-easeType="lerp")
 
-                .parallax__item-test(
-                    data-conponent='m-comp--parallax',
+                .parallax__item-test.js-parallax(
                     data-opacityStart='110'
                     data-opacityEnd='50'
                     data-ease
@@ -123,13 +120,10 @@ block content
         include ../component/threeBlocks/pug/tBlocks.pug
         
         section.overflow-hidden
-            .interceptTrigger.parallax__item-test(
-                data-conponent='m-comp--animate'
+            .interceptTrigger.parallax__item-test.js-animate(
                 data-triggerEl=".interceptObserver-1")
-            .interceptObserver.interceptObserver-1(
-                data-conponent='m-comp--animate')
-            .interceptObserver.interceptObserver-2(
-                data-conponent='m-comp--animate')
+            .interceptObserver.interceptObserver-1.js-animate
+            .interceptObserver.interceptObserver-2.js-animate
         
             .index-timeline(style="border:1px #ccc solid;position: relative;height:140px;")
                 //- div(style='position:absolute;left:50%;transform:translateX(-50%)')
@@ -137,9 +131,8 @@ block content
                   .index-parallax-1.inlineBLock
                     .parallax__item-test
                             
-            .parallax__item-test.inlineBLock(
+            .parallax__item-test.inlineBLock.js-parallax(
                 style="background:black;"
-                data-conponent='m-comp--parallax'
                 data-computationType="fixed"
                 data-propierties="rotate"
                 data-range="0"
@@ -151,23 +144,20 @@ block content
                 
                     
             .flex.justify-center
-                div(
-                    data-conponent='m-comp--parallax'
+                .js-parallax(
                     data-perspective="400"
                     data-propierties="rotateX"
                     data-reverse
                     data-ease
                     data-range="6")
-                    div(
-                        data-conponent='m-comp--parallax'
+                    .js-parallax(
                         data-reverse
                         data-ease
                         data-range="6")
                         .parallax__item-test
 
 
-            .parallax__item-test(
-                data-conponent='m-comp--parallax',
+            .parallax__item-test.js-parallax(
                 data-ease
                 data-easeType='spring'
                 data-propierties="opacity"
@@ -176,16 +166,14 @@ block content
                 
 
             .clearfix
-                .inlineBLock(
-                    data-conponent='m-comp--parallax',
+                .inlineBLock.js-parallax(
                     data-range='.7',
                     data-ease
                     data-onSwitch="in-back",
                     data-propierties="scale")
                     .parallax__item-test.parallax__item-test--float
 
-            .parallax__item-test(
-                data-conponent='m-comp--parallax',
+            .parallax__item-test.js-parallax(
                 data-range='2',
                 data-align='90',
                 data-onSwitch="in-back",
@@ -193,52 +181,45 @@ block content
                 data-propierties="x")
                 
 
-            .clipath-start(
-                data-conponent='m-comp--toggleEl',
+            .clipath-start.js-toggle-class(
                 data-startClass="clipath-start",
                 data-endClass="clipath-end")
                     .trasition-item-test 
 
             .flex
-                div(
-                    data-conponent='m-comp--parallax',
+                div.js-parallax(
                     data-range='2',
                     data-onSwitch="in-stop"
                     data-ease)
                     .parallax__item-test.parallax__item-test--float
 
-                div(
-                    data-conponent='m-comp--parallax',
+                div.js-parallax(
                     data-range='1.5',
                     data-onSwitch="out-stop"
                     data-springConfig="wobbly"
                     data-ease)
                     .parallax__item-test.parallax__item-test--float
 
-            .transformY-start(
-                data-conponent='m-comp--toggleEl',
+            .transformY-start.js-toggle-class(
                 data-startClass="transformY-start",
                 data-endClass="transformY-end",
                 data-onlyOnce)
                     .trasition-item-test 
 
             .flex
-                .parallax__item-test.inlineBLock(
-                    data-conponent='m-comp--parallax',
+                .parallax__item-test.inlineBLock.js-parallax(
                     data-range='2',
                     data-align='bottom',
                     data-ease,
                     data-propierties="rotate")
                     
 
-            .opacity-start(
-                data-conponent='m-comp--toggleEl',
+            .opacity-start.js-toggle-class(
                 data-startClass="opacity-start",
                 data-endClass="opacity-end")
                     .trasition-item-test 
 
-            .parallax__item-test(
-                data-conponent='m-comp--parallax',
+            .parallax__item-test.js-parallax(
                 data-range='2',
                 data-align='end',
                 data-propierties="x")

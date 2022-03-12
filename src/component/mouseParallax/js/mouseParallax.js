@@ -2,9 +2,7 @@ import { MouseParallaxItemClass } from './mouseParallaxitem.js';
 
 class MouseParallaxClass {
     constructor() {
-        this.mouseItem = document.querySelectorAll(
-            "*[data-conponent='m-comp--mouseParallax']"
-        );
+        this.mouseItem = document.querySelectorAll('.js-mouse-parallax');
         this.instances = [];
     }
 
@@ -36,7 +34,8 @@ class MouseParallaxClass {
         data.item = item;
         data.container = item.closest('.mouseParallax__container');
         data.centerToViewoport = item.hasAttribute('data-centerToViewoport');
-        data.range = item.getAttribute('data-range') || 20;
+        data.rangex = item.getAttribute('data-rangex') || 20;
+        data.rangey = item.getAttribute('data-rangey') || 20;
         return data;
     }
 }

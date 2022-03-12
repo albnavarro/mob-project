@@ -8,9 +8,7 @@ import {
 
 class toolTipClass {
     constructor() {
-        this.bnt = document.querySelectorAll(
-            "*[data-conponent='m-comp--tooltip']"
-        );
+        this.bnt = document.querySelectorAll('.js-tooltip');
         this.body = document.querySelector('body');
         this.lastToolTip = null;
         this.overTool = false;

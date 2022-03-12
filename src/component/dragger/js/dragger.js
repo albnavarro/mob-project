@@ -2,9 +2,7 @@ import { DraggerItemClass } from './draggerItem.js';
 
 class DraggerClass {
     constructor() {
-        this.componentItem = document.querySelectorAll(
-            "*[data-conponent='m-comp--dragger']"
-        );
+        this.componentItem = document.querySelectorAll('.js-dragger');
         this.instances = [];
     }
 

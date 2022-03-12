@@ -2,9 +2,7 @@ import { GlitchItemClass } from './glitchItem.js';
 
 class GlitchClass {
     constructor() {
-        this.glitchItem = document.querySelectorAll(
-            "*[data-conponent='m-comp--glitch']"
-        );
+        this.glitchItem = document.querySelectorAll('.js-glitch');
         this.instances = [];
     }
 

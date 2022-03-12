@@ -3,7 +3,7 @@ import { PredictiveTurbolenceItemClass } from './predictiveTurbolenceItem.js';
 class PredictiveTurbolenceClass {
     constructor() {
         this.predictiveItem = document.querySelectorAll(
-            "*[data-conponent='m-comp--predictiveTurbolence']"
+            '.js-predictiveTurbolence'
         );
         this.instances = [];
     }

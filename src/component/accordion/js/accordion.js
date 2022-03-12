@@ -2,9 +2,7 @@ import { AccordionItemClass } from './accordionItem.js';
 
 class AccordionClass {
     constructor() {
-        this.accordionItem = document.querySelectorAll(
-            "*[data-conponent='m-comp--accordion']"
-        );
+        this.accordionItem = document.querySelectorAll('.js-accordion');
         this.instances = [];
     }
 

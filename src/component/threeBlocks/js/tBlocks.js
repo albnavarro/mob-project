@@ -2,9 +2,7 @@ import { tBlocksItemClass } from './tBlocksItem.js';
 
 class tBlocksClass {
     constructor(data) {
-        (this.item = document.querySelectorAll(
-            "*[data-conponent='m-comp--tBlocks']"
-        )),
+        (this.item = document.querySelectorAll('.js-tblocks')),
             (this.instances = []);
     }
 

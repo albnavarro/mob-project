@@ -2,9 +2,7 @@ import { AnimateItemClass } from './animateItem.js';
 
 class AnimateClass {
     constructor() {
-        this.componentItem = document.querySelectorAll(
-            "*[data-conponent='m-comp--animate']"
-        );
+        this.componentItem = document.querySelectorAll('.js-animate');
         this.instances = [];
     }
 

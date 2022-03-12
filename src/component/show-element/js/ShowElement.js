@@ -2,9 +2,7 @@ import { showElementItemClass } from './ShowElementItem.js';
 
 class showElementClass {
     constructor(data) {
-        (this.item = document.querySelectorAll(
-            "*[data-conponent='m-comp--toggleEl']"
-        )),
+        (this.item = document.querySelectorAll('.js-toggle-class')),
             (this.instances = []);
     }
 

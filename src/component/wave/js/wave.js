@@ -2,9 +2,7 @@ import { WaveItemClass } from './waveItem.js';
 
 class waveClass {
     constructor() {
-        this.waveItem = document.querySelectorAll(
-            "*[data-conponent='m-comp--wave']"
-        );
+        this.waveItem = document.querySelectorAll('.js-wave');
         this.instances = [];
     }
 

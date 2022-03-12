@@ -154,7 +154,6 @@ export class ParallaxItemClass {
     }
 
     init() {
-        this.item.classList.add('parallax__item');
         this.setMotion();
         this.calcScreenPosition();
         this.calcOffset();

@@ -2,9 +2,7 @@ import { move3DContainerClass } from './move3DContainer.js';
 
 class move3DClass {
     constructor() {
-        this.mouseItem = document.querySelectorAll(
-            "*[data-conponent='m-comp--move3D']"
-        );
+        this.mouseItem = document.querySelectorAll('.js-move3d');
         this.instances = [];
     }
 

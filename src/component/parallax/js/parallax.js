@@ -2,9 +2,7 @@ import { ParallaxItemClass } from './parallaxItem.js';
 
 class ParallaxClass {
     constructor() {
-        this.parallaxItem = document.querySelectorAll(
-            "*[data-conponent='m-comp--parallax']"
-        );
+        this.parallaxItem = document.querySelectorAll('.js-parallax');
         this.id = 0;
         this.instances = [];
     }

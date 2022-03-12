@@ -10,21 +10,14 @@ block content
     main
         .mouseParallax-wrap
             .m-test.m-test--1
-                .mouseParallax__container
-                    .mouseParallax__item(data-conponent='m-comp--mouseParallax'
-                        data-range="10")
-                        .circle
+                .circle.js-mouse-parallax(data-rangex="10" data-rangey="10")
             .m-test.m-test--1
-                .mouseParallax__container
-                    .mouseParallax__item(data-conponent='m-comp--mouseParallax'
-                        data-range="30")
-                        .circle
+                .circle.js-mouse-parallax(data-rangex="30" data-rangey="30")
             .m-test.m-test--2
-                .mouseParallax__container
-                    .mouseParallax__item(data-conponent='m-comp--mouseParallax'
-                        data-range="20"
-                        data-centerToViewoport)
-                        .circle
+                .circle.js-mouse-parallax(
+                    data-rangex="20"
+                    data-rangey="10"
+                    data-centerToViewoport)
         
 
         

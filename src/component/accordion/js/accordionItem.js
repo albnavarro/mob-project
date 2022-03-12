@@ -8,9 +8,9 @@ export class AccordionItemClass {
         this.notAllClose = data.notAllClose || false;
         this.queryType = data.queryType || 'min';
         this.multiple = data.multiple;
-        this.itemClass = data.item || '[data-item]';
-        this.toggleClass = data.toggle || '[data-toggle]';
-        this.contentClass = data.content || '[data-content]';
+        this.itemClass = data.item || '.js-accordion-item';
+        this.toggleClass = data.toggle || '.js-accordion-toggle';
+        this.contentClass = data.content || '.js-accordion-content';
         this.btn = null;
         this.target = null;
     }
