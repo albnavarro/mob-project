@@ -54,9 +54,9 @@ export class handleSpring {
                 o.dampingForce = -friction * item.velocity;
                 o.acceleration = (o.tensionForce + o.dampingForce) / mass;
 
-                item.velocity = item.velocity + (o.acceleration * 1) / fps;
+                item.velocity = item.velocity + (o.acceleration * 1) / 60;
                 item.currentValue =
-                    item.currentValue + (item.velocity * 1) / fps;
+                    item.currentValue + (item.velocity * 1) / 60;
 
                 o.isVelocity = Math.abs(item.velocity) <= precision;
 
