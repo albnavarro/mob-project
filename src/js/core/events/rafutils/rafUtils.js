@@ -78,7 +78,8 @@ export const handleFrame = (() => {
     let startTime = 0;
     let lastUpdate = 0;
     let elapsed = 0;
-    let fps = 0;
+    let fps = 60;
+    let isStopped = false;
 
     const render = () => {
         time = getTime();
@@ -95,8 +96,8 @@ export const handleFrame = (() => {
         // Update global time
         time = lastUpdate - startTime;
 
-        // Get fps
-        fps = 1000 / (time - prevTime);
+        // Update fps if is running ( at first run after raf sleep get last fps )
+        if (!isStopped) fps = 1000 / (time - prevTime);
 
         // Fire callback
         callback.forEach((item) => item(time, fps));
@@ -105,10 +106,16 @@ export const handleFrame = (() => {
         prevTime = time;
         callback = [];
         frameIsRuning = false;
+        isStopped = false;
         frameStore.set('time', time);
 
         callback = [...callback, ...handleNextFrame.get()];
-        if (callback.length > 0) initFrame();
+        if (callback.length > 0) {
+            initFrame();
+        } else {
+            isStopped = true;
+        }
+
         handleNextTick.fire();
     };
 

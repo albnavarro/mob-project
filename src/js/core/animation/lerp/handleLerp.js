@@ -51,8 +51,8 @@ export class handleLerp {
                 item.currentValue = lerp(
                     item.currentValue,
                     item.toValue,
-                    // (velocity / fps) * 60
-                    velocity
+                    (velocity / fps) * 60
+                    // velocity
                 );
 
                 item.settled =
