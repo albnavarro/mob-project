@@ -1,6 +1,6 @@
 import { requestTimeout } from '../../utils/requestTimeOut.js';
 
-export class HandleTimeline {
+export class HandleAsyncTimeline {
     constructor(config = {}) {
         // Secure check timeline start with a close gruop action
         this.tweenList = [];
@@ -9,6 +9,7 @@ export class HandleTimeline {
         this.currentIndex = 0;
         this.repeat = config.repeat || 1;
         this.yoyo = config.yoyo || false;
+        this.forceYoyo = false;
         this.loopCounter = 1;
         this.groupId = null;
         // group "name" star from 1 to avoid 0 = falsa
@@ -191,8 +192,9 @@ export class HandleTimeline {
                     this.loopCounter++;
                     this.currentIndex = 0;
                     this.fromLabelIndex = null;
-                    if (this.yoyo) this.revertTween();
+                    if (this.yoyo || this.forceYoyo) this.revertTween();
                     this.run();
+                    this.forceYoyo = false;
                 } else {
                     this.currentIndex = 0;
                     this.loopCounter = 1;
@@ -460,6 +462,7 @@ export class HandleTimeline {
         this.loopCounter = 1;
         this.fromLabelIndex = null;
         this.isStopped = true;
+        this.forceYoyo = false;
 
         // Reset
         if (this.isReverse) this.revertTween();
@@ -487,11 +490,19 @@ export class HandleTimeline {
         });
     }
 
-    doReverseNext() {
+    reverse() {
+        this.stop();
+        this.isStopped = false;
+        this.forceYoyo = true;
+        this.fromLabelIndex = this.tweenList.length;
+        this.run();
+    }
+
+    reverseNext() {
         this.isReverseNext = true;
     }
 
-    doReverse() {
+    reverseImmediate() {
         if (this.isRunninReverseRealtime) return;
         this.isRunninReverseRealtime = true;
 

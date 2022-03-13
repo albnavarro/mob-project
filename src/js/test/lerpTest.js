@@ -1,5 +1,5 @@
 import { handleLerp } from '../core/animation/lerp/handleLerp.js';
-import { HandleTimeline } from '../core/animation/timeline/handleTimeline.js';
+import { HandleAsyncTimeline } from '../core/animation/asyncTimeline/handleAsyncTimeline.js';
 
 export function lerpTest() {
     const btnStart = document.querySelector('.lerp-btn-start');
@@ -7,6 +7,7 @@ export function lerpTest() {
     const btnStop = document.querySelector('.lerp-btn-stop');
     const btnPause = document.querySelector('.lerp-btn-pause');
     const btnPlay = document.querySelector('.lerp-btn-play');
+    const btnReverse = document.querySelector('.lerp-btn-reverse');
     const target = document.querySelector('.lerp-target');
 
     // DEFINE SPRING
@@ -23,7 +24,7 @@ export function lerpTest() {
     }
 
     // DEFINE TIMELINE
-    const timeline = new HandleTimeline({ repeat: 2, yoyo: true })
+    const timeline = new HandleAsyncTimeline({ repeat: 2, yoyo: true })
         .set(mylerp, { x: 0, y: 0, rotate: 0 })
         .goTo(mylerp, { x: -200 }, { velocity: 0.02, precision: 1 })
         .goFromTo(mylerp, { x: -200 }, { x: 400 })
@@ -56,5 +57,9 @@ export function lerpTest() {
 
     btnPlay.addEventListener('click', () => {
         timeline.resume();
+    });
+
+    btnReverse.addEventListener('click', () => {
+        timeline.reverse();
     });
 }

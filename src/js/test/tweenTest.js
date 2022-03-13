@@ -1,5 +1,5 @@
 import { handleTween } from '../core/animation/tween/handleTween.js';
-import { HandleTimeline } from '../core/animation/timeline/handleTimeline.js';
+import { HandleAsyncTimeline } from '../core/animation/asyncTimeline/handleAsyncTimeline.js';
 
 export function tweenTest() {
     const btnStart = document.querySelector('.tween-btn-start');
@@ -7,6 +7,7 @@ export function tweenTest() {
     const btnStop = document.querySelector('.tween-btn-stop');
     const btnPause = document.querySelector('.tween-btn-pause');
     const btnPlay = document.querySelector('.tween-btn-play');
+    const btnReverse = document.querySelector('.tween-btn-reverse');
     const target = document.querySelector('.tween-target');
 
     // DEFINE SPRING
@@ -25,7 +26,7 @@ export function tweenTest() {
     }
 
     // DEFINE TIMELINE
-    const timeline = new HandleTimeline({ repeat: -1, yoyo: true })
+    const timeline = new HandleAsyncTimeline({ repeat: -1, yoyo: true })
         .set(myTween, { x: 0, y: 0, rotate: 0 })
         .goTo(myTween, { x: -200 })
         .goFromTo(myTween, { x: -200 }, { x: 400 }, { duration: 800 })
@@ -54,5 +55,9 @@ export function tweenTest() {
 
     btnPlay.addEventListener('click', () => {
         timeline.resume();
+    });
+
+    btnReverse.addEventListener('click', () => {
+        timeline.reverse();
     });
 }

@@ -13,6 +13,7 @@
 // BASE MODULE
 import { vh } from './utility/vh.js';
 import { findElement } from './utility/findElement.js';
+import { handleLoad } from './core/events/loadutils/handleLoad.js';
 
 // NEW VANILLA COMPONENT MODULE
 import { totop } from '../component/to-top/js/toTop.js';
@@ -48,152 +49,156 @@ import { timlineMixTest } from './test/timlineMixTest.js';
 import { indexParallax } from './test/indexParallax.js';
 import { noGsap } from './test/noGsapScroller.js';
 
-const body = document.querySelector('body');
+handleLoad(() => {
+    const body = document.querySelector('body');
 
-if (body.classList.contains('page-index')) {
-    indexParallax();
-}
+    if (body.classList.contains('page-index')) {
+        indexParallax();
+    }
 
-if (body.classList.contains('page-tween')) {
-    springTest();
-    tweenTest();
-    lerpTest();
-    timlineMixTest();
-}
+    if (body.classList.contains('page-tween')) {
+        springTest();
+        tweenTest();
+        lerpTest();
+        timlineMixTest();
+    }
 
-if (body.classList.contains('template-fixed')) {
-    const smoothScroll = new SmoothScrollClass();
-    smoothScroll.init();
-}
+    if (body.classList.contains('template-fixed')) {
+        const smoothScroll = new SmoothScrollClass();
+        smoothScroll.init();
+    }
 
-if (body.classList.contains('template-scrollerH')) {
-    hScroller();
-}
+    if (body.classList.contains('template-scrollerH')) {
+        hScroller();
+    }
 
-if (body.classList.contains('page-gsapHorizontal2')) {
-    const gsapHorizontalCustom = new GsapHorizontalCustomClass({
-        rootEl: '.test-custom-scroller',
+    if (body.classList.contains('page-gsapHorizontal2')) {
+        const gsapHorizontalCustom = new GsapHorizontalCustomClass({
+            rootEl: '.test-custom-scroller',
+        });
+        gsapHorizontalCustom.init();
+
+        const gsapHorizontalCustom2 = new GsapHorizontalCustomClass({
+            rootEl: '.test-custom-scroller2',
+        });
+        gsapHorizontalCustom2.init();
+    }
+
+    if (body.classList.contains('page-noGsapHorizontal2')) {
+        noGsap();
+    }
+
+    pageScroll.init();
+    parallax.init();
+    tBlocks.init();
+    showElement.init();
+    toolTip.init();
+    totop.init();
+    vh.init();
+    move3D.init();
+    mouseParallax.init();
+    dragger.init();
+
+    accordion.init();
+    if (
+        body.classList.contains('page-gsap') ||
+        body.classList.contains('page-gsapHorizontal')
+    )
+        gsapTest.init();
+
+    if (body.classList.contains('page-store')) storeTest.init();
+    animate.init();
+    loadImageFromManifest.init();
+
+    // SVG
+    glitch.init();
+    wave.init();
+    predictiveTurbolence.init();
+
+    // CUSTOM ACCORDION VIA JS
+    const accordionCustom = new AccordionItemClass({
+        container: document.querySelector('.accordion-custom'),
+        item: '.accrdion-item',
+        toggle: '.accrdion-item__btn',
+        content: '.accrdion-item__content',
+        multiple: true,
     });
-    gsapHorizontalCustom.init();
+    accordionCustom.init();
 
-    const gsapHorizontalCustom2 = new GsapHorizontalCustomClass({
-        rootEl: '.test-custom-scroller2',
-    });
-    gsapHorizontalCustom2.init();
-}
-
-if (body.classList.contains('page-noGsapHorizontal2')) {
-    noGsap();
-}
-
-pageScroll.init();
-parallax.init();
-tBlocks.init();
-showElement.init();
-toolTip.init();
-totop.init();
-vh.init();
-move3D.init();
-mouseParallax.init();
-dragger.init();
-
-accordion.init();
-if (
-    body.classList.contains('page-gsap') ||
-    body.classList.contains('page-gsapHorizontal')
-)
-    gsapTest.init();
-
-if (body.classList.contains('page-store')) storeTest.init();
-animate.init();
-loadImageFromManifest.init();
-
-// SVG
-glitch.init();
-wave.init();
-predictiveTurbolence.init();
-
-// CUSTOM ACCORDION VIA JS
-const accordionCustom = new AccordionItemClass({
-    container: document.querySelector('.accordion-custom'),
-    item: '.accrdion-item',
-    toggle: '.accrdion-item__btn',
-    content: '.accrdion-item__content',
-    multiple: true,
-});
-accordionCustom.init();
-
-// TBlock custom event
-// L'evento su tBlocks è legato all'elemento container ( .tBlocks) che lo dispaccia
-// Sul cambio di item possiamo fare cose, arriva:
-// Direzione: up/down
-// Active Index
-const tBlockContaner1 = document.querySelector('.container-block-1 .tBlocks');
-if (typeof tBlockContaner1 != 'undefined' && tBlockContaner1 != null) {
-    tBlockContaner1.addEventListener(
-        'itemChange',
-        (e) => {
-            console.log(e.detail);
-        },
-        false
+    // TBlock custom event
+    // L'evento su tBlocks è legato all'elemento container ( .tBlocks) che lo dispaccia
+    // Sul cambio di item possiamo fare cose, arriva:
+    // Direzione: up/down
+    // Active Index
+    const tBlockContaner1 = document.querySelector(
+        '.container-block-1 .tBlocks'
     );
-}
+    if (typeof tBlockContaner1 != 'undefined' && tBlockContaner1 != null) {
+        tBlockContaner1.addEventListener(
+            'itemChange',
+            (e) => {
+                console.log(e.detail);
+            },
+            false
+        );
+    }
 
-// FIND ELEMENT
-findElement('.offset-slider')
-    .then(() => {
-        console.log('founded');
-    })
-    .catch(() => {
-        console.log('not found');
+    // FIND ELEMENT
+    findElement('.offset-slider')
+        .then(() => {
+            console.log('founded');
+        })
+        .catch(() => {
+            console.log('not found');
+        });
+
+    // LIGHTBOX
+    const lightSimply = new LightBoxClass({
+        openBtn: '.btn-Lightbox1',
+        closeBtn: '.lightbox__closeBtn',
+        lightbox: '.lightbox--static',
+        type: 'normal',
+    });
+    //
+    const lightImage = new LightBoxClass({
+        openBtn: '.btn-LightboxImage',
+        closeBtn: '.lightbox__closeBtn',
+        lightbox: '.lightbox--image',
+        type: 'image',
+    });
+    //
+    const lightSlide = new LightBoxClass({
+        openBtn: '.btn-LightboxImageSlide',
+        closeBtn: '.lightbox__closeBtn',
+        lightbox: '.lightbox--image',
+        type: 'image-slide',
+    });
+    //
+    const lightVideo = new LightBoxClass({
+        openBtn: '.btn-LightboxVideo',
+        closeBtn: '.lightbox__closeBtn',
+        lightbox: '.lightbox--video',
+        type: 'video',
     });
 
-// LIGHTBOX
-const lightSimply = new LightBoxClass({
-    openBtn: '.btn-Lightbox1',
-    closeBtn: '.lightbox__closeBtn',
-    lightbox: '.lightbox--static',
-    type: 'normal',
-});
-//
-const lightImage = new LightBoxClass({
-    openBtn: '.btn-LightboxImage',
-    closeBtn: '.lightbox__closeBtn',
-    lightbox: '.lightbox--image',
-    type: 'image',
-});
-//
-const lightSlide = new LightBoxClass({
-    openBtn: '.btn-LightboxImageSlide',
-    closeBtn: '.lightbox__closeBtn',
-    lightbox: '.lightbox--image',
-    type: 'image-slide',
-});
-//
-const lightVideo = new LightBoxClass({
-    openBtn: '.btn-LightboxVideo',
-    closeBtn: '.lightbox__closeBtn',
-    lightbox: '.lightbox--video',
-    type: 'video',
-});
+    // MENU
+    const menu = new menuClass({
+        componentWrapper: '.menu-container--top',
+    });
 
-// MENU
-const menu = new menuClass({
-    componentWrapper: '.menu-container--top',
-});
+    const sidebarMenu = new menuClass({
+        componentWrapper: '.menu-container--sidebar',
+        direction: 'vertical',
+        sideDirection: 'left',
+        offCanvas: false,
+    });
 
-const sidebarMenu = new menuClass({
-    componentWrapper: '.menu-container--sidebar',
-    direction: 'vertical',
-    sideDirection: 'left',
-    offCanvas: false,
+    // Provvisorio
+    // const forceResize = () => {
+    //     setTimeout(() => {
+    //         console.log('resize');
+    //         window.dispatchEvent(new Event('resize'));
+    //     }, 2000);
+    // };
+    // forceResize();
 });
-
-// Provvisorio
-// const forceResize = () => {
-//     setTimeout(() => {
-//         console.log('resize');
-//         window.dispatchEvent(new Event('resize'));
-//     }, 2000);
-// };
-// forceResize();

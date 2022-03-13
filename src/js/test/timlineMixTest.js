@@ -1,6 +1,6 @@
 import { handleSpring } from '../core/animation/spring/handleSpring.js';
 import { handleTween } from '../core/animation/tween/handleTween.js';
-import { HandleTimeline } from '../core/animation/timeline/handleTimeline.js';
+import { HandleAsyncTimeline } from '../core/animation/asyncTimeline/handleAsyncTimeline.js';
 
 export function timlineMixTest() {
     const btnStart = document.querySelector('.mix-btn-start');
@@ -9,8 +9,11 @@ export function timlineMixTest() {
     const btnPause = document.querySelector('.mix-btn-pause');
     const btnPlay = document.querySelector('.mix-btn-play');
     const btnFrom = document.querySelector('.mix-btn-playFrom');
-    const btnReverse = document.querySelector('.mix-btn-reverse');
+    const btnReverseImmediate = document.querySelector(
+        '.mix-btn-reverseImmediate'
+    );
     const btnReverseNext = document.querySelector('.mix-btn-reverseNext');
+    const btnReverse = document.querySelector('.mix-btn-reverse');
     const target = document.querySelector('.mix-target');
     const target2 = document.querySelector('.mix-target2');
 
@@ -36,7 +39,7 @@ export function timlineMixTest() {
     });
 
     // DEFINE TIMELINE
-    const timeline = new HandleTimeline({ repeat: -1, yoyo: true });
+    const timeline = new HandleAsyncTimeline({ repeat: -1, yoyo: true });
 
     timeline
         .add(() => springBox1.updatePreset('wobbly'))
@@ -70,8 +73,8 @@ export function timlineMixTest() {
             { config: { precision: 0.5 } }
         )
         .goTo(tweenBox2, { rotate: -180 }, { duration: 5000 })
-        .closeGroup()
-        .suspend();
+        .closeGroup();
+    // .suspend();
 
     // LISTNER
     btnStart.addEventListener('click', () => {
@@ -94,11 +97,15 @@ export function timlineMixTest() {
         timeline.playFrom('label1');
     });
 
-    btnReverse.addEventListener('click', () => {
-        timeline.doReverse();
+    btnReverseImmediate.addEventListener('click', () => {
+        timeline.reverseImmediate();
     });
 
     btnReverseNext.addEventListener('click', () => {
-        timeline.doReverseNext();
+        timeline.reverseNext();
+    });
+
+    btnReverse.addEventListener('click', () => {
+        timeline.reverse();
     });
 }

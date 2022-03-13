@@ -1,5 +1,5 @@
 import { handleSpring } from '../core/animation/spring/handleSpring.js';
-import { HandleTimeline } from '../core/animation/timeline/handleTimeline.js';
+import { HandleAsyncTimeline } from '../core/animation/asyncTimeline/handleAsyncTimeline.js';
 
 export function springTest() {
     const btnStart = document.querySelector('.spring-btn-start');
@@ -7,6 +7,7 @@ export function springTest() {
     const btnStop = document.querySelector('.spring-btn-stop');
     const btnPause = document.querySelector('.spring-btn-pause');
     const btnPlay = document.querySelector('.spring-btn-play');
+    const btnReverse = document.querySelector('.spring-btn-reverse');
     const target = document.querySelector('.spring-target');
 
     // DEFINE SPRING
@@ -27,7 +28,7 @@ export function springTest() {
     }
 
     // DEFINE TIMELINE
-    const timeline = new HandleTimeline({ repeat: 2, yoyo: true })
+    const timeline = new HandleAsyncTimeline({ repeat: 2, yoyo: true })
         .add(() => mySpring.updatePreset('wobbly'))
         .set(
             mySpring,
@@ -71,5 +72,9 @@ export function springTest() {
 
     btnPlay.addEventListener('click', () => {
         timeline.resume();
+    });
+
+    btnReverse.addEventListener('click', () => {
+        timeline.reverse();
     });
 }
