@@ -1,7 +1,7 @@
 const gulp = require('gulp');
 const gulpif = require('gulp-if');
 const path = require('path');
-const sourcemaps = require('gulp-sourcemaps');
+const sourcemaps = require('gulp');
 const sass = require('gulp-sass')(require('sass'));
 const cleanCSS = require('gulp-clean-css');
 const postcss = require('gulp-postcss');
@@ -19,26 +19,16 @@ const store = require('../store.js');
  */
 function style() {
     return gulp
-        .src(path.join(scssPath, 'style.scss'))
-        .pipe(sourcemaps.init())
+        .src(path.join(scssPath, 'style.scss'), { sourcemaps: true })
         .pipe(
             sass({
                 outputStyle: 'expanded',
-                includePaths: ['node_modules/susy/sass'],
             }).on('error', sass.logError)
         )
         .pipe(postcss([require('autoprefixer')()]))
-        .pipe(
-            gulpif(
-                !store.arg.prod,
-                sourcemaps.write('maps', {
-                    includeContent: false,
-                    sourceRoot: scssPath,
-                })
-            )
-        )
         .pipe(gulpif(store.arg.prod, cleanCSS()))
-        .pipe(gulp.dest(cssDest))
+        .pipe(gulpif(!store.arg.prod, gulp.dest(cssDest, { sourcemaps: true })))
+        .pipe(gulpif(store.arg.prod, gulp.dest(cssDest)))
         .pipe(
             browserSync.stream({
                 match: '**/*.css',
