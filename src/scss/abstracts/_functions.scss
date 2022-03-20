@@ -7,6 +7,8 @@
 /// @param {String} $type - asset type folder (e.g. `fonts/`)
 /// @param {String} $path - asset path
 /// @return {Url}
+@use "sass:math";
+
 @function asset($base, $type, $path) {
     @return url($base + $type + $path);
 }
@@ -45,7 +47,7 @@
         $mq: map-get($html-font-size, $mq);
     }
 
-    @return ($pixels / $mq) * 1rem;
+    @return math.div($pixels, $mq) * 1rem;
 }
 
 // calc EM in houses at the lowest average media query
@@ -64,18 +66,18 @@
         $mq: map-get($html-font-size, $mq);
     }
 
-    @return ($pixels / $mq) * 1em;
+    @return math.div($pixels, $mq) * 1em;
 }
 
 @function line-height($font-size , $line-height) {
-    @return ($line-height / $font-size) *1em;
+    @return math.div($line-height, $font-size) *1em;
 }
 
 @function getVWratio($ratioW , $ratioH , $imgW , $windowW) {
-    $percentW: (100 * $imgW) / $windowW;
+    $percentW: math.div(100 * $imgW, $windowW);
 
-    @return (( $percentW * $ratioH ) / $ratioW ) * 1vw;
+    @return math.div( $percentW * $ratioH , $ratioW)  * 1vw;
 }
 
 @function count-svg-item($nRow, $nColumn) {
-    @return ((100 / $nRow) * 1%) ((100 / $nColumn) * 1%); }
+    @return (math.div(100, $nRow) * 1%) (math.div(100, $nColumn) * 1%); }

@@ -46,5 +46,5 @@ img {
 
 .container {
     margin: auto;
-    max-width: map-get($breakpoints, 'x-large');
+    max-width: map-get($mq-breakpoints, xlarge);
 }

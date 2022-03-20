@@ -1,10 +1,10 @@
-$mediaQ: 'desktop';
+$mediaQ: desktop;
 
 .scroller {
     --sectionheight: 100vh;
 
     &__trigger {
-        @include _mq($mediaQ) {
+        @include mq($from: $mediaQ) {
             z-index: 10;
             position: relative;
             pointer-events: none;
@@ -13,7 +13,7 @@ $mediaQ: 'desktop';
     }
 
     &__row {
-        @include _mq($mediaQ) {
+        @include mq($from: $mediaQ) {
             display: flex;
             position: sticky;
             top: 0;
@@ -25,7 +25,7 @@ $mediaQ: 'desktop';
     &__section {
         height: var(--sectionheight);
 
-        @include _mq($mediaQ) {
+        @include mq($from: $mediaQ) {
             flex: 0 0 auto;
         }
     }
@@ -33,7 +33,7 @@ $mediaQ: 'desktop';
     &__shadowEl {
         display: none;
 
-        @include _mq($mediaQ) {
+        @include mq($from: $mediaQ) {
             width: 100%;
             display: block;
             pointer-events: none;
@@ -43,7 +43,7 @@ $mediaQ: 'desktop';
     &__shadow {
         display: none;
 
-        @include _mq($mediaQ) {
+        @include mq($from: $mediaQ) {
             pointer-events: none;
             display: block;
             position: absolute;

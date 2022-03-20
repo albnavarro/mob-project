@@ -6,7 +6,7 @@
 .sidebar {
     background-color: #bbb;
 
-    @include _mq('tablet') {
+    @include mq($from: tablet) {
         width: 30%;
         float: left;
         padding: 1rem;
@@ -14,7 +14,7 @@
 }
 
 .content {
-    @include _mq('tablet') {
+    @include mq($from: tablet) {
         width: 70%;
         float: right;
         padding: 1rem;

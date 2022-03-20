@@ -1,5 +1,5 @@
 const gulp = require('gulp');
-const uglify = require('gulp-uglify');
+const uglify = require('gulp-uglify-es').default;
 const rename = require('gulp-rename');
 const path = require('path');
 const themePath = path.resolve('src');

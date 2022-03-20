@@ -1,7 +1,6 @@
 const gulp = require('gulp');
 const fs = require('fs-extra');
 const rev = require('gulp-rev');
-const revdel = require('rev-del');
 const path = require('path');
 const themePath = path.resolve('src');
 const destPath = path.resolve('www');
@@ -32,7 +31,6 @@ function assets() {
 
     return gulp
         .src([cssFile, jsFile, imgFiles, videoFiles])
-
         .pipe(rev())
         .pipe(gulp.dest(distPath))
         .pipe(
@@ -40,7 +38,6 @@ function assets() {
                 path: 'manifest.json',
             })
         )
-        .pipe(revdel(distPath))
         .pipe(gulp.dest(distPath));
 }
 

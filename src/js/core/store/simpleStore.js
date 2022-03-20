@@ -1,24 +1,17 @@
+import {
+    checkType,
+    storeType,
+    maxDepth,
+    getDataRecursive,
+    getValidateRecursive,
+    getTypeRecursive,
+} from './storeType.js';
+
 export function SimpleStore(data) {
-    // Private function
-
-    const isObject = (obj) => {
-        return Object.prototype.toString.call(obj) === '[object Object]';
-    };
-
-    const maxDepth = (object) => {
-        if (!isObject(object)) return 0;
-        const values = Object.values(object);
-
-        return (
-            (values.length &&
-                Math.max(...values.map((value) => maxDepth(value)))) + 1
-        );
-    };
-
     /**
      * Log Style
      */
-    let logStyle = 'background: #222; color: yellow; padding: 10px;';
+    let logStyle = 'padding: 10px;';
 
     /**
      * Fire computed if some prop associated change
@@ -91,7 +84,7 @@ export function SimpleStore(data) {
             return;
         }
 
-        if (isObject(store[prop])) {
+        if (storeType.isObject(store[prop])) {
             setObj(prop, val, fireCallback);
         } else {
             setProp(prop, val, fireCallback);
@@ -111,7 +104,7 @@ export function SimpleStore(data) {
         /**
          * Check if val is an Object
          */
-        if (isObject(val)) {
+        if (storeType.isObject(val)) {
             console.warn(
                 `%c trying to execute setProp method on '${prop}' propierties: setProp methods doasn't allow objects as value, ${JSON.stringify(
                     val
@@ -124,7 +117,7 @@ export function SimpleStore(data) {
         /**
          * Check if prop is an Object
          */
-        if (isObject(store[prop])) {
+        if (storeType.isObject(store[prop])) {
             console.warn(
                 `%c trying to execute setProp method on '${prop}' propierties: '${JSON.stringify(
                     prop
@@ -134,10 +127,19 @@ export function SimpleStore(data) {
             return;
         }
 
+        const isValidType = checkType(type[prop], val);
+        if (!isValidType) {
+            console.warn(
+                `%c trying to execute setProp method on '${prop}' propierties: '${val}' is not ${type[prop]}`,
+                logStyle
+            );
+            return;
+        }
+
         /**
-         * Check if there is a validate function and update validateError arr
+         * Check if there is a validate function and update validateResult arr
          */
-        if (prop in fnValidate) validateError[prop] = fnValidate[prop](val);
+        validateResult[prop] = fnValidate[prop](val);
 
         /**
          * Update value and fire callback associated
@@ -148,7 +150,7 @@ export function SimpleStore(data) {
         if (fireCallback) {
             const fnByProp = fnStore.filter((item) => item.prop === prop);
             fnByProp.forEach((item, i) => {
-                item.fn(val, oldVal, validateError[prop]);
+                item.fn(val, oldVal, validateResult[prop]);
             });
         }
 
@@ -166,7 +168,7 @@ export function SimpleStore(data) {
         /**
          * Check if val is not an Object
          */
-        if (!isObject(val)) {
+        if (!storeType.isObject(val)) {
             console.warn(
                 `%c trying to execute setObj method on '${prop}' propierties: setObj methods allow only objects as value, ${val} is not an Object`,
                 logStyle
@@ -177,7 +179,7 @@ export function SimpleStore(data) {
         /**
          * Check if prop is not an Object
          */
-        if (!isObject(store[prop])) {
+        if (!storeType.isObject(store[prop])) {
             console.warn(
                 `%c trying to execute setObj data method on '${prop}' propierties: store propierties '${prop}' is not an object`,
                 logStyle
@@ -213,18 +215,35 @@ export function SimpleStore(data) {
             return;
         }
 
+        // Check type of eachpropierties
+        const isValidType = Object.entries(val)
+            .map((item, i) => {
+                const [subProp, subVal] = item;
+                const typeResponse = checkType(type[prop][subProp], subVal);
+
+                if (!typeResponse) {
+                    console.warn(
+                        `%c trying to execute setObj data method on ${prop}.${subProp} propierties: '${subVal}' is not ${type[prop][subProp]}`,
+                        logStyle
+                    );
+                }
+
+                return typeResponse;
+            })
+            .every((item) => item === true);
+
+        if (!isValidType) {
+            return;
+        }
+
         /**
-         * Validate value (value passed to setObj is a Object to merge with original) and store the result in validateError arr
+         * Validate value (value passed to setObj is a Object to merge with original) and store the result in validateResult arr
          * id there is no validation return true, otherwse get boolean value from fnValidate obj
          */
 
-        const valuesArray = Object.entries(val);
-        valuesArray.forEach((item, i) => {
+        Object.entries(val).forEach((item, i) => {
             const [subProp, subVal] = item;
-
-            if (prop in fnValidate && subProp in fnValidate[prop])
-                validateError[prop][subProp] =
-                    fnValidate[prop][subProp](subVal);
+            validateResult[prop][subProp] = fnValidate[prop][subProp](subVal);
         });
 
         /**
@@ -236,7 +255,7 @@ export function SimpleStore(data) {
         if (fireCallback) {
             const fnByProp = fnStore.filter((item) => item.prop === prop);
             fnByProp.forEach((item, i) => {
-                item.fn(store[prop], oldVal, validateError[prop]);
+                item.fn(store[prop], oldVal, validateResult[prop]);
             });
         }
 
@@ -283,7 +302,7 @@ export function SimpleStore(data) {
      * @return {Object} return validation store object
      */
     const getValidation = () => {
-        return validateError;
+        return validateResult;
     };
 
     /**
@@ -321,7 +340,8 @@ export function SimpleStore(data) {
         if (prop in store) {
             const fnByProp = fnStore.filter((item) => item.prop === prop);
             fnByProp.forEach((item, i) => {
-                item.fn(store[prop], store[prop]);
+                // Val , OldVal, Validate
+                item.fn(store[prop], store[prop], validateResult[prop]);
             });
         } else {
             console.warn(
@@ -330,62 +350,12 @@ export function SimpleStore(data) {
         }
     };
 
-    /**
-     * Set validate array
-     * Usage:
-     *   myStore.validate({
-     *       prop: (val) => {
-     *           return ....
-     *       },
-     *       prop2: {
-     *           subprop: (val) => {
-     *               return ....
-     *           },
-     *       }
-     *     });
-     *
-     * @param  {Object} data Object with validate function
-     */
-    const validate = (data) => {
-        const dataDepth = maxDepth(data);
-
-        fnValidate = (() => {
-            if (dataDepth > 2) {
-                console.warn(
-                    `%c data depth on validate object creation allowed is maximun 2 this data is ${dataDepth}`,
-                    logStyle
-                );
-                return {};
-            } else {
-                return { ...data };
-            }
-        })();
-
-        // Update validateError Object for every element in store that have a validate function asociated
-        for (const key in store) {
-            if (isObject(store[key])) {
-                for (const subkey in store[key]) {
-                    if (subkey in fnValidate[key]) {
-                        validateError[key][subkey] = fnValidate[key][subkey](
-                            store[key][subkey]
-                        );
-                    }
-                }
-            } else {
-                // Get value from not obj
-                if (fnValidate[key]) {
-                    validateError[key] = fnValidate[key](store[key]);
-                }
-            }
-        }
-    };
-
     const debugStore = () => {
         console.log(store);
     };
 
     const debugValidate = () => {
-        console.log(validateError);
+        console.log(validateResult);
     };
 
     const setStyle = (string) => {
@@ -477,9 +447,10 @@ export function SimpleStore(data) {
     let counterId = 0;
     let fnStore = [];
     let fnComputed = [];
-    let fnValidate = {};
-    const validateError = {};
+    const validateResult = {};
     const dataDepth = maxDepth(data);
+
+    // Create store obj
     const store = (() => {
         if (dataDepth > 2) {
             console.warn(
@@ -488,24 +459,45 @@ export function SimpleStore(data) {
             );
             return {};
         } else {
-            return { ...data };
+            return getDataRecursive(data);
         }
     })();
 
-    // Update validateError Object with basic value at store inizialization
-    // At inizialization every propierites dasn't have a validate function associated, so th validation is true
-    for (const key in store) {
-        if (isObject(store[key])) {
-            // If there is no obj create an empty obj
-            validateError[key] = {};
-
-            for (const subkey in store[key]) {
-                validateError[key][subkey] = true;
-            }
+    const type = (() => {
+        if (dataDepth > 2) {
+            console.warn(
+                `%c data depth on store creation allowed is maximun 2 this data is ${dataDepth}`,
+                logStyle
+            );
+            return {};
         } else {
-            validateError[key] = true;
+            return getTypeRecursive(data);
         }
+    })();
+
+    // Create array with alidate function
+    const fnValidate = (() => {
+        if (dataDepth > 2) {
+            console.warn(
+                `%c data depth on store creation allowed is maximun 2 this data is ${dataDepth}`,
+                logStyle
+            );
+            return {};
+        } else {
+            return getValidateRecursive(data);
+        }
+    })();
+
+    // Inzializa Empty obj in second level if nedeed
+    for (const key in store) {
+        if (storeType.isObject(store[key])) validateResult[key] = {};
     }
+
+    // First run execute each propierites to check validation without fire event
+    Object.entries(store).forEach((item, i) => {
+        const [key, value] = item;
+        set(key, value, false);
+    });
 
     return {
         set,
@@ -514,7 +506,6 @@ export function SimpleStore(data) {
         getValidation,
         watch,
         emit,
-        validate,
         computed,
         debugStore,
         debugValidate,

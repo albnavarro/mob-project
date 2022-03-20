@@ -23,7 +23,7 @@ function cleanDist(done) {
  * @return {function}
  */
 function cleanAll(done) {
-    fs.rmdirSync(destPath, { recursive: true });
+    fs.rmSync(destPath, { recursive: true });
     done();
 }
 

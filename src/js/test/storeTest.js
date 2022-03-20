@@ -15,37 +15,55 @@ class StoreTestClass {
         const getValidate = document.querySelector('.getValidate');
 
         const store = new SimpleStore({
-            input: 0,
+            input: () => ({
+                value: 10,
+                type: Number,
+                validate: (val) => val < 10,
+            }),
             obj: {
-                input: 0,
+                input: () => ({
+                    value: 0,
+                    type: Number,
+                    validate: (val) => val < 10,
+                }),
+                testElement: () => ({
+                    value: document.createElement('div'),
+                    type: Element,
+                }),
+                testNodeList: () => ({
+                    value: document.querySelectorAll('.dummyNodelist'),
+                    type: NodeList,
+                }),
             },
-            sum: 0,
+            sum: () => ({
+                value: 0,
+                type: Number,
+                validate: (val) => val === 3,
+            }),
         });
 
-        store.validate({
-            input: (val) => !isNaN(parseFloat(val)) && isFinite(val),
-            obj: {
-                input: (val) => !isNaN(parseFloat(val)) && isFinite(val),
-            },
-            sum: (val) => val === 3,
-        });
+        store.set('obj', { testElement: result1 });
+        store.set('obj', { testNodeList: document.querySelectorAll('button') });
+
+        console.log(store.debugStore());
+        console.log(store.debugValidate());
 
         // WATCHER
         const unsubscribeInput = store.watch(
             'input',
             (val, oldVal, validate) => {
-                result1.innerHTML = `input1: ${val} ,oldval: ${oldVal} , validate:${validate}`;
+                result1.innerHTML = `input1: ${val} ,oldval: ${oldVal} , val is < 10: ${validate}`;
             }
         );
-
+        //
         const unsubscribeObj = store.watch('obj', (val, oldVal, validate) => {
             const { input: value } = val;
             const { input: prevValue } = oldVal;
             const { input: error } = validate;
 
-            result2.innerHTML = `input2: ${value},oldval: ${prevValue} , validate:${error}`;
+            result2.innerHTML = `input2: ${value},oldval: ${prevValue} , val is < 10:${error}`;
         });
-
+        //
         const unsubscribeSum = store.watch('sum', (val, oldVal, validate) => {
             result3.innerHTML = `sum of input field: ${val} ,oldval: ${oldVal} , is equal 3:${validate}`;
         });
@@ -56,17 +74,17 @@ class StoreTestClass {
             const { obj: inputObjectValidation } = store.getValidation();
 
             return inputValidation && inputObjectValidation.input
-                ? parseInt(input) + parseInt(obj.input)
-                : null;
+                ? input + obj.input
+                : 0;
         });
 
         // HANDLER
         inputField1.addEventListener('input', (e) => {
-            store.set('input', inputField1.value);
+            store.set('input', parseInt(inputField1.value));
         });
 
         inputField2.addEventListener('input', (e) => {
-            store.set('obj', { input: inputField2.value });
+            store.set('obj', { input: parseInt(inputField2.value) });
         });
 
         inputField3.addEventListener('click', (e) => {

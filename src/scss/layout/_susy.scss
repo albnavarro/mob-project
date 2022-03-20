@@ -1,7 +1,7 @@
 // MARGIN MODE
 .susy-wrap1,
 .susy-wrap3 {
-    @include _mq('tablet') {
+    @include mq($from: tablet) {
         background: susy-svg-grid() no-repeat scroll;
         margin-bottom: 2rem;
     }
@@ -11,7 +11,7 @@
     background-color: rgba(0, 0, 0, 0.3);
 
     // USE DEFAULT GUTTER NARROW
-    @include _mq('tablet' , 'desktop') {
+    @include mq($from: tablet, $until: desktop) {
         width: span(6);
         margin-right: gutter();
         float: left;
@@ -23,7 +23,7 @@
     }
 
     // CANGEs DEFAULT GUTTER
-    @include _mq('desktop') {
+    @include mq($from: desktop) {
         width: span(4);
         margin-right: gutter();
         float: left;
@@ -38,10 +38,8 @@
 // WIDE sMODE
 
 .susy-wrap2 {
-    // @include _mq('tablet') {
     background: susy-svg-grid($wideconf) no-repeat scroll;
     margin-bottom: 2rem;
-    // }
 }
 
 .susy-wrap2__col {
@@ -51,13 +49,13 @@
         width: span(12);
         padding: 0 120px;
 
-        @include _mq('tablet' , 'desktop') {
+        @include mq($from: tablet, $until: desktop) {
             width: span(6);
             padding: 0 gutter();
             float: left;
         }
 
-        @include _mq('desktop') {
+        @include mq($from: desktop) {
             width: span(4);
             padding: 0 gutter();
             float: left;
@@ -70,7 +68,7 @@
 .susy-wrap3__col {
     background-color: rgba($black, 0.4);
 
-    @include _mq('tablet') {
+    @include mq($from: tablet) {
         &:nth-of-type(1) {
             width: span(2);
             margin-right: gutter();
@@ -92,14 +90,14 @@
 // ASYMMETRIC MODE
 
 .susy-wrap4 {
-    @include _mq('tablet') {
+    @include mq($from: tablet) {
         background: susy-svg-grid() no-repeat scroll;
         margin-bottom: 2rem;
     }
 }
 
 .susy-wrap4__col {
-    @include _mq('tablet') {
+    @include mq($from: tablet) {
         &:nth-of-type(1) {
             width: span(2);
             margin-right: gutter();
@@ -123,7 +121,7 @@
 }
 
 .nest1 {
-    @include _mq('tablet') {
+    @include mq($from: tablet) {
         width: span(1 of 8);
         background-color: rgba($black, 0.3);
         margin-right: gutter(8);
@@ -132,7 +130,7 @@
 }
 
 .nest2 {
-    @include _mq('tablet') {
+    @include mq($from: tablet) {
         width: span(5 of 8);
         background-color: rgba($black, 0.3);
         float: left;

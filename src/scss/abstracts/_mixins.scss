@@ -6,6 +6,8 @@
 /// @author Harry Roberts
 /// @param {Bool} $self [false] - Whether or not to include current selector
 /// @link https://twitter.com/csswizardry/status/478938530342006784 Original tweet from Harry Roberts
+@use "sass:math";
+
 @mixin on-event($self: false) {
     @if $self {
         &.active,
@@ -14,9 +16,7 @@
         &:focus {
             @content;
         }
-    }
-
-    @else {
+    } @else {
         &:hover,
         &:active,
         &:focus {
@@ -34,36 +34,7 @@
     }
 }
 
-/// Make media queries smarter
-@include breakpoint-set('to ems', true);
-
-@mixin _mq($min, $max: '') {
-    @if $max == '' {
-        @include breakpoint(map-get($breakpoints, $min)) {
-            @content;
-        }
-    }
-
-    @else {
-        @if $min == 'max' {
-            @include breakpoint('max-width' (map-get($breakpoints, $max) - 1)) {
-                @content;
-            }
-        }
-
-        @else {
-            @include breakpoint(
-                ((map-get($breakpoints, $min))
-                (map-get($breakpoints, $max) - 1))) {
-                @content;
-            }
-        }
-    }
-}
-
-@mixin susy-use(
-    $config
-) {
+@mixin susy-use($config) {
     //  parse and normalize any shorthand arguments
     $config: susy-compile($config);
 
@@ -96,7 +67,7 @@
     $encoded: '';
     $slice: 2000;
     $index: 0;
-    $loops: ceil(str-length($svg) / $slice);
+    $loops: ceil(math.div(str-length($svg), $slice));
 
     @for $i from 1 through $loops {
         $chunk: str-slice($svg, $index, $index + $slice - 1);
@@ -112,7 +83,7 @@
         $index: $index + $slice;
     }
 
-    @return url("data:image/svg+xml;charset=utf8,#{$encoded}");
+    @return url('data:image/svg+xml;charset=utf8,#{$encoded}');
 }
 
 /// Replace `$search` with `$replace` in `$string`
@@ -126,20 +97,16 @@
     $index: str-index($string, $search);
 
     @if $index {
-        @return str-slice($string, 1, $index - 1) + $replace + str-replace(str-slice($string, $index + str-length($search)), $search, $replace);
+        @return str-slice($string, 1, $index - 1) + $replace +
+            str-replace(
+                str-slice($string, $index + str-length($search)),
+                $search,
+                $replace
+            );
     }
 
     @return $string;
 }
-
-// responsive font size mixin v1
-// @mixin font-size-map() {
-//   @each $breakpoints, $font-size in $html-font-size {
-//     @include _mq($breakpoints) {
-//       font-size: $font-size;
-//     }
-//   }
-// }
 
 // responsive font size mixin v2
 @mixin font-size-map() {
@@ -147,7 +114,7 @@
 
     @each $key, $value in $html-font-size {
         @if $last-output != $value {
-            @include _mq($key) {
+            @include mq($from: $key) {
                 font-size: $value;
             }
         }
@@ -156,7 +123,9 @@
 }
 
 @mixin get-dot-bg($dotWidth, $dotColor) {
-    background-image: svg-uri('<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><rect y="50%" x="50%" width="#{$dotWidth}" height="#{$dotWidth}" fill="#{$dotColor}"/></svg>');
+    background-image: svg-uri(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><rect y="50%" x="50%" width="#{$dotWidth}" height="#{$dotWidth}" fill="#{$dotColor}"/></svg>'
+    );
     background-position: left top;
 }
 
@@ -167,23 +136,13 @@
 }
 
 @mixin Edge() {
-    @supports (-ms-accelerator:true) {
+    @supports (-ms-accelerator: true) {
         @content;
     }
 }
 
-@mixin vwHeight() {
-    height: calc(100vh - 80px);
-    height: calc((var(--vh, 1vh) * 100) - 80px);
-
-    @include _mq('tablet') {
-        height: calc(100vh - 145px);
-        height: calc((var(--vh, 1vh) * 100) - 145px);
-    }
-}
-
 @function strip-unit($value) {
-    @return $value / ($value * 0 + 1);
+    @return math.div($value, $value * 0 + 1);
 }
 
 @mixin fluid-type($min-vw, $max-vw, $min-font-size, $max-font-size) {
@@ -197,8 +156,26 @@
             font-size: $min-font-size;
 
             @media screen and (min-width: $min-vw) {
-                font-size: -webkit-calc(#{$min-font-size} + #{strip-unit($max-font-size - $min-font-size)} * ((100vw - #{$min-vw}) / #{strip-unit($max-vw - $min-vw)}));
-                font-size: calc(#{$min-font-size} + #{strip-unit($max-font-size - $min-font-size)} * ((100vw - #{$min-vw}) / #{strip-unit($max-vw - $min-vw)}));
+                font-size: -webkit-calc(
+                    #{$min-font-size} + #{strip-unit(
+                            $max-font-size - $min-font-size
+                        )} *
+                        (
+                            (100vw - #{$min-vw}) / #{strip-unit(
+                                    $max-vw - $min-vw
+                                )}
+                        )
+                );
+                font-size: calc(
+                    #{$min-font-size} + #{strip-unit(
+                            $max-font-size - $min-font-size
+                        )} *
+                        (
+                            (100vw - #{$min-vw}) / #{strip-unit(
+                                    $max-vw - $min-vw
+                                )}
+                        )
+                );
             }
 
             @media screen and (min-width: $max-vw) {
@@ -215,7 +192,7 @@
     // 1 vw is equal to 1% of the viewport width
     $vw-context: ($max-breakpoint-fluid * 0.01) * 1px; // 1% viewport width
 
-    @return ($target/$vw-context) * 1vw;
+    @return math.div($target, $vw-context) * 1vw;
 }
 
 // Mixin
@@ -230,9 +207,14 @@
     }
 }
 
-@mixin fluidElementWH($imgW , $imgH, $max-breakpoint-fluid,  $use-breakpoint: true) {
-    $widthW: (100 * $imgW) / $max-breakpoint-fluid;
-    $heightH: (( $widthW * $imgH ) / $imgW );
+@mixin fluidElementWH(
+    $imgW,
+    $imgH,
+    $max-breakpoint-fluid,
+    $use-breakpoint: true
+) {
+    $widthW: math.div(100 * $imgW, $max-breakpoint-fluid);
+    $heightH: math.div($widthW * $imgH, $imgW);
 
     height: $heightH * 1vw;
     width: $widthW * 1vw;
@@ -245,8 +227,8 @@
     }
 }
 
-@mixin fluidElementW($imgW, $max-breakpoint-fluid,  $use-breakpoint: true) {
-    $widthW: (100 * $imgW) / $max-breakpoint-fluid;
+@mixin fluidElementW($imgW, $max-breakpoint-fluid, $use-breakpoint: true) {
+    $widthW: math.div(100 * $imgW, $max-breakpoint-fluid);
 
     width: $widthW * 1vw;
 

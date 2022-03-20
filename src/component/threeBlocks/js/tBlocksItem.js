@@ -21,45 +21,77 @@ export class tBlocksItemClass {
         this.container = container;
         this.items = container.querySelectorAll('.tBlocks__item');
 
-        this.store = new SimpleStore({
-            activeItem: this.container.querySelector('.tBlocks__item--active'),
-            itemNotActive: null,
-            swapItem: {
-                item: null,
-                action: null,
-            },
-            clone: {
-                item: null,
-                action: null,
-            },
-            offsetLeft: 0,
-            horizontalDirection: this.DX,
-            verticalDirection: this.UP,
-            center: 0,
-            unsubscribeResize: () => {},
-        });
+        this.container.querySelectorAll(
+            '.tBlocks__item:not(.tBlocks__item--active)'
+        );
 
-        this.store.validate({
+        this.store = new SimpleStore({
+            itemsNotActive: () => ({
+                value: this.container.querySelectorAll(
+                    '.tBlocks__item:not(.tBlocks__item--active)'
+                ),
+                type: NodeList,
+            }),
+            activeItem: () => ({
+                value: this.container.querySelector('.tBlocks__item--active'),
+                type: Element,
+            }),
             swapItem: {
-                action: (val) => {
-                    const values = [this.UPDATE, this.REMOVE];
-                    return values.includes(val);
-                },
+                item: () => ({
+                    value: document.createElement('div'),
+                    type: Element,
+                }),
+                action: () => ({
+                    value: '',
+                    type: String,
+                    validate: (val) => {
+                        const values = [this.UPDATE, this.REMOVE];
+                        return values.includes(val);
+                    },
+                }),
             },
             clone: {
-                action: (val) => {
-                    const values = [this.REMOVE, this.ADD];
+                item: () => ({
+                    value: document.createElement('div'),
+                    type: Element,
+                }),
+                action: () => ({
+                    value: '',
+                    type: String,
+                    validate: (val) => {
+                        const values = [this.REMOVE, this.ADD];
+                        return values.includes(val);
+                    },
+                }),
+            },
+            horizontalDirection: () => ({
+                value: this.DX,
+                type: String,
+                validate: (val) => {
+                    const values = [this.SX, this.DX];
                     return values.includes(val);
                 },
-            },
-            horizontalDirection: (val) => {
-                const values = [this.SX, this.DX];
-                return values.includes(val);
-            },
-            verticalDirection: (val) => {
-                const values = [this.UP, this.DOWN];
-                return values.includes(val);
-            },
+            }),
+            verticalDirection: () => ({
+                value: this.UP,
+                type: String,
+                validate: (val) => {
+                    const values = [this.UP, this.DOWN];
+                    return values.includes(val);
+                },
+            }),
+            offsetLeft: () => ({
+                value: 0,
+                type: Number,
+            }),
+            center: () => ({
+                value: 0,
+                type: Number,
+            }),
+            unsubscribeResize: () => ({
+                value: () => {},
+                type: Function,
+            }),
         });
 
         Object.freeze(this);
@@ -102,9 +134,9 @@ export class tBlocksItemClass {
             this.onSwapChange(item);
         });
 
-        this.store.watch('itemNotActive', (newVal, oldVal) => {
+        this.store.watch('itemsNotActive', (newVal, oldVal) => {
             const items = newVal;
-            this.onItemNotActiveChange(items);
+            this.onitemsNotActiveChange(items);
         });
     }
 
@@ -140,11 +172,11 @@ export class tBlocksItemClass {
     }
 
     setNotActiveitemStyle() {
-        const itemNotActive = this.container.querySelectorAll(
+        const itemsNotActive = this.container.querySelectorAll(
             '.tBlocks__item:not(.tBlocks__item--active)'
         );
 
-        [...itemNotActive].forEach((item, i) => {
+        [...itemsNotActive].forEach((item, i) => {
             const innerEl = item.querySelector('.tBlocks__item__wrap');
             innerEl.style.transform = `translate3d(0,0,0) scale(1,1)`;
 
@@ -236,7 +268,7 @@ export class tBlocksItemClass {
         }
     }
 
-    onItemNotActiveChange(items) {
+    onitemsNotActiveChange(items) {
         if (items === null) return;
 
         [...items].forEach((item, i) => {
@@ -257,13 +289,13 @@ export class tBlocksItemClass {
         this.store.set('offsetLeft', offset(item).left);
 
         // Set non active item order style
-        const itemNotActive = this.container.querySelectorAll(
+        const itemsNotActive = this.container.querySelectorAll(
             '.tBlocks__item:not(.tBlocks__item--active)'
         );
-        this.store.set('itemNotActive', itemNotActive);
+        this.store.set('itemsNotActive', itemsNotActive);
 
         // Set item that change layout position
-        const swapItem = [...itemNotActive].find((el) => {
+        const swapItem = [...itemsNotActive].find((el) => {
             return el !== item;
         });
         this.store.set('swapItem', { item: swapItem, action: this.UPDATE });
@@ -308,7 +340,7 @@ export class tBlocksItemClass {
         );
 
         setTimeout(() => {
-            bodyScroll.to({ target: this.container });
+            bodyScroll.to({ target: this.container }).catch((err) => {});
         }, 500);
     }
 }

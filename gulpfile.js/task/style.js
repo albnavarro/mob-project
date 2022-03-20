@@ -2,8 +2,8 @@ const gulp = require('gulp');
 const gulpif = require('gulp-if');
 const path = require('path');
 const sourcemaps = require('gulp-sourcemaps');
-const sass = require('gulp-sass');
-const cssmin = require('gulp-cssmin');
+const sass = require('gulp-sass')(require('sass'));
+const cleanCSS = require('gulp-clean-css');
 const postcss = require('gulp-postcss');
 const themePath = path.resolve('src');
 const destPath = path.resolve('www');
@@ -23,18 +23,11 @@ function style() {
         .pipe(sourcemaps.init())
         .pipe(
             sass({
-                outputStyle: 'nested',
+                outputStyle: 'expanded',
                 includePaths: ['node_modules/susy/sass'],
             }).on('error', sass.logError)
         )
-        .pipe(
-            postcss([
-                require('autoprefixer')(),
-                require('css-mqpacker')({
-                    sort: true,
-                }),
-            ])
-        )
+        .pipe(postcss([require('autoprefixer')()]))
         .pipe(
             gulpif(
                 !store.arg.prod,
@@ -44,14 +37,7 @@ function style() {
                 })
             )
         )
-        .pipe(
-            gulpif(
-                store.arg.prod,
-                cssmin({
-                    keepSpecialComments: false,
-                })
-            )
-        )
+        .pipe(gulpif(store.arg.prod, cleanCSS()))
         .pipe(gulp.dest(cssDest))
         .pipe(
             browserSync.stream({

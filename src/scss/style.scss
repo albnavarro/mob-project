@@ -1,13 +1,15 @@
 @charset 'UTF-8';
+@use 'sass:math';
 
 @import // Vendors
-    '../../node_modules/breakpoint-sass/stylesheets/breakpoint',
-    '../../node_modules/susy/sass/susy',
-    '../../node_modules/susy/sass/plugins/svg-grid';
+    '../../node_modules/sass-mq/_mq.import';
 
 // 1. Configuration and helpers
-@import 'abstracts/variables', 'abstracts/functions', 'abstracts/mixins';
 @import 'vendor/normalize';
+@import 'vendor/susy/sass/susy';
+@import 'vendor/susy/sass/plugins/svg-grid';
+
+@import 'abstracts/variables', 'abstracts/functions', 'abstracts/mixins';
 
 // 3. Base stuff
 @import 'base/base', 'base/typography', 'base/fonts', 'base/helpers';
@@ -26,6 +28,6 @@
     '../component/horizontalCustom/scss/horizontalCustom.scss';
 
 // layout
-@import 'layout/index', 'layout/footer', 'layout/susy', 'layout/move3D',
-    'layout/mouseParallax', 'layout/gsap', 'layout/gsap2', 'layout/svg',
-    'layout/dragger', 'layout/scrollerH';
+@import 'layout/index', 'layout/footer', 'layout/move3D', 'layout/mouseParallax',
+    'layout/gsap', 'layout/gsap2', 'layout/svg', 'layout/dragger',
+    'layout/scrollerH', 'layout/susy';
