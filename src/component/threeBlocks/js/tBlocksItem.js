@@ -195,9 +195,8 @@ export class tBlocksItemClass {
         child.style.transform = `translate3d(0,0,0) scale(2,${scaleYVal})`;
 
         const content = child.querySelector('.tBlocks__item__notScaled');
-        content.style.transform = `translate3d(0,0,0) scale(.5,${
-            1 / scaleYVal
-        })`;
+        content.style.transform = `translate3d(0,0,0) scale(.5,${1 /
+            scaleYVal})`;
     }
 
     setActiveitemTransformOrigin() {

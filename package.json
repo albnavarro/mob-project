@@ -4,7 +4,7 @@
     "description": "gulp ssg",
     "main": "gulpfile.js",
     "scripts": {
-        "dev": "gulp dev --max-old-space-size=4096",
+        "dev": "gulp dev",
         "debugpage": "gulp html -debug -page",
         "build": "gulp build -prod",
         "assets": "gulp assets",

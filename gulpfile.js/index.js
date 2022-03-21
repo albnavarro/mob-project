@@ -3,7 +3,6 @@
 const config = require('../config.json');
 const path = require('path');
 const gulp = require('gulp');
-const watch = require('gulp');
 const themePath = path.resolve('src');
 const destPath = path.resolve('www');
 const jsPath = path.join(themePath, 'js');
