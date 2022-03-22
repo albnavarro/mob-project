@@ -428,7 +428,7 @@ export class HandleAsyncTimeline {
         };
 
         const mergedObj = { ...this.defaultObj, ...obj };
-        this.addToMainArray(tweenProps, obj);
+        this.addToMainArray(tweenProps, mergedObj);
         return this;
     }
 
