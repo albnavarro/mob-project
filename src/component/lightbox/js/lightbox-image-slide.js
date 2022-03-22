@@ -37,7 +37,7 @@ class LightBoxImageSlideClass {
             return element.getAttribute('data-imagegroup') == group;
         });
 
-        this.itemArray = this.buttons.map((item) => new this.setitem(item));
+        this.itemArray = this.buttons.map((item) => this.setitem(item));
         this.index = this.buttons.findIndex((el, i) => el === item);
 
         // Carico la prima immagine
@@ -51,8 +51,10 @@ class LightBoxImageSlideClass {
     }
 
     setitem(item) {
-        this.item = item;
-        this.url = item.getAttribute('data-url');
+        return {
+            item,
+            url: item.getAttribute('data-url'),
+        };
     }
 
     showImage(url, title, description, wrapper, hGap, wGap, zoom) {
