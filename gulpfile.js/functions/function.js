@@ -1,12 +1,12 @@
-const config = require("../../config.json");
-const fs = require("fs");
-const path = require("path");
-const themePath = path.resolve("src");
-const additionalDataPath = path.join(themePath, "additionalData");
-const dataPath = path.join(themePath, "data");
-const templatePath = path.join(themePath, "template");
-const { propValidate, mergeDeep } = require("./helpers.js");
-const store = require("../store.js");
+const config = require('../../config.json');
+const fs = require('fs');
+const path = require('path');
+const themePath = path.resolve('src');
+const additionalDataPath = path.join(themePath, 'additionalData');
+const dataPath = path.join(themePath, 'data');
+const templatePath = path.join(themePath, 'template');
+const { propValidate, mergeDeep } = require('./helpers.js');
+const store = require('../store.js');
 
 /**
  * Detect if is Archive Post or Page
@@ -15,13 +15,13 @@ const store = require("../store.js");
  * @return {string}
  */
 function getPageType(data) {
-  if ("isArchive" in data) {
-    return "archive";
-  } else if ("exportPost" in data) {
-    return "post";
-  } else {
-    return "page";
-  }
+    if ('isArchive' in data) {
+        return 'archive';
+    } else if ('exportPost' in data) {
+        return 'post';
+    } else {
+        return 'page';
+    }
 }
 
 /**
@@ -33,7 +33,7 @@ function getPageType(data) {
  * @return {string}
  */
 function getArchivePageName(index, nameFile, dinamicPageName) {
-  return index == 0 ? nameFile : `${dinamicPageName}${index}`;
+    return index == 0 ? nameFile : `${dinamicPageName}${index}`;
 }
 
 /**
@@ -43,15 +43,15 @@ function getArchivePageName(index, nameFile, dinamicPageName) {
  * @return {Boolean}
  */
 function fileIschanged(filepath) {
-  if (fs.existsSync(filepath)) {
-    const stats = fs.statSync(filepath);
-    const datetime = new Date();
-    const difference = datetime.getTime() - stats.mtime.getTime();
-    const seconds = Math.abs(difference / 1000);
-    return seconds < 2;
-  } else {
-    return false;
-  }
+    if (fs.existsSync(filepath)) {
+        const stats = fs.statSync(filepath);
+        const datetime = new Date();
+        const difference = datetime.getTime() - stats.mtime.getTime();
+        const seconds = Math.abs(difference / 1000);
+        return seconds < 2;
+    } else {
+        return false;
+    }
 }
 
 /**
@@ -61,7 +61,11 @@ function fileIschanged(filepath) {
  * @return {string}
  */
 function getNameFile(filepath) {
-  return filepath.split("/").pop().split(".").shift();
+    return filepath
+        .split('/')
+        .pop()
+        .split('.')
+        .shift();
 }
 
 /**
@@ -73,8 +77,8 @@ function getNameFile(filepath) {
  * @return {string}
  */
 function getPermalink(pathByLocale, nameFile, prependSlash = false) {
-  const slash = prependSlash ? "/" : "";
-  return `${slash}${pathByLocale}/${nameFile}${getExtensionFile()}`;
+    const slash = prependSlash ? '/' : '';
+    return `${slash}${pathByLocale}/${nameFile}${getExtensionFile()}`;
 }
 
 /**
@@ -83,7 +87,7 @@ function getPermalink(pathByLocale, nameFile, prependSlash = false) {
  * @return {string}
  */
 function getExtensionFile() {
-  return store.arg.prod ? "" : ".html";
+    return store.arg.prod ? '' : '.html';
 }
 
 /**
@@ -93,9 +97,9 @@ function getExtensionFile() {
  * @return {string}
  */
 function getOriginalPath(filepath) {
-  const pattern = new RegExp(`${dataPath}\/(.*\/).*$`);
-  const path = filepath.match(pattern);
-  return !path ? "" : path[1];
+    const pattern = new RegExp(`${dataPath}\/(.*\/).*$`);
+    const path = filepath.match(pattern);
+    return !path ? '' : path[1];
 }
 
 /**
@@ -108,44 +112,58 @@ function getOriginalPath(filepath) {
  * @return {string}          destination folder with lang folder prepended if needed
  */
 function getPathByLocale(filepath, lang) {
-  const pattern = new RegExp(`${dataPath}\/(.*\/).*$`);
-  const path = filepath.match(pattern);
-  const rootPath = !path ? "" : path[1];
+    const pattern = new RegExp(`${dataPath}\/(.*\/).*$`);
+    const path = filepath.match(pattern);
+    const rootPath = !path ? '' : path[1];
 
-  // Crete Array with all folder filepath from root
-  // es: [ 'archive', 'articles' ] from archive/articles/
-  const dirArr = rootPath.split("/");
-  dirArr.pop();
+    // Crete Array with all folder filepath from root
+    // es: [ 'archive', 'articles' ] from archive/articles/
+    const dirArr = rootPath.split('/');
+    dirArr.pop();
 
-  // Generate path based on the slug of all relatives
-  // es : { original: '/archive/articles', modified: '/archivio/articoli' }
-  const pathBySlug = dirArr.reduce(
-    (p, c, i) => {
-      const file = `${dataPath}${p.original}/${c}/index.${lang}.json`;
-      const fileDefaultLang = `${dataPath}${p.original}/${c}/index.${config.defaultLocales}.json`;
+    // Generate path based on the slug of all relatives
+    // es : { original: '/archive/articles', modified: '/archivio/articoli' }
+    const pathBySlug = dirArr.reduce(
+        (p, c, i) => {
+            const file = `${dataPath}${p.original}/${c}/index.${lang}.json`;
 
-      // parse index of current folder to get the slug if exist or get folder name
-      const parentData = fs.existsSync(file)
-        ? JSON.parse(fs.readFileSync(file))
-        : JSON.parse(fs.readFileSync(fileDefaultLang));
-      const slug = propValidate(["slug"], parentData) ? parentData.slug : c;
-      return {
-        original: `${p.original}/${c}`,
-        modified: `${p.modified}/${slug}`,
-      };
-    },
-    { original: "", modified: "" }
-  );
+            if (!fs.existsSync(file)) {
+                console.log('*****');
+                console.log(`Error`);
+                console.log(`Every folder must have an index file`);
+                console.log(
+                    `${dataPath}${p.original}/${c}/index. .... .json is missed`
+                );
+                console.log('*****');
+                process.exit();
+            }
 
-  const pathBySlugAndLang =
-    config.defaultLocales == lang
-      ? `${pathBySlug.modified}`
-      : `/${lang}${pathBySlug.modified}`;
+            const fileDefaultLang = `${dataPath}${p.original}/${c}/index.${config.defaultLocales}.json`;
 
-  /*
-   * Return subfolder if match in regex or empty vaalue
-   */
-  return pathBySlugAndLang;
+            // parse index of current folder to get the slug if exist or get folder name
+            const parentData = file
+                ? JSON.parse(fs.readFileSync(file))
+                : JSON.parse(fs.readFileSync(fileDefaultLang));
+            const slug = propValidate(['slug'], parentData)
+                ? parentData.slug
+                : c;
+            return {
+                original: `${p.original}/${c}`,
+                modified: `${p.modified}/${slug}`,
+            };
+        },
+        { original: '', modified: '' }
+    );
+
+    const pathBySlugAndLang =
+        config.defaultLocales == lang
+            ? `${pathBySlug.modified}`
+            : `/${lang}${pathBySlug.modified}`;
+
+    /*
+     * Return subfolder if match in regex or empty vaalue
+     */
+    return pathBySlugAndLang;
 }
 
 /**
@@ -155,7 +173,7 @@ function getPathByLocale(filepath, lang) {
  * @return {string}          source file path with name without lang and file extension
  */
 function getUnivoqueId(filepath) {
-  return `${getOriginalPath(filepath)}${getNameFile(filepath)}`;
+    return `${getOriginalPath(filepath)}${getNameFile(filepath)}`;
 }
 
 /**
@@ -165,8 +183,11 @@ function getUnivoqueId(filepath) {
  * @return {string}          get language from file name
  */
 function getLanguage(filepath) {
-  const nameFile = filepath.split("/").pop().split(".");
-  return nameFile.length == 3 ? nameFile[1] : config.defaultLocales;
+    const nameFile = filepath
+        .split('/')
+        .pop()
+        .split('.');
+    return nameFile.length == 3 ? nameFile[1] : config.defaultLocales;
 }
 
 /**
@@ -176,26 +197,26 @@ function getLanguage(filepath) {
  * @return {Object}  merged obj
  */
 function getAdditionalData(data) {
-  const additionalDataList = (data) =>
-    "additionalData" in data ? data.additionalData : [];
-  const additionalDataFile = additionalDataList(data);
+    const additionalDataList = (data) =>
+        'additionalData' in data ? data.additionalData : [];
+    const additionalDataFile = additionalDataList(data);
 
-  /*
+    /*
     map function return an array of Object
     the reduce function retur an obj from the array
     */
-  const additionalData = additionalDataFile
-    .map((item) => {
-      const filepath = `${additionalDataPath}/${item}`;
-      if (fs.existsSync(filepath)) {
-        return JSON.parse(fs.readFileSync(filepath));
-      } else {
-        return [];
-      }
-    })
-    .reduce((a, c) => (a = { ...a, ...c }), {});
+    const additionalData = additionalDataFile
+        .map((item) => {
+            const filepath = `${additionalDataPath}/${item}`;
+            if (fs.existsSync(filepath)) {
+                return JSON.parse(fs.readFileSync(filepath));
+            } else {
+                return [];
+            }
+        })
+        .reduce((a, c) => (a = { ...a, ...c }), {});
 
-  return additionalData;
+    return additionalData;
 }
 
 /**
@@ -205,41 +226,44 @@ function getAdditionalData(data) {
  * @return {string}
  */
 function getTemplate(data) {
-  const getDefaultTemplate = (data) => {
-    if (
-      propValidate(["isArchive", "pagination"], data) &&
-      data.isArchive.pagination === true
-    ) {
-      return propValidate(["defaultTemplate", "paginationArchive"], config)
-        ? config.defaultTemplate.paginationArchive
-        : null;
-    } else if ("isArchive" in data && "importPost" in data) {
-      return propValidate(["defaultTemplate", "postArchive"], config)
-        ? config.defaultTemplate.postArchive
-        : null;
-    } else if ("isArchive" in data && "importTag" in data) {
-      return propValidate(["defaultTemplate", "tagArchive"], config)
-        ? config.defaultTemplate.tagArchive
-        : null;
-    } else if ("exportPost" in data) {
-      return propValidate(["defaultTemplate", "post"], config)
-        ? config.defaultTemplate.post
-        : null;
-    } else {
-      return propValidate(["defaultTemplate", "page"], config)
-        ? config.defaultTemplate.page
-        : null;
-    }
-  };
+    const getDefaultTemplate = (data) => {
+        if (
+            propValidate(['isArchive', 'pagination'], data) &&
+            data.isArchive.pagination === true
+        ) {
+            return propValidate(
+                ['defaultTemplate', 'paginationArchive'],
+                config
+            )
+                ? config.defaultTemplate.paginationArchive
+                : null;
+        } else if ('isArchive' in data && 'importPost' in data) {
+            return propValidate(['defaultTemplate', 'postArchive'], config)
+                ? config.defaultTemplate.postArchive
+                : null;
+        } else if ('isArchive' in data && 'importTag' in data) {
+            return propValidate(['defaultTemplate', 'tagArchive'], config)
+                ? config.defaultTemplate.tagArchive
+                : null;
+        } else if ('exportPost' in data) {
+            return propValidate(['defaultTemplate', 'post'], config)
+                ? config.defaultTemplate.post
+                : null;
+        } else {
+            return propValidate(['defaultTemplate', 'page'], config)
+                ? config.defaultTemplate.page
+                : null;
+        }
+    };
 
-  const template = getDefaultTemplate(data);
+    const template = getDefaultTemplate(data);
 
-  // Check if default template is defined in config.json
-  const isValid = template !== null ? true : false;
+    // Check if default template is defined in config.json
+    const isValid = template !== null ? true : false;
 
-  return "template" in data
-    ? { template: `${templatePath}/${data.template}.pug`, isValid: true }
-    : { template: `${templatePath}/${template}`, isValid };
+    return 'template' in data
+        ? { template: `${templatePath}/${data.template}.pug`, isValid: true }
+        : { template: `${templatePath}/${template}`, isValid };
 }
 
 /**
@@ -251,24 +275,24 @@ function getTemplate(data) {
  * @return {type}            return merged object
  */
 function mergeData(filepath, parsed, lang) {
-  const defaultLocale =
-    "defaultLocales" in config ? config.defaultLocales : null;
-  const mergedDataForm =
-    "mergeDataFrom" in config ? config.mergeDataFrom : null;
-  const validateMergedData =
-    mergedDataForm !== null ? mergedDataForm : defaultLocale;
+    const defaultLocale =
+        'defaultLocales' in config ? config.defaultLocales : null;
+    const mergedDataForm =
+        'mergeDataFrom' in config ? config.mergeDataFrom : null;
+    const validateMergedData =
+        mergedDataForm !== null ? mergedDataForm : defaultLocale;
 
-  const defaultLangFilePath = `${dataPath}/${getOriginalPath(
-    filepath
-  )}${getNameFile(filepath)}.${validateMergedData}.json`;
-  const defaultLangData =
-    validateMergedData !== lang && fs.existsSync(defaultLangFilePath)
-      ? JSON.parse(fs.readFileSync(defaultLangFilePath))
-      : null;
+    const defaultLangFilePath = `${dataPath}/${getOriginalPath(
+        filepath
+    )}${getNameFile(filepath)}.${validateMergedData}.json`;
+    const defaultLangData =
+        validateMergedData !== lang && fs.existsSync(defaultLangFilePath)
+            ? JSON.parse(fs.readFileSync(defaultLangFilePath))
+            : null;
 
-  return defaultLangData === null
-    ? { ...parsed }
-    : mergeDeep(defaultLangData, parsed);
+    return defaultLangData === null
+        ? { ...parsed }
+        : mergeDeep(defaultLangData, parsed);
 }
 
 /**
@@ -278,9 +302,9 @@ function mergeData(filepath, parsed, lang) {
  * @return {boolean}      description
  */
 function langIsDisable(lang) {
-  return "disableLocales" in config
-    ? config.disableLocales.includes(lang)
-    : false;
+    return 'disableLocales' in config
+        ? config.disableLocales.includes(lang)
+        : false;
 }
 
 /**
@@ -290,11 +314,11 @@ function langIsDisable(lang) {
  * @return {Object}
  */
 function getPosts(data) {
-  return data.importPost.reduce((acc, curr) => {
-    if (propValidate([data.lang, curr], store.categoryMapData))
-      acc[curr] = store.categoryMapData[data.lang][curr];
-    return acc;
-  }, {});
+    return data.importPost.reduce((acc, curr) => {
+        if (propValidate([data.lang, curr], store.categoryMapData))
+            acc[curr] = store.categoryMapData[data.lang][curr];
+        return acc;
+    }, {});
 }
 
 /**
@@ -305,18 +329,22 @@ function getPosts(data) {
  * @return {Boleean}
  */
 function checkIfPostHaveTag(filterType, data, post) {
-  let tagIsFinded = false;
+    let tagIsFinded = false;
 
-  switch (filterType) {
-    case "some":
-      tagIsFinded = data.importTag.some((item) => post.tag.includes(item));
-      break;
-    case "every":
-      tagIsFinded = data.importTag.every((item) => post.tag.includes(item));
-      break;
-  }
+    switch (filterType) {
+        case 'some':
+            tagIsFinded = data.importTag.some((item) =>
+                post.tag.includes(item)
+            );
+            break;
+        case 'every':
+            tagIsFinded = data.importTag.every((item) =>
+                post.tag.includes(item)
+            );
+            break;
+    }
 
-  return tagIsFinded;
+    return tagIsFinded;
 }
 
 /**
@@ -326,31 +354,34 @@ function checkIfPostHaveTag(filterType, data, post) {
  * @return {<Array[Object]>}   Array of post
  */
 function getTags(data) {
-  const filterType =
-    propValidate(["tagFilter", "type"], data) &&
-    propValidate(["tagFilterType"], config) &&
-    config.tagFilterType.includes(data.tagFilter.type)
-      ? data.tagFilter.type
-      : "some"; // default value
+    const filterType =
+        propValidate(['tagFilter', 'type'], data) &&
+        propValidate(['tagFilterType'], config) &&
+        config.tagFilterType.includes(data.tagFilter.type)
+            ? data.tagFilter.type
+            : 'some'; // default value
 
-  const flatCategory =
-    data.lang in store.categoryMapData
-      ? Object.values(store.categoryMapData[data.lang]).flat()
-      : [];
+    const flatCategory =
+        data.lang in store.categoryMapData
+            ? Object.values(store.categoryMapData[data.lang]).flat()
+            : [];
 
-  const result = flatCategory.filter((curr) => {
-    // Filter postMap by tag some|every
-    const postFilterByType = checkIfPostHaveTag(filterType, data, curr);
+    const result = flatCategory.filter((curr) => {
+        // Filter postMap by tag some|every
+        const postFilterByType = checkIfPostHaveTag(filterType, data, curr);
 
-    // Filter postMap by category if required
-    const postFilterByCategory = propValidate(["tagFilter", "category"], data)
-      ? data.tagFilter.category.some((item) => item == curr.category)
-      : true;
+        // Filter postMap by category if required
+        const postFilterByCategory = propValidate(
+            ['tagFilter', 'category'],
+            data
+        )
+            ? data.tagFilter.category.some((item) => item == curr.category)
+            : true;
 
-    return postFilterByType && postFilterByCategory;
-  });
+        return postFilterByType && postFilterByCategory;
+    });
 
-  return result;
+    return result;
 }
 
 /**
@@ -360,17 +391,17 @@ function getTags(data) {
  * @return {<array[string]>}
  */
 function getTranslationFilesList(filepath) {
-  // get path without file name
-  const contentPath = () => {
-    const pattern = new RegExp(`\/(.*\/).*$`);
-    const path = filepath.match(pattern);
-    return !path ? "" : path[1];
-  };
+    // get path without file name
+    const contentPath = () => {
+        const pattern = new RegExp(`\/(.*\/).*$`);
+        const path = filepath.match(pattern);
+        return !path ? '' : path[1];
+    };
 
-  // return
-  return Object.keys(config.locales).map((item) => {
-    return `/${contentPath(filepath)}${getNameFile(filepath)}.${item}.json`;
-  });
+    // return
+    return Object.keys(config.locales).map((item) => {
+        return `/${contentPath(filepath)}${getNameFile(filepath)}.${item}.json`;
+    });
 }
 
 exports.getPageType = getPageType;
