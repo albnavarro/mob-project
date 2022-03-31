@@ -1,5 +1,5 @@
 import { springConfig } from './springConfig.js';
-import { getValueObj, mergeArray } from '../utils/animationUtils.js';
+import { getValueObj, mergeArray, getTime } from '../utils/animationUtils.js';
 import {
     handleFrame,
     handleNextFrame,
@@ -7,7 +7,11 @@ import {
 
 export class handleSpring {
     constructor(config = 'default') {
-        this.uniqueId = '_' + Math.random().toString(36).substr(2, 9);
+        this.uniqueId =
+            '_' +
+            Math.random()
+                .toString(36)
+                .substr(2, 9);
         this.config = springConfig[config];
         this.req = false;
         this.currentResolve = null;
@@ -49,25 +53,42 @@ export class handleSpring {
         const draw = (timestamp, fps) => {
             this.req = true;
 
-            this.values.forEach((item, i) => {
-                o.tensionForce = -tension * (item.currentValue - item.toValue);
-                o.dampingForce = -friction * item.velocity;
-                o.acceleration = (o.tensionForce + o.dampingForce) / mass;
+            // Get current time
+            o.time = getTime();
 
-                item.velocity = item.velocity + (o.acceleration * 1) / fps;
-                item.currentValue =
-                    item.currentValue + (item.velocity * 1) / fps;
+            // lastTime is set to now the first time.
+            // then check the difference from now and last time to check if we lost frame
+            o.lastTime = animationLastTime !== 0 ? animationLastTime : o.time;
 
-                o.isVelocity = Math.abs(item.velocity) <= precision;
+            // If we lost a lot of frames just jump to the end.
+            if (o.time > o.lastTime + this.lostFrameTresold)
+                o.lastTime = o.time;
 
-                o.isDisplacement =
-                    tension !== 0
-                        ? Math.abs(item.toValue - item.currentValue) <=
-                          precision
-                        : true;
+            // http://gafferongames.com/game-physics/fix-your-timestep/
+            o.numSteps = Math.floor(o.time - o.lastTime);
 
-                item.settled = o.isVelocity && o.isDisplacement;
-            });
+            for (let i = 0; i < o.numSteps; ++i) {
+                this.values.forEach((item, i) => {
+                    o.tensionForce =
+                        -tension * (item.currentValue - item.toValue);
+                    o.dampingForce = -friction * item.velocity;
+                    o.acceleration = (o.tensionForce + o.dampingForce) / mass;
+
+                    item.velocity = item.velocity + (o.acceleration * 1) / 1000;
+                    item.currentValue =
+                        item.currentValue + (item.velocity * 1) / 1000;
+
+                    o.isVelocity = Math.abs(item.velocity) <= precision;
+
+                    o.isDisplacement =
+                        tension !== 0
+                            ? Math.abs(item.toValue - item.currentValue) <=
+                              precision
+                            : true;
+
+                    item.settled = o.isVelocity && o.isDisplacement;
+                });
+            }
 
             // Prepare an obj to pass to the callback
             o.cbObject = getValueObj(this.values, 'currentValue');
@@ -76,6 +97,9 @@ export class handleSpring {
             this.callback.forEach(({ cb }) => {
                 cb(o.cbObject);
             });
+
+            // Update last time
+            animationLastTime = o.time;
 
             // Check if all values is completed
             o.allSettled = this.values.every((item) => item.settled === true);

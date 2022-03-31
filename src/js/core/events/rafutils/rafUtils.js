@@ -1,5 +1,6 @@
 import { SimpleStore } from '../../store/simpleStore.js';
 import { getTime, defaultTimestep } from '../../utils/time.js';
+import { clamp } from '../../animation/utils/animationUtils.js';
 
 export const frameStore = new SimpleStore({ time: 0 });
 
@@ -83,21 +84,14 @@ export const handleFrame = (() => {
 
     const render = () => {
         time = getTime();
-
-        /**
-         * Time start form last time when RAF is inactive ( elapsed more than 500ms )
-         */
         elapsed = time - lastUpdate;
 
-        // When broswer stop for more of 500 ms the time reset to 33ms form last tick (GSAP trick)
-        if (elapsed > lagThreshold) startTime += elapsed - adjustedLag;
+        if (isStopped) startTime += elapsed;
         lastUpdate += elapsed;
-
-        // Update global time
         time = lastUpdate - startTime;
 
         // Update fps if is running ( at first run after raf sleep get last fps )
-        if (!isStopped) fps = 1000 / (time - prevTime);
+        if (!isStopped) fps = clamp(parseInt(1000 / (time - prevTime)), 25, 80);
 
         // Fire callback
         callback.forEach((item) => item(time, fps));
