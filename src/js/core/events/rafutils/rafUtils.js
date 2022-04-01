@@ -71,16 +71,23 @@ export const handleNextTick = ((cb) => {
 export const handleFrame = (() => {
     let frameIsRuning = false;
     let callback = [];
-
-    const lagThreshold = 500;
-    const adjustedLag = 33;
     let time = getTime();
     let prevTime = getTime();
     let startTime = 0;
     let lastUpdate = 0;
     let elapsed = 0;
-    let fps = 60;
     let isStopped = false;
+
+    // FPS
+    const fpsLoopCycle = 30;
+    // Clamp fps
+    const maxFps = 80;
+    const minFps = 25;
+    //
+    let fpsStack = [];
+    let fpsCounter = 0;
+    let averageFps = 60;
+    const arrAvg = (arr) => arr.reduce((a, b) => a + b, 0) / arr.length;
 
     const render = () => {
         time = getTime();
@@ -90,11 +97,22 @@ export const handleFrame = (() => {
         lastUpdate += elapsed;
         time = lastUpdate - startTime;
 
-        // Update fps if is running ( at first run after raf sleep get last fps )
-        if (!isStopped) fps = clamp(parseInt(1000 / (time - prevTime)), 25, 80);
+        const fps = !isStopped
+            ? clamp(parseInt(1000 / (time - prevTime)), minFps, maxFps)
+            : 60;
+
+        // get average of fps every 30 cycle (fpsLoopCycle)
+        if (fpsCounter < fpsLoopCycle) {
+            fpsCounter++;
+            fpsStack.push(fps);
+        } else {
+            averageFps = parseInt(arrAvg(fpsStack));
+            fpsCounter = 0;
+            fpsStack = [];
+        }
 
         // Fire callback
-        callback.forEach((item) => item(time, fps));
+        callback.forEach((item) => item(time, averageFps));
 
         // Reset
         prevTime = time;

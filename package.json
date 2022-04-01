@@ -4,9 +4,10 @@
     "description": "gulp ssg",
     "main": "gulpfile.js",
     "scripts": {
-        "dev": "gulp dev",
-        "debugpage": "gulp html -debug -page",
+        "dev": "gulp dev -nobabel",
+        "legacy": "gulp dev",
         "build": "gulp build -prod",
+        "debugpage": "gulp html -debug -page",
         "assets": "gulp assets",
         "icons": "gulp icons",
         "permalink": "gulp permalink",

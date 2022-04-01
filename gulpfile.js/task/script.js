@@ -50,12 +50,15 @@ function js() {
                         browser: true,
                     }),
                     commonjs(),
-                    babel.babel({
-                        babelHelpers: 'bundled',
-                        exclude: 'node_modules/**',
-                        babelrc: true,
-                        // presets: ["@babel/preset-env"]
-                    }),
+                    (() => {
+                        return store.arg.nobabel
+                            ? Promise.resolve()
+                            : babel.babel({
+                                  babelHelpers: 'bundled',
+                                  exclude: 'node_modules/**',
+                                  babelrc: true,
+                              });
+                    })(),
                 ],
             })
             .then((bundle) => {
