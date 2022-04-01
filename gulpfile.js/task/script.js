@@ -45,13 +45,14 @@ function js() {
         return rollup
             .rollup({
                 input: './src/js/script.js',
+                treeshake: store.arg.speedup ? false : true,
                 plugins: [
                     nodeResolve.nodeResolve({
                         browser: true,
                     }),
                     commonjs(),
                     (() => {
-                        return store.arg.nobabel
+                        return store.arg.speedup
                             ? Promise.resolve()
                             : babel.babel({
                                   babelHelpers: 'bundled',
@@ -64,7 +65,8 @@ function js() {
             .then((bundle) => {
                 return bundle.write({
                     file: jsFile,
-                    format: 'umd',
+                    format: 'iife',
+                    indent: store.arg.speedup ? false : true,
                     name: 'library',
                     sourcemap: true,
                 });
