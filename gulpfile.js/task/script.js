@@ -68,7 +68,7 @@ function js() {
                     format: 'iife',
                     indent: store.arg.speedup ? false : true,
                     name: 'library',
-                    sourcemap: true,
+                    sourcemap: store.arg.speedup ? false : true,
                 });
             });
     }
