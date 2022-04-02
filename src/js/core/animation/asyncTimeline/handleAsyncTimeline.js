@@ -98,7 +98,6 @@ export class HandleAsyncTimeline {
                 suspend: () => {
                     return new Promise((res, reject) => {
                         if (!isImmediate) {
-                            console.log('fire suspend');
                             this.isSuspended = true;
                         }
                         res();
@@ -126,24 +125,18 @@ export class HandleAsyncTimeline {
 
                     // Prevent tween start after stop because have some delay
                     if (this.isStopped) {
+                        this.setctiveTweenCompleted(tween);
+                        unsubscribeOnStartTween();
                         reject();
                         return;
                     }
 
                     fn[action]()
-                        .then(() => {
-                            // Remove tween from active tween store
+                        .then(() => res())
+                        .catch(() => {})
+                        .finally(() => {
                             this.setctiveTweenCompleted(tween);
-                            // Unsubscribe from pause on start
                             unsubscribeOnStartTween();
-                            res();
-                        })
-                        .catch((error) => {
-                            // Remove tween from active tween store
-                            this.setctiveTweenCompleted(tween);
-                            // Unsubscribe from pause on start
-                            unsubscribeOnStartTween();
-                            reject();
                         });
                 };
 
@@ -169,7 +162,6 @@ export class HandleAsyncTimeline {
                 this.currentTween = [];
                 this.isRunninReverseRealtime = false;
 
-                console.log('resolve promise group');
                 if (this.isSuspended) return;
 
                 if (this.isReverseNext) {
@@ -203,7 +195,6 @@ export class HandleAsyncTimeline {
             })
             .catch((error) => {
                 this.currentTween = [];
-                console.log(error);
             });
     }
 
@@ -226,8 +217,6 @@ export class HandleAsyncTimeline {
                 completed: false,
             });
         }
-
-        console.log(this.currentTween);
     }
 
     setctiveTweenCompleted(tween) {
@@ -484,7 +473,6 @@ export class HandleAsyncTimeline {
 
     pause() {
         this.isInPause = true;
-        console.log('call pause', this.isInPause);
         this.currentTween.forEach(({ tween }) => {
             tween.pause();
         });
@@ -507,7 +495,14 @@ export class HandleAsyncTimeline {
         this.isRunninReverseRealtime = true;
 
         // Back current tween
-        const reverseTweenPrmises = this.currentTween.map(
+        const currentTweenCopy = [...this.currentTween];
+        this.currentTween = [];
+
+        currentTweenCopy.forEach(({ tween }, i) => {
+            if (tween && tween?.stop) tween.stop();
+        });
+
+        const reverseTweenPrmises = currentTweenCopy.map(
             ({ tween, propiertiesInUse, valuesFrom, valuesTo, completed }) => {
                 // If tween is completed ( delay side effect ) go to previous from value stored
                 // otherview if tween is in motion go to current form position
@@ -515,7 +510,6 @@ export class HandleAsyncTimeline {
 
                 return new Promise((res, reject) => {
                     this.addToActiveTween(tween, propiertiesInUse);
-                    tween.stop();
                     tween
                         .goTo(targetValue)
                         .then(() => {
@@ -532,7 +526,6 @@ export class HandleAsyncTimeline {
             return item.data.groupProps?.waitComplete;
         });
         const promiseType = waitComplete ? 'all' : 'race';
-        console.log(promiseType);
 
         // Resolved new tween group restar pipe
         Promise[promiseType](reverseTweenPrmises)
@@ -545,9 +538,7 @@ export class HandleAsyncTimeline {
                     this.currentIndex++;
                 this.run();
             })
-            .catch((err) => {
-                console.log(err);
-            });
+            .catch((err) => {});
     }
 
     /**
@@ -557,8 +548,6 @@ export class HandleAsyncTimeline {
      * @return {type}  description
      */
     resume() {
-        console.log('call resume check');
-
         if (this.isInPause) {
             this.isInPause = false;
             this.resumeEachTween();

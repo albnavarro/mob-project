@@ -416,9 +416,14 @@ export class handleLerp {
         });
 
         this.values = mergeArray(data, this.values);
-        const { reverse } = this.mergeProps(props);
+        const { reverse, immediate } = this.mergeProps(props);
 
         if (reverse) this.reverse(obj);
+
+        if (immediate) {
+            this.immediate();
+            return new Promise((res) => res());
+        }
 
         if (!this.req) {
             this.promise = new Promise((res, reject) => {

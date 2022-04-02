@@ -7,11 +7,7 @@ import {
 
 export class handleSpring {
     constructor(config = 'default') {
-        this.uniqueId =
-            '_' +
-            Math.random()
-                .toString(36)
-                .substr(2, 9);
+        this.uniqueId = '_' + Math.random().toString(36).substr(2, 9);
         this.config = springConfig[config];
         this.req = false;
         this.currentResolve = null;
@@ -448,9 +444,14 @@ export class handleSpring {
         });
 
         this.values = mergeArray(data, this.values);
-        const { reverse } = this.mergeProps(props);
+        const { reverse, immediate } = this.mergeProps(props);
 
         if (reverse) this.reverse(obj);
+
+        if (immediate) {
+            this.immediate();
+            return new Promise((res) => res());
+        }
 
         if (!this.req) {
             this.promise = new Promise((res, reject) => {
