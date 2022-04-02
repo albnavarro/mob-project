@@ -164,7 +164,7 @@ export class HandleAsyncTimeline {
                 this.currentTween = [];
                 this.isRunninReverseRealtime = false;
 
-                if (this.isSuspended) return;
+                if (this.isSuspended || this.isStopped) return;
 
                 if (this.isReverseNext) {
                     this.isReverseNext = false;
@@ -430,7 +430,8 @@ export class HandleAsyncTimeline {
         this.stop();
         this.isStopped = false;
         if (this.isReverse) this.revertTween();
-        this.run();
+
+        Promise.resolve().then(() => this.run());
     }
 
     playFrom(label) {
@@ -445,10 +446,11 @@ export class HandleAsyncTimeline {
             return labelCheck === label;
         });
 
-        this.run();
+        Promise.resolve().then(() => this.run());
     }
 
     stop() {
+        this.isStopped = true;
         this.currentIndex = 0;
         this.loopCounter = 1;
 
@@ -458,7 +460,6 @@ export class HandleAsyncTimeline {
         this.forceYoyo = false;
         this.isInPause = false;
         this.isSuspended = false;
-        this.isStopped = false;
         this.isRunninReverseRealtime = false;
 
         // Reset Reverse
@@ -493,7 +494,8 @@ export class HandleAsyncTimeline {
         this.isStopped = false;
         this.forceYoyo = true;
         this.fromLabelIndex = this.tweenList.length;
-        this.run();
+
+        Promise.resolve().then(() => this.run());
     }
 
     reverseNext() {
