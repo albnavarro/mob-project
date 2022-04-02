@@ -7,6 +7,10 @@ export function springTest() {
     const btnStop = document.querySelector('.spring-btn-stop');
     const btnPause = document.querySelector('.spring-btn-pause');
     const btnPlay = document.querySelector('.spring-btn-play');
+    const btnReverseImmediate = document.querySelector(
+        '.spring-reverseImmediate'
+    );
+    const btnReverseNext = document.querySelector('.spring-reverseNext');
     const btnReverse = document.querySelector('.spring-btn-reverse');
     const target = document.querySelector('.spring-target');
 
@@ -76,5 +80,13 @@ export function springTest() {
 
     btnReverse.addEventListener('click', () => {
         timeline.reverse();
+    });
+
+    btnReverseImmediate.addEventListener('click', () => {
+        timeline.reverseImmediate();
+    });
+
+    btnReverseNext.addEventListener('click', () => {
+        timeline.reverseNext();
     });
 }
