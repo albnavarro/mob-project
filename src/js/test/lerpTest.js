@@ -7,6 +7,7 @@ export function lerpTest() {
     const btnStop = document.querySelector('.lerp-btn-stop');
     const btnPause = document.querySelector('.lerp-btn-pause');
     const btnPlay = document.querySelector('.lerp-btn-play');
+    const btnFrom = document.querySelector('.lerp-playFrom');
     const btnReverseImmediate = document.querySelector(
         '.lerp-reverseImmediate'
     );
@@ -35,6 +36,7 @@ export function lerpTest() {
         .add(() => console.log('custom function'))
         .goTo(mylerp, { y: 400 }, { velocity: 0.05, precision: 1 })
         .add(() => console.log('custom function'))
+        .label({ name: 'label1' })
         .goTo(mylerp, { x: -100, rotate: 90 }, { velocity: 0.09, precision: 1 })
         .goTo(
             mylerp,
@@ -65,6 +67,10 @@ export function lerpTest() {
 
     btnReverse.addEventListener('click', () => {
         timeline.reverse();
+    });
+
+    btnFrom.addEventListener('click', () => {
+        timeline.playFrom('label1');
     });
 
     btnReverseImmediate.addEventListener('click', () => {

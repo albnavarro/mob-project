@@ -242,11 +242,6 @@ export class handleLerp {
             item.fromValue = item.toValue;
             item.currentValue = item.toValue;
         });
-
-        const cbValues = getValueObj(this.values, 'toValue');
-        this.callback.forEach(({ cb }) => {
-            cb(cbValues);
-        });
     }
 
     /**

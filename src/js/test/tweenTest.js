@@ -7,6 +7,7 @@ export function tweenTest() {
     const btnStop = document.querySelector('.tween-btn-stop');
     const btnPause = document.querySelector('.tween-btn-pause');
     const btnPlay = document.querySelector('.tween-btn-play');
+    const btnFrom = document.querySelector('.tween-playFrom');
     const btnReverseImmediate = document.querySelector(
         '.tween-reverseImmediate'
     );
@@ -36,6 +37,7 @@ export function tweenTest() {
         .goFromTo(myTween, { x: -200 }, { x: 400 }, { duration: 800 })
         .add(() => console.log('custom function'))
         .goTo(myTween, { y: 400 }, { duration: 350 })
+        .label({ name: 'label1' })
         .goTo(myTween, { x: -100, rotate: 90 }, { ease: 'easeInQuint' })
         .add(() => console.log('custom function'))
         .goTo(myTween, { x: 0, y: 0, rotate: 0 }, { duration: 2000 });
@@ -59,6 +61,10 @@ export function tweenTest() {
 
     btnPlay.addEventListener('click', () => {
         timeline.resume();
+    });
+
+    btnFrom.addEventListener('click', () => {
+        timeline.playFrom('label1');
     });
 
     btnReverseImmediate.addEventListener('click', () => {

@@ -1,4 +1,4 @@
-import { requestTimeout } from '../../utils/requestTimeOut.js';
+import { getTime } from '../../utils/time.js';
 
 export class HandleAsyncTimeline {
     constructor(config = {}) {
@@ -30,13 +30,16 @@ export class HandleAsyncTimeline {
 
         // Timeline state
         this.isReverseNext = false;
-        this.fromLabelIndex = null;
+        this.goToLabelIndex = null;
         this.forceYoyo = false;
         this.isReverse = false;
         this.isInPause = false;
         this.isSuspended = false;
         this.isStopped = false;
         this.isRunninReverseRealtime = false;
+        this.delayIsRunning = false;
+        this.startOnDelay = false;
+        this.actionAfterReject = [];
     }
 
     run(index = this.currentIndex) {
@@ -59,31 +62,37 @@ export class HandleAsyncTimeline {
             delete newTweenProps.delay;
 
             const isImmediate =
-                this.fromLabelIndex && index < this.fromLabelIndex;
+                this.goToLabelIndex && index < this.goToLabelIndex;
 
             if (isImmediate) newTweenProps.immediate = true;
 
+            // Get current valueTo for to use in reverse methods
+            if (tween && tween?.getTo) item.data.prevValueTo = tween.getTo();
+
             const fn = {
-                set: () => tween[action](valuesFrom, newTweenProps),
+                set: () => {
+                    return tween[action](valuesFrom, newTweenProps);
+                },
                 goTo: () => {
-                    // Store last valueTo to use in revertTween
-                    item.data.prevValueTo = tween.getTo();
                     return tween[action](valuesTo, newTweenProps);
                 },
-                goFrom: () => tween[action](valuesFrom, newTweenProps),
+                goFrom: () => {
+                    return tween[action](valuesFrom, newTweenProps);
+                },
                 goFromTo: () => {
                     return tween[action](valuesFrom, valuesTo, newTweenProps);
                 },
-
                 sync: () => {
                     return new Promise((res, reject) => {
                         const { from, to } = syncProp;
-                        to.setData(from.get());
-                        res();
+                        to.set(from.get(), { immediate: true }).then((value) =>
+                            res()
+                        );
                     });
                 },
                 add: () => {
                     return new Promise((res, reject) => {
+                        // Custom function
                         tween(this);
                         res();
                     });
@@ -108,10 +117,13 @@ export class HandleAsyncTimeline {
             };
 
             return new Promise((res, reject) => {
-                // Get delay
-                const delay = isImmediate ? false : tweenProps?.delay;
-
                 const cb = () => {
+                    // If after delay tween is stopped or some action start are started we fail tween
+                    if (this.isStopped || this.startOnDelay) {
+                        reject();
+                        return;
+                    }
+
                     // Add tween to active stack
                     this.addToActiveTween(tween, valuesTo);
 
@@ -125,14 +137,6 @@ export class HandleAsyncTimeline {
                               })
                             : this.NOOP;
 
-                    // Prevent tween start after stop because have some delay
-                    if (this.isStopped) {
-                        this.setctiveTweenCompleted(tween);
-                        unsubscribeTweenStartInPause();
-                        reject();
-                        return;
-                    }
-
                     fn[action]()
                         .then(() => res())
                         .catch(() => {})
@@ -142,10 +146,27 @@ export class HandleAsyncTimeline {
                         });
                 };
 
+                // Get delay
+                const delay = isImmediate ? false : tweenProps?.delay;
+
                 if (delay) {
-                    let t = null;
-                    requestTimeout(cb, delay, (id) => (t = id));
-                    cancelAnimationFrame(t);
+                    let start = getTime();
+                    this.delayIsRunning = true;
+
+                    // Delay loop
+                    const loop = () => {
+                        let current = getTime();
+                        const delta = current - start;
+
+                        if (delta >= delay || this.isStopped) {
+                            this.delayIsRunning = false;
+                            cb();
+                            return;
+                        }
+
+                        requestAnimationFrame(loop);
+                    };
+                    requestAnimationFrame(loop);
                 } else {
                     cb();
                 }
@@ -162,41 +183,51 @@ export class HandleAsyncTimeline {
         Promise[promiseType](tweenPromises)
             .then(() => {
                 this.currentTween = [];
-                this.isRunninReverseRealtime = false;
 
+                this.isRunninReverseRealtime = false;
                 if (this.isSuspended || this.isStopped) return;
 
                 if (this.isReverseNext) {
+                    // Check if need reverse at next step
                     this.isReverseNext = false;
                     this.currentIndex =
                         this.tweenList.length - this.currentIndex - 1;
-                    this.fromLabelIndex = null;
+                    this.goToLabelIndex = null;
                     this.revertTween();
                     this.run();
                     return;
                 }
 
                 if (this.currentIndex < this.tweenList.length - 1) {
+                    // Inside timeline pipe
                     this.currentIndex++;
                     this.run();
                 } else if (
+                    // At the end : Loop
                     this.loopCounter < this.repeat ||
                     this.repeat === -1
                 ) {
                     this.loopCounter++;
                     this.currentIndex = 0;
-                    this.fromLabelIndex = null;
+                    this.goToLabelIndex = null;
                     if (this.yoyo || this.forceYoyo) this.revertTween();
                     this.run();
                     this.forceYoyo = false;
                 } else {
-                    this.currentIndex = 0;
-                    this.loopCounter = 1;
-                    this.fromLabelIndex = null;
+                    // Rest all timeline is ended
+                    this.stop();
                 }
             })
             .catch((error) => {
                 this.currentTween = [];
+
+                // If play or reverse or playFromLabel is fired diring delay tween fail
+                // Afte fail we can fire the action
+                if (this.actionAfterReject.length > 0) {
+                    this.actionAfterReject.forEach((item, i) => item());
+                    this.actionAfterReject = [];
+                    return;
+                }
             });
     }
 
@@ -427,6 +458,13 @@ export class HandleAsyncTimeline {
     }
 
     play() {
+        if (this.delayIsRunning) {
+            this.startOnDelay = true;
+            this.actionAfterReject.push(() => this.play());
+            return;
+        }
+        this.startOnDelay = false;
+
         this.stop();
         this.isStopped = false;
         if (this.isReverse) this.revertTween();
@@ -435,11 +473,18 @@ export class HandleAsyncTimeline {
     }
 
     playFrom(label) {
+        if (this.delayIsRunning) {
+            this.startOnDelay = true;
+            this.actionAfterReject.push(() => this.playFrom(label));
+            return;
+        }
+        this.startOnDelay = false;
+
         this.stop();
         this.isStopped = false;
         if (this.isReverse) this.revertTween();
 
-        this.fromLabelIndex = this.tweenList.findIndex((item) => {
+        this.goToLabelIndex = this.tweenList.findIndex((item) => {
             // Get first item of group, unnecessary use of label inside a group becouse is parallel
             const [firstItem] = item;
             const labelCheck = firstItem.data.labelProps?.name;
@@ -449,51 +494,18 @@ export class HandleAsyncTimeline {
         Promise.resolve().then(() => this.run());
     }
 
-    stop() {
-        this.isStopped = true;
-        this.currentIndex = 0;
-        this.loopCounter = 1;
-
-        // Reset state
-        this.isReverseNext = false;
-        this.fromLabelIndex = null;
-        this.forceYoyo = false;
-        this.isInPause = false;
-        this.isSuspended = false;
-        this.isRunninReverseRealtime = false;
-
-        // Reset Reverse
-        if (this.isReverse) this.revertTween();
-        this.isReverse = false;
-
-        // Reset prevValueTo
-        this.tweenList.forEach((group) => {
-            group.forEach((item) => {
-                const { data } = item;
-                const { action } = data;
-
-                if (action === 'goTo') {
-                    item.data.prevValueTo = null;
-                }
-            });
-        });
-
-        // Stop all Tween
-        this.currentTween.forEach(({ tween }) => tween.stop());
-    }
-
-    pause() {
-        this.isInPause = true;
-        this.currentTween.forEach(({ tween }) => {
-            tween.pause();
-        });
-    }
-
     reverse() {
+        if (this.delayIsRunning) {
+            this.startOnDelay = true;
+            this.actionAfterReject.push(() => this.reverse());
+            return;
+        }
+        this.startOnDelay = false;
+
         this.stop();
         this.isStopped = false;
         this.forceYoyo = true;
-        this.fromLabelIndex = this.tweenList.length;
+        this.goToLabelIndex = this.tweenList.length;
 
         Promise.resolve().then(() => this.run());
     }
@@ -513,7 +525,7 @@ export class HandleAsyncTimeline {
         // Next step function
         const nextStep = () => {
             this.currentIndex = this.tweenList.length - this.currentIndex - 1;
-            this.fromLabelIndex = null;
+            this.goToLabelIndex = null;
             this.revertTween();
             if (this.currentIndex < this.tweenList.length - 1)
                 this.currentIndex++;
@@ -567,6 +579,34 @@ export class HandleAsyncTimeline {
             .catch((err) => {});
     }
 
+    stop() {
+        this.isStopped = true;
+        this.currentIndex = 0;
+        this.loopCounter = 1;
+
+        // Reset state
+        this.isReverseNext = false;
+        this.goToLabelIndex = null;
+        this.forceYoyo = false;
+        this.isInPause = false;
+        this.isSuspended = false;
+        this.isRunninReverseRealtime = false;
+
+        // Stop all Tween
+        this.currentTween.forEach(({ tween }) => tween.stop());
+
+        // Reset Reverse
+        if (this.isReverse) this.revertTween();
+        this.isReverse = false;
+    }
+
+    pause() {
+        this.isInPause = true;
+        this.currentTween.forEach(({ tween }) => {
+            tween.pause();
+        });
+    }
+
     /**
      * resume - if there is no tween active ( pause settend by add methods )
      * run next pipe element, otherwise resume current tween
@@ -588,7 +628,7 @@ export class HandleAsyncTimeline {
             } else if (this.currentIndex === this.tweenList.length - 1) {
                 // At the end suspend become item in pipe first ro skip it
                 this.currentIndex = this.yoyo && !this.isReverse ? 1 : 0;
-                this.fromLabelIndex = null;
+                this.goToLabelIndex = null;
                 if (this.yoyo) this.revertTween();
                 this.loopCounter++;
                 this.run();

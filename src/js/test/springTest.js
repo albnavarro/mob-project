@@ -7,6 +7,7 @@ export function springTest() {
     const btnStop = document.querySelector('.spring-btn-stop');
     const btnPause = document.querySelector('.spring-btn-pause');
     const btnPlay = document.querySelector('.spring-btn-play');
+    const btnFrom = document.querySelector('.spring-playFrom');
     const btnReverseImmediate = document.querySelector(
         '.spring-reverseImmediate'
     );
@@ -49,6 +50,7 @@ export function springTest() {
         .add(() => mySpring.updatePreset('default'))
         .goTo(mySpring, { y: 400 }, { config: { mass: 2, precision: 0.5 } })
         .add(() => mySpring.updatePreset('bounce'))
+        .label({ name: 'label1' })
         .goTo(mySpring, { x: -100, rotate: 90 }, { config: { precision: 0.5 } })
         .add(() => mySpring.updatePreset('gentle'))
         .goTo(
@@ -80,6 +82,10 @@ export function springTest() {
 
     btnReverse.addEventListener('click', () => {
         timeline.reverse();
+    });
+
+    btnFrom.addEventListener('click', () => {
+        timeline.playFrom('label1');
     });
 
     btnReverseImmediate.addEventListener('click', () => {

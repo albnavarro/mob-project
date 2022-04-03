@@ -264,14 +264,11 @@ export class handleSpring {
      *
      */
     immediate() {
+        this.req = false;
+
         this.values.forEach((item, i) => {
             item.fromValue = item.toValue;
             item.currentValue = item.toValue;
-        });
-
-        const cbValues = getValueObj(this.values, 'toValue');
-        this.callback.forEach(({ cb }) => {
-            cb(cbValues);
         });
     }
 
