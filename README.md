@@ -1,4 +1,4 @@
-#Static site generator
+# Static site generator
 
 Little static site generator written in javascript.
 Use Gulp (v.4) to synchronize javascript task.
@@ -27,10 +27,12 @@ Use Gulp (v.4) to synchronize javascript task.
 -   Selective refresh in development mode
 -   Dart sass
 
-##Node version
+## Node version
+
 node version 16.14.2
 
-##Basic command
+## Basic command
+
 **npm run dev**
 Run development mode 'light' , no babel no treeshaking
 
