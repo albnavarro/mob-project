@@ -23,6 +23,7 @@ Use Gulp (v.4) to synchronize javascript task.
 -   Pug template
 -   Custom js function for pug template
 -   Critical css for every template
+-   SVG sprite
 -   Rollup for es6 modules
 -   Selective refresh in development mode
 -   Dart sass
