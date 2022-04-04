@@ -4,16 +4,19 @@ const babel = require('@rollup/plugin-babel');
 const nodeResolve = require('@rollup/plugin-node-resolve');
 const commonjs = require('@rollup/plugin-commonjs');
 const terser = require('rollup-plugin-terser');
+const themePath = path.resolve('src');
 const destPath = path.resolve('www');
-const jsDest = path.join(destPath, 'assets/js');
-const jsFile = `${jsDest}/script.js`;
+const jsSourcePath = path.join(themePath, 'js');
+const jsDestPath = path.join(destPath, 'assets/js');
+const jsSource = `${jsSourcePath}/script.js`;
+const jsDest = `${jsDestPath}/script.js`;
 const store = require('../store.js');
 let cache;
 
 async function js() {
     if (store.arg.prod) {
         const bundle = await rollup.rollup({
-            input: './src/js/script.js',
+            input: jsSource,
             plugins: [
                 nodeResolve.nodeResolve({
                     browser: true,
@@ -30,7 +33,7 @@ async function js() {
         });
 
         await bundle.write({
-            file: jsFile,
+            file: jsDest,
             format: 'umd',
             name: 'library',
             sourcemap: false,
@@ -38,7 +41,7 @@ async function js() {
     } else {
         const bundle = await rollup.rollup({
             cache,
-            input: './src/js/script.js',
+            input: jsSource,
             treeshake: store.arg.speedup ? false : true,
             plugins: [
                 nodeResolve.nodeResolve({
@@ -59,7 +62,7 @@ async function js() {
         cache = bundle.cache;
 
         await bundle.write({
-            file: jsFile,
+            file: jsDest,
             format: 'iife',
             indent: store.arg.speedup ? false : true,
             name: 'library',

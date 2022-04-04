@@ -1,89 +1,86 @@
 {
-    "domain" : "http://es6.lcl:8888/",
-    "siteName" : "Mob project",
-    "locales" : {
+    "domain": "http://es6.lcl:8888/",
+    "siteName": "Mob project",
+    "locales": {
         "en": {
-            "name" : "English",
-            "nativeName" : "English",
-            "code" : "en-US"
+            "name": "English",
+            "nativeName": "English",
+            "code": "en-US"
         },
         "it": {
-            "name" : "Italian",
-            "nativeName" : "Italiano",
-            "code" : "it-IT"
+            "name": "Italian",
+            "nativeName": "Italiano",
+            "code": "it-IT"
         }
     },
-    "defaultTemplate" : {
-        "page" : "default/page.pug",
-        "postArchive" : "default/archivePost.pug",
-        "tagArchive" : "default/archiveTag.pug",
-        "paginationArchive" : "default/archivePagination.pug",
-        "post" : "default/post.pug"
+    "defaultTemplate": {
+        "page": "default/page.pug",
+        "postArchive": "default/archivePost.pug",
+        "tagArchive": "default/archiveTag.pug",
+        "paginationArchive": "default/archivePagination.pug",
+        "post": "default/post.pug"
     },
-    "defaultLocales" : "en",
-    "disableLocales" : ["it"],
-    "ogDefault" : {
-        "title" : "og title default",
-        "description" : "og description default",
-        "image" : "og/og-default.jpg",
-        "imageAlt" : "og image alt default",
-        "type" : "og type default"
+    "defaultLocales": "en",
+    "disableLocales": [],
+    "ogDefault": {
+        "title": "og title default",
+        "description": "og description default",
+        "image": "og/og-default.jpg",
+        "imageAlt": "og image alt default",
+        "type": "og type default"
     },
-    "mergeDataFrom" : "en",
-    "postPerPage" : "3",
-    "dinamicPageName" : "page-",
-    "categoryLocales" : {
-        "articles" : {
-            "name" : {
-                "en" :  "articles",
-                "it" : "articoli"
+    "mergeDataFrom": "en",
+    "postPerPage": "3",
+    "dinamicPageName": "page-",
+    "categoryLocales": {
+        "articles": {
+            "name": {
+                "en": "articles",
+                "it": "articoli"
             },
-            "indexUnivoqueId" : "archive/articles/index"
+            "indexUnivoqueId": "archive/articles/index"
         },
-        "news" : {
-            "name" : {
-                "en" :  "news",
-                "it" : "novitá"
+        "news": {
+            "name": {
+                "en": "news",
+                "it": "novitá"
             },
-            "indexUnivoqueId" : "archive/news/index"
+            "indexUnivoqueId": "archive/news/index"
         }
     },
-    "tagLocales" : {
-        "tag1" : {
-            "name" : {
-                "en" :  "tag1 en",
-                "it" : "tag1 it"
+    "tagLocales": {
+        "tag1": {
+            "name": {
+                "en": "tag1 en",
+                "it": "tag1 it"
             },
-            "indexUnivoqueId" : "tag1/index"
+            "indexUnivoqueId": "tag1/index"
         },
-        "tag2" : {
-            "name" : {
-                "en" :  "tag2 en",
-                "it" : "tag2 it"
+        "tag2": {
+            "name": {
+                "en": "tag2 en",
+                "it": "tag2 it"
             }
         },
-        "tag3" : {
-            "name" : {
-                "en" :  "tag3 en",
-                "it" : "tag3 it"
+        "tag3": {
+            "name": {
+                "en": "tag3 en",
+                "it": "tag3 it"
             }
         },
-        "tag4" : {
-            "name" : {
-                "en" :  "tag4 en",
-                "it" : "tag4 it"
+        "tag4": {
+            "name": {
+                "en": "tag4 en",
+                "it": "tag4 it"
             }
         },
-        "tag5" : {
-            "name" : {
-                "en" :  "tag5 en",
-                "it" : "tag5 it"
+        "tag5": {
+            "name": {
+                "en": "tag5 en",
+                "it": "tag5 it"
             }
         }
     },
-    "tagFilterType" : [
-        "some",
-        "every"
-    ],
-    "selectiveRefresh" : true
+    "tagFilterType": ["some", "every"],
+    "selectiveRefresh": true
 }
