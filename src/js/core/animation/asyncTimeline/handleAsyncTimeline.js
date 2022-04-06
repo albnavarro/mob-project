@@ -158,7 +158,11 @@ export class HandleAsyncTimeline {
                         let current = getTime();
                         const delta = current - start;
 
-                        if (delta >= delay || this.isStopped) {
+                        if (
+                            delta >= delay ||
+                            this.isStopped ||
+                            this.isRunninReverseRealtime
+                        ) {
                             this.delayIsRunning = false;
                             cb();
                             return;
