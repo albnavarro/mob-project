@@ -8,9 +8,6 @@ export function tweenTest() {
     const btnPause = document.querySelector('.tween-btn-pause');
     const btnPlay = document.querySelector('.tween-btn-play');
     const btnFrom = document.querySelector('.tween-playFrom');
-    const btnReverseImmediate = document.querySelector(
-        '.tween-reverseImmediate'
-    );
     const btnReverseNext = document.querySelector('.tween-reverseNext');
     const btnReverse = document.querySelector('.tween-btn-reverse');
     const target = document.querySelector('.tween-target');
@@ -65,10 +62,6 @@ export function tweenTest() {
 
     btnFrom.addEventListener('click', () => {
         timeline.playFrom('label1');
-    });
-
-    btnReverseImmediate.addEventListener('click', () => {
-        timeline.reverseImmediate();
     });
 
     btnReverseNext.addEventListener('click', () => {

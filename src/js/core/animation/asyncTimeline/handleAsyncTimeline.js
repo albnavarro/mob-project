@@ -36,7 +36,6 @@ export class HandleAsyncTimeline {
         this.isInPause = false;
         this.isSuspended = false;
         this.isStopped = false;
-        this.isRunninReverseRealtime = false;
         this.delayIsRunning = false;
         this.startOnDelay = false;
         this.actionAfterReject = [];
@@ -158,10 +157,11 @@ export class HandleAsyncTimeline {
                         let current = getTime();
                         const delta = current - start;
 
+                        // Start after dealy or immediate in caso of stop or reverse Next
                         if (
                             delta >= delay ||
                             this.isStopped ||
-                            this.isRunninReverseRealtime
+                            this.isReverseNext
                         ) {
                             this.delayIsRunning = false;
                             cb();
@@ -188,7 +188,6 @@ export class HandleAsyncTimeline {
             .then(() => {
                 this.currentTween = [];
 
-                this.isRunninReverseRealtime = false;
                 if (this.isSuspended || this.isStopped) return;
 
                 if (this.isReverseNext) {
@@ -256,6 +255,8 @@ export class HandleAsyncTimeline {
         }
     }
 
+    // Set cerrent tween completed if needed
+    // At moment is not used
     setctiveTweenCompleted(tween) {
         const tweenIndex = this.currentTween.findIndex(
             ({ tween: currentTween }) => {
@@ -518,71 +519,6 @@ export class HandleAsyncTimeline {
         this.isReverseNext = true;
     }
 
-    reverseImmediate() {
-        // One reverse realtime for each step i allowed
-        if (this.isRunninReverseRealtime) return;
-        this.isRunninReverseRealtime = true;
-
-        // Skip reverseNext if do it immediate
-        this.isReverseNext = false;
-
-        // Next step function
-        const nextStep = () => {
-            this.currentIndex = this.tweenList.length - this.currentIndex - 1;
-            this.goToLabelIndex = null;
-            this.revertTween();
-            if (this.currentIndex < this.tweenList.length - 1)
-                this.currentIndex++;
-            this.run();
-        };
-
-        // Back current tween
-        const currentTweenCopy = [...this.currentTween];
-        this.currentTween = [];
-
-        // If thee is no tween go directly next step
-        if (currentTweenCopy.length === 0) {
-            nextStep();
-            return;
-        }
-
-        // Stop all tween
-        currentTweenCopy.forEach(({ tween }, i) => {
-            if (tween && tween?.stop) tween.stop();
-        });
-
-        // Revert current tween then go next step
-        const reverseTweenPrmises = currentTweenCopy.map(
-            ({ tween, propiertiesInUse, valuesFrom, valuesTo, completed }) => {
-                // If tween is completed ( delay side effect ) go to previous from value stored
-                // otherview if tween is in motion go to current form position
-                const targetValue = completed ? valuesFrom : valuesTo;
-
-                return new Promise((res, reject) => {
-                    this.addToActiveTween(tween, propiertiesInUse);
-                    tween
-                        .goTo(targetValue)
-                        .then(() => {
-                            res();
-                        })
-                        .catch((err) => {
-                            reject();
-                        });
-                });
-            }
-        );
-
-        const waitComplete = this.tweenList[this.currentIndex].some((item) => {
-            return item.data.groupProps?.waitComplete;
-        });
-        const promiseType = waitComplete ? 'all' : 'race';
-
-        // Resolved new tween group restar pipe
-        Promise[promiseType](reverseTweenPrmises)
-            .then((value) => nextStep())
-            .catch((err) => {});
-    }
-
     stop() {
         this.isStopped = true;
         this.currentIndex = 0;
@@ -594,7 +530,6 @@ export class HandleAsyncTimeline {
         this.forceYoyo = false;
         this.isInPause = false;
         this.isSuspended = false;
-        this.isRunninReverseRealtime = false;
 
         // Stop all Tween
         this.currentTween.forEach(({ tween }) => tween.stop());

@@ -9,9 +9,6 @@ export function timlineMixTest() {
     const btnPause = document.querySelector('.mix-btn-pause');
     const btnPlay = document.querySelector('.mix-btn-play');
     const btnFrom = document.querySelector('.mix-btn-playFrom');
-    const btnReverseImmediate = document.querySelector(
-        '.mix-btn-reverseImmediate'
-    );
     const btnReverseNext = document.querySelector('.mix-btn-reverseNext');
     const btnReverse = document.querySelector('.mix-btn-reverse');
     const target = document.querySelector('.mix-target');
@@ -58,7 +55,7 @@ export function timlineMixTest() {
             { config: { mass: 2, precision: 0.5 }, delay: 500 }
         )
         .sync({ from: springBox1, to: tweenBox1 })
-        .createGroup({ waitComplete: true })
+        .createGroup({ waitComplete: false })
         .goTo(tweenBox1, { y: 400 }, { duration: 850 })
         .goTo(tweenBox2, { rotate: 360 }, { duration: 2000, delay: 1000 })
         .closeGroup()
@@ -96,10 +93,6 @@ export function timlineMixTest() {
 
     btnFrom.addEventListener('click', () => {
         timeline.playFrom('label1');
-    });
-
-    btnReverseImmediate.addEventListener('click', () => {
-        timeline.reverseImmediate();
     });
 
     btnReverseNext.addEventListener('click', () => {
