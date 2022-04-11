@@ -201,8 +201,19 @@ function html(done) {
                     : [],
         };
 
-        // Create critical css map where each template is associated to la st render file with that template
+        // Create critical css map where each template is associated to first render file with that template
         if (store.counterRun == 0) {
+            // At first run in development mode skip task
+            if (!store.arg.prod) {
+                return { skipTask: true, publish: false, fn: null };
+            }
+
+            // If template is just added skip task
+            // Render only one page for template for critical css task
+            if (templatename in store.criticalCssMapData) {
+                return { skipTask: true, publish: false, fn: null };
+            }
+
             const critcalCssByTemplate = {};
             critcalCssByTemplate[templatename] = {
                 source: `${destPath}${pathByLocale}/${nameFile}.html`,
