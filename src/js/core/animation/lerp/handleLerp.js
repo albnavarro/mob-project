@@ -75,11 +75,19 @@ export class handleLerp {
             const cbObject = getValueObj(this.values, 'currentValue');
 
             // Fire callback
-            this.callback.forEach(({ cb }, i) => {
-                handleFrameIndex(() => {
+            if (this.callback.length === 1) {
+                // No stagger, run immediatly
+                this.callback.forEach(({ cb }) => {
                     cb(cbObject);
-                }, i * this.stagger.each);
-            });
+                });
+            } else {
+                // Stagger
+                this.callback.forEach(({ cb }, i) => {
+                    handleFrameIndex(() => {
+                        cb(cbObject);
+                    }, i * this.stagger.each);
+                });
+            }
 
             // Check if all values is completed
             o.allSettled = this.values.every((item) => item.settled === true);

@@ -74,13 +74,19 @@ export class handleTween {
             // Prepare an obj to pass to the callback
             const cbObject = getValueObj(this.values, 'currentValue');
 
-            // Fire callback
-            this.callback.forEach(({ cb }, i) => {
-                handleFrameIndex(() => {
+            if (this.callback.length === 1) {
+                // No stagger, run immediatly
+                this.callback.forEach(({ cb }) => {
                     cb(cbObject);
-                }, i * this.stagger.each);
-            });
-
+                });
+            } else {
+                // Stagger
+                this.callback.forEach(({ cb }, i) => {
+                    handleFrameIndex(() => {
+                        cb(cbObject);
+                    }, i * this.stagger.each);
+                });
+            }
             this.isRunning = true;
 
             if (!isSettled) {
