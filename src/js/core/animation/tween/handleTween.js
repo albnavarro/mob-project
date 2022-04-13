@@ -3,7 +3,9 @@ import { getValueObj, mergeArrayTween } from '../utils/animationUtils.js';
 import {
     handleFrame,
     handleNextFrame,
+    handleFrameIndex,
 } from '../../events/rafutils/rafUtils.js';
+import { mergeDeep } from '../../utils/mergeDeep.js';
 
 export class handleTween {
     constructor(ease = 'easeOutBack') {
@@ -29,7 +31,14 @@ export class handleTween {
             ease,
             reverse: false,
             immediate: false,
+            stagger: {
+                each: 0,
+                waitComplete: false,
+            },
         };
+
+        //
+        this.stagger = { each: 0, waitComplete: false };
     }
 
     onReuqestAnim(timestamp, fps, res) {
@@ -66,8 +75,10 @@ export class handleTween {
             const cbObject = getValueObj(this.values, 'currentValue');
 
             // Fire callback
-            this.callback.forEach(({ cb }) => {
-                cb(cbObject);
+            this.callback.forEach(({ cb }, i) => {
+                handleFrameIndex(() => {
+                    cb(cbObject);
+                }, i * this.stagger.each);
             });
 
             this.isRunning = true;
@@ -77,34 +88,48 @@ export class handleTween {
                     if (this.req) draw(timestamp, fps);
                 });
             } else {
-                this.req = false;
-                this.isRunning = false;
-                this.pauseTime = 0;
+                const onComplete = () => {
+                    this.req = false;
+                    this.isRunning = false;
+                    this.pauseTime = 0;
 
-                // End of animation
-                // Set fromValue with ended value
-                // At the next call fromValue become the start value
-                this.values.forEach((item, i) => {
-                    if (item.shouldUpdate) {
-                        item.toValue = item.currentValue;
-                        item.fromValue = item.currentValue;
+                    // End of animation
+                    // Set fromValue with ended value
+                    // At the next call fromValue become the start value
+                    this.values.forEach((item, i) => {
+                        if (item.shouldUpdate) {
+                            item.toValue = item.currentValue;
+                            item.fromValue = item.currentValue;
+                        }
+                    });
+
+                    // On complete
+                    if (!this.pauseStatus) {
+                        res();
+
+                        // Set promise reference to null once resolved
+                        this.promise = null;
+                        this.currentReject = null;
+                        this.currentResolve = null;
                     }
-                });
+                };
 
                 // Fire callback with exact end value
-                this.callback.forEach(({ cb }) => {
-                    cb(cbObject);
+                this.callback.forEach(({ cb }, i) => {
+                    handleFrameIndex(() => {
+                        cb(cbObject);
+
+                        if (this.stagger.waitComplete) {
+                            if (i === this.callback.length - 1) {
+                                onComplete();
+                            }
+                        } else {
+                            if (i === 0) {
+                                onComplete();
+                            }
+                        }
+                    }, i * this.stagger.each);
                 });
-
-                // On complete
-                if (!this.pauseStatus) {
-                    res();
-
-                    // Set promise reference to null once resolved
-                    this.promise = null;
-                    this.currentReject = null;
-                    this.currentResolve = null;
-                }
             }
         };
 
@@ -269,10 +294,12 @@ export class handleTween {
      *
      */
     mergeProps(props) {
-        const newProps = { ...this.defaultProps, ...props };
-        const { ease, duration } = newProps;
+        const newProps = mergeDeep(this.defaultProps, props);
+        const { ease, duration, stagger } = newProps;
         this.ease = tweenConfig[ease];
         this.duration = duration;
+        this.stagger.each = stagger.each;
+        this.stagger.waitComplete = stagger.waitComplete;
 
         return newProps;
     }

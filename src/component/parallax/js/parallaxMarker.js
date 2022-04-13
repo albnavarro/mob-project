@@ -81,6 +81,7 @@ export const parallaxMarker = ({
                       height: '2px',
                       top: `${startPoint + top}px`,
                       padding: '0 30px',
+                      pointerEvents: 'none',
                   }
                 : {
                       right: 0,
@@ -88,6 +89,7 @@ export const parallaxMarker = ({
                       height: '2px',
                       bottom: `${startPoint + bottom}px`,
                       padding: '0 30px',
+                      pointerEvents: 'none',
                   };
         } else {
             return invertSide
@@ -97,6 +99,7 @@ export const parallaxMarker = ({
                       width: '2px',
                       left: `${startPoint + left}px`,
                       padding: '30px 0',
+                      pointerEvents: 'none',
                   }
                 : {
                       top: 0,
@@ -104,6 +107,7 @@ export const parallaxMarker = ({
                       width: '2px',
                       right: `${startPoint + right}px`,
                       padding: '30px 0',
+                      pointerEvents: 'none',
                   };
         }
     })();
@@ -117,6 +121,7 @@ export const parallaxMarker = ({
                       height: '2px',
                       top: `${startPoint + endPoint + top}px`,
                       padding: '0 30px',
+                      pointerEvents: 'none',
                   }
                 : {
                       right: 0,
@@ -124,6 +129,7 @@ export const parallaxMarker = ({
                       height: '2px',
                       bottom: `${startPoint + endPoint + bottom}px`,
                       padding: '0 30px',
+                      pointerEvents: 'none',
                   };
         } else {
             return invertSide
@@ -133,6 +139,7 @@ export const parallaxMarker = ({
                       width: '2px',
                       left: `${startPoint + endPoint + left}px`,
                       padding: '30px 0',
+                      pointerEvents: 'none',
                   }
                 : {
                       top: 0,
@@ -140,6 +147,7 @@ export const parallaxMarker = ({
                       width: '2px',
                       right: `${startPoint + endPoint + right}px`,
                       padding: '30px 0',
+                      pointerEvents: 'none',
                   };
         }
     })();

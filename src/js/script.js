@@ -45,6 +45,10 @@ import { loadImageFromManifest } from './test/loadImageFromManifest.js';
 import { springTest } from './test/springTest.js';
 import { tweenTest } from './test/tweenTest.js';
 import { lerpTest } from './test/lerpTest.js';
+import { staggerTweenTest } from './test/staggerTweenTest.js';
+import { staggerSpringTest } from './test/staggerSpringTest.js';
+import { staggerLerpTest } from './test/staggerLerpTest.js';
+import { mouseStagger } from './test/mouseStagger.js';
 import { timlineMixTest } from './test/timlineMixTest.js';
 import { indexParallax } from './test/indexParallax.js';
 import { noGsap } from './test/noGsapScroller.js';
@@ -61,6 +65,16 @@ handleLoad(() => {
         tweenTest();
         lerpTest();
         timlineMixTest();
+    }
+
+    if (body.classList.contains('page-stagger')) {
+        staggerTweenTest();
+        staggerSpringTest();
+        staggerLerpTest();
+    }
+
+    if (body.classList.contains('page-mouseStagger')) {
+        mouseStagger();
     }
 
     if (body.classList.contains('template-fixed')) {

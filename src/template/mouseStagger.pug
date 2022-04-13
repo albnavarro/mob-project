@@ -1,0 +1,31 @@
+extends default/_wrapper.pug
+
+block content
+    header
+        .container
+            include ../includes/langSelector.pug
+        .container.menu-container.menu-container--top
+            include ../includes/navigation.pug
+    main
+                    
+        .mouseStagger
+          .mouseStagger__item.mouseStagger__item--1
+          .mouseStagger__item.mouseStagger__item--2
+          .mouseStagger__item.mouseStagger__item--3
+          .mouseStagger__item.mouseStagger__item--4
+          .mouseStagger__item.mouseStagger__item--5
+          .mouseStagger__item.mouseStagger__item--6
+          .mouseStagger__item.mouseStagger__item--7
+        
+          .circle-stagger-container   
+            .stagger__item.stagger__item--1
+            .stagger__item.stagger__item--2
+            .stagger__item.stagger__item--3
+            .stagger__item.stagger__item--4
+            .stagger__item.stagger__item--5
+            .stagger__item.stagger__item--6
+
+
+    include ../component/lightbox/pug/lightbox-simple.pug
+    include ../component/lightbox/pug/lightbox-image.pug
+    include ../component/lightbox/pug/lightbox-video.pug

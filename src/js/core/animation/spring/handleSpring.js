@@ -3,7 +3,9 @@ import { getValueObj, mergeArray, getTime } from '../utils/animationUtils.js';
 import {
     handleFrame,
     handleNextFrame,
+    handleFrameIndex,
 } from '../../events/rafutils/rafUtils.js';
+import { mergeDeep } from '../../utils/mergeDeep.js';
 
 export class handleSpring {
     constructor(config = 'default') {
@@ -24,7 +26,13 @@ export class handleSpring {
             reverse: false,
             config: this.config,
             immediate: false,
+            stagger: {
+                each: 0,
+                waitComplete: false,
+            },
         };
+
+        this.stagger = { each: 0, waitComplete: false };
     }
 
     onReuqestAnim(timestamp, fps, res) {
@@ -87,11 +95,13 @@ export class handleSpring {
             }
 
             // Prepare an obj to pass to the callback
-            o.cbObject = getValueObj(this.values, 'currentValue');
+            const cbObject = getValueObj(this.values, 'currentValue');
 
             // Fire callback
-            this.callback.forEach(({ cb }) => {
-                cb(o.cbObject);
+            this.callback.forEach(({ cb }, i) => {
+                handleFrameIndex(() => {
+                    cb(cbObject);
+                }, i * this.stagger.each);
             });
 
             // Update last time
@@ -105,38 +115,51 @@ export class handleSpring {
                     if (this.req) draw(timestamp, fps);
                 });
             } else {
-                this.req = false;
+                const onComplete = () => {
+                    this.req = false;
 
-                // End of animation
-                // Set fromValue with ended value
-                // At the next call fromValue become the start value
-                this.values.forEach((item, i) => {
-                    item.fromValue = item.toValue;
-                });
+                    // End of animation
+                    // Set fromValue with ended value
+                    // At the next call fromValue become the start value
+                    this.values.forEach((item, i) => {
+                        item.fromValue = item.toValue;
+                    });
+
+                    // On complete
+                    if (!this.pauseStatus) {
+                        res();
+
+                        // Set promise reference to null once resolved
+                        this.promise = null;
+                        this.currentReject = null;
+                        this.currentResolve = null;
+                    }
+                };
 
                 // Prepare an obj to pass to the callback with rounded value ( end user value)
                 const cbObjectSettled = getValueObj(this.values, 'toValue');
 
-                handleNextFrame.add(() => {
-                    // Fire callback with exact end value
-                    this.callback.forEach(({ cb }) => {
+                this.callback.forEach(({ cb }, i) => {
+                    handleFrameIndex(() => {
                         cb(cbObjectSettled);
-                    });
 
-                    this.callbackOnComplete.forEach(({ cb }) => {
-                        cb(cbObjectSettled);
-                    });
+                        if (this.stagger.waitComplete) {
+                            if (i === this.callback.length - 1) {
+                                onComplete();
+                            }
+                        } else {
+                            if (i === 0) {
+                                onComplete();
+                            }
+                        }
+                    }, i * this.stagger.each);
                 });
 
-                // On complete
-                if (!this.pauseStatus) {
-                    res();
-
-                    // Set promise reference to null once resolved
-                    this.promise = null;
-                    this.currentReject = null;
-                    this.currentResolve = null;
-                }
+                this.callbackOnComplete.forEach(({ cb }, i) => {
+                    handleFrameIndex(() => {
+                        cb(cbObjectSettled);
+                    }, i * this.stagger.each);
+                });
             }
         };
 
@@ -280,11 +303,15 @@ export class handleSpring {
      *
      */
     mergeProps(props) {
-        const newProps = { ...this.defaultProps, ...props };
+        const newProps = mergeDeep(this.defaultProps, props);
 
         // Merge news config prop if there is some
         const config = props?.config ? props.config : {};
         this.config = { ...this.config, ...config };
+
+        const { stagger } = newProps;
+        this.stagger.each = stagger.each;
+        this.stagger.waitComplete = stagger.waitComplete;
 
         return newProps;
     }

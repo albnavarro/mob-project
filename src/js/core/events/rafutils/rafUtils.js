@@ -167,3 +167,20 @@ export const handleFrame = (() => {
         addMultiple,
     };
 })();
+
+/**
+ *  Go to X frame from now
+ */
+export const handleFrameIndex = (fn, index) => {
+    let start = 0;
+
+    const loop = () => {
+        if (start === index) {
+            fn();
+            return;
+        }
+        start++;
+        handleNextFrame.add(() => loop());
+    };
+    handleNextFrame.add(() => loop());
+};

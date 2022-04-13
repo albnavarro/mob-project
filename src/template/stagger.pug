@@ -1,0 +1,86 @@
+extends default/_wrapper.pug
+
+block content
+    header
+        .container
+            include ../includes/langSelector.pug
+        .container.menu-container.menu-container--top
+            include ../includes/navigation.pug
+    main
+        .container.clearfix
+            .sidebar.menu-container--sidebar
+                include ../includes/navigation.pug
+            .content(style="margin-bottom:500px;")
+                      
+              .tween.stagger-container        
+                  h1
+                    |tween stagger animation
+                  button.start(type="button")
+                    |start
+                  button.stop(type="button")
+                    |stop
+                  button.pause(type="button")
+                    |pause
+                  button.play(type="button")
+                    |resume
+                  button.reverseNext(type="button")
+                    |revrse Next
+                  button.reverse(type="button")
+                    |reverse
+                  .stagger.target
+                  .stagger.target-stagger
+                  .stagger.target-stagger
+                  .stagger.target-stagger
+                  .stagger.target-stagger
+                
+                
+                
+                
+              .spring.stagger-container        
+                  h1
+                    |spring stagger animation
+                  button.start(type="button")
+                    |start
+                  button.stop(type="button")
+                    |stop
+                  button.pause(type="button")
+                    |pause
+                  button.play(type="button")
+                    |resume
+                  button.reverseNext(type="button")
+                    |revrse Next
+                  button.reverse(type="button")
+                    |reverse
+                  .stagger.target
+                  .stagger.target-stagger
+                  .stagger.target-stagger
+                  .stagger.target-stagger
+                  .stagger.target-stagger
+                
+                
+                
+              .lerp.stagger-container        
+                  h1
+                    |lerp stagger animation
+                  button.start(type="button")
+                    |start
+                  button.stop(type="button")
+                    |stop
+                  button.pause(type="button")
+                    |pause
+                  button.play(type="button")
+                    |resume
+                  button.reverseNext(type="button")
+                    |revrse Next
+                  button.reverse(type="button")
+                    |reverse
+                  .stagger.target
+                  .stagger.target-stagger
+                  .stagger.target-stagger
+                  .stagger.target-stagger
+                  .stagger.target-stagger
+                
+
+    include ../component/lightbox/pug/lightbox-simple.pug
+    include ../component/lightbox/pug/lightbox-image.pug
+    include ../component/lightbox/pug/lightbox-video.pug
