@@ -24,7 +24,9 @@ export const circleAnimationTimeline = () => {
     const distance = 1;
     // stepNumber: 1 -> half loop
     // stepNumber: 2 -> full loop
-    const stepNumber = 2;
+    // multiply * 1000 so we have 1000 rotation per step
+    // so we avoid frame glitch when tween repeat
+    const stepNumber = 2 * 1000;
     const step = distance / Math.PI / stepNumber;
     const xRadius = 300;
     const yRadius = 200;
