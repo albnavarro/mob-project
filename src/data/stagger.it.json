@@ -1,7 +1,3 @@
 {
-    "template": "stagger",
-    "pageTitle": "stagger",
-    "description": "custom description",
-    "additionalData": ["string/en.json", "nav.json"],
-    "registerComponent": ["to-top/pug/toTop.pug"]
+    "template": "stagger"
 }

@@ -1,0 +1,91 @@
+extends default/_wrapper.pug
+
+block content
+    header
+        .container
+            include ../includes/langSelector.pug
+        .container.menu-container.menu-container--top
+            include ../includes/navigation.pug
+    main
+        .container.clearfix        
+          .shape__container.sin
+            .shape__nav
+              h1
+                |Math.sin()
+              button.anim-play(type='button')
+                |play
+              button.anim-stop(type='button')
+                |stop
+              button.anim-pause(type='button')
+                |pause
+              button.anim-resume(type='button')
+                |resume
+            .shape__xaxis
+            .shape__item
+              .shape__target.shape__target--1
+              .shape__target.shape__target--2
+              .shape__target.shape__target--3
+              .shape__target.shape__target--4
+              .shape__target.shape__target--5
+              .shape__target.shape__target--6
+                
+                
+          .shape__container.sin-revert
+            .shape__nav
+              h1
+                |Math.sin() and revert
+              button.anim-play(type='button')
+                |play
+              button.anim-stop(type='button')
+                |stop
+            .shape__xaxis
+            .shape__item
+              .shape__target.shape__target--1
+              .shape__target.shape__target--2
+              .shape__target.shape__target--3
+              .shape__target.shape__target--4
+              .shape__target.shape__target--5
+              .shape__target.shape__target--6
+                
+          .shape__container.circle-tween-timeline
+            .shape__nav
+              h1
+                |Ellipse
+              button.anim-play(type='button')
+                |play
+              button.anim-stop(type='button')
+                |stop
+              button.anim-pause(type='button')
+                |pause
+              button.anim-resume(type='button')
+                |resume
+            .shape__xaxis
+            .shape__item
+              .shape__target.shape__target--1
+              .shape__target.shape__target--2
+              .shape__target.shape__target--3
+              .shape__target.shape__target--4
+              .shape__target.shape__target--5
+              .shape__target.shape__target--6
+                
+          .shape__container.circle-tween
+            .shape__nav
+              h1
+                |Spring Circle - no timeline - RAF loop
+              button.anim-play(type='button')
+                |play
+              button.anim-stop(type='button')
+                |stop
+            .shape__xaxis
+            .shape__item
+              .shape__target.shape__target--1
+              .shape__target.shape__target--2
+              .shape__target.shape__target--3
+              .shape__target.shape__target--4
+              .shape__target.shape__target--5
+              .shape__target.shape__target--6
+                
+
+    include ../component/lightbox/pug/lightbox-simple.pug
+    include ../component/lightbox/pug/lightbox-image.pug
+    include ../component/lightbox/pug/lightbox-video.pug

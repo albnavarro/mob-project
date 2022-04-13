@@ -52,6 +52,10 @@ import { mouseStagger } from './test/mouseStagger.js';
 import { timlineMixTest } from './test/timlineMixTest.js';
 import { indexParallax } from './test/indexParallax.js';
 import { noGsap } from './test/noGsapScroller.js';
+import { sinAnimation } from './test/sinAnimation.js';
+import { sinRevertAnimation } from './test/sinRevertAnimation.js';
+import { circleAnimation } from './test/circleAnimation.js';
+import { circleAnimationTimeline } from './test/circleAnimationTimeline.js';
 
 handleLoad(() => {
     const body = document.querySelector('body');
@@ -71,6 +75,13 @@ handleLoad(() => {
         staggerTweenTest();
         staggerSpringTest();
         staggerLerpTest();
+    }
+
+    if (body.classList.contains('page-shape')) {
+        sinAnimation();
+        sinRevertAnimation();
+        circleAnimation();
+        circleAnimationTimeline();
     }
 
     if (body.classList.contains('page-mouseStagger')) {

@@ -5,20 +5,6 @@
             "univoqueId": "index"
         },
         {
-            "label": "parallax",
-            "univoqueId": "",
-            "children": [
-                {
-                    "label": "",
-                    "univoqueId": "mouseParallax"
-                },
-                {
-                    "label": "",
-                    "univoqueId": "noGsapHorizontal2"
-                }
-            ]
-        },
-        {
             "label": "gsap",
             "univoqueId": "",
             "children": [
@@ -37,9 +23,17 @@
             ]
         },
         {
-            "label": "vari",
+            "label": "no gsap",
             "univoqueId": "",
             "children": [
+                {
+                    "label": "",
+                    "univoqueId": "mouseParallax"
+                },
+                {
+                    "label": "",
+                    "univoqueId": "noGsapHorizontal2"
+                },
                 {
                     "label": "",
                     "univoqueId": "move3D"
@@ -70,23 +64,13 @@
                 },
                 {
                     "label": "",
-                    "univoqueId": "store",
-                    "children": [
-                        {
-                            "label": "test",
-                            "univoqueId": ""
-                        },
-                        {
-                            "label": "test",
-                            "univoqueId": ""
-                        },
-                        {
-                            "label": "test",
-                            "univoqueId": ""
-                        }
-                    ]
+                    "univoqueId": "shape"
                 }
             ]
+        },
+        {
+            "label": "",
+            "univoqueId": "store"
         },
         {
             "label": "",
