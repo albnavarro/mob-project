@@ -155,7 +155,11 @@ export class HandleAsyncTimeline {
                     // Delay loop
                     const loop = () => {
                         let current = getTime();
-                        const delta = current - start;
+                        let delta = current - start;
+
+                        // If play, resume, playFromLabel is fired whith another tween in delay
+                        // fire this tween immediatly, so avoid probem with musch much delay in same group
+                        if (this.actionAfterReject.length > 0) delta = delay;
 
                         // Start after dealy or immediate in caso of stop or reverse Next
                         if (
