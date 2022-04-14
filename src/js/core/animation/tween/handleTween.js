@@ -6,6 +6,7 @@ import {
     handleFrameIndex,
 } from '../../events/rafutils/rafUtils.js';
 import { mergeDeep } from '../../utils/mergeDeep.js';
+import { getStaggerIndex } from '../utils/getStaggerIndex.js';
 
 export class handleTween {
     constructor(ease = 'easeOutBack') {
@@ -34,15 +35,19 @@ export class handleTween {
             stagger: {
                 each: 0,
                 waitComplete: false,
+                from: 'start',
             },
         };
 
         //
-        this.stagger = { each: 0, waitComplete: false };
+        this.stagger = { each: 0, waitComplete: false, from: 'start' };
     }
 
     onReuqestAnim(timestamp, fps, res) {
         this.startTime = timestamp;
+
+        let slowlestStagger = { index: 0, frame: 0 };
+        let fastestStagger = { index: 0, frame: 0 };
 
         const draw = (timestamp, fps) => {
             this.req = true;
@@ -74,7 +79,7 @@ export class handleTween {
             // Prepare an obj to pass to the callback
             const cbObject = getValueObj(this.values, 'currentValue');
 
-            if (this.callback.length === 1) {
+            if (this.stagger.each === 0) {
                 // No stagger, run immediatly
                 this.callback.forEach(({ cb }) => {
                     cb(cbObject);
@@ -82,9 +87,27 @@ export class handleTween {
             } else {
                 // Stagger
                 this.callback.forEach(({ cb }, i) => {
+                    const { index, frame } = getStaggerIndex(
+                        i,
+                        this.callback.length,
+                        this.stagger
+                    );
+
+                    if (frame >= slowlestStagger.frame)
+                        slowlestStagger = {
+                            index,
+                            frame,
+                        };
+
+                    if (frame <= fastestStagger.frame)
+                        fastestStagger = {
+                            index,
+                            frame,
+                        };
+
                     handleFrameIndex(() => {
                         cb(cbObject);
-                    }, i * this.stagger.each);
+                    }, frame);
                 });
             }
             this.isRunning = true;
@@ -120,22 +143,31 @@ export class handleTween {
                     }
                 };
 
-                // Fire callback with exact end value
-                this.callback.forEach(({ cb }, i) => {
-                    handleFrameIndex(() => {
-                        cb(cbObject);
+                if (this.stagger.each === 0) {
+                    onComplete();
 
-                        if (this.stagger.waitComplete) {
-                            if (i === this.callback.length - 1) {
-                                onComplete();
+                    // Fire callback with exact end value
+                    this.callback.forEach(({ cb }) => {
+                        cb(cbObject);
+                    });
+                } else {
+                    // Fire callback with exact end value
+                    this.callback.forEach(({ cb }, i) => {
+                        handleFrameIndex(() => {
+                            cb(cbObject);
+
+                            if (this.stagger.waitComplete) {
+                                if (i === slowlestStagger.index) {
+                                    onComplete();
+                                }
+                            } else {
+                                if (i === fastestStagger.index) {
+                                    onComplete();
+                                }
                             }
-                        } else {
-                            if (i === 0) {
-                                onComplete();
-                            }
-                        }
-                    }, i * this.stagger.each);
-                });
+                        }, getStaggerIndex(i, this.callback.length, this.stagger).frame);
+                    });
+                }
             }
         };
 
@@ -306,6 +338,7 @@ export class handleTween {
         this.duration = duration;
         this.stagger.each = stagger.each;
         this.stagger.waitComplete = stagger.waitComplete;
+        this.stagger.from = stagger.from;
 
         return newProps;
     }

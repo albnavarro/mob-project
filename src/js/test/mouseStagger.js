@@ -25,7 +25,7 @@ export const mouseStagger = () => {
     // In real time (like mousemove) use waitComplete: false, to avoid moviemnt when promise in sot resolved
     handleMouseMove(({ client }) => {
         const { x, y } = client;
-        spring.goTo({ x, y }, { stagger: { each: 4 } });
+        spring.goTo({ x, y }, { stagger: { each: 4 } }).catch((err) => {});
     });
 
     // 2
@@ -45,7 +45,7 @@ export const mouseStagger = () => {
         tween,
         { scale: 2 },
         {
-            stagger: { each: 10 },
+            stagger: { each: 10, from: 'start' },
             duration: 1000,
         }
     );

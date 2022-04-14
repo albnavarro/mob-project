@@ -56,6 +56,7 @@ import { sinAnimation } from './test/sinAnimation.js';
 import { sinRevertAnimation } from './test/sinRevertAnimation.js';
 import { circleAnimation } from './test/circleAnimation.js';
 import { circleAnimationTimeline } from './test/circleAnimationTimeline.js';
+import { infiniteAnimation } from './test/infiniteAnimation.js';
 
 handleLoad(() => {
     const body = document.querySelector('body');
@@ -82,6 +83,7 @@ handleLoad(() => {
         sinRevertAnimation();
         circleAnimation();
         circleAnimationTimeline();
+        infiniteAnimation();
     }
 
     if (body.classList.contains('page-mouseStagger')) {

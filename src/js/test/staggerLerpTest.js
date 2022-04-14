@@ -41,7 +41,7 @@ export function staggerLerpTest() {
         .goTo(myTween, { y: 500 }, { precision: 1 })
         .createGroup({ waitComplete: false })
         .goTo(myTween, { x: 0 }, { precision: 1 })
-        .goTo(myStagger, { x: 500 }, { stagger: { each: 4 } })
+        .goTo(myStagger, { x: 500 }, { stagger: { each: 4, from: 'edges' } })
         .closeGroup()
         .goTo(myTween, { y: 0 }, { precision: 1 })
 

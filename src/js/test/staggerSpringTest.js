@@ -41,7 +41,7 @@ export function staggerSpringTest() {
         .goTo(myTween, { y: 500 }, { config: { precision: 1 } })
         .createGroup({ waitComplete: false })
         .goTo(myTween, { x: 0 }, { config: { precision: 1 } })
-        .goTo(myStagger, { x: 500 }, { stagger: { each: 4 } })
+        .goTo(myStagger, { x: 500 }, { stagger: { each: 4, from: 'center' } })
         .closeGroup()
         .goTo(myTween, { y: 0 }, { config: { precision: 1 } })
 

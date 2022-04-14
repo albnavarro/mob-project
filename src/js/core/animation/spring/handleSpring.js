@@ -6,6 +6,7 @@ import {
     handleFrameIndex,
 } from '../../events/rafutils/rafUtils.js';
 import { mergeDeep } from '../../utils/mergeDeep.js';
+import { getStaggerIndex } from '../utils/getStaggerIndex.js';
 
 export class handleSpring {
     constructor(config = 'default') {
@@ -29,10 +30,11 @@ export class handleSpring {
             stagger: {
                 each: 0,
                 waitComplete: false,
+                from: 'start',
             },
         };
 
-        this.stagger = { each: 0, waitComplete: false };
+        this.stagger = { each: 0, waitComplete: false, from: 'start' };
     }
 
     onReuqestAnim(timestamp, fps, res) {
@@ -53,6 +55,8 @@ export class handleSpring {
         const precision = parseFloat(this.config.precision);
 
         const o = {};
+        o.slowlestStagger = { index: 0, frame: 0 };
+        o.fastestStagger = { index: 0, frame: 0 };
 
         const draw = (timestamp, fps) => {
             this.req = true;
@@ -97,7 +101,7 @@ export class handleSpring {
             // Prepare an obj to pass to the callback
             const cbObject = getValueObj(this.values, 'currentValue');
 
-            if (this.callback.length === 1) {
+            if (this.stagger.each === 0) {
                 // No stagger, run immediatly
                 this.callback.forEach(({ cb }) => {
                     cb(cbObject);
@@ -105,9 +109,27 @@ export class handleSpring {
             } else {
                 // Stagger
                 this.callback.forEach(({ cb }, i) => {
+                    const { index, frame } = getStaggerIndex(
+                        i,
+                        this.callback.length,
+                        this.stagger
+                    );
+
+                    if (frame >= o.slowlestStagger.frame)
+                        o.slowlestStagger = {
+                            index,
+                            frame,
+                        };
+
+                    if (frame <= o.fastestStagger.frame)
+                        o.fastestStagger = {
+                            index,
+                            frame,
+                        };
+
                     handleFrameIndex(() => {
                         cb(cbObject);
-                    }, i * this.stagger.each);
+                    }, frame);
                 });
             }
 
@@ -146,27 +168,42 @@ export class handleSpring {
                 // Prepare an obj to pass to the callback with rounded value ( end user value)
                 const cbObjectSettled = getValueObj(this.values, 'toValue');
 
-                this.callback.forEach(({ cb }, i) => {
-                    handleFrameIndex(() => {
-                        cb(cbObjectSettled);
+                if (this.stagger.each === 0) {
+                    onComplete();
 
-                        if (this.stagger.waitComplete) {
-                            if (i === this.callback.length - 1) {
-                                onComplete();
-                            }
-                        } else {
-                            if (i === 0) {
-                                onComplete();
-                            }
-                        }
-                    }, i * this.stagger.each);
-                });
+                    handleNextFrame.add(() => {
+                        // Fire callback with exact end value
+                        this.callback.forEach(({ cb }) => {
+                            cb(cbObjectSettled);
+                        });
 
-                this.callbackOnComplete.forEach(({ cb }, i) => {
-                    handleFrameIndex(() => {
-                        cb(cbObjectSettled);
-                    }, i * this.stagger.each);
-                });
+                        this.callbackOnComplete.forEach(({ cb }) => {
+                            cb(cbObjectSettled);
+                        });
+                    });
+                } else {
+                    this.callback.forEach(({ cb }, i) => {
+                        handleFrameIndex(() => {
+                            cb(cbObjectSettled);
+
+                            if (this.stagger.waitComplete) {
+                                if (i === o.slowlestStagger.index) {
+                                    onComplete();
+                                }
+                            } else {
+                                if (i === o.fastestStagger.index) {
+                                    onComplete();
+                                }
+                            }
+                        }, getStaggerIndex(i, this.callback.length, this.stagger).frame);
+                    });
+
+                    this.callbackOnComplete.forEach(({ cb }, i) => {
+                        handleFrameIndex(() => {
+                            cb(cbObjectSettled);
+                        }, getStaggerIndex(i, this.callback.length, this.stagger).frame);
+                    });
+                }
             }
         };
 
@@ -319,6 +356,7 @@ export class handleSpring {
         const { stagger } = newProps;
         this.stagger.each = stagger.each;
         this.stagger.waitComplete = stagger.waitComplete;
+        this.stagger.from = stagger.from;
 
         return newProps;
     }

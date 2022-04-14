@@ -6,7 +6,8 @@
         position: relative;
 
         &.circle-tween,
-        &.circle-tween-timeline {
+        &.circle-tween-timeline,
+        &.infinite-tween {
             justify-content: center;
         }
     }

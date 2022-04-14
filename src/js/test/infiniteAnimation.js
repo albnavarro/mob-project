@@ -5,25 +5,25 @@ import {
 } from '../core/events/rafutils/rafUtils.js';
 import { HandleAsyncTimeline } from '../core/animation/asyncTimeline/handleAsyncTimeline.js';
 
-export const circleAnimation = () => {
-    const stagger = document.querySelectorAll('.circle-tween .shape__target');
-    const play = document.querySelector('.circle-tween .anim-play');
-    const stop = document.querySelector('.circle-tween .anim-stop');
+export const infiniteAnimation = () => {
+    const stagger = document.querySelectorAll('.infinite-tween .shape__target');
+    const play = document.querySelector('.infinite-tween .anim-play');
+    const stop = document.querySelector('.infinite-tween .anim-stop');
 
     const tween = new handleSpring();
     tween.setData({ x: 0 });
     tween.set({ x: 0 });
 
-    const distance = window.innerWidth / 2;
-    const velocity = 10;
-    const step = distance / Math.PI / velocity;
-    const radius = 200;
-    const duration = 1000 * velocity;
+    const xAmplitude = 500;
+    const yAmplitude = 400;
+    const friction = 30;
 
     stagger.forEach((item, i) => {
         tween.subscribe(({ x }) => {
-            const xr = Math.sin(x / step) * radius;
-            const yr = Math.cos(x / step) * radius;
+            const scale = 2 / (3 - Math.cos(2 * (x / friction)));
+            const xr = scale * Math.cos(x / friction) * xAmplitude;
+            const yr =
+                ((scale * Math.sin(2 * (x / friction))) / 2) * yAmplitude;
             item.style.transform = `translate3D(0px,0px,0px) translate(${xr}px, ${yr}px)`;
         });
     });
@@ -32,9 +32,7 @@ export const circleAnimation = () => {
     let isRunning = false;
     const loop = () => {
         counter++;
-        tween
-            .goTo({ x: counter }, { stagger: { each: 3, from: 'end' } })
-            .catch((err) => {});
+        tween.goTo({ x: counter }, { stagger: { each: 3 } }).catch((err) => {});
         if (isRunning) handleNextFrame.add(() => loop());
     };
 

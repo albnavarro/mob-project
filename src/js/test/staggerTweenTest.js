@@ -41,7 +41,11 @@ export function staggerTweenTest() {
         .goTo(myTween, { y: 500 })
         .createGroup({ waitComplete: false })
         .goTo(myTween, { x: 0 })
-        .goTo(myStagger, { x: 500 }, { stagger: { each: 4 } })
+        .goTo(
+            myStagger,
+            { x: 500 },
+            { duration: 1500, stagger: { each: 4, from: 'edges' } }
+        )
         .closeGroup()
         .goTo(myTween, { y: 0 })
 
