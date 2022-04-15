@@ -2,10 +2,34 @@ const STAGGER_START = 'start';
 const STAGGER_END = 'end';
 const STAGGER_CENTER = 'center';
 const STAGGER_EDGES = 'edges';
+const STAGGER_RANDOM = 'random';
 
-export const getStaggerIndex = (index, arraylenght, stagger) => {
+// Get random frame without duplicate
+export const getRandomChoice = (arr, each, index) => {
+    // Get previous result
+    const previousFrame = arr.slice(0, index).map((item) => item.frame);
+
+    // Get possibile result
+    const posibileFrame = arr.map((item, i) => i * each);
+
+    // Get array of possibile result without previous
+    const randomChoice = posibileFrame.filter(
+        (x) => !previousFrame.includes(x)
+    );
+
+    return randomChoice;
+};
+
+// Get frame per index
+export const getStaggerIndex = (
+    index,
+    arraylenght,
+    stagger,
+    randomChoice = []
+) => {
     const { from, each } = stagger;
     const isOdd = (num) => num % 2;
+    const getRandomInt = (max) => Math.floor(Math.random() * max);
 
     // STAGGER_INDEX
     const isNumer = (value) => {
@@ -14,6 +38,13 @@ export const getStaggerIndex = (index, arraylenght, stagger) => {
             isFinite(value)
         );
     };
+
+    if (from === STAGGER_RANDOM) {
+        return {
+            index: index,
+            frame: (() => randomChoice[getRandomInt(randomChoice.length)])(),
+        };
+    }
 
     if (from === STAGGER_START) {
         return {

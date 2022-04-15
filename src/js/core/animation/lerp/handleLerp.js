@@ -6,7 +6,7 @@ import {
     handleFrameIndex,
 } from '../../events/rafutils/rafUtils.js';
 import { mergeDeep } from '../../utils/mergeDeep.js';
-import { getStaggerIndex } from '../utils/getStaggerIndex.js';
+import { getStaggerIndex, getRandomChoice } from '../utils/getStaggerIndex.js';
 
 const LERP_DEFAULT_PRECISION = 0.01;
 
@@ -26,6 +26,7 @@ export class handleLerp {
         this.callbackOnComplete = [];
         this.callbackStartInPause = [];
         this.pauseStatus = false;
+        this.firstRun = true;
         this.lostFrameTresold = 64;
         this.defaultProps = {
             reverse: false,
@@ -40,6 +41,14 @@ export class handleLerp {
         };
 
         this.stagger = { each: 0, waitComplete: false, from: 'start' };
+        this.slowlestStagger = {
+            index: 0,
+            frame: 0,
+        };
+        this.fastestStagger = {
+            index: 0,
+            frame: 0,
+        };
     }
 
     onReuqestAnim(timestamp, fps, res) {
@@ -51,8 +60,6 @@ export class handleLerp {
         const precision = this.precision;
 
         const o = {};
-        o.slowlestStagger = { index: 0, frame: 0 };
-        o.fastestStagger = { index: 0, frame: 0 };
 
         const draw = (timestamp, fps) => {
             this.req = true;
@@ -86,25 +93,7 @@ export class handleLerp {
                 });
             } else {
                 // Stagger
-                this.callback.forEach(({ cb }, i) => {
-                    const { index, frame } = getStaggerIndex(
-                        i,
-                        this.callback.length,
-                        this.stagger
-                    );
-
-                    if (frame >= o.slowlestStagger.frame)
-                        o.slowlestStagger = {
-                            index,
-                            frame,
-                        };
-
-                    if (frame <= o.fastestStagger.frame)
-                        o.fastestStagger = {
-                            index,
-                            frame,
-                        };
-
+                this.callback.forEach(({ cb, index, frame }, i) => {
                     handleFrameIndex(() => {
                         cb(cbObject);
                     }, frame);
@@ -157,27 +146,29 @@ export class handleLerp {
                         });
                     });
                 } else {
-                    this.callback.forEach(({ cb }, i) => {
+                    this.callback.forEach(({ cb, index, frame }, i) => {
                         handleFrameIndex(() => {
                             cb(cbObjectSettled);
 
                             if (this.stagger.waitComplete) {
-                                if (i === o.slowlestStagger.index) {
+                                if (i === this.slowlestStagger.index) {
                                     onComplete();
                                 }
                             } else {
-                                if (i === o.fastestStagger.index) {
+                                if (i === this.fastestStagger.index) {
                                     onComplete();
                                 }
                             }
-                        }, getStaggerIndex(i, this.callback.length, this.stagger).frame);
+                        }, frame);
                     });
 
-                    this.callbackOnComplete.forEach(({ cb }, i) => {
-                        handleFrameIndex(() => {
-                            cb(cbObjectSettled);
-                        }, getStaggerIndex(i, this.callback.length, this.stagger).frame);
-                    });
+                    this.callbackOnComplete.forEach(
+                        ({ cb, index, frame }, i) => {
+                            handleFrameIndex(() => {
+                                cb(cbObjectSettled);
+                            }, frame);
+                        }
+                    );
                 }
             }
         };
@@ -327,6 +318,39 @@ export class handleLerp {
         this.stagger.each = stagger.each;
         this.stagger.waitComplete = stagger.waitComplete;
         this.stagger.from = stagger.from;
+
+        if (this.stagger.each > 0 && this.firstRun) {
+            this.callback.forEach((item, i) => {
+                const { index, frame } = getStaggerIndex(
+                    i,
+                    this.callback.length,
+                    this.stagger,
+                    getRandomChoice(this.callback, this.stagger.each, i)
+                );
+
+                item.index = index;
+                item.frame = frame;
+
+                if (this.callbackOnComplete.length > 0) {
+                    this.callbackOnComplete[i].index = index;
+                    this.callbackOnComplete[i].frame = frame;
+                }
+
+                if (frame >= this.slowlestStagger.frame)
+                    this.slowlestStagger = {
+                        index,
+                        frame,
+                    };
+
+                if (frame <= this.fastestStagger.frame)
+                    this.fastestStagger = {
+                        index,
+                        frame,
+                    };
+            });
+
+            this.firstRun = false;
+        }
 
         return newProps;
     }

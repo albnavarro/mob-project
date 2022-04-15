@@ -30,6 +30,12 @@ export function staggerLerpTest() {
         });
     });
 
+    stagger.forEach((item, i) => {
+        myStagger.onComplete(({ x }) => {
+            item.style.transform = `translate(${x}px, 0px)`;
+        });
+    });
+
     // When use waitComplete: false all the stagger of same tween must have the same each value to syncronize
     // DEFINE TIMELINE
     const timeline = new HandleAsyncTimeline({ repeat: -1, yoyo: true })

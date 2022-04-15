@@ -6,7 +6,7 @@ import {
     handleFrameIndex,
 } from '../../events/rafutils/rafUtils.js';
 import { mergeDeep } from '../../utils/mergeDeep.js';
-import { getStaggerIndex } from '../utils/getStaggerIndex.js';
+import { getStaggerIndex, getRandomChoice } from '../utils/getStaggerIndex.js';
 
 export class handleTween {
     constructor(ease = 'easeOutBack') {
@@ -19,6 +19,7 @@ export class handleTween {
         this.values = [];
         this.id = 0;
         this.callback = [];
+        this.callbackOnComplete = [];
         this.callbackStartInPause = [];
         this.pauseStatus = false;
         this.comeFromResume = false;
@@ -27,6 +28,7 @@ export class handleTween {
         this.isRunning = false;
         this.timeElapsed = 0;
         this.pauseTime = 0;
+        this.firstRun = true;
         this.defaultProps = {
             duration: 1000,
             ease,
@@ -41,13 +43,18 @@ export class handleTween {
 
         //
         this.stagger = { each: 0, waitComplete: false, from: 'start' };
+        this.slowlestStagger = {
+            index: 0,
+            frame: 0,
+        };
+        this.fastestStagger = {
+            index: 0,
+            frame: 0,
+        };
     }
 
     onReuqestAnim(timestamp, fps, res) {
         this.startTime = timestamp;
-
-        let slowlestStagger = { index: 0, frame: 0 };
-        let fastestStagger = { index: 0, frame: 0 };
 
         const draw = (timestamp, fps) => {
             this.req = true;
@@ -86,25 +93,7 @@ export class handleTween {
                 });
             } else {
                 // Stagger
-                this.callback.forEach(({ cb }, i) => {
-                    const { index, frame } = getStaggerIndex(
-                        i,
-                        this.callback.length,
-                        this.stagger
-                    );
-
-                    if (frame >= slowlestStagger.frame)
-                        slowlestStagger = {
-                            index,
-                            frame,
-                        };
-
-                    if (frame <= fastestStagger.frame)
-                        fastestStagger = {
-                            index,
-                            frame,
-                        };
-
+                this.callback.forEach(({ cb, index, frame }, i) => {
                     handleFrameIndex(() => {
                         cb(cbObject);
                     }, frame);
@@ -150,23 +139,35 @@ export class handleTween {
                     this.callback.forEach(({ cb }) => {
                         cb(cbObject);
                     });
+
+                    this.callbackOnComplete.forEach(({ cb }) => {
+                        cb(cbObject);
+                    });
                 } else {
                     // Fire callback with exact end value
-                    this.callback.forEach(({ cb }, i) => {
+                    this.callback.forEach(({ cb, index, frame }, i) => {
                         handleFrameIndex(() => {
                             cb(cbObject);
 
                             if (this.stagger.waitComplete) {
-                                if (i === slowlestStagger.index) {
+                                if (i === this.slowlestStagger.index) {
                                     onComplete();
                                 }
                             } else {
-                                if (i === fastestStagger.index) {
+                                if (i === this.fastestStagger.index) {
                                     onComplete();
                                 }
                             }
-                        }, getStaggerIndex(i, this.callback.length, this.stagger).frame);
+                        }, frame);
                     });
+
+                    this.callbackOnComplete.forEach(
+                        ({ cb, index, frame }, i) => {
+                            handleFrameIndex(() => {
+                                cb(cbObject);
+                            }, frame);
+                        }
+                    );
                 }
             }
         };
@@ -339,6 +340,39 @@ export class handleTween {
         this.stagger.each = stagger.each;
         this.stagger.waitComplete = stagger.waitComplete;
         this.stagger.from = stagger.from;
+
+        if (this.stagger.each > 0 && this.firstRun) {
+            this.callback.forEach((item, i) => {
+                const { index, frame } = getStaggerIndex(
+                    i,
+                    this.callback.length,
+                    this.stagger,
+                    getRandomChoice(this.callback, this.stagger.each, i)
+                );
+
+                item.index = index;
+                item.frame = frame;
+
+                if (this.callbackOnComplete.length > 0) {
+                    this.callbackOnComplete[i].index = index;
+                    this.callbackOnComplete[i].frame = frame;
+                }
+
+                if (frame >= this.slowlestStagger.frame)
+                    this.slowlestStagger = {
+                        index,
+                        frame,
+                    };
+
+                if (frame <= this.fastestStagger.frame)
+                    this.fastestStagger = {
+                        index,
+                        frame,
+                    };
+            });
+
+            this.firstRun = false;
+        }
 
         return newProps;
     }
@@ -627,6 +661,18 @@ export class handleTween {
 
         return () => {
             this.callbackStartInPause = this.callbackStartInPause.filter(
+                (item) => item.id !== cbId
+            );
+        };
+    }
+
+    onComplete(cb) {
+        this.callbackOnComplete.push({ cb, id: this.id });
+        const cbId = this.id;
+        this.id++;
+
+        return () => {
+            this.callbackOnComplete = this.callbackOnComplete.filter(
                 (item) => item.id !== cbId
             );
         };
