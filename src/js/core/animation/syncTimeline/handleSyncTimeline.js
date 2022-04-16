@@ -150,7 +150,7 @@ export class HandleSyncTimeline {
     }
 
     reverse() {
-        if (this.isStopped || !this.pauseStatus) return;
+        if (this.isStopped || this.pauseStatus) return;
 
         this.isReverse = !this.isReverse;
         if (this.isReverse) {
