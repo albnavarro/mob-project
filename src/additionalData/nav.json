@@ -52,11 +52,11 @@
                 },
                 {
                     "label": "",
-                    "univoqueId": "tween"
+                    "univoqueId": "asyncTimeline"
                 },
                 {
                     "label": "",
-                    "univoqueId": "stagger"
+                    "univoqueId": "asyncTimelineStagger"
                 },
                 {
                     "label": "",
@@ -65,6 +65,10 @@
                 {
                     "label": "",
                     "univoqueId": "shape"
+                },
+                {
+                    "label": "",
+                    "univoqueId": "syncTimeline"
                 }
             ]
         },

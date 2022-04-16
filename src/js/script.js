@@ -57,6 +57,7 @@ import { sinRevertAnimation } from './test/sinRevertAnimation.js';
 import { circleAnimation } from './test/circleAnimation.js';
 import { circleAnimationTimeline } from './test/circleAnimationTimeline.js';
 import { infiniteAnimation } from './test/infiniteAnimation.js';
+import { syncTimelineTest } from './test/syncTimelineTest.js';
 
 handleLoad(() => {
     const body = document.querySelector('body');
@@ -65,14 +66,14 @@ handleLoad(() => {
         indexParallax();
     }
 
-    if (body.classList.contains('page-tween')) {
+    if (body.classList.contains('page-asyncTimeline')) {
         springTest();
         tweenTest();
         lerpTest();
         timlineMixTest();
     }
 
-    if (body.classList.contains('page-stagger')) {
+    if (body.classList.contains('page-asyncTimelineStagger')) {
         staggerTweenTest();
         staggerSpringTest();
         staggerLerpTest();
@@ -84,6 +85,10 @@ handleLoad(() => {
         circleAnimation();
         circleAnimationTimeline();
         infiniteAnimation();
+    }
+
+    if (body.classList.contains('page-syncTimeline')) {
+        syncTimelineTest();
     }
 
     if (body.classList.contains('page-mouseStagger')) {

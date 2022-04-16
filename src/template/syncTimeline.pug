@@ -1,0 +1,36 @@
+extends default/_wrapper.pug
+
+block content
+    header
+        .container
+            include ../includes/langSelector.pug
+        .container.menu-container.menu-container--top
+            include ../includes/navigation.pug
+    main
+        .container.clearfix  
+          .syncTimeline
+              h1
+                |Sync timeline animation
+              button.start(type="button")
+                |start
+              button.stop(type="button")
+                |stop
+              button.pause(type="button")
+                |pause
+              button.resume(type="button")
+                |resume
+              button.reverse(type="button")
+                |reverse
+              button.startReverse(type="button")
+                |startReverse
+              .sync-target
+              .sync-stagger
+              .sync-stagger
+              .sync-stagger
+              .sync-stagger
+              .sync-stagger
+            
+
+    include ../component/lightbox/pug/lightbox-simple.pug
+    include ../component/lightbox/pug/lightbox-image.pug
+    include ../component/lightbox/pug/lightbox-video.pug

@@ -1,6 +1,6 @@
 {
-    "template": "tween",
-    "pageTitle": "tween",
+    "template": "asyncTimeline",
+    "pageTitle": "asyncTimeline",
     "description": "custom description",
     "additionalData": ["string/en.json", "nav.json"],
     "registerComponent": ["to-top/pug/toTop.pug"]

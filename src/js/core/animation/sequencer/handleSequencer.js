@@ -1,8 +1,10 @@
 import { tweenConfig } from '../tween/tweenConfig.js';
 import { clamp, getValueObj } from '../utils/animationUtils.js';
+import { getStaggerIndex, getRandomChoice } from '../utils/getStaggerIndex.js';
+import { handleFrameIndex } from '../../events/rafutils/rafUtils.js';
 
 export class HandleSequencer {
-    constructor() {
+    constructor(data = {}) {
         // Basic array with all the propierties, is creted in setData methods
         // in draw methods currentValue and settled will be updated for each prop
         // it is used as a mock to create the array to add to the timeline
@@ -17,6 +19,35 @@ export class HandleSequencer {
         this.duration = 10;
         this.type = 'sequencer';
         this.defaultProp = { start: 0, end: this.duration, ease: 'easeLinear' };
+
+        // Stagger
+        this.stagger = {
+            each: data?.stagger?.each ? data.stagger.each : 0,
+            from: data?.stagger?.from ? data.stagger.from : 'start',
+        };
+
+        this.useStagger = true;
+    }
+
+    setStagger() {
+        if (this.stagger.each > 0) {
+            this.callback.forEach((item, i) => {
+                const { index, frame } = getStaggerIndex(
+                    i,
+                    this.callback.length,
+                    this.stagger,
+                    getRandomChoice(this.callback, this.stagger.each, i)
+                );
+
+                item.index = index;
+                item.frame = frame;
+
+                if (this.callbackOnStop.length > 0) {
+                    this.callbackOnStop[i].index = index;
+                    this.callbackOnStop[i].frame = frame;
+                }
+            });
+        }
     }
 
     draw({ partial, isLastDraw }) {
@@ -91,16 +122,37 @@ export class HandleSequencer {
 
         const cbObject = getValueObj(this.values, 'currentValue');
 
-        // Fire callback
-        this.callback.forEach(({ cb }) => {
-            cb(cbObject);
-        });
-
-        if (isLastDraw) {
-            this.callbackOnStop.forEach(({ cb }) => {
+        if (this.stagger.each === 0 || this.useStagger === false) {
+            // No stagger, run immediatly
+            this.callback.forEach(({ cb }) => {
                 cb(cbObject);
             });
+        } else {
+            // Stagger
+            this.callback.forEach(({ cb, index, frame }, i) => {
+                handleFrameIndex(() => {
+                    cb(cbObject);
+                }, frame);
+            });
         }
+
+        if (isLastDraw) {
+            if (this.stagger.each === 0 || this.useStagger === false) {
+                // No stagger, run immediatly
+                this.callbackOnStop.forEach(({ cb }) => {
+                    cb(cbObject);
+                });
+            } else {
+                // Stagger
+                this.callbackOnStop.forEach(({ cb, index, frame }, i) => {
+                    handleFrameIndex(() => {
+                        cb(cbObject);
+                    }, frame);
+                });
+            }
+        }
+
+        this.useStagger = true;
     }
 
     /**
@@ -343,6 +395,7 @@ export class HandleSequencer {
         this.callback.push({ cb, id: this.id });
         const cbId = this.id;
         this.id++;
+        this.setStagger();
 
         return () => {
             this.callback = this.callback.filter((item) => item.id !== cbId);
@@ -353,6 +406,7 @@ export class HandleSequencer {
         this.callbackOnStop.push({ cb, id: this.id });
         const cbId = this.id;
         this.id++;
+        this.setStagger();
 
         return () => {
             this.callbackOnStop = this.callbackOnStop.filter(
@@ -365,8 +419,18 @@ export class HandleSequencer {
         return this.duration;
     }
 
+    setDuration(val) {
+        this.duration = val;
+    }
+
     getType() {
         return this.type;
+    }
+
+    // Disable stagger for one run
+    // To place object immediatly without "delay"
+    disableStagger() {
+        this.useStagger = false;
     }
 }
 

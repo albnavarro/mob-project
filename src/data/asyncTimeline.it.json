@@ -1,5 +1,5 @@
 {
-    "pageTitle": "tween",
-    "slug": "tween",
+    "pageTitle": "asyncTimeline",
+    "slug": "asyncTimeline",
     "additionalData": ["string/it.json", "nav.json", "nonEsistenteFile.json"]
 }

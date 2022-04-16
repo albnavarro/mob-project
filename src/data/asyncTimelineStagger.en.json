@@ -1,6 +1,6 @@
 {
-    "template": "stagger",
-    "pageTitle": "stagger",
+    "template": "asyncTimelineStagger",
+    "pageTitle": "asyncTimelineStagger",
     "description": "custom description",
     "additionalData": ["string/en.json", "nav.json"],
     "registerComponent": ["to-top/pug/toTop.pug"]
