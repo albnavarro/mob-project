@@ -17,12 +17,14 @@ export class HandleSyncTimeline {
         this.timeAtReverse = 0;
         this.timeAtReverseBack = 0;
         this.skipFirstRender = false;
-        this.loop = data?.loop ? data.loop : false;
+        this.repeat = data?.repeat ? data.repeat : false;
         this.yoyo = data?.yoyo ? data.yoyo : false;
         this.loopCounter = 0;
         this.squencers = [];
         this.completed = false;
         this.isPlayngReverse = false;
+        this.BACKWARD = 'backward';
+        this.FORWARD = 'forward';
 
         // Callback on complete
         this.onCompleteId = 0;
@@ -77,19 +79,30 @@ export class HandleSyncTimeline {
                 return;
             }
 
-            if (partial >= this.duration) {
+            // onComplete callback condition by direction of animation
+            const onCompleteCondition = !this.isReverse
+                ? partial >= this.duration
+                : partial <= 0;
+
+            if (onCompleteCondition) {
                 handleNextFrame.add(() => {
                     // Prevent multiple fire of complete event
+                    // Send direction BACKWARD || FORWARD as argument
                     if (!this.isInInzializing && !this.completed) {
-                        this.callback.forEach(({ cb }) => cb());
+                        this.loopCounter++;
                         this.completed = true;
+
+                        this.callback.forEach(({ cb }) =>
+                            cb({
+                                direction: this.getDirection(),
+                                loop: this.loopCounter,
+                            })
+                        );
                     }
                 });
             }
 
-            this.loopCounter++;
-
-            if (!this.loop || this.loopCounter === this.loop) {
+            if (!this.repeat || this.loopCounter === this.repeat - 1) {
                 this.isStopped = true;
                 this.resetTime();
                 if (this.isReverse) this.isReverse = false;
@@ -117,6 +130,10 @@ export class HandleSyncTimeline {
                 this.goToNextFrame();
             }
         }
+    }
+
+    getDirection() {
+        return this.isReverse ? this.BACKWARD : this.FORWARD;
     }
 
     goToNextFrame() {
@@ -152,7 +169,7 @@ export class HandleSyncTimeline {
             this.squencers.forEach((item, i) => {
                 item.disableStagger();
                 item.draw({
-                    partial: this.duration,
+                    partial: 0,
                     isLastDraw: false,
                 });
             });

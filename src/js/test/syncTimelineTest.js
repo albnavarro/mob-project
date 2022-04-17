@@ -21,8 +21,8 @@ export function syncTimelineTest() {
         .goTo({ x: 0 }, { start: 5000, end: 7500, ease: 'easeInOutBack' })
         .goTo({ y: 0 }, { start: 7500, end: 10000, ease: 'easeInOutBack' })
         .goTo({ rotate: 720 }, { start: 0, end: 10000 })
-        .goTo({ scale: 2 }, { start: 3500, end: 5000 })
-        .goTo({ scale: 1 }, { start: 5000, end: 6500 });
+        .goTo({ scale: 2 }, { start: 3500, end: 5000, ease: 'easeInOutBack' })
+        .goTo({ scale: 1 }, { start: 5000, end: 6500, ease: 'easeInOutBack' });
 
     seq1.subscribe(({ x, y, rotate, scale }) => {
         target.style.transform = `translate3D(0,0,0) translate(${x}px, ${y}px) scale(${scale}) rotate(${rotate}deg)`;
@@ -43,12 +43,12 @@ export function syncTimelineTest() {
         });
     });
 
-    const syncTimeline = new HandleSyncTimeline({ loop: -1, yoyo: true });
+    const syncTimeline = new HandleSyncTimeline({ repeat: -1, yoyo: false });
     syncTimeline.add(seq1);
     syncTimeline.add(seqStagger);
     syncTimeline.setDuration('10000');
-    syncTimeline.onComplete(() => {
-        console.log('complete');
+    syncTimeline.onComplete(({ direction, loop }) => {
+        console.log(`direction: ${direction}, loop index: ${loop}`);
     });
 
     btnStart.addEventListener('click', () => {
