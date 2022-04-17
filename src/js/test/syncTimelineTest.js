@@ -43,10 +43,13 @@ export function syncTimelineTest() {
         });
     });
 
-    const syncTimeline = new HandleSyncTimeline({ loop: true, yoyo: true });
+    const syncTimeline = new HandleSyncTimeline({ loop: -1, yoyo: true });
     syncTimeline.add(seq1);
     syncTimeline.add(seqStagger);
     syncTimeline.setDuration('10000');
+    syncTimeline.onComplete(() => {
+        console.log('complete');
+    });
 
     btnStart.addEventListener('click', () => {
         syncTimeline.play();
