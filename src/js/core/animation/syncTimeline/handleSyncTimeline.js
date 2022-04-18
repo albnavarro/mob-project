@@ -106,6 +106,13 @@ export class HandleSyncTimeline {
                 this.isStopped = true;
                 this.resetTime();
                 if (this.isReverse) this.isReverse = false;
+
+                // Fire callback onStop of each sequencr
+                handleNextFrame.add(() => {
+                    this.squencers.forEach((item, i) => {
+                        item.draw({ partial: this.endTime, isLastDraw: true });
+                    });
+                });
             } else {
                 if (this.yoyo) {
                     this.reverse();
@@ -251,6 +258,13 @@ export class HandleSyncTimeline {
     stop() {
         this.isStopped = true;
         this.pauseStatus = false;
+
+        // Fire callback onStop of each sequencr
+        handleFrame.add(() => {
+            this.squencers.forEach((item, i) => {
+                item.draw({ partial: this.endTime, isLastDraw: true });
+            });
+        });
     }
 
     add(sequencer) {

@@ -28,6 +28,10 @@ export function syncTimelineTest() {
         target.style.transform = `translate3D(0,0,0) translate(${x}px, ${y}px) scale(${scale}) rotate(${rotate}deg)`;
     });
 
+    seq1.onStop(({ x, y, rotate, scale }) => {
+        target.style.transform = `translate(${x}px, ${y}px) scale(${scale}) rotate(${rotate}deg)`;
+    });
+
     // STAGGER
     const seqStagger = new HandleSequencer({ stagger: { each: 10 } });
     seqStagger
@@ -40,6 +44,12 @@ export function syncTimelineTest() {
     starger.forEach((item, i) => {
         seqStagger.subscribe(({ x, scale }) => {
             item.style.transform = `translate3D(0,0,0) translate(${x}px, 0px) scale(${scale})`;
+        });
+    });
+
+    starger.forEach((item, i) => {
+        seqStagger.onStop(({ x, scale }) => {
+            item.style.transform = `translate(${x}px, 0px) scale(${scale})`;
         });
     });
 

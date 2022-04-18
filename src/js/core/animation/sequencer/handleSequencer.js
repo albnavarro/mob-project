@@ -42,7 +42,7 @@ export class HandleSequencer {
                 item.index = index;
                 item.frame = frame;
 
-                if (this.callbackOnStop.length > 0) {
+                if (this.callbackOnStop[i]) {
                     this.callbackOnStop[i].index = index;
                     this.callbackOnStop[i].frame = frame;
                 }
