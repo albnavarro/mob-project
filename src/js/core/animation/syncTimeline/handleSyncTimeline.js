@@ -26,6 +26,14 @@ export class HandleSyncTimeline {
         this.BACKWARD = 'backward';
         this.FORWARD = 'forward';
 
+        // Onlu one loop , prevent sideEffct of this.frameThreshold
+        if (this.repeat === 1 || this.repeat === 0) {
+            this.repeat = false;
+        }
+
+        // If loop anitcipate by 6 millsencod next loop so we a have more precise animation
+        this.frameThreshold = this.repeat ? 6 : 0;
+
         // Callback on complete
         this.onCompleteId = 0;
         this.callback = [];
@@ -65,7 +73,11 @@ export class HandleSyncTimeline {
 
         this.skipFirstRender = false;
 
-        if (partial <= this.duration && partial >= 0 && !this.isStopped) {
+        if (
+            partial <= this.duration - this.frameThreshold &&
+            partial >= 0 + this.frameThreshold &&
+            !this.isStopped
+        ) {
             this.completed = false;
             this.goToNextFrame();
         } else {
@@ -81,8 +93,8 @@ export class HandleSyncTimeline {
 
             // onComplete callback condition by direction of animation
             const onCompleteCondition = !this.isReverse
-                ? partial >= this.duration
-                : partial <= 0;
+                ? partial >= this.duration - this.frameThreshold
+                : partial <= 0 + this.frameThreshold;
 
             if (onCompleteCondition) {
                 handleNextFrame.add(() => {

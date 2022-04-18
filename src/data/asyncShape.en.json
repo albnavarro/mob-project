@@ -1,6 +1,6 @@
 {
-    "template": "shape",
-    "pageTitle": "shape",
+    "template": "asyncShape",
+    "pageTitle": "asyncShape",
     "description": "custom description",
     "additionalData": ["string/en.json", "nav.json"],
     "registerComponent": ["to-top/pug/toTop.pug"]

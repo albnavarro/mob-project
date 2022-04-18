@@ -58,6 +58,7 @@ import { circleAnimation } from './test/circleAnimation.js';
 import { circleAnimationTimeline } from './test/circleAnimationTimeline.js';
 import { infiniteAnimation } from './test/infiniteAnimation.js';
 import { syncTimelineTest } from './test/syncTimelineTest.js';
+import { infiniteAnimationSync } from './test/infiniteAnimationSync.js';
 
 handleLoad(() => {
     const body = document.querySelector('body');
@@ -79,12 +80,16 @@ handleLoad(() => {
         staggerLerpTest();
     }
 
-    if (body.classList.contains('page-shape')) {
+    if (body.classList.contains('page-asyncShape')) {
         sinAnimation();
         sinRevertAnimation();
         circleAnimation();
         circleAnimationTimeline();
         infiniteAnimation();
+    }
+
+    if (body.classList.contains('page-syncShape')) {
+        infiniteAnimationSync();
     }
 
     if (body.classList.contains('page-syncTimeline')) {

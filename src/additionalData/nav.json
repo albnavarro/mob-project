@@ -64,11 +64,15 @@
                 },
                 {
                     "label": "",
-                    "univoqueId": "shape"
+                    "univoqueId": "asyncShape"
                 },
                 {
                     "label": "",
                     "univoqueId": "syncTimeline"
+                },
+                {
+                    "label": "",
+                    "univoqueId": "syncShape"
                 }
             ]
         },
