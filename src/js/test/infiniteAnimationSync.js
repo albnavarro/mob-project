@@ -24,10 +24,10 @@ export const infiniteAnimationSync = () => {
             { x: duration + duration / 4 },
             { start: 0, end: duration, ease: 'easeLinear' }
         )
-        .goTo({ opacity: 0 }, { start: 0, end: 750, ease: 'easeLinear' })
-        .goTo({ opacity: 1 }, { start: 750, end: 1500, ease: 'easeLinear' })
-        .goTo({ opacity: 0 }, { start: 1500, end: 2250, ease: 'easeLinear' })
-        .goTo({ opacity: 1 }, { start: 2250, end: 3000, ease: 'easeLinear' });
+        .goTo({ opacity: 0 }, { start: 0, end: 750, ease: 'easeOutQuad' })
+        .goTo({ opacity: 1 }, { start: 750, end: 1500, ease: 'easeInQuad' })
+        .goTo({ opacity: 0 }, { start: 1500, end: 2250, ease: 'easeOutQuad' })
+        .goTo({ opacity: 1 }, { start: 2250, end: 3000, ease: 'easeInQuad' });
 
     stagger.forEach((item, i) => {
         infinite.subscribe(({ x, opacity }) => {
