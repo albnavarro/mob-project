@@ -31,9 +31,6 @@ export class HandleSyncTimeline {
             this.repeat = false;
         }
 
-        // If loop anitcipate by 6 millsencod next loop so we a have more precise animation
-        this.frameThreshold = this.repeat ? 6 : 0;
-
         // Callback on complete
         this.onCompleteId = 0;
         this.callback = [];
@@ -43,6 +40,13 @@ export class HandleSyncTimeline {
         if (this.isStopped || this.isInInzializing) return;
 
         const now = getTime();
+
+        // If loop anitcipate by 6 millsencod next loop so we a have more precise animation
+        const frameThreshold =
+            !this.repeat ||
+            (this.repeat >= 2 && this.loopCounter === this.repeat - 1)
+                ? 0
+                : 6;
 
         if (this.pauseStatus) {
             this.pauseTime =
@@ -74,8 +78,8 @@ export class HandleSyncTimeline {
         this.skipFirstRender = false;
 
         if (
-            partial <= this.duration - this.frameThreshold &&
-            partial >= 0 + this.frameThreshold &&
+            partial <= this.duration - frameThreshold &&
+            partial >= 0 + frameThreshold &&
             !this.isStopped
         ) {
             this.completed = false;
@@ -93,8 +97,8 @@ export class HandleSyncTimeline {
 
             // onComplete callback condition by direction of animation
             const onCompleteCondition = !this.isReverse
-                ? partial >= this.duration - this.frameThreshold
-                : partial <= 0 + this.frameThreshold;
+                ? partial >= this.duration - frameThreshold
+                : partial <= 0 + frameThreshold;
 
             if (onCompleteCondition) {
                 handleNextFrame.add(() => {
