@@ -67,6 +67,9 @@ export class handleLerp {
         const o = {};
         o.inMotion = false;
 
+        // Reset maxFos when animartion start
+        this.maxFps = 60;
+
         const draw = (timestamp, fps) => {
             this.req = true;
 
