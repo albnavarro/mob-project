@@ -27,7 +27,6 @@ export class handleLerp {
         this.callbackStartInPause = [];
         this.pauseStatus = false;
         this.firstRun = true;
-        this.lostFrameTresold = 64;
         this.defaultProps = {
             reverse: false,
             velocity,
