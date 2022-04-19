@@ -35,15 +35,15 @@ export class HandleSyncTimeline {
         this.callback = [];
     }
 
-    updateTime(timestamp) {
+    updateTime(timestamp, fps) {
         if (this.isStopped || this.isInInzializing) return;
 
-        // If loop anitcipate by 6 millsencod next loop so we a have more precise animation
+        // If loop anitcipate by half frame ( in millsenconds ) next loop so we a have more precise animation
         const frameThreshold =
             !this.repeat ||
             (this.repeat >= 2 && this.loopCounter === this.repeat - 1)
                 ? 0
-                : 6;
+                : 1000 / fps / 2;
 
         if (this.pauseStatus) {
             this.pauseTime =
@@ -159,9 +159,9 @@ export class HandleSyncTimeline {
     }
 
     goToNextFrame() {
-        handleNextFrame.add((timestamp) => {
+        handleNextFrame.add((timestamp, fps) => {
             // Prevent fire too many raf
-            if (!this.isInInzializing) this.updateTime(timestamp);
+            if (!this.isInInzializing) this.updateTime(timestamp, fps);
         });
     }
 
@@ -195,10 +195,10 @@ export class HandleSyncTimeline {
                 });
             });
 
-            handleNextFrame.add((timestamp) => {
+            handleNextFrame.add((timestamp, fps) => {
                 this.startTime = timestamp;
                 this.isInInzializing = false;
-                this.updateTime(timestamp);
+                this.updateTime(timestamp, fps);
             });
         });
     }
@@ -236,10 +236,10 @@ export class HandleSyncTimeline {
                 });
             });
 
-            handleNextFrame.add((timestamp) => {
+            handleNextFrame.add((timestamp, fps) => {
                 this.isInInzializing = false;
                 this.startTime = timestamp;
-                this.updateTime(timestamp);
+                this.updateTime(timestamp, fps);
             });
         });
     }
