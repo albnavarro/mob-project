@@ -1,5 +1,5 @@
 import { springConfig } from './springConfig.js';
-import { getValueObj, mergeArray, getTime } from '../utils/animationUtils.js';
+import { getValueObj, mergeArray } from '../utils/animationUtils.js';
 import {
     handleFrame,
     handleNextFrame,
@@ -69,18 +69,19 @@ export class handleSpring {
             this.req = true;
 
             // Get current time
-            o.time = getTime();
+            timestamp = timestamp;
 
             // lastTime is set to now the first time.
             // then check the difference from now and last time to check if we lost frame
-            o.lastTime = animationLastTime !== 0 ? animationLastTime : o.time;
+            o.lastTime =
+                animationLastTime !== 0 ? animationLastTime : timestamp;
 
             // If we lost a lot of frames just jump to the end.
-            if (o.time > o.lastTime + this.lostFrameTresold)
-                o.lastTime = o.time;
+            if (timestamp > o.lastTime + this.lostFrameTresold)
+                o.lastTime = timestamp;
 
             // http://gafferongames.com/game-physics/fix-your-timestep/
-            o.numSteps = Math.floor(o.time - o.lastTime);
+            o.numSteps = Math.floor(timestamp - o.lastTime);
 
             for (let i = 0; i < o.numSteps; ++i) {
                 this.values.forEach((item, i) => {
@@ -123,7 +124,7 @@ export class handleSpring {
             }
 
             // Update last time
-            animationLastTime = o.time;
+            animationLastTime = timestamp;
 
             // Check if all values is completed
             o.allSettled = this.values.every((item) => item.settled === true);
