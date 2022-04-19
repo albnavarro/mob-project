@@ -56,6 +56,23 @@ export const handleNextTick = ((cb) => {
 })();
 
 /**
+ *  Go to X frame from now
+ */
+export const handleFrameIndex = (fn, index) => {
+    let start = 0;
+
+    const loop = () => {
+        if (start === index) {
+            fn();
+            return;
+        }
+        start++;
+        handleNextFrame.add(() => loop());
+    };
+    handleNextFrame.add(() => loop());
+};
+
+/**
  * Utils to centralize all action form all components in one Request Animation Frame,
  * All subsciber use the same frame
  * handleFrame run once then delete all subscriber
@@ -167,20 +184,3 @@ export const handleFrame = (() => {
         addMultiple,
     };
 })();
-
-/**
- *  Go to X frame from now
- */
-export const handleFrameIndex = (fn, index) => {
-    let start = 0;
-
-    const loop = () => {
-        if (start === index) {
-            fn();
-            return;
-        }
-        start++;
-        handleNextFrame.add(() => loop());
-    };
-    handleNextFrame.add(() => loop());
-};

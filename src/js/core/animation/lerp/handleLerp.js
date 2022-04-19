@@ -27,6 +27,12 @@ export class handleLerp {
         this.callbackStartInPause = [];
         this.pauseStatus = false;
         this.firstRun = true;
+
+        // Store max fps so is the fops of monitor using
+        this.maxFps = 60;
+        // If fps is under this.maxFps by this.fpsThreshold is algging, so skip to not overload
+        this.fpsThreshold = 15;
+
         this.defaultProps = {
             reverse: false,
             velocity,
@@ -59,9 +65,13 @@ export class handleLerp {
         const precision = this.precision;
 
         const o = {};
+        o.inMotion = false;
 
         const draw = (timestamp, fps) => {
             this.req = true;
+
+            // Get max fps
+            if (this.maxFps < fps) this.maxFps = fps;
 
             this.values.forEach((item, i) => {
                 if (item.settled) return;
@@ -84,17 +94,22 @@ export class handleLerp {
             // Prepare an obj to pass to the callback
             const cbObject = getValueObj(this.values, 'currentValue');
 
+            // Check if we lost some fps so we skip update to not overload browser rendering
+            // Not first time, only inside motion
+            o.deltaFps = !o.inMotion ? 0 : Math.abs(this.maxFps - fps);
+            o.inMotion = true;
+
             // Fire callback
             if (this.stagger.each === 0) {
                 // No stagger, run immediatly
                 this.callback.forEach(({ cb }) => {
-                    cb(cbObject);
+                    if (o.deltaFps < this.fpsThreshold) cb(cbObject);
                 });
             } else {
                 // Stagger
                 this.callback.forEach(({ cb, index, frame }, i) => {
                     handleFrameIndex(() => {
-                        cb(cbObject);
+                        if (o.deltaFps < this.fpsThreshold) cb(cbObject);
                     }, frame);
                 });
             }
