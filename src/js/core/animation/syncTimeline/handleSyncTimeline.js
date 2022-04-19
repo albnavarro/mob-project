@@ -1,4 +1,3 @@
-import { getTime } from '../../utils/time.js';
 import {
     handleFrame,
     handleNextFrame,
@@ -36,10 +35,8 @@ export class HandleSyncTimeline {
         this.callback = [];
     }
 
-    updateTime() {
+    updateTime(timestamp) {
         if (this.isStopped || this.isInInzializing) return;
-
-        const now = getTime();
 
         // If loop anitcipate by 6 millsencod next loop so we a have more precise animation
         const frameThreshold =
@@ -50,14 +47,14 @@ export class HandleSyncTimeline {
 
         if (this.pauseStatus) {
             this.pauseTime =
-                now -
+                timestamp -
                 this.startTime -
                 this.timeElapsed -
                 this.timeAtReverseBack;
         }
 
         this.timeElapsed = parseInt(
-            now - this.startTime - this.pauseTime - this.timeAtReverseBack
+            timestamp - this.startTime - this.pauseTime - this.timeAtReverseBack
         );
 
         const partial = !this.isReverse
@@ -121,6 +118,7 @@ export class HandleSyncTimeline {
             if (!this.repeat || this.loopCounter === this.repeat - 1) {
                 this.isStopped = true;
                 this.resetTime();
+                this.startTime = timestamp;
                 if (this.isReverse) this.isReverse = false;
 
                 // Fire callback onStop of each sequencr
@@ -134,6 +132,7 @@ export class HandleSyncTimeline {
                     this.reverse();
                 } else {
                     this.resetTime();
+                    this.startTime = timestamp;
 
                     if (this.isPlayngReverse) {
                         if (!this.isReverse) {
@@ -160,9 +159,9 @@ export class HandleSyncTimeline {
     }
 
     goToNextFrame() {
-        handleNextFrame.add(() => {
+        handleNextFrame.add((timestamp) => {
             // Prevent fire too many raf
-            if (!this.isInInzializing) this.updateTime();
+            if (!this.isInInzializing) this.updateTime(timestamp);
         });
     }
 
@@ -172,7 +171,6 @@ export class HandleSyncTimeline {
         this.endTime = 0;
         this.timeAtReverse = 0;
         this.timeAtReverseBack = 0;
-        this.startTime = getTime();
     }
 
     play() {
@@ -197,10 +195,10 @@ export class HandleSyncTimeline {
                 });
             });
 
-            handleNextFrame.add(() => {
-                this.startTime = getTime();
+            handleNextFrame.add((timestamp) => {
+                this.startTime = timestamp;
                 this.isInInzializing = false;
-                this.updateTime();
+                this.updateTime(timestamp);
             });
         });
     }
@@ -238,10 +236,10 @@ export class HandleSyncTimeline {
                 });
             });
 
-            handleNextFrame.add(() => {
+            handleNextFrame.add((timestamp) => {
                 this.isInInzializing = false;
-                this.startTime = getTime();
-                this.updateTime();
+                this.startTime = timestamp;
+                this.updateTime(timestamp);
             });
         });
     }
