@@ -116,17 +116,19 @@ export class HandleSyncTimeline {
             }
 
             if (!this.repeat || this.loopCounter === this.repeat - 1) {
+                // Fire callback onStop of each sequencr
+                // Prevent async problem, endTime back to start, so store the value
+                const endTime = this.endTime;
+                handleNextFrame.add(() => {
+                    this.squencers.forEach((item, i) => {
+                        item.draw({ partial: endTime, isLastDraw: true });
+                    });
+                });
+
                 this.isStopped = true;
                 this.resetTime();
                 this.startTime = timestamp;
                 if (this.isReverse) this.isReverse = false;
-
-                // Fire callback onStop of each sequencr
-                handleNextFrame.add(() => {
-                    this.squencers.forEach((item, i) => {
-                        item.draw({ partial: this.endTime, isLastDraw: true });
-                    });
-                });
             } else {
                 if (this.yoyo) {
                     this.reverse();
