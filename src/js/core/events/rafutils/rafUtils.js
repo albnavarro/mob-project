@@ -45,10 +45,10 @@ export const handleNextTick = ((cb) => {
         callback.push(cb);
     };
 
-    const fire = () => {
+    const fire = (time, averageFps) => {
         if (callback.length === 0) return;
 
-        callback.forEach((item) => item());
+        callback.forEach((item) => item(time, averageFps));
         callback = [];
     };
 
@@ -103,6 +103,8 @@ export const handleFrame = (() => {
     //
     let fpsStack = [];
     let fpsCounter = 0;
+
+    // TO DO get initial real FPS
     let averageFps = 60;
     const arrAvg = (arr) => arr.reduce((a, b) => a + b, 0) / arr.length;
 
@@ -145,7 +147,7 @@ export const handleFrame = (() => {
             isStopped = true;
         }
 
-        handleNextTick.fire();
+        handleNextTick.fire(time, averageFps);
     };
 
     /**
