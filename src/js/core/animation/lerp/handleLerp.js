@@ -73,7 +73,7 @@ export class handleLerp {
         const draw = (timestamp, fps) => {
             this.req = true;
 
-            // Get max fps
+            // Get max fps upper limit
             if (this.maxFps < fps) this.maxFps = fps;
 
             this.values.forEach((item, i) => {
@@ -106,13 +106,15 @@ export class handleLerp {
             if (this.stagger.each === 0) {
                 // No stagger, run immediatly
                 this.callback.forEach(({ cb }) => {
-                    if (o.deltaFps < this.fpsThreshold) cb(cbObject);
+                    if (o.deltaFps < this.fpsThreshold || fps > this.maxFps)
+                        cb(cbObject);
                 });
             } else {
                 // Stagger
                 this.callback.forEach(({ cb, index, frame }, i) => {
                     handleFrameIndex(() => {
-                        if (o.deltaFps < this.fpsThreshold) cb(cbObject);
+                        if (o.deltaFps < this.fpsThreshold || fps > this.maxFps)
+                            cb(cbObject);
                     }, frame);
                 });
             }
