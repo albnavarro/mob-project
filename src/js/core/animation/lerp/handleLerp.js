@@ -68,13 +68,14 @@ export class handleLerp {
         o.inMotion = false;
 
         // Reset maxFos when animartion start
-        this.maxFps = fps;
+        this.maxFps = 0;
 
         const draw = (timestamp, fps) => {
             this.req = true;
+            o.isRealFps = handleFrame.isRealFps();
 
             // Get max fps upper limit
-            if (this.maxFps < fps) this.maxFps = fps;
+            if (fps > this.maxFps && o.isRealFps) this.maxFps = fps;
 
             this.values.forEach((item, i) => {
                 if (item.settled) return;
@@ -83,7 +84,6 @@ export class handleLerp {
                     item.currentValue,
                     item.toValue,
                     (velocity / fps) * 60
-                    // velocity
                 );
 
                 item.settled =
@@ -98,8 +98,9 @@ export class handleLerp {
             const cbObject = getValueObj(this.values, 'currentValue');
 
             // Check if we lost some fps so we skip update to not overload browser rendering
-            // Not first time, only inside motion
-            o.deltaFps = !o.inMotion ? 0 : Math.abs(this.maxFps - fps);
+            // Not first time, only inside motion and once fps is real ( stable )
+            o.deltaFps =
+                !o.inMotion || !o.isRealFps ? 0 : Math.abs(this.maxFps - fps);
             o.inMotion = true;
 
             // Fire callback

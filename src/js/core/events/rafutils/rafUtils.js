@@ -96,17 +96,19 @@ export const handleFrame = (() => {
     let isStopped = false;
 
     // FPS
+    const arrAvg = (arr) => arr.reduce((a, b) => a + b, 0) / arr.length;
     const fpsLoopCycle = 30;
+    // Initial fps average
+    let averageFps = 60;
     // Clamp fps
     const maxFps = 80;
     const minFps = 25;
-    //
+    // Fps data
     let fpsStack = [];
+    // After how many cicles fps is calculated
     let fpsCounter = 0;
-
-    // TO DO get initial real FPS
-    let averageFps = 60;
-    const arrAvg = (arr) => arr.reduce((a, b) => a + b, 0) / arr.length;
+    // Indicate that fps is a real calucaltion and not the initial approssimation
+    let fpsIsReal = false;
 
     const render = () => {
         time = getTime();
@@ -128,6 +130,9 @@ export const handleFrame = (() => {
             averageFps = parseInt(arrAvg(fpsStack));
             fpsCounter = 0;
             fpsStack = [];
+
+            // After 1 cycles fps is stable
+            fpsIsReal = true;
         }
 
         // Fire callback
@@ -165,6 +170,8 @@ export const handleFrame = (() => {
         frameIsRuning = true;
     };
 
+    const isRealFps = () => fpsIsReal;
+
     /**
      *  Add callback
      */
@@ -184,5 +191,6 @@ export const handleFrame = (() => {
     return {
         add,
         addMultiple,
+        isRealFps,
     };
 })();
