@@ -68,9 +68,6 @@ export class handleSpring {
         const draw = (timestamp, fps) => {
             this.req = true;
 
-            // Get current time
-            timestamp = timestamp;
-
             // lastTime is set to now the first time.
             // then check the difference from now and last time to check if we lost frame
             o.lastTime =
