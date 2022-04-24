@@ -3,6 +3,7 @@ import { getValueObj, mergeArray } from '../utils/animationUtils.js';
 import {
     handleFrame,
     handleNextFrame,
+    handleNextTick,
     handleFrameIndex,
 } from '../../events/rafutils/rafUtils.js';
 import { mergeDeep } from '../../utils/mergeDeep.js';
@@ -106,19 +107,21 @@ export class handleSpring {
             // Prepare an obj to pass to the callback
             const cbObject = getValueObj(this.values, 'currentValue');
 
-            if (this.stagger.each === 0) {
-                // No stagger, run immediatly
-                this.callback.forEach(({ cb }) => {
-                    cb(cbObject);
-                });
-            } else {
-                // Stagger
-                this.callback.forEach(({ cb, index, frame }, i) => {
-                    handleFrameIndex(() => {
+            handleFrame.add(() => {
+                if (this.stagger.each === 0) {
+                    // No stagger, run immediatly
+                    this.callback.forEach(({ cb }) => {
                         cb(cbObject);
-                    }, frame);
-                });
-            }
+                    });
+                } else {
+                    // Stagger
+                    this.callback.forEach(({ cb, index, frame }, i) => {
+                        handleFrameIndex(() => {
+                            cb(cbObject);
+                        }, frame);
+                    });
+                }
+            });
 
             // Update last time
             animationLastTime = timestamp;
@@ -127,8 +130,10 @@ export class handleSpring {
             o.allSettled = this.values.every((item) => item.settled === true);
 
             if (!o.allSettled) {
-                handleNextFrame.add((timestamp, fps) => {
-                    if (this.req) draw(timestamp, fps);
+                handleFrame.add(() => {
+                    handleNextTick.add((timestamp, fps) => {
+                        if (this.req) draw(timestamp, fps);
+                    });
                 });
             } else {
                 const onComplete = () => {
@@ -217,13 +222,15 @@ export class handleSpring {
         this.currentReject = reject;
         this.currentResolve = res;
 
-        handleFrame.add((timestamp, fps) => {
-            const prevent = this.callbackStartInPause
-                .map(({ cb }) => cb())
-                .some((item) => item === true);
+        handleFrame.add(() => {
+            handleNextTick.add((timestamp, fps) => {
+                const prevent = this.callbackStartInPause
+                    .map(({ cb }) => cb())
+                    .some((item) => item === true);
 
-            this.onReuqestAnim(timestamp, fps, res);
-            if (prevent) this.pause();
+                this.onReuqestAnim(timestamp, fps, res);
+                if (prevent) this.pause();
+            });
         });
     }
 
@@ -287,8 +294,10 @@ export class handleSpring {
         this.pauseStatus = false;
 
         if (!this.req && this.currentResolve) {
-            handleFrame.add((timestamp, fps) => {
-                this.onReuqestAnim(timestamp, fps, this.currentResolve);
+            handleFrame.add(() => {
+                handleNextTick.add((timestamp, fps) => {
+                    this.onReuqestAnim(timestamp, fps, this.currentResolve);
+                });
             });
         }
     }

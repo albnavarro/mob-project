@@ -2,8 +2,6 @@ import { SimpleStore } from '../../store/simpleStore.js';
 import { getTime, defaultTimestep } from '../../utils/time.js';
 import { clamp } from '../../animation/utils/animationUtils.js';
 
-export const frameStore = new SimpleStore({ time: 0 });
-
 /**
  *
  * @example:
@@ -110,6 +108,8 @@ export const handleFrame = (() => {
     // Indicate that fps is a real calucaltion and not the initial approssimation
     let fpsIsReal = false;
 
+    let frame = null;
+
     const render = () => {
         time = getTime();
         elapsed = time - lastUpdate;
@@ -143,16 +143,23 @@ export const handleFrame = (() => {
         callback = [];
         frameIsRuning = false;
         isStopped = false;
-        frameStore.set('time', time);
 
-        callback = [...callback, ...handleNextFrame.get()];
-        if (callback.length > 0) {
-            initFrame();
-        } else {
-            isStopped = true;
-        }
+        // Cancel running animation Frame
+        cancelAnimationFrame(frame);
+        frame = null;
 
-        handleNextTick.fire(time, averageFps);
+        setTimeout(() => {
+            // Fire next Tick outside asnimationframe
+            handleNextTick.fire(time, averageFps);
+
+            callback = [...callback, ...handleNextFrame.get()];
+            if (callback.length > 0) {
+                // Call Next animationFrame
+                initFrame();
+            } else {
+                isStopped = true;
+            }
+        });
     };
 
     /**
@@ -162,7 +169,7 @@ export const handleFrame = (() => {
         if (frameIsRuning) return;
 
         if (typeof window !== 'undefined') {
-            requestAnimationFrame(render);
+            frame = requestAnimationFrame(render);
         } else {
             setTimeout(() => render(), defaultTimestep);
         }

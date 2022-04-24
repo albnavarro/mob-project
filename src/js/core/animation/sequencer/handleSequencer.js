@@ -1,7 +1,10 @@
 import { tweenConfig } from '../tween/tweenConfig.js';
 import { clamp, getValueObj } from '../utils/animationUtils.js';
 import { getStaggerIndex, getRandomChoice } from '../utils/getStaggerIndex.js';
-import { handleFrameIndex } from '../../events/rafutils/rafUtils.js';
+import {
+    handleFrame,
+    handleFrameIndex,
+} from '../../events/rafutils/rafUtils.js';
 
 export class HandleSequencer {
     constructor(data = {}) {
@@ -50,7 +53,7 @@ export class HandleSequencer {
         }
     }
 
-    draw({ partial, isLastDraw }) {
+    draw({ partial, isLastDraw, useFrame }) {
         this.values.forEach((item, i) => {
             item.settled = false;
         });
@@ -124,30 +127,35 @@ export class HandleSequencer {
 
         if (this.stagger.each === 0 || this.useStagger === false) {
             // No stagger, run immediatly
-            this.callback.forEach(({ cb }) => {
-                cb(cbObject);
-            });
+            const fn = () => this.callback.forEach(({ cb }) => cb(cbObject));
+
+            if (useFrame) {
+                handleFrame.add(() => fn());
+            } else {
+                fn();
+            }
         } else {
             // Stagger
             this.callback.forEach(({ cb, index, frame }, i) => {
-                handleFrameIndex(() => {
-                    cb(cbObject);
-                }, frame);
+                handleFrameIndex(() => cb(cbObject), frame);
             });
         }
 
         if (isLastDraw) {
             if (this.stagger.each === 0 || this.useStagger === false) {
                 // No stagger, run immediatly
-                this.callbackOnStop.forEach(({ cb }) => {
-                    cb(cbObject);
-                });
+                const fn = () =>
+                    this.callbackOnStop.forEach(({ cb }) => cb(cbObject));
+
+                if (useFrame) {
+                    handleFrame.add(() => fn());
+                } else {
+                    fn();
+                }
             } else {
                 // Stagger
                 this.callbackOnStop.forEach(({ cb, index, frame }, i) => {
-                    handleFrameIndex(() => {
-                        cb(cbObject);
-                    }, frame);
+                    handleFrameIndex(() => cb(cbObject), frame);
                 });
             }
         }

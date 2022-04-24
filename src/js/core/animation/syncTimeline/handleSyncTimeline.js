@@ -1,6 +1,7 @@
 import {
     handleFrame,
     handleNextFrame,
+    handleNextTick,
 } from '../../events/rafutils/rafUtils.js';
 import { clamp } from '../utils/animationUtils.js';
 
@@ -67,7 +68,11 @@ export class HandleSyncTimeline {
             // When come from playReverse skip first frame becouse is 0
             if (!this.skipFirstRender) {
                 this.squencers.forEach((item, i) => {
-                    item.draw({ partial: this.endTime, isLastDraw: false });
+                    item.draw({
+                        partial: this.endTime,
+                        isLastDraw: false,
+                        useFrame: true,
+                    });
                 });
             }
         }
@@ -119,9 +124,11 @@ export class HandleSyncTimeline {
                 // Fire callback onStop of each sequencr
                 // Prevent async problem, endTime back to start, so store the value
                 const endTime = this.endTime;
-                handleNextFrame.add(() => {
-                    this.squencers.forEach((item, i) => {
-                        item.draw({ partial: endTime, isLastDraw: true });
+                this.squencers.forEach((item, i) => {
+                    item.draw({
+                        partial: endTime,
+                        isLastDraw: true,
+                        useFrame: true,
                     });
                 });
 
@@ -161,9 +168,11 @@ export class HandleSyncTimeline {
     }
 
     goToNextFrame() {
-        handleNextFrame.add((timestamp, fps) => {
-            // Prevent fire too many raf
-            if (!this.isInInzializing) this.updateTime(timestamp, fps);
+        handleFrame.add(() => {
+            handleNextTick.add((timestamp, fps) => {
+                // Prevent fire too many raf
+                if (!this.isInInzializing) this.updateTime(timestamp, fps);
+            });
         });
     }
 
@@ -188,16 +197,17 @@ export class HandleSyncTimeline {
         this.isPlayngReverse = false;
         this.loopCounter = 0;
 
-        handleFrame.add(() => {
-            this.squencers.forEach((item, i) => {
-                item.disableStagger();
-                item.draw({
-                    partial: 0,
-                    isLastDraw: false,
-                });
+        this.squencers.forEach((item, i) => {
+            item.disableStagger();
+            item.draw({
+                partial: 0,
+                isLastDraw: false,
+                useFrame: true,
             });
+        });
 
-            handleNextFrame.add((timestamp, fps) => {
+        handleFrame.add(() => {
+            handleNextTick.add((timestamp, fps) => {
                 this.startTime = timestamp;
                 this.isInInzializing = false;
                 this.updateTime(timestamp, fps);
@@ -229,16 +239,17 @@ export class HandleSyncTimeline {
         // While start isInInzializing fa fallire le altre raf
         this.isInInzializing = true;
 
-        handleFrame.add(() => {
-            this.squencers.forEach((item, i) => {
-                item.disableStagger();
-                item.draw({
-                    partial: this.duration,
-                    isLastDraw: false,
-                });
+        this.squencers.forEach((item, i) => {
+            item.disableStagger();
+            item.draw({
+                partial: this.duration,
+                isLastDraw: false,
+                useFrame: true,
             });
+        });
 
-            handleNextFrame.add((timestamp, fps) => {
+        handleFrame.add(() => {
+            handleNextTick.add((timestamp, fps) => {
                 this.isInInzializing = false;
                 this.startTime = timestamp;
                 this.updateTime(timestamp, fps);
@@ -276,9 +287,11 @@ export class HandleSyncTimeline {
         this.pauseStatus = false;
 
         // Fire callback onStop of each sequencr
-        handleFrame.add(() => {
-            this.squencers.forEach((item, i) => {
-                item.draw({ partial: this.endTime, isLastDraw: true });
+        this.squencers.forEach((item, i) => {
+            item.draw({
+                partial: this.endTime,
+                isLastDraw: true,
+                useFrame: true,
             });
         });
     }
