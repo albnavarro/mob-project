@@ -14,22 +14,25 @@ export const parallaxMarker = ({
     // Creat emarker if not exist
     const { lastStartMarker, lastEndMarkerEl } = (() => {
         if (!startMarker && !endMarker) {
+            // Replace illegal charachter with '-'
+            const labelSanitized = label.replace(/^[^a-z]+|[^\w:.-]+/gi, '-');
+
             const startMarkerEL = document.createElement('span');
-            startMarkerEL.className += `p-marker p-marker--start  p-marker-${label}`;
-            startMarkerEL.innerHTML = `start ${label}`;
+            startMarkerEL.className += `p-marker p-marker--start  p-marker-${labelSanitized}`;
+            startMarkerEL.innerHTML = `start ${labelSanitized}`;
 
             const endMarkerEL = document.createElement('span');
-            endMarkerEL.className += `p-marker p-marker--end  p-marker-${label}`;
-            endMarkerEL.innerHTML = `end ${label}`;
+            endMarkerEL.className += `p-marker p-marker--end  p-marker-${labelSanitized}`;
+            endMarkerEL.innerHTML = `end ${labelSanitized}`;
 
             document.body.appendChild(startMarkerEL);
             document.body.appendChild(endMarkerEL);
 
             const startMarkerGenerated = document.querySelector(
-                `.p-marker--start.p-marker-${label}`
+                `.p-marker--start.p-marker-${labelSanitized}`
             );
             const endMarkerElGenerated = document.querySelector(
-                `.p-marker--end.p-marker-${label}`
+                `.p-marker--end.p-marker-${labelSanitized}`
             );
             return {
                 lastStartMarker: startMarkerGenerated,

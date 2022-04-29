@@ -234,7 +234,12 @@ export class ParallaxItemClass {
     }
 
     setMotion() {
-        this.motion.setData({ val: 0 });
+        const initialValue =
+            parallaxConstant.PROP_SCALE || parallaxConstant.PROP_OPACITY
+                ? 1
+                : 0;
+
+        this.motion.setData({ val: initialValue });
         this.unsubscribeMotion = this.motion.subscribe(({ val }) => {
             if (val === this.lastValue) return;
 
@@ -782,10 +787,8 @@ export class ParallaxItemClass {
                 return value;
 
             case parallaxConstant.PROP_SCALE:
-                return -o.percent * 10;
-
             case parallaxConstant.PROP_OPACITY:
-                return -o.percent / 100;
+                return 1 - o.percent;
 
             default:
                 return -o.percent;
@@ -928,7 +931,10 @@ export class ParallaxItemClass {
                 return { opacity: `${o.typeVal}` };
 
             case parallaxConstant.PROP_SCALE:
-                o.scaleVal = 1 + o.typeVal / 1000;
+                o.scaleVal =
+                    this.computationType !== parallaxConstant.TYPE_FIXED
+                        ? 1 + o.typeVal / 1000
+                        : o.typeVal;
                 return {
                     transform: `${o.force3DStyle} scale(${o.scaleVal})`,
                 };

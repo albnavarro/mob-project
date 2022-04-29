@@ -77,6 +77,7 @@ class ParallaxClass {
 
         // FIXED PROPS
         // string marker id
+        // es: marker: 'parallax-timeline'
         data.marker = item.getAttribute('data-marker');
 
         // enable pin
@@ -156,6 +157,8 @@ class ParallaxClass {
         // Range of movement
         // computationType = 'default'
         // form .1 to up less is the number bigger is the movement
+        // Opacity : is alway from 0 to 1, is controlled by opacityStart and opacityEnd
+        //
         // computationType = 'fixed'
         // horzontal / vertical:
         // '100h' => percent of item height
@@ -164,7 +167,14 @@ class ParallaxClass {
         // '100vw' => pervent of viewport width
         // '100wh' => pervent of viewport height
         // negative number is valid es: '-100px' or '-100h%'
-        // other ( scale rotate margin etcc..)
+        //
+        // Scale:
+        // '0.3' add 0.3 to 1 -> final result is 1.3
+        // '-0.3' substract 0.3 to 1 -> final result is 0.7
+        //
+        // Opacity: '-0.3' substract 0.3 to 1 -> final result is 0.7
+        //
+        // other ( rotate margin etcc..)
         // '90' -> 90 deg etc..
         data.range = item.getAttribute('data-range');
 
