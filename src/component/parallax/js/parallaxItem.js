@@ -123,6 +123,12 @@ export class ParallaxItemClass {
             ? data.easeType
             : parallaxConstant.EASE_SPRING;
 
+        // Add more precision to motion spring/lerp to trigger better force3D
+        this.motionParameters =
+            data.easeType === parallaxConstant.EASE_SPRING
+                ? { config: { precision: 0.001 } }
+                : { precision: 0.001 };
+
         //
         this.springConfig = data.springConfig || null;
         this.lerpConfig = data.lerpConfig || null;
@@ -608,7 +614,9 @@ export class ParallaxItemClass {
         )
             return;
 
-        this.motion.goTo({ val: this.endValue }).catch((err) => {});
+        this.motion
+            .goTo({ val: this.endValue }, this.motionParameters)
+            .catch((err) => {});
     }
 
     computeValue(scrollVal = null) {
