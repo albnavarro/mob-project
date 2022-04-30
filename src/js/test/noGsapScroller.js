@@ -12,23 +12,24 @@ export const noGsap = () => {
         scroller: scroller,
         direction: 'horizontal',
         computationType: 'fixed',
-        propierties: 'x',
-        fromTo: true,
-        // ease: true,
+        propierties: 'y',
+        pin: true,
+        forceTranspond: true,
+        marker: 'pin',
         dynamicStart: {
             position: 'right',
             value: () => {
-                return -title.offsetWidth;
+                return window.innerWidth / 2;
             },
         },
         dynamicEnd: {
             position: 'left',
             value: () => {
-                return -title.offsetWidth;
+                return 0;
             },
         },
         dynamicRange: () => {
-            return 400;
+            return -300;
         },
     });
     parallaxIn.init();

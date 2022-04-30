@@ -87,7 +87,7 @@ class ParallaxClass {
         data.animatePin = item.hasAttribute('data-animatePin');
 
         // use animation on pin collision
-        data.forceTraspond = item.hasAttribute('data-forceTraspond');
+        data.forceTranspond = item.hasAttribute('data-forceTranspond');
 
         // Boolean
         // Mandatory computationType = 'fixed'

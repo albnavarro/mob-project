@@ -38,11 +38,29 @@ export class ParallaxPin {
         this.unsubscribeScrollStart = () => {};
         this.unsubscribeSpring = () => {};
 
-        // Paerent style to apply to item
+        // Item style applied to pin wrapper
+        this.itemRequireStyleToWrapper = [
+            'flex',
+            'float',
+            'display',
+            'grid-area',
+            'grid-column-start',
+            'grid-column-end',
+            'grid-row-start',
+            'grid-row-end',
+            'box-sizing',
+        ];
+
+        // Paerent style to applied to item
         this.parentRequireStyle = ['text-align', 'box-sizing'];
 
-        // Item style to apply when transpond
-        this.itemRequireStyleWhenTraspond = ['font-size', 'padding'];
+        // Item style get and applied when transpond
+        this.itemRequireStyleWhenTraspond = [
+            'font-size',
+            'padding',
+            'line-height',
+            'white-space',
+        ];
 
         // Style to reset wwhen transpond
         // Margin: parent height is calculated without px
@@ -58,7 +76,7 @@ export class ParallaxPin {
         this.prevScroll = 0;
         this.animatePin = false;
         this.anticipateFactor = 1.2;
-        this.forceTraspond = false;
+        this.forceTranspond = false;
     }
 
     init() {
@@ -70,12 +88,13 @@ export class ParallaxPin {
         this.screen = this.parallaxInstance.screen;
         this.prevScrolY = window.pageYOffset;
         this.animatePin = this.parallaxInstance.animatePin;
-        this.forceTraspond = this.parallaxInstance.forceTraspond;
+        this.forceTranspond = this.parallaxInstance.forceTranspond;
         this.isInizialized = true;
 
         this.refresh();
         this.createPin();
         this.setPinSize();
+        this.addStyleFromPinToWrapper();
         this.setUpMotion();
 
         // Update pix top position when use custom screen ad scroll outside on window
@@ -163,6 +182,16 @@ export class ParallaxPin {
         this.checkIfShouldTranspond();
     }
 
+    // Get style fomr item and apply to wrapper ( es: flex)
+    addStyleFromPinToWrapper() {
+        const compStyles = window.getComputedStyle(this.item);
+        const style = this.itemRequireStyleToWrapper.reduce((p, c) => {
+            return { ...p, ...{ [c]: compStyles.getPropertyValue(c) } };
+        }, {});
+
+        Object.assign(this.wrapper.style, style);
+    }
+
     setPinSize() {
         const cb = () => {
             this.wrapper.style.height = '';
@@ -213,7 +242,7 @@ export class ParallaxPin {
     }
 
     checkIfShouldTranspond() {
-        if (this.forceTraspond) {
+        if (this.forceTranspond) {
             this.shoulTranspond = true;
             return;
         }

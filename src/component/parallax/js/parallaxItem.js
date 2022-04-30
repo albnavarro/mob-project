@@ -65,7 +65,7 @@ export class ParallaxItemClass {
         this.pin = data.pin || false;
         this.animatePin = data.animatePin || false;
         this.pinInstance = null;
-        this.forceTraspond = data.forceTraspond || false;
+        this.forceTranspond = data.forceTranspond || false;
 
         //Fixed prop
         this.fromTo = data.fromTo || false;
