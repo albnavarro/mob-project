@@ -42,7 +42,6 @@ export class ParallaxItemClass {
         this.prevFixedClamp = null;
         this.firstTime = true;
         this.isInViewport = false;
-        this.dontUSeFrame = false;
         this.force3D = false;
 
         // Base props
@@ -66,6 +65,7 @@ export class ParallaxItemClass {
         this.pin = data.pin || false;
         this.animatePin = data.animatePin || false;
         this.pinInstance = null;
+        this.forceTraspond = data.forceTraspond || false;
 
         //Fixed prop
         this.fromTo = data.fromTo || false;
@@ -194,12 +194,10 @@ export class ParallaxItemClass {
             if (this.scroller === window) {
                 this.unsubscribeScroll = handleScroll(() => {
                     this.computeValue();
-                    this.dontUSeFrame = false;
                     this.noEasingRender();
                 });
             }
             this.computeValue();
-            this.dontUSeFrame = false;
             this.noEasingRender();
         }
 
@@ -219,10 +217,7 @@ export class ParallaxItemClass {
                 handleNextTick.add(() => {
                     this.getScrollerOffset();
                     this.pinInstance.init();
-                    this.pinInstance.onScroll(
-                        this.scrollerScroll,
-                        this.dontUSeFrame
-                    );
+                    this.pinInstance.onScroll(this.scrollerScroll);
                 });
             }
         }
@@ -257,7 +252,9 @@ export class ParallaxItemClass {
                 this.updateStyle(val);
             }
 
-            if (this.onTickCallback) this.onTickCallback(val);
+            handleNextTick.add(() => {
+                if (this.onTickCallback) this.onTickCallback(val);
+            });
         });
 
         this.motion.onComplete(({ val }) => {
@@ -576,9 +573,6 @@ export class ParallaxItemClass {
     }
 
     move(scrollVal = null) {
-        // Bypass request animation frame, is supposed that is used outside
-        this.dontUSeFrame = true;
-
         // Bypass translate3D() if there is no easing
         if (!this.ease) this.force3D = false;
 
@@ -645,7 +639,7 @@ export class ParallaxItemClass {
             return;
 
         if (this.pin && this.pinInstance) {
-            this.pinInstance.onScroll(this.scrollerScroll, this.dontUSeFrame);
+            this.pinInstance.onScroll(this.scrollerScroll);
         }
 
         switch (this.computationType) {
@@ -672,11 +666,6 @@ export class ParallaxItemClass {
     }
 
     noEasingRender() {
-        if (this.dontUSeFrame) {
-            this.cleanRender();
-            return;
-        }
-
         handleFrame.add(() => {
             this.cleanRender();
         });
@@ -693,7 +682,9 @@ export class ParallaxItemClass {
             this.updateStyle(this.endValue);
         }
 
-        if (this.onTickCallback) this.onTickCallback(this.endValue);
+        handleNextTick.add(() => {
+            if (this.onTickCallback) this.onTickCallback(this.endValue);
+        });
     }
 
     updateStyle(val) {

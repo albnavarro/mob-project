@@ -108,8 +108,6 @@ export const handleFrame = (() => {
     // Indicate that fps is a real calucaltion and not the initial approssimation
     let fpsIsReal = false;
 
-    let frame = null;
-
     const render = () => {
         time = getTime();
         elapsed = time - lastUpdate;
@@ -144,10 +142,6 @@ export const handleFrame = (() => {
         frameIsRuning = false;
         isStopped = false;
 
-        // Cancel running animation Frame
-        cancelAnimationFrame(frame);
-        frame = null;
-
         setTimeout(() => {
             // Fire next Tick outside asnimationframe
             handleNextTick.fire(time, averageFps);
@@ -169,7 +163,7 @@ export const handleFrame = (() => {
         if (frameIsRuning) return;
 
         if (typeof window !== 'undefined') {
-            frame = requestAnimationFrame(render);
+            requestAnimationFrame(render);
         } else {
             setTimeout(() => render(), defaultTimestep);
         }

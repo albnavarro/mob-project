@@ -37,14 +37,28 @@ export class ParallaxPin {
         this.unsubscribeScroll = () => {};
         this.unsubscribeScrollStart = () => {};
         this.unsubscribeSpring = () => {};
+
+        // Paerent style to apply to item
         this.parentRequireStyle = ['text-align', 'box-sizing'];
+
+        // Item style to apply when transpond
+        this.itemRequireStyleWhenTraspond = ['font-size', 'padding'];
+
+        // Style to reset wwhen transpond
+        // Margin: parent height is calculated without px
+        this.itemRequireStyleToReset = [{ prop: 'margin', value: 0 }];
+
+        // Parent style that trigger transpond
         this.styleToTranspond = ['transform', 'position'];
+
+        // Skip parent style above with this value
         this.nonRelevantRule = ['none', 'static'];
+
         this.isInizialized = false;
         this.prevScroll = 0;
         this.animatePin = false;
         this.anticipateFactor = 1.2;
-        this.dontUSeFrame = false;
+        this.forceTraspond = false;
     }
 
     init() {
@@ -56,6 +70,7 @@ export class ParallaxPin {
         this.screen = this.parallaxInstance.screen;
         this.prevScrolY = window.pageYOffset;
         this.animatePin = this.parallaxInstance.animatePin;
+        this.forceTraspond = this.parallaxInstance.forceTraspond;
         this.isInizialized = true;
 
         this.refresh();
@@ -72,13 +87,9 @@ export class ParallaxPin {
                     this.pin.style.transition = `transform .85s cubic-bezier(0, 0.68, 0.45, 1.1)`;
                 };
 
-                if (this.dontUSeFrame) {
+                handleFrame.add(() => {
                     cb();
-                } else {
-                    handleFrame.add(() => {
-                        cb();
-                    });
-                }
+                });
             }
         });
 
@@ -170,13 +181,9 @@ export class ParallaxPin {
             this.pin.style.width = `${width}px`;
         };
 
-        if (this.dontUSeFrame) {
+        handleFrame.add(() => {
             cb();
-        } else {
-            handleFrame.add(() => {
-                cb();
-            });
-        }
+        });
     }
 
     findStyle(target, rule) {
@@ -206,6 +213,11 @@ export class ParallaxPin {
     }
 
     checkIfShouldTranspond() {
+        if (this.forceTraspond) {
+            this.shoulTranspond = true;
+            return;
+        }
+
         this.shoulTranspond = this.styleToTranspond
             .map((item) => {
                 const style = this.findStyle(this.wrapper, item);
@@ -312,13 +324,10 @@ export class ParallaxPin {
                 }
             };
 
-            if (this.dontUSeFrame) {
+            handleFrame.add(() => {
                 cb();
-            } else {
-                handleFrame.add(() => {
-                    cb();
-                });
-            }
+            });
+
             this.setPinSize();
             this.checkIfShouldTranspond();
         }
@@ -343,13 +352,9 @@ export class ParallaxPin {
             }
         };
 
-        if (this.dontUSeFrame) {
+        handleFrame.add(() => {
             cb();
-        } else {
-            handleFrame.add(() => {
-                cb();
-            });
-        }
+        });
     }
 
     getGap() {
@@ -376,13 +381,9 @@ export class ParallaxPin {
             this.pin.style[this.collisionStyleProp] = `${this.startFromTop}px`;
         };
 
-        if (this.dontUSeFrame) {
+        handleFrame.add(() => {
             cb();
-        } else {
-            handleFrame.add(() => {
-                cb();
-            });
-        }
+        });
 
         if (this.animatePin) {
             this.spring
@@ -399,13 +400,9 @@ export class ParallaxPin {
             this.pin.style.transform = `translate(0px, 0px)`;
         };
 
-        if (this.dontUSeFrame) {
+        handleFrame.add(() => {
             cb();
-        } else {
-            handleFrame.add(() => {
-                cb();
-            });
-        }
+        });
     }
 
     resetStyleWhenUnder() {
@@ -417,13 +414,9 @@ export class ParallaxPin {
             this.pin.style.left = ``;
         };
 
-        if (this.dontUSeFrame) {
+        handleFrame.add(() => {
             cb();
-        } else {
-            handleFrame.add(() => {
-                cb();
-            });
-        }
+        });
     }
 
     resetStyleWhenOver() {
@@ -442,13 +435,9 @@ export class ParallaxPin {
             }
         };
 
-        if (this.dontUSeFrame) {
+        handleFrame.add(() => {
             cb();
-        } else {
-            handleFrame.add(() => {
-                cb();
-            });
-        }
+        });
     }
 
     setFixedPosition() {
@@ -467,13 +456,37 @@ export class ParallaxPin {
             this.pin.style[style] = `${left}px`;
         };
 
-        if (this.dontUSeFrame) {
+        handleFrame.add(() => {
             cb();
-        } else {
-            handleFrame.add(() => {
-                cb();
-            });
-        }
+        });
+    }
+
+    addStyleToItem() {
+        const compStyles = window.getComputedStyle(this.item);
+        const styleObj = this.itemRequireStyleWhenTraspond.reduce((p, c) => {
+            return { ...p, ...{ [c]: compStyles.getPropertyValue(c) } };
+        }, {});
+
+        const styleReset = this.itemRequireStyleToReset.reduce((p, c) => {
+            const { prop, value } = c;
+            return { ...p, ...{ [prop]: value } };
+        }, {});
+
+        return { ...styleObj, ...styleReset };
+    }
+
+    removeStyleToItem() {
+        const compStyles = window.getComputedStyle(this.item);
+        const styleObj = this.itemRequireStyleWhenTraspond.reduce((p, c) => {
+            return { ...p, ...{ [c]: '' } };
+        }, {});
+
+        const stylereset = this.itemRequireStyleToReset.reduce((p, c) => {
+            const { prop } = c;
+            return { ...p, ...{ [prop]: '' } };
+        }, {});
+
+        return { ...styleObj, ...stylereset };
     }
 
     activateTrasponder() {
@@ -481,16 +494,13 @@ export class ParallaxPin {
             this.addRquiredStyle();
 
             const cb = () => {
+                Object.assign(this.item.style, this.addStyleToItem());
                 document.body.appendChild(this.pin);
             };
 
-            if (this.dontUSeFrame) {
+            handleFrame.add(() => {
                 cb();
-            } else {
-                handleFrame.add(() => {
-                    cb();
-                });
-            }
+            });
 
             this.trasponderActive = true;
         }
@@ -502,13 +512,10 @@ export class ParallaxPin {
                 this.wrapper.appendChild(this.pin);
             };
 
-            if (this.dontUSeFrame) {
+            handleFrame.add(() => {
+                Object.assign(this.item.style, this.removeStyleToItem());
                 cb();
-            } else {
-                handleFrame.add(() => {
-                    cb();
-                });
-            }
+            });
 
             this.trasponderActive = false;
         }
@@ -570,10 +577,8 @@ export class ParallaxPin {
         };
     }
 
-    onScroll(scrollTop, dontUSeFrame) {
+    onScroll(scrollTop) {
         if (!this.isInizialized) return;
-
-        this.dontUSeFrame = dontUSeFrame;
 
         const scrollDirection =
             this.prevScroll > scrollTop
@@ -587,10 +592,13 @@ export class ParallaxPin {
                 : position(this.wrapper).left;
 
         // Get anticipate value
-        const { anticipateBottom, anticipateInnerIn, anticipateInnerOut } =
-            !this.invertSide
-                ? this.getAnticipateValue(scrollTop, scrollDirection)
-                : this.getAnticipateValueInverted(scrollTop, scrollDirection);
+        const {
+            anticipateBottom,
+            anticipateInnerIn,
+            anticipateInnerOut,
+        } = !this.invertSide
+            ? this.getAnticipateValue(scrollTop, scrollDirection)
+            : this.getAnticipateValueInverted(scrollTop, scrollDirection);
 
         const bottomCondition = !this.invertSide
             ? offsetTop > this.scrollerHeight - this.start + anticipateBottom
