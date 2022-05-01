@@ -51,10 +51,10 @@ export class ParallaxPin {
             'box-sizing',
         ];
 
-        // Paerent style to applied to item
-        this.parentRequireStyle = ['text-align', 'box-sizing'];
+        // Paerent style to applied to pin wrapper
+        this.parentRequireStyle = ['text-align'];
 
-        // Item style get and applied when transpond
+        // Item style get and applied itself when transpond
         this.itemRequireStyleWhenTraspond = [
             'font-size',
             'padding',
@@ -62,14 +62,10 @@ export class ParallaxPin {
             'white-space',
         ];
 
-        // Style to reset wwhen transpond
-        // Margin: parent height is calculated without px
-        this.itemRequireStyleToReset = [{ prop: 'margin', value: 0 }];
-
-        // Parent style that trigger transpond
+        // Parent style that activate transpond
         this.styleToTranspond = ['transform', 'position'];
 
-        // Skip parent style above with this value
+        // Skip parent style to activate transpond above with this value
         this.nonRelevantRule = ['none', 'static'];
 
         this.isInizialized = false;
@@ -176,6 +172,9 @@ export class ParallaxPin {
         pin.appendChild(this.item);
         this.wrapper = this.item.closest('.pin-wrapper');
         this.pin = this.item.closest('.pin');
+
+        // Add disply table to avoid margin problem inside
+        this.pin.style.display = 'table';
         // Set misure to pin lement and wrap element
 
         this.addRquiredStyle();
@@ -492,30 +491,15 @@ export class ParallaxPin {
 
     addStyleToItem() {
         const compStyles = window.getComputedStyle(this.item);
-        const styleObj = this.itemRequireStyleWhenTraspond.reduce((p, c) => {
+        return this.itemRequireStyleWhenTraspond.reduce((p, c) => {
             return { ...p, ...{ [c]: compStyles.getPropertyValue(c) } };
         }, {});
-
-        const styleReset = this.itemRequireStyleToReset.reduce((p, c) => {
-            const { prop, value } = c;
-            return { ...p, ...{ [prop]: value } };
-        }, {});
-
-        return { ...styleObj, ...styleReset };
     }
 
     removeStyleToItem() {
-        const compStyles = window.getComputedStyle(this.item);
-        const styleObj = this.itemRequireStyleWhenTraspond.reduce((p, c) => {
+        return this.itemRequireStyleWhenTraspond.reduce((p, c) => {
             return { ...p, ...{ [c]: '' } };
         }, {});
-
-        const stylereset = this.itemRequireStyleToReset.reduce((p, c) => {
-            const { prop } = c;
-            return { ...p, ...{ [prop]: '' } };
-        }, {});
-
-        return { ...styleObj, ...stylereset };
     }
 
     activateTrasponder() {
