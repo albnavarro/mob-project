@@ -533,11 +533,13 @@ export class ParallaxItemClass {
         this.onLeave = () => {};
         this.onLeaveBack = () => {};
         this.onTickCallback = () => {};
-        if (this.pin) this.pinInstance.destroy();
+        if (this.pin && this.pinInstance) this.pinInstance.destroy();
         if (this.startMarker) this.startMarker.remove();
         if (this.endMarker) this.endMarker.remove();
         this.startMarker = null;
         this.endMarker = null;
+        this.pinInstance = null;
+        this.endValue = 0;
     }
 
     refresh() {
@@ -569,10 +571,27 @@ export class ParallaxItemClass {
         // reset value to update animation after resize
         this.lastValue = null;
         this.firstTime = true;
-        this.move();
+
+        if (!mq[this.queryType](this.breackpoint)) {
+            if (this.ease) this.motion.stop();
+
+            // Reset Style
+            // For tween is necessary reset inside tween callback
+            handleFrame.add(() => {
+                if (this.applyTo) {
+                    Object.assign(this.applyTo.style, this.getResetStyle());
+                } else {
+                    Object.assign(this.item.style, this.getResetStyle());
+                }
+            });
+        } else {
+            this.move();
+        }
     }
 
     move(scrollVal = null) {
+        if (!mq[this.queryType](this.breackpoint)) return;
+
         // Bypass translate3D() if there is no easing
         if (!this.ease) this.force3D = false;
 
@@ -590,6 +609,8 @@ export class ParallaxItemClass {
     }
 
     smoothParallaxJs(scrollVal = null) {
+        if (!mq[this.queryType](this.breackpoint)) return;
+
         this.computeValue(scrollVal);
 
         // Skip motion fixed type
@@ -666,6 +687,8 @@ export class ParallaxItemClass {
     }
 
     noEasingRender() {
+        if (!mq[this.queryType](this.breackpoint)) return;
+
         handleFrame.add(() => {
             this.cleanRender();
         });
@@ -940,6 +963,27 @@ export class ParallaxItemClass {
 
             default:
                 return { [this.propierties.toLowerCase()]: `${o.typeVal}px` };
+        }
+    }
+
+    getResetStyle() {
+        switch (this.propierties) {
+            case parallaxConstant.PROP_VERTICAL:
+            case parallaxConstant.PROP_HORIZONTAL:
+            case parallaxConstant.PROP_ROTATE:
+            case parallaxConstant.PROP_ROTATEY:
+            case parallaxConstant.PROP_ROTATEX:
+            case parallaxConstant.PROP_ROTATEZ:
+            case parallaxConstant.PROP_SCALE:
+                return {
+                    transform: ``,
+                };
+
+            case parallaxConstant.PROP_OPACITY:
+                return { opacity: `` };
+
+            default:
+                return { [this.propierties.toLowerCase()]: `` };
         }
     }
 }
