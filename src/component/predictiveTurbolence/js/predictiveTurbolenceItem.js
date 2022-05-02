@@ -71,8 +71,8 @@ export class PredictiveTurbolenceItemClass {
             this.setGlobalCoord({ page });
             this.onMove();
         });
-        this.unsubscribeScroll = handleScroll(({ scrolY }) => {
-            this.onScroll({ scrolY });
+        this.unsubscribeScroll = handleScroll(({ scrollY }) => {
+            this.onScroll({ scrollY });
         });
         this.unsubscribeResize = handleResize(() => {
             this.onResize();
@@ -159,7 +159,7 @@ export class PredictiveTurbolenceItemClass {
         this.pageCoord = { x: page.x, y: page.y };
     }
 
-    onScroll({ scrolY }) {
+    onScroll({ scrollY }) {
         const scrollTop = window.pageYOffset;
 
         if (this.lastScrolledTop != scrollTop) {

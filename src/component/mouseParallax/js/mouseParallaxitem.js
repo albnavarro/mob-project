@@ -46,8 +46,8 @@ export class MouseParallaxItemClass {
             this.getDimension();
         });
 
-        this.unsubscribeScroll = handleScroll(({ scrolY }) => {
-            this.onScroll(scrolY);
+        this.unsubscribeScroll = handleScroll(({ scrollY }) => {
+            this.onScroll(scrollY);
         });
 
         this.spring.setData({ ax: 0, ay: 0 });
@@ -75,7 +75,7 @@ export class MouseParallaxItemClass {
         this.clientCoord = { x: client.x, y: client.y };
     }
 
-    onScroll(scrolY) {
+    onScroll(scrollY) {
         const scrollTop = window.pageYOffset;
 
         if (this.lastScrolledTop != scrollTop) {

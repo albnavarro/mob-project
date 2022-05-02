@@ -41,6 +41,8 @@ export class ParallaxPin {
         // Item style applied to pin wrapper
         this.itemRequireStyleToWrapper = [
             'flex',
+            'flex-shrink',
+            'flex-basis',
             'float',
             'display',
             'grid-area',
@@ -49,6 +51,10 @@ export class ParallaxPin {
             'grid-row-start',
             'grid-row-end',
             'box-sizing',
+            'order',
+            'place-self',
+            'align-self',
+            'justify-self',
         ];
 
         // Paerent style to applied to pin wrapper
@@ -58,6 +64,7 @@ export class ParallaxPin {
         this.itemRequireStyleWhenTraspond = [
             'font-size',
             'padding',
+            'margin',
             'line-height',
             'white-space',
         ];
@@ -82,7 +89,7 @@ export class ParallaxPin {
             this.parallaxInstance.scrollTrigger || this.parallaxInstance.item;
         this.scroller = this.parallaxInstance.scroller;
         this.screen = this.parallaxInstance.screen;
-        this.prevScrolY = window.pageYOffset;
+        this.prevscrollY = window.pageYOffset;
         this.animatePin = this.parallaxInstance.animatePin;
         this.forceTranspond = this.parallaxInstance.forceTranspond;
         this.isInizialized = true;
@@ -108,7 +115,7 @@ export class ParallaxPin {
             }
         });
 
-        this.unsubscribeScroll = handleScroll(({ scrolY }) => {
+        this.unsubscribeScroll = handleScroll(({ scrollY }) => {
             if (!this.isInizialized) return;
 
             if (this.screen !== window) {
@@ -116,8 +123,8 @@ export class ParallaxPin {
                     this.refreshCollisionPoint();
                 }
 
-                const gap = scrolY - this.prevScrolY;
-                this.prevScrolY = scrolY;
+                const gap = scrollY - this.prevscrollY;
+                this.prevscrollY = scrollY;
 
                 if (this.isInner && this.pin) {
                     const { verticalGap } = this.spring.get();

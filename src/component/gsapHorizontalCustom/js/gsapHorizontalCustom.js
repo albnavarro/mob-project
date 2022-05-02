@@ -15,13 +15,16 @@ export class GsapHorizontalCustomClass {
         this.breackpoint = data.breackpoint || 'desktop';
         this.queryType = data.queryType || 'min';
         this.mainContainer = document.querySelector(data.rootEl);
-        this.triggerContainer =
-            this.mainContainer.querySelector('.scroller__trigger');
-        this.row = this.mainContainer.querySelector('.scroller__row');
-        this.cards = this.mainContainer.querySelectorAll('.scroller__section');
+        this.triggerContainer = this.mainContainer.querySelector(
+            '.gsap-scroller__trigger'
+        );
+        this.row = this.mainContainer.querySelector('.gsap-scroller__row');
+        this.cards = this.mainContainer.querySelectorAll(
+            '.gsap-scroller__section'
+        );
         this.shadow = this.mainContainer.querySelectorAll('[data-shadow]');
-        this.shadowMainClass = 'scroller__shadowEl';
-        this.shadowMainClassTransition = 'scroller__shadow';
+        this.shadowMainClass = 'gsap-scroller__shadowEl';
+        this.shadowMainClassTransition = 'gsap-scroller__shadow';
         //
         this.callback = [];
 
@@ -140,19 +143,19 @@ export class GsapHorizontalCustomClass {
             const widthAmount = offset / screenRatio;
             const diffAmount = offset - offset / screenRatio;
             const shadowTransitionEl = this.mainContainer.querySelector(
-                `.scroller__shadow[data-shadow="${shadowData}"]`
+                `.gsap-scroller__shadow[data-shadow="${shadowData}"]`
             );
             const inCenterMarker = shadowTransitionEl.querySelector(
-                '.scroller__shadow__in-center'
+                '.gsap-scroller__shadow__in-center'
             );
             const outCenterMarker = shadowTransitionEl.querySelector(
-                '.scroller__shadow__out-center'
+                '.gsap-scroller__shadow__out-center'
             );
             const leftMarker = shadowTransitionEl.querySelector(
-                '.scroller__shadow__left'
+                '.gsap-scroller__shadow__left'
             );
             const endMarker = shadowTransitionEl.querySelector(
-                '.scroller__shadow__end'
+                '.gsap-scroller__shadow__end'
             );
 
             // Strengh shadow end item to bottom of page
@@ -272,7 +275,7 @@ export class GsapHorizontalCustomClass {
             this.updateShadow();
             this.initGsap();
         } else if (gsapisActive && !mq[this.queryType](this.breackpoint)) {
-            gsap.set('.scroller__row', {
+            gsap.set('.gsap-scroller__row', {
                 xPercent: 0,
             });
             this.row.style.transform = '';

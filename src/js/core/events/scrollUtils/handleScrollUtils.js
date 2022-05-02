@@ -40,7 +40,7 @@ function handleScrollUtils(type) {
 
         // Prepare data to callback
         const scrollData = {
-            scrolY: window.pageYOffset,
+            scrollY: window.pageYOffset,
         };
 
         // Fire end fo scroll
@@ -70,7 +70,7 @@ function handleScrollUtils(type) {
         if (type === 'START') {
             unsubscribeScroll = handleScroll(() => {
                 const scrollData = {
-                    scrolY: window.pageYOffset,
+                    scrollY: window.pageYOffset,
                 };
 
                 // At first scroll isScrolling is false

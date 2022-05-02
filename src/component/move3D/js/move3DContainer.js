@@ -100,8 +100,8 @@ export class move3DContainerClass {
         });
 
         if (this.pageY) {
-            this.unsubscribeScroll = handleScroll(({ scrolY }) => {
-                this.onScroll(scrolY);
+            this.unsubscribeScroll = handleScroll(({ scrollY }) => {
+                this.onScroll(scrollY);
             });
         }
 
@@ -178,7 +178,7 @@ export class move3DContainerClass {
         Object.assign(this.scene.style, style);
     }
 
-    onScroll(scrolY) {
+    onScroll(scrollY) {
         const scrollTop = window.pageYOffset;
 
         if (this.lastScrolledTop != scrollTop) {

@@ -29,6 +29,6 @@
 
 // layout
 @import 'layout/index', 'layout/footer', 'layout/move3D', 'layout/mouseParallax',
-    'layout/gsap', 'layout/gsap2', 'layout/svg', 'layout/dragger',
-    'layout/scrollerH', 'layout/susy', 'layout/mouseStagger', 'layout/stagger',
-    'layout/shape', 'layout/syncTimeline';
+    'layout/gsap', 'layout/noGsapScroller', 'layout/gsapScroller', 'layout/svg',
+    'layout/dragger', 'layout/scrollerH', 'layout/susy', 'layout/mouseStagger',
+    'layout/stagger', 'layout/shape', 'layout/syncTimeline';

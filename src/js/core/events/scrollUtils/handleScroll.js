@@ -8,7 +8,7 @@
  *
  * @example:
  * onMount(() => {
- *   const unsubscribe = handleScroll(({scrolY, direction}) => console.log(scrolY,direction));
+ *   const unsubscribe = handleScroll(({scrollY, direction}) => console.log(scrollY,direction));
  *   return(() => unsubscribe())
  * }
  *
@@ -47,7 +47,7 @@ export const handleScroll = (() => {
 
         // Prepare data to callback
         const scrollData = {
-            scrolY: val,
+            scrollY: val,
             direction,
         };
 

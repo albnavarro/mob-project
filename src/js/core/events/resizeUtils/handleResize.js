@@ -25,7 +25,7 @@ export const handleResize = (() => {
 
         // Prepare data to callback
         const resizeData = {
-            scrolY: window.pageYOffset,
+            scrollY: window.pageYOffset,
             windowsHeight: window.innerHeight,
             windowsWidth: window.innerWidth,
             documentHeight: document.documentElement.scrollHeight,

@@ -14,8 +14,9 @@ export class horizontalCustomClass {
         this.breackpoint = data.breackpoint || 'desktop';
         this.queryType = data.queryType || 'min';
         this.mainContainer = document.querySelector(data.rootEl);
-        this.triggerContainer =
-            this.mainContainer.querySelector('.scroller__trigger');
+        this.triggerContainer = this.mainContainer.querySelector(
+            '.scroller__trigger'
+        );
         this.row = this.mainContainer.querySelector('.scroller__row');
         this.cards = this.mainContainer.querySelectorAll('.scroller__section');
         this.shadow = this.mainContainer.querySelectorAll('[data-shadow]');
@@ -58,6 +59,7 @@ export class horizontalCustomClass {
                 const width = this.horizontalWidth;
                 this.percentRange = (100 * (width - window.innerWidth)) / width;
                 this.triggerContainer.style.height = `${width}px`;
+                this.mainContainer.style.height = `${width}px`;
                 this.row.style.width = `${width}px`;
 
                 resolve();
@@ -236,7 +238,7 @@ export class horizontalCustomClass {
                         return end / 2 + plusHalf;
                     })();
 
-                    this.triggerContainer.style['margin-top'] = `-${height}px`;
+                    // this.triggerContainer.style['margin-top'] = `-${height}px`;
                     shadowTransitionEl.style.top = `${start}px`;
                     inCenterMarker.style.height = `${inCenter}px`;
                     outCenterMarker.style.height = `${inCenter}px`;
@@ -261,6 +263,7 @@ export class horizontalCustomClass {
             computationType: 'fixed',
             propierties: 'x',
             breackpoint: 'x-small',
+            pin: true,
             dynamicRange: () => {
                 return -(this.horizontalWidth - window.innerWidth);
             },
@@ -325,6 +328,7 @@ export class horizontalCustomClass {
         this.row.style.transform = '';
         this.row.style.width = '';
         this.triggerContainer.style.height = '';
+        this.mainContainer.style.height = '';
         this.removeShadow();
 
         if (this.moduleisActive) {

@@ -111,12 +111,12 @@ handleLoad(() => {
 
     if (body.classList.contains('page-gsapHorizontal2')) {
         const gsapHorizontalCustom = new GsapHorizontalCustomClass({
-            rootEl: '.test-custom-scroller',
+            rootEl: '.gsap-test-custom-scroller',
         });
         gsapHorizontalCustom.init();
 
         const gsapHorizontalCustom2 = new GsapHorizontalCustomClass({
-            rootEl: '.test-custom-scroller2',
+            rootEl: '.gsap-test-custom-scroller2',
         });
         gsapHorizontalCustom2.init();
     }

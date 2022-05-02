@@ -1,5 +1,5 @@
-export const mq = {
-    s: {
+export const mq = (() => {
+    let media = {
         'x-small': '320',
         small: '360',
         medium: '600',
@@ -7,13 +7,11 @@ export const mq = {
         desktop: '992',
         large: '1200',
         'x-large': '1400',
-    },
+    };
 
-    max: function (breakpoint) {
-        return window.innerWidth < mq.s[breakpoint];
-    },
+    const max = (breakpoint) => window.innerWidth < media[breakpoint];
+    const min = (breakpoint) => window.innerWidth >= media[breakpoint];
+    const update = (obj) => (media = { ...obj });
 
-    min: function (breakpoint) {
-        return window.innerWidth >= mq.s[breakpoint];
-    },
-};
+    return { max, min, update };
+})();
