@@ -184,7 +184,10 @@ export class ParallaxPin {
         this.pin.style.display = 'table';
         // Set misure to pin lement and wrap element
 
-        this.addRquiredStyle();
+        const requiredStyleToadd = this.addRquiredStyle();
+        handleFrame.add(() => {
+            Object.assign(this.pin.style, requiredStyleToadd);
+        });
         this.checkIfShouldTranspond();
     }
 
@@ -195,7 +198,7 @@ export class ParallaxPin {
             return { ...p, ...{ [c]: compStyles.getPropertyValue(c) } };
         }, {});
 
-        Object.assign(this.wrapper.style, style);
+        handleFrame.add(() => Object.assign(this.wrapper.style, style));
     }
 
     setPinSize() {
@@ -235,7 +238,7 @@ export class ParallaxPin {
     }
 
     addRquiredStyle() {
-        const additionalStyle = this.parentRequireStyle
+        return this.parentRequireStyle
             .map((item) => {
                 return this.findStyle(this.pin, item);
             })
@@ -243,8 +246,6 @@ export class ParallaxPin {
             .reduce((p, c) => {
                 return { ...p, ...c };
             }, {});
-
-        Object.assign(this.pin.style, additionalStyle);
     }
 
     checkIfShouldTranspond() {
@@ -511,10 +512,13 @@ export class ParallaxPin {
 
     activateTrasponder() {
         if (this.shoulTranspond) {
-            this.addRquiredStyle();
+            // Interrogato DOM before rendering, avoid recalculation sryle inside RAF
+            const requiredStyleToAdd = this.addRquiredStyle();
+            const styleToAdd = this.addStyleToItem();
 
             const cb = () => {
-                Object.assign(this.item.style, this.addStyleToItem());
+                Object.assign(this.pin.style, requiredStyleToAdd);
+                Object.assign(this.item.style, styleToAdd);
                 document.body.appendChild(this.pin);
             };
 
@@ -529,11 +533,11 @@ export class ParallaxPin {
     deactivateTrasponder() {
         if (this.shoulTranspond) {
             const cb = () => {
+                Object.assign(this.item.style, this.removeStyleToItem());
                 this.wrapper.appendChild(this.pin);
             };
 
             handleFrame.add(() => {
-                Object.assign(this.item.style, this.removeStyleToItem());
                 cb();
             });
 
