@@ -1,9 +1,10 @@
 import { bodyScroll } from '../../../js/core/animation/bodyScroll/bodyScroll.js';
 import { handleScroll } from '.../../../js/core/events/scrollUtils/handleScroll.js';
+import { handleFrame } from '../../../js/core/events/rafutils/rafUtils.js';
 
 class totopClass {
     constructor() {
-        this.$totop = document.querySelector('.to-top');
+        this.totop = document.querySelector('.to-top');
         this.hide = true;
     }
 
@@ -14,7 +15,7 @@ class totopClass {
     }
 
     addHandler() {
-        this.$totop.addEventListener('click', this.onClick.bind(this));
+        this.totop.addEventListener('click', this.onClick.bind(this));
     }
 
     onClick(event) {
@@ -24,11 +25,15 @@ class totopClass {
 
     showArrow() {
         if (window.pageYOffset >= window.innerWidth && this.hide) {
-            this.$totop.classList.add('visible');
-            this.hide = false;
+            handleFrame.add(() => {
+                this.totop.classList.add('visible');
+                this.hide = false;
+            });
         } else if (window.pageYOffset < window.innerWidth && !this.hide) {
-            this.$totop.classList.remove('visible');
-            this.hide = true;
+            handleFrame.add(() => {
+                this.totop.classList.remove('visible');
+                this.hide = true;
+            });
         }
     }
 }

@@ -1,6 +1,7 @@
 import { offset } from '../../../js/core/utils/vanillaFunction.js';
 import { handleResize } from '.../../../js/core/events/resizeUtils/handleResize.js';
 import { handleScroll } from '.../../../js/core/events/scrollUtils/handleScroll.js';
+import { handleFrame } from '../../../js/core/events/rafutils/rafUtils.js';
 
 export class showElementItemClass {
     constructor(data) {
@@ -56,14 +57,18 @@ export class showElementItemClass {
         const isAble = this.onlyOnce && this.firstActive ? false : true;
 
         if (postion < window.pageYOffset && this.hide && isAble) {
-            this.item.classList.remove(this.startClass);
-            this.item.classList.add(this.endClass);
-            this.hide = false;
-            this.firstActive = true;
+            handleFrame.add(() => {
+                this.item.classList.remove(this.startClass);
+                this.item.classList.add(this.endClass);
+                this.hide = false;
+                this.firstActive = true;
+            });
         } else if (postion >= window.pageYOffset && !this.hide && isAble) {
-            this.item.classList.remove(this.endClass);
-            this.item.classList.add(this.startClass);
-            this.hide = true;
+            handleFrame.add(() => {
+                this.item.classList.remove(this.endClass);
+                this.item.classList.add(this.startClass);
+                this.hide = true;
+            });
         }
     }
 }

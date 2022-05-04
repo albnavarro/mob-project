@@ -1,3 +1,5 @@
+import { handleFrame } from '../../../js/core/events/rafutils/rafUtils.js';
+
 export class AnimateItemClass {
     constructor(data) {
         this.compRoot = data.compRoot;
@@ -19,10 +21,14 @@ export class AnimateItemClass {
             if (this.noRepeat && this.firstTime) return;
             entries.forEach((entry) => {
                 if (entry.isIntersecting) {
-                    this.compRoot.classList.add('animate');
-                    this.firstTime = true;
+                    handleFrame.add(() => {
+                        this.compRoot.classList.add('animate');
+                        this.firstTime = true;
+                    });
                 } else if (!entry.isIntersecting) {
-                    this.compRoot.classList.remove('animate');
+                    handleFrame.add(() => {
+                        this.compRoot.classList.remove('animate');
+                    });
                 }
             });
         };
