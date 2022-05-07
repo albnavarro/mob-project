@@ -39,14 +39,15 @@ export const handleNextFrame = ((cb) => {
 export const handleNextTick = ((cb) => {
     let callback = [];
 
-    const add = (cb) => {
-        callback.push(cb);
+    const add = (cb, priority = 100) => {
+        callback.push({ cb, priority });
     };
 
     const fire = (time, averageFps) => {
         if (callback.length === 0) return;
 
-        callback.forEach((item) => item(time, averageFps));
+        callback.sort((a, b) => a.priority - b.priority);
+        callback.forEach(({ cb }) => cb(time, averageFps));
         callback = [];
     };
 
@@ -142,6 +143,7 @@ export const handleFrame = (() => {
         frameIsRuning = false;
         isStopped = false;
 
+        // Valutare requestIdleCallback con polifyll
         setTimeout(() => {
             // Fire next Tick outside asnimationframe
             handleNextTick.fire(time, averageFps);

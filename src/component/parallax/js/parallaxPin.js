@@ -78,6 +78,10 @@ export class ParallaxPin {
         this.isInizialized = false;
         this.prevScroll = 0;
         this.animatePin = false;
+
+        // HandleScroll switch callback after requestAnimationframe
+        // so if window is the sroller we have to retrieve 1 frame
+        // if scrolle ris not window the pin is syncronous with it's scroller
         this.anticipateFactor = 1.2;
         this.forceTranspond = false;
     }
@@ -547,10 +551,7 @@ export class ParallaxPin {
 
     getAnticipate(scrollTop) {
         const step = Math.abs(scrollTop - this.prevScroll);
-        const remaining = Math.abs(this.startFromTop - scrollTop);
-        return step > remaining
-            ? Math.abs(step - remaining) * this.anticipateFactor
-            : step * this.anticipateFactor;
+        return step * this.anticipateFactor;
     }
 
     getAnticipateValue(scrollTop, scrollDirection) {

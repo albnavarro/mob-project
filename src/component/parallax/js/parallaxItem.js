@@ -11,6 +11,7 @@ import {
 } from '../../../js/core/events/rafutils/rafUtils.js';
 import { handleResize } from '../../../js/core/events/resizeUtils/handleResize.js';
 import { handleScroll } from '../../../js/core/events/scrollUtils/handleScroll.js';
+import { handleScrollImmediate } from '../../../js/core/events/scrollUtils/handleScrollImmediate.js';
 import { handleScrollStart } from '../../../js/core/events/scrollUtils/handleScrollUtils.js';
 import { handleSpring } from '../../../js/core/animation/spring/handleSpring.js';
 import { handleLerp } from '../../../js/core/animation/lerp/handleLerp.js';
@@ -177,6 +178,18 @@ export class ParallaxItemClass {
             this.calcFixedLimit();
         }
 
+        // If use pin we have to get fresh value on scroll
+        // Otherwise we can optimize and fire scoll callback after requerst animationFrame
+        const getScrollfucuntion = (cb) => {
+            if (this.pin) {
+                this.unsubscribeScroll = handleScrollImmediate(cb);
+                return handleScrollImmediate;
+            } else {
+                this.unsubscribeScroll = handleScroll(cb);
+                return handleScroll;
+            }
+        };
+
         if (this.ease) {
             // Force transform3D onscroll start
             this.unsubscribeScrollStart = handleScrollStart(() => {
@@ -184,7 +197,7 @@ export class ParallaxItemClass {
             });
 
             if (this.scroller === window) {
-                this.unsubscribeScroll = handleScroll(() => {
+                getScrollfucuntion(() => {
                     this.smoothParallaxJs();
                 });
             }
@@ -192,7 +205,7 @@ export class ParallaxItemClass {
             this.smoothParallaxJs();
         } else {
             if (this.scroller === window) {
-                this.unsubscribeScroll = handleScroll(() => {
+                getScrollfucuntion(() => {
                     this.computeValue();
                     this.noEasingRender();
                 });

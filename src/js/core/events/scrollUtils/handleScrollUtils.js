@@ -1,5 +1,6 @@
 import { handleScroll } from './handleScroll.js';
 import { debounceFuncion } from '../debounce.js';
+import { handleFrame, handleNextTick } from '../rafutils/rafUtils.js';
 
 /**
  * Same of handleScroll but trigger scrollEnd and scrollStart event
@@ -38,17 +39,21 @@ function handleScrollUtils(type) {
             return;
         }
 
-        // Prepare data to callback
-        const scrollData = {
-            scrollY: window.pageYOffset,
-        };
+        handleFrame.add(() => {
+            handleNextTick.add(() => {
+                // Prepare data to callback
+                const scrollData = {
+                    scrollY: window.pageYOffset,
+                };
 
-        // Fire end fo scroll
-        if (type === 'END') {
-            callback.forEach(({ cb }) => {
-                cb(scrollData);
-            });
-        }
+                // Fire end fo scroll
+                if (type === 'END') {
+                    callback.forEach(({ cb }) => {
+                        cb(scrollData);
+                    });
+                }
+            }, 0);
+        });
     }
 
     /**
@@ -68,9 +73,9 @@ function handleScrollUtils(type) {
 
         // Use normal scroll event ( no debuonce ) to detect if page is scrolling
         if (type === 'START') {
-            unsubscribeScroll = handleScroll(() => {
+            unsubscribeScroll = handleScroll(({ scrollY }) => {
                 const scrollData = {
-                    scrollY: window.pageYOffset,
+                    scrollY,
                 };
 
                 // At first scroll isScrolling is false

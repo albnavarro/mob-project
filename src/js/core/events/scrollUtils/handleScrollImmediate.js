@@ -14,9 +14,7 @@
  *
  */
 
-import { handleFrame, handleNextTick } from '../rafutils/rafUtils.js';
-
-export const handleScroll = (() => {
+export const handleScrollImmediate = (() => {
     let inizialized = false;
     let callback = [];
     let id = 0;
@@ -47,22 +45,18 @@ export const handleScroll = (() => {
             return;
         }
 
-        handleFrame.add(() => {
-            handleNextTick.add(() => {
-                prev = val;
-                val = window.pageYOffset;
-                direction = val > prev ? DOWN : UP;
+        prev = val;
+        val = window.pageYOffset;
+        direction = val > prev ? DOWN : UP;
 
-                // Prepare data to callback
-                scrollData = {
-                    scrollY: val,
-                    direction,
-                };
+        // Prepare data to callback
+        scrollData = {
+            scrollY: val,
+            direction,
+        };
 
-                callback.forEach(({ cb }) => {
-                    cb(scrollData);
-                });
-            }, 0);
+        callback.forEach(({ cb }) => {
+            cb(scrollData);
         });
     }
 
