@@ -1,5 +1,9 @@
 import { handleScroll } from '../core/events/scrollUtils/handleScroll.js';
 import { handleResize } from '../core/events/resizeUtils/handleResize.js';
+import {
+    handleFrame,
+    handleNextTick,
+} from '../core/events/rafutils/rafUtils.js';
 
 class vhClass {
     constructor(images, callback) {
@@ -8,19 +12,27 @@ class vhClass {
 
     init() {
         this.calcVh();
-
-        handleScroll(() => this.onScroll());
+        handleScroll(({ scrollY }) => this.onScroll(scrollY));
         handleResize(() => this.calcVh());
     }
 
     calcVh() {
-        let vh = window.innerHeight * 0.01;
-        document.documentElement.style.setProperty('--vh', `${vh}px`);
-        console.log('calc vh');
+        handleFrame.add(() => {
+            handleNextTick.add(() => {
+                const vh = window.innerHeight * 0.01;
+
+                handleFrame.add(() => {
+                    document.documentElement.style.setProperty(
+                        '--vh',
+                        `${vh}px`
+                    );
+                });
+            });
+        });
     }
 
-    onScroll() {
-        if (window.pageYOffset == 0) {
+    onScroll(scrollY) {
+        if (scrollY == 0) {
             this.calcVh();
         }
     }

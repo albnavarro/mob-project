@@ -40,7 +40,6 @@ export class SmoothScrollClass {
         this.rafOnScroll = null;
         this.containerWidth = 0;
         this.containerHeight = 0;
-        this.progress = 0;
         this.firstTouchValue = 0;
         this.threshold = 30;
         this.maxValue = 0;
@@ -338,8 +337,6 @@ export class SmoothScrollClass {
     // COMMON CALCULATE VALUE
     calcaluteValue() {
         this.endValue = this.clamp(this.endValue, 0, this.maxValue);
-        this.target.style.setProperty('--progress', `${this.progress * 100}%`);
-
         this.motion.goTo({ val: this.endValue }).catch((err) => {});
     }
 }
