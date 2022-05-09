@@ -6,6 +6,7 @@ import { position } from '../../../js/core/utils/vanillaFunction.js';
 import { handleScroll } from '.../../../js/core/events/scrollUtils/handleScroll.js';
 import { handleScrollStart } from '.../../../js/core/events/scrollUtils/handleScrollUtils.js';
 import { getTranslateValues } from '../../../js/core/utils/vanillaFunction.js';
+import { clamp } from '.../../../js/core/animation/utils/animationUtils.js';
 
 export class ParallaxPin {
     constructor(data) {
@@ -84,6 +85,13 @@ export class ParallaxPin {
         // if scrolle ris not window the pin is syncronous with it's scroller
         this.anticipateFactor = 1.2;
         this.forceTranspond = false;
+
+        this.justPinned = false;
+        this.afterPinCounter = 0;
+        this.lastStep = 0;
+        this.afterJustPinned = false;
+        this.afterJustPinnedCounter = 0;
+        this.numeCycleToFreeze = 3;
     }
 
     init() {
@@ -494,6 +502,12 @@ export class ParallaxPin {
         const cb = () => {
             this.pin.style.position = 'fixed';
             this.pin.style[style] = `${left}px`;
+
+            // Frezze pin for two frame so avoid possible visual jump
+            // Item stop can stop ain the middle of anticipate step
+            // and just after item jump to original position
+            this.justPinned = true;
+            this.afterJustPinned = true;
         };
 
         handleFrame.add(() => {
@@ -550,7 +564,27 @@ export class ParallaxPin {
     }
 
     getAnticipate(scrollTop) {
-        const step = Math.abs(scrollTop - this.prevScroll);
+        // if come just after pin use the last step to avoid glitch
+        // if item is pinned too soon
+        const step =
+            this.afterJustPinned && this.afterJustPinnedCounter < 3
+                ? this.lastStep
+                : clamp(Math.abs(scrollTop - this.prevScroll), 0, 250);
+
+        // Reset afterJustPinned
+        if (
+            this.afterJustPinned &&
+            this.afterJustPinnedCounter < this.numeCycleToFreeze
+        ) {
+            this.afterJustPinnedCounter++;
+        } else {
+            this.afterJustPinnedCounter = 0;
+            this.afterJustPinned = false;
+        }
+
+        // Cache previouse stop
+        this.lastStep = step;
+
         return step * this.anticipateFactor;
     }
 
@@ -604,6 +638,16 @@ export class ParallaxPin {
 
     onScroll(scrollTop) {
         if (!this.isInizialized) return;
+
+        // Skip pin check for 3 scroll if is if just pinned
+        // this to prevent glitch if item is pinned too son and user stop scroll too soon
+        if (this.justPinned && this.afterPinCounter < this.numeCycleToFreeze) {
+            this.afterPinCounter++;
+            return;
+        } else {
+            this.afterPinCounter = 0;
+            this.justPinned = false;
+        }
 
         const scrollDirection =
             this.prevScroll > scrollTop

@@ -1,9 +1,5 @@
 import { handleSpring } from '../core/animation/spring/handleSpring.js';
-import {
-    handleFrame,
-    handleNextFrame,
-} from '../core/events/rafutils/rafUtils.js';
-import { HandleAsyncTimeline } from '../core/animation/asyncTimeline/handleAsyncTimeline.js';
+import { handleNextFrame } from '../core/events/rafutils/rafUtils.js';
 
 export const circleAnimation = () => {
     const stagger = document.querySelectorAll('.circle-tween .shape__target');
@@ -14,16 +10,13 @@ export const circleAnimation = () => {
     tween.setData({ x: 0 });
     tween.set({ x: 0 });
 
-    const distance = window.innerWidth / 2;
-    const velocity = 10;
-    const step = distance / Math.PI / velocity;
+    const step = 0.06;
     const radius = 200;
-    const duration = 1000 * velocity;
 
     stagger.forEach((item, i) => {
         tween.subscribe(({ x }) => {
-            const xr = Math.sin(x / step) * radius;
-            const yr = Math.cos(x / step) * radius;
+            const xr = Math.sin(x * step) * radius;
+            const yr = Math.cos(x * step) * radius;
             item.style.transform = `translate3D(0px,0px,0px) translate(${xr}px, ${yr}px)`;
         });
     });
@@ -33,7 +26,7 @@ export const circleAnimation = () => {
     const loop = () => {
         counter++;
         tween
-            .goTo({ x: counter }, { stagger: { each: 3, from: 'end' } })
+            .goTo({ x: counter }, { stagger: { each: 3, from: 'start' } })
             .catch((err) => {});
         if (isRunning) handleNextFrame.add(() => loop());
     };
