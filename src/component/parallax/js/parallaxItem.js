@@ -221,7 +221,9 @@ export class ParallaxItemClass {
             });
         }
 
-        this.unsubscribeResize = handleResize(() => this.refresh());
+        this.unsubscribeResize = handleResize(({ horizontalResize }) => {
+            if (horizontalResize) this.refresh();
+        });
 
         if (this.pin) {
             this.pinInstance = new ParallaxPin({ instance: this });

@@ -5,6 +5,8 @@ export const handleResize = (() => {
     let callback = [];
     let id = 0;
     let debouceFunctionReference = () => {};
+    let previousWindowHeight = window.innerHeight;
+    let previousWindowWidth = window.innerWidth;
 
     /**
      * handler - handler for scroll debounce
@@ -23,12 +25,22 @@ export const handleResize = (() => {
             return;
         }
 
+        // Check there is a vertical resizer
+        const windowsHeight = window.innerHeight;
+        const windowsWidth = window.innerWidth;
+        const verticalResize = windowsHeight !== previousWindowHeight;
+        const horizontalResize = windowsWidth !== previousWindowWidth;
+        previousWindowHeight = windowsHeight;
+        previousWindowWidth = windowsWidth;
+
         // Prepare data to callback
         const resizeData = {
             scrollY: window.pageYOffset,
-            windowsHeight: window.innerHeight,
-            windowsWidth: window.innerWidth,
+            windowsHeight,
+            windowsWidth,
             documentHeight: document.documentElement.scrollHeight,
+            verticalResize,
+            horizontalResize,
         };
 
         // Fire end of resize

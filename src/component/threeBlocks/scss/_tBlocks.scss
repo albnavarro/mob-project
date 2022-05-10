@@ -8,7 +8,7 @@ $activeHeight: calc(var(--vh, 1vh) * 60);
 .tBlocks {
     display: flex;
     height: $containerHeightFallback;
-    height: $containerHeight;
+    // height: $containerHeight; Prevent resize on ipad
     position: relative;
     overflow: hidden;
 
@@ -21,7 +21,7 @@ $activeHeight: calc(var(--vh, 1vh) * 60);
         &__wrap {
             transition: transform 0.55s cubic-bezier(0.305, 0.55, 0.47, 1.015);
             height: $defaultHeightFallback;
-            height: $defaultHeight;
+            // height: $defaultHeight;
             overflow: hidden;
             position: relative;
 
@@ -84,7 +84,7 @@ $activeHeight: calc(var(--vh, 1vh) * 60);
 
         &--active {
             height: $activeHeightFallback;
-            height: $activeHeight;
+            // height: $activeHeight;
             width: 100%;
             position: absolute;
             cursor: default;
