@@ -1,5 +1,9 @@
 import { springConfig } from './springConfig.js';
-import { getValueObj, mergeArray } from '../utils/animationUtils.js';
+import {
+    getValueObj,
+    mergeArray,
+    compareKeys,
+} from '../utils/animationUtils.js';
 import {
     handleFrame,
     handleNextFrame,
@@ -25,6 +29,12 @@ export class handleSpring {
         this.lostFrameTresold = 64;
         this.pauseStatus = false;
         this.firstRun = true;
+
+        // Store max fps so is the fops of monitor using
+        this.maxFps = 60;
+        // If fps is under this.maxFps by this.fpsThreshold is algging, so skip to not overload
+        this.fpsThreshold = 15;
+
         this.defaultProps = {
             reverse: false,
             config: this.config,
@@ -65,9 +75,17 @@ export class handleSpring {
         const precision = parseFloat(this.config.precision);
 
         const o = {};
+        o.inMotion = false;
+
+        // Reset maxFos when animartion start
+        this.maxFps = 0;
 
         const draw = (timestamp, fps) => {
             this.req = true;
+            o.isRealFps = handleFrame.isRealFps();
+
+            // Get max fps upper limit
+            if (fps > this.maxFps && o.isRealFps) this.maxFps = fps;
 
             // lastTime is set to now the first time.
             // then check the difference from now and last time to check if we lost frame
@@ -107,17 +125,28 @@ export class handleSpring {
             // Prepare an obj to pass to the callback
             const cbObject = getValueObj(this.values, 'currentValue');
 
+            // Check if we lost some fps so we skip update to not overload browser rendering
+            // Not first time, only inside motion and once fps is real ( stable )
+            o.deltaFps =
+                !o.inMotion || !o.isRealFps ? 0 : Math.abs(this.maxFps - fps);
+            o.inMotion = true;
+
             handleFrame.add(() => {
                 if (this.stagger.each === 0) {
                     // No stagger, run immediatly
                     this.callback.forEach(({ cb }) => {
-                        cb(cbObject);
+                        if (o.deltaFps < this.fpsThreshold || fps > this.maxFps)
+                            cb(cbObject);
                     });
                 } else {
                     // Stagger
                     this.callback.forEach(({ cb, index, frame }, i) => {
                         handleFrameIndex(() => {
-                            cb(cbObject);
+                            if (
+                                o.deltaFps < this.fpsThreshold ||
+                                fps > this.maxFps
+                            )
+                                cb(cbObject);
                         }, frame);
                     });
                 }
@@ -202,20 +231,6 @@ export class handleSpring {
         };
 
         draw(timestamp, fps);
-    }
-
-    /**
-     * compareKeys - Compare fromObj, toObj in goFromTo methods
-     * Check if has the same keys
-     *
-     * @param  {Object} a fromObj Object
-     * @param  {Object} b toObj Object
-     * @return {bollean} has thew same keys
-     */
-    compareKeys(a, b) {
-        var aKeys = Object.keys(a).sort();
-        var bKeys = Object.keys(b).sort();
-        return JSON.stringify(aKeys) === JSON.stringify(bKeys);
     }
 
     startRaf(res, reject) {
@@ -488,8 +503,15 @@ export class handleSpring {
         if (this.pauseStatus) return;
 
         // Check if fromObj has the same keys of toObj
-        const dataIsValid = this.compareKeys(fromObj, toObj);
-        if (!dataIsValid) return this.promise;
+        const dataIsValid = compareKeys(fromObj, toObj);
+        if (!dataIsValid) {
+            console.warn(
+                `handleSpring: ${JSON.stringify(
+                    fromObj
+                )} and to ${JSON.stringify(toObj)} is not equal`
+            );
+            return this.promise;
+        }
 
         const data = Object.keys(fromObj).map((item) => {
             return {

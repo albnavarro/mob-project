@@ -1,4 +1,9 @@
-import { getValueObj, mergeArray, lerp } from '../utils/animationUtils.js';
+import {
+    getValueObj,
+    mergeArray,
+    lerp,
+    compareKeys,
+} from '../utils/animationUtils.js';
 
 import {
     handleFrame,
@@ -202,20 +207,6 @@ export class handleLerp {
         };
 
         draw(timestamp, fps);
-    }
-
-    /**
-     * compareKeys - Compare fromObj, toObj in goFromTo methods
-     * Check if has the same keys
-     *
-     * @param  {Object} a fromObj Object
-     * @param  {Object} b toObj Object
-     * @return {bollean} has thew same keys
-     */
-    compareKeys(a, b) {
-        var aKeys = Object.keys(a).sort();
-        var bKeys = Object.keys(b).sort();
-        return JSON.stringify(aKeys) === JSON.stringify(bKeys);
     }
 
     startRaf(res, reject) {
@@ -482,8 +473,15 @@ export class handleLerp {
         if (this.pauseStatus) return;
 
         // Check if fromObj has the same keys of toObj
-        const dataIsValid = this.compareKeys(fromObj, toObj);
-        if (!dataIsValid) return this.promise;
+        const dataIsValid = compareKeys(fromObj, toObj);
+        if (!dataIsValid) {
+            console.warn(
+                `handleLerp: ${JSON.stringify(fromObj)} and to ${JSON.stringify(
+                    toObj
+                )} is not equal`
+            );
+            return this.promise;
+        }
 
         const data = Object.keys(fromObj).map((item) => {
             return {

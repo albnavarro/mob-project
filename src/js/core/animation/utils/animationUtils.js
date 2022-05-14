@@ -41,3 +41,17 @@ export const clamp = (num, min, max) => {
 export const lerp = (start, end, amt) => {
     return (1 - amt) * start + amt * end;
 };
+
+/**
+ * this.compareKeys - Compare two Object
+ * Check if has the same keys
+ *
+ * @param  {Object} a fromObj Object
+ * @param  {Object} b toObj Object
+ * @return {bollean} has thew same keys
+ */
+export const compareKeys = (a, b) => {
+    var aKeys = Object.keys(a).sort();
+    var bKeys = Object.keys(b).sort();
+    return JSON.stringify(aKeys) === JSON.stringify(bKeys);
+};

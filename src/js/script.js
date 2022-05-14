@@ -59,6 +59,7 @@ import { circleAnimationTimeline } from './test/circleAnimationTimeline.js';
 import { infiniteAnimation } from './test/infiniteAnimation.js';
 import { syncTimelineTest } from './test/syncTimelineTest.js';
 import { infiniteAnimationSync } from './test/infiniteAnimationSync.js';
+import { scrollStagger } from './test/scrollStagger.js';
 
 handleLoad(() => {
     const body = document.querySelector('body');
@@ -123,6 +124,10 @@ handleLoad(() => {
 
     if (body.classList.contains('page-noGsapHorizontal2')) {
         noGsap();
+    }
+
+    if (body.classList.contains('page-scrollStagger')) {
+        scrollStagger();
     }
 
     pageScroll.init();

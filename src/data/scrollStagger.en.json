@@ -1,0 +1,8 @@
+{
+    "template": "scrollStagger",
+    "slug": "scrollStagger",
+    "pageTitle": "scrollStagger",
+    "description": "custom description",
+    "additionalData": ["nav.json"],
+    "registerComponent": ["to-top/pug/toTop.pug"]
+}

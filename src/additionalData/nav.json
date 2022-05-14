@@ -73,6 +73,10 @@
                 {
                     "label": "",
                     "univoqueId": "syncShape"
+                },
+                {
+                    "label": "",
+                    "univoqueId": "scrollStagger"
                 }
             ]
         },

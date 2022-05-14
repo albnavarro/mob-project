@@ -1,0 +1,17 @@
+extends default/_wrapper.pug
+
+block content
+    header
+        .container
+            include ../includes/langSelector.pug
+        .container.menu-container.menu-container--top
+            include ../includes/navigation.pug
+    main
+      .container
+        .scrollStagger
+            .scrollStagger__container
+                span.scrollStagger__item.js-item
+                span.scrollStagger__item.js-item
+                span.scrollStagger__item.js-item
+                span.scrollStagger__item.js-item
+                span.scrollStagger__item.js-item

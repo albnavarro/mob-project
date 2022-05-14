@@ -1,5 +1,18 @@
-import { tweenConfig } from '.../../../js/core/animation/tween/tweenConfig.js';
-import { getValueObj } from '.../../../js/core/animation/utils/animationUtils.js';
+import { tweenConfig } from '../../../js/core/animation/tween/tweenConfig.js';
+import {
+    getValueObj,
+    compareKeys,
+} from '../../../js/core/animation/utils/animationUtils.js';
+import { mergeDeep } from '../../../js/core/utils/mergeDeep.js';
+import {
+    getStaggerIndex,
+    getRandomChoice,
+} from '.../../../js/core/animation/utils/getStaggerIndex.js';
+import {
+    handleFrame,
+    handleNextTick,
+    handleFrameIndex,
+} from '../../../js/core/events/rafutils/rafUtils.js';
 
 export class ParallaxTween {
     constructor(ease = 'easeLinear') {
@@ -10,9 +23,21 @@ export class ParallaxTween {
         this.callback = [];
         this.duration = 1000;
         this.type = 'tween';
+        this.firstRun = true;
+        this.newPros = {};
+        this.defaultProps = {
+            stagger: {
+                each: 0,
+                from: 'start',
+            },
+        };
+        this.stagger = { each: 0, from: 'start' };
     }
 
     draw({ partial, isLastDraw }) {
+        // At first run define props like stagger
+        if (this.firstRun) this.mergeProps();
+
         this.values.forEach((item, i) => {
             item.currentValue = this.ease(
                 partial,
@@ -26,29 +51,29 @@ export class ParallaxTween {
         const cbObject = getValueObj(this.values, 'currentValue');
 
         // Fire callback
-        this.callback.forEach(({ cb }) => {
-            cb(cbObject);
-        });
-
-        if (isLastDraw) {
-            this.callbackOnStop.forEach(({ cb }) => {
-                cb(cbObject);
+        if (this.stagger.each === 0 || this.firstRun) {
+            // No stagger, run immediatly
+            this.callback.forEach(({ cb }) => cb(cbObject));
+        } else {
+            // Stagger
+            this.callback.forEach(({ cb, index, frame }, i) => {
+                handleFrameIndex(() => cb(cbObject), frame);
             });
         }
-    }
 
-    /**
-     * this.compareKeys - Compare fromObj, toObj in goFromTo methods
-     * Check if has the same keys
-     *
-     * @param  {Object} a fromObj Object
-     * @param  {Object} b toObj Object
-     * @return {bollean} has thew same keys
-     */
-    compareKeys(a, b) {
-        var aKeys = Object.keys(a).sort();
-        var bKeys = Object.keys(b).sort();
-        return JSON.stringify(aKeys) === JSON.stringify(bKeys);
+        if (isLastDraw) {
+            if (this.stagger.each === 0 || this.firstRun) {
+                // No stagger, run immediatly
+                this.callbackOnStop.forEach(({ cb }) => cb(cbObject));
+            } else {
+                // Stagger
+                this.callbackOnStop.forEach(({ cb, index, frame }, i) => {
+                    handleFrameIndex(() => cb(cbObject), frame);
+                });
+            }
+        }
+
+        this.firstRun = false;
     }
 
     /**
@@ -70,9 +95,10 @@ export class ParallaxTween {
                 toValProcessed: value,
                 fromValue: value,
                 currentValue: value,
-                update: false,
             };
         });
+
+        return this;
     }
 
     /**
@@ -90,9 +116,7 @@ export class ParallaxTween {
             });
 
             // If exist merge
-            return itemToMerge
-                ? { ...item, ...itemToMerge, ...{ update: true } }
-                : { ...item, ...{ update: false } };
+            return itemToMerge ? { ...item, ...itemToMerge } : { ...item };
         });
     }
 
@@ -104,10 +128,44 @@ export class ParallaxTween {
      */
     setToValProcessed() {
         this.values.forEach((item, i) => {
-            if (item.update) {
-                item.toValProcessed = item.toValue - item.fromValue;
-            }
+            item.toValProcessed = item.toValue - item.fromValue;
         });
+    }
+
+    /**
+     * mergeProps - Mege special props with default props
+     *
+     * @param  {Object} props { reverse: <>, config: <> , immediate <> }
+     * @return {Object} props merged
+     *
+     */
+    mergeProps() {
+        const newProps = mergeDeep(this.defaultProps, this.newPros);
+
+        const { stagger } = newProps;
+        this.stagger.each = stagger.each;
+        this.stagger.from = stagger.from;
+
+        if (this.stagger.each > 0) {
+            this.callback.forEach((item, i) => {
+                const { index, frame } = getStaggerIndex(
+                    i,
+                    this.callback.length,
+                    this.stagger,
+                    getRandomChoice(this.callback, this.stagger.each, i)
+                );
+
+                item.index = index;
+                item.frame = frame;
+
+                if (this.callbackOnStop.length > 0) {
+                    this.callbackOnStop[i].index = index;
+                    this.callbackOnStop[i].frame = frame;
+                }
+            });
+        }
+
+        return newProps;
     }
 
     /**
@@ -118,7 +176,7 @@ export class ParallaxTween {
      * @example
      * myTween.goTo({ val: 100 });
      */
-    goTo(obj) {
+    goTo(obj, props = {}) {
         const newDataArray = Object.keys(obj).map((item) => {
             return {
                 prop: item,
@@ -126,8 +184,12 @@ export class ParallaxTween {
             };
         });
 
+        // Store pros like stagger
+        // Aplly it in subscribe
+        this.newPros = { ...props };
         this.mergeData(newDataArray);
         this.setToValProcessed();
+        return this;
     }
 
     /**
@@ -138,7 +200,7 @@ export class ParallaxTween {
      * @example
      * myTween.goFrom({ val: 100 });
      */
-    goFrom(obj) {
+    goFrom(obj, props = {}) {
         const newDataArray = Object.keys(obj).map((item) => {
             return {
                 prop: item,
@@ -146,8 +208,13 @@ export class ParallaxTween {
             };
         });
 
+        // Store pros like stagger
+        // Aplly it in subscribe
+        this.newPros = { ...props };
+        //
         this.mergeData(newDataArray);
         this.setToValProcessed();
+        return this;
     }
 
     /**
@@ -159,12 +226,17 @@ export class ParallaxTween {
      * @example
      * myTween.goFromTo({ val: 0 },{ val: 100 })
      */
-    goFromTo(fromObj, toObj) {
-        if (this.pauseStatus || this.comeFromResume) this.stop();
-
+    goFromTo(fromObj, toObj, props = {}) {
         // Check if fromObj has the same keys of toObj
-        const dataIsValid = this.compareKeys(fromObj, toObj);
-        if (!dataIsValid) return;
+        const dataIsValid = compareKeys(fromObj, toObj);
+        if (!dataIsValid) {
+            console.warn(
+                `parallaxTween: ${JSON.stringify(
+                    fromObj
+                )} and to ${JSON.stringify(toObj)} is not equal`
+            );
+            return;
+        }
 
         const newDataArray = Object.keys(fromObj).map((item) => {
             return {
@@ -174,8 +246,13 @@ export class ParallaxTween {
             };
         });
 
+        // Store pros like stagger
+        // Aplly it in subscribe
+        this.newPros = { ...props };
+        //
         this.mergeData(newDataArray);
         this.setToValProcessed();
+        return this;
     }
 
     /**

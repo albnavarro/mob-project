@@ -1,5 +1,9 @@
 import { tweenConfig } from './tweenConfig.js';
-import { getValueObj, mergeArrayTween } from '../utils/animationUtils.js';
+import {
+    getValueObj,
+    mergeArrayTween,
+    compareKeys,
+} from '../utils/animationUtils.js';
 import {
     handleFrame,
     handleNextFrame,
@@ -179,20 +183,6 @@ export class handleTween {
         };
 
         draw(timestamp, fps);
-    }
-
-    /**
-     * this.compareKeys - Compare fromObj, toObj in goFromTo methods
-     * Check if has the same keys
-     *
-     * @param  {Object} a fromObj Object
-     * @param  {Object} b toObj Object
-     * @return {bollean} has thew same keys
-     */
-    compareKeys(a, b) {
-        var aKeys = Object.keys(a).sort();
-        var bKeys = Object.keys(b).sort();
-        return JSON.stringify(aKeys) === JSON.stringify(bKeys);
     }
 
     startRaf(res, reject) {
@@ -486,8 +476,15 @@ export class handleTween {
         if (this.pauseStatus || this.comeFromResume) this.stop();
 
         // Check if fromObj has the same keys of toObj
-        const dataIsValid = this.compareKeys(fromObj, toObj);
-        if (!dataIsValid) return this.promise;
+        const dataIsValid = compareKeys(fromObj, toObj);
+        if (!dataIsValid) {
+            console.warn(
+                `handleTween: ${JSON.stringify(
+                    fromObj
+                )} and to ${JSON.stringify(toObj)} is not equal`
+            );
+            return this.promise;
+        }
 
         const data = Object.keys(fromObj).map((item) => {
             return {
