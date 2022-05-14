@@ -51,7 +51,7 @@ export const lerp = (start, end, amt) => {
  * @return {bollean} has thew same keys
  */
 export const compareKeys = (a, b) => {
-    var aKeys = Object.keys(a).sort();
-    var bKeys = Object.keys(b).sort();
+    const aKeys = Object.keys(a).sort();
+    const bKeys = Object.keys(b).sort();
     return JSON.stringify(aKeys) === JSON.stringify(bKeys);
 };
