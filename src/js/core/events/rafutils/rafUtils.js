@@ -1,6 +1,7 @@
 import { SimpleStore } from '../../store/simpleStore.js';
 import { getTime, defaultTimestep } from '../../utils/time.js';
 import { clamp } from '../../animation/utils/animationUtils.js';
+import { handleSetUp } from '../../setup.js';
 
 /**
  *
@@ -96,7 +97,7 @@ export const handleFrame = (() => {
 
     // FPS
     const arrAvg = (arr) => arr.reduce((a, b) => a + b, 0) / arr.length;
-    const fpsLoopCycle = 30;
+    const fpsLoopCycle = handleSetUp.get('fpsLoopCycle');
     // Initial fps average
     let averageFps = 60;
     // Clamp fps

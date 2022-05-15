@@ -13,6 +13,7 @@ import {
 } from '../../events/rafutils/rafUtils.js';
 import { mergeDeep } from '../../utils/mergeDeep.js';
 import { getStaggerIndex, getRandomChoice } from '../utils/getStaggerIndex.js';
+import { handleSetUp } from '../../setup.js';
 
 const LERP_DEFAULT_PRECISION = 0.01;
 
@@ -37,7 +38,7 @@ export class handleLerp {
         // Store max fps so is the fops of monitor using
         this.maxFps = 60;
         // If fps is under this.maxFps by this.fpsThreshold is algging, so skip to not overload
-        this.fpsThreshold = 15;
+        this.fpsThreshold = handleSetUp.get('fpsThreshold');
 
         this.defaultProps = {
             reverse: false,

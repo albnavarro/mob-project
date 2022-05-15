@@ -12,6 +12,7 @@ import {
 } from '../../events/rafutils/rafUtils.js';
 import { mergeDeep } from '../../utils/mergeDeep.js';
 import { getStaggerIndex, getRandomChoice } from '../utils/getStaggerIndex.js';
+import { handleSetUp } from '../../setup.js';
 
 export class handleTween {
     constructor(ease = 'easeOutBack') {
@@ -34,6 +35,12 @@ export class handleTween {
         this.timeElapsed = 0;
         this.pauseTime = 0;
         this.firstRun = true;
+
+        // Store max fps so is the fops of monitor using
+        this.maxFps = 60;
+        // If fps is under this.maxFps by this.fpsThreshold is algging, so skip to not overload
+        this.fpsThreshold = handleSetUp.get('fpsThreshold');
+
         this.defaultProps = {
             duration: 1000,
             ease,
@@ -61,8 +68,19 @@ export class handleTween {
     onReuqestAnim(timestamp, fps, res) {
         this.startTime = timestamp;
 
+        const o = {};
+        o.inMotion = false;
+
+        // Reset maxFos when animartion start
+        this.maxFps = 0;
+
         const draw = (timestamp, fps) => {
             this.req = true;
+
+            o.isRealFps = handleFrame.isRealFps();
+
+            // Get max fps upper limit
+            if (fps > this.maxFps && o.isRealFps) this.maxFps = fps;
 
             if (this.pauseStatus) {
                 this.pauseTime = timestamp - this.startTime - this.timeElapsed;
@@ -91,17 +109,28 @@ export class handleTween {
             // Prepare an obj to pass to the callback
             const cbObject = getValueObj(this.values, 'currentValue');
 
+            // Check if we lost some fps so we skip update to not overload browser rendering
+            // Not first time, only inside motion and once fps is real ( stable )
+            o.deltaFps =
+                !o.inMotion || !o.isRealFps ? 0 : Math.abs(this.maxFps - fps);
+            o.inMotion = true;
+
             handleFrame.add(() => {
                 if (this.stagger.each === 0) {
                     // No stagger, run immediatly
                     this.callback.forEach(({ cb }) => {
-                        cb(cbObject);
+                        if (o.deltaFps < this.fpsThreshold || fps > this.maxFps)
+                            cb(cbObject);
                     });
                 } else {
                     // Stagger
                     this.callback.forEach(({ cb, index, frame }, i) => {
                         handleFrameIndex(() => {
-                            cb(cbObject);
+                            if (
+                                o.deltaFps < this.fpsThreshold ||
+                                fps > this.maxFps
+                            )
+                                cb(cbObject);
                         }, frame);
                     });
                 }

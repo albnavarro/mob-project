@@ -95,10 +95,10 @@ export class ParallaxPin {
     }
 
     init() {
-        // Get baisc element item ad if exist scrolltrigger
+        // Get baisc element item ad if exist trigger
         this.item = this.parallaxInstance.item;
         this.trigger =
-            this.parallaxInstance.scrollTrigger || this.parallaxInstance.item;
+            this.parallaxInstance.trigger || this.parallaxInstance.item;
         this.scroller = this.parallaxInstance.scroller;
         this.screen = this.parallaxInstance.screen;
         this.prevscrollY = window.pageYOffset;

@@ -192,7 +192,7 @@ class ParallaxClass {
 
         // String: DOM element
         // Performs calculations based on another element of the DOM at your choice
-        data.scrollTrigger = item.getAttribute('data-scrollTrigger');
+        data.trigger = item.getAttribute('data-trigger');
 
         // String
         data.breackpoint = item.getAttribute('data-breackpoint');

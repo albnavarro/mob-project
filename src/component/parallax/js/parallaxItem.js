@@ -102,11 +102,11 @@ export class ParallaxItemClass {
         this.dynamicRange = data.dynamicRange || null;
         this.perspective = data.perspective || false;
         this.applyTo = data.applyTo || false;
-        this.scrollTrigger = (() => {
-            if (data.scrollTrigger) {
-                return typeof data.scrollTrigger === 'string'
-                    ? document.querySelector(data.scrollTrigger)
-                    : data.scrollTrigger;
+        this.trigger = (() => {
+            if (data.trigger) {
+                return typeof data.trigger === 'string'
+                    ? document.querySelector(data.trigger)
+                    : data.trigger;
             } else {
                 return null;
             }
@@ -441,16 +441,16 @@ export class ParallaxItemClass {
     }
 
     calcOffset() {
-        const el = this.scrollTrigger === null ? this.item : this.scrollTrigger;
+        const el = this.trigger === null ? this.item : this.trigger;
 
         let x = 0;
         let y = 0;
         let z = 0;
 
-        if (this.scrollTrigger) {
-            x = getTranslateValues(this.scrollTrigger).x;
-            y = getTranslateValues(this.scrollTrigger).y;
-            z = getTranslateValues(this.scrollTrigger).z;
+        if (this.trigger) {
+            x = getTranslateValues(this.trigger).x;
+            y = getTranslateValues(this.trigger).y;
+            z = getTranslateValues(this.trigger).z;
         }
 
         // Reset transofrm for get right offset value if transform is applyed itself
@@ -474,9 +474,9 @@ export class ParallaxItemClass {
                 : (this.offset -= parseInt(position(this.screen).left));
         }
 
-        if (this.scrollTrigger && (x !== 0 || y !== 0 || z !== 0)) {
+        if (this.trigger && (x !== 0 || y !== 0 || z !== 0)) {
             console.log('apply');
-            this.scrollTrigger.style.tranform = `translate3D(${x}px, ${y}px, ${z}px)`;
+            this.trigger.style.tranform = `translate3D(${x}px, ${y}px, ${z}px)`;
         }
     }
 
@@ -490,7 +490,7 @@ export class ParallaxItemClass {
     }
 
     calcHeight() {
-        const el = this.scrollTrigger === null ? this.item : this.scrollTrigger;
+        const el = this.trigger === null ? this.item : this.trigger;
         this.height =
             this.direction === parallaxConstant.DIRECTION_VERTICAL
                 ? parseInt(el.offsetHeight)
@@ -498,7 +498,7 @@ export class ParallaxItemClass {
     }
 
     calcWidth() {
-        const el = this.scrollTrigger === null ? this.item : this.scrollTrigger;
+        const el = this.trigger === null ? this.item : this.trigger;
         this.width =
             this.direction === parallaxConstant.DIRECTION_VERTICAL
                 ? parseInt(el.offsetWidth)

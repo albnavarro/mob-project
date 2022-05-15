@@ -14,6 +14,7 @@
 import { vh } from './utility/vh.js';
 import { findElement } from './utility/findElement.js';
 import { handleLoad } from './core/events/loadutils/handleLoad.js';
+import { handleSetUp } from './core/setup.js';
 
 // NEW VANILLA COMPONENT MODULE
 import { totop } from '../component/to-top/js/toTop.js';
@@ -62,6 +63,11 @@ import { infiniteAnimationSync } from './test/infiniteAnimationSync.js';
 import { scrollStagger } from './test/scrollStagger.js';
 
 handleLoad(() => {
+    handleSetUp.set({
+        fpsLoopCycle: 20,
+        fpsThreshold: 5,
+    });
+
     const body = document.querySelector('body');
 
     if (body.classList.contains('page-index')) {
