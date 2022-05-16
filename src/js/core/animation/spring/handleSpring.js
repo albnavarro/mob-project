@@ -16,7 +16,11 @@ import { handleSetUp } from '../../setup.js';
 
 export class handleSpring {
     constructor(config = 'default') {
-        this.uniqueId = '_' + Math.random().toString(36).substr(2, 9);
+        this.uniqueId =
+            '_' +
+            Math.random()
+                .toString(36)
+                .substr(2, 9);
         this.config = springConfig[config];
         this.req = false;
         this.currentResolve = null;
@@ -148,7 +152,7 @@ export class handleSpring {
                                 fps > this.maxFps
                             )
                                 cb(cbObject);
-                        }, frame);
+                        }, Math.round((frame * fps) / 60));
                     });
                 }
             });
@@ -217,14 +221,14 @@ export class handleSpring {
                                     onComplete();
                                 }
                             }
-                        }, frame);
+                        }, Math.round((frame * fps) / 60));
                     });
 
                     this.callbackOnComplete.forEach(
                         ({ cb, index, frame }, i) => {
                             handleFrameIndex(() => {
                                 cb(cbObjectSettled);
-                            }, frame);
+                            }, Math.round((frame * fps) / 60));
                         }
                     );
                 }

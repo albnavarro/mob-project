@@ -2,7 +2,7 @@ import { compareKeys } from './animation/utils/animationUtils.js';
 
 export const handleSetUp = (() => {
     let data = {
-        fpsLoopCycle: 25,
+        fpsLoopCycle: 30,
         fpsThreshold: 10,
     };
 

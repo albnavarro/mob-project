@@ -137,7 +137,10 @@ export class HandleSequencer {
         } else {
             // Stagger
             this.callback.forEach(({ cb, index, frame }, i) => {
-                handleFrameIndex(() => cb(cbObject), frame);
+                handleFrameIndex(
+                    () => cb(cbObject),
+                    Math.round((frame * handleFrame.getFps()) / 60)
+                );
             });
         }
 
@@ -155,7 +158,10 @@ export class HandleSequencer {
             } else {
                 // Stagger
                 this.callbackOnStop.forEach(({ cb, index, frame }, i) => {
-                    handleFrameIndex(() => cb(cbObject), frame);
+                    handleFrameIndex(
+                        () => cb(cbObject),
+                        Math.round((frame * handleFrame.getFps()) / 60)
+                    );
                 });
             }
         }

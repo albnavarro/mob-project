@@ -176,6 +176,8 @@ export const handleFrame = (() => {
 
     const isRealFps = () => fpsIsReal;
 
+    const getFps = () => averageFps;
+
     /**
      *  Add callback
      */
@@ -196,5 +198,6 @@ export const handleFrame = (() => {
         add,
         addMultiple,
         isRealFps,
+        getFps,
     };
 })();

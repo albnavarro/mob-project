@@ -19,7 +19,11 @@ const LERP_DEFAULT_PRECISION = 0.01;
 
 export class handleLerp {
     constructor(velocity = 0.06) {
-        this.uniqueId = '_' + Math.random().toString(36).substr(2, 9);
+        this.uniqueId =
+            '_' +
+            Math.random()
+                .toString(36)
+                .substr(2, 9);
         this.config = {};
         this.velocity = velocity;
         this.precision = LERP_DEFAULT_PRECISION;
@@ -127,7 +131,7 @@ export class handleLerp {
                                 fps > this.maxFps
                             )
                                 cb(cbObject);
-                        }, frame);
+                        }, Math.round((frame * fps) / 60));
                     });
                 }
             });
@@ -193,14 +197,14 @@ export class handleLerp {
                                     onComplete();
                                 }
                             }
-                        }, frame);
+                        }, Math.round((frame * fps) / 60));
                     });
 
                     this.callbackOnComplete.forEach(
                         ({ cb, index, frame }, i) => {
                             handleFrameIndex(() => {
                                 cb(cbObjectSettled);
-                            }, frame);
+                            }, Math.round((frame * fps) / 60));
                         }
                     );
                 }

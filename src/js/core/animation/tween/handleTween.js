@@ -16,7 +16,11 @@ import { handleSetUp } from '../../setup.js';
 
 export class handleTween {
     constructor(ease = 'easeOutBack') {
-        this.uniqueId = '_' + Math.random().toString(36).substr(2, 9);
+        this.uniqueId =
+            '_' +
+            Math.random()
+                .toString(36)
+                .substr(2, 9);
         this.ease = tweenConfig[ease];
         this.req = false;
         this.currentResolve = null;
@@ -131,7 +135,7 @@ export class handleTween {
                                 fps > this.maxFps
                             )
                                 cb(cbObject);
-                        }, frame);
+                        }, Math.round((frame * fps) / 60));
                     });
                 }
             });
@@ -197,14 +201,14 @@ export class handleTween {
                                     onComplete();
                                 }
                             }
-                        }, frame);
+                        }, Math.round((frame * fps) / 60));
                     });
 
                     this.callbackOnComplete.forEach(
                         ({ cb, index, frame }, i) => {
                             handleFrameIndex(() => {
                                 cb(cbObject);
-                            }, frame);
+                            }, Math.round((frame * fps) / 60));
                         }
                     );
                 }

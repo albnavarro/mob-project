@@ -64,7 +64,7 @@ import { scrollStagger } from './test/scrollStagger.js';
 
 handleLoad(() => {
     handleSetUp.set({
-        fpsLoopCycle: 20,
+        fpsLoopCycle: 30,
         fpsThreshold: 5,
     });
 
