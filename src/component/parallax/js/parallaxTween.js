@@ -14,9 +14,12 @@ import {
     handleFrameIndex,
 } from '../../../js/core/events/rafutils/rafUtils.js';
 
+// Stagger and eade is defined at tween creation
 export class ParallaxTween {
-    constructor(ease = 'easeLinear') {
-        this.ease = tweenConfig[ease];
+    constructor(data = {}) {
+        this.ease = data?.ease
+            ? tweenConfig[data.ease]
+            : tweenConfig['easeLinear'];
         this.values = [];
         this.id = 0;
         this.callbackOnStop = [];
@@ -24,20 +27,36 @@ export class ParallaxTween {
         this.duration = 1000;
         this.type = 'tween';
         this.firstRun = true;
-        this.newPros = {};
-        this.defaultProps = {
-            stagger: {
-                each: 0,
-                from: 'start',
-            },
+        // Stagger
+
+        this.stagger = {
+            each: data?.stagger?.each ? data.stagger.each : 0,
+            from: data?.stagger?.from ? data.stagger.from : 'start',
         };
-        this.stagger = { each: 0, from: 'start' };
+    }
+
+    setStagger() {
+        if (this.stagger.each > 0) {
+            this.callback.forEach((item, i) => {
+                const { index, frame } = getStaggerIndex(
+                    i,
+                    this.callback.length,
+                    this.stagger,
+                    getRandomChoice(this.callback, this.stagger.each, i)
+                );
+
+                item.index = index;
+                item.frame = frame;
+
+                if (this.callbackOnStop[i]) {
+                    this.callbackOnStop[i].index = index;
+                    this.callbackOnStop[i].frame = frame;
+                }
+            });
+        }
     }
 
     draw({ partial, isLastDraw }) {
-        // At first run define props like stagger
-        if (this.firstRun) this.mergeProps();
-
         this.values.forEach((item, i) => {
             item.currentValue = this.ease(
                 partial,
@@ -139,42 +158,6 @@ export class ParallaxTween {
     }
 
     /**
-     * mergeProps - Mege special props with default props
-     *
-     * @param  {Object} props { reverse: <>, config: <> , immediate <> }
-     * @return {Object} props merged
-     *
-     */
-    mergeProps() {
-        const newProps = mergeDeep(this.defaultProps, this.newPros);
-
-        const { stagger } = newProps;
-        this.stagger.each = stagger.each;
-        this.stagger.from = stagger.from;
-
-        if (this.stagger.each > 0) {
-            this.callback.forEach((item, i) => {
-                const { index, frame } = getStaggerIndex(
-                    i,
-                    this.callback.length,
-                    this.stagger,
-                    getRandomChoice(this.callback, this.stagger.each, i)
-                );
-
-                item.index = index;
-                item.frame = frame;
-
-                if (this.callbackOnStop.length > 0) {
-                    this.callbackOnStop[i].index = index;
-                    this.callbackOnStop[i].frame = frame;
-                }
-            });
-        }
-
-        return newProps;
-    }
-
-    /**
      * goTo - go from fromValue stored to new toValue
      *
      * @param  {number} to new toValue
@@ -190,9 +173,6 @@ export class ParallaxTween {
             };
         });
 
-        // Store pros like stagger
-        // Aplly it in subscribe
-        this.newPros = { ...props };
         this.mergeData(newDataArray);
         this.setToValProcessed();
         return this;
@@ -214,10 +194,6 @@ export class ParallaxTween {
             };
         });
 
-        // Store pros like stagger
-        // Aplly it in subscribe
-        this.newPros = { ...props };
-        //
         this.mergeData(newDataArray);
         this.setToValProcessed();
         return this;
@@ -252,10 +228,6 @@ export class ParallaxTween {
             };
         });
 
-        // Store pros like stagger
-        // Aplly it in subscribe
-        this.newPros = { ...props };
-        //
         this.mergeData(newDataArray);
         this.setToValProcessed();
         return this;
@@ -272,6 +244,7 @@ export class ParallaxTween {
         this.callback.push({ cb, id: this.id });
         const cbId = this.id;
         this.id++;
+        this.setStagger();
 
         return () => {
             this.callback = this.callback.filter((item) => item.id !== cbId);
@@ -282,6 +255,7 @@ export class ParallaxTween {
         this.callbackOnStop.push({ cb, id: this.id });
         const cbId = this.id;
         this.id++;
+        this.setStagger();
 
         return () => {
             this.callbackOnStop = this.callbackOnStop.filter(

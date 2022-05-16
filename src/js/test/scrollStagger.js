@@ -6,12 +6,12 @@ export const scrollStagger = () => {
     const items = document.querySelectorAll('.js-item');
     const trigger = document.querySelector('.scrollStagger');
 
-    const myParallaxTween = new ParallaxTween()
+    const myParallaxTween = new ParallaxTween({
+        stagger: { each: 3, from: 'end' },
+        ease: 'easeLinear',
+    })
         .setData({ rotate: 0, scale: 1 })
-        .goTo(
-            { rotate: 360, scale: 0.7 },
-            { stagger: { each: 3, from: 'end' } }
-        );
+        .goTo({ rotate: 360, scale: 0.7 });
 
     items.forEach((item, i) => {
         myParallaxTween.subscribe(({ rotate, scale }) => {
