@@ -260,7 +260,11 @@ export class ParallaxItemClass {
             if (val === this.lastValue) return;
 
             if (this.propierties === parallaxConstant.PROP_TWEEN) {
-                this.tween.draw({ partial: val, isLastDraw: false });
+                this.tween.draw({
+                    partial: val,
+                    isLastDraw: false,
+                    useFrame: false,
+                });
                 this.lastValue = val;
                 this.firstTime = false;
             } else {
@@ -276,7 +280,11 @@ export class ParallaxItemClass {
             this.force3D = false;
 
             if (this.propierties === parallaxConstant.PROP_TWEEN) {
-                this.tween.draw({ partial: val, isLastDraw: true });
+                this.tween.draw({
+                    partial: val,
+                    isLastDraw: true,
+                    useFrame: false,
+                });
             } else {
                 this.updateStyle(val);
             }
@@ -713,7 +721,11 @@ export class ParallaxItemClass {
         if (this.endValue === this.lastValue) return;
 
         if (this.propierties === parallaxConstant.PROP_TWEEN) {
-            this.tween.draw({ partial: this.endValue, isLastDraw: true });
+            this.tween.draw({
+                partial: this.endValue,
+                isLastDraw: true,
+                useFrame: false,
+            });
             this.lastValue = this.endValue;
             this.firstTime = false;
         } else {

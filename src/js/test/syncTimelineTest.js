@@ -14,7 +14,7 @@ export function syncTimelineTest() {
     );
 
     // SINGLE
-    const seq1 = new HandleSequencer();
+    const seq1 = new HandleSequencer({ ease: 'easeInOutCubic' });
     seq1.setData({ x: 0, y: 0, rotate: 0, scale: 1 })
         .goTo({ x: 800 }, { start: 0, end: 2500, ease: 'easeInOutBack' })
         .goTo({ y: 450 }, { start: 2500, end: 5000, ease: 'easeInOutBack' })
@@ -33,7 +33,9 @@ export function syncTimelineTest() {
     });
 
     // STAGGER
-    const seqStagger = new HandleSequencer({ stagger: { each: 10 } });
+    const seqStagger = new HandleSequencer({
+        stagger: { each: 10 },
+    });
     seqStagger
         .setData({ x: 0, scale: 1 })
         .goTo({ x: 800 }, { start: 3000, end: 5000, ease: 'easeInOutBack' })

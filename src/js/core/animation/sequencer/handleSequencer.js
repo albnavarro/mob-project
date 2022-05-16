@@ -21,7 +21,11 @@ export class HandleSequencer {
         this.callbackOnStop = [];
         this.duration = 10;
         this.type = 'sequencer';
-        this.defaultProp = { start: 0, end: this.duration, ease: 'easeLinear' };
+        this.defaultProp = {
+            start: 0,
+            end: this.duration,
+            ease: data?.ease ? data.ease : 'easeLinear',
+        };
 
         // Stagger
         this.stagger = {
