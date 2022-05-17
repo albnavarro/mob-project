@@ -13,6 +13,7 @@ export class horizontalCustomClass {
     constructor(data = {}) {
         this.breackpoint = data.breackpoint || 'desktop';
         this.queryType = data.queryType || 'min';
+        this.forceTranspond = data.forceTranspond || false;
         this.mainContainer = document.querySelector(data.rootEl);
         this.triggerContainer = this.mainContainer.querySelector(
             '.scroller__trigger'
@@ -25,7 +26,7 @@ export class horizontalCustomClass {
         //
         this.onTickCallBack = [];
         this.onRefreshCallBack = [];
-
+        //
         this.moduleisActive = false;
         this.horizontalWidth = 0;
         this.scroller = [];
@@ -287,8 +288,8 @@ export class horizontalCustomClass {
                 });
             },
             ease: true,
+            forceTranspond: this.forceTranspond, //Bring element to body to have better performance
             easeType: 'lerp',
-            jumpOnLag: true,
         });
         scroller.init();
 

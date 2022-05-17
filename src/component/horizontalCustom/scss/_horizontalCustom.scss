@@ -1,7 +1,6 @@
 $mediaQ: desktop;
 
 .scroller {
-    --sectionheight: 100vh;
     position: relative;
 
     &__trigger {
@@ -17,6 +16,8 @@ $mediaQ: desktop;
     }
 
     &__row {
+        --sectionheight: 100vh;
+
         @include mq($from: $mediaQ) {
             display: flex;
             height: var(--sectionheight);

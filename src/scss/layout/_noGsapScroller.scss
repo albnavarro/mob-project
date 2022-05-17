@@ -3,7 +3,6 @@ $mediaQ: desktop;
 .scroller__section {
     @include mq($from: $mediaQ) {
         width: 80vw;
-        height: 100vh;
         border: 1px #000 solid;
         display: flex;
         justify-content: center;

@@ -36,6 +36,7 @@ export const noGsap = () => {
 
     const horizontalCustom = new horizontalCustomClass({
         rootEl: '.test-custom-scroller',
+        forceTranspond: true, // Tryying to massimize performance, move scroll to body on pin
     });
     horizontalCustom.onTick((scrollVal) => {
         parallaxIn.move(scrollVal);

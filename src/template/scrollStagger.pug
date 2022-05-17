@@ -7,11 +7,17 @@ block content
         .container.menu-container.menu-container--top
             include ../includes/navigation.pug
     main
-      .container
-        .scrollStagger
-            .scrollStagger__container
-                span.scrollStagger__item.js-item
-                span.scrollStagger__item.js-item
-                span.scrollStagger__item.js-item
-                span.scrollStagger__item.js-item
-                span.scrollStagger__item.js-item
+      //- Element in fixed near body to have better performance
+      .scrollStagger__element
+        .scrollStagger__item.js-item
+      .scrollStagger__element
+        .scrollStagger__item.js-item
+      .scrollStagger__element
+        .scrollStagger__item.js-item
+      .scrollStagger__element
+        .scrollStagger__item.js-item
+      .scrollStagger__element
+        .scrollStagger__item.js-item
+
+      .scrollStagger
+      
