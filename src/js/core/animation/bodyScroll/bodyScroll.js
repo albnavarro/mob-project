@@ -6,14 +6,14 @@ import { offset, isNode } from '../../utils/vanillaFunction.js';
  *
  * @example:
  *  bodyScroll.to({
- *    value: 3000 // target === number
+ *    target: 3000 // target === number
  *    duration: 1500,
  *    ease: 'easeOutBack',
  *    prevent: false,
  *  }).then((value) => console.log('end'));
  *
  *  bodyScroll.to({
- *    value: document.querySelector('.el') // target === node
+ *    target: document.querySelector('.el') // target === node
  *  }).then((value) => console.log('end'));
  */
 export const bodyScroll = (() => {

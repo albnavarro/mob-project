@@ -23,7 +23,7 @@ class totopClass {
 
     onClick(event) {
         event.preventDefault();
-        bodyScroll.to({ val: 0, duration: 1000 });
+        bodyScroll.to({ target: 0, duration: 1000 });
     }
 
     showArrow(scrollY) {

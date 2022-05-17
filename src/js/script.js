@@ -141,7 +141,7 @@ handleLoad(() => {
     tBlocks.init();
     showElement.init();
     toolTip.init();
-    // totop.init();
+    totop.init();
     vh.init();
     move3D.init();
     mouseParallax.init();
