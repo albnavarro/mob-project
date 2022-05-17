@@ -1,5 +1,6 @@
 import { handleLerp } from '../core/animation/lerp/handleLerp.js';
 import { HandleAsyncTimeline } from '../core/animation/asyncTimeline/handleAsyncTimeline.js';
+import { isIOS } from '../utility/isIOS.js';
 
 export function staggerLerpTest() {
     const btnStart = document.querySelector('.lerp .start');
@@ -32,7 +33,7 @@ export function staggerLerpTest() {
 
     stagger.forEach((item, i) => {
         myStagger.onComplete(({ x }) => {
-            item.style.transform = `translate(${x}px, 0px)`;
+            if (!isIOS()) item.style.transform = `translate(${x}px, 0px)`;
         });
     });
 

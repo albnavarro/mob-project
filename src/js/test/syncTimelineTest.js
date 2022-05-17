@@ -1,5 +1,6 @@
 import { HandleSyncTimeline } from '../core/animation/syncTimeline/handleSyncTimeline.js';
 import { HandleSequencer } from '../core/animation/sequencer/handleSequencer.js';
+import { isIOS } from '../utility/isIOS.js';
 
 export function syncTimelineTest() {
     const target = document.querySelector('.sync-target');
@@ -29,7 +30,9 @@ export function syncTimelineTest() {
     });
 
     seq1.onStop(({ x, y, rotate, scale }) => {
-        target.style.transform = `translate(${x}px, ${y}px) scale(${scale}) rotate(${rotate}deg)`;
+        // If remove translate3D on ipad have a bug and the image still remaing on screen
+        if (!isIOS())
+            target.style.transform = `translate(${x}px, ${y}px) scale(${scale}) rotate(${rotate}deg)`;
     });
 
     // STAGGER

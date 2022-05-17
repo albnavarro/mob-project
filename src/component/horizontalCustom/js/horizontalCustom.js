@@ -38,7 +38,9 @@ export class horizontalCustomClass {
                 this.createShadow().then(() =>
                     this.updateShadow().then(() => {
                         this.initScroller();
-                        handleResize(() => this.onResize());
+                        handleResize(({ horizontalResize }) =>
+                            this.onResize(horizontalResize)
+                        );
                     })
                 )
             )
@@ -338,9 +340,9 @@ export class horizontalCustomClass {
         }
     }
 
-    onResize() {
+    onResize(horizontalResize) {
         if (this.moduleisActive && mq[this.queryType](this.breackpoint)) {
-            this.update();
+            if (horizontalResize) this.update();
         } else if (
             !this.moduleisActive &&
             mq[this.queryType](this.breackpoint)
