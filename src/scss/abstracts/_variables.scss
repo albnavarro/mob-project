@@ -26,7 +26,7 @@ $mq-breakpoints: (
 );
 
 $mq-show-breakpoints: (xsmall, small, medium, tablet, large, large, xlarge);
-@include mq-show-breakpoints;
+// @include mq-show-breakpoints;
 
 $html-font-size: (
     xsmall: 16px,
@@ -49,16 +49,21 @@ $base-url: '/assets/' !default;
 $susy: (
     'columns': susy-repeat(12),
     'gutters': math.div(25, 50),
-    //25px gutter per col di 50px = .5
-        'spread': 'narrow',
+    //25px gutter per col di 50px = 0.5 'spread': 'narrow',
     'container-spread': 'narrow',
     'svg-grid-colors': hsl(180, 50%, 80%),
 );
 
-$wideconf: (
-    'columns': susy-repeat(12),
-    'gutters': math.div(5, 50),
-    'spread': 'wide',
-    'container-spread': 'wide',
-    'svg-grid-colors': hsl(180, 50%, 80%),
+// GRID
+$grid-config: (
+    xsmall: (
+        container: 375,
+        cols: 4,
+        gutter: 24,
+    ),
+    desktop: (
+        container: 1400,
+        cols: 12,
+        gutter: 24,
+    ),
 );

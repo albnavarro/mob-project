@@ -7,7 +7,15 @@ export const noGsap = () => {
         '.test-custom-scroller .scroller__row'
     );
 
-    const parallaxIn = new ParallaxItemClass({
+    // Create first scroll to have css for parallax test
+    const horizontalCustom = new horizontalCustomClass({
+        rootEl: '.test-custom-scroller',
+        forceTranspond: true, // Tryying to massimize performance, move scroll to body on pin
+        addCss: true,
+    });
+
+    // Create child parallax
+    const parallaxTest = new ParallaxItemClass({
         item: title,
         scroller: scroller,
         direction: 'horizontal',
@@ -32,19 +40,20 @@ export const noGsap = () => {
             return -300;
         },
     });
-    parallaxIn.init();
 
-    const horizontalCustom = new horizontalCustomClass({
-        rootEl: '.test-custom-scroller',
-        forceTranspond: true, // Tryying to massimize performance, move scroll to body on pin
-    });
+    // Move parallax child
     horizontalCustom.onTick((scrollVal) => {
-        parallaxIn.move(scrollVal);
+        parallaxTest.move(scrollVal);
     });
+
+    // Init all
     horizontalCustom.init();
+    parallaxTest.init();
 
     const horizontalCustom2 = new horizontalCustomClass({
         rootEl: '.test-custom-scroller2',
+        forceTranspond: true, // Tryying to massimize performance, move scroll to body on pin
+        addCss: true,
     });
     horizontalCustom2.init();
 };

@@ -8,9 +8,10 @@
 /// @param {String} $path - asset path
 /// @return {Url}
 @use "sass:math";
+@use 'sass:map';
 
 @function asset($base, $type, $path) {
-    @return url($base + $type + $path);
+    @return url($base+$type+$path);
 }
 
 /// Returns URL to an image based on its path
@@ -41,9 +42,7 @@
 
     @if $mq == '' {
         $mq: map-get($html-font-size, $default-font-size);
-    }
-
-    @else {
+    } @else {
         $mq: map-get($html-font-size, $mq);
     }
 
@@ -60,24 +59,75 @@
 
     @if $mq == '' {
         $mq: map-get($html-font-size, $default-font-size);
-    }
-
-    @else {
+    } @else {
         $mq: map-get($html-font-size, $mq);
     }
 
     @return math.div($pixels, $mq) * 1em;
 }
 
-@function line-height($font-size , $line-height) {
-    @return math.div($line-height, $font-size) *1em;
+@function line-height($font-size, $line-height) {
+    @return math.div($line-height, $font-size) * 1em;
 }
 
-@function getVWratio($ratioW , $ratioH , $imgW , $windowW) {
+@function getVWratio($ratioW, $ratioH, $imgW, $windowW) {
     $percentW: math.div(100 * $imgW, $windowW);
 
-    @return math.div( $percentW * $ratioH , $ratioW)  * 1vw;
+    @return math.div($percentW * $ratioH, $ratioW) * 1vw;
 }
 
 @function count-svg-item($nRow, $nColumn) {
-    @return (math.div(100, $nRow) * 1%) (math.div(100, $nColumn) * 1%); }
+    @return (math.div(100, $nRow) * 1%) (math.div(100, $nColumn) * 1%);
+}
+
+// Grid
+@function calc-col($config: $config) {
+    $container: map.get(
+        $map: $config,
+        $key: 'container',
+    );
+    $cols: map.get(
+        $map: $config,
+        $key: 'cols',
+    );
+    $gutter: map.get(
+        $map: $config,
+        $key: 'gutter',
+    );
+    $pixel-col: math.div($container - ($gutter * $cols + $gutter), $cols);
+
+    @return math.div($pixel-col, $container) * 100;
+}
+
+@function calc-gutter($config: $config) {
+    $container: map.get(
+        $map: $config,
+        $key: 'container',
+    );
+    $gutter: map.get(
+        $map: $config,
+        $key: 'gutter',
+    );
+
+    @return math.div($gutter, $container) * 100;
+}
+
+@function sass-grid($config: $grid-config) {
+    $cols: map.get(
+        $map: $config,
+        $key: 'cols',
+    );
+    $gutter: map.get(
+        $map: $config,
+        $key: 'gutter',
+    );
+    $col: calc-col($config);
+    $gutter: calc-gutter($config);
+    $svg: "data:image/svg+xml,%3Csvg version='1.1' id='Layer_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' viewBox='0 0 100% 100%' style='enable-background:new 0 0 100% 100%;' xml:space='preserve'";
+    @for $c from 0 to $cols {
+        $svg: $svg +
+            "%3E%3Crect x='#{$gutter + (($gutter + $col) * $c)}%' width='#{$col}%' height='101%' style='fill:hsla(78, 100%, 50%, 0.2); stroke:hsla(78, 100%, 50%, 1); stroke-width:1px;'/%3E%0A";
+    }
+
+    @return url('#{$svg}%3C/svg%3E') no-repeat scroll;
+}

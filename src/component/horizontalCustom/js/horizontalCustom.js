@@ -8,12 +8,14 @@ import {
 import { handleResize } from '.../../../js/core/events/resizeUtils/handleResize.js';
 import { handleFrame } from '.../../../js/core/events/rafutils/rafUtils.js';
 import { ParallaxItemClass } from '../../parallax/js/parallaxItem.js';
+import { horizontalCustomCss } from './horizontalCustomCss.js';
 
 export class horizontalCustomClass {
     constructor(data = {}) {
         this.breackpoint = data.breackpoint || 'desktop';
         this.queryType = data.queryType || 'min';
         this.forceTranspond = data.forceTranspond || false;
+        this.addCss = data.addCss || false;
         this.mainContainer = document.querySelector(data.rootEl);
         this.triggerContainer = this.mainContainer.querySelector(
             '.scroller__trigger'
@@ -31,6 +33,8 @@ export class horizontalCustomClass {
         this.horizontalWidth = 0;
         this.scroller = [];
         this.percentRange = 0;
+
+        if (this.addCss) horizontalCustomCss(this.queryType, this.breackpoint);
     }
 
     init() {

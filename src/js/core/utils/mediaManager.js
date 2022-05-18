@@ -12,6 +12,7 @@ export const mq = (() => {
     const max = (breakpoint) => window.innerWidth < media[breakpoint];
     const min = (breakpoint) => window.innerWidth >= media[breakpoint];
     const update = (obj) => (media = { ...obj });
+    const getBreackpoint = (breakpoint) => media[breakpoint];
 
-    return { max, min, update };
+    return { max, min, update, getBreackpoint };
 })();

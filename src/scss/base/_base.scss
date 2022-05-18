@@ -1,10 +1,14 @@
 // -----------------------------------------------------------------------------
 // This file contains very basic styles.
 // -----------------------------------------------------------------------------
+@use 'sass:map';
 
 /**
  * Set up a decent box model on the root element
  */
+
+// @include debug-grid('xlarge');
+
 html {
     box-sizing: border-box;
 }
@@ -46,5 +50,5 @@ img {
 
 .container {
     margin: auto;
-    max-width: map-get($mq-breakpoints, xlarge);
+    max-width: map.get($mq-breakpoints, xlarge);
 }

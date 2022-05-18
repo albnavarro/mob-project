@@ -1,5 +1,6 @@
 @charset 'UTF-8';
 @use 'sass:math';
+@use 'sass:map';
 
 @import // Vendors
     '../../node_modules/sass-mq/_mq.import';
@@ -24,12 +25,11 @@
     '../component/threeBlocks/scss/tBlocks', '../component/move3D/scss/move3D',
     '../component/pageScroll/scss/pageScroll.scss',
     '../component/dragger/scss/dragger.scss',
-    '../component/gsapHorizontalCustom/scss/gsapHorizontalCustom.scss',
-    '../component/horizontalCustom/scss/horizontalCustom.scss';
+    '../component/gsapHorizontalCustom/scss/gsapHorizontalCustom.scss';
 
 // layout
 @import 'layout/index', 'layout/footer', 'layout/move3D', 'layout/mouseParallax',
     'layout/gsap', 'layout/noGsapScroller', 'layout/gsapScroller', 'layout/svg',
-    'layout/dragger', 'layout/scrollerH', 'layout/susy', 'layout/mouseStagger',
+    'layout/dragger', 'layout/scrollerH', 'layout/mouseStagger',
     'layout/stagger', 'layout/shape', 'layout/syncTimeline',
     'layout/scrollStagger';
