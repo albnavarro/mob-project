@@ -48,8 +48,10 @@ export const parallaxConstant = {
     // Align constant
     ALIGN_START: 'start',
     ALIGN_TOP: 'top',
+    ALIGN_RIGHT: 'right',
     ALIGN_CENTER: 'center',
     ALIGN_BOTTOM: 'bottom',
+    ALIGN_LEFT: 'left',
     ALIGN_END: 'end',
 
     // Switch constant

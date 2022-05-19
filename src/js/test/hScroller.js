@@ -28,6 +28,17 @@ export const hScroller = () => {
     });
     parallax1.init();
 
+    const parallax2 = new ParallaxItemClass({
+        item: document.querySelector('.parallax-js-2'),
+        scroller: '.scrollerH-container .scrollerH',
+        direction: 'horizontal',
+        propierties: 'x',
+        range: 7,
+        reverse: true,
+        onSwitch: 'in-stop',
+    });
+    parallax2.init();
+
     const parallaxPin = new ParallaxItemClass({
         item: document.querySelector('.parallax-js-pin'),
         scroller: '.scrollerH-container .scrollerH',
@@ -145,6 +156,7 @@ export const hScroller = () => {
     smoothScrollFull.onTick((scrollVal) => {
         handleNextTick.add(() => {
             parallax1.move(scrollVal);
+            parallax2.move(scrollVal);
             parallaxOpacity.move(scrollVal);
             parallaxPin.move(scrollVal);
             parallaxIn.move(scrollVal);
