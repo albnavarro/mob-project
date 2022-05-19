@@ -880,7 +880,7 @@ export class ParallaxItemClass {
                 return _.scrollerScroll / _.range;
 
             case parallaxConstant.ALIGN_TOP:
-            case parallaxConstant.ALIGN_RIGHT:
+            case parallaxConstant.ALIGN_LEFT:
                 return (_.scrollerScroll - _.offset) / _.range;
 
             case parallaxConstant.ALIGN_CENTER:
@@ -892,7 +892,7 @@ export class ParallaxItemClass {
                 );
 
             case parallaxConstant.ALIGN_BOTTOM:
-            case parallaxConstant.ALIGN_LEFT:
+            case parallaxConstant.ALIGN_RIGHT:
                 return (
                     (_.scrollerScroll +
                         (_.scrollerHeight - _.height) -
