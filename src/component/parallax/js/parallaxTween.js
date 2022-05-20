@@ -26,7 +26,6 @@ export class ParallaxTween {
         this.callback = [];
         this.duration = 1000;
         this.type = 'tween';
-        this.firstRun = true;
         // Stagger
 
         this.stagger = {
@@ -45,12 +44,16 @@ export class ParallaxTween {
                     getRandomChoice(this.callback, this.stagger.each, i)
                 );
 
+                const frameNow = parseInt((frame * handleFrame.getFps()) / 60);
+
                 item.index = index;
                 item.frame = frame;
+                item.maxFrame = frameNow;
 
                 if (this.callbackOnStop[i]) {
                     this.callbackOnStop[i].index = index;
                     this.callbackOnStop[i].frame = frame;
+                    this.callbackOnStop[i].maxFrame = frameNow;
                 }
             });
         }
@@ -70,35 +73,36 @@ export class ParallaxTween {
         const cbObject = getValueObj(this.values, 'currentValue');
 
         // Fire callback
-        if (this.stagger.each === 0 || this.firstRun) {
+        if (this.stagger.each === 0) {
             // No stagger, run immediatly
             this.callback.forEach(({ cb }) => cb(cbObject));
         } else {
             // Stagger
-            this.callback.forEach(({ cb, index, frame }, i) => {
-                handleFrameIndex(
-                    () => cb(cbObject),
-                    Math.round((frame * handleFrame.getFps()) / 60)
-                );
+            this.callback.forEach(({ cb, index, frame, maxFrame }, i) => {
+                // Prevent overlapping frame if fps change, fix the value to the maximum fps
+                // Update maxFrame only if there is a value bigger then previous
+                // So we have a stable frame Index
+                const frameNow = parseInt((frame * handleFrame.getFps()) / 60);
+                const maxFrameNow = frameNow > maxFrame ? frameNow : maxFrame;
+                this.callback[i].maxFrame = maxFrameNow;
+                if (this.callbackOnStop.length > 0) {
+                    this.callbackOnStop[i].maxFrame = maxFrameNow;
+                }
+                handleFrameIndex(() => cb(cbObject), maxFrameNow);
             });
         }
 
         if (isLastDraw) {
-            if (this.stagger.each === 0 || this.firstRun) {
+            if (this.stagger.each === 0) {
                 // No stagger, run immediatly
                 this.callbackOnStop.forEach(({ cb }) => cb(cbObject));
             } else {
                 // Stagger
-                this.callbackOnStop.forEach(({ cb, index, frame }, i) => {
-                    handleFrameIndex(
-                        () => cb(cbObject),
-                        Math.round((frame * handleFrame.getFps()) / 60)
-                    );
+                this.callbackOnStop.forEach(({ cb, index, maxFrame }, i) => {
+                    handleFrameIndex(() => cb(cbObject), maxFrame + 1);
                 });
             }
         }
-
-        this.firstRun = false;
     }
 
     /**

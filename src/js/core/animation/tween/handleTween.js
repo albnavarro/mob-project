@@ -16,11 +16,7 @@ import { handleSetUp } from '../../setup.js';
 
 export class handleTween {
     constructor(ease = 'easeOutBack') {
-        this.uniqueId =
-            '_' +
-            Math.random()
-                .toString(36)
-                .substr(2, 9);
+        this.uniqueId = '_' + Math.random().toString(36).substr(2, 9);
         this.ease = tweenConfig[ease];
         this.req = false;
         this.currentResolve = null;
@@ -128,15 +124,30 @@ export class handleTween {
                     });
                 } else {
                     // Stagger
-                    this.callback.forEach(({ cb, index, frame }, i) => {
-                        handleFrameIndex(() => {
-                            if (
-                                o.deltaFps < this.fpsThreshold ||
-                                fps > this.maxFps
-                            )
-                                cb(cbObject);
-                        }, Math.round((frame * fps) / 60));
-                    });
+                    this.callback.forEach(
+                        ({ cb, index, frame, maxFrame }, i) => {
+                            // Prevent overlapping frame if fps change, fix the value to the maximum fps
+                            // Update maxFrame only if there is a value bigger then previous
+                            // So we have a stable frame Index
+                            const frameNow = parseInt((frame * fps) / 60);
+                            const maxFrameNow =
+                                frameNow > maxFrame ? frameNow : maxFrame;
+                            this.callback[i].maxFrame = maxFrameNow;
+                            if (this.callbackOnComplete.length > 0) {
+                                this.callbackOnComplete[
+                                    i
+                                ].maxFrame = maxFrameNow;
+                            }
+
+                            handleFrameIndex(() => {
+                                if (
+                                    o.deltaFps < this.fpsThreshold ||
+                                    fps > this.maxFps
+                                )
+                                    cb(cbObject);
+                            }, maxFrameNow);
+                        }
+                    );
                 }
             });
 
@@ -188,7 +199,7 @@ export class handleTween {
                     });
                 } else {
                     // Fire callback with exact end value
-                    this.callback.forEach(({ cb, index, frame }, i) => {
+                    this.callback.forEach(({ cb, index, maxFrame }, i) => {
                         handleFrameIndex(() => {
                             cb(cbObject);
 
@@ -201,14 +212,14 @@ export class handleTween {
                                     onComplete();
                                 }
                             }
-                        }, Math.round((frame * fps) / 60));
+                        }, maxFrame);
                     });
 
                     this.callbackOnComplete.forEach(
-                        ({ cb, index, frame }, i) => {
+                        ({ cb, index, maxFrame }, i) => {
                             handleFrameIndex(() => {
                                 cb(cbObject);
-                            }, Math.round((frame * fps) / 60));
+                            }, maxFrame + 1);
                         }
                     );
                 }
@@ -381,12 +392,16 @@ export class handleTween {
                     getRandomChoice(this.callback, this.stagger.each, i)
                 );
 
+                const frameNow = parseInt((frame * handleFrame.getFps()) / 60);
+
                 item.index = index;
                 item.frame = frame;
+                item.maxFrame = frameNow;
 
                 if (this.callbackOnComplete.length > 0) {
                     this.callbackOnComplete[i].index = index;
                     this.callbackOnComplete[i].frame = frame;
+                    this.callbackOnComplete[i].maxFrame = frameNow;
                 }
 
                 if (frame >= this.slowlestStagger.frame)
