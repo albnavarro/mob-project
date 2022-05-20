@@ -58,9 +58,6 @@ export class ParallaxPin {
             'justify-self',
         ];
 
-        // Paerent style to applied to pin wrapper
-        this.parentRequireStyle = ['text-align'];
-
         // Item style get and applied itself when transpond
         this.itemRequireStyleWhenTraspond = [
             'font-size',
@@ -69,6 +66,12 @@ export class ParallaxPin {
             'line-height',
             'white-space',
         ];
+
+        // Paerent style to applied to pin
+        this.parentRequireStyle = ['text-align'];
+
+        // Item style applied to pin
+        this.itemRequireStyleToPin = ['z-index'];
 
         // Parent style that activate transpond
         this.styleToTranspond = ['transform', 'position'];
@@ -196,9 +199,17 @@ export class ParallaxPin {
         this.pin.style.display = 'table';
         // Set misure to pin lement and wrap element
 
+        // get style from parent and add to pin, es text-align
         const requiredStyleToadd = this.addRquiredStyle();
+
+        // get style from iem and add to pin, es z-index
+        const pinStyleFromItem = this.addPinStyleFromItem();
+
         handleFrame.add(() => {
-            Object.assign(this.pin.style, requiredStyleToadd);
+            Object.assign(this.pin.style, {
+                ...pinStyleFromItem,
+                ...requiredStyleToadd,
+            });
         });
         this.checkIfShouldTranspond();
     }
@@ -515,6 +526,13 @@ export class ParallaxPin {
         });
     }
 
+    addPinStyleFromItem() {
+        const compStyles = window.getComputedStyle(this.item);
+        return this.itemRequireStyleToPin.reduce((p, c) => {
+            return { ...p, ...{ [c]: compStyles.getPropertyValue(c) } };
+        }, {});
+    }
+
     addStyleToItem() {
         const compStyles = window.getComputedStyle(this.item);
         return this.itemRequireStyleWhenTraspond.reduce((p, c) => {
@@ -532,10 +550,14 @@ export class ParallaxPin {
         if (this.shoulTranspond) {
             // Interrogato DOM before rendering, avoid recalculation sryle inside RAF
             const requiredStyleToAdd = this.addRquiredStyle();
+            const pinStyleFromItem = this.addPinStyleFromItem();
             const styleToAdd = this.addStyleToItem();
 
             const cb = () => {
-                Object.assign(this.pin.style, requiredStyleToAdd);
+                Object.assign(this.pin.style, {
+                    ...pinStyleFromItem,
+                    ...requiredStyleToAdd,
+                });
                 Object.assign(this.item.style, styleToAdd);
                 document.body.appendChild(this.pin);
             };
