@@ -46,7 +46,9 @@ export class HandleSequencer {
                     getRandomChoice(this.callback, this.stagger.each, i)
                 );
 
-                const frameNow = parseInt((frame * handleFrame.getFps()) / 60);
+                const frameNow = Math.round(
+                    (frame * handleFrame.getFps()) / 60
+                );
 
                 item.index = index;
                 item.frame = frameNow;
@@ -148,7 +150,9 @@ export class HandleSequencer {
                 // Prevent overlapping frame if fps change, fix the value to the maximum fps
                 // Update maxFrame only if there is a value bigger then previous
                 // So we have a stable frame Index
-                const frameNow = parseInt((frame * handleFrame.getFps()) / 60);
+                const frameNow = Math.round(
+                    (frame * handleFrame.getFps()) / 60
+                );
                 const maxFrameNow = frameNow > maxFrame ? frameNow : maxFrame;
                 this.callback[i].maxFrame = maxFrameNow;
                 if (this.callbackOnStop.length > 0) {
