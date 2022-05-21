@@ -47,12 +47,12 @@ export class ParallaxTween {
                 const frameNow = parseInt((frame * handleFrame.getFps()) / 60);
 
                 item.index = index;
-                item.frame = frame;
+                item.frame = frameNow;
                 item.maxFrame = frameNow;
 
                 if (this.callbackOnStop[i]) {
                     this.callbackOnStop[i].index = index;
-                    this.callbackOnStop[i].frame = frame;
+                    this.callbackOnStop[i].frame = frameNow;
                     this.callbackOnStop[i].maxFrame = frameNow;
                 }
             });

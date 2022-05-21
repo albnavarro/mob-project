@@ -1,63 +1,31 @@
+.page-scrollStagger {
+    background: $black;
+    footer {
+        background: $black;
+    }
+}
+
 .scrollStagger {
     height: 400vh;
+}
 
-    &__element {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+.mySvg {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100vw;
+    height: 100vh;
 
-        &:nth-of-type(1) {
-            .scrollStagger__item {
-                opacity: 0.1;
-                width: 380px;
-                height: 380px;
-                background: rgba($black, 0.2);
+    rect {
+        @for $i from 1 through 30 {
+            &:nth-of-type(#{$i}) {
+                fill: none;
+                // stroke: red;
+                fill: $black;
+                stroke-width: 0.1;
+                opacity: #{$i * 0.03};
             }
         }
-
-        &:nth-of-type(2) {
-            .scrollStagger__item {
-                opacity: 0.3;
-                width: 360px;
-                height: 360px;
-                background: rgba($black, 0.2);
-            }
-        }
-
-        &:nth-of-type(3) {
-            .scrollStagger__item {
-                opacity: 0.5;
-                width: 340px;
-                height: 340px;
-                background: rgba($black, 0.2);
-            }
-        }
-
-        &:nth-of-type(4) {
-            .scrollStagger__item {
-                opacity: 0.7;
-                width: 320px;
-                height: 320px;
-                background: rgba($black, 0.2);
-            }
-        }
-
-        &:nth-of-type(5) {
-            .scrollStagger__item {
-                opacity: 1;
-                background: $black;
-            }
-        }
-    }
-
-    &__item {
-        font-size: 160px;
-        line-height: 1;
-        font-weight: 800;
-        width: 300px;
-        height: 300px;
-        border-radius: 30px;
-        display: block;
     }
 }

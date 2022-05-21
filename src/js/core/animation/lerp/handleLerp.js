@@ -370,12 +370,12 @@ export class handleLerp {
                 const frameNow = parseInt((frame * handleFrame.getFps()) / 60);
 
                 item.index = index;
-                item.frame = frame;
+                item.frame = frameNow;
                 item.maxFrame = frameNow;
 
                 if (this.callbackOnComplete.length > 0) {
                     this.callbackOnComplete[i].index = index;
-                    this.callbackOnComplete[i].frame = frame;
+                    this.callbackOnComplete[i].frame = frameNow;
                     this.callbackOnComplete[i].maxFrame = frameNow;
                 }
 
