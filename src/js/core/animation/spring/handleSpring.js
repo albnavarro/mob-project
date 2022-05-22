@@ -141,30 +141,15 @@ export class handleSpring {
                     });
                 } else {
                     // Stagger
-                    this.callback.forEach(
-                        ({ cb, index, frame, maxFrame }, i) => {
-                            // Prevent overlapping frame if fps change, fix the value to the maximum fps
-                            // Update maxFrame only if there is a value bigger then previous
-                            // So we have a stable frame Index
-                            const frameNow = Math.round((frame * fps) / 60);
-                            const maxFrameNow =
-                                frameNow > maxFrame ? frameNow : maxFrame;
-                            this.callback[i].maxFrame = maxFrameNow;
-                            if (this.callbackOnComplete.length > 0) {
-                                this.callbackOnComplete[
-                                    i
-                                ].maxFrame = maxFrameNow;
-                            }
-
-                            handleFrameIndex(() => {
-                                if (
-                                    o.deltaFps < this.fpsThreshold ||
-                                    fps > this.maxFps
-                                )
-                                    cb(cbObject);
-                            }, maxFrameNow);
-                        }
-                    );
+                    this.callback.forEach(({ cb, index, frame }, i) => {
+                        handleFrameIndex(() => {
+                            if (
+                                o.deltaFps < this.fpsThreshold ||
+                                fps > this.maxFps
+                            )
+                                cb(cbObject);
+                        }, frame);
+                    });
                 }
             });
 
@@ -219,7 +204,7 @@ export class handleSpring {
                         });
                     });
                 } else {
-                    this.callback.forEach(({ cb, index, maxFrame }, i) => {
+                    this.callback.forEach(({ cb, index, frame }, i) => {
                         handleFrameIndex(() => {
                             cb(cbObjectSettled);
 
@@ -232,14 +217,14 @@ export class handleSpring {
                                     onComplete();
                                 }
                             }
-                        }, maxFrame);
+                        }, frame);
                     });
 
                     this.callbackOnComplete.forEach(
-                        ({ cb, index, maxFrame }, i) => {
+                        ({ cb, index, frame }, i) => {
                             handleFrameIndex(() => {
                                 cb(cbObjectSettled);
-                            }, maxFrame + 1);
+                            }, frame + 1);
                         }
                     );
                 }
@@ -396,18 +381,12 @@ export class handleSpring {
                     getRandomChoice(this.callback, this.stagger.each, i)
                 );
 
-                const frameNow = Math.round(
-                    (frame * handleFrame.getFps()) / 60
-                );
-
                 item.index = index;
-                item.frame = frameNow;
-                item.maxFrame = frameNow;
+                item.frame = frame;
 
                 if (this.callbackOnComplete.length > 0) {
                     this.callbackOnComplete[i].index = index;
-                    this.callbackOnComplete[i].frame = frameNow;
-                    this.callbackOnComplete[i].maxFrame = frameNow;
+                    this.callbackOnComplete[i].frame = frame;
                 }
 
                 if (frame >= this.slowlestStagger.frame)

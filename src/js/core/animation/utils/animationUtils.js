@@ -1,6 +1,6 @@
 export const getValueObj = (arr, key) => {
     return arr
-        .map((item) => ({ [item.prop]: parseFloat(item[key]).toFixed(4) }))
+        .map((item) => ({ [item.prop]: parseFloat(item[key]) }))
         .reduce((p, c) => ({ ...p, ...c }), {});
 };
 
