@@ -1,7 +1,7 @@
 .page-scrollStagger {
-    background: $black;
+    // background: $black;
     footer {
-        background: $black;
+        // background: $white;
     }
 }
 
@@ -14,17 +14,18 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 100vw;
-    height: 100vh;
+    width: 500px;
+    height: 500px;
+    overflow: visible !important;
 
     rect {
         @for $i from 1 through 30 {
             &:nth-of-type(#{$i}) {
                 fill: none;
                 // stroke: red;
-                fill: $black;
+                fill: white;
                 stroke-width: 0.1;
-                opacity: #{$i * 0.03};
+                opacity: #{$i * 0.05};
             }
         }
     }
