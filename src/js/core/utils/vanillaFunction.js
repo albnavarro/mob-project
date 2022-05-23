@@ -32,8 +32,8 @@ export function position(el) {
 
 export function getSiblings(elem, selector) {
     // Setup siblings array and get the first sibling
-    var siblings = [];
-    var sibling = elem.parentNode.firstChild;
+    let siblings = [];
+    let sibling = elem.parentNode.firstChild;
 
     // Loop through each sibling and push to the array
     while (sibling) {
@@ -50,7 +50,7 @@ export function getSiblings(elem, selector) {
 
 export function getParents(elem, selector) {
     // Set up a parent array
-    var parents = [];
+    const parents = [];
 
     // Push each parent element to the array
     for (; elem && elem !== document; elem = elem.parentNode) {
@@ -68,7 +68,7 @@ export function getParents(elem, selector) {
 }
 
 export function isDescendant(parent, child) {
-    var node = child.parentNode;
+    let node = child.parentNode;
     while (node != null) {
         if (node == parent) {
             return true;
@@ -78,15 +78,15 @@ export function isDescendant(parent, child) {
     return false;
 }
 
-export const simulateClick = function (elem) {
+export const simulateClick = function(elem) {
     // Create our event (with options)
-    var evt = new MouseEvent('click', {
+    const evt = new MouseEvent('click', {
         bubbles: true,
         cancelable: true,
         view: window,
     });
     // If cancelled, don't dispatch our event
-    var canceled = !elem.dispatchEvent(evt);
+    let canceled = !elem.dispatchEvent(evt);
 };
 
 /**

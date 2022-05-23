@@ -41,7 +41,7 @@ export const slide = (() => {
 
         // Return unsubscribe
         return () => {
-            data.unsubcribe;
+            data.unsubscribe();
             data.tween = null;
             data.item = null;
             slideItems = slideItems.filter(({ id }) => id !== prevId);

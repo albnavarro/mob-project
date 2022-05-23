@@ -1,5 +1,5 @@
 import { tweenConfig } from '../tween/tweenConfig.js';
-import { clamp, getValueObj } from '../utils/animationUtils.js';
+import { clamp, getValueObj, compareKeys } from '../utils/animationUtils.js';
 import { getStaggerIndex, getRandomChoice } from '../utils/getStaggerIndex.js';
 import {
     handleFrame,
@@ -165,20 +165,6 @@ export class HandleSequencer {
         }
 
         this.useStagger = true;
-    }
-
-    /**
-     * this.compareKeys - Compare fromObj, toObj in goFromTo methods
-     * Check if has the same keys
-     *
-     * @param  {Object} a fromObj Object
-     * @param  {Object} b toObj Object
-     * @return {bollean} has thew same keys
-     */
-    compareKeys(a, b) {
-        var aKeys = Object.keys(a).sort();
-        var bKeys = Object.keys(b).sort();
-        return JSON.stringify(aKeys) === JSON.stringify(bKeys);
     }
 
     /**
@@ -369,7 +355,7 @@ export class HandleSequencer {
         const propMerged = { ...this.defaultProp, ...props };
         const { start, end, ease } = propMerged;
 
-        const dataIsValid = this.compareKeys(fromObj, toObj);
+        const dataIsValid = compareKeys(fromObj, toObj);
         if (!dataIsValid) {
             console.warn('sequencer: fromValue and toValue is different');
             return;
