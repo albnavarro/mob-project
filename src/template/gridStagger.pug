@@ -1,0 +1,44 @@
+extends default/_wrapper.pug
+
+block content
+    header
+        .container
+            include ../includes/langSelector.pug
+        .container.menu-container.menu-container--top
+            include ../includes/navigation.pug
+    main
+        - const items = 49;
+        .container.clearfix       
+          .grid-stagger.grid-stagger-tween
+            h1
+              | Tween
+            .grid-stagger__container
+                each i in [...Array(items).keys()]
+                  .grid-stagger__item
+                    
+          .grid-stagger.grid-stagger-spring
+            h1
+              | Spring
+            .grid-stagger__container
+                each i in [...Array(items).keys()]
+                  .grid-stagger__item
+                    
+          .grid-stagger.grid-stagger-lerp
+            h1
+              | Lerp
+            .grid-stagger__container
+                each i in [...Array(items).keys()]
+                  .grid-stagger__item
+          
+          .grid-stagger.grid-stagger-sequencer
+            h1
+              | Sequencer
+            .grid-stagger__container
+                each i in [...Array(items).keys()]
+                  .grid-stagger__item
+                
+                
+
+    include ../component/lightbox/pug/lightbox-simple.pug
+    include ../component/lightbox/pug/lightbox-image.pug
+    include ../component/lightbox/pug/lightbox-video.pug

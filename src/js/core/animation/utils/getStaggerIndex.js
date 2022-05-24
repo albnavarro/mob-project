@@ -1,3 +1,5 @@
+import { sliceIntoChunks, arrayColumn } from '../utils/animationUtils.js';
+
 const STAGGER_START = 'start';
 const STAGGER_END = 'end';
 const STAGGER_CENTER = 'center';
@@ -172,4 +174,121 @@ export const getStaggerIndex = (
             }
         })();
     }
+};
+
+export const setStagger = ({
+    cb,
+    endCb,
+    stagger,
+    slowlestStagger,
+    fastestStagger,
+    DIRECTION_ROW,
+}) => {
+    // get chunk size by col if there is a size ( > -1 )
+    const chunckSizeCol =
+        stagger.grid.col === -1 ? cb.length : stagger.grid.col;
+
+    // get chunk size by row if there is a size ( > -1 )
+    const chunckSizeRow =
+        stagger.grid.row === -1 ? cb.length : stagger.grid.row;
+
+    // Function that convert row matrix to col matrix
+    const getCbByRow = (arr) => {
+        // Reorder main array if direction === row
+        if (stagger.grid.direction === DIRECTION_ROW) {
+            const chunkByCol = sliceIntoChunks(arr, chunckSizeCol);
+
+            const colToRowArray = [...Array(stagger.grid.col).keys()].reduce(
+                (p, c, i) => {
+                    return [...p, ...arrayColumn(chunkByCol, i)];
+                },
+                []
+            );
+
+            return [...colToRowArray].flat();
+        } else {
+            return arr;
+        }
+    };
+
+    // main callBack
+    const cbByRow = getCbByRow(cb);
+    const cbNow = cbByRow.map((item) => {
+        return item != undefined ? item : { cb: () => {} };
+    });
+
+    // onComplete callBack
+    const cbCompleteByRow = getCbByRow(endCb);
+    const cbCompleteNow = cbCompleteByRow.map((item) => {
+        return item != undefined ? item : { cb: () => {} };
+    });
+
+    // get chunkes array
+    const chuncked = (() => {
+        const chunckSize =
+            stagger.grid.direction === DIRECTION_ROW
+                ? chunckSizeRow
+                : chunckSizeCol;
+
+        return sliceIntoChunks(cbNow, chunckSize);
+    })();
+
+    const firstChunk = chuncked[0];
+
+    // Get First row stagger
+    firstChunk.forEach((item, i) => {
+        const { index, frame } = getStaggerIndex(
+            i,
+            chuncked[0].length,
+            stagger,
+            getRandomChoice(firstChunk, stagger.each, i)
+        );
+
+        item.index = index;
+        item.frame = frame;
+
+        if (frame >= slowlestStagger.frame)
+            slowlestStagger = {
+                index,
+                frame,
+            };
+
+        if (frame <= fastestStagger.frame)
+            fastestStagger = {
+                index,
+                frame,
+            };
+    });
+
+    // Set other chunk, copy from first [0]
+    chuncked.forEach((chunkItem, chunkIndex) => {
+        chunkItem.forEach((item, i) => {
+            if (item) {
+                item.index = chuncked[0][i].index;
+                item.frame = chuncked[0][i].frame;
+            }
+        });
+    });
+
+    // Flat the chunked array
+    const flat = chuncked.flat();
+
+    // set data to original (this.callback) array
+    flat.forEach((item, i) => {
+        cbNow[i].index = item.index;
+        cbNow[i].frame = item.frame;
+
+        // If there an OnCompelte callack
+        if (cbCompleteNow.length > 0) {
+            cbCompleteNow[i].index = item.index;
+            cbCompleteNow[i].frame = item.frame;
+        }
+    });
+
+    return {
+        cbNow,
+        cbCompleteNow,
+        fastestStagger,
+        slowlestStagger,
+    };
 };

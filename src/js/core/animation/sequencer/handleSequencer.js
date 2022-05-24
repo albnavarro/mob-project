@@ -1,6 +1,10 @@
 import { tweenConfig } from '../tween/tweenConfig.js';
 import { clamp, getValueObj, compareKeys } from '../utils/animationUtils.js';
-import { getStaggerIndex, getRandomChoice } from '../utils/getStaggerIndex.js';
+import {
+    getStaggerIndex,
+    getRandomChoice,
+    setStagger,
+} from '../utils/getStaggerIndex.js';
 import {
     handleFrame,
     handleFrameIndex,
@@ -27,37 +31,47 @@ export class HandleSequencer {
             ease: data?.ease ? data.ease : 'easeLinear',
         };
 
+        this.DIRECTION_DEFAULT = null;
+        this.DIRECTION_ROW = 'row';
+        this.DIRECTION_COL = 'col';
+
         // Stagger
         this.stagger = {
             each: data?.stagger?.each ? data.stagger.each : 0,
             from: data?.stagger?.from ? data.stagger.from : 'start',
+            grid: {
+                col: data?.stagger?.grid?.col ? data.stagger.grid.col : -1,
+                row: data?.stagger?.grid?.row ? data.stagger.grid.row : -1,
+                direction: data?.stagger?.grid?.direction
+                    ? data.stagger.grid.direction
+                    : this.DIRECTION_COL,
+            },
         };
 
         this.useStagger = true;
+        this.firstRun = true;
     }
 
     setStagger() {
         if (this.stagger.each > 0) {
-            this.callback.forEach((item, i) => {
-                const { index, frame } = getStaggerIndex(
-                    i,
-                    this.callback.length,
-                    this.stagger,
-                    getRandomChoice(this.callback, this.stagger.each, i)
-                );
-
-                item.index = index;
-                item.frame = frame;
-
-                if (this.callbackOnStop[i]) {
-                    this.callbackOnStop[i].index = index;
-                    this.callbackOnStop[i].frame = frame;
-                }
+            const { cbNow, cbCompleteNow } = setStagger({
+                cb: this.callback,
+                endCb: this.callbackOnStop,
+                stagger: this.stagger,
+                slowlestStagger: {},
+                fastestStagger: {},
+                DIRECTION_ROW: this.DIRECTION_ROW,
             });
+
+            this.callback = [...cbNow];
+            this.callbackOnStop = [...cbCompleteNow];
         }
     }
 
     draw({ partial, isLastDraw, useFrame }) {
+        if (this.firstRun) this.setStagger();
+        this.firstRun = false;
+
         this.values.forEach((item, i) => {
             item.settled = false;
         });
@@ -393,7 +407,6 @@ export class HandleSequencer {
         this.callback.push({ cb, id: this.id });
         const cbId = this.id;
         this.id++;
-        this.setStagger();
 
         return () => {
             this.callback = this.callback.filter((item) => item.id !== cbId);
@@ -404,7 +417,6 @@ export class HandleSequencer {
         this.callbackOnStop.push({ cb, id: this.id });
         const cbId = this.id;
         this.id++;
-        this.setStagger();
 
         return () => {
             this.callbackOnStop = this.callbackOnStop.filter(

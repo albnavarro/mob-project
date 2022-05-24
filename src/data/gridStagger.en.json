@@ -1,0 +1,8 @@
+{
+    "template": "gridStagger",
+    "slug": "gridStagger",
+    "pageTitle": "gridStagger",
+    "description": "custom description",
+    "additionalData": ["nav.json"],
+    "registerComponent": ["to-top/pug/toTop.pug"]
+}

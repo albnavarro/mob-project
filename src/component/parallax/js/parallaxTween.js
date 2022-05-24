@@ -7,6 +7,7 @@ import { mergeDeep } from '../../../js/core/utils/mergeDeep.js';
 import {
     getStaggerIndex,
     getRandomChoice,
+    setStagger,
 } from '.../../../js/core/animation/utils/getStaggerIndex.js';
 import {
     handleFrame,
@@ -28,34 +29,45 @@ export class ParallaxTween {
         this.type = 'tween';
         // Stagger
 
+        this.DIRECTION_DEFAULT = null;
+        this.DIRECTION_ROW = 'row';
+        this.DIRECTION_COL = 'col';
+
         this.stagger = {
             each: data?.stagger?.each ? data.stagger.each : 0,
             from: data?.stagger?.from ? data.stagger.from : 'start',
+            grid: {
+                col: data?.stagger?.grid?.col ? data.stagger.grid.col : -1,
+                row: data?.stagger?.grid?.row ? data.stagger.grid.row : -1,
+                direction: data?.stagger?.grid?.direction
+                    ? data.stagger.grid.direction
+                    : this.DIRECTION_COL,
+            },
         };
+
+        this.firstRun = true;
     }
 
     setStagger() {
         if (this.stagger.each > 0) {
-            this.callback.forEach((item, i) => {
-                const { index, frame } = getStaggerIndex(
-                    i,
-                    this.callback.length,
-                    this.stagger,
-                    getRandomChoice(this.callback, this.stagger.each, i)
-                );
-
-                item.index = index;
-                item.frame = frame;
-
-                if (this.callbackOnStop[i]) {
-                    this.callbackOnStop[i].index = index;
-                    this.callbackOnStop[i].frame = frame;
-                }
+            const { cbNow, cbCompleteNow } = setStagger({
+                cb: this.callback,
+                endCb: this.callbackOnStop,
+                stagger: this.stagger,
+                slowlestStagger: {},
+                fastestStagger: {},
+                DIRECTION_ROW: this.DIRECTION_ROW,
             });
+
+            this.callback = [...cbNow];
+            this.callbackOnStop = [...cbCompleteNow];
         }
     }
 
     draw({ partial, isLastDraw }) {
+        if (this.firstRun) this.setStagger();
+        this.firstRun = false;
+
         this.values.forEach((item, i) => {
             item.currentValue = this.ease(
                 partial,
@@ -235,7 +247,6 @@ export class ParallaxTween {
         this.callback.push({ cb, id: this.id });
         const cbId = this.id;
         this.id++;
-        this.setStagger();
 
         return () => {
             this.callback = this.callback.filter((item) => item.id !== cbId);
@@ -246,7 +257,6 @@ export class ParallaxTween {
         this.callbackOnStop.push({ cb, id: this.id });
         const cbId = this.id;
         this.id++;
-        this.setStagger();
 
         return () => {
             this.callbackOnStop = this.callbackOnStop.filter(

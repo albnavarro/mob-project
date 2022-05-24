@@ -12,7 +12,11 @@ import {
     handleFrameIndex,
 } from '../../events/rafutils/rafUtils.js';
 import { mergeDeep } from '../../utils/mergeDeep.js';
-import { getStaggerIndex, getRandomChoice } from '../utils/getStaggerIndex.js';
+import {
+    getStaggerIndex,
+    getRandomChoice,
+    setStagger,
+} from '../utils/getStaggerIndex.js';
 import { handleSetUp } from '../../setup.js';
 
 const LERP_DEFAULT_PRECISION = 0.01;
@@ -40,6 +44,10 @@ export class handleLerp {
         // If fps is under this.maxFps by this.fpsThreshold is algging, so skip to not overload
         this.fpsThreshold = handleSetUp.get('fpsThreshold');
 
+        this.DIRECTION_DEFAULT = null;
+        this.DIRECTION_ROW = 'row';
+        this.DIRECTION_COL = 'col';
+
         this.defaultProps = {
             reverse: false,
             velocity,
@@ -49,10 +57,25 @@ export class handleLerp {
                 each: 0,
                 waitComplete: false,
                 from: 'start',
+                grid: {
+                    col: -1,
+                    row: -1,
+                    direction: this.DIRECTION_COL,
+                },
             },
         };
 
-        this.stagger = { each: 0, waitComplete: false, from: 'start' };
+        this.stagger = {
+            each: 0,
+            waitComplete: false,
+            from: 'start',
+            grid: {
+                col: -1,
+                row: -1,
+                direction: this.DIRECTION_COL,
+            },
+        };
+
         this.slowlestStagger = {
             index: 0,
             frame: 0,
@@ -342,36 +365,35 @@ export class handleLerp {
         this.stagger.each = stagger.each;
         this.stagger.waitComplete = stagger.waitComplete;
         this.stagger.from = stagger.from;
+        this.stagger.grid = stagger.grid;
 
         if (this.stagger.each > 0 && this.firstRun) {
-            this.callback.forEach((item, i) => {
-                const { index, frame } = getStaggerIndex(
-                    i,
-                    this.callback.length,
-                    this.stagger,
-                    getRandomChoice(this.callback, this.stagger.each, i)
+            if (this.stagger.grid.col > this.callback.length) {
+                console.warn(
+                    'stagger col of grid is out of range, it must be less than the number of staggers '
                 );
+                this.firstRun = false;
+                return;
+            }
 
-                item.index = index;
-                item.frame = frame;
-
-                if (this.callbackOnComplete.length > 0) {
-                    this.callbackOnComplete[i].index = index;
-                    this.callbackOnComplete[i].frame = frame;
-                }
-
-                if (frame >= this.slowlestStagger.frame)
-                    this.slowlestStagger = {
-                        index,
-                        frame,
-                    };
-
-                if (frame <= this.fastestStagger.frame)
-                    this.fastestStagger = {
-                        index,
-                        frame,
-                    };
+            const {
+                cbNow,
+                cbCompleteNow,
+                fastestStagger,
+                slowlestStagger,
+            } = setStagger({
+                cb: this.callback,
+                endCb: this.callbackOnComplete,
+                stagger: this.stagger,
+                slowlestStagger: this.slowlestStagger,
+                fastestStagger: this.fastestStagger,
+                DIRECTION_ROW: this.DIRECTION_ROW,
             });
+
+            this.callback = [...cbNow];
+            this.callbackOnComplete = [...cbCompleteNow];
+            this.slowlestStagger = { ...slowlestStagger };
+            this.fastestStagger = { ...fastestStagger };
 
             this.firstRun = false;
         }

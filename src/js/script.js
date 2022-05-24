@@ -61,6 +61,10 @@ import { infiniteAnimation } from './test/infiniteAnimation.js';
 import { syncTimelineTest } from './test/syncTimelineTest.js';
 import { infiniteAnimationSync } from './test/infiniteAnimationSync.js';
 import { scrollStagger } from './test/scrollStagger.js';
+import { gridStaggerTween } from './test/gridStaggerTween.js';
+import { gridStaggerSpring } from './test/gridStaggerSpring.js';
+import { gridStaggerLerp } from './test/gridStaggerLerp.js';
+import { gridStaggerSequencer } from './test/gridStaggerSequencer.js';
 
 handleLoad(() => {
     handleSetUp.set({
@@ -134,6 +138,12 @@ handleLoad(() => {
 
     if (body.classList.contains('page-scrollStagger')) {
         scrollStagger();
+    }
+    if (body.classList.contains('page-gridStagger')) {
+        gridStaggerTween();
+        gridStaggerSpring();
+        gridStaggerLerp();
+        gridStaggerSequencer();
     }
 
     pageScroll.init();

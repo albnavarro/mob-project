@@ -77,6 +77,10 @@
                 {
                     "label": "",
                     "univoqueId": "scrollStagger"
+                },
+                {
+                    "label": "",
+                    "univoqueId": "gridStagger"
                 }
             ]
         },
