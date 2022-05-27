@@ -66,6 +66,8 @@ import { gridStaggerSpring } from './test/gridStaggerSpring.js';
 import { gridStaggerLerp } from './test/gridStaggerLerp.js';
 import { gridStaggerSequencer } from './test/gridStaggerSequencer.js';
 
+import { test } from './test/explosion/explosionbase.js';
+
 handleLoad(() => {
     handleSetUp.set({
         fpsLoopCycle: 30,
