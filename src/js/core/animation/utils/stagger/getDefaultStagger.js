@@ -1,10 +1,12 @@
-import { sliceIntoChunks, arrayColumn } from '../utils/animationUtils.js';
-
-const STAGGER_START = 'start';
-const STAGGER_END = 'end';
-const STAGGER_CENTER = 'center';
-const STAGGER_EDGES = 'edges';
-const STAGGER_RANDOM = 'random';
+import { sliceIntoChunks, arrayColumn } from '../animationUtils.js';
+import {
+    STAGGER_START,
+    STAGGER_END,
+    STAGGER_CENTER,
+    STAGGER_EDGES,
+    STAGGER_RANDOM,
+    DIRECTION_ROW,
+} from './staggerCostant';
 
 // Get random frame without duplicate
 export const getRandomChoice = (arr, each, index) => {
@@ -23,12 +25,7 @@ export const getRandomChoice = (arr, each, index) => {
 };
 
 // Get frame per index
-export const getStaggerIndex = (
-    index,
-    arraylenght,
-    stagger,
-    randomChoice = []
-) => {
+const getStaggerIndex = (index, arraylenght, stagger, randomChoice = []) => {
     const { from, each } = stagger;
     const isOdd = (num) => num % 2;
     const getRandomInt = (max) => Math.floor(Math.random() * max);
@@ -176,13 +173,12 @@ export const getStaggerIndex = (
     }
 };
 
-export const setStagger = ({
+export const getDefaultStagger = ({
     cb,
     endCb,
     stagger,
     slowlestStagger,
     fastestStagger,
-    DIRECTION_ROW,
 }) => {
     // get chunk size by col if there is a size ( > -1 )
     const chunckSizeCol =

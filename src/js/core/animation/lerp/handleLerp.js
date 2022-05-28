@@ -12,12 +12,9 @@ import {
     handleFrameIndex,
 } from '../../events/rafutils/rafUtils.js';
 import { mergeDeep } from '../../utils/mergeDeep.js';
-import {
-    getStaggerIndex,
-    getRandomChoice,
-    setStagger,
-} from '../utils/getStaggerIndex.js';
 import { handleSetUp } from '../../setup.js';
+import { setStagger } from '../utils/stagger/setStagger.js';
+import { DIRECTION_COL } from '../utils/stagger/staggerCostant.js';
 
 const LERP_DEFAULT_PRECISION = 0.01;
 
@@ -44,10 +41,6 @@ export class handleLerp {
         // If fps is under this.maxFps by this.fpsThreshold is algging, so skip to not overload
         this.fpsThreshold = handleSetUp.get('fpsThreshold');
 
-        this.DIRECTION_DEFAULT = null;
-        this.DIRECTION_ROW = 'row';
-        this.DIRECTION_COL = 'col';
-
         this.defaultProps = {
             reverse: false,
             velocity,
@@ -60,7 +53,7 @@ export class handleLerp {
                 grid: {
                     col: -1,
                     row: -1,
-                    direction: this.DIRECTION_COL,
+                    direction: DIRECTION_COL,
                 },
             },
         };
@@ -72,7 +65,7 @@ export class handleLerp {
             grid: {
                 col: -1,
                 row: -1,
-                direction: this.DIRECTION_COL,
+                direction: DIRECTION_COL,
             },
         };
 
@@ -387,7 +380,6 @@ export class handleLerp {
                 stagger: this.stagger,
                 slowlestStagger: this.slowlestStagger,
                 fastestStagger: this.fastestStagger,
-                DIRECTION_ROW: this.DIRECTION_ROW,
             });
 
             this.callback = [...cbNow];

@@ -50,7 +50,7 @@ export function staggerTweenTest() {
         .goTo(
             myStagger,
             { x: 500 },
-            { duration: 1500, stagger: { each: 4, from: 'edges' } }
+            { duration: 1500, stagger: { each: 4, from: 'start' } }
         )
         .closeGroup()
         .goTo(myTween, { y: 0 })

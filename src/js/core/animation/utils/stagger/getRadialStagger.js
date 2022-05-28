@@ -1,12 +1,11 @@
-import { sliceIntoChunks } from '../../core/animation/utils/animationUtils.js';
+import { sliceIntoChunks, arrayColumn } from '../animationUtils.js';
+import { MERGE_FROM_UP, MERGE_FROM_DOWN } from './staggerCostant';
 
-const getRadialArray = (arr, col, x, y) => {
-    const MERGE_FROM_UP = 'MERGE_FROM_UP';
-    const MERGE_FROM_DOWN = 'MERGE_FROM_DOWN';
+export const getRadialArray = (arr, stagger) => {
+    const { col } = stagger.grid;
+    const { x, y } = stagger.from;
 
     const chunk = sliceIntoChunks(arr, col);
-    console.log(chunk);
-    console.log('x:', x, 'y:', y);
 
     // Add empy row (one row for each column) at the end to prevent missing cell form matrix calc
     [...Array(col).keys()].forEach((item, i) => {
@@ -133,19 +132,7 @@ const getRadialArray = (arr, col, x, y) => {
         return c.length === 0 ? p : [...p, ...[c]];
     }, []);
 
-    return cleanArray;
-};
-
-export const test = () => {
-    /**
-     **
-     **
-     **/
-    const col = 11;
-    const x = 0;
-    const y = 8;
-    const arr = [...Array(100).keys()];
-
-    const result = getRadialArray(arr, col, x, y);
-    console.log(result);
+    return {
+        cleanArray,
+    };
 };

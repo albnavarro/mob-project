@@ -5,15 +5,12 @@ import {
 } from '../../../js/core/animation/utils/animationUtils.js';
 import { mergeDeep } from '../../../js/core/utils/mergeDeep.js';
 import {
-    getStaggerIndex,
-    getRandomChoice,
-    setStagger,
-} from '.../../../js/core/animation/utils/getStaggerIndex.js';
-import {
     handleFrame,
     handleNextTick,
     handleFrameIndex,
 } from '../../../js/core/events/rafutils/rafUtils.js';
+import { setStagger } from '.../../../js/core/animation/utils/stagger/setStagger.js';
+import { DIRECTION_COL } from '.../../../js/core/animation/utils/stagger/staggerCostant.js';
 
 // Stagger and eade is defined at tween creation
 export class ParallaxTween {
@@ -29,10 +26,6 @@ export class ParallaxTween {
         this.type = 'tween';
         // Stagger
 
-        this.DIRECTION_DEFAULT = null;
-        this.DIRECTION_ROW = 'row';
-        this.DIRECTION_COL = 'col';
-
         this.stagger = {
             each: data?.stagger?.each ? data.stagger.each : 0,
             from: data?.stagger?.from ? data.stagger.from : 'start',
@@ -41,7 +34,7 @@ export class ParallaxTween {
                 row: data?.stagger?.grid?.row ? data.stagger.grid.row : -1,
                 direction: data?.stagger?.grid?.direction
                     ? data.stagger.grid.direction
-                    : this.DIRECTION_COL,
+                    : DIRECTION_COL,
             },
         };
 
@@ -56,7 +49,6 @@ export class ParallaxTween {
                 stagger: this.stagger,
                 slowlestStagger: {},
                 fastestStagger: {},
-                DIRECTION_ROW: this.DIRECTION_ROW,
             });
 
             this.callback = [...cbNow];

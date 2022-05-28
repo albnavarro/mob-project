@@ -37,7 +37,7 @@ export function syncTimelineTest() {
 
     // STAGGER
     const seqStagger = new HandleSequencer({
-        stagger: { each: 10 },
+        stagger: { each: 10, from: 'end' },
     });
     seqStagger
         .setData({ x: 0, scale: 1 })

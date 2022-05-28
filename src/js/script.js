@@ -65,8 +65,10 @@ import { gridStaggerTween } from './test/gridStaggerTween.js';
 import { gridStaggerSpring } from './test/gridStaggerSpring.js';
 import { gridStaggerLerp } from './test/gridStaggerLerp.js';
 import { gridStaggerSequencer } from './test/gridStaggerSequencer.js';
+import { radialStaggerTween } from './test/radialStaggerTween.js';
 
-import { test } from './test/explosion/explosionbase.js';
+// import { test } from './test/explosion/explosionbase.js';
+// test();
 
 handleLoad(() => {
     handleSetUp.set({
@@ -146,6 +148,10 @@ handleLoad(() => {
         gridStaggerSpring();
         gridStaggerLerp();
         gridStaggerSequencer();
+    }
+
+    if (body.classList.contains('page-radialStagger')) {
+        radialStaggerTween();
     }
 
     pageScroll.init();
