@@ -18,22 +18,8 @@ export const radialStaggerTween = () => {
     const timeline = new HandleAsyncTimeline({ repeat: -1, yoyo: true });
 
     timeline
-        .goFromTo(
-            tween,
-            { scale: 1.5 },
-            { scale: 0.5 },
-            {
-                duration: 1000,
-            }
-        )
-        .goFromTo(
-            tween,
-            { scale: 0.5 },
-            { scale: 2.5 },
-            {
-                duration: 500,
-            }
-        );
+        .goTo(tween, { scale: 0.5 }, { duration: 1000 })
+        .goTo(tween, { scale: 2.5 }, { duration: 500 });
 
     // Exmple set and go
     tween
