@@ -8,7 +8,6 @@ export const gridStaggerLerp = () => {
 
     const tween = new handleLerp();
     tween.setData({ scale: 1 });
-    tween.set({ scale: 1 });
 
     items.forEach((item, i) => {
         tween.subscribe(({ scale }) => {
@@ -30,5 +29,7 @@ export const gridStaggerLerp = () => {
         }
     );
 
-    timeline.play();
+    tween.set({ scale: 1 }).then((value) => {
+        timeline.play();
+    });
 };

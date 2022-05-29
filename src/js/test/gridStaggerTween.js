@@ -8,7 +8,6 @@ export const gridStaggerTween = () => {
 
     const tween = new handleTween('easeInOutQuad');
     tween.setData({ scale: 1 });
-    tween.set({ scale: 1 });
 
     items.forEach((item, i) => {
         tween.subscribe(({ scale }) => {
@@ -31,5 +30,8 @@ export const gridStaggerTween = () => {
         }
     );
 
-    timeline.play();
+    // Exmple set and go
+    tween.set({ scale: 1 }).then((value) => {
+        timeline.play();
+    });
 };

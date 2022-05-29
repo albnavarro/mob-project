@@ -8,7 +8,6 @@ export const gridStaggerSpring = () => {
 
     const tween = new handleSpring('bounce');
     tween.setData({ scale: 1 });
-    tween.set({ scale: 1 });
 
     items.forEach((item, i) => {
         tween.subscribe(({ scale }) => {
@@ -31,5 +30,7 @@ export const gridStaggerSpring = () => {
         }
     );
 
-    timeline.play();
+    tween.set({ scale: 1 }).then((value) => {
+        timeline.play();
+    });
 };

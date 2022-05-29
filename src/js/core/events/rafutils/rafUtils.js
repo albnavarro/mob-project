@@ -2,6 +2,7 @@ import { SimpleStore } from '../../store/simpleStore.js';
 import { getTime, defaultTimestep } from '../../utils/time.js';
 import { clamp } from '../../animation/utils/animationUtils.js';
 import { handleSetUp } from '../../setup.js';
+import { handleVisibilityChange } from '../visibilityChange/handleVisibilityChange.js';
 
 /**
  *
@@ -109,6 +110,11 @@ export const handleFrame = (() => {
     let fpsCounter = 0;
     // Indicate that fps is a real calucaltion and not the initial approssimation
     let fpsIsReal = false;
+
+    // Stop timer when user change tab
+    handleVisibilityChange(({ visibilityState }) => {
+        isStopped = visibilityState === 'visible';
+    });
 
     const render = () => {
         time = getTime();

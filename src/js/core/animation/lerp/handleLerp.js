@@ -355,10 +355,15 @@ export class handleLerp {
         const { velocity, precision, stagger } = newProps;
         this.velocity = velocity;
         this.precision = precision;
-        this.stagger.each = stagger.each;
-        this.stagger.waitComplete = stagger.waitComplete;
-        this.stagger.from = stagger.from;
-        this.stagger.grid = stagger.grid;
+
+        /*
+        CREATE STAGGER INDEX
+        */
+
+        if (this.firstRun) {
+            // Update stagger global value first time
+            this.stagger = mergeDeep(this.stagger, stagger);
+        }
 
         if (this.stagger.each > 0 && this.firstRun) {
             if (this.stagger.grid.col > this.callback.length) {

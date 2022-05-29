@@ -383,16 +383,17 @@ export class handleTween {
         const { ease, duration, stagger } = newProps;
         this.ease = tweenConfig[ease];
         this.duration = duration;
-        this.stagger.each = stagger.each;
-        this.stagger.waitComplete = stagger.waitComplete;
-        this.stagger.from = stagger.from;
-        this.stagger.grid = stagger.grid;
 
         /*
         CREATE STAGGER INDEX
         */
 
-        if (this.stagger.each > 0 && this.firstRun) {
+        if (this.firstRun) {
+            // Update stagger global value first time
+            this.stagger = mergeDeep(this.stagger, stagger);
+        }
+
+        if (stagger.each > 0 && this.firstRun) {
             if (this.stagger.grid.col > this.callback.length) {
                 console.warn(
                     'stagger col of grid is out of range, it must be less than the number of staggers '
