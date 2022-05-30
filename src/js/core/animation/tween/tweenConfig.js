@@ -1,156 +1,407 @@
+// https://github.com/bameyrick/js-easing-s/blob/master/src/index.ts
+
 export const tweenConfig = {
-    easeLinear: (t, b, c, d) => {
-        return (c * t) / d + b;
+    easeLinear: (elapsed, initialValue, amountOfChange, duration) => {
+        return (amountOfChange * elapsed) / duration + initialValue;
     },
-    easeInQuad: (t, b, c, d) => {
-        return c * (t /= d) * t + b;
+    easeInQuad: (elapsed, initialValue, amountOfChange, duration) => {
+        return amountOfChange * (elapsed /= duration) * elapsed + initialValue;
     },
-    easeOutQuad: (t, b, c, d) => {
-        return -c * (t /= d) * (t - 2) + b;
+    easeOutQuad: (elapsed, initialValue, amountOfChange, duration) => {
+        return (
+            -amountOfChange * (elapsed /= duration) * (elapsed - 2) +
+            initialValue
+        );
     },
-    easeInOutQuad: (t, b, c, d) => {
-        if ((t /= d / 2) < 1) return (c / 2) * t * t + b;
-        return (-c / 2) * (--t * (t - 2) - 1) + b;
+    easeInOutQuad: (elapsed, initialValue, amountOfChange, duration) => {
+        if ((elapsed /= duration / 2) < 1) {
+            return (amountOfChange / 2) * elapsed * elapsed + initialValue;
+        }
+        return (
+            (-amountOfChange / 2) * (--elapsed * (elapsed - 2) - 1) +
+            initialValue
+        );
     },
-    easeInSine: (t, b, c, d) => {
-        return -c * Math.cos((t / d) * (Math.PI / 2)) + c + b;
+    easeInCubic: (elapsed, initialValue, amountOfChange, duration) => {
+        return (
+            amountOfChange * (elapsed /= duration) * elapsed * elapsed +
+            initialValue
+        );
     },
-    easeOutSine: (t, b, c, d) => {
-        return c * Math.sin((t / d) * (Math.PI / 2)) + b;
+    easeOutCubic: (elapsed, initialValue, amountOfChange, duration) => {
+        return (
+            amountOfChange *
+                ((elapsed = elapsed / duration - 1) * elapsed * elapsed + 1) +
+            initialValue
+        );
     },
-    easeInOutSine: (t, b, c, d) => {
-        return (-c / 2) * (Math.cos((Math.PI * t) / d) - 1) + b;
+    easeInOutCubic: (elapsed, initialValue, amountOfChange, duration) => {
+        if ((elapsed /= duration / 2) < 1) {
+            return (
+                (amountOfChange / 2) * elapsed * elapsed * elapsed +
+                initialValue
+            );
+        }
+        return (
+            (amountOfChange / 2) * ((elapsed -= 2) * elapsed * elapsed + 2) +
+            initialValue
+        );
     },
-    easeInExpo: (t, b, c, d) => {
-        return t == 0 ? b : c * Math.pow(2, 10 * (t / d - 1)) + b;
+    easeInQuart: (elapsed, initialValue, amountOfChange, duration) => {
+        return (
+            amountOfChange *
+                (elapsed /= duration) *
+                elapsed *
+                elapsed *
+                elapsed +
+            initialValue
+        );
     },
-    easeOutExpo: (t, b, c, d) => {
-        return t == d ? b + c : c * (-Math.pow(2, (-10 * t) / d) + 1) + b;
+    easeOutQuart: (elapsed, initialValue, amountOfChange, duration) => {
+        return (
+            -amountOfChange *
+                ((elapsed = elapsed / duration - 1) *
+                    elapsed *
+                    elapsed *
+                    elapsed -
+                    1) +
+            initialValue
+        );
     },
-    easeInOutExpo: (t, b, c, d) => {
-        if (t == 0) return b;
-        if (t == d) return b + c;
-        if ((t /= d / 2) < 1) return (c / 2) * Math.pow(2, 10 * (t - 1)) + b;
-        return (c / 2) * (-Math.pow(2, -10 * --t) + 2) + b;
+    easeInOutQuart: (elapsed, initialValue, amountOfChange, duration) => {
+        if ((elapsed /= duration / 2) < 1) {
+            return (
+                (amountOfChange / 2) * elapsed * elapsed * elapsed * elapsed +
+                initialValue
+            );
+        }
+        return (
+            (-amountOfChange / 2) *
+                ((elapsed -= 2) * elapsed * elapsed * elapsed - 2) +
+            initialValue
+        );
     },
-    easeInCirc: (t, b, c, d) => {
-        return -c * (Math.sqrt(1 - (t /= d) * t) - 1) + b;
+    easeInQuint: (elapsed, initialValue, amountOfChange, duration) => {
+        return (
+            amountOfChange *
+                (elapsed /= duration) *
+                elapsed *
+                elapsed *
+                elapsed *
+                elapsed +
+            initialValue
+        );
     },
-    easeOutCirc: (t, b, c, d) => {
-        return c * Math.sqrt(1 - (t = t / d - 1) * t) + b;
+    easeOutQuint: (elapsed, initialValue, amountOfChange, duration) => {
+        return (
+            amountOfChange *
+                ((elapsed = elapsed / duration - 1) *
+                    elapsed *
+                    elapsed *
+                    elapsed *
+                    elapsed +
+                    1) +
+            initialValue
+        );
     },
-    easeInOutCirc: (t, b, c, d) => {
-        if ((t /= d / 2) < 1) return (-c / 2) * (Math.sqrt(1 - t * t) - 1) + b;
-        return (c / 2) * (Math.sqrt(1 - (t -= 2) * t) + 1) + b;
+    easeInOutQuint: (elapsed, initialValue, amountOfChange, duration) => {
+        if ((elapsed /= duration / 2) < 1) {
+            return (
+                (amountOfChange / 2) *
+                    elapsed *
+                    elapsed *
+                    elapsed *
+                    elapsed *
+                    elapsed +
+                initialValue
+            );
+        }
+        return (
+            (amountOfChange / 2) *
+                ((elapsed -= 2) * elapsed * elapsed * elapsed * elapsed + 2) +
+            initialValue
+        );
     },
-    easeInCubic: (t, b, c, d) => {
-        return c * (t /= d) * t * t + b;
+    easeInSine: (elapsed, initialValue, amountOfChange, duration) => {
+        return (
+            -amountOfChange * Math.cos((elapsed / duration) * (Math.PI / 2)) +
+            amountOfChange +
+            initialValue
+        );
     },
-    easeOutCubic: (t, b, c, d) => {
-        return c * ((t = t / d - 1) * t * t + 1) + b;
+    easeOutSine: (elapsed, initialValue, amountOfChange, duration) => {
+        return (
+            amountOfChange * Math.sin((elapsed / duration) * (Math.PI / 2)) +
+            initialValue
+        );
     },
-    easeInOutCubic: (t, b, c, d) => {
-        if ((t /= d / 2) < 1) return (c / 2) * t * t * t + b;
-        return (c / 2) * ((t -= 2) * t * t + 2) + b;
+    easeInOutSine: (elapsed, initialValue, amountOfChange, duration) => {
+        return (
+            (-amountOfChange / 2) *
+                (Math.cos((Math.PI * elapsed) / duration) - 1) +
+            initialValue
+        );
     },
-    easeInQuart: (t, b, c, d) => {
-        return c * (t /= d) * t * t * t + b;
+    easeInExpo: (elapsed, initialValue, amountOfChange, duration) => {
+        return elapsed === 0
+            ? initialValue
+            : amountOfChange * Math.pow(2, 10 * (elapsed / duration - 1)) +
+                  initialValue;
     },
-    easeOutQuart: (t, b, c, d) => {
-        return -c * ((t = t / d - 1) * t * t * t - 1) + b;
+    easeOutExpo: (elapsed, initialValue, amountOfChange, duration) => {
+        return elapsed === duration
+            ? initialValue + amountOfChange
+            : amountOfChange * (-Math.pow(2, (-10 * elapsed) / duration) + 1) +
+                  initialValue;
     },
-    easeInOutQuart: (t, b, c, d) => {
-        if ((t /= d / 2) < 1) return (c / 2) * t * t * t * t + b;
-        return (-c / 2) * ((t -= 2) * t * t * t - 2) + b;
+    easeInOutExpo: (elapsed, initialValue, amountOfChange, duration) => {
+        if (elapsed === 0) {
+            return initialValue;
+        }
+        if (elapsed === duration) {
+            return initialValue + amountOfChange;
+        }
+        if ((elapsed /= duration / 2) < 1) {
+            return (
+                (amountOfChange / 2) * Math.pow(2, 10 * (elapsed - 1)) +
+                initialValue
+            );
+        }
+        return (
+            (amountOfChange / 2) * (-Math.pow(2, -10 * --elapsed) + 2) +
+            initialValue
+        );
     },
-    easeInQuint: (t, b, c, d) => {
-        return c * (t /= d) * t * t * t * t + b;
+    easeInCirc: (elapsed, initialValue, amountOfChange, duration) => {
+        return (
+            -amountOfChange *
+                (Math.sqrt(1 - (elapsed /= duration) * elapsed) - 1) +
+            initialValue
+        );
     },
-    easeOutQuint: (t, b, c, d) => {
-        return c * ((t = t / d - 1) * t * t * t * t + 1) + b;
+    easeOutCirc: (elapsed, initialValue, amountOfChange, duration) => {
+        return (
+            amountOfChange *
+                Math.sqrt(1 - (elapsed = elapsed / duration - 1) * elapsed) +
+            initialValue
+        );
     },
-    easeInOutQuint: (t, b, c, d) => {
-        if ((t /= d / 2) < 1) return (c / 2) * t * t * t * t * t + b;
-        return (c / 2) * ((t -= 2) * t * t * t * t + 2) + b;
+    easeInOutCirc: (elapsed, initialValue, amountOfChange, duration) => {
+        if ((elapsed /= duration / 2) < 1) {
+            return (
+                (-amountOfChange / 2) * (Math.sqrt(1 - elapsed * elapsed) - 1) +
+                initialValue
+            );
+        }
+        return (
+            (amountOfChange / 2) *
+                (Math.sqrt(1 - (elapsed -= 2) * elapsed) + 1) +
+            initialValue
+        );
     },
-    easeInElastic: (t, b, c, d) => {
-        var s = 1.70158;
-        var p = 0;
-        var a = c;
-        if (t == 0) return b;
-        if ((t /= d) == 1) return b + c;
-        if (!p) p = d * 0.3;
-        if (a < Math.abs(c)) {
-            a = c;
-            var s = p / 4;
-        } else var s = (p / (2 * Math.PI)) * Math.asin(c / a);
+    easeInElastic: (elapsed, initialValue, amountOfChange, duration) => {
+        let s = 1.70158;
+        let p = 0;
+        let a = amountOfChange;
+        if (elapsed === 0) {
+            return initialValue;
+        }
+        if ((elapsed /= duration) === 1) {
+            return initialValue + amountOfChange;
+        }
+        if (!p) {
+            p = duration * 0.3;
+        }
+        if (a < Math.abs(amountOfChange)) {
+            a = amountOfChange;
+            s = p / 4;
+        } else {
+            s = (p / (2 * Math.PI)) * Math.asin(amountOfChange / a);
+        }
         return (
             -(
                 a *
-                Math.pow(2, 10 * (t -= 1)) *
-                Math.sin(((t * d - s) * (2 * Math.PI)) / p)
-            ) + b
+                Math.pow(2, 10 * (elapsed -= 1)) *
+                Math.sin(((elapsed * duration - s) * (2 * Math.PI)) / p)
+            ) + initialValue
         );
     },
-    easeOutElastic: (t, b, c, d) => {
-        var s = 1.70158;
-        var p = 0;
-        var a = c;
-        if (t == 0) return b;
-        if ((t /= d) == 1) return b + c;
-        if (!p) p = d * 0.3;
-        if (a < Math.abs(c)) {
-            a = c;
-            var s = p / 4;
-        } else var s = (p / (2 * Math.PI)) * Math.asin(c / a);
+    easeOutElastic: (elapsed, initialValue, amountOfChange, duration) => {
+        let s = 1.70158;
+        let p = 0;
+        let a = amountOfChange;
+        if (elapsed === 0) {
+            return initialValue;
+        }
+        if ((elapsed /= duration) === 1) {
+            return initialValue + amountOfChange;
+        }
+        if (!p) {
+            p = duration * 0.3;
+        }
+        if (a < Math.abs(amountOfChange)) {
+            a = amountOfChange;
+            s = p / 4;
+        } else {
+            s = (p / (2 * Math.PI)) * Math.asin(amountOfChange / a);
+        }
         return (
             a *
-                Math.pow(2, -10 * t) *
-                Math.sin(((t * d - s) * (2 * Math.PI)) / p) +
-            c +
-            b
+                Math.pow(2, -10 * elapsed) *
+                Math.sin(((elapsed * duration - s) * (2 * Math.PI)) / p) +
+            amountOfChange +
+            initialValue
         );
     },
-    easeInOutElastic: (t, b, c, d) => {
-        var s = 1.70158;
-        var p = 0;
-        var a = c;
-        if (t == 0) return b;
-        if ((t /= d / 2) == 2) return b + c;
-        if (!p) p = d * (0.3 * 1.5);
-        if (a < Math.abs(c)) {
-            a = c;
-            var s = p / 4;
-        } else var s = (p / (2 * Math.PI)) * Math.asin(c / a);
-        if (t < 1)
+    easeInOutElastic: (elapsed, initialValue, amountOfChange, duration) => {
+        let s = 1.70158;
+        let p = 0;
+        let a = amountOfChange;
+        if (elapsed === 0) {
+            return initialValue;
+        }
+        if ((elapsed /= duration / 2) === 2) {
+            return initialValue + amountOfChange;
+        }
+        if (!p) {
+            p = duration * (0.3 * 1.5);
+        }
+        if (a < Math.abs(amountOfChange)) {
+            a = amountOfChange;
+            s = p / 4;
+        } else {
+            s = (p / (2 * Math.PI)) * Math.asin(amountOfChange / a);
+        }
+        if (elapsed < 1) {
             return (
                 -0.5 *
                     (a *
-                        Math.pow(2, 10 * (t -= 1)) *
-                        Math.sin(((t * d - s) * (2 * Math.PI)) / p)) +
-                b
+                        Math.pow(2, 10 * (elapsed -= 1)) *
+                        Math.sin(
+                            ((elapsed * duration - s) * (2 * Math.PI)) / p
+                        )) +
+                initialValue
             );
+        }
         return (
             a *
-                Math.pow(2, -10 * (t -= 1)) *
-                Math.sin(((t * d - s) * (2 * Math.PI)) / p) *
+                Math.pow(2, -10 * (elapsed -= 1)) *
+                Math.sin(((elapsed * duration - s) * (2 * Math.PI)) / p) *
                 0.5 +
-            c +
-            b
+            amountOfChange +
+            initialValue
         );
     },
-    easeInBack: (t, b, c, d) => {
-        const s = 1.70158;
-        return c * (t /= d) * t * ((s + 1) * t - s) + b;
+    easeInBack: (
+        elapsed,
+        initialValue,
+        amountOfChange,
+        duration,
+        s = 1.70158
+    ) => {
+        return (
+            amountOfChange *
+                (elapsed /= duration) *
+                elapsed *
+                ((s + 1) * elapsed - s) +
+            initialValue
+        );
     },
-    easeOutBack: (t, b, c, d) => {
-        const s = 1.70158;
-        return c * ((t = t / d - 1) * t * ((s + 1) * t + s) + 1) + b;
+    easeOutBack: (
+        elapsed,
+        initialValue,
+        amountOfChange,
+        duration,
+        s = 1.70158
+    ) => {
+        return (
+            amountOfChange *
+                ((elapsed = elapsed / duration - 1) *
+                    elapsed *
+                    ((s + 1) * elapsed + s) +
+                    1) +
+            initialValue
+        );
     },
-    easeInOutBack: (t, b, c, d) => {
-        let s = 1.70158;
-        if ((t /= d / 2) < 1)
-            return (c / 2) * (t * t * (((s *= 1.525) + 1) * t - s)) + b;
-        return (c / 2) * ((t -= 2) * t * (((s *= 1.525) + 1) * t + s) + 2) + b;
+    easeInOutBack: (
+        elapsed,
+        initialValue,
+        amountOfChange,
+        duration,
+        s = 1.70158
+    ) => {
+        if ((elapsed /= duration / 2) < 1) {
+            return (
+                (amountOfChange / 2) *
+                    (elapsed * elapsed * (((s *= 1.525) + 1) * elapsed - s)) +
+                initialValue
+            );
+        }
+        return (
+            (amountOfChange / 2) *
+                ((elapsed -= 2) * elapsed * (((s *= 1.525) + 1) * elapsed + s) +
+                    2) +
+            initialValue
+        );
+    },
+    easeInBounce: (elapsed, initialValue, amountOfChange, duration) => {
+        return (
+            amountOfChange -
+            tweenConfig.easeOutBounce(
+                duration - elapsed,
+                0,
+                amountOfChange,
+                duration
+            ) +
+            initialValue
+        );
+    },
+    easeOutBounce: (elapsed, initialValue, amountOfChange, duration) => {
+        if ((elapsed /= duration) < 1 / 2.75) {
+            return amountOfChange * (7.5625 * elapsed * elapsed) + initialValue;
+        } else if (elapsed < 2 / 2.75) {
+            return (
+                amountOfChange *
+                    (7.5625 * (elapsed -= 1.5 / 2.75) * elapsed + 0.75) +
+                initialValue
+            );
+        } else if (elapsed < 2.5 / 2.75) {
+            return (
+                amountOfChange *
+                    (7.5625 * (elapsed -= 2.25 / 2.75) * elapsed + 0.9375) +
+                initialValue
+            );
+        } else {
+            return (
+                amountOfChange *
+                    (7.5625 * (elapsed -= 2.625 / 2.75) * elapsed + 0.984375) +
+                initialValue
+            );
+        }
+    },
+    easeInOutBounce: (elapsed, initialValue, amountOfChange, duration) => {
+        if (elapsed < duration / 2) {
+            return (
+                tweenConfig.easeInBounce(
+                    elapsed * 2,
+                    0,
+                    amountOfChange,
+                    duration
+                ) *
+                    0.5 +
+                initialValue
+            );
+        }
+        return (
+            tweenConfig.easeOutBounce(
+                elapsed * 2 - duration,
+                0,
+                amountOfChange,
+                duration
+            ) *
+                0.5 +
+            amountOfChange * 0.5 +
+            initialValue
+        );
     },
 };

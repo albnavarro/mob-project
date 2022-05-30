@@ -124,23 +124,3 @@ exports.build = build;
 exports.reset = reset;
 exports.dev = dev;
 exports.watch = watchTask;
-
-/*
- * gulp build
- * gulp build -debug -page "it/index.json"
- * ....
- * gulp build -prod -page "it/index.json"
- */
-
-/*
- * npm run dev
- * npm run build
- * npm run build -- --debug
- *
- * watch single page:
- * npm run page "en/index.json"
- *
- * debug single page:
- * npm run debugpage "index.it.json"
- * .....
- */

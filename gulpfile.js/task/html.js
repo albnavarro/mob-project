@@ -202,7 +202,8 @@ function html(done) {
         };
 
         // Create critical css map where each template is associated to first render file with that template
-        if (store.counterRun == 0) {
+        // If debug one page skip block otherwise return skipTask = true
+        if (store.counterRun == 0 && !store.arg.debug) {
             // At first run in development mode skip task
             if (!store.arg.prod) {
                 return { skipTask: true, publish: false, fn: null };
@@ -371,7 +372,7 @@ function html(done) {
                         )
                         .pipe(rename(newName + '.html'))
                         .pipe(gulp.dest(`${destPath}/${pathByLocale}`))
-                        .on('end', function () {
+                        .on('end', function() {
                             if (store.arg.debug) {
                                 debugRenderHtml(newName, newData);
                                 console.log(
@@ -437,7 +438,7 @@ function html(done) {
                     )
                     .pipe(rename(nameFile + '.html'))
                     .pipe(gulp.dest(`${destPath}/${pathByLocale}`))
-                    .on('end', function () {
+                    .on('end', function() {
                         if (store.arg.debug) {
                             debugRenderHtml(nameFile, allData);
                             console.log(
