@@ -20,7 +20,11 @@ const LERP_DEFAULT_PRECISION = 0.01;
 
 export class handleLerp {
     constructor(velocity = 0.06) {
-        this.uniqueId = '_' + Math.random().toString(36).substr(2, 9);
+        this.uniqueId =
+            '_' +
+            Math.random()
+                .toString(36)
+                .substr(2, 9);
         this.config = {};
         this.velocity = velocity;
         this.precision = LERP_DEFAULT_PRECISION;
@@ -623,11 +627,9 @@ export class handleLerp {
      */
     updateVelocity(velocity) {
         this.velocity = velocity;
-        this.defaultProps = {
-            reverse: false,
+        this.defaultProps = mergeDeep(this.defaultProps, {
             velocity: velocity,
-            precision: LERP_DEFAULT_PRECISION,
-        };
+        });
     }
 
     /**

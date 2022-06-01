@@ -1,0 +1,8 @@
+{
+    "template": "masterSequencer",
+    "slug": "masterSequencer",
+    "pageTitle": "masterSequencer",
+    "description": "custom description",
+    "additionalData": ["nav.json"],
+    "registerComponent": ["to-top/pug/toTop.pug"]
+}

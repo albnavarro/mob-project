@@ -98,7 +98,7 @@ export const handleFrame = (() => {
 
     // FPS
     const arrAvg = (arr) => arr.reduce((a, b) => a + b, 0) / arr.length;
-    const fpsLoopCycle = handleSetUp.get('fpsLoopCycle');
+
     // Initial fps average
     let averageFps = 60;
     // Clamp fps
@@ -129,6 +129,7 @@ export const handleFrame = (() => {
             : 60;
 
         // get average of fps every 30 cycle (fpsLoopCycle)
+        const fpsLoopCycle = handleSetUp.get('fpsLoopCycle');
         if (fpsCounter < fpsLoopCycle) {
             fpsCounter++;
             fpsStack.push(fps);
@@ -150,8 +151,7 @@ export const handleFrame = (() => {
         frameIsRuning = false;
         isStopped = false;
 
-        // Valutare requestIdleCallback con polifyll
-        setTimeout(() => {
+        const nextTickFn = () => {
             // Fire next Tick outside asnimationframe
             handleNextTick.fire(time, averageFps);
 
@@ -162,7 +162,14 @@ export const handleFrame = (() => {
             } else {
                 isStopped = true;
             }
-        });
+        };
+
+        const deferredNextTick = handleSetUp.get('deferredNextTick');
+        if (deferredNextTick) {
+            setTimeout(() => nextTickFn());
+        } else {
+            nextTickFn();
+        }
     };
 
     /**

@@ -28,16 +28,27 @@ export function tweenTest() {
     }
 
     // DEFINE TIMELINE
-    const timeline = new HandleAsyncTimeline({ repeat: -1, yoyo: true })
+    const timeline = new HandleAsyncTimeline({ repeat: 2, yoyo: true })
         .set(myTween, { x: 0, y: 0, rotate: 0 })
         .goTo(myTween, { x: -200 })
         .goFromTo(myTween, { x: -200 }, { x: 400 }, { duration: 800 })
         .add(() => console.log('custom function'))
+        .addAsync((res) => {
+            console.log('start async function');
+            setTimeout(() => {
+                console.log('end async function');
+                res();
+            }, 2000);
+        })
         .goTo(myTween, { y: 400 }, { duration: 350 })
         .label({ name: 'label1' })
         .goTo(myTween, { x: -100, rotate: 90 }, { ease: 'easeInQuint' })
         .add(() => console.log('custom function'))
         .goTo(myTween, { x: 0, y: 0, rotate: 0 }, { duration: 2000 });
+
+    const unsubscribe = timeline.onComplete(() => {
+        console.log('complete');
+    });
 
     // LISTNER
     btnStart.addEventListener('click', () => {

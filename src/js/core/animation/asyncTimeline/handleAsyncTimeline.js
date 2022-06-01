@@ -39,6 +39,10 @@ export class HandleAsyncTimeline {
         this.delayIsRunning = false;
         this.startOnDelay = false;
         this.actionAfterReject = [];
+
+        // Callback
+        this.id = 0;
+        this.callback = [];
     }
 
     run(index = this.currentIndex) {
@@ -92,8 +96,14 @@ export class HandleAsyncTimeline {
                 add: () => {
                     return new Promise((res, reject) => {
                         // Custom function
-                        tween(this);
+                        tween();
                         res();
+                    });
+                },
+                addAsync: () => {
+                    return new Promise((res, reject) => {
+                        // Custom function that fire the result of the promise
+                        tween(res);
                     });
                 },
                 createGroup: () => {
@@ -223,6 +233,11 @@ export class HandleAsyncTimeline {
                 } else {
                     // Rest all timeline is ended
                     this.stop();
+
+                    // Fire and of timeline
+                    this.callback.forEach(({ cb }) => {
+                        cb();
+                    });
                 }
             })
             .catch((error) => {
@@ -396,6 +411,18 @@ export class HandleAsyncTimeline {
         const obj = {
             tween: fn,
             action: 'add',
+            groupProps: { waitComplete: this.waitComplete },
+        };
+
+        const mergedObj = { ...this.defaultObj, ...obj };
+        this.addToMainArray(tweenProps, mergedObj);
+        return this;
+    }
+
+    addAsync(fn, tweenProps = {}) {
+        const obj = {
+            tween: fn,
+            action: 'addAsync',
             groupProps: { waitComplete: this.waitComplete },
         };
 
@@ -590,6 +617,17 @@ export class HandleAsyncTimeline {
     destroy() {
         this.tweenList = [];
         this.currentTween = [];
+        this.callback = [];
         this.currentIndex = 0;
+    }
+
+    onComplete(cb) {
+        this.callback.push({ cb, id: this.id });
+        const cbId = this.id;
+        this.id++;
+
+        return () => {
+            this.callback = this.callback.filter((item) => item.id !== cbId);
+        };
     }
 }

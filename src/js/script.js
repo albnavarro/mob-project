@@ -66,14 +66,16 @@ import { gridStaggerSpring } from './test/gridStaggerSpring.js';
 import { gridStaggerLerp } from './test/gridStaggerLerp.js';
 import { gridStaggerSequencer } from './test/gridStaggerSequencer.js';
 import { radialStaggerTween } from './test/radialStaggerTween.js';
+import { masterSequencer } from './test/masterSequencer.js';
 
 // import { test } from './test/explosion/explosionbase.js';
 // test();
 
 handleLoad(() => {
     handleSetUp.set({
-        fpsLoopCycle: 30,
+        fpsLoopCycle: 20,
         fpsThreshold: 5,
+        deferredNextTick: true,
     });
 
     const body = document.querySelector('body');
@@ -152,6 +154,10 @@ handleLoad(() => {
 
     if (body.classList.contains('page-radialStagger')) {
         radialStaggerTween();
+    }
+
+    if (body.classList.contains('page-masterSequencer')) {
+        masterSequencer();
     }
 
     pageScroll.init();

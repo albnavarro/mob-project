@@ -17,7 +17,11 @@ import { DIRECTION_COL } from '../utils/stagger/staggerCostant.js';
 
 export class handleSpring {
     constructor(config = 'default') {
-        this.uniqueId = '_' + Math.random().toString(36).substr(2, 9);
+        this.uniqueId =
+            '_' +
+            Math.random()
+                .toString(36)
+                .substr(2, 9);
         this.config = springConfig[config];
         this.req = false;
         this.currentResolve = null;
@@ -643,17 +647,6 @@ export class handleSpring {
     }
 
     /**
-     * updateConfig - Update config object
-     *
-     * @param  {Object} config udate single prop of config object
-     * @return {void}
-     *
-     */
-    updateConfig(config) {
-        this.config = { ...this.config, ...config };
-    }
-
-    /**
      * reverse - sitch fromValue and ToValue for specific input value
      *
      * @return {void}
@@ -673,6 +666,20 @@ export class handleSpring {
     }
 
     /**
+     * updateConfig - Update config object
+     *
+     * @param  {Object} config udate single prop of config object
+     * @return {void}
+     *
+     */
+    updateConfig(config) {
+        this.config = { ...this.config, ...config };
+        this.defaultProps = mergeDeep(this.defaultProps, {
+            config,
+        });
+    }
+
+    /**
      * updatePreset - Update config object with new preset
      *
      * @param  {String} preset new preset
@@ -683,6 +690,10 @@ export class handleSpring {
         if (preset in springConfig) {
             this.config = springConfig[preset];
         }
+
+        this.defaultProps = mergeDeep(this.defaultProps, {
+            config: this.config,
+        });
     }
 
     /**

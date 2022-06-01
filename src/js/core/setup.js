@@ -4,6 +4,7 @@ export const handleSetUp = (() => {
     let data = {
         fpsLoopCycle: 30,
         fpsThreshold: 10,
+        deferredNextTick: true,
     };
 
     const set = (obj) => {

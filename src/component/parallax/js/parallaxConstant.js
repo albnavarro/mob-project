@@ -63,6 +63,7 @@ export const parallaxConstant = {
     // Ease type constant
     EASE_SPRING: 'spring',
     EASE_LERP: 'lerp',
+    EASE_PRECISION: 0.001,
 
     SCROLL_UP: 'up',
     SCROLL_DOWN: 'down',

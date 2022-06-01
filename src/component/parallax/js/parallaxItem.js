@@ -127,8 +127,8 @@ export class ParallaxItemClass {
         // Add more precision to motion spring/lerp to trigger better force3D
         this.motionParameters =
             data.easeType === parallaxConstant.EASE_SPRING
-                ? { config: { precision: 0.001 } }
-                : { precision: 0.001 };
+                ? { config: { precision: parallaxConstant.EASE_PRECISION } }
+                : { precision: parallaxConstant.EASE_PRECISION };
 
         //
         this.springConfig = data.springConfig || null;
@@ -139,6 +139,10 @@ export class ParallaxItemClass {
                 this.tween.getType() === parallaxConstant.TWEEN_TIMELINE
             ) {
                 this.easeType = parallaxConstant.EASE_LERP;
+                // Force lerp motion parameters if tween is a sequencer
+                this.motionParameters = {
+                    precision: parallaxConstant.EASE_PRECISION,
+                };
             }
 
             return this.easeType === parallaxConstant.EASE_LERP

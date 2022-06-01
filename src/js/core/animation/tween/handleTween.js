@@ -17,7 +17,11 @@ import { DIRECTION_COL } from '../utils/stagger/staggerCostant.js';
 
 export class handleTween {
     constructor(ease = 'easeOutBack') {
-        this.uniqueId = '_' + Math.random().toString(36).substr(2, 9);
+        this.uniqueId =
+            '_' +
+            Math.random()
+                .toString(36)
+                .substr(2, 9);
         this.ease = tweenConfig[ease];
         this.req = false;
         this.currentResolve = null;
@@ -666,6 +670,10 @@ export class handleTween {
         if (preset in tweenConfig) {
             this.ease = tweenConfig[preset];
         }
+
+        this.defaultProps = mergeDeep(this.defaultProps, {
+            ease: preset,
+        });
     }
 
     /**
