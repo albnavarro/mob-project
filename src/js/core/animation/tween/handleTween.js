@@ -19,6 +19,11 @@ import {
     STAGGER_DEFAULT_OBJ,
     STAGGER_DEFAULT_INDEX_OBJ,
 } from '../utils/stagger/staggerCostant.js';
+import {
+    defaultCallbackOnComplete,
+    defaultCallback,
+    getDeltaFps,
+} from '../utils/callbacks/defaultCallback.js';
 
 export class handleTween {
     constructor(ease = 'easeOutBack') {
@@ -115,31 +120,29 @@ export class handleTween {
             // Prepare an obj to pass to the callback
             const cbObject = getValueObj(this.values, 'currentValue');
 
-            // Check if we lost some fps so we skip update to not overload browser rendering
-            // Not first time, only inside motion and once fps is real ( stable )
-            o.deltaFps =
-                !o.inMotion || !o.isRealFps ? 0 : Math.abs(this.maxFps - fps);
+            /**
+            Check if we lost some fps so we skip update to not overload browser rendering
+            Not first time, only inside motion and once fps is real ( stable )
+            **/
+            o.deltaFps = getDeltaFps({
+                inMotion: o.inMotion,
+                isRealFps: o.isRealFps,
+                maxFps: this.maxFps,
+                fps,
+            });
             o.inMotion = true;
 
-            handleFrame.add(() => {
-                if (this.stagger.each === 0) {
-                    // No stagger, run immediatly
-                    this.callback.forEach(({ cb }) => {
-                        if (o.deltaFps < this.fpsThreshold || fps > this.maxFps)
-                            cb(cbObject);
-                    });
-                } else {
-                    // Stagger
-                    this.callback.forEach(({ cb, index, frame }, i) => {
-                        handleFrameIndex(() => {
-                            if (
-                                o.deltaFps < this.fpsThreshold ||
-                                fps > this.maxFps
-                            )
-                                cb(cbObject);
-                        }, frame);
-                    });
-                }
+            /**
+            Fire CallBack
+             **/
+            defaultCallback({
+                stagger: this.stagger,
+                callback: this.callback,
+                deltaFps: o.deltaFps,
+                fpsThreshold: this.fpsThreshold,
+                maxFps: this.maxFps,
+                fps,
+                cbObject,
             });
 
             this.isRunning = true;
@@ -177,44 +180,15 @@ export class handleTween {
                     }
                 };
 
-                if (this.stagger.each === 0) {
-                    onComplete();
-
-                    handleNextFrame.add(() => {
-                        // Fire callback with exact end value
-                        this.callback.forEach(({ cb }) => {
-                            cb(cbObject);
-                        });
-
-                        this.callbackOnComplete.forEach(({ cb }) => {
-                            cb(cbObject);
-                        });
-                    });
-                } else {
-                    this.callback.forEach(({ cb, index, frame }, i) => {
-                        handleFrameIndex(() => {
-                            cb(cbObject);
-
-                            if (this.stagger.waitComplete) {
-                                if (i === this.slowlestStagger.index) {
-                                    onComplete();
-                                }
-                            } else {
-                                if (i === this.fastestStagger.index) {
-                                    onComplete();
-                                }
-                            }
-                        }, frame);
-                    });
-
-                    this.callbackOnComplete.forEach(
-                        ({ cb, index, frame }, i) => {
-                            handleFrameIndex(() => {
-                                cb(cbObject);
-                            }, frame + 1);
-                        }
-                    );
-                }
+                defaultCallbackOnComplete({
+                    onComplete,
+                    callback: this.callback,
+                    callbackOnComplete: this.callbackOnComplete,
+                    cbObject,
+                    stagger: this.stagger,
+                    slowlestStagger: this.slowlestStagger,
+                    fastestStagger: this.fastestStagger,
+                });
             }
         };
 
