@@ -1,5 +1,6 @@
 import { tweenConfig } from './tweenConfig.js';
 import {
+    getUnivoqueId,
     getValueObj,
     mergeArrayTween,
     compareKeys,
@@ -13,16 +14,15 @@ import {
 import { mergeDeep } from '../../utils/mergeDeep.js';
 import { handleSetUp } from '../../setup.js';
 import { setStagger } from '../utils/stagger/setStagger.js';
-import { DIRECTION_COL } from '../utils/stagger/staggerCostant.js';
+import {
+    DIRECTION_COL,
+    STAGGER_DEFAULT_OBJ,
+    STAGGER_DEFAULT_INDEX_OBJ,
+} from '../utils/stagger/staggerCostant.js';
 
 export class handleTween {
     constructor(ease = 'easeOutBack') {
-        this.uniqueId =
-            '_' +
-            Math.random()
-                .toString(36)
-                .substr(2, 9);
-        this.ease = tweenConfig[ease];
+        this.uniqueId = getUnivoqueId();
         this.req = false;
         this.currentResolve = null;
         this.currentReject = null;
@@ -34,7 +34,6 @@ export class handleTween {
         this.callbackStartInPause = [];
         this.pauseStatus = false;
         this.comeFromResume = false;
-        this.duration = 1000;
         this.startTime = null;
         this.isRunning = false;
         this.timeElapsed = 0;
@@ -46,46 +45,30 @@ export class handleTween {
         // If fps is under this.maxFps by this.fpsThreshold is algging, so skip to not overload
         this.fpsThreshold = handleSetUp.get('fpsThreshold');
 
+        /**
+        This value lives from user call ( goTo etc..) until next call
+         **/
+        this.ease = tweenConfig[ease];
+        this.duration = 1000;
+
+        /**
+        This value is the base value merged with new value in custom prop
+        passed form user in goTo etc..
+         **/
         this.defaultProps = {
             duration: 1000,
             ease,
             reverse: false,
             immediate: false,
-            stagger: {
-                each: 0,
-                waitComplete: false,
-                from: 'start',
-                grid: {
-                    col: -1,
-                    row: -1,
-                    direction: DIRECTION_COL,
-                },
-            },
+            stagger: STAGGER_DEFAULT_OBJ,
         };
 
-        //
-        this.stagger = {
-            each: 0,
-            waitComplete: false,
-            from: 'start',
-            grid: {
-                col: -1,
-                row: -1,
-                direction: DIRECTION_COL,
-            },
-        };
-
-        //
-        this.slowlestStagger = {
-            index: 0,
-            frame: 0,
-        };
-
-        //
-        this.fastestStagger = {
-            index: 0,
-            frame: 0,
-        };
+        /**
+        Stagger value
+         **/
+        this.stagger = STAGGER_DEFAULT_OBJ;
+        this.slowlestStagger = STAGGER_DEFAULT_INDEX_OBJ;
+        this.fastestStagger = STAGGER_DEFAULT_INDEX_OBJ;
     }
 
     onReuqestAnim(timestamp, fps, res) {
@@ -197,16 +180,17 @@ export class handleTween {
                 if (this.stagger.each === 0) {
                     onComplete();
 
-                    // Fire callback with exact end value
-                    this.callback.forEach(({ cb }) => {
-                        cb(cbObject);
-                    });
+                    handleNextFrame.add(() => {
+                        // Fire callback with exact end value
+                        this.callback.forEach(({ cb }) => {
+                            cb(cbObject);
+                        });
 
-                    this.callbackOnComplete.forEach(({ cb }) => {
-                        cb(cbObject);
+                        this.callbackOnComplete.forEach(({ cb }) => {
+                            cb(cbObject);
+                        });
                     });
                 } else {
-                    // Fire callback with exact end value
                     this.callback.forEach(({ cb, index, frame }, i) => {
                         handleFrameIndex(() => {
                             cb(cbObject);

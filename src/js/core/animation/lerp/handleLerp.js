@@ -1,4 +1,5 @@
 import {
+    getUnivoqueId,
     getValueObj,
     mergeArray,
     lerp,
@@ -14,20 +15,18 @@ import {
 import { mergeDeep } from '../../utils/mergeDeep.js';
 import { handleSetUp } from '../../setup.js';
 import { setStagger } from '../utils/stagger/setStagger.js';
-import { DIRECTION_COL } from '../utils/stagger/staggerCostant.js';
+import {
+    DIRECTION_COL,
+    STAGGER_DEFAULT_OBJ,
+    STAGGER_DEFAULT_INDEX_OBJ,
+} from '../utils/stagger/staggerCostant.js';
 
 const LERP_DEFAULT_PRECISION = 0.01;
 
 export class handleLerp {
     constructor(velocity = 0.06) {
-        this.uniqueId =
-            '_' +
-            Math.random()
-                .toString(36)
-                .substr(2, 9);
+        this.uniqueId = getUnivoqueId();
         this.config = {};
-        this.velocity = velocity;
-        this.precision = LERP_DEFAULT_PRECISION;
         this.req = false;
         this.currentResolve = null;
         this.currentReject = null;
@@ -45,42 +44,30 @@ export class handleLerp {
         // If fps is under this.maxFps by this.fpsThreshold is algging, so skip to not overload
         this.fpsThreshold = handleSetUp.get('fpsThreshold');
 
+        /**
+        This value lives from user call ( goTo etc..) until next call
+         **/
+        this.velocity = velocity;
+        this.precision = LERP_DEFAULT_PRECISION;
+
+        /**
+        This value is the base value merged with new value in custom prop
+        passed form user in goTo etc..
+         **/
         this.defaultProps = {
             reverse: false,
             velocity,
             precision: LERP_DEFAULT_PRECISION,
             immediate: false,
-            stagger: {
-                each: 0,
-                waitComplete: false,
-                from: 'start',
-                grid: {
-                    col: -1,
-                    row: -1,
-                    direction: DIRECTION_COL,
-                },
-            },
+            stagger: STAGGER_DEFAULT_OBJ,
         };
 
-        this.stagger = {
-            each: 0,
-            waitComplete: false,
-            from: 'start',
-            grid: {
-                col: -1,
-                row: -1,
-                direction: DIRECTION_COL,
-            },
-        };
-
-        this.slowlestStagger = {
-            index: 0,
-            frame: 0,
-        };
-        this.fastestStagger = {
-            index: 0,
-            frame: 0,
-        };
+        /**
+        Stagger value
+         **/
+        this.stagger = STAGGER_DEFAULT_OBJ;
+        this.slowlestStagger = STAGGER_DEFAULT_INDEX_OBJ;
+        this.fastestStagger = STAGGER_DEFAULT_INDEX_OBJ;
     }
 
     onReuqestAnim(timestamp, fps, res) {

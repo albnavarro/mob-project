@@ -95,15 +95,23 @@ export class HandleAsyncTimeline {
                 },
                 add: () => {
                     return new Promise((res, reject) => {
-                        // Custom function
-                        tween();
-                        res();
+                        if (!isImmediate) {
+                            // Custom function
+                            tween({ reverse: this.isReverse });
+                            res();
+                        } else {
+                            res();
+                        }
                     });
                 },
                 addAsync: () => {
                     return new Promise((res, reject) => {
-                        // Custom function that fire the result of the promise
-                        tween(res);
+                        if (!isImmediate) {
+                            // Custom function that fire the result of the promise
+                            tween({ reverse: this.isReverse, resolve: res });
+                        } else {
+                            res();
+                        }
                     });
                 },
                 createGroup: () => {
@@ -563,7 +571,9 @@ export class HandleAsyncTimeline {
         this.isSuspended = false;
 
         // Stop all Tween
-        this.currentTween.forEach(({ tween }) => tween.stop());
+        this.currentTween.forEach(({ tween }) => {
+            if (tween?.stop) tween.stop();
+        });
 
         // Reset Reverse
         if (this.isReverse) this.revertTween();
@@ -573,7 +583,7 @@ export class HandleAsyncTimeline {
     pause() {
         this.isInPause = true;
         this.currentTween.forEach(({ tween }) => {
-            tween.pause();
+            if (tween?.pause) tween.pause();
         });
     }
 
@@ -607,7 +617,9 @@ export class HandleAsyncTimeline {
     }
 
     resumeEachTween() {
-        this.currentTween.forEach(({ tween }) => tween.resume());
+        this.currentTween.forEach(({ tween }) => {
+            if (tween?.resume) tween.resume();
+        });
     }
 
     get() {
