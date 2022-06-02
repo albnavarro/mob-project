@@ -656,9 +656,13 @@ export class ParallaxItemClass {
         )
             return;
 
-        this.motion
-            .goTo({ val: this.endValue }, this.motionParameters)
-            .catch((err) => {});
+        // First time render with no easing
+        const action = this.firstTime ? 'set' : 'goTo';
+
+        this.motion[action](
+            { val: this.endValue },
+            this.motionParameters
+        ).catch((err) => {});
     }
 
     computeValue(scrollVal = null) {
