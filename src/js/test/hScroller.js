@@ -92,17 +92,19 @@ export const hScroller = () => {
         },
         onEnter: () => {
             console.log('onEnter');
+            return (pluto.style['background-color'] = 'red');
         },
         onEnterBack: () => {
             console.log('onEnterBack');
+            return (pluto.style['background-color'] = 'red');
         },
         onLeave: () => {
             console.log('onLeave');
-            return (pluto.style['background-color'] = 'red');
+            return (pluto.style['background-color'] = '');
         },
         onLeaveBack: () => {
             console.log('onLeaveBack');
-            return (pluto.style['background-color'] = 'white');
+            return (pluto.style['background-color'] = '');
         },
     });
     parallaxIn.init();

@@ -67,4 +67,10 @@ export const parallaxConstant = {
 
     SCROLL_UP: 'up',
     SCROLL_DOWN: 'down',
+
+    ON_LEAVE: 'ON_LEAVE',
+    ON_LEAVE_BACK: 'ON_LEAVE_BACK',
+    ON_ENTER: 'ON_ENTER',
+    ON_ENTER_BACK: 'ON_ENTER_BACK',
+    ON_NOOP: 'ON_NOOP',
 };

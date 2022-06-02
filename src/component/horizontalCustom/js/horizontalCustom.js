@@ -6,7 +6,10 @@ import {
     getTranslateValues,
 } from '../../../js/core/utils/vanillaFunction.js';
 import { handleResize } from '.../../../js/core/events/resizeUtils/handleResize.js';
-import { handleFrame } from '.../../../js/core/events/rafutils/rafUtils.js';
+import {
+    handleFrame,
+    handleNextTick,
+} from '.../../../js/core/events/rafutils/rafUtils.js';
 import { ParallaxItemClass } from '../../parallax/js/parallaxItem.js';
 import { horizontalCustomCss } from './horizontalCustomCss.js';
 
@@ -305,7 +308,17 @@ export class horizontalCustomClass {
         this.getWidth().then(() =>
             this.setDimension().then(() =>
                 this.createShadow().then(() =>
-                    this.updateShadow().then(() => this.initScroller())
+                    this.updateShadow().then(() => {
+                        this.initScroller();
+
+                        handleFrame.add(() => {
+                            handleNextTick.add(() => {
+                                this.onRefreshCallBack.forEach((item, i) =>
+                                    item()
+                                );
+                            });
+                        });
+                    })
                 )
             )
         );
@@ -314,8 +327,11 @@ export class horizontalCustomClass {
     updateModule() {
         if (this.moduleisActive) {
             this.scroller.refresh();
-            this.onRefreshCallBack.forEach((item, i) => {
-                item();
+
+            handleFrame.add(() => {
+                handleNextTick.add(() => {
+                    this.onRefreshCallBack.forEach((item, i) => item());
+                });
             });
         }
     }

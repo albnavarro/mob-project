@@ -1,3 +1,5 @@
+import { parallaxConstant } from './parallaxConstant.js';
+
 export function parallaxEmitter({
     prevValue,
     value,
@@ -7,35 +9,61 @@ export function parallaxEmitter({
     onLeave,
     onLeaveBack,
 }) {
-    if (value > maxVal && prevValue < maxVal) {
-        if (maxVal > 0) {
+    const action = () => {
+        /**
+         * ON_LEAVE
+         **/
+        if (
+            (value > maxVal && prevValue < maxVal && maxVal > 0) ||
+            (value < maxVal && prevValue > maxVal && maxVal < 0)
+        )
+            return parallaxConstant.ON_LEAVE;
+
+        /**
+         * ON_ENTER_BACK
+         **/
+        if (
+            (value > maxVal && prevValue < maxVal && maxVal < 0) ||
+            (value < maxVal && prevValue > maxVal && maxVal > 0)
+        )
+            return parallaxConstant.ON_ENTER_BACK;
+
+        /**
+         * ON_LEAVE_BACK
+         **/
+        if (
+            (value > 0 && prevValue < 0 && maxVal < 0) ||
+            (value < 0 && prevValue > 0 && maxVal > 0)
+        )
+            return parallaxConstant.ON_LEAVE_BACK;
+
+        /**
+         * ON_ENTER
+         **/
+        if (
+            (value > 0 && value < maxVal && prevValue < 0 && maxVal > 0) ||
+            (value < 0 && prevValue > 0 && maxVal < 0)
+        )
+            return parallaxConstant.ON_ENTER;
+
+        return parallaxConstant.ON_NOOP;
+    };
+
+    const fn = {
+        [parallaxConstant.ON_LEAVE]: () => {
             if (onLeave) onLeave();
-        } else {
-            if (onLeaveBack) onLeaveBack();
-        }
-    }
-
-    if (value < maxVal && prevValue > maxVal) {
-        if (maxVal > 0) {
-            if (onLeaveBack) onLeaveBack();
-        } else {
-            if (onLeave) onLeave();
-        }
-    }
-
-    if (value > 0 && value < maxVal && prevValue < 0 && maxVal > 0) {
-        if (onEnter) onEnter();
-    }
-
-    if (value > 0 && prevValue < 0 && maxVal < 0) {
-        if (onEnterBack) onEnterBack();
-    }
-
-    if (value < 0 && prevValue > 0) {
-        if (maxVal > 0) {
+        },
+        [parallaxConstant.ON_ENTER_BACK]: () => {
             if (onEnterBack) onEnterBack();
-        } else {
+        },
+        [parallaxConstant.ON_LEAVE_BACK]: () => {
+            if (onLeaveBack) onLeaveBack();
+        },
+        [parallaxConstant.ON_ENTER]: () => {
             if (onEnter) onEnter();
-        }
-    }
+        },
+        [parallaxConstant.ON_NOOP]: () => {},
+    };
+
+    fn[action()]();
 }

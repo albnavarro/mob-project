@@ -46,6 +46,11 @@ export const noGsap = () => {
         parallaxTest.move(scrollVal);
     });
 
+    // Rtefresh parallax child
+    horizontalCustom.onRefresh((scrollVal) => {
+        parallaxTest.refresh();
+    });
+
     // Init all
     horizontalCustom.init();
     parallaxTest.init();
