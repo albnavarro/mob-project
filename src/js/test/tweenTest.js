@@ -28,7 +28,7 @@ export function tweenTest() {
     }
 
     // DEFINE TIMELINE
-    const timeline = new HandleAsyncTimeline({ repeat: 2, yoyo: true })
+    const timeline = new HandleAsyncTimeline({ repeat: -1, yoyo: false })
         .set(myTween, { x: 0, y: 0, rotate: 0 })
         .goTo(myTween, { x: -200 })
         .goFromTo(myTween, { x: -200 }, { x: 400 }, { duration: 800 })
