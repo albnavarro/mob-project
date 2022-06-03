@@ -150,6 +150,8 @@ export class ParallaxItemClass {
                 : new handleSpring();
         })();
         this.unsubscribeMotion = () => {};
+        this.unsubscribeOnComplete = () => {};
+        this.animateAtStart = data.animateAtStart || false;
 
         //
         this.unitMisure = '';
@@ -280,7 +282,7 @@ export class ParallaxItemClass {
             });
         });
 
-        this.motion.onComplete(({ val }) => {
+        this.unsubscribeOnComplete = this.motion.onComplete(({ val }) => {
             this.force3D = false;
 
             if (this.propierties === parallaxConstant.PROP_TWEEN) {
@@ -553,6 +555,7 @@ export class ParallaxItemClass {
         this.unsubscribeScrollStart();
         this.unsubscribeResize();
         this.unsubscribeMotion();
+        this.unsubscribeOnComplete();
         this.unsubscribeMarker();
         this.dynamicRange = null;
         this.onEnter = () => {};
@@ -657,7 +660,7 @@ export class ParallaxItemClass {
             return;
 
         // First time render with no easing
-        const action = this.firstTime ? 'set' : 'goTo';
+        const action = this.firstTime & !this.animateAtStart ? 'set' : 'goTo';
 
         this.motion[action](
             { val: this.endValue },

@@ -297,6 +297,7 @@ export class horizontalCustomClass {
             ease: true,
             forceTranspond: this.forceTranspond, //Bring element to body to have better performance
             easeType: 'lerp',
+            animateAtStart: false,
         });
         scroller.init();
 
