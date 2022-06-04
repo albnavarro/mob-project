@@ -14,8 +14,20 @@ export class HandleMasterSequencer {
         this.children.push(item);
     }
 
+    setDuration(val) {
+        this.children.forEach((item, i) => {
+            item.setDuration(val);
+        });
+    }
+
     getDuration() {
         return this.children.length > 0 ? this.children[0].getDuration() : 0;
+    }
+
+    disableStagger() {
+        this.children.forEach((item, i) => {
+            item.disableStagger();
+        });
     }
 
     getType() {

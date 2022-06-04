@@ -89,6 +89,10 @@
                 {
                     "label": "",
                     "univoqueId": "masterSequencer"
+                },
+                {
+                    "label": "",
+                    "univoqueId": "sequencerStaggerTime"
                 }
             ]
         },

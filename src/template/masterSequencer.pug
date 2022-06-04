@@ -7,11 +7,12 @@ block content
         .container.menu-container.menu-container--top
             include ../includes/navigation.pug
     main
-        - const items = 8;     
-        .master-stagger
-            .master-stagger__container
-                each i in [...Array(items).keys()]
-                  .master-stagger__item
-                    
-        .scrollStagger
+      - const items = 8;     
+      .master-stagger.master-stagger--fixed
+          .master-stagger__container
+              each i in [...Array(items).keys()]
+                .master-stagger__item
+                  
+      .scrollStagger
+
         

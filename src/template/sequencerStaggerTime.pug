@@ -1,0 +1,31 @@
+extends default/_wrapper.pug
+
+block content
+    header
+        .container
+            include ../includes/langSelector.pug
+        .container.menu-container.menu-container--top
+            include ../includes/navigation.pug
+    main
+        .master-stagger-nav
+          button.animation-play
+            |play
+          button.animation-reverse
+            |reverse
+          button.animation-play-reverse
+            |play reverse
+          button.animation-stop
+            |stop
+          button.animation-pause
+            |pause
+          button.animation-resume
+            |resume
+          
+        - const items = 8;     
+        .master-stagger
+            .master-stagger__container
+                each i in [...Array(items).keys()]
+                  .master-stagger__item
+                    
+
+        

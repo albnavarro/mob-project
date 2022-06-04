@@ -67,6 +67,7 @@ import { gridStaggerLerp } from './test/gridStaggerLerp.js';
 import { gridStaggerSequencer } from './test/gridStaggerSequencer.js';
 import { radialStaggerTween } from './test/radialStaggerTween.js';
 import { masterSequencer } from './test/masterSequencer.js';
+import { sequencerStaggerTime } from './test/sequencerStaggerTime.js';
 
 // import { test } from './test/explosion/explosionbase.js';
 // test();
@@ -158,6 +159,10 @@ handleLoad(() => {
 
     if (body.classList.contains('page-masterSequencer')) {
         masterSequencer();
+    }
+
+    if (body.classList.contains('page-sequencerStaggerTime')) {
+        sequencerStaggerTime();
     }
 
     pageScroll.init();
