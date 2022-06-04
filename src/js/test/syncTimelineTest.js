@@ -58,12 +58,17 @@ export function syncTimelineTest() {
         });
     });
 
-    const syncTimeline = new HandleSyncTimeline({ repeat: -1, yoyo: false });
+    const syncTimeline = new HandleSyncTimeline({ repeat: 4, yoyo: false });
     syncTimeline.add(seq1);
     syncTimeline.add(seqStagger);
     syncTimeline.setDuration('10000');
-    syncTimeline.onComplete(({ direction, loop }) => {
+
+    // callback
+    syncTimeline.onLoopEnd(({ direction, loop }) => {
         console.log(`direction: ${direction}, loop index: ${loop}`);
+    });
+    syncTimeline.onComplete(() => {
+        console.log(`complete`);
     });
 
     btnStart.addEventListener('click', () => {

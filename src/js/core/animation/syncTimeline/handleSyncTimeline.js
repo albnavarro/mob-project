@@ -31,9 +31,10 @@ export class HandleSyncTimeline {
             this.repeat = false;
         }
 
-        // Callback on complete
-        this.onCompleteId = 0;
-        this.callback = [];
+        // callbackLoop on complete
+        this.callbackId = 0;
+        this.callbackLoop = [];
+        this.callbackComplete = [];
     }
 
     updateTime(timestamp, fps) {
@@ -97,12 +98,12 @@ export class HandleSyncTimeline {
                 return;
             }
 
-            // onComplete callback condition by direction of animation
-            const onCompleteCondition = !this.isReverse
+            // onLoopEnd callbackLoop condition by direction of animation
+            const onLoopEndCondition = !this.isReverse
                 ? partial >= this.duration - frameThreshold
                 : partial <= 0 + frameThreshold;
 
-            if (onCompleteCondition) {
+            if (onLoopEndCondition) {
                 handleNextFrame.add(() => {
                     // Prevent multiple fire of complete event
                     // Send direction BACKWARD || FORWARD as argument
@@ -110,7 +111,7 @@ export class HandleSyncTimeline {
                         this.loopCounter++;
                         this.completed = true;
 
-                        this.callback.forEach(({ cb }) =>
+                        this.callbackLoop.forEach(({ cb }) =>
                             cb({
                                 direction: this.getDirection(),
                                 loop: this.loopCounter,
@@ -121,7 +122,7 @@ export class HandleSyncTimeline {
             }
 
             if (!this.repeat || this.loopCounter === this.repeat - 1) {
-                // Fire callback onStop of each sequencr
+                // Fire callbackLoop onStop of each sequencr
                 // Prevent async problem, endTime back to start, so store the value
                 const endTime = this.endTime;
                 this.squencers.forEach((item, i) => {
@@ -136,6 +137,9 @@ export class HandleSyncTimeline {
                 this.resetTime();
                 this.startTime = timestamp;
                 if (this.isReverse) this.isReverse = false;
+
+                // Fire last callback on Complete
+                this.callbackComplete.forEach(({ cb }, i) => cb());
             } else {
                 if (this.yoyo) {
                     this.reverse();
@@ -286,7 +290,7 @@ export class HandleSyncTimeline {
         this.isStopped = true;
         this.pauseStatus = false;
 
-        // Fire callback onStop of each sequencr
+        // Fire callbackLoop onStop of each sequencr
         this.squencers.forEach((item, i) => {
             item.draw({
                 partial: this.endTime,
@@ -305,13 +309,27 @@ export class HandleSyncTimeline {
         this.duration = duration;
     }
 
-    onComplete(cb) {
-        this.callback.push({ cb, id: this.onCompleteId });
-        const cbId = this.onCompleteId;
-        this.onCompleteId++;
+    onLoopEnd(cb) {
+        this.callbackLoop.push({ cb, id: this.callbackId });
+        const cbId = this.callbackId;
+        this.callbackId++;
 
         return () => {
-            this.callback = this.callback.filter((item) => item.id !== cbId);
+            this.callbackLoop = this.callbackLoop.filter(
+                (item) => item.id !== cbId
+            );
+        };
+    }
+
+    onComplete(cb) {
+        this.callbackComplete.push({ cb, id: this.callbackId });
+        const cbId = this.callbackId;
+        this.callbackId++;
+
+        return () => {
+            this.callbackComplete = this.callbackComplete.filter(
+                (item) => item.id !== cbId
+            );
         };
     }
 
