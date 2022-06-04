@@ -6,6 +6,7 @@ import {
 } from '../../events/rafutils/rafUtils.js';
 import { setStagger } from '../utils/stagger/setStagger.js';
 import { DIRECTION_COL } from '../utils/stagger/staggerCostant.js';
+import { SEQUENCER_DEFAULT_DURATION } from './sequencerUtils.js';
 
 export class HandleSequencer {
     constructor(data = {}) {
@@ -20,7 +21,7 @@ export class HandleSequencer {
         this.id = 0;
         this.callback = [];
         this.callbackOnStop = [];
-        this.duration = 10;
+        this.duration = SEQUENCER_DEFAULT_DURATION;
         this.type = 'sequencer';
         this.defaultProp = {
             start: 0,

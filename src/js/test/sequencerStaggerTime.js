@@ -4,10 +4,7 @@ import { HandleMasterSequencer } from '../core/animation/sequencer/handleMasterS
 import { ParallaxItemClass } from '../../component/parallax/js/parallaxItem.js';
 import { outerHeight } from '../core/utils/vanillaFunction.js';
 import { handleResize } from '../core/events/resizeUtils/handleResize.js';
-import {
-    sequencerDelay,
-    sequencerEqual,
-} from '../core/animation/sequencer/sequencerUtils.js';
+import { createStaggers } from '../core/animation/sequencer/sequencerUtils.js';
 
 export const sequencerStaggerTime = () => {
     const items = document.querySelectorAll('.master-stagger__item');
@@ -21,30 +18,19 @@ export const sequencerStaggerTime = () => {
     let masterSequencer = new HandleMasterSequencer();
     const duration = 2000;
 
+    const staggers = createStaggers({
+        items,
+        stagger: {
+            each: 30,
+        },
+        duration: 2000,
+    });
+
     // Create sequencer
     const createSequencer = () => {
-        [...items].forEach((item, i) => {
+        staggers.forEach(({ item, start, end }) => {
             const sequencer = new HandleSequencer();
             sequencer.setDuration(duration);
-
-            /**
-             *  Equal distance
-             **/
-            // const { start, end } = sequencerEqual({
-            //     duration: sequencer.getDuration(),
-            //     itemsLength: items.length,
-            //     index: i,
-            // });
-
-            /**
-             *  Delay
-             **/
-            const { start, end } = sequencerDelay({
-                factor: 1000,
-                duration: sequencer.getDuration(),
-                itemsLength: items.length,
-                index: i,
-            });
 
             sequencer
                 .setData({ y: 0 })

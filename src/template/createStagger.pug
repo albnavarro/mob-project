@@ -1,0 +1,20 @@
+extends default/_wrapper.pug
+
+block content
+    header
+        .container
+            include ../includes/langSelector.pug
+        .container.menu-container.menu-container--top
+            include ../includes/navigation.pug
+    main
+        - const items = 81;
+        .container.clearfix       
+          .create-stagger
+            h1
+              | Create
+            .create-stagger__container
+                each i in [...Array(items).keys()]
+                  .create-stagger__item
+          .scrollStagger
+                    
+        

@@ -2,11 +2,10 @@ import { HandleSequencer } from '../core/animation/sequencer/handleSequencer.js'
 import { HandleMasterSequencer } from '../core/animation/sequencer/handleMasterSequencer.js';
 import { ParallaxItemClass } from '../../component/parallax/js/parallaxItem.js';
 import { outerHeight } from '../core/utils/vanillaFunction.js';
-import { handleResize } from '../core/events/resizeUtils/handleResize.js';
 import { createStaggers } from '../core/animation/sequencer/sequencerUtils.js';
 
-export const masterSequencer = () => {
-    const items = document.querySelectorAll('.master-stagger__item');
+export const createStagger = () => {
+    const items = document.querySelectorAll('.create-stagger__item');
     const trigger = document.querySelector('.scrollStagger');
 
     let masterSequencer = new HandleMasterSequencer();
@@ -15,7 +14,9 @@ export const masterSequencer = () => {
     const staggers = createStaggers({
         items,
         stagger: {
-            each: 30,
+            each: 2,
+            from: { x: 4, y: 4 },
+            grid: { col: 9, row: 9, direction: 'radial' },
         },
     });
 
@@ -23,17 +24,14 @@ export const masterSequencer = () => {
     const createSequencer = () => {
         sequencers = staggers.map(({ item, start, end }) => {
             const sequencer = new HandleSequencer();
+            sequencer.setData({ scale: 1 }).goTo({ scale: 2 }, { start, end });
 
-            sequencer
-                .setData({ y: 0 })
-                .goTo({ y: 300 }, { start, end, ease: 'easeInOutBack' });
-
-            const unsubscribe = sequencer.subscribe(({ y }) => {
-                item.style.transform = `translate3D(0px,0px,0px) translate(0, ${y}px)`;
+            const unsubscribe = sequencer.subscribe(({ scale }) => {
+                item.style.transform = `translate3D(0px,0px,0px) scale(${scale})`;
             });
 
-            const unsubscribeStop = sequencer.onStop(({ y }) => {
-                item.style.transform = `translate(0, ${y}px)`;
+            const unsubscribeStop = sequencer.onStop(({ scale }) => {
+                item.style.transform = `scale(${scale})`;
             });
 
             masterSequencer.add(sequencer);
@@ -42,14 +40,6 @@ export const masterSequencer = () => {
     };
 
     createSequencer();
-
-    // Test destroy and create sequencer on resize
-    handleResize(() => {
-        sequencers.forEach(({ unsubscribe }, i) => unsubscribe());
-        sequencers.forEach(({ unsubscribeStop }, i) => unsubscribeStop());
-        masterSequencer.destroy();
-        createSequencer();
-    });
 
     const parallaxIn = new ParallaxItemClass({
         item: trigger,
@@ -66,7 +56,6 @@ export const masterSequencer = () => {
         },
         ease: true,
         easeType: 'lerp',
-        // lerpConfig: 0.09,
     });
     parallaxIn.init();
 };
