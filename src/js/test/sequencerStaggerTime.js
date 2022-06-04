@@ -1,5 +1,6 @@
 import { HandleSequencer } from '../core/animation/sequencer/handleSequencer.js';
 import { HandleSyncTimeline } from '../core/animation/syncTimeline/handleSyncTimeline.js';
+import { HandleMasterSequencer } from '../core/animation/sequencer/handleMasterSequencer.js';
 import { ParallaxItemClass } from '../../component/parallax/js/parallaxItem.js';
 import { outerHeight } from '../core/utils/vanillaFunction.js';
 import { handleResize } from '../core/events/resizeUtils/handleResize.js';
@@ -17,12 +18,12 @@ export const sequencerStaggerTime = () => {
     const pause = document.querySelector('.animation-pause');
     const resume = document.querySelector('.animation-resume');
 
-    let sequencers = [];
+    let masterSequencer = new HandleMasterSequencer();
     const duration = 2000;
 
     // Create sequencer
     const createSequencer = () => {
-        sequencers = [...items].map((item, i) => {
+        [...items].forEach((item, i) => {
             const sequencer = new HandleSequencer();
             sequencer.setDuration(duration);
 
@@ -53,7 +54,11 @@ export const sequencerStaggerTime = () => {
                 item.style.transform = `translate3D(0px,0px,0px) translate(0, ${y}px)`;
             });
 
-            return { sequencer, unsubscribe };
+            sequencer.onStop(({ y }) => {
+                item.style.transform = `translate(0, ${y}px)`;
+            });
+
+            masterSequencer.add(sequencer);
         });
     };
 
@@ -63,7 +68,7 @@ export const sequencerStaggerTime = () => {
      *  Animation
      **/
     const timeline = new HandleSyncTimeline({ repeat: -1, yoyo: true });
-    sequencers.forEach(({ sequencer }, i) => timeline.add(sequencer));
+    timeline.add(masterSequencer);
     timeline.setDuration(duration);
 
     play.addEventListener('click', () => {

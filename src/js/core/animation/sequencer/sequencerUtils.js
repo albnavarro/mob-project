@@ -5,8 +5,7 @@ export const sequencerDelay = ({ factor, duration, itemsLength, index }) => {
     const unit = Math.abs(duration / itemsLength / realDelay);
     const itemDelay = unit * index;
     const start = itemDelay;
-    const stepDuration = duration - itemDelay;
-    const end = start + stepDuration;
+    const end = duration;
 
     return { start, end };
 };
