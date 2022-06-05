@@ -11,13 +11,26 @@ export const setStagger = ({
 }) => {
     const result = (() => {
         // Check if direction is an object like {x: n, y: n}
-        if (
-            Object.prototype.toString.call(stagger.from) ===
-                '[object Object]' &&
-            'x' in stagger.from &&
-            'y' in stagger.from &&
-            stagger.grid.direction === DIRECTION_RADIAL
-        ) {
+        if (stagger.grid.direction === DIRECTION_RADIAL) {
+            /**
+             * Check if from is a valid parameters
+             * **/
+            if (
+                Object.prototype.toString.call(stagger.from) !==
+                    '[object Object]' ||
+                !('x' in stagger?.from) ||
+                !('y' in stagger?.from)
+            ) {
+                console.warn(
+                    `Stagger error: in radial direction 'from' propierties must be a object {x:val,y:val}`
+                );
+                return {
+                    cbNow: [],
+                    cbCompleteNow: [],
+                    fastestStagger: {},
+                    slowlestStagger: {},
+                };
+            }
             /**
              * GRID STAGGER
              * stagger: {
@@ -82,6 +95,23 @@ export const setStagger = ({
                 slowlestStagger,
             };
         } else {
+            /**
+             * Check if from is a valid parameters
+             * **/
+            if (
+                Object.prototype.toString.call(stagger.from) ===
+                '[object Object]'
+            ) {
+                console.warn(
+                    `Stagger error: in col/row direction 'from' propierties must be a string start/end/center/edges`
+                );
+                return {
+                    cbNow: [],
+                    cbCompleteNow: [],
+                    fastestStagger: {},
+                    slowlestStagger: {},
+                };
+            }
             /**
              * DEFAULT STAGGER
              * grid: { col: n, row: n, direction: 'row' },

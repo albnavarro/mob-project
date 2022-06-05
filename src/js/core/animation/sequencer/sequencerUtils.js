@@ -51,7 +51,7 @@ export const createStaggers = ({ items, stagger, duration }) => {
     // Number of stagger chunk
     const numItem = frameSet.length;
 
-    const staggers = cbNow.map(({ cb, frame, id }) => {
+    const staggers = cbNow.map(({ cb, frame }) => {
         const index = frameSet.findIndex((item) => item === frame);
 
         const { start, end } = (() => {

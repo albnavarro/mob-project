@@ -14,17 +14,19 @@ export const createStagger = () => {
     const staggers = createStaggers({
         items,
         stagger: {
-            each: 2,
+            each: 'equal',
             from: { x: 4, y: 4 },
-            grid: { col: 9, row: 9, direction: 'radial' },
+            grid: { col: 5, row: 5, direction: 'radial' },
         },
     });
 
     // Create sequencer
     const createSequencer = () => {
-        sequencers = staggers.map(({ item, start, end }) => {
+        sequencers = staggers.map(({ item, start, end, index }) => {
             const sequencer = new HandleSequencer();
-            sequencer.setData({ scale: 1 }).goTo({ scale: 2 }, { start, end });
+            sequencer
+                .setData({ scale: 0.5 })
+                .goTo({ scale: 1 }, { start, end });
 
             const unsubscribe = sequencer.subscribe(({ scale }) => {
                 item.style.transform = `translate3D(0px,0px,0px) scale(${scale})`;

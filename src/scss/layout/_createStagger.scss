@@ -16,14 +16,13 @@
 
     &__container {
         display: grid;
-        grid-template-columns: repeat(9, 1fr);
-        grid-gap: 20px;
+        grid-template-columns: repeat(5, 1fr);
     }
 
     &__item {
-        width: 40px;
-        height: 40px;
+        width: 100px;
+        height: 100px;
         background: #ccc;
-        border-radius: 100%;
+        transform: scale(0.5);
     }
 }
