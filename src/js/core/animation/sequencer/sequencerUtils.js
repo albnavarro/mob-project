@@ -42,8 +42,16 @@ export const createStaggers = ({ items, stagger, duration }) => {
         fastestStagger: {},
     });
 
+    /**
+     * Remove element with no dom item ,is possible with row and item fantasiose
+     * In tween there is no problem beciuse use NOOP callback
+     * */
+    const cbNowFiltered = cbNow.filter(
+        ({ cb }) => cb instanceof Element || cb instanceof HTMLDocument
+    );
+
     // Num of total different stagger by frame
-    const frameArray = cbNow.map(({ frame }) => frame);
+    const frameArray = cbNowFiltered.map(({ frame }) => frame);
 
     // Remove duplicate and sort from 0
     const frameSet = [...new Set(frameArray)].sort((a, b) => a - b);
@@ -51,7 +59,7 @@ export const createStaggers = ({ items, stagger, duration }) => {
     // Number of stagger chunk
     const numItem = frameSet.length;
 
-    const staggers = cbNow.map(({ cb, frame }) => {
+    const staggers = cbNowFiltered.map(({ cb, frame }) => {
         const index = frameSet.findIndex((item) => item === frame);
 
         const { start, end } = (() => {
