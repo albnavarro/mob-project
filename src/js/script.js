@@ -15,6 +15,7 @@ import { vh } from './utility/vh.js';
 import { findElement } from './utility/findElement.js';
 import { handleLoad } from './core/events/loadutils/handleLoad.js';
 import { handleSetUp } from './core/setup.js';
+import { heatFps, framStore } from './core/events/rafutils/rafUtils.js';
 
 // NEW VANILLA COMPONENT MODULE
 import { totop } from '../component/to-top/js/toTop.js';
@@ -78,6 +79,11 @@ handleLoad(() => {
         fpsLoopCycle: 20,
         fpsThreshold: 10,
         deferredNextTick: true,
+    });
+    heatFps();
+    const unsubscribe = framStore.watch('fpsIsReady', () => {
+        console.log('fps ready');
+        unsubscribe();
     });
 
     const body = document.querySelector('body');

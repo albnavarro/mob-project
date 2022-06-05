@@ -99,11 +99,13 @@ export const handleFrame = (() => {
     // FPS
     const arrAvg = (arr) => arr.reduce((a, b) => a + b, 0) / arr.length;
 
+    // Clamp fps
+    const maxFps = 200;
+    const minFps = 10;
+
     // Initial fps average
     let averageFps = 60;
-    // Clamp fps
-    const maxFps = 80;
-    const minFps = 25;
+
     // Fps data
     let fpsStack = [];
     // After how many cicles fps is calculated
@@ -126,7 +128,7 @@ export const handleFrame = (() => {
 
         const fps = !isStopped
             ? clamp(parseInt(1000 / (time - prevTime)), minFps, maxFps)
-            : 60;
+            : averageFps;
 
         // get average of fps every 30 cycle (fpsLoopCycle)
         const fpsLoopCycle = handleSetUp.get('fpsLoopCycle');
@@ -214,3 +216,37 @@ export const handleFrame = (() => {
         getFps,
     };
 })();
+
+/**
+ *  Utils; ster script after heatFps is completed
+ * const unsubscribe = framStore.watch('fpsIsReady', () => {
+ *    ....
+ *    unsubscribe();
+ * });
+ *
+ */
+export const framStore = new SimpleStore({
+    fpsIsReady: () => ({
+        value: false,
+        type: Boolean,
+    }),
+});
+
+/**
+ *  Intial loop fo 60 frame to reach the right fps
+ */
+export const heatFps = () => {
+    const inizializeCountInitialValue = 60;
+    let inizializeCount = 0;
+
+    const inizializeLoop = () => {
+        inizializeCount++;
+        if (inizializeCount >= inizializeCountInitialValue) {
+            framStore.set('fpsIsReady', true);
+            return;
+        }
+
+        handleNextFrame.add(() => inizializeLoop());
+    };
+    handleFrame.add(() => inizializeLoop());
+};

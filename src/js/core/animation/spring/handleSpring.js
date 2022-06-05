@@ -71,8 +71,6 @@ export class handleSpring {
     }
 
     onReuqestAnim(timestamp, fps, res) {
-        let animationLastTime = 0;
-
         this.values.forEach((item, i) => {
             item.velocity = parseFloat(this.config.velocity);
             item.currentValue = parseFloat(item.fromValue);
@@ -100,40 +98,25 @@ export class handleSpring {
             // Get max fps upper limit
             if (fps > this.maxFps && o.isRealFps) this.maxFps = fps;
 
-            // lastTime is set to now the first time.
-            // then check the difference from now and last time to check if we lost frame
-            o.lastTime =
-                animationLastTime !== 0 ? animationLastTime : timestamp;
+            this.values.forEach((item, i) => {
+                o.tensionForce = -tension * (item.currentValue - item.toValue);
+                o.dampingForce = -friction * item.velocity;
+                o.acceleration = (o.tensionForce + o.dampingForce) / mass;
 
-            // If we lost a lot of frames just jump to the end.
-            if (timestamp > o.lastTime + this.lostFrameTresold)
-                o.lastTime = timestamp;
+                item.velocity = item.velocity + (o.acceleration * 1) / fps;
+                item.currentValue =
+                    item.currentValue + (item.velocity * 1) / fps;
 
-            // http://gafferongames.com/game-physics/fix-your-timestep/
-            o.numSteps = Math.floor(timestamp - o.lastTime);
+                o.isVelocity = Math.abs(item.velocity) <= precision;
 
-            for (let i = 0; i < o.numSteps; ++i) {
-                this.values.forEach((item, i) => {
-                    o.tensionForce =
-                        -tension * (item.currentValue - item.toValue);
-                    o.dampingForce = -friction * item.velocity;
-                    o.acceleration = (o.tensionForce + o.dampingForce) / mass;
+                o.isDisplacement =
+                    tension !== 0
+                        ? Math.abs(item.toValue - item.currentValue) <=
+                          precision
+                        : true;
 
-                    item.velocity = item.velocity + (o.acceleration * 1) / 1000;
-                    item.currentValue =
-                        item.currentValue + (item.velocity * 1) / 1000;
-
-                    o.isVelocity = Math.abs(item.velocity) <= precision;
-
-                    o.isDisplacement =
-                        tension !== 0
-                            ? Math.abs(item.toValue - item.currentValue) <=
-                              precision
-                            : true;
-
-                    item.settled = o.isVelocity && o.isDisplacement;
-                });
-            }
+                item.settled = o.isVelocity && o.isDisplacement;
+            });
 
             // Prepare an obj to pass to the callback
             const cbObject = getValueObj(this.values, 'currentValue');
@@ -162,9 +145,6 @@ export class handleSpring {
                 fps,
                 cbObject,
             });
-
-            // Update last time
-            animationLastTime = timestamp;
 
             // Check if all values is completed
             o.allSettled = this.values.every((item) => item.settled === true);
