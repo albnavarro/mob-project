@@ -23,7 +23,7 @@ export const sequencerStaggerTime = () => {
         stagger: {
             each: 30,
         },
-        duration: 2000,
+        duration,
     });
 
     // Create sequencer

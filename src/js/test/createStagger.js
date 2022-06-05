@@ -10,6 +10,7 @@ export const createStagger = () => {
 
     let masterSequencer = new HandleMasterSequencer();
     let sequencers = [];
+    const duration = 2000;
 
     const staggers = createStaggers({
         items,
@@ -18,12 +19,14 @@ export const createStagger = () => {
             from: { x: 4, y: 4 },
             grid: { col: 5, row: 5, direction: 'radial' },
         },
+        duration,
     });
 
     // Create sequencer
     const createSequencer = () => {
         sequencers = staggers.map(({ item, start, end, index }) => {
             const sequencer = new HandleSequencer();
+            sequencer.setDuration(duration);
             sequencer
                 .setData({ scale: 0.5 })
                 .goTo({ scale: 1 }, { start, end });
