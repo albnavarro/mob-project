@@ -1,6 +1,7 @@
 import { getDefaultStagger } from './getDefaultStagger.js';
 import { getRadialArray } from './getRadialStagger.js';
 import { DIRECTION_RADIAL } from './staggerCostant.js';
+import { handleFrame } from '../../../events/rafutils/rafUtils.js';
 
 export const setStagger = ({
     cb,
@@ -130,6 +131,18 @@ export const setStagger = ({
     const cbCompleteNow = result.cbCompleteNow;
     fastestStagger = result.fastestStagger;
     slowlestStagger = result.slowlestStagger;
+
+    /**
+     * fit the frame value to current fps
+     *
+     **/
+    cbNow.forEach((item, i) => {
+        item.frame = parseInt(item.frame * (handleFrame.getFps() / 60));
+    });
+
+    cbCompleteNow.forEach((item, i) => {
+        item.frame = parseInt(item.frame * (handleFrame.getFps() / 60));
+    });
 
     return {
         cbNow,

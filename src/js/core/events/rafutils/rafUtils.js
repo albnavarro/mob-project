@@ -167,6 +167,7 @@ export const handleFrame = (() => {
         };
 
         const deferredNextTick = handleSetUp.get('deferredNextTick');
+
         if (deferredNextTick) {
             setTimeout(() => nextTickFn());
         } else {
@@ -218,14 +219,14 @@ export const handleFrame = (() => {
 })();
 
 /**
- *  Utils; ster script after heatFps is completed
+ * Utils: fire script after heatFps is completed
  * const unsubscribe = framStore.watch('fpsIsReady', () => {
  *    ....
  *    unsubscribe();
  * });
  *
  */
-export const framStore = new SimpleStore({
+export const frameStore = new SimpleStore({
     fpsIsReady: () => ({
         value: false,
         type: Boolean,
@@ -236,17 +237,29 @@ export const framStore = new SimpleStore({
  *  Intial loop fo 60 frame to reach the right fps
  */
 export const heatFps = () => {
-    const inizializeCountInitialValue = 60;
+    // Loop two time in accordion of fpsLoopCycle value
+    // So we are sure that the fps is stable
+    const fpsLoopCycle = handleSetUp.get('fpsLoopCycle');
+    const inizializeCountInitialValue = fpsLoopCycle * 2 + 2;
     let inizializeCount = 0;
 
     const inizializeLoop = () => {
         inizializeCount++;
         if (inizializeCount >= inizializeCountInitialValue) {
-            framStore.set('fpsIsReady', true);
+            frameStore.set('fpsIsReady', true);
             return;
         }
 
-        handleNextFrame.add(() => inizializeLoop());
+        handleFrame.add(() => {
+            handleNextTick.add(() => {
+                inizializeLoop();
+            });
+        });
     };
-    handleFrame.add(() => inizializeLoop());
+
+    handleFrame.add(() => {
+        handleNextTick.add(() => {
+            inizializeLoop();
+        });
+    });
 };

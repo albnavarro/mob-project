@@ -22,33 +22,28 @@ export const scrollStagger = () => {
     items.forEach((item, i) => {
         const unitInverse = items.length - i;
 
-        handleFrame.add(() => {
-            const style = {
-                width: `${unitInverse * unit * (i / 10)}px`,
-                height: `${unitInverse * unit * (i / 5)}px`,
+        const style = {
+            width: `${unitInverse * unit * (i / 10)}px`,
+            height: `${unitInverse * unit * (i / 5)}px`,
 
-                // Sfalsato
-                transformOrigin: `${unitInverse * unit}px ${i * unit}px`,
+            // Sfalsato
+            transformOrigin: `${unitInverse * unit}px ${i * unit}px`,
 
-                // Center
-                // transformOrigin: `${unitInverse * unit}px ${
-                //     unitInverse * unit
-                // }px`,
-            };
-
-            Object.assign(item.style, style);
-        });
+            // Center
+            // transformOrigin: `${unitInverse * unit}px ${
+            //     unitInverse * unit
+            // }px`,
+        };
+        Object.assign(item.style, style);
     });
 
-    handleNextTick.add(() => {
-        items.forEach((item, i) => {
-            const unitInverse = items.length - i;
+    items.forEach((item, i) => {
+        const unitInverse = items.length - i;
 
-            myParallaxTween.subscribe(({ rotate }) => {
-                item.style.transform = `translate3D(0,0,0) translate(${
-                    50 - unitInverse * unit
-                }px, ${50 - unitInverse * unit}px) rotate(${rotate}deg)`;
-            });
+        myParallaxTween.subscribe(({ rotate }) => {
+            item.style.transform = `translate3D(0,0,0) translate(${
+                50 - unitInverse * unit
+            }px, ${50 - unitInverse * unit}px) rotate(${rotate}deg)`;
         });
     });
 

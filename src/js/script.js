@@ -15,7 +15,7 @@ import { vh } from './utility/vh.js';
 import { findElement } from './utility/findElement.js';
 import { handleLoad } from './core/events/loadutils/handleLoad.js';
 import { handleSetUp } from './core/setup.js';
-import { heatFps, framStore } from './core/events/rafutils/rafUtils.js';
+import { heatFps, frameStore } from './core/events/rafutils/rafUtils.js';
 
 // NEW VANILLA COMPONENT MODULE
 import { totop } from '../component/to-top/js/toTop.js';
@@ -76,12 +76,12 @@ import { createStagger } from './test/createStagger.js';
 
 handleLoad(() => {
     handleSetUp.set({
-        fpsLoopCycle: 60,
+        fpsLoopCycle: 25,
         fpsThreshold: 15,
         deferredNextTick: true,
     });
     heatFps();
-    const unsubscribe = framStore.watch('fpsIsReady', () => {
+    const unsubscribe = frameStore.watch('fpsIsReady', () => {
         console.log('fps ready');
         unsubscribe();
     });
@@ -100,29 +100,44 @@ handleLoad(() => {
     }
 
     if (body.classList.contains('page-asyncTimelineStagger')) {
-        staggerTweenTest();
-        staggerSpringTest();
-        staggerLerpTest();
+        const unsubscribe = frameStore.watch('fpsIsReady', () => {
+            staggerTweenTest();
+            staggerSpringTest();
+            staggerLerpTest();
+            unsubscribe();
+        });
     }
 
     if (body.classList.contains('page-asyncShape')) {
-        sinAnimation();
-        sinRevertAnimation();
-        circleAnimation();
-        circleAnimationTimeline();
-        infiniteAnimation();
+        const unsubscribe = frameStore.watch('fpsIsReady', () => {
+            sinAnimation();
+            sinRevertAnimation();
+            circleAnimation();
+            circleAnimationTimeline();
+            infiniteAnimation();
+            unsubscribe();
+        });
     }
 
     if (body.classList.contains('page-syncShape')) {
-        infiniteAnimationSync();
+        const unsubscribe = frameStore.watch('fpsIsReady', () => {
+            infiniteAnimationSync();
+            unsubscribe();
+        });
     }
 
     if (body.classList.contains('page-syncTimeline')) {
-        syncTimelineTest();
+        const unsubscribe = frameStore.watch('fpsIsReady', () => {
+            syncTimelineTest();
+            unsubscribe();
+        });
     }
 
     if (body.classList.contains('page-mouseStagger')) {
-        mouseStagger();
+        const unsubscribe = frameStore.watch('fpsIsReady', () => {
+            mouseStagger();
+            unsubscribe();
+        });
     }
 
     if (body.classList.contains('template-fixed')) {
@@ -151,17 +166,26 @@ handleLoad(() => {
     }
 
     if (body.classList.contains('page-scrollStagger')) {
-        scrollStagger();
+        const unsubscribe = frameStore.watch('fpsIsReady', () => {
+            scrollStagger();
+            unsubscribe();
+        });
     }
     if (body.classList.contains('page-gridStagger')) {
-        gridStaggerTween();
-        gridStaggerSpring();
-        gridStaggerLerp();
-        gridStaggerSequencer();
+        const unsubscribe = frameStore.watch('fpsIsReady', () => {
+            gridStaggerTween();
+            gridStaggerSpring();
+            gridStaggerLerp();
+            gridStaggerSequencer();
+            unsubscribe();
+        });
     }
 
     if (body.classList.contains('page-radialStagger')) {
-        radialStaggerTween();
+        const unsubscribe = frameStore.watch('fpsIsReady', () => {
+            radialStaggerTween();
+            unsubscribe();
+        });
     }
 
     if (body.classList.contains('page-masterSequencer')) {
