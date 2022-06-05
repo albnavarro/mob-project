@@ -128,7 +128,7 @@ export const handleFrame = (() => {
 
         const fps = !isStopped
             ? clamp(parseInt(1000 / (time - prevTime)), minFps, maxFps)
-            : averageFps;
+            : 60;
 
         // get average of fps every 30 cycle (fpsLoopCycle)
         const fpsLoopCycle = handleSetUp.get('fpsLoopCycle');
