@@ -45,11 +45,11 @@ export const handleNextTick = ((cb) => {
         callback.push({ cb, priority });
     };
 
-    const fire = (time, averageFps) => {
+    const fire = (time, fps) => {
         if (callback.length === 0) return;
 
         callback.sort((a, b) => a.priority - b.priority);
-        callback.forEach(({ cb }) => cb(time, averageFps));
+        callback.forEach(({ cb }) => cb(time, fps));
         callback = [];
     };
 
@@ -74,6 +74,21 @@ export const handleFrameIndex = (fn, index) => {
 };
 
 /**
+ * Utils: fire script after heatFps is completed
+ * const unsubscribe = framStore.watch('fpsIsReady', () => {
+ *    ....
+ *    unsubscribe();
+ * });
+ *
+ */
+export const frameStore = new SimpleStore({
+    fpsIsReady: () => ({
+        value: false,
+        type: Boolean,
+    }),
+});
+
+/**
  * Utils to centralize all action form all components in one Request Animation Frame,
  * All subsciber use the same frame
  * handleFrame run once then delete all subscriber
@@ -86,6 +101,8 @@ export const handleFrameIndex = (fn, index) => {
  * });
  *
  */
+let stopHeatFps = false;
+
 export const handleFrame = (() => {
     let frameIsRuning = false;
     let callback = [];
@@ -96,22 +113,19 @@ export const handleFrame = (() => {
     let elapsed = 0;
     let isStopped = false;
 
-    // FPS
-    const arrAvg = (arr) => arr.reduce((a, b) => a + b, 0) / arr.length;
+    let fps = 60;
 
     // Clamp fps
-    const maxFps = 200;
+    const maxFps = 150;
     const minFps = 10;
-
-    // Initial fps average
-    let averageFps = 60;
 
     // Fps data
     let fpsStack = [];
-    // After how many cicles fps is calculated
-    let fpsCounter = 0;
+
     // Indicate that fps is a real calucaltion and not the initial approssimation
     let fpsIsReal = false;
+
+    let fpsLoopCounter = 0;
 
     // Stop timer when user change tab
     handleVisibilityChange(({ visibilityState }) => {
@@ -126,26 +140,23 @@ export const handleFrame = (() => {
         lastUpdate += elapsed;
         time = lastUpdate - startTime;
 
-        const fps = !isStopped
-            ? clamp(parseInt(1000 / (time - prevTime)), minFps, maxFps)
-            : 60;
-
-        // get average of fps every 30 cycle (fpsLoopCycle)
-        const fpsLoopCycle = handleSetUp.get('fpsLoopCycle');
-        if (fpsCounter < fpsLoopCycle) {
-            fpsCounter++;
-            fpsStack.push(fps);
-        } else {
-            averageFps = parseInt(arrAvg(fpsStack));
-            fpsCounter = 0;
-            fpsStack = [];
-
-            // After 1 cycles fps is stable
+        while (fpsStack.length > 0 && fpsStack[0] <= time - 1000) {
+            fpsStack.shift();
+            fps = fpsStack.length;
             fpsIsReal = true;
+
+            if (fpsLoopCounter > 1) {
+                frameStore.set('fpsIsReady', true);
+                stopHeatFps = true;
+            } else {
+                fpsLoopCounter++;
+            }
         }
 
+        fpsStack.push(time);
+
         // Fire callback
-        callback.forEach((item) => item(time, averageFps));
+        callback.forEach((item) => item(time, fps));
 
         // Reset
         prevTime = time;
@@ -155,7 +166,7 @@ export const handleFrame = (() => {
 
         const nextTickFn = () => {
             // Fire next Tick outside asnimationframe
-            handleNextTick.fire(time, averageFps);
+            handleNextTick.fire(time, fps);
 
             callback = [...callback, ...handleNextFrame.get()];
             if (callback.length > 0) {
@@ -192,7 +203,7 @@ export const handleFrame = (() => {
 
     const isRealFps = () => fpsIsReal;
 
-    const getFps = () => averageFps;
+    const getFps = () => fps;
 
     /**
      *  Add callback
@@ -219,36 +230,11 @@ export const handleFrame = (() => {
 })();
 
 /**
- * Utils: fire script after heatFps is completed
- * const unsubscribe = framStore.watch('fpsIsReady', () => {
- *    ....
- *    unsubscribe();
- * });
- *
+ *  Intial loop fo reach the right fps
  */
-export const frameStore = new SimpleStore({
-    fpsIsReady: () => ({
-        value: false,
-        type: Boolean,
-    }),
-});
-
-/**
- *  Intial loop fo 60 frame to reach the right fps
- */
-export const heatFps = () => {
-    // Loop two time in accordion of fpsLoopCycle value
-    // So we are sure that the fps is stable
-    const fpsLoopCycle = handleSetUp.get('fpsLoopCycle');
-    const inizializeCountInitialValue = fpsLoopCycle * 2 + 2;
-    let inizializeCount = 0;
-
+export const startFps = () => {
     const inizializeLoop = () => {
-        inizializeCount++;
-        if (inizializeCount >= inizializeCountInitialValue) {
-            frameStore.set('fpsIsReady', true);
-            return;
-        }
+        if (stopHeatFps) return;
 
         handleFrame.add(() => {
             handleNextTick.add(() => {

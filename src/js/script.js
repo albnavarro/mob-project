@@ -15,7 +15,7 @@ import { vh } from './utility/vh.js';
 import { findElement } from './utility/findElement.js';
 import { handleLoad } from './core/events/loadutils/handleLoad.js';
 import { handleSetUp } from './core/setup.js';
-import { heatFps, frameStore } from './core/events/rafutils/rafUtils.js';
+import { startFps, frameStore } from './core/events/rafutils/rafUtils.js';
 
 // NEW VANILLA COMPONENT MODULE
 import { totop } from '../component/to-top/js/toTop.js';
@@ -76,11 +76,10 @@ import { createStagger } from './test/createStagger.js';
 
 handleLoad(() => {
     handleSetUp.set({
-        fpsLoopCycle: 25,
         fpsThreshold: 15,
         deferredNextTick: true,
     });
-    heatFps();
+    startFps();
     const unsubscribe = frameStore.watch('fpsIsReady', () => {
         console.log('fps ready');
         unsubscribe();
