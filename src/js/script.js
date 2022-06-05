@@ -76,8 +76,8 @@ import { createStagger } from './test/createStagger.js';
 
 handleLoad(() => {
     handleSetUp.set({
-        fpsLoopCycle: 20,
-        fpsThreshold: 10,
+        fpsLoopCycle: 60,
+        fpsThreshold: 15,
         deferredNextTick: true,
     });
     heatFps();
