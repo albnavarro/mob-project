@@ -80,10 +80,8 @@ export class handleLerp {
             item.currentValue = parseFloat(item.fromValue);
         });
 
-        const velocity = parseFloat(this.velocity);
-        const precision = this.precision;
-
-        const o = {};
+        let o = {};
+        o.velocity = parseFloat(this.velocity);
         o.inMotion = false;
 
         // Reset maxFos when animartion start
@@ -102,11 +100,12 @@ export class handleLerp {
                 item.currentValue = lerp(
                     item.currentValue,
                     item.toValue,
-                    (velocity / fps) * 60
+                    (o.velocity / fps) * 60
                 );
 
                 item.settled =
-                    Math.abs(item.toValue - item.currentValue) <= precision;
+                    Math.abs(item.toValue - item.currentValue) <=
+                    this.precision;
 
                 if (item.settled) {
                     item.currentValue = item.toValue;
@@ -114,7 +113,7 @@ export class handleLerp {
             });
 
             // Prepare an obj to pass to the callback
-            const cbObject = getValueObj(this.values, 'currentValue');
+            o.cbObject = getValueObj(this.values, 'currentValue');
 
             /**
             Check if we lost some fps so we skip update to not overload browser rendering
@@ -138,7 +137,7 @@ export class handleLerp {
                 fpsThreshold: this.fpsThreshold,
                 maxFps: this.maxFps,
                 fps,
-                cbObject,
+                cbObject: o.cbObject,
             });
 
             // Check if all values is completed
@@ -163,6 +162,9 @@ export class handleLerp {
 
                     // On complete
                     if (!this.pauseStatus) {
+                        // Remove reference to o Object
+                        o = null;
+                        //
                         res();
 
                         // Set promise reference to null once resolved

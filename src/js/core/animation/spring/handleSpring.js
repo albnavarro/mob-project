@@ -80,12 +80,12 @@ export class handleSpring {
         });
 
         // Normalize spring config props
-        const tension = parseFloat(this.config.tension);
-        const friction = parseFloat(this.config.friction);
-        const mass = parseFloat(this.config.mass);
-        const precision = parseFloat(this.config.precision);
 
-        const o = {};
+        let o = {};
+        o.tension = parseFloat(this.config.tension);
+        o.friction = parseFloat(this.config.friction);
+        o.mass = parseFloat(this.config.mass);
+        o.precision = parseFloat(this.config.precision);
         o.inMotion = false;
 
         // Reset maxFos when animartion start
@@ -99,27 +99,28 @@ export class handleSpring {
             if (fps > this.maxFps && o.isRealFps) this.maxFps = fps;
 
             this.values.forEach((item, i) => {
-                o.tensionForce = -tension * (item.currentValue - item.toValue);
-                o.dampingForce = -friction * item.velocity;
-                o.acceleration = (o.tensionForce + o.dampingForce) / mass;
+                o.tensionForce =
+                    -o.tension * (item.currentValue - item.toValue);
+                o.dampingForce = -o.friction * item.velocity;
+                o.acceleration = (o.tensionForce + o.dampingForce) / o.mass;
 
                 item.velocity = item.velocity + (o.acceleration * 1) / fps;
                 item.currentValue =
                     item.currentValue + (item.velocity * 1) / fps;
 
-                o.isVelocity = Math.abs(item.velocity) <= precision;
+                o.isVelocity = Math.abs(item.velocity) <= o.precision;
 
                 o.isDisplacement =
-                    tension !== 0
+                    o.tension !== 0
                         ? Math.abs(item.toValue - item.currentValue) <=
-                          precision
+                          o.precision
                         : true;
 
                 item.settled = o.isVelocity && o.isDisplacement;
             });
 
             // Prepare an obj to pass to the callback
-            const cbObject = getValueObj(this.values, 'currentValue');
+            o.cbObject = getValueObj(this.values, 'currentValue');
 
             /**
             Check if we lost some fps so we skip update to not overload browser rendering
@@ -143,7 +144,7 @@ export class handleSpring {
                 fpsThreshold: this.fpsThreshold,
                 maxFps: this.maxFps,
                 fps,
-                cbObject,
+                cbObject: o.cbObject,
             });
 
             // Check if all values is completed
@@ -168,6 +169,9 @@ export class handleSpring {
 
                     // On complete
                     if (!this.pauseStatus) {
+                        // Remove reference to o Object
+                        o = null;
+                        //
                         res();
 
                         // Set promise reference to null once resolved

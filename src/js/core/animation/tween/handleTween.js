@@ -79,7 +79,7 @@ export class handleTween {
     onReuqestAnim(timestamp, fps, res) {
         this.startTime = timestamp;
 
-        const o = {};
+        let o = {};
         o.inMotion = false;
 
         // Reset maxFos when animartion start
@@ -115,10 +115,10 @@ export class handleTween {
                 }
             });
 
-            const isSettled = parseInt(this.timeElapsed) === this.duration;
+            o.isSettled = parseInt(this.timeElapsed) === this.duration;
 
             // Prepare an obj to pass to the callback
-            const cbObject = getValueObj(this.values, 'currentValue');
+            o.cbObject = getValueObj(this.values, 'currentValue');
 
             /**
             Check if we lost some fps so we skip update to not overload browser rendering
@@ -142,12 +142,12 @@ export class handleTween {
                 fpsThreshold: this.fpsThreshold,
                 maxFps: this.maxFps,
                 fps,
-                cbObject,
+                cbObject: o.cbObject,
             });
 
             this.isRunning = true;
 
-            if (!isSettled) {
+            if (!o.isSettled) {
                 handleNextFrame.add(() => {
                     handleNextTick.add((timestamp, fps) => {
                         if (this.req) draw(timestamp, fps);
@@ -171,6 +171,9 @@ export class handleTween {
 
                     // On complete
                     if (!this.pauseStatus) {
+                        // Remove reference to o Object
+                        o = null;
+                        //
                         res();
 
                         // Set promise reference to null once resolved
@@ -184,7 +187,7 @@ export class handleTween {
                     onComplete,
                     callback: this.callback,
                     callbackOnComplete: this.callbackOnComplete,
-                    cbObject,
+                    cbObject: o.cbObject,
                     stagger: this.stagger,
                     slowlestStagger: this.slowlestStagger,
                     fastestStagger: this.fastestStagger,
