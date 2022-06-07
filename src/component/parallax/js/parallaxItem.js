@@ -573,7 +573,7 @@ export class ParallaxItemClass {
     }
 
     refresh() {
-        if (this.pin && this.pinInstance) this.pinInstance.reset();
+        if (this.pin && this.pinInstance) this.pinInstance.destroy();
 
         this.calcScreenPosition();
         this.calcOffset();
@@ -586,14 +586,8 @@ export class ParallaxItemClass {
             if (this.dynamicRange) this.calcRangeAndUnitMiusure();
 
             if (this.pin && this.pinInstance) {
-                if (!mq[this.queryType](this.breackpoint)) {
-                    this.pinInstance.destroy();
-                } else {
-                    if (this.pinInstance.isInizialized) {
-                        this.pinInstance.refresh();
-                    } else {
-                        this.pinInstance.init();
-                    }
+                if (mq[this.queryType](this.breackpoint)) {
+                    this.pinInstance.init();
                 }
             }
         }

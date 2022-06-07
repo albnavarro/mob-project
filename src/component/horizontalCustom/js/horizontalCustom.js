@@ -311,14 +311,7 @@ export class horizontalCustomClass {
                 this.createShadow().then(() =>
                     this.updateShadow().then(() => {
                         this.initScroller();
-
-                        handleFrame.add(() => {
-                            handleNextTick.add(() => {
-                                this.onRefreshCallBack.forEach((item, i) =>
-                                    item()
-                                );
-                            });
-                        });
+                        this.onRefreshCallBack.forEach((item, i) => item());
                     })
                 )
             )
@@ -356,9 +349,13 @@ export class horizontalCustomClass {
         this.removeShadow();
 
         if (this.moduleisActive) {
-            this.scroller.unsubscribe();
-            this.scroller = null;
-            this.moduleisActive = false;
+            handleFrame.add(() => {
+                handleNextTick.add(() => {
+                    this.scroller.unsubscribe();
+                    this.scroller = null;
+                    this.moduleisActive = false;
+                });
+            });
         }
     }
 

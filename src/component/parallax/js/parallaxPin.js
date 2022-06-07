@@ -18,7 +18,6 @@ export class ParallaxPin {
         this.scroller = window;
         this.invertSide = null;
         this.end = 0;
-        this.pippo = 0;
         this.orientation = parallaxConstant.DIRECTION_VERTICAL;
         this.compesateValue = 0;
         this.trigger = null;
@@ -104,12 +103,24 @@ export class ParallaxPin {
             this.parallaxInstance.trigger || this.parallaxInstance.item;
         this.scroller = this.parallaxInstance.scroller;
         this.screen = this.parallaxInstance.screen;
-        this.prevscrollY = window.pageYOffset;
         this.animatePin = this.parallaxInstance.animatePin;
         this.forceTranspond = this.parallaxInstance.forceTranspond;
+        this.invertSide = this.parallaxInstance.invertSide;
+        this.orientation = this.parallaxInstance.direction;
+        this.prevscrollY = window.pageYOffset;
+        this.scrollerHeight = this.parallaxInstance.scrollerHeight;
+        this.refreshCollisionPoint();
+        this.collisionTranslateProp =
+            this.orientation === parallaxConstant.DIRECTION_VERTICAL
+                ? 'Y'
+                : 'X';
+
+        this.collisionStyleProp =
+            this.orientation === parallaxConstant.DIRECTION_VERTICAL
+                ? 'top'
+                : 'left';
         this.isInizialized = true;
 
-        this.refresh();
         this.createPin();
         this.setPinSize();
         this.addStyleFromPinToWrapper();
@@ -178,10 +189,17 @@ export class ParallaxPin {
     }
 
     resetSpring() {
-        this.spring.set({ collision: 0, verticalGap: 0 }).catch((err) => {});
+        if (this.pin)
+            this.spring
+                .set({ collision: 0, verticalGap: 0 })
+                .catch((err) => {});
     }
 
     createPin() {
+        // Get first misure when is unwrapped
+        // this.lastHeight = this.item.offsetheight;
+        // this.lastWidth = this.item.offsetWidth;
+
         // Wrap pin element
         // pin-wrapper , use to cache potion into dom flow when pin go to fixed
         const wrapper = document.createElement('div');
@@ -212,6 +230,10 @@ export class ParallaxPin {
             });
         });
         this.checkIfShouldTranspond();
+
+        // Get misure when is unwrapped from wrapper
+        this.lastHeight = this.wrapper.offsetheight;
+        this.lastWidth = this.wrapper.offsetWidth;
     }
 
     // Get style fomr item and apply to wrapper ( es: flex)
@@ -296,35 +318,6 @@ export class ParallaxPin {
             .some((item) => item === true);
     }
 
-    /**
-     * reset - on parallax refresh reset pin postion to permit parallax get right offset value
-     * this before any aother operation in parallax reresh methods
-     *
-     * @return {void}
-     */
-    reset() {
-        if (this.pin && this.isInizialized) {
-            this.lastPosition = this.pin.style.position;
-            this.lastTop = this.pin.style.top;
-            this.lastLeft = this.pin.style.left;
-
-            this.wrapper.style.height = '';
-            this.wrapper.style.width = '';
-            this.pin.style.height = '';
-            this.pin.style.width = '';
-            this.pin.style.position = '';
-
-            this.lastWidth = this.pin.offsetWidth;
-            this.lastHeight = this.pin.offsetHeight;
-            // this.pin.style.transform = `translate(0px,0px)`;
-
-            if (this.scroller === window) {
-                this.pin.style.left = ``;
-                this.pin.style.top = ``;
-            }
-        }
-    }
-
     refreshCollisionPoint() {
         this.start = this.parallaxInstance.startPoint;
 
@@ -349,49 +342,6 @@ export class ParallaxPin {
             : parseInt(this.end);
     }
 
-    /**
-     * refresh - on parallax refresh after all opration restore pin tp and position values
-     * and get fresh data
-     *
-     * @return {void}
-     */
-    refresh() {
-        if (!this.isInizialized) return;
-
-        this.invertSide = this.parallaxInstance.invertSide;
-        this.orientation = this.parallaxInstance.direction;
-        this.scrollerHeight = this.parallaxInstance.scrollerHeight;
-        this.refreshCollisionPoint();
-
-        this.collisionTranslateProp =
-            this.orientation === parallaxConstant.DIRECTION_VERTICAL
-                ? 'Y'
-                : 'X';
-
-        this.collisionStyleProp =
-            this.orientation === parallaxConstant.DIRECTION_VERTICAL
-                ? 'top'
-                : 'left';
-
-        if (this.pin) {
-            const cb = () => {
-                this.pin.style.position = this.lastPosition;
-
-                if (this.scroller === window) {
-                    this.pin.style.top = this.lastTop;
-                    this.pin.style.left = this.lastLeft;
-                }
-            };
-
-            handleFrame.add(() => {
-                cb();
-            });
-
-            this.setPinSize();
-            this.checkIfShouldTranspond();
-        }
-    }
-
     destroy() {
         if (!this.isInizialized) return;
 
@@ -399,21 +349,20 @@ export class ParallaxPin {
         this.unsubscribeScroll();
         this.unsubscribeScrollStart();
         this.spring = null;
+        this.afterPinCounter = 0;
+        this.justPinned = false;
+        this.isUnder = false;
+        this.isInner = false;
+        this.isOver = false;
 
-        const cb = () => {
-            if (this.pin && this.wrapper) {
-                this.wrapper.parentNode.insertBefore(this.item, this.wrapper);
-                this.pin.remove();
-                this.wrapper.remove();
-                this.wrapper = null;
-                this.pin = null;
-                this.isInizialized = false;
-            }
-        };
-
-        handleFrame.add(() => {
-            cb();
-        });
+        if (this.pin && this.wrapper) {
+            this.wrapper.parentNode.insertBefore(this.item, this.wrapper);
+            this.pin.remove();
+            this.wrapper.remove();
+            this.wrapper = null;
+            this.pin = null;
+            this.isInizialized = false;
+        }
     }
 
     getGap() {
@@ -444,7 +393,7 @@ export class ParallaxPin {
             cb();
         });
 
-        if (this.animatePin) {
+        if (this.animatePin && this.pin) {
             this.spring
                 .goFrom({ collision: gap })
                 .then(() => {
