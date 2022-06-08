@@ -23,17 +23,11 @@ export class ParallaxPin {
         this.trigger = null;
         this.item = null;
         this.spring = null;
-        this.springIsRunning = false;
         this.wrapper = null;
         this.pin = null;
         this.isOver = false;
         this.isInner = false;
         this.isUnder = false;
-        this.lastPosition = 0;
-        this.lastTop = 0;
-        this.lastLeft = 0;
-        this.lastWidth = null;
-        this.lastHeight = null;
         this.unsubscribeScroll = () => {};
         this.unsubscribeScrollStart = () => {};
         this.unsubscribeSpring = () => {};
@@ -82,10 +76,7 @@ export class ParallaxPin {
         this.prevScroll = 0;
         this.animatePin = false;
 
-        // HandleScroll switch callback after requestAnimationframe
-        // so if window is the sroller we have to retrieve 1 frame
-        // if scrolle ris not window the pin is syncronous with it's scroller
-        this.anticipateFactor = 1.2;
+        this.anticipateFactor = 1.5;
         this.forceTranspond = false;
 
         this.justPinned = false;
@@ -122,8 +113,8 @@ export class ParallaxPin {
         this.isInizialized = true;
 
         this.createPin();
-        this.setPinSize();
         this.addStyleFromPinToWrapper();
+        this.setPinSize();
         this.setUpMotion();
 
         // Update pix top position when use custom screen ad scroll outside on window
@@ -176,12 +167,15 @@ export class ParallaxPin {
 
         this.unsubscribeSpring = this.spring.subscribe(
             ({ collision, verticalGap }) => {
-                if (this.orientation === parallaxConstant.DIRECTION_VERTICAL) {
+                if (
+                    this.orientation === parallaxConstant.DIRECTION_VERTICAL &&
+                    this.pin !== null
+                ) {
                     // In vertical mode gap to translate when pin is in fixed position
                     // on window scroll is the same of collision
                     // The same axis reset the two prop
                     this.pin.style.transform = `translate(0px, ${collision}px)`;
-                } else {
+                } else if (this.pin !== null) {
                     this.pin.style.transform = `translate(${collision}px, ${verticalGap}px)`;
                 }
             }
@@ -196,10 +190,6 @@ export class ParallaxPin {
     }
 
     createPin() {
-        // Get first misure when is unwrapped
-        // this.lastHeight = this.item.offsetheight;
-        // this.lastWidth = this.item.offsetWidth;
-
         // Wrap pin element
         // pin-wrapper , use to cache potion into dom flow when pin go to fixed
         const wrapper = document.createElement('div');
@@ -213,27 +203,38 @@ export class ParallaxPin {
         this.wrapper = this.item.closest('.pin-wrapper');
         this.pin = this.item.closest('.pin');
 
-        // Add disply table to avoid margin problem inside
-        this.pin.style.display = 'table';
-        // Set misure to pin lement and wrap element
-
         // get style from parent and add to pin, es text-align
         const requiredStyleToadd = this.addRquiredStyle();
 
         // get style from iem and add to pin, es z-index
         const pinStyleFromItem = this.addPinStyleFromItem();
 
+        // Add disply table to avoid margin problem inside
+        const display = { display: 'table' };
+
         handleFrame.add(() => {
             Object.assign(this.pin.style, {
+                ...display,
                 ...pinStyleFromItem,
                 ...requiredStyleToadd,
             });
         });
         this.checkIfShouldTranspond();
+    }
 
-        // Get misure when is unwrapped from wrapper
-        this.lastHeight = this.wrapper.offsetheight;
-        this.lastWidth = this.wrapper.offsetWidth;
+    setPinSize() {
+        const cb = () => {
+            const height = this.wrapper.offsetheight;
+            const width = this.wrapper.offsetWidth;
+            this.wrapper.style.height = `${height}px`;
+            this.wrapper.style.width = `${width}px`;
+            this.pin.style.height = `${height}px`;
+            this.pin.style.width = `${width}px`;
+        };
+
+        handleFrame.add(() => {
+            cb();
+        });
     }
 
     // Get style fomr item and apply to wrapper ( es: flex)
@@ -244,29 +245,6 @@ export class ParallaxPin {
         }, {});
 
         handleFrame.add(() => Object.assign(this.wrapper.style, style));
-    }
-
-    setPinSize() {
-        const cb = () => {
-            this.wrapper.style.height = '';
-            this.wrapper.style.width = '';
-            this.pin.style.height = '';
-            this.pin.style.width = '';
-            const height = this.lastHeight
-                ? this.lastHeight
-                : this.pin.offsetHeight;
-            const width = this.lastWidth
-                ? this.lastWidth
-                : this.pin.offsetWidth;
-            this.wrapper.style.height = `${height}px`;
-            this.wrapper.style.width = `${width}px`;
-            this.pin.style.height = `${height}px`;
-            this.pin.style.width = `${width}px`;
-        };
-
-        handleFrame.add(() => {
-            cb();
-        });
     }
 
     findStyle(target, rule) {
@@ -345,6 +323,7 @@ export class ParallaxPin {
     destroy() {
         if (!this.isInizialized) return;
 
+        this.spring.stop();
         this.unsubscribeSpring();
         this.unsubscribeScroll();
         this.unsubscribeScrollStart();

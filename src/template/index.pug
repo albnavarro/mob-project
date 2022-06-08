@@ -130,18 +130,21 @@ block content
                 div
                   .index-parallax-1.inlineBLock
                     .parallax__item-test
-                            
-            .parallax__item-test.inlineBLock.js-parallax(
-                style="background:black;"
-                data-computationType="fixed"
-                data-propierties="rotate"
-                data-range="0"
-                data-start="top 30vh"
-                data-end="top 80vh"
-                data-pin
-                data-marker='side-tween-from-top'
-                )
-                
+              
+            .grid-parallax             
+              .grid-parallax__item.js-parallax(
+                  data-computationType="fixed"
+                  data-propierties="rotate"
+                  data-range="0"
+                  data-start="bottom 50vh"
+                  data-end="top"
+                  data-pin
+                  data-marker='side-tween-from-top'
+                  )
+                  .grid-parallax__cell
+                    |1
+                  .grid-parallax__cell
+                    |2  
                     
             .flex.justify-center
                 .js-parallax(

@@ -166,3 +166,23 @@
 .index-parallax-1 {
     transform-origin: center;
 }
+
+.grid-parallax {
+    text-align: center;
+    max-width: 600px;
+    width: 100%;
+    margin: auto;
+    padding: 20px;
+    margin-top: 600px;
+    margin-bottom: 400px;
+
+    &__item {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        background: yellow;
+    }
+
+    &__cell {
+        border: 1px #000 solid;
+    }
+}

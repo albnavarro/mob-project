@@ -76,7 +76,7 @@ import { createStagger } from './test/createStagger.js';
 
 handleLoad(() => {
     handleSetUp.set({
-        fpsThreshold: 50,
+        fpsThreshold: 25,
         deferredNextTick: true,
     });
     startFps();

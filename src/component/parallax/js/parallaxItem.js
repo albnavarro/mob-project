@@ -551,6 +551,9 @@ export class ParallaxItemClass {
     }
 
     unsubscribe() {
+        if ('stop' in this.motion) {
+            this.motion.stop();
+        }
         this.unsubscribeScroll();
         this.unsubscribeScrollStart();
         this.unsubscribeResize();
