@@ -17,6 +17,7 @@ import { handleSpring } from '../../../js/core/animation/spring/handleSpring.js'
 import { handleLerp } from '../../../js/core/animation/lerp/handleLerp.js';
 import { springConfig } from '../../../js/core/animation/spring/springConfig.js';
 import { getTranslateValues } from '../../../js/core/utils/vanillaFunction.js';
+import { getRoundedValue } from '../../../js/core/animation/utils/animationUtils.js';
 
 export class ParallaxItemClass {
     constructor(data) {
@@ -697,20 +698,24 @@ export class ParallaxItemClass {
         switch (this.computationType) {
             case parallaxConstant.TYPE_FIXED:
                 const val = this.getFixedValue();
-                this.endValue = parseFloat(val).toFixed(4);
+                this.endValue = getRoundedValue(val);
                 break;
 
             default:
                 switch (this.propierties) {
                     case parallaxConstant.PROP_OPACITY:
-                        this.endValue = this.getOpacityValue().toFixed(2);
+                        this.endValue = getRoundedValue(this.getOpacityValue());
                         break;
 
                     default:
                         if (Number.isNaN(parseInt(this.align))) {
-                            this.endValue = this.getIsNaNValue() / 2;
+                            this.endValue = getRoundedValue(
+                                this.getIsNaNValue() / 2
+                            );
                         } else {
-                            this.endValue = this.getIsANumberValue() / 2;
+                            this.endValue = getRoundedValue(
+                                this.getIsANumberValue() / 2
+                            );
                         }
                         break;
                 }

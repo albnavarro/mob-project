@@ -4,6 +4,7 @@ import {
     getValueObj,
     mergeArrayTween,
     compareKeys,
+    getRoundedValue,
 } from '../utils/animationUtils.js';
 import {
     handleFrame,
@@ -110,6 +111,7 @@ export class handleTween {
                         item.toValProcessed,
                         this.duration
                     );
+                    item.currentValue = getRoundedValue(item.currentValue);
                 } else {
                     item.currentValue = item.fromValue;
                 }
@@ -318,7 +320,11 @@ export class handleTween {
     setToValProcessed() {
         this.values.forEach((item, i) => {
             if (item.shouldUpdate) {
-                item.toValProcessed = item.toValue - item.fromValue;
+                /*
+                Prevent error on tween revert if is 0 some easeType can't run
+                es: easeInElastic
+                */
+                item.toValProcessed = item.toValue - item.fromValue + 0.00001;
             }
         });
     }

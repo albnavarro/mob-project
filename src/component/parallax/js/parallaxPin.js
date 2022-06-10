@@ -213,6 +213,8 @@ export class ParallaxPin {
         const display = { display: 'table' };
 
         handleFrame.add(() => {
+            if (!this.pin) return;
+
             Object.assign(this.pin.style, {
                 ...display,
                 ...pinStyleFromItem,
@@ -224,7 +226,8 @@ export class ParallaxPin {
 
     setPinSize() {
         const cb = () => {
-            const height = this.wrapper.offsetheight;
+            if (!this.pin || !this.wrapper) return;
+            const height = this.wrapper.offsetHeight;
             const width = this.wrapper.offsetWidth;
             this.wrapper.style.height = `${height}px`;
             this.wrapper.style.width = `${width}px`;
@@ -244,7 +247,10 @@ export class ParallaxPin {
             return { ...p, ...{ [c]: compStyles.getPropertyValue(c) } };
         }, {});
 
-        handleFrame.add(() => Object.assign(this.wrapper.style, style));
+        handleFrame.add(() => {
+            if (!this.wrapper) return;
+            Object.assign(this.wrapper.style, style);
+        });
     }
 
     findStyle(target, rule) {
@@ -365,6 +371,7 @@ export class ParallaxPin {
 
     tween(gap) {
         const cb = () => {
+            if (!this.pin) return;
             this.pin.style[this.collisionStyleProp] = `${this.startFromTop}px`;
         };
 
@@ -384,6 +391,8 @@ export class ParallaxPin {
 
     resetPinTransform() {
         const cb = () => {
+            if (!this.pin) return;
+
             this.pin.style.transform = `translate(0px, 0px)`;
         };
 
@@ -395,6 +404,8 @@ export class ParallaxPin {
     resetStyleWhenUnder() {
         this.resetSpring();
         const cb = () => {
+            if (!this.pin) return;
+
             this.pin.style.transition = '';
             this.pin.style.position = 'relative';
             this.pin.style.top = ``;
@@ -410,6 +421,8 @@ export class ParallaxPin {
         this.resetSpring();
 
         const cb = () => {
+            if (!this.pin) return;
+
             this.pin.style.transition = '';
             this.pin.style.position = 'relative';
 
@@ -439,6 +452,8 @@ export class ParallaxPin {
                 : 'top';
 
         const cb = () => {
+            if (!this.pin) return;
+
             this.pin.style.position = 'fixed';
             this.pin.style[style] = `${left}px`;
 
@@ -482,6 +497,8 @@ export class ParallaxPin {
             const styleToAdd = this.addStyleToItem();
 
             const cb = () => {
+                if (!this.pin) return;
+
                 Object.assign(this.pin.style, {
                     ...pinStyleFromItem,
                     ...requiredStyleToAdd,
@@ -501,6 +518,8 @@ export class ParallaxPin {
     deactivateTrasponder() {
         if (this.shoulTranspond) {
             const cb = () => {
+                if (!this.pin) return;
+
                 Object.assign(this.item.style, this.removeStyleToItem());
                 this.wrapper.appendChild(this.pin);
             };

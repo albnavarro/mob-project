@@ -1,5 +1,10 @@
 import { tweenConfig } from '../tween/tweenConfig.js';
-import { clamp, getValueObj, compareKeys } from '../utils/animationUtils.js';
+import {
+    clamp,
+    getValueObj,
+    compareKeys,
+    getRoundedValue,
+} from '../utils/animationUtils.js';
 import {
     handleFrame,
     handleFrameIndex,
@@ -126,6 +131,8 @@ export class HandleSequencer {
                               minVal,
                               maxVal
                           );
+
+                item.currentValue = getRoundedValue(item.currentValue);
 
                 if (!Number.isNaN(item.currentValue)) {
                     currentEl.currentValue = item.currentValue.toFixed(4);

@@ -4,6 +4,7 @@ import {
     getValueObj,
     mergeArray,
     compareKeys,
+    getRoundedValue,
 } from '../utils/animationUtils.js';
 import {
     handleFrame,
@@ -107,6 +108,8 @@ export class handleSpring {
                 item.velocity = item.velocity + (o.acceleration * 1) / fps;
                 item.currentValue =
                     item.currentValue + (item.velocity * 1) / fps;
+
+                item.currentValue = getRoundedValue(item.currentValue);
 
                 o.isVelocity = Math.abs(item.velocity) <= o.precision;
 

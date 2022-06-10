@@ -2,6 +2,7 @@ import { tweenConfig } from '../../../js/core/animation/tween/tweenConfig.js';
 import {
     getValueObj,
     compareKeys,
+    getRoundedValue,
 } from '../../../js/core/animation/utils/animationUtils.js';
 import { mergeDeep } from '../../../js/core/utils/mergeDeep.js';
 import {
@@ -67,6 +68,7 @@ export class ParallaxTween {
                 item.toValProcessed,
                 this.duration
             );
+            item.currentValue = getRoundedValue(item.currentValue);
         });
 
         // Prepare an obj to pass to the callback

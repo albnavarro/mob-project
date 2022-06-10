@@ -60,8 +60,7 @@ export function timlineMixTest() {
         .goTo(tweenBox2, { rotate: 360 }, { duration: 2000, delay: 1000 })
         .closeGroup()
         .label({ name: 'label1' })
-        .goTo(tweenBox1, { x: -100, rotate: 180 }, { ease: 'easeInOutBack' })
-        //tweenBox1 : easeInElastic -> fail reverseNext ? // TODO: why ?
+        .goTo(tweenBox1, { x: -100, rotate: 180 }, { ease: 'easeInElastic' })
         .sync({ from: tweenBox1, to: springBox1 })
         .add(() => springBox1.updatePreset('gentle'))
         .createGroup({ waitComplete: false })

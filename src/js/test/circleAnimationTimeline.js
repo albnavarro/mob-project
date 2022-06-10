@@ -21,7 +21,7 @@ export const circleAnimationTimeline = () => {
     tween.set({ x: 0 });
 
     // 0 to 1
-    const distance = 1;
+    const distance = 100;
     // stepNumber: 1 -> half loop
     // stepNumber: 2 -> full loop
     // multiply * 1000 so we have 1000 rotation per step

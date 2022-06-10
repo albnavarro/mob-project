@@ -4,6 +4,7 @@ import {
     mergeArray,
     lerp,
     compareKeys,
+    getRoundedValue,
 } from '../utils/animationUtils.js';
 
 import {
@@ -102,6 +103,8 @@ export class handleLerp {
                     item.toValue,
                     (o.velocity / fps) * 60
                 );
+
+                item.currentValue = getRoundedValue(item.currentValue);
 
                 item.settled =
                     Math.abs(item.toValue - item.currentValue) <=
