@@ -31,6 +31,7 @@ export class ParallaxPin {
         this.unsubscribeScroll = () => {};
         this.unsubscribeScrollStart = () => {};
         this.unsubscribeSpring = () => {};
+        this.firstTime = true;
 
         // Item style applied to pin wrapper
         this.itemRequireStyleToWrapper = [
@@ -85,16 +86,35 @@ export class ParallaxPin {
         this.afterJustPinned = false;
         this.afterJustPinnedCounter = 0;
         this.numeCycleToFreeze = 3;
+
+        /*
+        Obj utils to avoid new GC allocation during animation
+        Try to reduce the GC timing
+        Support caluculation in each frame
+        */
+        this.GC = {
+            step: null,
+            anticipate: null,
+            anticipateBottom: null,
+            anticipateInnerIn: null,
+            anticipateInnerOut: null,
+            scrollDirection: null,
+            offsetTop: null,
+            bottomCondition: null,
+            innerCondition: null,
+        };
     }
 
     init() {
         // Get baisc element item ad if exist trigger
         this.item = this.parallaxInstance.item;
+        this.marker = this.parallaxInstance.marker;
         this.trigger =
             this.parallaxInstance.trigger || this.parallaxInstance.item;
         this.scroller = this.parallaxInstance.scroller;
         this.screen = this.parallaxInstance.screen;
         this.animatePin = this.parallaxInstance.animatePin;
+        this.anticipatePinOnLoad = this.parallaxInstance.anticipatePinOnLoad;
         this.forceTranspond = this.parallaxInstance.forceTranspond;
         this.invertSide = this.parallaxInstance.invertSide;
         this.orientation = this.parallaxInstance.direction;
@@ -111,6 +131,7 @@ export class ParallaxPin {
                 ? 'top'
                 : 'left';
         this.isInizialized = true;
+        this.firstTime = true;
 
         this.createPin();
         this.addStyleFromPinToWrapper();
@@ -209,11 +230,35 @@ export class ParallaxPin {
         // get style from iem and add to pin, es z-index
         const pinStyleFromItem = this.addPinStyleFromItem();
 
+        const wrapperStyle = (() => {
+            if (!this.marker) return {};
+
+            if (this.orientation === parallaxConstant.DIRECTION_VERTICAL) {
+                return this.invertSide
+                    ? {
+                          borderBottom: '1px green solid',
+                      }
+                    : {
+                          borderTop: '1px green solid',
+                      };
+            } else {
+                return this.invertSide
+                    ? {
+                          borderRight: '1px green solid',
+                      }
+                    : {
+                          borderLeft: '1px green solid',
+                      };
+            }
+        })();
+
         // Add disply table to avoid margin problem inside
         const display = { display: 'table' };
 
         handleFrame.add(() => {
-            if (!this.pin) return;
+            if (!this.pin || !this.wrapper) return;
+
+            Object.assign(this.wrapper.style, { ...wrapperStyle });
 
             Object.assign(this.pin.style, {
                 ...display,
@@ -235,9 +280,12 @@ export class ParallaxPin {
             this.pin.style.width = `${width}px`;
         };
 
-        handleFrame.add(() => {
-            cb();
-        });
+        /*
+        Firse time ww don't use raf to apply basic
+        misureimmediatly on component creation
+        Otherwise we can have some wron calculation after
+        */
+        cb();
     }
 
     // Get style fomr item and apply to wrapper ( es: flex)
@@ -535,7 +583,7 @@ export class ParallaxPin {
     getAnticipate(scrollTop) {
         // if come just after pin use the last step to avoid glitch
         // if item is pinned too soon
-        const step =
+        this.GC.step =
             this.afterJustPinned && this.afterJustPinnedCounter < 3
                 ? this.lastStep
                 : clamp(Math.abs(scrollTop - this.prevScroll), 0, 250);
@@ -552,13 +600,13 @@ export class ParallaxPin {
         }
 
         // Cache previouse stop
-        this.lastStep = step;
+        this.lastStep = this.GC.step;
 
-        return step * this.anticipateFactor;
+        return this.GC.step * this.anticipateFactor;
     }
 
     getAnticipateValue(scrollTop, scrollDirection) {
-        if (this.animatePin) {
+        if (this.animatePin || (this.firstTime && !this.anticipatePinOnLoad)) {
             return {
                 anticipateBottom: 0,
                 anticipateInnerIn: 0,
@@ -566,23 +614,29 @@ export class ParallaxPin {
             };
         }
 
-        const anticipate = this.getAnticipate(scrollTop);
-        const anticipateBottom =
-            scrollDirection === parallaxConstant.SCROLL_UP ? 0 : anticipate;
-        const anticipateInnerIn =
-            scrollDirection === parallaxConstant.SCROLL_UP ? 0 : anticipate * 2;
-        const anticipateInnerOut =
-            scrollDirection === parallaxConstant.SCROLL_UP ? anticipate : 0;
+        this.GC.anticipate = this.getAnticipate(scrollTop);
+        this.GC.anticipateBottom =
+            scrollDirection === parallaxConstant.SCROLL_UP
+                ? 0
+                : this.GC.anticipate;
+        this.GC.anticipateInnerIn =
+            scrollDirection === parallaxConstant.SCROLL_UP
+                ? 0
+                : this.GC.anticipate * 2;
+        this.GC.anticipateInnerOut =
+            scrollDirection === parallaxConstant.SCROLL_UP
+                ? this.GC.anticipate
+                : 0;
 
         return {
-            anticipateBottom,
-            anticipateInnerIn,
-            anticipateInnerOut,
+            anticipateBottom: this.GC.anticipateBottom,
+            anticipateInnerIn: this.GC.anticipateInnerIn,
+            anticipateInnerOut: this.GC.anticipateInnerOut,
         };
     }
 
     getAnticipateValueInverted(scrollTop, scrollDirection) {
-        if (this.animatePin) {
+        if (this.animatePin || (this.firstTime && !this.anticipatePinOnLoad)) {
             return {
                 anticipateBottom: 0,
                 anticipateInnerIn: 0,
@@ -590,18 +644,24 @@ export class ParallaxPin {
             };
         }
 
-        const anticipate = this.getAnticipate(scrollTop);
-        const anticipateBottom =
-            scrollDirection === parallaxConstant.SCROLL_UP ? anticipate : 0;
-        const anticipateInnerIn =
-            scrollDirection === parallaxConstant.SCROLL_UP ? anticipate * 2 : 0;
-        const anticipateInnerOut =
-            scrollDirection === parallaxConstant.SCROLL_UP ? 0 : anticipate;
+        this.GC.anticipate = this.getAnticipate(scrollTop);
+        this.GC.anticipateBottom =
+            scrollDirection === parallaxConstant.SCROLL_UP
+                ? this.GC.anticipate
+                : 0;
+        this.GC.anticipateInnerIn =
+            scrollDirection === parallaxConstant.SCROLL_UP
+                ? this.GC.anticipate * 2
+                : 0;
+        this.GC.anticipateInnerOut =
+            scrollDirection === parallaxConstant.SCROLL_UP
+                ? 0
+                : this.GC.anticipate;
 
         return {
-            anticipateBottom,
-            anticipateInnerIn,
-            anticipateInnerOut,
+            anticipateBottom: this.GC.anticipateBottom,
+            anticipateInnerIn: this.GC.anticipateInnerIn,
+            anticipateInnerOut: this.GC.anticipateInnerOut,
         };
     }
 
@@ -618,13 +678,13 @@ export class ParallaxPin {
             this.justPinned = false;
         }
 
-        const scrollDirection =
+        this.GC.scrollDirection =
             this.prevScroll > scrollTop
                 ? parallaxConstant.SCROLL_UP
                 : parallaxConstant.SCROLL_DOWN;
 
         // Set up scroll condition
-        const offsetTop =
+        this.GC.offsetTop =
             this.orientation === parallaxConstant.DIRECTION_VERTICAL
                 ? position(this.wrapper).top
                 : position(this.wrapper).left;
@@ -635,22 +695,26 @@ export class ParallaxPin {
             anticipateInnerIn,
             anticipateInnerOut,
         } = !this.invertSide
-            ? this.getAnticipateValue(scrollTop, scrollDirection)
-            : this.getAnticipateValueInverted(scrollTop, scrollDirection);
+            ? this.getAnticipateValue(scrollTop, this.GC.scrollDirection)
+            : this.getAnticipateValueInverted(
+                  scrollTop,
+                  this.GC.scrollDirection
+              );
 
-        const bottomCondition = !this.invertSide
-            ? offsetTop > this.scrollerHeight - this.start + anticipateBottom
-            : offsetTop < this.start - anticipateBottom;
+        this.GC.bottomCondition = !this.invertSide
+            ? this.GC.offsetTop >
+              this.scrollerHeight - this.start + anticipateBottom
+            : this.GC.offsetTop < this.start - anticipateBottom;
 
-        const innerCondition = !this.invertSide
-            ? offsetTop <=
+        this.GC.innerCondition = !this.invertSide
+            ? this.GC.offsetTop <=
                   this.scrollerHeight - this.start + anticipateInnerIn &&
-              this.scrollerHeight - offsetTop <=
+              this.scrollerHeight - this.GC.offsetTop <=
                   this.end + anticipateInnerOut + this.start
-            : offsetTop >= this.start - anticipateInnerIn &&
-              offsetTop <= this.start + anticipateInnerOut + this.end;
+            : this.GC.offsetTop >= this.start - anticipateInnerIn &&
+              this.GC.offsetTop <= this.start + anticipateInnerOut + this.end;
 
-        if (bottomCondition) {
+        if (this.GC.bottomCondition) {
             if (!this.isUnder) {
                 // Reset style
                 this.resetStyleWhenUnder();
@@ -660,14 +724,14 @@ export class ParallaxPin {
                 this.isInner = false;
                 this.isOver = false;
             }
-        } else if (innerCondition) {
+        } else if (this.GC.innerCondition) {
             if (!this.isInner) {
                 this.setFixedPosition();
 
                 const fireSpring =
-                    (scrollDirection === parallaxConstant.SCROLL_DOWN &&
+                    (this.GC.scrollDirection === parallaxConstant.SCROLL_DOWN &&
                         !this.invertSide) ||
-                    (scrollDirection === parallaxConstant.SCROLL_UP &&
+                    (this.GC.scrollDirection === parallaxConstant.SCROLL_UP &&
                         this.invertSide);
 
                 this.activateTrasponder();
@@ -692,5 +756,6 @@ export class ParallaxPin {
         }
 
         this.prevScroll = scrollTop;
+        this.firstTime = false;
     }
 }

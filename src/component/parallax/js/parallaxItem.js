@@ -64,10 +64,14 @@ export class ParallaxItemClass {
             ? document.querySelector(data.screen)
             : window;
 
+        /*
+        Pin  prop
+        */
         this.pin = data.pin || false;
         this.animatePin = data.animatePin || false;
-        this.pinInstance = null;
         this.forceTranspond = data.forceTranspond || false;
+        this.anticipatePinOnLoad = data.anticipatePinOnLoad || false;
+        this.pinInstance = null;
 
         //Fixed prop
         this.fromTo = data.fromTo || false;
@@ -165,6 +169,37 @@ export class ParallaxItemClass {
         this.onLeave = data.onLeave || null;
         this.onLeaveBack = data.onLeaveBack || null;
         this.onTickCallback = data.onTick || null;
+
+        /*
+        Obj utils to avoid new GC allocation during animation
+        Try to reduce the GC timing
+        Support caluculation in each frame
+        */
+        this.GC = {
+            // getFixedValue
+            partials: null,
+            maxVal: null,
+            partialVal: null,
+            valPerDirection: null,
+            clamp: null,
+            percent: null,
+            // getOpacityValue
+            vhLimit: null,
+            vhStart: null,
+            val: null,
+            valClamped: null,
+            // getIsNaNValue
+            documentHeight: null,
+            // getIsANumberValue
+            align: null,
+            offset: null,
+            range: null,
+            // getStyle
+            reverseVal: null,
+            typeVal: null,
+            force3DStyle: null,
+            scaleVal: null,
+        };
     }
 
     init() {
@@ -490,7 +525,6 @@ export class ParallaxItemClass {
         }
 
         if (this.trigger && (x !== 0 || y !== 0 || z !== 0)) {
-            console.log('apply');
             this.trigger.style.tranform = `translate3D(${x}px, ${y}px, ${z}px)`;
         }
     }
@@ -762,9 +796,7 @@ export class ParallaxItemClass {
     }
 
     getFixedValue() {
-        let o = {};
-
-        o.partials = !this.invertSide
+        this.GC.partials = !this.invertSide
             ? -(
                   this.scrollerScroll +
                   this.scrollerHeight -
@@ -778,31 +810,40 @@ export class ParallaxItemClass {
                   (this.offset + this.endPoint)
               );
 
-        o.maxVal = (this.endPoint / 100) * this.numericRange;
-        o.partialVal = (o.partials / 100) * this.numericRange;
+        this.GC.maxVal = (this.endPoint / 100) * this.numericRange;
+        this.GC.partialVal = (this.GC.partials / 100) * this.numericRange;
 
-        o.valPerDirection = (() => {
+        this.GC.valPerDirection = (() => {
             if (this.fromTo) {
                 return !this.invertSide
-                    ? o.partialVal
-                    : o.maxVal - o.partialVal;
+                    ? this.GC.partialVal
+                    : this.GC.maxVal - this.GC.partialVal;
             } else {
                 return !this.invertSide
-                    ? o.maxVal - o.partialVal
-                    : o.partialVal;
+                    ? this.GC.maxVal - this.GC.partialVal
+                    : this.GC.partialVal;
             }
         })();
 
-        o.clamp =
-            o.maxVal > 0
-                ? -parallaxUtils.clamp(o.valPerDirection, 0, o.maxVal)
-                : -parallaxUtils.clamp(o.valPerDirection, o.maxVal, 0);
+        this.GC.clamp =
+            this.GC.maxVal > 0
+                ? -parallaxUtils.clamp(
+                      this.GC.valPerDirection,
+                      0,
+                      this.GC.maxVal
+                  )
+                : -parallaxUtils.clamp(
+                      this.GC.valPerDirection,
+                      this.GC.maxVal,
+                      0
+                  );
 
-        this.fixedShouldRender = this.prevFixedClamp === o.clamp ? false : true;
-        this.prevFixedClamp = o.clamp;
+        this.fixedShouldRender =
+            this.prevFixedClamp === this.GC.clamp ? false : true;
+        this.prevFixedClamp = this.GC.clamp;
         if (!this.fixedShouldRender && !this.firstTime) return this.endValue;
 
-        o.percent = (o.clamp * 100) / this.endPoint;
+        this.GC.percent = (this.GC.clamp * 100) / this.endPoint;
 
         // Fire callback if there is
         if (
@@ -813,8 +854,8 @@ export class ParallaxItemClass {
         ) {
             parallaxEmitter({
                 prevValue: this.prevFixedRawValue,
-                value: o.valPerDirection,
-                maxVal: o.maxVal,
+                value: this.GC.valPerDirection,
+                maxVal: this.GC.maxVal,
                 onEnter: this.onEnter,
                 onEnterBack: this.onEnterBack,
                 onLeave: this.onLeave,
@@ -822,7 +863,7 @@ export class ParallaxItemClass {
             });
         }
 
-        this.prevFixedRawValue = o.valPerDirection;
+        this.prevFixedRawValue = this.GC.valPerDirection;
 
         switch (this.propierties) {
             case parallaxConstant.PROP_HORIZONTAL:
@@ -830,82 +871,69 @@ export class ParallaxItemClass {
                 const value = (() => {
                     switch (this.unitMisure) {
                         case parallaxConstant.VW:
-                            return (this.windowInnerWidth / 100) * -o.percent;
+                            return (
+                                (this.windowInnerWidth / 100) * -this.GC.percent
+                            );
 
                         case parallaxConstant.VH:
-                            return (this.windowInnerHeight / 100) * -o.percent;
+                            return (
+                                (this.windowInnerHeight / 100) *
+                                -this.GC.percent
+                            );
 
                         case parallaxConstant.WPERCENT:
                             return this.direction ===
                                 parallaxConstant.DIRECTION_VERTICAL
-                                ? (this.width / 100) * -o.percent
-                                : (this.height / 100) * -o.percent;
+                                ? (this.width / 100) * -this.GC.percent
+                                : (this.height / 100) * -this.GC.percent;
 
                         case parallaxConstant.HPERCENT:
                             return this.direction ===
                                 parallaxConstant.DIRECTION_VERTICAL
-                                ? (this.height / 100) * -o.percent
-                                : (this.width / 100) * -o.percent;
+                                ? (this.height / 100) * -this.GC.percent
+                                : (this.width / 100) * -this.GC.percent;
 
                         case parallaxConstant.PX:
                         case parallaxConstant.DEGREE:
                         case parallaxConstant.PROP_TWEEN:
                         default:
-                            return -o.percent;
+                            return -this.GC.percent;
                     }
                 })();
-                // Remove reference to Object
-                o = null;
-                //
                 return value;
 
             case parallaxConstant.PROP_SCALE:
             case parallaxConstant.PROP_OPACITY:
-                const valueScaleOpacity = 1 - o.percent;
-                // Remove reference to Object
-                o = null;
-                //
-                return valueScaleOpacity;
+                return 1 - this.GC.percent;
 
             default:
-                const valueDefault = -o.percent;
-                // Remove reference to Object
-                o = null;
-                //
-                return valueDefault;
+                return -this.GC.percent;
         }
     }
 
     getOpacityValue() {
-        let o = {};
-
-        o.vhLimit = (this.scrollerHeight / 100) * this.opacityEnd;
-        o.vhStart =
+        this.GC.vhLimit = (this.scrollerHeight / 100) * this.opacityEnd;
+        this.GC.vhStart =
             this.scrollerHeight -
             (this.scrollerHeight / 100) * this.opacityStart;
 
-        o.val =
+        this.GC.val =
             this.align == parallaxConstant.ALIGN_START
                 ? -this.scrollerScroll * -1
-                : (this.scrollerScroll + o.vhLimit - this.offset) * -1;
+                : (this.scrollerScroll + this.GC.vhLimit - this.offset) * -1;
 
-        o.valClamped =
+        this.GC.valClamped =
             this.align == parallaxConstant.ALIGN_START
-                ? 1 - o.val / this.offset
-                : 1 - o.val / (this.scrollerHeight - o.vhStart - o.vhLimit);
+                ? 1 - this.GC.val / this.offset
+                : 1 -
+                  this.GC.val /
+                      (this.scrollerHeight - this.GC.vhStart - this.GC.vhLimit);
 
-        const value = o.valClamped;
-
-        // Remove reference to Object
-        o = null;
-        //
-        return parallaxUtils.clamp(value, 0, 1);
+        return parallaxUtils.clamp(this.GC.valClamped, 0, 1);
     }
 
     getIsNaNValue() {
-        let o = {};
-
-        o.documentHeight =
+        this.GC.documentHeight =
             this.direction === parallaxConstant.DIRECTION_VERTICAL
                 ? document.documentElement.scrollHeight
                 : document.documentElement.scrollWidth;
@@ -913,79 +941,50 @@ export class ParallaxItemClass {
         // Prefixed align
         switch (this.align) {
             case parallaxConstant.ALIGN_START:
-                const valueStart = this.scrollerScroll / this.range;
-                // Remove reference to Object
-                o = null;
-                //
-                return valueStart;
+                return this.scrollerScroll / this.range;
 
             case parallaxConstant.ALIGN_TOP:
             case parallaxConstant.ALIGN_LEFT:
-                const valueTop =
-                    (this.scrollerScroll - this.offset) / this.range;
-
-                // Remove reference to Object
-                o = null;
-                //
-                return valueTop;
+                return (this.scrollerScroll - this.offset) / this.range;
 
             case parallaxConstant.ALIGN_CENTER:
-                const valueCenter =
+                return (
                     (this.scrollerScroll +
                         (this.scrollerHeight / 2 - this.height / 2) -
                         this.offset) /
-                    this.range;
-
-                // Remove reference to Object
-                o = null;
-                //
-                return valueCenter;
+                    this.range
+                );
 
             case parallaxConstant.ALIGN_BOTTOM:
             case parallaxConstant.ALIGN_RIGHT:
-                const valueBottom =
+                return (
                     (this.scrollerScroll +
                         (this.scrollerHeight - this.height) -
                         this.offset) /
-                    this.range;
-
-                // Remove reference to Object
-                o = null;
-                //
-                return valueBottom;
+                    this.range
+                );
 
             case parallaxConstant.ALIGN_END:
-                const valueEnd =
+                return (
                     -(
-                        o.documentHeight -
+                        this.GC.documentHeight -
                         (this.scrollerScroll + this.scrollerHeight)
-                    ) / this.range;
-
-                // Remove reference to Object
-                o = null;
-                //
-                return valueEnd;
+                    ) / this.range
+                );
         }
     }
 
     getIsANumberValue() {
-        let o = {};
+        this.GC.align = parseFloat(this.align);
+        this.GC.offset = this.offset;
+        this.GC.range = this.range;
 
-        o.align = parseFloat(this.align);
-        o.offset = this.offset;
-        o.range = this.range;
-
-        const value =
+        return (
             (this.scrollerScroll +
-                (this.scrollerHeight / 100) * o.align -
-                o.offset) /
-            o.range;
-
-        // Remove reference to Object
-        o = null;
-        //
-
-        return value;
+                (this.scrollerHeight / 100) * this.GC.align -
+                this.GC.offset) /
+            this.GC.range
+        );
     }
 
     getSwitchAfterZeroValue(value) {
@@ -997,65 +996,65 @@ export class ParallaxItemClass {
     }
 
     getStyle(val) {
-        const o = {};
-
-        o.reverseVal = this.reverse
+        this.GC.reverseVal = this.reverse
             ? parallaxUtils.getRetReverseValue(this.propierties, val)
             : val;
 
-        o.typeVal =
+        this.GC.typeVal =
             this.computationType !== parallaxConstant.TYPE_FIXED
-                ? this.getSwitchAfterZeroValue(o.reverseVal)
-                : o.reverseVal;
+                ? this.getSwitchAfterZeroValue(this.GC.reverseVal)
+                : this.GC.reverseVal;
 
-        o.force3DStyle = this.force3D ? 'translate3D(0px, 0px, 0px)' : '';
+        this.GC.force3DStyle = this.force3D ? 'translate3D(0px, 0px, 0px)' : '';
 
         switch (this.propierties) {
             case parallaxConstant.PROP_VERTICAL:
                 return {
-                    transform: `${o.force3DStyle} translateY(${o.typeVal}px)`,
+                    transform: `${this.GC.force3DStyle} translateY(${this.GC.typeVal}px)`,
                 };
 
             case parallaxConstant.PROP_HORIZONTAL:
                 return {
-                    transform: `${o.force3DStyle} translateX(${o.typeVal}px)`,
+                    transform: `${this.GC.force3DStyle} translateX(${this.GC.typeVal}px)`,
                 };
 
             case parallaxConstant.PROP_ROTATE:
                 return {
-                    transform: `${o.force3DStyle} rotate(${o.typeVal}deg)`,
+                    transform: `${this.GC.force3DStyle} rotate(${this.GC.typeVal}deg)`,
                 };
                 break;
 
             case parallaxConstant.PROP_ROTATEY:
                 return {
-                    transform: `${o.force3DStyle} rotateY(${o.typeVal}deg)`,
+                    transform: `${this.GC.force3DStyle} rotateY(${this.GC.typeVal}deg)`,
                 };
 
             case parallaxConstant.PROP_ROTATEX:
                 return {
-                    transform: `${o.force3DStyle} rotateX(${o.typeVal}deg)`,
+                    transform: `${this.GC.force3DStyle} rotateX(${this.GC.typeVal}deg)`,
                 };
 
             case parallaxConstant.PROP_ROTATEZ:
                 return {
-                    transform: `${o.force3DStyle} rotateZ(${o.typeVal}deg)`,
+                    transform: `${this.GC.force3DStyle} rotateZ(${this.GC.typeVal}deg)`,
                 };
 
             case parallaxConstant.PROP_OPACITY:
-                return { opacity: `${o.typeVal}` };
+                return { opacity: `${this.GC.typeVal}` };
 
             case parallaxConstant.PROP_SCALE:
-                o.scaleVal =
+                this.GC.scaleVal =
                     this.computationType !== parallaxConstant.TYPE_FIXED
-                        ? 1 + o.typeVal / 1000
-                        : o.typeVal;
+                        ? 1 + this.GC.typeVal / 1000
+                        : this.GC.typeVal;
                 return {
-                    transform: `${o.force3DStyle} scale(${o.scaleVal})`,
+                    transform: `${this.GC.force3DStyle} scale(${this.GC.scaleVal})`,
                 };
 
             default:
-                return { [this.propierties.toLowerCase()]: `${o.typeVal}px` };
+                return {
+                    [this.propierties.toLowerCase()]: `${this.GC.typeVal}px`,
+                };
         }
     }
 

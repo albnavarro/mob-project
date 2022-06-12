@@ -47,6 +47,7 @@ export const hScroller = () => {
         trigger: '.pluto',
         propierties: 'x',
         pin: true,
+        marker: 'pin-marker',
         range: '0px',
         start: 'right 10vw +width',
         end: 'right 50vw +halfWidth',

@@ -51,6 +51,7 @@ export const parallaxMarker = ({
         'z-index': '99999',
         background: 'red',
         'font-size': '14px',
+        'white-space': 'nowrap',
     };
 
     const { top, right, bottom, left } = (() => {

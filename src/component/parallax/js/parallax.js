@@ -89,6 +89,12 @@ class ParallaxClass {
         // use animation on pin collision
         data.forceTranspond = item.hasAttribute('data-forceTranspond');
 
+        // anticipate pin on load, useful for element that start pinned
+        // we are scure that element is pinned
+        data.anticipatePinOnLoad = item.hasAttribute(
+            'data-anticipatePinOnLoad'
+        );
+
         // Boolean
         // Mandatory computationType = 'fixed'
         // Start from maximum value

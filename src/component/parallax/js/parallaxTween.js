@@ -58,44 +58,52 @@ export class ParallaxTween {
     }
 
     draw({ partial, isLastDraw }) {
-        if (this.firstRun) this.setStagger();
-        this.firstRun = false;
+        const mainFn = () => {
+            if (this.firstRun) this.setStagger();
+            this.firstRun = false;
 
-        this.values.forEach((item, i) => {
-            item.currentValue = this.ease(
-                partial,
-                item.fromValue,
-                item.toValProcessed,
-                this.duration
-            );
-            item.currentValue = getRoundedValue(item.currentValue);
-        });
-
-        // Prepare an obj to pass to the callback
-        const cbObject = getValueObj(this.values, 'currentValue');
-
-        // Fire callback
-        if (this.stagger.each === 0) {
-            // No stagger, run immediatly
-            this.callback.forEach(({ cb }) => cb(cbObject));
-        } else {
-            // Stagger
-            this.callback.forEach(({ cb, index, frame }, i) => {
-                handleFrameIndex(() => cb(cbObject), frame);
+            this.values.forEach((item, i) => {
+                item.currentValue = this.ease(
+                    partial,
+                    item.fromValue,
+                    item.toValProcessed,
+                    this.duration
+                );
+                item.currentValue = getRoundedValue(item.currentValue);
             });
-        }
 
-        if (isLastDraw) {
+            // Prepare an obj to pass to the callback
+            const cbObject = getValueObj(this.values, 'currentValue');
+
+            // Fire callback
             if (this.stagger.each === 0) {
                 // No stagger, run immediatly
-                this.callbackOnStop.forEach(({ cb }) => cb(cbObject));
+                handleFrame.add(() => {
+                    this.callback.forEach(({ cb }) => cb(cbObject));
+                });
             } else {
                 // Stagger
-                this.callbackOnStop.forEach(({ cb, index, frame }, i) => {
-                    handleFrameIndex(() => cb(cbObject), frame + 1);
+                this.callback.forEach(({ cb, index, frame }, i) => {
+                    handleFrameIndex(() => cb(cbObject), frame);
                 });
             }
-        }
+
+            if (isLastDraw) {
+                if (this.stagger.each === 0) {
+                    // No stagger, run immediatly
+                    handleFrame.add(() => {
+                        this.callbackOnStop.forEach(({ cb }) => cb(cbObject));
+                    });
+                } else {
+                    // Stagger
+                    this.callbackOnStop.forEach(({ cb, index, frame }, i) => {
+                        handleFrameIndex(() => cb(cbObject), frame + 1);
+                    });
+                }
+            }
+        };
+
+        handleNextTick.add(() => mainFn());
     }
 
     /**

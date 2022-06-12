@@ -7,6 +7,7 @@ import {
 } from '../utils/animationUtils.js';
 import {
     handleFrame,
+    handleNextTick,
     handleFrameIndex,
 } from '../../events/rafutils/rafUtils.js';
 import { setStagger } from '../utils/stagger/setStagger.js';
@@ -49,6 +50,20 @@ export class HandleSequencer {
 
         this.useStagger = true;
         this.firstRun = true;
+
+        /*
+        Obj utils to avoid new GC allocation during animation
+        Try to reduce the GC timing
+        Support caluculation in each frame
+        */
+        this.GC = {
+            currentEl: null,
+            isLastUsableProp: null,
+            nextActiveItem: null,
+            duration: null,
+            minVal: null,
+            maxVal: null,
+        };
     }
 
     setStagger() {
@@ -67,118 +82,130 @@ export class HandleSequencer {
     }
 
     draw({ partial, isLastDraw, useFrame }) {
-        if (this.firstRun) this.setStagger();
-        this.firstRun = false;
+        const mainFn = () => {
+            if (this.firstRun) this.setStagger();
+            this.firstRun = false;
 
-        this.values.forEach((item, i) => {
-            item.settled = false;
-        });
+            this.values.forEach((item, i) => {
+                item.settled = false;
+            });
 
-        this.timeline.forEach(({ start, end, values }, i) => {
-            values.forEach((item) => {
-                const currentEl = this.values.find(
-                    ({ prop }) => prop === item.prop
-                );
+            this.timeline.forEach(({ start, end, values }, i) => {
+                values.forEach((item) => {
+                    this.GC.currentEl = this.values.find(
+                        ({ prop }) => prop === item.prop
+                    );
 
-                // Id the prop is settled or is inactive skip
-                if (currentEl.settled || !item.active) return;
+                    // Id the prop is settled or is inactive skip
+                    if (this.GC.currentEl.settled || !item.active) return;
 
-                // Check if in the next step of timeline the same prop is active an start before partial
-                const isLastUsableProp = this.timeline
-                    .slice(i + 1, this.timeline.length)
-                    .reduce((p, { start: nextStart, values: nextValues }) => {
-                        const nextActiveItem = nextValues.find((nextItem) => {
-                            return (
-                                nextItem.prop === item.prop && nextItem.active
-                            );
-                        });
-                        if (nextActiveItem && nextStart <= partial) {
-                            return false;
-                        } else {
-                            return p;
-                        }
-                    }, true);
+                    // Check if in the next step of timeline the same prop is active an start before partial
+                    this.GC.isLastUsableProp = this.timeline
+                        .slice(i + 1, this.timeline.length)
+                        .reduce(
+                            (p, { start: nextStart, values: nextValues }) => {
+                                this.GC.nextActiveItem = nextValues.find(
+                                    (nextItem) => {
+                                        return (
+                                            nextItem.prop === item.prop &&
+                                            nextItem.active
+                                        );
+                                    }
+                                );
+                                if (
+                                    this.GC.nextActiveItem &&
+                                    nextStart <= partial
+                                ) {
+                                    return false;
+                                } else {
+                                    return p;
+                                }
+                            },
+                            true
+                        );
 
-                // If in the next step the same props is active and start before partial skip
-                if (!isLastUsableProp) return;
+                    // If in the next step the same props is active and start before partial skip
+                    if (!this.GC.isLastUsableProp) return;
 
-                // At least we get the current value
-                const duration = end - start;
-                const minVal =
-                    item.toValue > item.fromValue
-                        ? item.fromValue
-                        : item.toValue;
-                const maxVal =
-                    item.toValue > item.fromValue
-                        ? item.toValue
-                        : item.fromValue;
+                    // At least we get the current value
+                    this.GC.duration = end - start;
+                    this.GC.minVal =
+                        item.toValue > item.fromValue
+                            ? item.fromValue
+                            : item.toValue;
+                    this.GC.maxVal =
+                        item.toValue > item.fromValue
+                            ? item.toValue
+                            : item.fromValue;
 
-                item.currentValue =
-                    partial >= start && partial <= end
-                        ? item.ease(
-                              partial - start,
-                              item.fromValue,
-                              item.toValue - item.fromValue,
-                              duration
-                          )
-                        : clamp(
-                              item.ease(
+                    item.currentValue =
+                        partial >= start && partial <= end
+                            ? item.ease(
                                   partial - start,
                                   item.fromValue,
                                   item.toValue - item.fromValue,
-                                  duration
-                              ),
-                              minVal,
-                              maxVal
-                          );
+                                  this.GC.duration
+                              )
+                            : clamp(
+                                  item.ease(
+                                      partial - start,
+                                      item.fromValue,
+                                      item.toValue - item.fromValue,
+                                      this.GC.duration
+                                  ),
+                                  this.GC.minVal,
+                                  this.GC.maxVal
+                              );
 
-                item.currentValue = getRoundedValue(item.currentValue);
+                    item.currentValue = getRoundedValue(item.currentValue);
 
-                if (!Number.isNaN(item.currentValue)) {
-                    currentEl.currentValue = item.currentValue.toFixed(4);
-                    currentEl.settled = true;
-                }
+                    if (!Number.isNaN(item.currentValue)) {
+                        this.GC.currentEl.currentValue = item.currentValue.toFixed(
+                            4
+                        );
+                        this.GC.currentEl.settled = true;
+                    }
+                });
             });
-        });
 
-        const cbObject = getValueObj(this.values, 'currentValue');
+            const cbObject = getValueObj(this.values, 'currentValue');
 
-        if (this.stagger.each === 0 || this.useStagger === false) {
-            // No stagger, run immediatly
-            const fn = () => this.callback.forEach(({ cb }) => cb(cbObject));
-
-            if (useFrame) {
-                handleFrame.add(() => fn());
-            } else {
-                fn();
-            }
-        } else {
-            // Stagger
-            this.callback.forEach(({ cb, index, frame }, i) => {
-                handleFrameIndex(() => cb(cbObject), frame);
-            });
-        }
-
-        if (isLastDraw) {
             if (this.stagger.each === 0 || this.useStagger === false) {
                 // No stagger, run immediatly
                 const fn = () =>
-                    this.callbackOnStop.forEach(({ cb }) => cb(cbObject));
+                    this.callback.forEach(({ cb }) => cb(cbObject));
 
-                if (useFrame) {
-                    handleFrame.add(() => fn());
-                } else {
-                    fn();
-                }
+                handleFrame.add(() => fn());
             } else {
                 // Stagger
-                this.callbackOnStop.forEach(({ cb, index, frame }, i) => {
-                    handleFrameIndex(() => cb(cbObject), frame + 1);
+                this.callback.forEach(({ cb, index, frame }, i) => {
+                    handleFrameIndex(() => cb(cbObject), frame);
                 });
             }
-        }
 
-        this.useStagger = true;
+            if (isLastDraw) {
+                if (this.stagger.each === 0 || this.useStagger === false) {
+                    // No stagger, run immediatly
+                    const fn = () =>
+                        this.callbackOnStop.forEach(({ cb }) => cb(cbObject));
+
+                    handleFrame.add(() => fn());
+                } else {
+                    // Stagger
+                    this.callbackOnStop.forEach(({ cb, index, frame }, i) => {
+                        handleFrameIndex(() => cb(cbObject), frame + 1);
+                    });
+                }
+            }
+
+            this.useStagger = true;
+        };
+
+        if (useFrame) {
+            mainFn();
+        } else {
+            handleNextTick.add(() => mainFn());
+        }
     }
 
     /**
