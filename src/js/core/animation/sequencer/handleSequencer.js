@@ -50,20 +50,6 @@ export class HandleSequencer {
 
         this.useStagger = true;
         this.firstRun = true;
-
-        /*
-        Obj utils to avoid new GC allocation during animation
-        Try to reduce the GC timing
-        Support caluculation in each frame
-        */
-        this.GC = {
-            currentEl: null,
-            isLastUsableProp: null,
-            nextActiveItem: null,
-            duration: null,
-            minVal: null,
-            maxVal: null,
-        };
     }
 
     setStagger() {
@@ -86,25 +72,39 @@ export class HandleSequencer {
             if (this.firstRun) this.setStagger();
             this.firstRun = false;
 
+            /*
+            Obj utils to avoid new GC allocation during animation
+            Try to reduce the GC timing
+            Support caluculation in each frame
+            */
+            let GC = {
+                currentEl: null,
+                isLastUsableProp: null,
+                nextActiveItem: null,
+                duration: null,
+                minVal: null,
+                maxVal: null,
+            };
+
             this.values.forEach((item, i) => {
                 item.settled = false;
             });
 
             this.timeline.forEach(({ start, end, values }, i) => {
                 values.forEach((item) => {
-                    this.GC.currentEl = this.values.find(
+                    GC.currentEl = this.values.find(
                         ({ prop }) => prop === item.prop
                     );
 
                     // Id the prop is settled or is inactive skip
-                    if (this.GC.currentEl.settled || !item.active) return;
+                    if (GC.currentEl.settled || !item.active) return;
 
                     // Check if in the next step of timeline the same prop is active an start before partial
-                    this.GC.isLastUsableProp = this.timeline
+                    GC.isLastUsableProp = this.timeline
                         .slice(i + 1, this.timeline.length)
                         .reduce(
                             (p, { start: nextStart, values: nextValues }) => {
-                                this.GC.nextActiveItem = nextValues.find(
+                                GC.nextActiveItem = nextValues.find(
                                     (nextItem) => {
                                         return (
                                             nextItem.prop === item.prop &&
@@ -112,10 +112,7 @@ export class HandleSequencer {
                                         );
                                     }
                                 );
-                                if (
-                                    this.GC.nextActiveItem &&
-                                    nextStart <= partial
-                                ) {
+                                if (GC.nextActiveItem && nextStart <= partial) {
                                     return false;
                                 } else {
                                     return p;
@@ -125,15 +122,15 @@ export class HandleSequencer {
                         );
 
                     // If in the next step the same props is active and start before partial skip
-                    if (!this.GC.isLastUsableProp) return;
+                    if (!GC.isLastUsableProp) return;
 
                     // At least we get the current value
-                    this.GC.duration = end - start;
-                    this.GC.minVal =
+                    GC.duration = end - start;
+                    GC.minVal =
                         item.toValue > item.fromValue
                             ? item.fromValue
                             : item.toValue;
-                    this.GC.maxVal =
+                    GC.maxVal =
                         item.toValue > item.fromValue
                             ? item.toValue
                             : item.fromValue;
@@ -144,26 +141,26 @@ export class HandleSequencer {
                                   partial - start,
                                   item.fromValue,
                                   item.toValue - item.fromValue,
-                                  this.GC.duration
+                                  GC.duration
                               )
                             : clamp(
                                   item.ease(
                                       partial - start,
                                       item.fromValue,
                                       item.toValue - item.fromValue,
-                                      this.GC.duration
+                                      GC.duration
                                   ),
-                                  this.GC.minVal,
-                                  this.GC.maxVal
+                                  GC.minVal,
+                                  GC.maxVal
                               );
 
                     item.currentValue = getRoundedValue(item.currentValue);
 
                     if (!Number.isNaN(item.currentValue)) {
-                        this.GC.currentEl.currentValue = item.currentValue.toFixed(
+                        GC.currentEl.currentValue = item.currentValue.toFixed(
                             4
                         );
-                        this.GC.currentEl.settled = true;
+                        GC.currentEl.settled = true;
                     }
                 });
             });
@@ -199,6 +196,8 @@ export class HandleSequencer {
             }
 
             this.useStagger = true;
+            // Remove reference to o Object
+            GC = null;
         };
 
         if (useFrame) {
