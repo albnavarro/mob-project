@@ -1,10 +1,10 @@
-import { SmoothScrollClass } from '../../component/smoothScroll/js/smoothScroll.js';
 import {
     parallax,
     HandleSequencer,
     ParallaxTween,
     ParallaxItemClass,
     handleNextTick,
+    SmoothScrollClass,
 } from '../core';
 
 export const hScroller = () => {
@@ -150,6 +150,7 @@ export const hScroller = () => {
     });
     parallaxOut.init();
 
+    const inputRange = document.querySelector('.scrollerInput');
     const smoothScrollFull = new SmoothScrollClass({
         target: '.scrollerH',
         direction: 'HORIZONTAL',
@@ -158,15 +159,24 @@ export const hScroller = () => {
         drag: true,
     });
     smoothScrollFull.init();
-    smoothScrollFull.onTick((scrollVal) => {
+    smoothScrollFull.onTick(({ scrollValue, percent }) => {
         handleNextTick.add(() => {
-            parallax1.move(scrollVal);
-            parallax2.move(scrollVal);
-            parallaxOpacity.move(scrollVal);
-            parallaxPin.move(scrollVal);
-            parallaxIn.move(scrollVal);
-            parallaxOut.move(scrollVal);
+            parallax1.move(scrollValue);
+            parallax2.move(scrollValue);
+            parallaxOpacity.move(scrollValue);
+            parallaxPin.move(scrollValue);
+            parallaxIn.move(scrollValue);
+            parallaxOut.move(scrollValue);
         });
+    });
+
+    smoothScrollFull.updateScrollbar(({ percent }) => {
+        inputRange.value = percent;
+    });
+
+    inputRange.addEventListener('input', (e) => {
+        const range = inputRange.value;
+        smoothScrollFull.move(range);
     });
     // END FIRST
 
@@ -208,10 +218,10 @@ export const hScroller = () => {
         drag: true,
     });
     smoothScrollContiner.init();
-    smoothScrollContiner.onTick((scrollVal) => {
+    smoothScrollContiner.onTick(({ scrollValue }) => {
         handleNextTick.add(() => {
-            parallaxb1.move(scrollVal);
-            parallaxb2.move(scrollVal);
+            parallaxb1.move(scrollValue);
+            parallaxb2.move(scrollValue);
         });
     });
 
@@ -277,12 +287,12 @@ export const hScroller = () => {
         drag: true,
     });
     smoothScrollContiner2.init();
-    smoothScrollContiner2.onTick((scrollVal) => {
+    smoothScrollContiner2.onTick(({ scrollValue }) => {
         handleNextTick.add(() => {
-            parallaxC1.move(scrollVal);
-            parallaxC2.move(scrollVal);
-            parallaxC3.move(scrollVal);
-            parallaxC4.move(scrollVal);
+            parallaxC1.move(scrollValue);
+            parallaxC2.move(scrollValue);
+            parallaxC3.move(scrollValue);
+            parallaxC4.move(scrollValue);
         });
     });
 };

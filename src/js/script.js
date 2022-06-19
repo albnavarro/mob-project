@@ -19,6 +19,7 @@ import {
     startFps,
     frameStore,
     parallax,
+    SmoothScrollClass,
 } from './core/';
 
 // NEW VANILLA COMPONENT MODULE
@@ -37,7 +38,6 @@ import { wave } from '../component/wave/js/wave.js';
 import { predictiveTurbolence } from '../component/predictiveTurbolence/js/predictiveTurbolence.js';
 import { animate } from '../component/animate/js/animate.js';
 import { pageScroll } from '../component/pageScroll/js/pageScroll.js';
-import { SmoothScrollClass } from '../component/smoothScroll/js/smoothScroll.js';
 import { dragger } from '../component/dragger/js/dragger.js';
 import { GsapHorizontalCustomClass } from '../component/gsapHorizontalCustom/js/gsapHorizontalCustom.js';
 

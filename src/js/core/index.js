@@ -103,3 +103,5 @@ export { tweenConfig } from './animation/tween/tweenConfig.js';
 export { parallax } from './animation/parallax/parallax.js';
 export { ParallaxItemClass } from './animation/parallax/parallaxItem.js';
 export { ParallaxTween } from './animation/parallax/parallaxTween.js';
+// Smopoth scroll
+export { SmoothScrollClass } from './animation/smoothScroller/smoothScroll.js';

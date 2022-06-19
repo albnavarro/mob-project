@@ -1,8 +1,10 @@
+import { handleResize } from '../../events/resizeUtils/handleResize.js';
+import { handleScroll } from '../../events/scrollUtils/handleScroll.js';
 import {
-    handleResize,
-    handleScroll,
     handleScrollStart,
     handleScrollEnd,
+} from '../../events/scrollUtils/handleScrollUtils.js';
+import {
     handleTouchStart,
     handleTouchEnd,
     handleMouseDown,
@@ -11,11 +13,13 @@ import {
     handleTouchMove,
     handleMouseWheel,
     handleMouseClick,
+} from '../../events/mouseUtils/handleMouse.js';
+import {
     isDescendant,
     getTranslateValues,
-    HandleLerp,
-    HandleSpring,
-} from '.../../../js/core';
+} from '../../utils/vanillaFunction.js';
+import { HandleLerp } from '../../animation/lerp/handleLerp.js';
+import { HandleSpring } from '../../animation/spring/handleSpring.js';
 
 export class SmoothScrollClass {
     constructor(data = {}) {
@@ -32,6 +36,7 @@ export class SmoothScrollClass {
         this.endValue = window.pageYOffset;
         this.startValue = 0;
         this.endValue = 0;
+        this.percent = 0;
         this.prevValue = 0;
         this.rafOnScroll = null;
         this.containerWidth = 0;
@@ -47,9 +52,9 @@ export class SmoothScrollClass {
         this.touchmove = null;
         this.prevTouchVal = 0;
         this.touchVal = 0;
-
         //
         this.onTickCallback = [];
+        this.onUpdateScrollBar = () => {};
 
         // Unsubscribe event
         this.subscribeResize = () => {};
@@ -71,6 +76,8 @@ export class SmoothScrollClass {
         this.motion = null;
         this.unsubscribeMotion = () => {};
         this.unsubscribeOnComplete = () => {};
+
+        this.scrollbarIsRunning = false;
     }
 
     init() {
@@ -84,10 +91,10 @@ export class SmoothScrollClass {
                 break;
         }
 
-        this.reset();
-        this.subscribeResize = handleResize(() => this.reset());
-        this.subscribeScrollStart = handleScrollStart(() => this.reset());
-        this.subscribeScrollEnd = handleScrollEnd(() => this.reset());
+        this.updateProps();
+        this.subscribeResize = handleResize(() => this.updateProps());
+        this.subscribeScrollStart = handleScrollStart(() => this.updateProps());
+        this.subscribeScrollEnd = handleScrollEnd(() => this.updateProps());
         this.subscribeTouchStart = handleTouchStart((data) =>
             this.onMouseDown(data)
         );
@@ -136,7 +143,10 @@ export class SmoothScrollClass {
             }
 
             this.onTickCallback.forEach((item, i) => {
-                item(-val);
+                item({
+                    scrollValue: -val,
+                    percent: this.percent,
+                });
             });
         });
 
@@ -187,10 +197,15 @@ export class SmoothScrollClass {
         this.subscribeMouseClick();
         this.unsubscribeMotion();
         this.unsubscribeOnComplete();
+        this.onUpdateScrollBar = () => {};
     }
 
     onTick(fn) {
         this.onTickCallback.push(fn);
+    }
+
+    updateScrollbar(fn) {
+        this.onUpdateScrollBar = fn;
     }
 
     /**
@@ -210,7 +225,7 @@ export class SmoothScrollClass {
     }
 
     // RESET DATA
-    reset() {
+    updateProps() {
         this.isScrolling = false;
 
         this.containerWidth =
@@ -268,7 +283,7 @@ export class SmoothScrollClass {
             }
         })();
 
-        this.calcaluteValue();
+        this.calculateValue();
     }
 
     // GET POSITION FORM MOUSE/TOUCH EVENT
@@ -286,11 +301,13 @@ export class SmoothScrollClass {
             this.dragEnable = true;
             this.prevTouchVal = this.getMousePos(client);
             this.touchVal = this.getMousePos(client);
+            this.scrollbarIsRunning = false;
         }
     }
 
     onMouseUp({ target, client }) {
         this.dragEnable = false;
+        this.scrollbarIsRunning = false;
     }
 
     onTouchMove({ target, client, preventDefault }) {
@@ -307,7 +324,8 @@ export class SmoothScrollClass {
             const result = parseInt(this.prevTouchVal - this.touchVal);
             this.endValue += result;
 
-            this.calcaluteValue();
+            this.calculateValue();
+            this.scrollbarIsRunning = false;
         }
     }
 
@@ -326,13 +344,30 @@ export class SmoothScrollClass {
         if (target === this.target || isDescendant(this.target, target)) {
             preventDefault();
             this.endValue += spinY * this.speed;
-            this.calcaluteValue();
+            this.calculateValue();
+            this.scrollbarIsRunning = false;
         }
     }
 
+    move(percent) {
+        this.scrollbarIsRunning = true;
+        this.percent = percent;
+        this.endValue = (this.percent * this.maxValue) / 100;
+        this.motion.goTo({ val: this.endValue }).catch((err) => {});
+    }
+
     // COMMON CALCULATE VALUE
-    calcaluteValue() {
+    calculateValue() {
+        const percentValue = (this.endValue * 100) / this.maxValue;
+        this.percent = this.clamp(percentValue, 0, 100);
         this.endValue = this.clamp(this.endValue, 0, this.maxValue);
         this.motion.goTo({ val: this.endValue }).catch((err) => {});
+
+        if (!this.scrollbarIsRunning) {
+            this.onUpdateScrollBar({
+                scrollValue: -this.endValue,
+                percent: this.percent,
+            });
+        }
     }
 }
