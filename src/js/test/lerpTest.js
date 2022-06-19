@@ -1,5 +1,4 @@
-import { handleLerp } from '../core/animation/lerp/handleLerp.js';
-import { HandleAsyncTimeline } from '../core/animation/asyncTimeline/handleAsyncTimeline.js';
+import { HandleLerp, HandleAsyncTimeline } from '../core';
 
 export function lerpTest() {
     const btnStart = document.querySelector('.lerp-btn-start');
@@ -13,7 +12,7 @@ export function lerpTest() {
     const target = document.querySelector('.lerp-target');
 
     // DEFINE SPRING
-    const mylerp = new handleLerp();
+    const mylerp = new HandleLerp();
     mylerp.setData({ x: 0, y: 0, rotate: 0 });
     mylerp.subscribe(({ x, y, rotate }) => {
         target.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg)`;

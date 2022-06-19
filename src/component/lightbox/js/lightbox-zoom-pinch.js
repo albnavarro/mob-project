@@ -2,9 +2,7 @@ import {
     outerHeight,
     outerWidth,
     offset,
-} from '../../../js/core/utils/vanillaFunction.js';
-import { handleResize } from '.../../../js/core/events/resizeUtils/handleResize.js';
-import {
+    handleResize,
     handleTouchStart,
     handleTouchEnd,
     handleMouseDown,
@@ -12,8 +10,8 @@ import {
     handleMouseMove,
     handleTouchMove,
     handleMouseWheel,
-} from '.../../../js/core/events/mouseUtils/handleMouse.js';
-import { handleFrame } from '.../../../js/core/events/rafutils/rafUtils.js';
+    handleFrame,
+} from '.../../../js/core';
 
 class LightPichZoomClass {
     constructor() {

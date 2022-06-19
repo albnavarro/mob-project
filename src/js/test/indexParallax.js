@@ -1,6 +1,4 @@
-import { parallax } from '../../component/parallax/js/parallax.js';
-import { HandleSequencer } from '../core/animation/sequencer/handleSequencer.js';
-import { ParallaxItemClass } from '../../component/parallax/js/parallaxItem.js';
+import { parallax, HandleSequencer, ParallaxItemClass } from '../core';
 
 export function indexParallax() {
     const item = document.querySelector('.index-parallax-1');

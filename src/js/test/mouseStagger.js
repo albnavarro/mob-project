@@ -1,13 +1,15 @@
-import { handleSpring } from '../core/animation/spring/handleSpring.js';
-import { handleTween } from '../core/animation/tween/handleTween.js';
-import { HandleAsyncTimeline } from '../core/animation/asyncTimeline/handleAsyncTimeline.js';
-import { handleMouseMove } from '../core/events/mouseUtils/handleMouse.js';
+import {
+    HandleSpring,
+    HandleTween,
+    HandleAsyncTimeline,
+    handleMouseMove,
+} from '../core';
 
 export const mouseStagger = () => {
     // 1
     const cursor = document.querySelectorAll('.mouseStagger__item');
 
-    const spring = new handleSpring('gentle');
+    const spring = new HandleSpring('gentle');
     spring.setData({ x: 0, y: 0 });
 
     cursor.forEach((item, i) => {
@@ -30,7 +32,7 @@ export const mouseStagger = () => {
 
     // 2
     const stagger = document.querySelectorAll('.stagger__item');
-    const tween = new handleTween('easeInOutQuad');
+    const tween = new HandleTween('easeInOutQuad');
     tween.setData({ scale: 1 });
     tween.set({ scale: 1 });
 

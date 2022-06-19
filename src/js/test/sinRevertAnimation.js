@@ -1,12 +1,11 @@
-import { handleTween } from '../core/animation/tween/handleTween.js';
-import { HandleAsyncTimeline } from '../core/animation/asyncTimeline/handleAsyncTimeline.js';
+import { HandleTween, HandleAsyncTimeline } from '../core';
 
 export const sinRevertAnimation = () => {
     const stagger = document.querySelectorAll('.sin-revert .shape__target');
     const play = document.querySelector('.sin-revert .anim-play');
     const stop = document.querySelector('.sin-revert .anim-stop');
 
-    const tween = new handleTween('easeLinear');
+    const tween = new HandleTween('easeLinear');
     tween.setData({ x: 0 });
     tween.set({ x: 0 });
 

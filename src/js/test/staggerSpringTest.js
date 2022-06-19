@@ -1,5 +1,4 @@
-import { handleSpring } from '../core/animation/spring/handleSpring.js';
-import { HandleAsyncTimeline } from '../core/animation/asyncTimeline/handleAsyncTimeline.js';
+import { HandleSpring, HandleAsyncTimeline } from '../core';
 
 export function staggerSpringTest() {
     const btnStart = document.querySelector('.spring .start');
@@ -12,7 +11,7 @@ export function staggerSpringTest() {
     const stagger = document.querySelectorAll('.spring .target-stagger');
 
     // DEFINE SPRING
-    const myTween = new handleSpring();
+    const myTween = new HandleSpring();
     myTween.setData({ x: 0, y: 0 });
     myTween.set({ x: 0, y: 0 });
 
@@ -20,7 +19,7 @@ export function staggerSpringTest() {
         target.style.transform = `translate3D(0px,0px,0px) translate(${x}px, ${y}px)`;
     });
 
-    const myStagger = new handleSpring();
+    const myStagger = new HandleSpring();
     myStagger.setData({ x: 0 });
     myStagger.set({ x: 0 });
 

@@ -1,5 +1,4 @@
-import { handleTween } from '../core/animation/tween/handleTween.js';
-import { HandleAsyncTimeline } from '../core/animation/asyncTimeline/handleAsyncTimeline.js';
+import { HandleTween, HandleAsyncTimeline } from '../core';
 
 export const sinAnimation = () => {
     const stagger = document.querySelectorAll('.sin .shape__target');
@@ -8,7 +7,7 @@ export const sinAnimation = () => {
     const pause = document.querySelector('.sin .anim-pause');
     const resume = document.querySelector('.sin .anim-resume');
 
-    const tween = new handleTween('easeInOutQuad');
+    const tween = new HandleTween('easeInOutQuad');
     tween.setData({ x: 0 });
     tween.set({ x: 0 });
 

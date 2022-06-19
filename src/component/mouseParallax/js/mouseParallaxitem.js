@@ -3,11 +3,11 @@ import {
     outerWidth,
     offset,
     getTranslateValues,
-} from '../../../js/core/utils/vanillaFunction.js';
-import { handleSpring } from '.../../../js/core/animation/spring/handleSpring.js';
-import { handleResize } from '.../../../js/core/events/resizeUtils/handleResize.js';
-import { handleScroll } from '.../../../js/core/events/scrollUtils/handleScroll.js';
-import { handleMouseMove } from '.../../../js/core/events/mouseUtils/handleMouse.js';
+    HandleSpring,
+    handleResize,
+    handleScroll,
+    handleMouseMove,
+} from '.../../../js/core';
 
 export class MouseParallaxItemClass {
     constructor(data) {
@@ -20,7 +20,7 @@ export class MouseParallaxItemClass {
         this.offSetTop = 0;
         this.offSetLeft = 0;
         this.smooth = 10;
-        this.spring = new handleSpring();
+        this.spring = new HandleSpring();
         this.unsubscribeSpring = () => {};
         this.unsubscribeOnComplete = () => {};
 

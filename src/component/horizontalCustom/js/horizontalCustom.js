@@ -1,16 +1,14 @@
-import { mq } from '../../../js/core/utils/mediaManager.js';
 import {
+    mq,
     offset,
     outerHeight,
     outerWidth,
     getTranslateValues,
-} from '../../../js/core/utils/vanillaFunction.js';
-import { handleResize } from '.../../../js/core/events/resizeUtils/handleResize.js';
-import {
+    handleResize,
     handleFrame,
     handleNextTick,
-} from '.../../../js/core/events/rafutils/rafUtils.js';
-import { ParallaxItemClass } from '../../parallax/js/parallaxItem.js';
+    ParallaxItemClass,
+} from '../../../js/core';
 import { horizontalCustomCss } from './horizontalCustomCss.js';
 
 export class horizontalCustomClass {

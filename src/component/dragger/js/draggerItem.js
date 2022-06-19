@@ -1,15 +1,15 @@
-import { isDescendant } from '../../../js/core/utils/vanillaFunction.js';
-import { handleSpring } from '.../../../js/core/animation/spring/handleSpring.js';
-import { handleResize } from '.../../../js/core/events/resizeUtils/handleResize.js';
-import { handleScroll } from '.../../../js/core/events/scrollUtils/handleScroll.js';
 import {
+    isDescendant,
+    HandleSpring,
+    handleResize,
+    handleScroll,
     handleTouchStart,
     handleTouchEnd,
     handleMouseDown,
     handleMouseUp,
     handleMouseMove,
     handleTouchMove,
-} from '.../../../js/core/events/mouseUtils/handleMouse.js';
+} from '.../../../js/core';
 
 export class DraggerItemClass {
     constructor(data) {
@@ -49,7 +49,7 @@ export class DraggerItemClass {
 
         // Animation
         this.endValue = { xValue: 0, yValue: 0 };
-        this.spring = new handleSpring();
+        this.spring = new HandleSpring();
         this.unsubscribeSpring = () => {};
         this.unsubscribeOnComplete = () => {};
 

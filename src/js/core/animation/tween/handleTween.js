@@ -26,7 +26,7 @@ import {
     getDeltaFps,
 } from '../utils/callbacks/defaultCallback.js';
 
-export class handleTween {
+export class HandleTween {
     constructor(ease = 'easeOutBack') {
         this.uniqueId = getUnivoqueId();
         this.req = false;
@@ -501,7 +501,7 @@ export class handleTween {
         const dataIsValid = compareKeys(fromObj, toObj);
         if (!dataIsValid) {
             console.warn(
-                `handleTween: ${JSON.stringify(
+                `HandleTween: ${JSON.stringify(
                     fromObj
                 )} and to ${JSON.stringify(toObj)} is not equal`
             );

@@ -1,6 +1,6 @@
 import { lightDescription } from './lightbox-description.js';
 import { lightboxUtils } from './lightbox-utils.js';
-import { handleResize } from '.../../../js/core/events/resizeUtils/handleResize.js';
+import { handleResize } from '.../../../js/core';
 
 class LightBoxVideoClass {
     constructor() {
@@ -72,13 +72,15 @@ class LightBoxVideoClass {
         const maxWidth = window.innerWidth - newWGap;
         const width = ratioW;
         const height = ratioH;
-        const { ratioWidth, ratioHeight } =
-            lightboxUtils.calculateAspectRatioFit(
-                width,
-                height,
-                maxWidth,
-                maxHeight
-            );
+        const {
+            ratioWidth,
+            ratioHeight,
+        } = lightboxUtils.calculateAspectRatioFit(
+            width,
+            height,
+            maxWidth,
+            maxHeight
+        );
 
         const style = {
             width: `${ratioWidth}px`,

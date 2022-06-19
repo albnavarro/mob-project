@@ -1,13 +1,13 @@
+import { modernzier } from '../../../js/utility/modernizr.js';
 import {
     position,
     outerWidth,
     outerHeight,
     offset,
-} from '../../../js/core/utils/vanillaFunction.js';
-import { modernzier } from '../../../js/utility/modernizr.js';
-import { SimpleStore } from '../../../js/core/store/simpleStore.js';
-import { handleResize } from '.../../../js/core/events/resizeUtils/handleResize.js';
-import { bodyScroll } from '../../../js/core/animation/bodyScroll/bodyScroll.js';
+    SimpleStore,
+    handleResize,
+    bodyScroll,
+} from '../../../js/core';
 
 export class tBlocksItemClass {
     constructor(container) {
@@ -195,8 +195,9 @@ export class tBlocksItemClass {
         child.style.transform = `translate3d(0,0,0) scale(2,${scaleYVal})`;
 
         const content = child.querySelector('.tBlocks__item__notScaled');
-        content.style.transform = `translate3d(0,0,0) scale(.5,${1 /
-            scaleYVal})`;
+        content.style.transform = `translate3d(0,0,0) scale(.5,${
+            1 / scaleYVal
+        })`;
     }
 
     setActiveitemTransformOrigin() {

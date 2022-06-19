@@ -1,14 +1,15 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { mq } from '../../../js/core/utils/mediaManager.js';
-import { SimpleStore } from '../../../js/core/store/simpleStore.js';
+
 import {
     offset,
     outerHeight,
     outerWidth,
     getTranslateValues,
-} from '../../../js/core/utils/vanillaFunction.js';
-import { handleResize } from '.../../../js/core/events/resizeUtils/handleResize.js';
+    SimpleStore,
+    mq,
+    handleResize,
+} from '../../../js/core';
 
 export class GsapHorizontalCustomClass {
     constructor(data = {}) {

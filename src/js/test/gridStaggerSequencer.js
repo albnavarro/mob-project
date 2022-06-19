@@ -1,5 +1,4 @@
-import { HandleSyncTimeline } from '../core/animation/syncTimeline/handleSyncTimeline.js';
-import { HandleSequencer } from '../core/animation/sequencer/handleSequencer.js';
+import { HandleSyncTimeline, HandleSequencer } from '../core';
 
 export const gridStaggerSequencer = () => {
     const items = document.querySelectorAll(

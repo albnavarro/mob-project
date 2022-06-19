@@ -1,10 +1,11 @@
-import { ParallaxTween } from '../../component/parallax/js/parallaxTween.js';
-import { ParallaxItemClass } from '../../component/parallax/js/parallaxItem.js';
-import { offset, outerHeight } from '../core/utils/vanillaFunction.js';
 import {
+    ParallaxTween,
+    ParallaxItemClass,
+    offset,
+    outerHeight,
     handleFrame,
     handleNextTick,
-} from '../core/events/rafutils/rafUtils.js';
+} from '../core';
 
 export const scrollStagger = () => {
     const items = document.querySelectorAll('rect');

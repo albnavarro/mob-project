@@ -1,4 +1,4 @@
-import { mq } from '../../../js/core/utils/mediaManager.js';
+import { mq } from '../../../js/core';
 
 let horizontalCustomCssIsAlive = false;
 

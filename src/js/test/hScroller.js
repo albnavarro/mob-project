@@ -1,9 +1,11 @@
-import { parallax } from '../../component/parallax/js/parallax.js';
-import { HandleSequencer } from '../core/animation/sequencer/handleSequencer.js';
-import { ParallaxTween } from '../../component/parallax/js/parallaxTween.js';
-import { ParallaxItemClass } from '../../component/parallax/js/parallaxItem.js';
 import { SmoothScrollClass } from '../../component/smoothScroll/js/smoothScroll.js';
-import { handleNextTick } from '../core/events/rafutils/rafUtils.js';
+import {
+    parallax,
+    HandleSequencer,
+    ParallaxTween,
+    ParallaxItemClass,
+    handleNextTick,
+} from '../core';
 
 export const hScroller = () => {
     // FIRST

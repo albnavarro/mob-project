@@ -26,7 +26,7 @@ import {
     getDeltaFps,
 } from '../utils/callbacks/defaultCallback.js';
 
-export class handleSpring {
+export class HandleSpring {
     constructor(config = 'default') {
         this.uniqueId = getUnivoqueId();
         this.req = false;
@@ -476,7 +476,7 @@ export class handleSpring {
         const dataIsValid = compareKeys(fromObj, toObj);
         if (!dataIsValid) {
             console.warn(
-                `handleSpring: ${JSON.stringify(
+                `HandleSpring: ${JSON.stringify(
                     fromObj
                 )} and to ${JSON.stringify(toObj)} is not equal`
             );

@@ -1,12 +1,11 @@
-import { handleLerp } from '../core/animation/lerp/handleLerp.js';
-import { HandleAsyncTimeline } from '../core/animation/asyncTimeline/handleAsyncTimeline.js';
+import { HandleLerp, HandleAsyncTimeline } from '../core';
 
 export const gridStaggerLerp = () => {
     const items = document.querySelectorAll(
         '.grid-stagger-lerp .grid-stagger__item'
     );
 
-    const tween = new handleLerp();
+    const tween = new HandleLerp();
     tween.setData({ scale: 1 });
 
     items.forEach((item, i) => {

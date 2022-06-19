@@ -1,12 +1,11 @@
-import { handleTween } from '../core/animation/tween/handleTween.js';
-import { HandleAsyncTimeline } from '../core/animation/asyncTimeline/handleAsyncTimeline.js';
+import { HandleAsyncTimeline, HandleTween } from '../core';
 
 export const radialStaggerTween = () => {
     const items = document.querySelectorAll(
         '.radial-stagger .radial-stagger__item'
     );
 
-    const tween = new handleTween('easeInOutQuad');
+    const tween = new HandleTween('easeInOutQuad');
     tween.setData({ scale: 1 });
 
     items.forEach((item, i) => {

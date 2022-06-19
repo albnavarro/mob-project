@@ -29,7 +29,7 @@ import {
 
 const LERP_DEFAULT_PRECISION = 0.01;
 
-export class handleLerp {
+export class HandleLerp {
     constructor(velocity = 0.06) {
         this.uniqueId = getUnivoqueId();
         this.config = {};
@@ -465,7 +465,7 @@ export class handleLerp {
         const dataIsValid = compareKeys(fromObj, toObj);
         if (!dataIsValid) {
             console.warn(
-                `handleLerp: ${JSON.stringify(fromObj)} and to ${JSON.stringify(
+                `HandleLerp: ${JSON.stringify(fromObj)} and to ${JSON.stringify(
                     toObj
                 )} is not equal`
             );

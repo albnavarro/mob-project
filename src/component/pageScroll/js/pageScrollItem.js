@@ -1,12 +1,12 @@
-import { mq } from '../../../js/core/utils/mediaManager.js';
 import {
+    mq,
     outerHeight,
     outerWidth,
     offset,
-} from '../../../js/core/utils/vanillaFunction.js';
-import { handleResize } from '.../../../js/core/events/resizeUtils/handleResize.js';
-import { handleScroll } from '.../../../js/core/events/scrollUtils/handleScroll.js';
-import { handleLerp } from '.../../../js/core/animation/lerp/handleLerp.js';
+    handleResize,
+    handleScroll,
+    HandleLerp,
+} from '.../../../js/core';
 
 export class PageScrollItemClass {
     constructor(data) {
@@ -21,7 +21,7 @@ export class PageScrollItemClass {
         this.endValue = 0;
         this.prevValue = 0;
         this.firstTime = true;
-        this.lerp = new handleLerp();
+        this.lerp = new HandleLerp();
         this.unsubscribeResize = () => {};
         this.unsubscribeScroll = () => {};
         this.unsubscribeLerp = () => {};

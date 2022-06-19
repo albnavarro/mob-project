@@ -1,9 +1,9 @@
-import { bodyScroll } from '../../../js/core/animation/bodyScroll/bodyScroll.js';
-import { handleScroll } from '.../../../js/core/events/scrollUtils/handleScroll.js';
 import {
+    bodyScroll,
+    handleScroll,
     handleFrame,
     handleNextTick,
-} from '../../../js/core/events/rafutils/rafUtils.js';
+} from '../../../js/core';
 
 class totopClass {
     constructor() {

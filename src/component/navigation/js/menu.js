@@ -3,21 +3,24 @@ import {
     enableBodyScroll,
     clearAllBodyScrollLocks,
 } from 'body-scroll-lock';
-import { mq } from '../../../js/core/utils/mediaManager.js';
-import {
-    outerHeight,
-    outerWidth,
-    offset,
-    getParents,
-    getSiblings,
-} from '../../../js/core/utils/vanillaFunction.js';
+
 import {
     slideUpDownReset,
     slideUp,
     slideDown,
 } from '../../../js/utility/animation.js';
-import { handleResize } from '.../../../js/core/events/resizeUtils/handleResize.js';
+
 import { modernzier } from '../../../js/utility/modernizr.js';
+
+import {
+    mq,
+    outerHeight,
+    outerWidth,
+    offset,
+    getParents,
+    getSiblings,
+    handleResize,
+} from '../../../js/core';
 
 export class menuClass {
     constructor(data) {
@@ -179,10 +182,8 @@ export class menuClass {
             this.parentItemPos = 0;
             this.parentItemWidth = 0;
             this.maxLevel = [...this.submenu].reduce((p, c) => {
-                const numSubmenuParents = getParents(
-                    c,
-                    context.SUB_MENU
-                ).length;
+                const numSubmenuParents = getParents(c, context.SUB_MENU)
+                    .length;
                 return numSubmenuParents > p ? numSubmenuParents : p;
             }, 1);
             this.totalWidth = 0;

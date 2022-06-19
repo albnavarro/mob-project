@@ -1,4 +1,4 @@
-import { mq } from '../../../js/core/utils/mediaManager.js';
+import { mq } from '../../../js/core';
 import { forceRedraw } from '../../../js/utility/redrowNode.js';
 import { detectSafari } from '../../../js/utility/isSafari.js';
 

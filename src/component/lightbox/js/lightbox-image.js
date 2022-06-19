@@ -1,8 +1,7 @@
 import { lightDescription } from './lightbox-description.js';
-import { loadImages } from '../../../js/core/utils/loadImages.js';
 import { lightboxUtils } from './lightbox-utils.js';
 import { lightPichZoom } from './lightbox-zoom-pinch.js';
-import { handleResize } from '.../../../js/core/events/resizeUtils/handleResize.js';
+import { loadImages, handleResize } from '.../../../js/core';
 
 class LightBoxImageClass {
     constructor() {
@@ -82,13 +81,15 @@ class LightBoxImageClass {
         const maxHeight = window.innerHeight - newHGap;
         const maxWidth = window.innerWidth - newWGap;
 
-        const { ratioWidth, ratioHeight } =
-            lightboxUtils.calculateAspectRatioFit(
-                width,
-                height,
-                maxWidth,
-                maxHeight
-            );
+        const {
+            ratioWidth,
+            ratioHeight,
+        } = lightboxUtils.calculateAspectRatioFit(
+            width,
+            height,
+            maxWidth,
+            maxHeight
+        );
 
         const style = {
             width: `${ratioWidth}px`,

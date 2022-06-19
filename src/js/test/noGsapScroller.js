@@ -1,5 +1,5 @@
 import { horizontalCustomClass } from '../../component/horizontalCustom/js/horizontalCustom.js';
-import { ParallaxItemClass } from '../../component/parallax/js/parallaxItem.js';
+import { ParallaxItemClass } from '../core';
 
 export const noGsap = () => {
     const title = document.querySelector('.js-scroll-item');

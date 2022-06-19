@@ -1,4 +1,4 @@
-import { handleFrame } from '../../../js/core/events/rafutils/rafUtils.js';
+import { handleFrame } from '../../../js/core';
 
 export class AnimateItemClass {
     constructor(data) {

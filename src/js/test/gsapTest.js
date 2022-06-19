@@ -1,11 +1,6 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import {
-    offset,
-    outerHeight,
-    outerWidth,
-} from '../core/utils/vanillaFunction.js';
-import { handleResize } from '../core/events/resizeUtils/handleResize.js';
+import { offset, outerHeight, outerWidth, handleResize } from '../core';
 
 class gsapTestClass {
     constructor() {}

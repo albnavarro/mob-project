@@ -1,7 +1,9 @@
-import { offset } from '../../../js/core/utils/vanillaFunction.js';
-import { handleResize } from '.../../../js/core/events/resizeUtils/handleResize.js';
-import { handleScroll } from '.../../../js/core/events/scrollUtils/handleScroll.js';
-import { handleFrame } from '../../../js/core/events/rafutils/rafUtils.js';
+import {
+    offset,
+    handleResize,
+    handleScroll,
+    handleFrame,
+} from '../../../js/core';
 
 export class showElementItemClass {
     constructor(data) {

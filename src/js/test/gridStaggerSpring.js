@@ -1,12 +1,11 @@
-import { handleSpring } from '../core/animation/spring/handleSpring.js';
-import { HandleAsyncTimeline } from '../core/animation/asyncTimeline/handleAsyncTimeline.js';
+import { HandleSpring, HandleAsyncTimeline } from '../core';
 
 export const gridStaggerSpring = () => {
     const items = document.querySelectorAll(
         '.grid-stagger-spring .grid-stagger__item'
     );
 
-    const tween = new handleSpring('bounce');
+    const tween = new HandleSpring('bounce');
     tween.setData({ scale: 1 });
 
     items.forEach((item, i) => {

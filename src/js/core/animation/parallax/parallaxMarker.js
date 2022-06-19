@@ -1,5 +1,5 @@
 import { parallaxConstant } from './parallaxConstant.js';
-import { handleFrame } from '.../../../js/core/events/rafutils/rafUtils.js';
+import { handleFrame } from '../../events/rafutils/rafUtils.js';
 
 export const parallaxMarker = ({
     startMarker,

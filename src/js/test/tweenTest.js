@@ -1,5 +1,4 @@
-import { handleTween } from '../core/animation/tween/handleTween.js';
-import { HandleAsyncTimeline } from '../core/animation/asyncTimeline/handleAsyncTimeline.js';
+import { HandleTween, HandleAsyncTimeline } from '../core';
 
 export function tweenTest() {
     const btnStart = document.querySelector('.tween-btn-start');
@@ -13,7 +12,7 @@ export function tweenTest() {
     const target = document.querySelector('.tween-target');
 
     // DEFINE SPRING
-    const myTween = new handleTween();
+    const myTween = new HandleTween();
     myTween.setData({ x: 0, y: 0, rotate: 0 });
     myTween.subscribe(({ x, y, rotate }) => {
         target.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg)`;

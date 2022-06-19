@@ -1,8 +1,10 @@
-import { HandleSequencer } from '../core/animation/sequencer/handleSequencer.js';
-import { HandleMasterSequencer } from '../core/animation/sequencer/handleMasterSequencer.js';
-import { ParallaxItemClass } from '../../component/parallax/js/parallaxItem.js';
-import { outerHeight } from '../core/utils/vanillaFunction.js';
-import { createStaggers } from '../core/animation/sequencer/sequencerUtils.js';
+import {
+    HandleSequencer,
+    HandleMasterSequencer,
+    ParallaxItemClass,
+    outerHeight,
+    createStaggers,
+} from '../core';
 
 export const createStagger = () => {
     const items = document.querySelectorAll('.create-stagger__item');

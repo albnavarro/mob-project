@@ -1,5 +1,4 @@
-import { handleTween } from '../core/animation/tween/handleTween.js';
-import { HandleAsyncTimeline } from '../core/animation/asyncTimeline/handleAsyncTimeline.js';
+import { HandleTween, HandleAsyncTimeline } from '../core';
 
 export function staggerTweenTest() {
     const btnStart = document.querySelector('.tween .start');
@@ -12,7 +11,7 @@ export function staggerTweenTest() {
     const stagger = document.querySelectorAll('.tween .target-stagger');
 
     // DEFINE SPRING
-    const myTween = new handleTween();
+    const myTween = new HandleTween();
     myTween.setData({ x: 0, y: 0 });
     myTween.set({ x: 0, y: 0 });
 
@@ -20,7 +19,7 @@ export function staggerTweenTest() {
         target.style.transform = `translate3D(0px,0px,0px) translate(${x}px, ${y}px)`;
     });
 
-    const myStagger = new handleTween();
+    const myStagger = new HandleTween();
     myStagger.setData({ x: 0 });
     myStagger.set({ x: 0 });
 

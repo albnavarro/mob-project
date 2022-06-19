@@ -1,5 +1,4 @@
-import { HandleSyncTimeline } from '../core/animation/syncTimeline/handleSyncTimeline.js';
-import { HandleSequencer } from '../core/animation/sequencer/handleSequencer.js';
+import { HandleSyncTimeline, HandleSequencer } from '../core';
 import { isIOS } from '../utility/isIOS.js';
 
 export function syncTimelineTest() {

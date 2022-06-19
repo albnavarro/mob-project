@@ -1,4 +1,4 @@
-import { handleTween } from '../tween/handleTween.js';
+import { HandleTween } from '../tween/handleTween.js';
 import { outerHeight } from '../../utils/vanillaFunction.js';
 
 /**  slide.subscribe(el);
@@ -14,7 +14,7 @@ export const slide = (() => {
         const data = {};
         data.item = el;
         data.id = slideId;
-        data.tween = new handleTween('easeOutQuad');
+        data.tween = new HandleTween('easeOutQuad');
         data.unsubscribe = data.tween.subscribe(({ val }) => {
             data.item.style.height = `${val}px`;
         });

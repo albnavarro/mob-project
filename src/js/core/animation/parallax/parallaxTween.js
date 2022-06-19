@@ -1,17 +1,17 @@
-import { tweenConfig } from '../../../js/core/animation/tween/tweenConfig.js';
+import { tweenConfig } from '../../animation/tween/tweenConfig.js';
 import {
     getValueObj,
     compareKeys,
     getRoundedValue,
-} from '../../../js/core/animation/utils/animationUtils.js';
-import { mergeDeep } from '../../../js/core/utils/mergeDeep.js';
+} from '../../animation/utils/animationUtils.js';
+import { mergeDeep } from '../../utils/mergeDeep.js';
 import {
     handleFrame,
     handleNextTick,
     handleFrameIndex,
-} from '../../../js/core/events/rafutils/rafUtils.js';
-import { setStagger } from '.../../../js/core/animation/utils/stagger/setStagger.js';
-import { DIRECTION_COL } from '.../../../js/core/animation/utils/stagger/staggerCostant.js';
+} from '../../events/rafutils/rafUtils.js';
+import { setStagger } from '../../animation/utils/stagger/setStagger.js';
+import { DIRECTION_COL } from '../../animation/utils/stagger/staggerCostant.js';
 
 // Stagger and eade is defined at tween creation
 export class ParallaxTween {

@@ -1,10 +1,8 @@
-import { handleResize } from '.../../../js/core/events/resizeUtils/handleResize.js';
-import { handleScroll } from '.../../../js/core/events/scrollUtils/handleScroll.js';
 import {
+    handleResize,
+    handleScroll,
     handleScrollStart,
     handleScrollEnd,
-} from '.../../../js/core/events/scrollUtils/handleScrollUtils.js';
-import {
     handleTouchStart,
     handleTouchEnd,
     handleMouseDown,
@@ -13,13 +11,11 @@ import {
     handleTouchMove,
     handleMouseWheel,
     handleMouseClick,
-} from '.../../../js/core/events/mouseUtils/handleMouse.js';
-import {
     isDescendant,
     getTranslateValues,
-} from '../../../js/core/utils/vanillaFunction.js';
-import { handleLerp } from '.../../../js/core/animation/lerp/handleLerp.js';
-import { handleSpring } from '.../../../js/core/animation/spring/handleSpring.js';
+    HandleLerp,
+    HandleSpring,
+} from '.../../../js/core';
 
 export class SmoothScrollClass {
     constructor(data = {}) {
@@ -80,11 +76,11 @@ export class SmoothScrollClass {
     init() {
         switch (this.motionType) {
             case this.SPRING:
-                this.motion = new handleSpring();
+                this.motion = new HandleSpring();
                 break;
 
             default:
-                this.motion = new handleLerp();
+                this.motion = new HandleLerp();
                 break;
         }
 

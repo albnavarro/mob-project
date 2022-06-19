@@ -1,12 +1,12 @@
-import { handleSpring } from '.../../../js/core/animation/spring/handleSpring.js';
-import { handleFrame } from '.../../../js/core/events/rafutils/rafUtils.js';
+import { HandleSpring } from '../../animation/spring/handleSpring.js';
+import { handleFrame } from '../../events/rafutils/rafUtils.js';
 import { parallaxConstant } from './parallaxConstant.js';
 import { parallaxUtils } from './parallaxUtils.js';
-import { position } from '../../../js/core/utils/vanillaFunction.js';
-import { handleScroll } from '.../../../js/core/events/scrollUtils/handleScroll.js';
-import { handleScrollStart } from '.../../../js/core/events/scrollUtils/handleScrollUtils.js';
-import { getTranslateValues } from '../../../js/core/utils/vanillaFunction.js';
-import { clamp } from '.../../../js/core/animation/utils/animationUtils.js';
+import { position } from '../../utils/vanillaFunction.js';
+import { handleScroll } from '../../events/scrollUtils/handleScroll.js';
+import { handleScrollStart } from '../../events/scrollUtils/handleScrollUtils.js';
+import { getTranslateValues } from '../../utils/vanillaFunction.js';
+import { clamp } from '../../animation/utils/animationUtils.js';
 
 export class ParallaxPin {
     constructor(data) {
@@ -183,7 +183,7 @@ export class ParallaxPin {
     }
 
     setUpMotion() {
-        this.spring = new handleSpring('wobbly');
+        this.spring = new HandleSpring('wobbly');
         this.spring.setData({ collision: 0, verticalGap: 0 });
 
         this.unsubscribeSpring = this.spring.subscribe(

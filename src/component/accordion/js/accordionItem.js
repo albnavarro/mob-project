@@ -1,5 +1,4 @@
-import { mq } from '../../../js/core/utils/mediaManager.js';
-import { slide } from '../../../js/core/animation/slide/slide.js';
+import { mq, slide } from '../../../js/core';
 
 export class AccordionItemClass {
     constructor(data) {

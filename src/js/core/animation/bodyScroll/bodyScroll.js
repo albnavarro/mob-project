@@ -1,4 +1,4 @@
-import { handleTween } from '../tween/handleTween.js';
+import { HandleTween } from '../tween/handleTween.js';
 import { offset, isNode } from '../../utils/vanillaFunction.js';
 
 /**
@@ -18,7 +18,7 @@ import { offset, isNode } from '../../utils/vanillaFunction.js';
  */
 export const bodyScroll = (() => {
     const defaultPreset = 'easeOutQuad';
-    const tween = new handleTween(defaultPreset);
+    const tween = new HandleTween(defaultPreset);
     tween.setData({ val: 0 });
     tween.subscribe(({ val }) => {
         document.documentElement.scrollTop = val;

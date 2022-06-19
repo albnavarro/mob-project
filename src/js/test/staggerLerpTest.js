@@ -1,5 +1,4 @@
-import { handleLerp } from '../core/animation/lerp/handleLerp.js';
-import { HandleAsyncTimeline } from '../core/animation/asyncTimeline/handleAsyncTimeline.js';
+import { HandleLerp, HandleAsyncTimeline } from '../core';
 import { isIOS } from '../utility/isIOS.js';
 
 export function staggerLerpTest() {
@@ -13,7 +12,7 @@ export function staggerLerpTest() {
     const stagger = document.querySelectorAll('.lerp .target-stagger');
 
     // DEFINE SPRING
-    const myTween = new handleLerp();
+    const myTween = new HandleLerp();
     myTween.setData({ x: 0, y: 0 });
     myTween.set({ x: 0, y: 0 });
 
@@ -21,7 +20,7 @@ export function staggerLerpTest() {
         target.style.transform = `translate3D(0px,0px,0px) translate(${x}px, ${y}px)`;
     });
 
-    const myStagger = new handleLerp();
+    const myStagger = new HandleLerp();
     myStagger.setData({ x: 0 });
     myStagger.set({ x: 0 });
 

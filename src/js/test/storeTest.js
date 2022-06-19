@@ -1,4 +1,4 @@
-import { SimpleStore } from '../core/store/simpleStore.js';
+import { SimpleStore } from '../core';
 
 class StoreTestClass {
     constructor() {}

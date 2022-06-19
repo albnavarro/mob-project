@@ -1,9 +1,9 @@
-import { handleTween } from '../core/animation/tween/handleTween.js';
 import {
+    HandleTween,
     handleFrame,
     handleNextFrame,
-} from '../core/events/rafutils/rafUtils.js';
-import { HandleAsyncTimeline } from '../core/animation/asyncTimeline/handleAsyncTimeline.js';
+    HandleAsyncTimeline,
+} from '../core';
 
 export const circleAnimationTimeline = () => {
     const stagger = document.querySelectorAll(
@@ -16,7 +16,7 @@ export const circleAnimationTimeline = () => {
         '.circle-tween-timeline .anim-resume'
     );
 
-    const tween = new handleTween('easeLinear');
+    const tween = new HandleTween('easeLinear');
     tween.setData({ x: 0 });
     tween.set({ x: 0 });
 

@@ -3,18 +3,16 @@ import {
     outerHeight,
     outerWidth,
     offset,
-} from '../../../js/core/utils/vanillaFunction.js';
-import { handleSpring } from '.../../../js/core/animation/spring/handleSpring.js';
-import { handleResize } from '.../../../js/core/events/resizeUtils/handleResize.js';
-import { handleScroll } from '.../../../js/core/events/scrollUtils/handleScroll.js';
-import {
+    HandleSpring,
+    handleResize,
+    handleScroll,
     handleTouchStart,
     handleTouchEnd,
     handleMouseDown,
     handleMouseUp,
     handleMouseMove,
     handleTouchMove,
-} from '.../../../js/core/events/mouseUtils/handleMouse.js';
+} from '.../../../js/core';
 
 export class move3DContainerClass {
     constructor(data) {
@@ -44,7 +42,7 @@ export class move3DContainerClass {
         this.pageY = false;
         this.childrenInstances = [];
 
-        this.spring = new handleSpring();
+        this.spring = new HandleSpring();
         this.unsubscribeSpring = () => {};
 
         // MOUSE COORD

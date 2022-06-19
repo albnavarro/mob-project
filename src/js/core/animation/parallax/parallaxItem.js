@@ -1,23 +1,20 @@
-import { mq } from '../../../js/core/utils/mediaManager.js';
-import { offset, position } from '../../../js/core/utils/vanillaFunction.js';
+import { mq } from '../../utils/mediaManager.js';
+import { offset, position } from '../../utils/vanillaFunction.js';
 import { parallaxUtils } from './parallaxUtils.js';
 import { parallaxConstant } from './parallaxConstant.js';
 import { parallaxMarker } from './parallaxMarker.js';
 import { parallaxEmitter } from './parallaxEmitter.js';
 import { ParallaxPin } from './parallaxPin.js';
-import {
-    handleFrame,
-    handleNextTick,
-} from '../../../js/core/events/rafutils/rafUtils.js';
-import { handleResize } from '../../../js/core/events/resizeUtils/handleResize.js';
-import { handleScroll } from '../../../js/core/events/scrollUtils/handleScroll.js';
-import { handleScrollImmediate } from '../../../js/core/events/scrollUtils/handleScrollImmediate.js';
-import { handleScrollStart } from '../../../js/core/events/scrollUtils/handleScrollUtils.js';
-import { handleSpring } from '../../../js/core/animation/spring/handleSpring.js';
-import { handleLerp } from '../../../js/core/animation/lerp/handleLerp.js';
-import { springConfig } from '../../../js/core/animation/spring/springConfig.js';
-import { getTranslateValues } from '../../../js/core/utils/vanillaFunction.js';
-import { getRoundedValue } from '../../../js/core/animation/utils/animationUtils.js';
+import { handleFrame, handleNextTick } from '../../events/rafutils/rafUtils.js';
+import { handleResize } from '../../events/resizeUtils/handleResize.js';
+import { handleScroll } from '../../events/scrollUtils/handleScroll.js';
+import { handleScrollImmediate } from '../../events/scrollUtils/handleScrollImmediate.js';
+import { handleScrollStart } from '../../events/scrollUtils/handleScrollUtils.js';
+import { HandleSpring } from '../../animation/spring/handleSpring.js';
+import { HandleLerp } from '../../animation/lerp/handleLerp.js';
+import { springConfig } from '../../animation/spring/springConfig.js';
+import { getTranslateValues } from '../../utils/vanillaFunction.js';
+import { getRoundedValue } from '../../animation/utils/animationUtils.js';
 
 export class ParallaxItemClass {
     constructor(data) {
@@ -151,8 +148,8 @@ export class ParallaxItemClass {
             }
 
             return this.easeType === parallaxConstant.EASE_LERP
-                ? new handleLerp()
-                : new handleSpring();
+                ? new HandleLerp()
+                : new HandleSpring();
         })();
         this.unsubscribeMotion = () => {};
         this.unsubscribeOnComplete = () => {};

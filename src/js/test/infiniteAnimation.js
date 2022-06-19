@@ -1,16 +1,16 @@
-import { handleSpring } from '../core/animation/spring/handleSpring.js';
 import {
+    HandleSpring,
     handleFrame,
     handleNextFrame,
-} from '../core/events/rafutils/rafUtils.js';
-import { HandleAsyncTimeline } from '../core/animation/asyncTimeline/handleAsyncTimeline.js';
+    HandleAsyncTimeline,
+} from '../core';
 
 export const infiniteAnimation = () => {
     const stagger = document.querySelectorAll('.infinite-tween .shape__target');
     const play = document.querySelector('.infinite-tween .anim-play');
     const stop = document.querySelector('.infinite-tween .anim-stop');
 
-    const tween = new handleSpring();
+    const tween = new HandleSpring();
     tween.setData({ x: 0 });
     tween.set({ x: 0 });
 

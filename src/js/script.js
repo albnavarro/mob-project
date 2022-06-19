@@ -13,15 +13,17 @@
 // BASE MODULE
 import { vh } from './utility/vh.js';
 import { findElement } from './utility/findElement.js';
-import { handleLoad } from './core/events/loadutils/handleLoad.js';
-import { handleSetUp } from './core/setup.js';
-import { startFps, frameStore } from './core/events/rafutils/rafUtils.js';
+import {
+    handleSetUp,
+    handleLoad,
+    startFps,
+    frameStore,
+    parallax,
+} from './core/';
 
 // NEW VANILLA COMPONENT MODULE
 import { totop } from '../component/to-top/js/toTop.js';
 import { tBlocks } from '../component/threeBlocks/js/tBlocks.js';
-import { parallax } from '../component/parallax/js/parallax.js';
-import { ParallaxItemClass } from '../component/parallax/js/parallaxItem.js';
 import { accordion } from '../component/accordion/js/accordion.js';
 import { AccordionItemClass } from '../component/accordion/js/accordionItem.js';
 import { showElement } from '../component/show-element/js/ShowElement.js';
