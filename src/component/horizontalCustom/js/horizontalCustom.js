@@ -268,7 +268,7 @@ export class horizontalCustomClass {
         const scroller = new ParallaxItemClass({
             item: this.row,
             trigger: this.triggerContainer,
-            computationType: 'fixed',
+            type: 'scrolltrigger',
             propierties: 'x',
             breackpoint: 'x-small',
             pin: true,

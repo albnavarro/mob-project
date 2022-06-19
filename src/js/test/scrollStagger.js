@@ -50,7 +50,7 @@ export const scrollStagger = () => {
 
     const parallaxIn = new ParallaxItemClass({
         item: trigger,
-        computationType: 'fixed',
+        type: 'scrolltrigger',
         propierties: 'tween',
         tween: myParallaxTween,
         dynamicStart: {

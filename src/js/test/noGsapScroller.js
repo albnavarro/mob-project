@@ -19,7 +19,7 @@ export const noGsap = () => {
         item: title,
         scroller: scroller,
         direction: 'horizontal',
-        computationType: 'fixed',
+        type: 'scrolltrigger',
         propierties: 'y',
         pin: true,
         forceTranspond: true,

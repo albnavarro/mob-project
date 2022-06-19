@@ -29,7 +29,7 @@ export const parallaxConstant = {
 
     // Constant computation type
     TYPE_DEFAULT: 'default',
-    TYPE_FIXED: 'fixed',
+    TYPE_SCROLLTRIGGER: 'scrolltrigger',
 
     // Constant propierties
     PROP_VERTICAL: 'y',

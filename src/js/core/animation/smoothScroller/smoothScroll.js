@@ -20,6 +20,7 @@ import {
 } from '../../utils/vanillaFunction.js';
 import { HandleLerp } from '../../animation/lerp/handleLerp.js';
 import { HandleSpring } from '../../animation/spring/handleSpring.js';
+import { clamp } from '../../animation/utils/animationUtils.js';
 
 export class SmoothScrollClass {
     constructor(data = {}) {
@@ -177,10 +178,6 @@ export class SmoothScrollClass {
             item.setAttribute('draggable', false);
             item.style['user-select'] = 'none';
         });
-    }
-
-    clamp(num, min, max) {
-        return Math.min(Math.max(num, min), max);
     }
 
     destroy() {
@@ -359,8 +356,8 @@ export class SmoothScrollClass {
     // COMMON CALCULATE VALUE
     calculateValue() {
         const percentValue = (this.endValue * 100) / this.maxValue;
-        this.percent = this.clamp(percentValue, 0, 100);
-        this.endValue = this.clamp(this.endValue, 0, this.maxValue);
+        this.percent = clamp(percentValue, 0, 100);
+        this.endValue = clamp(this.endValue, 0, this.maxValue);
         this.motion.goTo({ val: this.endValue }).catch((err) => {});
 
         if (!this.scrollbarIsRunning) {

@@ -32,7 +32,7 @@ export function indexParallax() {
     const parallaxIn = new ParallaxItemClass({
         item: item,
         trigger: trigger,
-        computationType: 'fixed',
+        type: 'scrolltrigger',
         propierties: 'tween',
         tween: myParallaxTimeline,
         start: 'bottom',

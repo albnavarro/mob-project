@@ -82,24 +82,21 @@ export class ParallaxItemClass {
 
         //Lienar prop
         this.align = data.align ? data.align : parallaxConstant.ALIGN_CENTER;
-        this.onSwitch = data.onSwitch ? data.onSwitch : false;
+        this.onSwitch = data.onSwitch ? data.onSwitch.toLowerCase() : false;
 
         // Opacity Prop
         this.opacityStart = data.opacityStart || 100;
         this.opacityEnd = data.opacityEnd || 0;
 
         // Common prop
-        this.computationType = data.computationType
-            ? data.computationType
+        this.type = data.type
+            ? data.type.toLowerCase()
             : parallaxConstant.TYPE_DEFAULT;
 
         // Base range
         this.range =
             data.range ||
-            (() =>
-                this.computationType === parallaxConstant.TYPE_DEFAULT
-                    ? 2
-                    : 0)();
+            (() => (this.type === parallaxConstant.TYPE_DEFAULT ? 2 : 0))();
         // Function that return a range value
         this.dynamicRange = data.dynamicRange || null;
         this.perspective = data.perspective || false;
@@ -208,7 +205,7 @@ export class ParallaxItemClass {
         this.getScreenHeight();
         this.setPerspective();
 
-        if (this.computationType == parallaxConstant.TYPE_FIXED) {
+        if (this.type == parallaxConstant.TYPE_SCROLLTRIGGER) {
             this.limiterOff = true;
             if (this.propierties === parallaxConstant.PROP_TWEEN) {
                 this.range = this.tween.getDuration();
@@ -616,7 +613,7 @@ export class ParallaxItemClass {
         this.calcWidth();
         this.getScreenHeight();
 
-        if (this.computationType == parallaxConstant.TYPE_FIXED) {
+        if (this.type == parallaxConstant.TYPE_SCROLLTRIGGER) {
             this.calcFixedLimit();
             if (this.dynamicRange) this.calcRangeAndUnitMiusure();
 
@@ -676,7 +673,7 @@ export class ParallaxItemClass {
         if (
             !this.fixedShouldRender &&
             !this.firstTime &&
-            this.computationType === parallaxConstant.TYPE_FIXED
+            this.type === parallaxConstant.TYPE_SCROLLTRIGGER
         )
             return;
 
@@ -684,7 +681,7 @@ export class ParallaxItemClass {
         if (
             !this.isInViewport &&
             !this.firstTime &&
-            !this.computationType !== parallaxConstant.TYPE_FIXED
+            !this.type !== parallaxConstant.TYPE_SCROLLTRIGGER
         )
             return;
 
@@ -718,7 +715,7 @@ export class ParallaxItemClass {
         if (
             !this.isInViewport &&
             !this.limiterOff &&
-            !this.computationType !== parallaxConstant.TYPE_FIXED
+            !this.type !== parallaxConstant.TYPE_SCROLLTRIGGER
         )
             return;
 
@@ -726,8 +723,8 @@ export class ParallaxItemClass {
             this.pinInstance.onScroll(this.scrollerScroll);
         }
 
-        switch (this.computationType) {
-            case parallaxConstant.TYPE_FIXED:
+        switch (this.type) {
+            case parallaxConstant.TYPE_SCROLLTRIGGER:
                 const val = this.getFixedValue();
                 this.endValue = getRoundedValue(val);
                 break;
@@ -998,7 +995,7 @@ export class ParallaxItemClass {
             : val;
 
         this.GC.typeVal =
-            this.computationType !== parallaxConstant.TYPE_FIXED
+            this.type !== parallaxConstant.TYPE_SCROLLTRIGGER
                 ? this.getSwitchAfterZeroValue(this.GC.reverseVal)
                 : this.GC.reverseVal;
 
@@ -1041,7 +1038,7 @@ export class ParallaxItemClass {
 
             case parallaxConstant.PROP_SCALE:
                 this.GC.scaleVal =
-                    this.computationType !== parallaxConstant.TYPE_FIXED
+                    this.type !== parallaxConstant.TYPE_SCROLLTRIGGER
                         ? 1 + this.GC.typeVal / 1000
                         : this.GC.typeVal;
                 return {

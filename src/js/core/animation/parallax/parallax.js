@@ -62,9 +62,8 @@ class ParallaxClass {
         const data = {};
         data.item = item;
 
-        // String: fixed || default
-        data.computationType =
-            item.getAttribute('data-computationType') || 'default';
+        // String: scrolltrigger || default
+        data.type = item.getAttribute('data-type') || 'default';
 
         // String: 'vertical' || 'horizontal'
         data.direction = item.getAttribute('data-direction');
@@ -96,7 +95,7 @@ class ParallaxClass {
         );
 
         // Boolean
-        // Mandatory computationType = 'fixed'
+        // Mandatory type = 'scrolltrigger'
         // Start from maximum value
         data.fromTo = item.hasAttribute('data-fromTo');
 
@@ -131,7 +130,7 @@ class ParallaxClass {
         data.end = item.getAttribute('data-end');
 
         // String: in-stop - in-back - out-stop - out-back
-        // Mandatory computationType = 'default' doasn't work with opacity
+        // Mandatory type = 'default' doasn't work with opacity
         // in-stop: stop the calculation reached zero
         // in-back : revert the calculation reached zero
         // out-stop: move element only ofter reached 0
@@ -139,7 +138,7 @@ class ParallaxClass {
         data.onSwitch = item.getAttribute('data-onSwitch');
 
         // String || number
-        // Mandatory computationType = 'default'
+        // Mandatory type = 'default'
         // start - top - center - bottom - end  || 1-100
         // start = zero at top of the document
         // top = zero at top of the viewport
@@ -164,11 +163,11 @@ class ParallaxClass {
 
         // Any
         // Range of movement
-        // computationType = 'default'
+        // type = 'default'
         // form .1 to up less is the number bigger is the movement
         // Opacity : is alway from 0 to 1, is controlled by opacityStart and opacityEnd
         //
-        // computationType = 'fixed'
+        // type = 'scrolltrigger'
         // horzontal / vertical:
         // '100h' => percent of item height
         // '100w' => percent of item width
@@ -221,7 +220,7 @@ class ParallaxClass {
         data.lerpConfig = item.getAttribute('data-lerpConfig');
 
         // Boolean
-        // Mandatory computationType = 'default'
+        // Mandatory type = 'default'
         // inverts the calculated value
         data.reverse = item.hasAttribute('data-reverse');
 
