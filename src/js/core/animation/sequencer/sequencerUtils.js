@@ -1,4 +1,4 @@
-import { clamp } from '../utils/animationUtils.js';
+import { clamp, getRoundedValue } from '../utils/animationUtils.js';
 import { setStagger } from '../utils/stagger/setStagger.js';
 import {
     DIRECTION_COL,
@@ -65,8 +65,8 @@ export const createStaggers = ({ items, stagger, duration }) => {
         const { start, end } = (() => {
             if (isEqual) {
                 const stepDuration = durationNow / numItem;
-                const start = index * stepDuration;
-                const end = start + stepDuration;
+                const start = getRoundedValue(index * stepDuration);
+                const end = getRoundedValue(start + stepDuration);
 
                 return { start, end };
             } else {
@@ -77,8 +77,8 @@ export const createStaggers = ({ items, stagger, duration }) => {
                     const gap = (noopSpace / STAGGER_RANGE) * stagger.each;
 
                     return {
-                        start: cleanStart - gap,
-                        end: durationNow,
+                        start: getRoundedValue(cleanStart - gap),
+                        end: getRoundedValue(durationNow),
                     };
                 })();
             }

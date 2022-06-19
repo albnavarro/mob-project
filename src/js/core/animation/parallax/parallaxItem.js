@@ -582,7 +582,7 @@ export class ParallaxItemClass {
         }
     }
 
-    unsubscribe() {
+    destroy() {
         if ('stop' in this.motion) {
             this.motion.stop();
         }

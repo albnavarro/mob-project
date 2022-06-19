@@ -349,7 +349,7 @@ export class horizontalCustomClass {
         if (this.moduleisActive) {
             handleFrame.add(() => {
                 handleNextTick.add(() => {
-                    this.scroller.unsubscribe();
+                    this.scroller.destroy();
                     this.scroller = null;
                     this.moduleisActive = false;
                 });
