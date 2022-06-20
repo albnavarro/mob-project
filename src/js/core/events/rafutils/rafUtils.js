@@ -74,21 +74,6 @@ export const handleFrameIndex = (fn, index) => {
 };
 
 /**
- * Utils: fire script after heatFps is completed
- * const unsubscribe = framStore.watch('fpsIsReady', () => {
- *    ....
- *    unsubscribe();
- * });
- *
- */
-export const frameStore = new SimpleStore({
-    fpsIsReady: () => ({
-        value: false,
-        type: Boolean,
-    }),
-});
-
-/**
  * Utils to centralize all action form all components in one Request Animation Frame,
  * All subsciber use the same frame
  * handleFrame run once then delete all subscriber
@@ -101,7 +86,12 @@ export const frameStore = new SimpleStore({
  * });
  *
  */
+
+/*
+ Global props use to get an fps much real as possibile
+ */
 let stopHeatFps = false;
+let fpsLoopCounter = 0;
 
 export const handleFrame = (() => {
     let frameIsRuning = false;
@@ -123,9 +113,7 @@ export const handleFrame = (() => {
     let fpsStack = [];
 
     // Indicate that fps is a real calucaltion and not the initial approssimation
-    let fpsIsReal = false;
-
-    let fpsLoopCounter = 0;
+    let _isRealFps = false;
 
     // Stop timer when user change tab
     handleVisibilityChange(({ visibilityState }) => {
@@ -140,13 +128,19 @@ export const handleFrame = (() => {
         lastUpdate += elapsed;
         time = lastUpdate - startTime;
 
+        /*
+        Fps calculation
+        */
         while (fpsStack.length > 0 && fpsStack[0] <= time - 1000) {
             fpsStack.shift();
             fps = fpsStack.length;
-            fpsIsReal = true;
 
+            /*
+            After two loop fps should be stable
+            So stop startFps function and fire the callback
+            */
             if (fpsLoopCounter > 1) {
-                frameStore.set('fpsIsReady', true);
+                _isRealFps = true;
                 stopHeatFps = true;
             } else {
                 fpsLoopCounter++;
@@ -155,19 +149,32 @@ export const handleFrame = (() => {
 
         fpsStack.push(time);
 
-        // Fire callback
+        /*
+        Fire callbnack
+        */
         callback.forEach((item) => item(time, fps));
 
-        // Reset
+        /*
+        Reset props
+        */
         prevTime = time;
         callback = [];
-        frameIsRuning = false;
         isStopped = false;
 
         const nextTickFn = () => {
-            // Fire next Tick outside asnimationframe
+            /*
+            RequestAnimationFrame is ended, ready for another
+            */
+            frameIsRuning = false;
+
+            /*
+            Fire next tick
+            */
             handleNextTick.fire(time, fps);
 
+            /*
+            Get next callback
+            */
             callback = [...callback, ...handleNextFrame.get()];
             if (callback.length > 0) {
                 // Call Next animationFrame
@@ -201,8 +208,14 @@ export const handleFrame = (() => {
         frameIsRuning = true;
     };
 
-    const isRealFps = () => fpsIsReal;
+    /**
+     * Get fps status , approxuimation or real calculation
+     */
+    const isRealFps = () => _isRealFps;
 
+    /**
+     * Get fps value
+     */
     const getFps = () => fps;
 
     /**
@@ -230,22 +243,46 @@ export const handleFrame = (() => {
 })();
 
 /**
+ * Utils: fire script after heatFps is completed
+ * const unsubscribe = framStore.watch('fpsIsReady', () => {
+ *    ....
+ *    unsubscribe();
+ * });
+ *
+ */
+export const frameStore = new SimpleStore({
+    fpsIsReady: () => ({
+        value: false,
+        type: Boolean,
+    }),
+});
+
+/**
  *  Intial loop fo reach the right fps
  */
 export const startFps = () => {
-    const inizializeLoop = () => {
-        if (stopHeatFps) return;
+    /*
+    Reset prop to get some requestAnimationFrame and get a stable fps
+    */
+    stopHeatFps = false;
+    fpsLoopCounter = 0;
+
+    const loop = () => {
+        if (stopHeatFps) {
+            frameStore.set('fpsIsReady', true);
+            return;
+        }
 
         handleFrame.add(() => {
             handleNextTick.add(() => {
-                inizializeLoop();
+                loop();
             });
         });
     };
 
     handleFrame.add(() => {
         handleNextTick.add(() => {
-            inizializeLoop();
+            loop();
         });
     });
 };
