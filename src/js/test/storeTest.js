@@ -90,7 +90,7 @@ class StoreTestClass {
         inputField3.addEventListener('click', (e) => {
             const { input } = store.get();
             const { input: inputValidation } = store.getValidation('input');
-            getValidate.innerHTML = `field1: ${input},  is number: ${inputValidation}`;
+            getValidate.innerHTML = `field1: ${input},  is minus 10: ${inputValidation}`;
         });
     }
 }
