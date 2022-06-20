@@ -1,11 +1,11 @@
+import { checkType, getTypeName, storeType } from './storeType.js';
+
 import {
-    checkType,
-    storeType,
     maxDepth,
     getDataRecursive,
     getValidateRecursive,
     getTypeRecursive,
-} from './storeType.js';
+} from './storeUtils.js';
 
 export function SimpleStore(data) {
     /**
@@ -46,8 +46,9 @@ export function SimpleStore(data) {
 
             // Controllo che la prop in entrata sia una dipendenza del computed
             // E' il controlo chiave che scatena il computed
-            const propChangedIsDependency =
-                propsShouldChange.includes(propChanged);
+            const propChangedIsDependency = propsShouldChange.includes(
+                propChanged
+            );
 
             if (!propChangedIsDependency) return;
 
@@ -130,7 +131,9 @@ export function SimpleStore(data) {
         const isValidType = checkType(type[prop], val);
         if (!isValidType) {
             console.warn(
-                `%c trying to execute setProp method on '${prop}' propierties: '${val}' is not ${type[prop]}`,
+                `%c trying to execute setProp method on '${prop}' propierties: ${val} is not ${getTypeName(
+                    type[prop]
+                )}`,
                 logStyle
             );
             return;
@@ -223,7 +226,9 @@ export function SimpleStore(data) {
 
                 if (!typeResponse) {
                     console.warn(
-                        `%c trying to execute setObj data method on ${prop}.${subProp} propierties: '${subVal}' is not ${type[prop][subProp]}`,
+                        `%c trying to execute setObj data method on ${prop}.${subProp} propierties: ${subVal} is not a ${getTypeName(
+                            type[prop][subProp]
+                        )}`,
                         logStyle
                     );
                 }

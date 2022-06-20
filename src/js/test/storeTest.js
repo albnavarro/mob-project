@@ -45,8 +45,8 @@ class StoreTestClass {
         store.set('obj', { testElement: result1 });
         store.set('obj', { testNodeList: document.querySelectorAll('button') });
 
-        console.log(store.debugStore());
-        console.log(store.debugValidate());
+        store.debugStore();
+        store.debugValidate();
 
         // WATCHER
         const unsubscribeInput = store.watch(
