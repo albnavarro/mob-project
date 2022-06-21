@@ -16,8 +16,7 @@ import { findElement } from './utility/findElement.js';
 import {
     handleSetUp,
     handleLoad,
-    startFps,
-    frameStore,
+    loadFps,
     parallax,
     SmoothScrollClass,
 } from './core/';
@@ -81,11 +80,8 @@ handleLoad(() => {
         fpsThreshold: 25,
         deferredNextTick: true,
     });
-    startFps();
-    const unsubscribe = frameStore.watch('fpsIsReady', () => {
-        console.log('fps ready');
-        unsubscribe();
-    });
+
+    loadFps().then(() => console.log('fps ready'));
 
     const body = document.querySelector('body');
 
@@ -101,43 +97,38 @@ handleLoad(() => {
     }
 
     if (body.classList.contains('page-asyncTimelineStagger')) {
-        const unsubscribe = frameStore.watch('fpsIsReady', () => {
+        loadFps().then(() => {
             staggerTweenTest();
             staggerSpringTest();
             staggerLerpTest();
-            unsubscribe();
         });
     }
 
     if (body.classList.contains('page-asyncShape')) {
-        const unsubscribe = frameStore.watch('fpsIsReady', () => {
+        loadFps().then(() => {
             sinAnimation();
             sinRevertAnimation();
             circleAnimation();
             circleAnimationTimeline();
             infiniteAnimation();
-            unsubscribe();
         });
     }
 
     if (body.classList.contains('page-syncShape')) {
-        const unsubscribe = frameStore.watch('fpsIsReady', () => {
+        loadFps().then(() => {
             infiniteAnimationSync();
-            unsubscribe();
         });
     }
 
     if (body.classList.contains('page-syncTimeline')) {
-        const unsubscribe = frameStore.watch('fpsIsReady', () => {
+        loadFps().then(() => {
             syncTimelineTest();
-            unsubscribe();
         });
     }
 
     if (body.classList.contains('page-mouseStagger')) {
-        const unsubscribe = frameStore.watch('fpsIsReady', () => {
+        loadFps().then(() => {
             mouseStagger();
-            unsubscribe();
         });
     }
 
@@ -167,25 +158,22 @@ handleLoad(() => {
     }
 
     if (body.classList.contains('page-scrollStagger')) {
-        const unsubscribe = frameStore.watch('fpsIsReady', () => {
+        loadFps().then(() => {
             scrollStagger();
-            unsubscribe();
         });
     }
     if (body.classList.contains('page-gridStagger')) {
-        const unsubscribe = frameStore.watch('fpsIsReady', () => {
+        loadFps().then(() => {
             gridStaggerTween();
             gridStaggerSpring();
             gridStaggerLerp();
             gridStaggerSequencer();
-            unsubscribe();
         });
     }
 
     if (body.classList.contains('page-radialStagger')) {
-        const unsubscribe = frameStore.watch('fpsIsReady', () => {
+        loadFps().then(() => {
             radialStaggerTween();
-            unsubscribe();
         });
     }
 

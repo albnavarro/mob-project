@@ -54,9 +54,8 @@ export {
     handleNextFrame,
     handleNextTick,
     handleFrameIndex,
-    frameStore,
     handleFrame,
-    startFps,
+    loadFps,
 } from './events/rafutils/rafUtils.js';
 
 /*

@@ -7,6 +7,7 @@ import {
     STAGGER_RANDOM,
     DIRECTION_ROW,
 } from './staggerCostant';
+import { getEachByFps } from './staggerUtils.js';
 
 // Get random frame without duplicate
 export const getRandomChoice = (arr, each, index) => {
@@ -27,6 +28,10 @@ export const getRandomChoice = (arr, each, index) => {
 // Get frame per index
 const getStaggerIndex = (index, arraylenght, stagger, randomChoice = []) => {
     const { from, each } = stagger;
+    /*
+    Get stagger each by fps
+    */
+    const eachByFps = getEachByFps(each);
     const isOdd = (num) => num % 2;
     const getRandomInt = (max) => Math.floor(Math.random() * max);
 
@@ -48,14 +53,14 @@ const getStaggerIndex = (index, arraylenght, stagger, randomChoice = []) => {
     if (from === STAGGER_START) {
         return {
             index: index,
-            frame: index * each,
+            frame: index * eachByFps,
         };
     }
 
     if (from === STAGGER_END) {
         return {
             index: index,
-            frame: (arraylenght - 1 - index) * each,
+            frame: (arraylenght - 1 - index) * eachByFps,
         };
     }
 
@@ -67,7 +72,7 @@ const getStaggerIndex = (index, arraylenght, stagger, randomChoice = []) => {
                 // From 0 half
                 return {
                     index: index,
-                    frame: (index - half) * each,
+                    frame: (index - half) * eachByFps,
                 };
             } else if (index < half) {
                 // From half to end half
@@ -80,11 +85,11 @@ const getStaggerIndex = (index, arraylenght, stagger, randomChoice = []) => {
                           return isOdd(arraylenght) === 0
                               ? {
                                     index: index,
-                                    frame: (half - index - 1) * each,
+                                    frame: (half - index - 1) * eachByFps,
                                 }
                               : {
                                     index: index,
-                                    frame: (half - index) * each,
+                                    frame: (half - index) * eachByFps,
                                 };
                       })();
             } else {
@@ -104,14 +109,15 @@ const getStaggerIndex = (index, arraylenght, stagger, randomChoice = []) => {
                 // From 0 half
                 return {
                     index: index,
-                    frame: (arraylenght - half - 1 - (index - half)) * each,
+                    frame:
+                        (arraylenght - half - 1 - (index - half)) * eachByFps,
                 };
             } else if (index < half) {
                 // From half to end half
                 return isOdd(arraylenght) === 0 && half - index === 1
                     ? {
                           index: index,
-                          frame: (half - 1) * each,
+                          frame: (half - 1) * eachByFps,
                       }
                     : (() => {
                           return isOdd(arraylenght) === 0
@@ -119,7 +125,7 @@ const getStaggerIndex = (index, arraylenght, stagger, randomChoice = []) => {
                                     index: index,
                                     frame:
                                         (arraylenght - half - (half - index)) *
-                                        each,
+                                        eachByFps,
                                 }
                               : {
                                     index: index,
@@ -128,18 +134,18 @@ const getStaggerIndex = (index, arraylenght, stagger, randomChoice = []) => {
                                             half -
                                             1 -
                                             (half - index)) *
-                                        each, // dfault,
+                                        eachByFps, // dfault,
                                 };
                       })();
             } else {
                 return isOdd(arraylenght)
                     ? {
                           index: index,
-                          frame: half * each, // dfault,
+                          frame: half * eachByFps, // dfault,
                       }
                     : {
                           index: index,
-                          frame: (half - 1) * each, // dfault,
+                          frame: (half - 1) * eachByFps, // dfault,
                       }; // center item
             }
         })();

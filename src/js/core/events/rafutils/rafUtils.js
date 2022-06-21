@@ -90,7 +90,7 @@ export const handleFrameIndex = (fn, index) => {
 /*
  Global props use to get an fps much real as possibile
  */
-let stopHeatFps = false;
+let loadFpsComplete = false;
 let fpsLoopCounter = 0;
 
 export const handleFrame = (() => {
@@ -137,11 +137,11 @@ export const handleFrame = (() => {
 
             /*
             After two loop fps should be stable
-            So stop startFps function and fire the callback
+            So stop loadFps function and fire the callback
             */
             if (fpsLoopCounter > 1) {
                 _isRealFps = true;
-                stopHeatFps = true;
+                loadFpsComplete = true;
             } else {
                 fpsLoopCounter++;
             }
@@ -243,46 +243,34 @@ export const handleFrame = (() => {
 })();
 
 /**
- * Utils: fire script after heatFps is completed
- * const unsubscribe = framStore.watch('fpsIsReady', () => {
- *    ....
- *    unsubscribe();
- * });
- *
- */
-export const frameStore = new SimpleStore({
-    fpsIsReady: () => ({
-        value: false,
-        type: Boolean,
-    }),
-});
-
-/**
  *  Intial loop fo reach the right fps
+ *  loadFps().then(() => ... );
  */
-export const startFps = () => {
+export const loadFps = () => {
     /*
     Reset prop to get some requestAnimationFrame and get a stable fps
     */
-    stopHeatFps = false;
+    loadFpsComplete = false;
     fpsLoopCounter = 0;
 
-    const loop = () => {
-        if (stopHeatFps) {
-            frameStore.set('fpsIsReady', true);
-            return;
-        }
+    return new Promise((resolve, reject) => {
+        const loop = () => {
+            if (loadFpsComplete) {
+                resolve();
+                return;
+            }
+
+            handleFrame.add(() => {
+                handleNextTick.add(() => {
+                    loop();
+                });
+            });
+        };
 
         handleFrame.add(() => {
             handleNextTick.add(() => {
                 loop();
             });
-        });
-    };
-
-    handleFrame.add(() => {
-        handleNextTick.add(() => {
-            loop();
         });
     });
 };
