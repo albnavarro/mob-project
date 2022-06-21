@@ -8,7 +8,6 @@ import {
     getTranslateValues,
     mobbu,
     mq,
-    handleResize,
 } from '../../../js/core';
 
 export class GsapHorizontalCustomClass {
@@ -46,7 +45,7 @@ export class GsapHorizontalCustomClass {
         this.getWidth();
         this.createShadow();
         this.initGsap();
-        handleResize(() => this.onResize());
+        mobbu.use('resize', () => this.onResize());
     }
 
     onTick(fn) {

@@ -1,6 +1,6 @@
 import { lightDescription } from './lightbox-description.js';
 import { lightboxUtils } from './lightbox-utils.js';
-import { handleResize } from '.../../../js/core';
+import { mobbu } from '.../../../js/core';
 
 class LightBoxVideoClass {
     constructor() {
@@ -57,7 +57,7 @@ class LightBoxVideoClass {
             videoWrapper.classList.add('visible');
         }, 200);
 
-        this.unsubscribeResize = handleResize(() => {
+        this.unsubscribeResize = mobbu.use('resize', () => {
             this.setVideoSize(wrapper, hGap, wGap, ratioW, ratioH);
         });
 

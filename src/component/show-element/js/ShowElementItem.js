@@ -1,9 +1,4 @@
-import {
-    offset,
-    handleResize,
-    handleScroll,
-    handleFrame,
-} from '../../../js/core';
+import { offset, mobbu } from '../../../js/core';
 
 export class showElementItemClass {
     constructor(data) {
@@ -26,10 +21,11 @@ export class showElementItemClass {
         this.calcOffset();
         this.checkPosition();
 
-        this.unsubscribeScroll = handleScroll(() => {
+        this.unsubscribeScroll = mobbu.use('scroll', () => {
             this.checkPosition();
         });
-        this.unsubscribeResize = handleResize(() => {
+
+        this.unsubscribeResize = mobbu.use('resize', () => {
             this.refresh();
         });
     }
@@ -59,14 +55,14 @@ export class showElementItemClass {
         const isAble = this.onlyOnce && this.firstActive ? false : true;
 
         if (postion < window.pageYOffset && this.hide && isAble) {
-            handleFrame.add(() => {
+            mobbu.use('frame', () => {
                 this.item.classList.remove(this.startClass);
                 this.item.classList.add(this.endClass);
                 this.hide = false;
                 this.firstActive = true;
             });
         } else if (postion >= window.pageYOffset && !this.hide && isAble) {
-            handleFrame.add(() => {
+            mobbu.use('frame', () => {
                 this.item.classList.remove(this.endClass);
                 this.item.classList.add(this.startClass);
                 this.hide = true;

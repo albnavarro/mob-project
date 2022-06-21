@@ -1,6 +1,6 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { offset, outerHeight, outerWidth, handleResize } from '../core';
+import { offset, outerHeight, outerWidth, mobbu } from '../core';
 
 class gsapTestClass {
     constructor() {}
@@ -216,7 +216,7 @@ class gsapTestClass {
             },
         });
 
-        handleResize(() => {
+        mobbu.use('resize', () => {
             width = this.cardWidth(card);
             this.applyStyle(width, container, itemToScroll);
             percentRange = this.getPercentMaxScroll();
@@ -257,7 +257,7 @@ class gsapTestClass {
             },
         });
 
-        handleResize(() => {
+        mobbu.use('reize', () => {
             width = this.cardWidth(card);
             this.applyStyle(width, container, itemToScroll);
             tl.scrollTrigger.refresh();

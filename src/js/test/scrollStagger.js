@@ -1,10 +1,4 @@
-import {
-    mobbu,
-    offset,
-    outerHeight,
-    handleFrame,
-    handleNextTick,
-} from '../core';
+import { mobbu, offset, outerHeight } from '../core';
 
 export const scrollStagger = () => {
     const items = document.querySelectorAll('rect');
@@ -48,9 +42,8 @@ export const scrollStagger = () => {
         });
     });
 
-    const parallaxIn = mobbu.create('parallax', {
+    const parallaxIn = mobbu.create('scrolltrigger', {
         item: trigger,
-        type: 'scrolltrigger',
         propierties: 'tween',
         tween: myParallaxTween,
         dynamicStart: {

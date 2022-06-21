@@ -1,4 +1,4 @@
-import { mobbu, handleFrame, handleNextFrame } from '../core';
+import { mobbu } from '../core';
 
 export const infiniteAnimation = () => {
     const stagger = document.querySelectorAll('.infinite-tween .shape__target');
@@ -28,7 +28,7 @@ export const infiniteAnimation = () => {
     const loop = () => {
         counter++;
         tween.goTo({ x: counter }, { stagger: { each: 3 } }).catch((err) => {});
-        if (isRunning) handleNextFrame.add(() => loop());
+        if (isRunning) mobbu.use('nextFrame', () => loop());
     };
 
     play.addEventListener('click', () => {

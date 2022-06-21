@@ -1,4 +1,4 @@
-import { handleMouseMove, mobbu } from '../core';
+import { mobbu } from '../core';
 
 export const mouseStagger = () => {
     // 1
@@ -20,7 +20,7 @@ export const mouseStagger = () => {
     });
 
     // In real time (like mousemove) use waitComplete: false, to avoid moviemnt when promise in sot resolved
-    handleMouseMove(({ client }) => {
+    mobbu.use('mouseMove', ({ client }) => {
         const { x, y } = client;
         spring.goTo({ x, y }, { stagger: { each: 4 } }).catch((err) => {});
     });

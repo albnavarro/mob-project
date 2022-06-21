@@ -7,9 +7,6 @@ import {
     outerWidth,
     offset,
     mobbu,
-    handleResize,
-    handleScroll,
-    handleMouseMove,
     springConfig,
 } from '.../../../js/core';
 
@@ -67,14 +64,14 @@ export class PredictiveTurbolenceItemClass {
         this.inzializeSvg();
         this.onResize();
 
-        this.unsubscribeMouseMove = handleMouseMove(({ page }) => {
+        this.unsubscribeMouseMove = mobbu.use('mouseMove', ({ page }) => {
             this.setGlobalCoord({ page });
             this.onMove();
         });
-        this.unsubscribeScroll = handleScroll(({ scrollY }) => {
+        this.unsubscribeScroll = mobbu.use('scroll', ({ scrollY }) => {
             this.onScroll({ scrollY });
         });
-        this.unsubscribeResize = handleResize(() => {
+        this.unsubscribeResize = mobbu.use('resize', () => {
             this.onResize();
         });
 

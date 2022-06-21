@@ -1,9 +1,4 @@
-import {
-    bodyScroll,
-    handleScroll,
-    handleFrame,
-    handleNextTick,
-} from '../../../js/core';
+import { mobbu } from '../../../js/core';
 
 class totopClass {
     constructor() {
@@ -14,7 +9,7 @@ class totopClass {
     init() {
         this.addHandler();
         this.showArrow();
-        handleScroll(({ scrollY }) => this.showArrow(scrollY));
+        mobbu.use('scroll', ({ scrollY }) => this.showArrow(scrollY));
     }
 
     addHandler() {
@@ -23,19 +18,19 @@ class totopClass {
 
     onClick(event) {
         event.preventDefault();
-        bodyScroll.to({ target: 0, duration: 1000 });
+        mobbu.scrollTo({ target: 0, duration: 1000 });
     }
 
     showArrow(scrollY) {
-        handleFrame.add(() => {
-            handleNextTick.add(() => {
+        mobbu.use('frame', () => {
+            mobbu.use('nextTick', () => {
                 if (scrollY >= window.innerWidth && this.hide) {
-                    handleFrame.add(() => {
+                    mobbu.use('frame', () => {
                         this.totop.classList.add('visible');
                         this.hide = false;
                     });
                 } else if (scrollY < window.innerWidth && !this.hide) {
-                    handleFrame.add(() => {
+                    mobbu.use('frame', () => {
                         this.totop.classList.remove('visible');
                         this.hide = true;
                     });

@@ -29,10 +29,9 @@ export function indexParallax() {
         item.style.opacity = opacity;
     });
 
-    const parallaxIn = mobbu.create('parallax', {
+    const parallaxIn = mobbu.create('scrolltrigger', {
         item: item,
         trigger: trigger,
-        type: 'scrolltrigger',
         propierties: 'tween',
         tween: myParallaxTimeline,
         start: 'bottom',

@@ -1,4 +1,4 @@
-import { handleFrame, handleNextFrame, mobbu } from '../core';
+import { mobbu } from '../core';
 
 export const circleAnimationTimeline = () => {
     const stagger = document.querySelectorAll(

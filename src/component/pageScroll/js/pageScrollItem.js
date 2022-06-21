@@ -1,12 +1,4 @@
-import {
-    mq,
-    outerHeight,
-    outerWidth,
-    offset,
-    handleResize,
-    handleScroll,
-    mobbu,
-} from '.../../../js/core';
+import { mq, outerHeight, outerWidth, offset, mobbu } from '.../../../js/core';
 
 export class PageScrollItemClass {
     constructor(data) {
@@ -36,13 +28,13 @@ export class PageScrollItemClass {
         this.setShadow();
         this.setOffset();
         this.setContent();
-        this.unsubscribeResize = handleResize(() => {
+        this.unsubscribeResize = mobbu.use('resize', () => {
             this.firstTime = true;
             this.setShadow();
             this.setOffset();
             this.setContent();
         });
-        this.unsubscribeScroll = handleScroll(() => this.onScroll());
+        this.unsubscribeScroll = mobbu.use('scroll', () => this.onScroll());
     }
 
     destroy() {

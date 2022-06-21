@@ -1,4 +1,4 @@
-import { parallax, handleNextTick, mobbu } from '../core';
+import { mobbu } from '../core';
 
 export const hScroller = () => {
     // FIRST
@@ -34,11 +34,10 @@ export const hScroller = () => {
     });
     parallax2.init();
 
-    const parallaxPin = mobbu.create('parallax', {
+    const parallaxPin = mobbu.create('scrolltrigger', {
         item: document.querySelector('.parallax-js-pin'),
         scroller: '.scrollerH-container .scrollerH',
         direction: 'horizontal',
-        type: 'scrolltrigger',
         trigger: '.pluto',
         propierties: 'x',
         pin: true,
@@ -65,12 +64,11 @@ export const hScroller = () => {
         target.style.transform = `translate3D(0,0,0) translate(${x}px, ${y}px)`;
     });
 
-    const parallaxIn = mobbu.create('parallax', {
+    const parallaxIn = mobbu.create('scrolltrigger', {
         item: target,
         scroller: '.scrollerH-container .scrollerH',
         trigger: '.pluto3',
         direction: 'horizontal',
-        type: 'scrolltrigger',
         propierties: 'tween',
         tween: myParallaxTimeline,
         marker: 'parallax',
@@ -118,12 +116,11 @@ export const hScroller = () => {
         target2.style.transform = `translate(${x}px, ${y}px)`;
     });
 
-    let parallaxOut = mobbu.create('parallax', {
+    let parallaxOut = mobbu.create('scrolltrigger', {
         item: target2,
         scroller: '.scrollerH-container .scrollerH',
         trigger: '.pluto3',
         direction: 'tween',
-        type: 'scrolltrigger',
         ease: true,
         dynamicStart: {
             position: 'left',
@@ -153,7 +150,7 @@ export const hScroller = () => {
     });
     smoothScrollFull.init();
     smoothScrollFull.onTick(({ scrollValue, percent }) => {
-        handleNextTick.add(() => {
+        mobbu.use('nextTick', () => {
             parallax1.move(scrollValue);
             parallax2.move(scrollValue);
             parallaxOpacity.move(scrollValue);
@@ -185,12 +182,11 @@ export const hScroller = () => {
     });
     parallaxb1.init();
 
-    const parallaxb2 = mobbu.create('parallax', {
+    const parallaxb2 = mobbu.create('scrolltrigger', {
         item: document.querySelector('.parallax-js-b2'),
         direction: 'horizontal',
         scroller: '.scrollerH-container2 .scrollerH2',
         screen: '.scrollerH-container2',
-        type: 'scrolltrigger',
         trigger: '.pluto2',
         start: 'right 100px',
         marker: 'pin',
@@ -212,18 +208,17 @@ export const hScroller = () => {
     });
     smoothScrollContiner.init();
     smoothScrollContiner.onTick(({ scrollValue }) => {
-        handleNextTick.add(() => {
+        mobbu.use('nextTick', () => {
             parallaxb1.move(scrollValue);
             parallaxb2.move(scrollValue);
         });
     });
 
     // THIRD
-    const parallaxC1 = mobbu.create('parallax', {
+    const parallaxC1 = mobbu.create('scrolltrigger', {
         item: document.querySelector('.parallax-js-c1'),
         scroller: '.scrollerH-container3 .scrollerH3',
         screen: '.scrollerH-container3',
-        type: 'scrolltrigger',
         trigger: '.pluto5',
         start: 'bottom',
         end: 'bottom +height',
@@ -232,11 +227,10 @@ export const hScroller = () => {
     });
     parallaxC1.init();
 
-    const parallaxC2 = mobbu.create('parallax', {
+    const parallaxC2 = mobbu.create('scrolltrigger', {
         item: document.querySelector('.parallax-js-c2'),
         scroller: '.scrollerH-container3 .scrollerH3',
         screen: '.scrollerH-container3',
-        type: 'scrolltrigger',
         propierties: 'x',
         trigger: '.pluto6',
         start: 'top',
@@ -246,11 +240,10 @@ export const hScroller = () => {
     });
     parallaxC2.init();
 
-    const parallaxC3 = mobbu.create('parallax', {
+    const parallaxC3 = mobbu.create('scrolltrigger', {
         item: document.querySelector('.parallax-js-c3'),
         scroller: '.scrollerH-container3 .scrollerH3',
         screen: '.scrollerH-container3',
-        type: 'scrolltrigger',
         marker: 'pin2',
         pin: true,
         start: 'bottom 100px',
@@ -281,7 +274,7 @@ export const hScroller = () => {
     });
     smoothScrollContiner2.init();
     smoothScrollContiner2.onTick(({ scrollValue }) => {
-        handleNextTick.add(() => {
+        mobbu.use('nextTick', () => {
             parallaxC1.move(scrollValue);
             parallaxC2.move(scrollValue);
             parallaxC3.move(scrollValue);

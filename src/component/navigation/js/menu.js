@@ -19,7 +19,7 @@ import {
     offset,
     getParents,
     getSiblings,
-    handleResize,
+    mobbu,
 } from '../../../js/core';
 
 export class menuClass {
@@ -127,7 +127,7 @@ export class menuClass {
         this.addHandler();
         this.resetSubmenuHeight();
 
-        handleResize(() => {
+        mobbu.use('resize', () => {
             this.getSubmenuWidth();
             this.getToggleWrapHeight();
             this.resizeMenu();
@@ -137,7 +137,7 @@ export class menuClass {
         if (this.direction == 'horizontal') {
             this.SetPosition();
 
-            handleResize(() => {
+            mobbu.use('resize', () => {
                 this.SetPosition();
             });
         }

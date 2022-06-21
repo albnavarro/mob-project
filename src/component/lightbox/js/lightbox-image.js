@@ -1,7 +1,7 @@
 import { lightDescription } from './lightbox-description.js';
 import { lightboxUtils } from './lightbox-utils.js';
 import { lightPichZoom } from './lightbox-zoom-pinch.js';
-import { loadImages, handleResize } from '.../../../js/core';
+import { loadImages, mobbu } from '.../../../js/core';
 
 class LightBoxImageClass {
     constructor() {
@@ -44,7 +44,7 @@ class LightBoxImageClass {
 
                 this.removeLoder(wrapper);
 
-                this.unsubscribeResize = handleResize(() => {
+                this.unsubscribeResize = mobbu.use('resize', () => {
                     this.onResizeLightboxImage(wrapper, hGap, wGap, zoom);
                 });
 

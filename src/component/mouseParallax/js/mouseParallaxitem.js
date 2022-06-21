@@ -4,9 +4,6 @@ import {
     offset,
     getTranslateValues,
     mobbu,
-    handleResize,
-    handleScroll,
-    handleMouseMove,
 } from '.../../../js/core';
 
 export class MouseParallaxItemClass {
@@ -37,16 +34,19 @@ export class MouseParallaxItemClass {
     init() {
         this.getDimension();
 
-        this.unsubscribeMouseMove = handleMouseMove(({ page, client }) => {
-            this.setGlobalCoord({ page, client });
-            this.onMove();
-        });
+        this.unsubscribeMouseMove = mobbu.use(
+            'mouseMove',
+            ({ page, client }) => {
+                this.setGlobalCoord({ page, client });
+                this.onMove();
+            }
+        );
 
-        this.unsubscribeResize = handleResize(() => {
+        this.unsubscribeResize = mobbu.use('resize', () => {
             this.getDimension();
         });
 
-        this.unsubscribeScroll = handleScroll(({ scrollY }) => {
+        this.unsubscribeScroll = mobbu.use('scroll', ({ scrollY }) => {
             this.onScroll(scrollY);
         });
 

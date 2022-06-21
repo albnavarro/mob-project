@@ -5,8 +5,6 @@ import {
     outerHeight,
     offset,
     mobbu,
-    handleResize,
-    bodyScroll,
 } from '../../../js/core';
 
 export class tBlocksItemClass {
@@ -109,7 +107,7 @@ export class tBlocksItemClass {
         this.setActiveitemTransformOrigin();
         this.setActiveitemStyle();
 
-        const unsubscribeResize = handleResize(() => {
+        const unsubscribeResize = mobbu.use('resize', () => {
             this.setWidth();
             this.calcCenter();
             this.store.set('clone', { action: this.REMOVE });
@@ -340,7 +338,7 @@ export class tBlocksItemClass {
         );
 
         setTimeout(() => {
-            bodyScroll.to({ target: this.container }).catch((err) => {});
+            mobbu.scrollTo({ target: this.container }).catch((err) => {});
         }, 500);
     }
 }

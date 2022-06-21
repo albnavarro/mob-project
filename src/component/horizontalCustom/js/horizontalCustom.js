@@ -4,9 +4,6 @@ import {
     outerHeight,
     outerWidth,
     getTranslateValues,
-    handleResize,
-    handleFrame,
-    handleNextTick,
     mobbu,
 } from '../../../js/core';
 import { horizontalCustomCss } from './horizontalCustomCss.js';
@@ -44,7 +41,7 @@ export class horizontalCustomClass {
                 this.createShadow().then(() =>
                     this.updateShadow().then(() => {
                         this.initScroller();
-                        handleResize(({ horizontalResize }) =>
+                        mobbu.use('resize', ({ horizontalResize }) =>
                             this.onResize(horizontalResize)
                         );
                     })
@@ -63,7 +60,7 @@ export class horizontalCustomClass {
 
     setDimension() {
         return new Promise((resolve, reject) => {
-            handleFrame.add(() => {
+            mobbu.use('frame', () => {
                 const width = this.horizontalWidth;
                 this.percentRange = (100 * (width - window.innerWidth)) / width;
                 this.triggerContainer.style.height = `${width}px`;
@@ -77,7 +74,7 @@ export class horizontalCustomClass {
 
     getWidth() {
         return new Promise((resolve, reject) => {
-            handleFrame.add(() => {
+            mobbu.use('frame', () => {
                 if (!mq[this.queryType](this.breackpoint)) {
                     resolve();
                     return;
@@ -96,7 +93,7 @@ export class horizontalCustomClass {
 
     createShadow() {
         return new Promise((resolve, reject) => {
-            handleFrame.add(() => {
+            mobbu.use('frame', () => {
                 if (!mq[this.queryType](this.breackpoint)) {
                     resolve();
                     return;
@@ -159,7 +156,7 @@ export class horizontalCustomClass {
                 return;
             }
 
-            handleFrame.add(() => {
+            mobbu.use('frame', () => {
                 const shadowEl = this.mainContainer.querySelectorAll(
                     `.${this.shadowMainClass}`
                 );
@@ -265,10 +262,9 @@ export class horizontalCustomClass {
         if (!this.triggerContainer || !mq[this.queryType](this.breackpoint))
             return;
 
-        const scroller = mobbu.create('parallax', {
+        const scroller = mobbu.create('scrolltrigger', {
             item: this.row,
             trigger: this.triggerContainer,
-            type: 'scrolltrigger',
             propierties: 'x',
             breackpoint: 'x-small',
             pin: true,
@@ -320,8 +316,8 @@ export class horizontalCustomClass {
         if (this.moduleisActive) {
             this.scroller.refresh();
 
-            handleFrame.add(() => {
-                handleNextTick.add(() => {
+            mobbu.use('frame', () => {
+                mobbu.use('nextTick', () => {
                     this.onRefreshCallBack.forEach((item, i) => item());
                 });
             });
@@ -347,8 +343,8 @@ export class horizontalCustomClass {
         this.removeShadow();
 
         if (this.moduleisActive) {
-            handleFrame.add(() => {
-                handleNextTick.add(() => {
+            mobbu.use('frame', () => {
+                mobbu.use('nextTick', () => {
                     this.scroller.destroy();
                     this.scroller = null;
                     this.moduleisActive = false;

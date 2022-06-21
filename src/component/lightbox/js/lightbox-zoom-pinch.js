@@ -1,17 +1,4 @@
-import {
-    outerHeight,
-    outerWidth,
-    offset,
-    handleResize,
-    handleTouchStart,
-    handleTouchEnd,
-    handleMouseDown,
-    handleMouseUp,
-    handleMouseMove,
-    handleTouchMove,
-    handleMouseWheel,
-    handleFrame,
-} from '.../../../js/core';
+import { outerHeight, outerWidth, offset, mobbu } from '.../../../js/core';
 
 class LightPichZoomClass {
     constructor() {
@@ -64,39 +51,41 @@ class LightPichZoomClass {
         zoom.appendChild(zoomOut);
         this.setZoomBtnhandler();
 
-        this.unsubscribeWheel = handleMouseWheel(({ spinY, target }) => {
+        this.unsubscribeWheel = mobbu.use('mouseWheel', ({ spinY, target }) => {
             this.onWeel({ spinY, target });
         });
 
-        this.unsubscribeTouchStart = handleTouchStart(
+        this.unsubscribeTouchStart = mobbu.use(
+            'touchStart',
             ({ target, preventDefault }) => {
                 this.onMouseDown({ target, preventDefault });
             }
         );
 
-        this.unsubscribeMouseDown = handleMouseDown(
+        this.unsubscribeMouseDown = mobbu.use(
+            'mouseDown',
             ({ target, preventDefault }) => {
                 this.onMouseDown({ target, preventDefault });
             }
         );
 
-        this.unsubscribeTouchEnd = handleTouchEnd(() => {
+        this.unsubscribeTouchEnd = mobbu.use('touchEnd', () => {
             this.onMouseUp();
         });
 
-        this.unsubscribeMouseUp = handleMouseUp(() => {
+        this.unsubscribeMouseUp = mobbu.use('mouseUp', () => {
             this.onMouseUp();
         });
 
-        this.unsubscribeMouseMove = handleMouseMove(({ page }) => {
+        this.unsubscribeMouseMove = mobbu.use('mouseMove', ({ page }) => {
             this.onMove(false, page.x, page.y);
         });
 
-        this.unsubscribeTouchMove = handleTouchMove(({ page }) => {
+        this.unsubscribeTouchMove = mobbu.use('touchMove', ({ page }) => {
             this.onMove(false, page.x, page.y);
         });
 
-        this.unsubscribeResize = handleResize(() => {
+        this.unsubscribeResize = mobbu.use('resize', () => {
             this.resetZoom();
         });
     }
@@ -280,7 +269,7 @@ class LightPichZoomClass {
 
         if (this.onDrag || force) {
             // this.image.style.transform = `translateX(${xValue}px) translateY(${yValue}px) scale(${this.scale})`;
-            handleFrame.add(() => {
+            mobbu.use('frame', () => {
                 this.image.style.transform = `translateX(${xValue}px) translateY(${yValue}px) scale(${this.scale})`;
             });
         }

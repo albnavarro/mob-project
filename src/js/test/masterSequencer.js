@@ -1,4 +1,4 @@
-import { mobbu, outerHeight, handleResize } from '../core';
+import { mobbu, outerHeight } from '../core';
 
 export const masterSequencer = () => {
     const items = document.querySelectorAll('.master-stagger__item');
@@ -39,16 +39,15 @@ export const masterSequencer = () => {
     createSequencer();
 
     // Test destroy and create sequencer on resize
-    handleResize(() => {
+    mobbu.use('resize', () => {
         sequencers.forEach(({ unsubscribe }, i) => unsubscribe());
         sequencers.forEach(({ unsubscribeStop }, i) => unsubscribeStop());
         masterSequencer.destroy();
         createSequencer();
     });
 
-    const parallaxIn = mobbu.create('parallax', {
+    const parallaxIn = mobbu.create('scrolltrigger', {
         item: trigger,
-        type: 'scrolltrigger',
         propierties: 'tween',
         tween: masterSequencer,
         dynamicStart: {

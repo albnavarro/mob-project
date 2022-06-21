@@ -13,7 +13,7 @@
 // BASE MODULE
 import { vh } from './utility/vh.js';
 import { findElement } from './utility/findElement.js';
-import { handleSetUp, handleLoad, loadFps, parallax, mobbu } from './core/';
+import { handleSetUp, parallax, mobbu } from './core/';
 
 // NEW VANILLA COMPONENT MODULE
 import { totop } from '../component/to-top/js/toTop.js';
@@ -69,13 +69,13 @@ import { createStagger } from './test/createStagger.js';
 // import { test } from './test/explosion/explosionbase.js';
 // test();
 
-handleLoad(() => {
+mobbu.use('load', () => {
     handleSetUp.set({
         fpsThreshold: 25,
         deferredNextTick: true,
     });
 
-    loadFps().then(() => console.log('fps ready'));
+    mobbu.use('loadFps', () => console.log('fps ready'));
 
     const body = document.querySelector('body');
 
@@ -91,7 +91,7 @@ handleLoad(() => {
     }
 
     if (body.classList.contains('page-asyncTimelineStagger')) {
-        loadFps().then(() => {
+        mobbu.use('loadFps', () => {
             staggerTweenTest();
             staggerSpringTest();
             staggerLerpTest();
@@ -99,7 +99,7 @@ handleLoad(() => {
     }
 
     if (body.classList.contains('page-asyncShape')) {
-        loadFps().then(() => {
+        mobbu.use('loadFps', () => {
             sinAnimation();
             sinRevertAnimation();
             circleAnimation();
@@ -109,19 +109,19 @@ handleLoad(() => {
     }
 
     if (body.classList.contains('page-syncShape')) {
-        loadFps().then(() => {
+        mobbu.use('loadFps', () => {
             infiniteAnimationSync();
         });
     }
 
     if (body.classList.contains('page-syncTimeline')) {
-        loadFps().then(() => {
+        mobbu.use('loadFps', () => {
             syncTimelineTest();
         });
     }
 
     if (body.classList.contains('page-mouseStagger')) {
-        loadFps().then(() => {
+        mobbu.use('loadFps', () => {
             mouseStagger();
         });
     }
@@ -152,12 +152,12 @@ handleLoad(() => {
     }
 
     if (body.classList.contains('page-scrollStagger')) {
-        loadFps().then(() => {
+        mobbu.use('loadFps', () => {
             scrollStagger();
         });
     }
     if (body.classList.contains('page-gridStagger')) {
-        loadFps().then(() => {
+        mobbu.use('loadFps', () => {
             gridStaggerTween();
             gridStaggerSpring();
             gridStaggerLerp();
@@ -166,7 +166,7 @@ handleLoad(() => {
     }
 
     if (body.classList.contains('page-radialStagger')) {
-        loadFps().then(() => {
+        mobbu.use('loadFps', () => {
             radialStaggerTween();
         });
     }
