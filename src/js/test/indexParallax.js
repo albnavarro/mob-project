@@ -1,10 +1,10 @@
-import { parallax, HandleSequencer, ParallaxItemClass } from '../core';
+import { mobbu } from '../core';
 
 export function indexParallax() {
     const item = document.querySelector('.index-parallax-1');
     const trigger = document.querySelector('.index-timeline');
 
-    const myParallaxTimeline = new HandleSequencer();
+    const myParallaxTimeline = mobbu.create('sequencer');
     myParallaxTimeline
         .setData({
             x: 0,
@@ -29,7 +29,7 @@ export function indexParallax() {
         item.style.opacity = opacity;
     });
 
-    const parallaxIn = new ParallaxItemClass({
+    const parallaxIn = mobbu.create('parallax', {
         item: item,
         trigger: trigger,
         type: 'scrolltrigger',
@@ -43,5 +43,4 @@ export function indexParallax() {
         marker: 'parallax-timeline',
     });
     parallaxIn.init();
-    parallax.add(parallaxIn);
 }

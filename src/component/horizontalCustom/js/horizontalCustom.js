@@ -7,7 +7,7 @@ import {
     handleResize,
     handleFrame,
     handleNextTick,
-    ParallaxItemClass,
+    mobbu,
 } from '../../../js/core';
 import { horizontalCustomCss } from './horizontalCustomCss.js';
 
@@ -265,7 +265,7 @@ export class horizontalCustomClass {
         if (!this.triggerContainer || !mq[this.queryType](this.breackpoint))
             return;
 
-        const scroller = new ParallaxItemClass({
+        const scroller = mobbu.create('parallax', {
             item: this.row,
             trigger: this.triggerContainer,
             type: 'scrolltrigger',

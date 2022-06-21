@@ -1,4 +1,4 @@
-import { HandleTween, HandleAsyncTimeline } from '../core';
+import { mobbu } from '../core';
 
 export function tweenTest() {
     const btnStart = document.querySelector('.tween-btn-start');
@@ -12,7 +12,7 @@ export function tweenTest() {
     const target = document.querySelector('.tween-target');
 
     // DEFINE SPRING
-    const myTween = new HandleTween();
+    const myTween = mobbu.create('tween');
     myTween.setData({ x: 0, y: 0, rotate: 0 });
     myTween.subscribe(({ x, y, rotate }) => {
         target.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg)`;
@@ -27,7 +27,8 @@ export function tweenTest() {
     }
 
     // DEFINE TIMELINE
-    const timeline = new HandleAsyncTimeline({ repeat: -1, yoyo: false })
+    const timeline = mobbu
+        .create('asyncTimeline', { repeat: -1, yoyo: false })
         .set(myTween, { x: 0, y: 0, rotate: 0 })
         .goTo(myTween, { x: -200 })
         .goFromTo(myTween, { x: -200 }, { x: 400 }, { duration: 800 })

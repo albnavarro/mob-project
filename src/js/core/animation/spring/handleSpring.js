@@ -27,7 +27,7 @@ import {
 } from '../utils/callbacks/defaultCallback.js';
 
 export class HandleSpring {
-    constructor(config = 'default') {
+    constructor(data = {}) {
         this.uniqueId = getUnivoqueId();
         this.req = false;
         this.currentResolve = null;
@@ -50,7 +50,10 @@ export class HandleSpring {
         /**
         This value lives from user call ( goTo etc..) until next call
          **/
-        this.config = springConfig[config];
+        this.config =
+            'config' in data
+                ? springConfig[data.config]
+                : springConfig['default'];
 
         /**
         This value is the base value merged with new value in custom prop

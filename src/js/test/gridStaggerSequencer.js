@@ -1,11 +1,11 @@
-import { HandleSyncTimeline, HandleSequencer } from '../core';
+import { mobbu } from '../core';
 
 export const gridStaggerSequencer = () => {
     const items = document.querySelectorAll(
         '.grid-stagger-sequencer .grid-stagger__item'
     );
 
-    const tween = new HandleSequencer({
+    const tween = mobbu.create('sequencer', {
         stagger: {
             each: 15,
             from: 'start',
@@ -24,7 +24,7 @@ export const gridStaggerSequencer = () => {
         });
     });
 
-    const timeline = new HandleSyncTimeline({ repeat: -1, yoyo: false });
+    const timeline = mobbu.create('syncTimeline', { repeat: -1, yoyo: false });
     timeline.add(tween);
     timeline.setDuration('5000');
     timeline.play();

@@ -1,12 +1,4 @@
-import {
-    HandleSequencer,
-    HandleSyncTimeline,
-    HandleMasterSequencer,
-    ParallaxItemClass,
-    outerHeight,
-    handleResize,
-    createStaggers,
-} from '../core';
+import { mobbu, outerHeight, handleResize } from '../core';
 
 export const sequencerStaggerTime = () => {
     const items = document.querySelectorAll('.master-stagger__item');
@@ -17,10 +9,10 @@ export const sequencerStaggerTime = () => {
     const pause = document.querySelector('.animation-pause');
     const resume = document.querySelector('.animation-resume');
 
-    let masterSequencer = new HandleMasterSequencer();
+    let masterSequencer = mobbu.create('masterSequencer');
     const duration = 2000;
 
-    const staggers = createStaggers({
+    const staggers = mobbu.create('stagger', {
         items,
         stagger: {
             each: 30,
@@ -31,7 +23,7 @@ export const sequencerStaggerTime = () => {
     // Create sequencer
     const createSequencer = () => {
         staggers.forEach(({ item, start, end }) => {
-            const sequencer = new HandleSequencer();
+            const sequencer = mobbu.create('sequencer');
             sequencer.setDuration(duration);
 
             sequencer
@@ -55,7 +47,7 @@ export const sequencerStaggerTime = () => {
     /**
      *  Animation
      **/
-    const timeline = new HandleSyncTimeline({ repeat: -1, yoyo: true });
+    const timeline = mobbu.create('syncTimeline', { repeat: -1, yoyo: true });
     timeline.add(masterSequencer);
     timeline.setDuration(duration);
 

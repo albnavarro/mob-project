@@ -1,4 +1,4 @@
-import { SimpleStore } from '../core';
+import { mobbu } from '../core';
 
 class StoreTestClass {
     constructor() {}
@@ -14,7 +14,7 @@ class StoreTestClass {
 
         const getValidate = document.querySelector('.getValidate');
 
-        const store = new SimpleStore({
+        const store = mobbu.create('store', {
             input: () => ({
                 value: 10,
                 type: Number,

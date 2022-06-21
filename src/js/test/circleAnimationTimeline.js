@@ -1,9 +1,4 @@
-import {
-    HandleTween,
-    handleFrame,
-    handleNextFrame,
-    HandleAsyncTimeline,
-} from '../core';
+import { handleFrame, handleNextFrame, mobbu } from '../core';
 
 export const circleAnimationTimeline = () => {
     const stagger = document.querySelectorAll(
@@ -16,7 +11,7 @@ export const circleAnimationTimeline = () => {
         '.circle-tween-timeline .anim-resume'
     );
 
-    const tween = new HandleTween('easeLinear');
+    const tween = mobbu.create('tween', { ease: 'easeLinear' });
     tween.setData({ x: 0 });
     tween.set({ x: 0 });
 
@@ -40,7 +35,7 @@ export const circleAnimationTimeline = () => {
         });
     });
 
-    const timeline = new HandleAsyncTimeline({ repeat: -1 });
+    const timeline = mobbu.create('asyncTimeline', { repeat: -1 });
     timeline.goFromTo(
         tween,
         { x: 0 },

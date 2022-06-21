@@ -3,7 +3,7 @@ import {
     outerHeight,
     outerWidth,
     offset,
-    HandleSpring,
+    mobbu,
     handleResize,
     handleScroll,
     handleTouchStart,
@@ -42,7 +42,7 @@ export class move3DContainerClass {
         this.pageY = false;
         this.childrenInstances = [];
 
-        this.spring = new HandleSpring();
+        this.spring = mobbu.create('spring');
         this.unsubscribeSpring = () => {};
 
         // MOUSE COORD

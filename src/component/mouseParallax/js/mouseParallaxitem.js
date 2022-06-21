@@ -3,7 +3,7 @@ import {
     outerWidth,
     offset,
     getTranslateValues,
-    HandleSpring,
+    mobbu,
     handleResize,
     handleScroll,
     handleMouseMove,
@@ -20,7 +20,7 @@ export class MouseParallaxItemClass {
         this.offSetTop = 0;
         this.offSetLeft = 0;
         this.smooth = 10;
-        this.spring = new HandleSpring();
+        this.spring = mobbu.create('spring');
         this.unsubscribeSpring = () => {};
         this.unsubscribeOnComplete = () => {};
 

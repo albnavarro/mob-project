@@ -1,6 +1,5 @@
 import {
-    ParallaxTween,
-    ParallaxItemClass,
+    mobbu,
     offset,
     outerHeight,
     handleFrame,
@@ -11,10 +10,11 @@ export const scrollStagger = () => {
     const items = document.querySelectorAll('rect');
     const trigger = document.querySelector('.scrollStagger');
 
-    const myParallaxTween = new ParallaxTween({
-        stagger: { each: 3, from: 'center' },
-        ease: 'easeLinear',
-    })
+    const myParallaxTween = mobbu
+        .create('parallaxTween', {
+            stagger: { each: 3, from: 'center' },
+            ease: 'easeLinear',
+        })
         .setData({ rotate: 70 })
         .goTo({ rotate: 800 });
 
@@ -48,7 +48,7 @@ export const scrollStagger = () => {
         });
     });
 
-    const parallaxIn = new ParallaxItemClass({
+    const parallaxIn = mobbu.create('parallax', {
         item: trigger,
         type: 'scrolltrigger',
         propierties: 'tween',

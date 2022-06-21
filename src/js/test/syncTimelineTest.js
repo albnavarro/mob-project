@@ -1,4 +1,4 @@
-import { HandleSyncTimeline, HandleSequencer } from '../core';
+import { mobbu } from '../core';
 import { isIOS } from '../utility/isIOS.js';
 
 export function syncTimelineTest() {
@@ -14,7 +14,7 @@ export function syncTimelineTest() {
     );
 
     // SINGLE
-    const seq1 = new HandleSequencer({ ease: 'easeInOutCubic' });
+    const seq1 = mobbu.create('sequencer', { ease: 'easeInOutCubic' });
     seq1.setData({ x: 0, y: 0, rotate: 0, scale: 1 })
         .goTo({ x: 800 }, { start: 0, end: 2500, ease: 'easeInOutBack' })
         .goTo({ y: 450 }, { start: 2500, end: 5000, ease: 'easeInOutBack' })
@@ -35,7 +35,7 @@ export function syncTimelineTest() {
     });
 
     // STAGGER
-    const seqStagger = new HandleSequencer({
+    const seqStagger = mobbu.create('sequencer', {
         stagger: { each: 10, from: 'end' },
     });
     seqStagger
@@ -57,7 +57,10 @@ export function syncTimelineTest() {
         });
     });
 
-    const syncTimeline = new HandleSyncTimeline({ repeat: 4, yoyo: false });
+    const syncTimeline = mobbu.create('syncTimeline', {
+        repeat: 4,
+        yoyo: false,
+    });
     syncTimeline.add(seq1);
     syncTimeline.add(seqStagger);
     syncTimeline.setDuration('10000');

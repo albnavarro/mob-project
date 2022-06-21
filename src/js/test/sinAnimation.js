@@ -1,4 +1,4 @@
-import { HandleTween, HandleAsyncTimeline } from '../core';
+import { mobbu } from '../core';
 
 export const sinAnimation = () => {
     const stagger = document.querySelectorAll('.sin .shape__target');
@@ -7,7 +7,7 @@ export const sinAnimation = () => {
     const pause = document.querySelector('.sin .anim-pause');
     const resume = document.querySelector('.sin .anim-resume');
 
-    const tween = new HandleTween('easeInOutQuad');
+    const tween = mobbu.create('tween', { ease: 'easeInOutQuad' });
     tween.setData({ x: 0 });
     tween.set({ x: 0 });
 
@@ -24,7 +24,7 @@ export const sinAnimation = () => {
         });
     });
 
-    const timeline = new HandleAsyncTimeline({ repeat: -1, yoyo: true });
+    const timeline = mobbu.create('asyncTimeline', { repeat: -1, yoyo: true });
     timeline.goFromTo(
         tween,
         { x: 0 },

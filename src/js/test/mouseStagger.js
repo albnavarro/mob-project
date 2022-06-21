@@ -1,15 +1,10 @@
-import {
-    HandleSpring,
-    HandleTween,
-    HandleAsyncTimeline,
-    handleMouseMove,
-} from '../core';
+import { handleMouseMove, mobbu } from '../core';
 
 export const mouseStagger = () => {
     // 1
     const cursor = document.querySelectorAll('.mouseStagger__item');
 
-    const spring = new HandleSpring('gentle');
+    const spring = mobbu.create('spring', { config: 'gentle' });
     spring.setData({ x: 0, y: 0 });
 
     cursor.forEach((item, i) => {
@@ -32,7 +27,7 @@ export const mouseStagger = () => {
 
     // 2
     const stagger = document.querySelectorAll('.stagger__item');
-    const tween = new HandleTween('easeInOutQuad');
+    const tween = mobbu.create('tween', { ease: 'easeInOutQuad' });
     tween.setData({ scale: 1 });
     tween.set({ scale: 1 });
 
@@ -42,7 +37,7 @@ export const mouseStagger = () => {
         });
     });
 
-    const timeline = new HandleAsyncTimeline({ repeat: -1, yoyo: true });
+    const timeline = mobbu.create('asyncTimeline', { repeat: -1, yoyo: true });
     timeline.goTo(
         tween,
         { scale: 2 },

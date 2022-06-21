@@ -30,7 +30,7 @@ import {
 const LERP_DEFAULT_PRECISION = 0.01;
 
 export class HandleLerp {
-    constructor(velocity = 0.06) {
+    constructor(data = {}) {
         this.uniqueId = getUnivoqueId();
         this.config = {};
         this.req = false;
@@ -53,7 +53,7 @@ export class HandleLerp {
         /**
         This value lives from user call ( goTo etc..) until next call
          **/
-        this.velocity = velocity;
+        this.velocity = 'velocity' in data ? data.velocity : 0.06;
         this.precision = LERP_DEFAULT_PRECISION;
 
         /**
@@ -62,7 +62,7 @@ export class HandleLerp {
          **/
         this.defaultProps = {
             reverse: false,
-            velocity,
+            velocity: this.velocity,
             precision: LERP_DEFAULT_PRECISION,
             immediate: false,
             stagger: STAGGER_DEFAULT_OBJ,

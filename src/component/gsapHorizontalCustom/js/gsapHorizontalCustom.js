@@ -6,7 +6,7 @@ import {
     outerHeight,
     outerWidth,
     getTranslateValues,
-    SimpleStore,
+    mobbu,
     mq,
     handleResize,
 } from '../../../js/core';
@@ -30,7 +30,7 @@ export class GsapHorizontalCustomClass {
         this.callback = [];
 
         // GSAP store
-        this.store = new SimpleStore({
+        this.store = mobbu.create('store', {
             gsapisActive: false,
             horizontalWidth: 0,
             tl: [],

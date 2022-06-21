@@ -1,11 +1,11 @@
-import { HandleLerp, HandleAsyncTimeline } from '../core';
+import { mobbu } from '../core';
 
 export const gridStaggerLerp = () => {
     const items = document.querySelectorAll(
         '.grid-stagger-lerp .grid-stagger__item'
     );
 
-    const tween = new HandleLerp();
+    const tween = mobbu.create('lerp');
     tween.setData({ scale: 1 });
 
     items.forEach((item, i) => {
@@ -14,7 +14,7 @@ export const gridStaggerLerp = () => {
         });
     });
 
-    const timeline = new HandleAsyncTimeline({ repeat: -1, yoyo: true });
+    const timeline = mobbu.create('asyncTimeline', { repeat: -1, yoyo: true });
     timeline.goTo(
         tween,
         { scale: 0.5 },

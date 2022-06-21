@@ -1,4 +1,4 @@
-import { HandleTween, HandleAsyncTimeline } from '../core';
+import { mobbu } from '../core';
 
 export function staggerTweenTest() {
     const btnStart = document.querySelector('.tween .start');
@@ -11,7 +11,7 @@ export function staggerTweenTest() {
     const stagger = document.querySelectorAll('.tween .target-stagger');
 
     // DEFINE SPRING
-    const myTween = new HandleTween();
+    const myTween = mobbu.create('tween');
     myTween.setData({ x: 0, y: 0 });
     myTween.set({ x: 0, y: 0 });
 
@@ -19,7 +19,7 @@ export function staggerTweenTest() {
         target.style.transform = `translate3D(0px,0px,0px) translate(${x}px, ${y}px)`;
     });
 
-    const myStagger = new HandleTween();
+    const myStagger = mobbu.create('tween');
     myStagger.setData({ x: 0 });
     myStagger.set({ x: 0 });
 
@@ -37,7 +37,8 @@ export function staggerTweenTest() {
 
     // When use waitComplete: false all the stagger of same tween must have the same each value to syncronize
     // DEFINE TIMELINE
-    const timeline = new HandleAsyncTimeline({ repeat: -1, yoyo: true })
+    const timeline = mobbu
+        .create('asyncTimeline', { repeat: -1, yoyo: true })
         // At the start fix position ( useful to reverse while running)
         .set(myTween, { x: 0, y: 0 })
         .set(myStagger, { x: 0 })

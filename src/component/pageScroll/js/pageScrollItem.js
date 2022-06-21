@@ -5,7 +5,7 @@ import {
     offset,
     handleResize,
     handleScroll,
-    HandleLerp,
+    mobbu,
 } from '.../../../js/core';
 
 export class PageScrollItemClass {
@@ -21,7 +21,7 @@ export class PageScrollItemClass {
         this.endValue = 0;
         this.prevValue = 0;
         this.firstTime = true;
-        this.lerp = new HandleLerp();
+        this.lerp = mobbu.create('lerp');
         this.unsubscribeResize = () => {};
         this.unsubscribeScroll = () => {};
         this.unsubscribeLerp = () => {};

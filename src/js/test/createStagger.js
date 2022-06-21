@@ -1,20 +1,14 @@
-import {
-    HandleSequencer,
-    HandleMasterSequencer,
-    ParallaxItemClass,
-    outerHeight,
-    createStaggers,
-} from '../core';
+import { mobbu, outerHeight } from '../core';
 
 export const createStagger = () => {
     const items = document.querySelectorAll('.create-stagger__item');
     const trigger = document.querySelector('.scrollStagger');
 
-    let masterSequencer = new HandleMasterSequencer();
+    let masterSequencer = mobbu.create('masterSequencer');
     let sequencers = [];
     const duration = 2000;
 
-    const staggers = createStaggers({
+    const staggers = mobbu.create('stagger', {
         items,
         stagger: {
             each: 'equal',
@@ -27,7 +21,7 @@ export const createStagger = () => {
     // Create sequencer
     const createSequencer = () => {
         sequencers = staggers.map(({ item, start, end, index }) => {
-            const sequencer = new HandleSequencer();
+            const sequencer = mobbu.create('sequencer');
             sequencer.setDuration(duration);
             sequencer
                 .setData({ scale: 0.5 })
@@ -48,7 +42,7 @@ export const createStagger = () => {
 
     createSequencer();
 
-    const parallaxIn = new ParallaxItemClass({
+    const parallaxIn = mobbu.create('parallax', {
         item: trigger,
         type: 'scrolltrigger',
         propierties: 'tween',

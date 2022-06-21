@@ -1,11 +1,11 @@
-import { HandleTween, HandleAsyncTimeline } from '../core';
+import { mobbu } from '../core';
 
 export const sinRevertAnimation = () => {
     const stagger = document.querySelectorAll('.sin-revert .shape__target');
     const play = document.querySelector('.sin-revert .anim-play');
     const stop = document.querySelector('.sin-revert .anim-stop');
 
-    const tween = new HandleTween('easeLinear');
+    const tween = mobbu.create('tween', { ease: 'easeLinear' });
     tween.setData({ x: 0 });
     tween.set({ x: 0 });
 
@@ -26,7 +26,7 @@ export const sinRevertAnimation = () => {
         });
     });
 
-    const timeline = new HandleAsyncTimeline({ repeat: -1, yoyo: true });
+    const timeline = mobbu.create('asyncTimeline', { repeat: -1, yoyo: true });
     timeline.goFromTo(
         tween,
         { x: 0 },

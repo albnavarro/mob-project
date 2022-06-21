@@ -6,7 +6,7 @@ import {
     outerHeight,
     outerWidth,
     offset,
-    HandleSpring,
+    mobbu,
     handleResize,
     handleScroll,
     handleMouseMove,
@@ -34,7 +34,7 @@ export class PredictiveTurbolenceItemClass {
         this.offsetX = 0;
         this.width = 0;
         this.height = 0;
-        this.spring = new HandleSpring();
+        this.spring = mobbu.create('spring');
         this.unsubscribeSpring = () => {};
         this.unsubscribeScroll = () => {};
         this.unsubscribeResize = () => {};

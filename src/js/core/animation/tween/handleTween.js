@@ -27,7 +27,8 @@ import {
 } from '../utils/callbacks/defaultCallback.js';
 
 export class HandleTween {
-    constructor(ease = 'easeOutBack') {
+    // constructor(ease = 'easeOutBack') {
+    constructor(data = {}) {
         this.uniqueId = getUnivoqueId();
         this.req = false;
         this.currentResolve = null;
@@ -54,7 +55,10 @@ export class HandleTween {
         /**
         This value lives from user call ( goTo etc..) until next call
          **/
-        this.ease = tweenConfig[ease];
+        this.ease =
+            'ease' in data
+                ? tweenConfig[data.ease]
+                : tweenConfig['easeOutBack'];
         this.duration = 1000;
 
         /**
@@ -63,7 +67,7 @@ export class HandleTween {
          **/
         this.defaultProps = {
             duration: 1000,
-            ease,
+            ease: 'ease' in data ? data.ease : 'easeOutBack',
             reverse: false,
             immediate: false,
             stagger: STAGGER_DEFAULT_OBJ,

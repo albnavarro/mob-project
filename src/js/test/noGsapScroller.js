@@ -1,5 +1,5 @@
 import { horizontalCustomClass } from '../../component/horizontalCustom/js/horizontalCustom.js';
-import { ParallaxItemClass } from '../core';
+import { mobbu } from '../core';
 
 export const noGsap = () => {
     const title = document.querySelector('.js-scroll-item');
@@ -15,7 +15,7 @@ export const noGsap = () => {
     });
 
     // Create child parallax
-    const parallaxTest = new ParallaxItemClass({
+    const parallaxTest = mobbu.create('parallax', {
         item: title,
         scroller: scroller,
         direction: 'horizontal',

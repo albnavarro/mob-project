@@ -1,4 +1,4 @@
-import { HandleLerp, HandleAsyncTimeline } from '../core';
+import { mobbu } from '../core';
 
 export function lerpTest() {
     const btnStart = document.querySelector('.lerp-btn-start');
@@ -12,7 +12,7 @@ export function lerpTest() {
     const target = document.querySelector('.lerp-target');
 
     // DEFINE SPRING
-    const mylerp = new HandleLerp();
+    const mylerp = mobbu.create('lerp');
     mylerp.setData({ x: 0, y: 0, rotate: 0 });
     mylerp.subscribe(({ x, y, rotate }) => {
         target.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg)`;
@@ -25,7 +25,8 @@ export function lerpTest() {
     }
 
     // DEFINE TIMELINE
-    const timeline = new HandleAsyncTimeline({ repeat: 2, yoyo: true })
+    const timeline = mobbu
+        .create('asyncTimeline', { repeat: 2, yoyo: true })
         .set(mylerp, { x: 0, y: 0, rotate: 0 })
         .goTo(mylerp, { x: -200 }, { velocity: 0.02, precision: 1 })
         .goFromTo(mylerp, { x: -200 }, { x: 400 })

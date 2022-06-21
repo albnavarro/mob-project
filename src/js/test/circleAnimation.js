@@ -1,11 +1,11 @@
-import { HandleSpring, handleNextFrame } from '../core';
+import { mobbu, handleNextFrame } from '../core';
 
 export const circleAnimation = () => {
     const stagger = document.querySelectorAll('.circle-tween .shape__target');
     const play = document.querySelector('.circle-tween .anim-play');
     const stop = document.querySelector('.circle-tween .anim-stop');
 
-    const tween = new HandleSpring();
+    const tween = mobbu.create('spring');
     tween.setData({ x: 0 });
     tween.set({ x: 0 });
 

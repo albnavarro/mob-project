@@ -13,13 +13,7 @@
 // BASE MODULE
 import { vh } from './utility/vh.js';
 import { findElement } from './utility/findElement.js';
-import {
-    handleSetUp,
-    handleLoad,
-    loadFps,
-    parallax,
-    SmoothScrollClass,
-} from './core/';
+import { handleSetUp, handleLoad, loadFps, parallax, mobbu } from './core/';
 
 // NEW VANILLA COMPONENT MODULE
 import { totop } from '../component/to-top/js/toTop.js';
@@ -133,7 +127,7 @@ handleLoad(() => {
     }
 
     if (body.classList.contains('template-fixed')) {
-        const smoothScroll = new SmoothScrollClass();
+        const smoothScroll = mobbu.create('smoothScroll');
         smoothScroll.init();
     }
 

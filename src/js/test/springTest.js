@@ -1,4 +1,4 @@
-import { HandleSpring, HandleAsyncTimeline } from '../core';
+import { mobbu } from '../core';
 
 export function springTest() {
     const btnStart = document.querySelector('.spring-btn-start');
@@ -12,7 +12,7 @@ export function springTest() {
     const target = document.querySelector('.spring-target');
 
     // DEFINE SPRING
-    const mySpring = new HandleSpring();
+    const mySpring = mobbu.create('spring');
     mySpring.setData({ x: 0, y: 0, rotate: 0 });
     mySpring.subscribe(({ x, y, rotate }) => {
         target.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg)`;
@@ -29,7 +29,8 @@ export function springTest() {
     }
 
     // DEFINE TIMELINE
-    const timeline = new HandleAsyncTimeline({ repeat: 2, yoyo: true })
+    const timeline = mobbu
+        .create('asyncTimeline', { repeat: 2, yoyo: true })
         .add(() => mySpring.updatePreset('wobbly'))
         .set(
             mySpring,

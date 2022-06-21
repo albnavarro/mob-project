@@ -1,15 +1,8 @@
-import {
-    parallax,
-    HandleSequencer,
-    ParallaxTween,
-    ParallaxItemClass,
-    handleNextTick,
-    SmoothScrollClass,
-} from '../core';
+import { parallax, handleNextTick, mobbu } from '../core';
 
 export const hScroller = () => {
     // FIRST
-    const parallaxOpacity = new ParallaxItemClass({
+    const parallaxOpacity = mobbu.create('parallax', {
         item: document.querySelector('.parallax-via-js-opacity'),
         scroller: '.scrollerH-container .scrollerH',
         direction: 'horizontal',
@@ -20,7 +13,7 @@ export const hScroller = () => {
     });
     parallaxOpacity.init();
 
-    const parallax1 = new ParallaxItemClass({
+    const parallax1 = mobbu.create('parallax', {
         item: document.querySelector('.parallax-js-1'),
         scroller: '.scrollerH-container .scrollerH',
         direction: 'horizontal',
@@ -30,7 +23,7 @@ export const hScroller = () => {
     });
     parallax1.init();
 
-    const parallax2 = new ParallaxItemClass({
+    const parallax2 = mobbu.create('parallax', {
         item: document.querySelector('.parallax-js-2'),
         scroller: '.scrollerH-container .scrollerH',
         direction: 'horizontal',
@@ -41,7 +34,7 @@ export const hScroller = () => {
     });
     parallax2.init();
 
-    const parallaxPin = new ParallaxItemClass({
+    const parallaxPin = mobbu.create('parallax', {
         item: document.querySelector('.parallax-js-pin'),
         scroller: '.scrollerH-container .scrollerH',
         direction: 'horizontal',
@@ -60,7 +53,7 @@ export const hScroller = () => {
     const pluto = document.querySelector('.pluto3');
     pluto.style.webkitTransition = 'background-color .35s';
 
-    const myParallaxTimeline = new HandleSequencer();
+    const myParallaxTimeline = mobbu.create('sequencer');
     myParallaxTimeline
         .setData({ x: 0, y: 0 })
         .goTo({ x: pluto.offsetWidth / 2 }, { start: 0, end: 2 })
@@ -72,7 +65,7 @@ export const hScroller = () => {
         target.style.transform = `translate3D(0,0,0) translate(${x}px, ${y}px)`;
     });
 
-    const parallaxIn = new ParallaxItemClass({
+    const parallaxIn = mobbu.create('parallax', {
         item: target,
         scroller: '.scrollerH-container .scrollerH',
         trigger: '.pluto3',
@@ -113,7 +106,7 @@ export const hScroller = () => {
     parallaxIn.init();
 
     const target2 = document.querySelector('.parallax-via-js-out');
-    const myParallaxTween = new ParallaxTween();
+    const myParallaxTween = mobbu.create('parallaxTween');
     myParallaxTween.setData({ x: 0, y: 0 });
     myParallaxTween.goTo({ x: -pluto.offsetWidth, y: pluto.offsetHeight });
 
@@ -125,7 +118,7 @@ export const hScroller = () => {
         target2.style.transform = `translate(${x}px, ${y}px)`;
     });
 
-    let parallaxOut = new ParallaxItemClass({
+    let parallaxOut = mobbu.create('parallax', {
         item: target2,
         scroller: '.scrollerH-container .scrollerH',
         trigger: '.pluto3',
@@ -151,7 +144,7 @@ export const hScroller = () => {
     parallaxOut.init();
 
     const inputRange = document.querySelector('.scrollerInput');
-    const smoothScrollFull = new SmoothScrollClass({
+    const smoothScrollFull = mobbu.create('smoothScroll', {
         target: '.scrollerH',
         direction: 'HORIZONTAL',
         speed: 40,
@@ -181,7 +174,7 @@ export const hScroller = () => {
     // END FIRST
 
     // SECOND
-    const parallaxb1 = new ParallaxItemClass({
+    const parallaxb1 = mobbu.create('parallax', {
         item: document.querySelector('.parallax-js-b1'),
         direction: 'horizontal',
         scroller: '.scrollerH-container2 .scrollerH2',
@@ -192,7 +185,7 @@ export const hScroller = () => {
     });
     parallaxb1.init();
 
-    const parallaxb2 = new ParallaxItemClass({
+    const parallaxb2 = mobbu.create('parallax', {
         item: document.querySelector('.parallax-js-b2'),
         direction: 'horizontal',
         scroller: '.scrollerH-container2 .scrollerH2',
@@ -209,7 +202,7 @@ export const hScroller = () => {
     });
     parallaxb2.init();
 
-    const smoothScrollContiner = new SmoothScrollClass({
+    const smoothScrollContiner = mobbu.create('smoothScroll', {
         target: '.scrollerH2',
         container: '.scrollerH-container2',
         direction: 'HORIZONTAL',
@@ -226,7 +219,7 @@ export const hScroller = () => {
     });
 
     // THIRD
-    const parallaxC1 = new ParallaxItemClass({
+    const parallaxC1 = mobbu.create('parallax', {
         item: document.querySelector('.parallax-js-c1'),
         scroller: '.scrollerH-container3 .scrollerH3',
         screen: '.scrollerH-container3',
@@ -239,7 +232,7 @@ export const hScroller = () => {
     });
     parallaxC1.init();
 
-    const parallaxC2 = new ParallaxItemClass({
+    const parallaxC2 = mobbu.create('parallax', {
         item: document.querySelector('.parallax-js-c2'),
         scroller: '.scrollerH-container3 .scrollerH3',
         screen: '.scrollerH-container3',
@@ -253,7 +246,7 @@ export const hScroller = () => {
     });
     parallaxC2.init();
 
-    const parallaxC3 = new ParallaxItemClass({
+    const parallaxC3 = mobbu.create('parallax', {
         item: document.querySelector('.parallax-js-c3'),
         scroller: '.scrollerH-container3 .scrollerH3',
         screen: '.scrollerH-container3',
@@ -268,7 +261,7 @@ export const hScroller = () => {
     });
     parallaxC3.init();
 
-    const parallaxC4 = new ParallaxItemClass({
+    const parallaxC4 = mobbu.create('parallax', {
         item: document.querySelector('.parallax-js-c4'),
         conponent: 'm-comp--parallax',
         scroller: '.scrollerH-container3 .scrollerH3',
@@ -278,7 +271,7 @@ export const hScroller = () => {
     });
     parallaxC4.init();
 
-    const smoothScrollContiner2 = new SmoothScrollClass({
+    const smoothScrollContiner2 = mobbu.create('smoothScroll', {
         target: '.scrollerH3',
         container: '.scrollerH-container3',
         direction: 'VERTICAL',

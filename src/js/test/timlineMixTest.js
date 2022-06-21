@@ -1,4 +1,4 @@
-import { HandleSpring, HandleTween, HandleAsyncTimeline } from '../core';
+import { mobbu } from '../core';
 
 export function timlineMixTest() {
     const btnStart = document.querySelector('.mix-btn-start');
@@ -13,28 +13,28 @@ export function timlineMixTest() {
     const target2 = document.querySelector('.mix-target2');
 
     // DEFINE SPRING
-    const springBox1 = new HandleSpring();
+    const springBox1 = mobbu.create('spring');
     springBox1.setData({ x: 0, y: 0, rotate: 0 });
     springBox1.subscribe(({ x, y, rotate }) => {
         target.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg)`;
     });
 
     // DEFINE TWEEN
-    const tweenBox1 = new HandleTween();
+    const tweenBox1 = mobbu.create('tween');
     tweenBox1.setData({ x: 0, y: 0, rotate: 0 });
     tweenBox1.subscribe(({ x, y, rotate }) => {
         target.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg)`;
     });
 
     // DEFINE TWEEN 2
-    const tweenBox2 = new HandleTween();
+    const tweenBox2 = mobbu.create('tween');
     tweenBox2.setData({ rotate: 0 });
     tweenBox2.subscribe(({ rotate }) => {
         target2.style.transform = `rotate(${rotate}deg)`;
     });
 
     // DEFINE TIMELINE
-    const timeline = new HandleAsyncTimeline({ repeat: -1, yoyo: true });
+    const timeline = mobbu.create('asyncTimeline', { repeat: -1, yoyo: true });
 
     timeline
         .add(() => springBox1.updatePreset('wobbly'))

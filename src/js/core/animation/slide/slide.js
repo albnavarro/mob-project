@@ -14,7 +14,7 @@ export const slide = (() => {
         const data = {};
         data.item = el;
         data.id = slideId;
-        data.tween = new HandleTween('easeOutQuad');
+        data.tween = new HandleTween({ ease: 'easeOutQuad' });
         data.unsubscribe = data.tween.subscribe(({ val }) => {
             data.item.style.height = `${val}px`;
         });

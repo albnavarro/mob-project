@@ -20,11 +20,6 @@ export {
 } from './utils/vanillaFunction.js';
 
 /*
-STORE
-*/
-export { SimpleStore } from './store/simpleStore.js';
-
-/*
 EVENTS
 */
 
@@ -83,24 +78,14 @@ export { handleVisibilityChange } from './events/visibilityChange/handleVisibili
 ANIMATION
 */
 
-// basic animation
-export { HandleLerp } from './animation/lerp/handleLerp.js';
-export { HandleSpring } from './animation/spring/handleSpring.js';
-export { HandleTween } from './animation/tween/handleTween.js';
-export { HandleSequencer } from './animation/sequencer/handleSequencer.js';
-// timeline
-export { HandleAsyncTimeline } from './animation/asyncTimeline/handleAsyncTimeline.js';
-export { HandleSyncTimeline } from './animation/syncTimeline/handleSyncTimeline.js';
-export { HandleMasterSequencer } from './animation/sequencer/handleMasterSequencer.js';
 // utils
 export { bodyScroll } from './animation/bodyScroll/bodyScroll.js';
 export { slide } from './animation/slide/slide.js';
-export { createStaggers } from './animation/sequencer/sequencerUtils.js';
 export { springConfig } from './animation/spring/springConfig.js';
 export { tweenConfig } from './animation/tween/tweenConfig.js';
+
 // parallax
 export { parallax } from './animation/parallax/parallax.js';
-export { ParallaxItemClass } from './animation/parallax/parallaxItem.js';
-export { ParallaxTween } from './animation/parallax/parallaxTween.js';
-// Smopoth scroll
-export { SmoothScrollClass } from './animation/smoothScroller/smoothScroll.js';
+
+// Factory class
+export { mobbu } from './createInstance.js';

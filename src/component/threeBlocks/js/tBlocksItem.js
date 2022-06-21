@@ -4,7 +4,7 @@ import {
     outerWidth,
     outerHeight,
     offset,
-    SimpleStore,
+    mobbu,
     handleResize,
     bodyScroll,
 } from '../../../js/core';
@@ -25,7 +25,7 @@ export class tBlocksItemClass {
             '.tBlocks__item:not(.tBlocks__item--active)'
         );
 
-        this.store = new SimpleStore({
+        this.store = mobbu.create('store', {
             itemsNotActive: () => ({
                 value: this.container.querySelectorAll(
                     '.tBlocks__item:not(.tBlocks__item--active)'

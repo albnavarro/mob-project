@@ -1,6 +1,6 @@
 import {
     isDescendant,
-    HandleSpring,
+    mobbu,
     handleResize,
     handleScroll,
     handleTouchStart,
@@ -49,7 +49,7 @@ export class DraggerItemClass {
 
         // Animation
         this.endValue = { xValue: 0, yValue: 0 };
-        this.spring = new HandleSpring();
+        this.spring = mobbu.create('spring');
         this.unsubscribeSpring = () => {};
         this.unsubscribeOnComplete = () => {};
 

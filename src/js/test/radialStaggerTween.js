@@ -1,11 +1,11 @@
-import { HandleAsyncTimeline, HandleTween } from '../core';
+import { mobbu } from '../core';
 
 export const radialStaggerTween = () => {
     const items = document.querySelectorAll(
         '.radial-stagger .radial-stagger__item'
     );
 
-    const tween = new HandleTween('easeInOutQuad');
+    const tween = mobbu.create('tween', { ease: 'easeInOutQuad' });
     tween.setData({ scale: 1 });
 
     items.forEach((item, i) => {
@@ -14,7 +14,7 @@ export const radialStaggerTween = () => {
         });
     });
 
-    const timeline = new HandleAsyncTimeline({ repeat: -1, yoyo: true });
+    const timeline = mobbu.create('asyncTimeline', { repeat: -1, yoyo: true });
 
     timeline
         .goTo(tween, { scale: 0.5 }, { duration: 1000 })

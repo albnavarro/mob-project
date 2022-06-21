@@ -1,4 +1,4 @@
-import { HandleSyncTimeline, HandleSequencer } from '../core';
+import { mobbu } from '../core';
 
 export const infiniteAnimationSync = () => {
     const stagger = document.querySelectorAll('.infinite-tween .shape__target');
@@ -16,7 +16,7 @@ export const infiniteAnimationSync = () => {
     const duration = 3000;
     const friction = duration / 2 / Math.PI;
 
-    const infinite = new HandleSequencer({ stagger: { each: 5 } });
+    const infinite = mobbu.create('sequencer', { stagger: { each: 5 } });
     infinite
         .setData({ x: duration / 4, opacity: 1 }) // duration / 4 => start from center
         .goTo(
@@ -39,7 +39,10 @@ export const infiniteAnimationSync = () => {
         });
     });
 
-    const syncTimeline = new HandleSyncTimeline({ repeat: -1, yoyo: false });
+    const syncTimeline = mobbu.create('syncTimeline', {
+        repeat: -1,
+        yoyo: false,
+    });
     syncTimeline.add(infinite);
     syncTimeline.setDuration(duration);
     syncTimeline.onComplete(({ direction, loop }) => {

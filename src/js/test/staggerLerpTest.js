@@ -1,4 +1,4 @@
-import { HandleLerp, HandleAsyncTimeline } from '../core';
+import { mobbu } from '../core';
 import { isIOS } from '../utility/isIOS.js';
 
 export function staggerLerpTest() {
@@ -12,7 +12,7 @@ export function staggerLerpTest() {
     const stagger = document.querySelectorAll('.lerp .target-stagger');
 
     // DEFINE SPRING
-    const myTween = new HandleLerp();
+    const myTween = mobbu.create('lerp');
     myTween.setData({ x: 0, y: 0 });
     myTween.set({ x: 0, y: 0 });
 
@@ -20,7 +20,7 @@ export function staggerLerpTest() {
         target.style.transform = `translate3D(0px,0px,0px) translate(${x}px, ${y}px)`;
     });
 
-    const myStagger = new HandleLerp();
+    const myStagger = mobbu.create('lerp');
     myStagger.setData({ x: 0 });
     myStagger.set({ x: 0 });
 
@@ -38,7 +38,8 @@ export function staggerLerpTest() {
 
     // When use waitComplete: false all the stagger of same tween must have the same each value to syncronize
     // DEFINE TIMELINE
-    const timeline = new HandleAsyncTimeline({ repeat: -1, yoyo: true })
+    const timeline = mobbu
+        .create('asyncTimeline', { repeat: -1, yoyo: true })
         // At the start fix position ( useful to reverse while running)
         .set(myTween, { x: 0, y: 0 }, { precision: 1 })
         .set(myStagger, { x: 0 })

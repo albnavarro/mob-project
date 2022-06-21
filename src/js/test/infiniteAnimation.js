@@ -1,16 +1,11 @@
-import {
-    HandleSpring,
-    handleFrame,
-    handleNextFrame,
-    HandleAsyncTimeline,
-} from '../core';
+import { mobbu, handleFrame, handleNextFrame } from '../core';
 
 export const infiniteAnimation = () => {
     const stagger = document.querySelectorAll('.infinite-tween .shape__target');
     const play = document.querySelector('.infinite-tween .anim-play');
     const stop = document.querySelector('.infinite-tween .anim-stop');
 
-    const tween = new HandleSpring();
+    const tween = mobbu.create('spring');
     tween.setData({ x: 0 });
     tween.set({ x: 0 });
 

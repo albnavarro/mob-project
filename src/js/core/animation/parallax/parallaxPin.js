@@ -183,7 +183,7 @@ export class ParallaxPin {
     }
 
     setUpMotion() {
-        this.spring = new HandleSpring('wobbly');
+        this.spring = new HandleSpring({ config: 'wobbly' });
         this.spring.setData({ collision: 0, verticalGap: 0 });
 
         this.unsubscribeSpring = this.spring.subscribe(

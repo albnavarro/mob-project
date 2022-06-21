@@ -1,11 +1,11 @@
-import { HandleSpring, HandleAsyncTimeline } from '../core';
+import { mobbu } from '../core';
 
 export const gridStaggerSpring = () => {
     const items = document.querySelectorAll(
         '.grid-stagger-spring .grid-stagger__item'
     );
 
-    const tween = new HandleSpring('bounce');
+    const tween = mobbu.create('spring', { config: 'bounce' });
     tween.setData({ scale: 1 });
 
     items.forEach((item, i) => {
@@ -14,7 +14,7 @@ export const gridStaggerSpring = () => {
         });
     });
 
-    const timeline = new HandleAsyncTimeline({ repeat: -1, yoyo: true });
+    const timeline = mobbu.create('asyncTimeline', { repeat: -1, yoyo: true });
     timeline.goTo(
         tween,
         { scale: 0.5 },
