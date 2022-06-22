@@ -18,7 +18,7 @@ export const throttle = (func, limit) => {
                     func.apply(context, args);
                     lastRan = getTime();
                 }
-            }, limit - (Date.now() - lastRan));
+            }, limit - (getTime() - lastRan));
         }
     };
 };
