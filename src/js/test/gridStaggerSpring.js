@@ -5,7 +5,15 @@ export const gridStaggerSpring = () => {
         '.grid-stagger-spring .grid-stagger__item'
     );
 
-    const tween = mobbu.create('spring', { config: 'bounce' });
+    const tween = mobbu.create('spring', {
+        config: 'bounce',
+        stagger: {
+            each: 15,
+            from: 'center',
+            grid: { col: 7, row: 7, direction: 'row' },
+            waitComplete: false,
+        },
+    });
     tween.setData({ scale: 1 });
 
     items.forEach((item, i) => {
@@ -19,12 +27,6 @@ export const gridStaggerSpring = () => {
         tween,
         { scale: 0.5 },
         {
-            stagger: {
-                each: 15,
-                from: 'center',
-                grid: { col: 7, row: 7, direction: 'row' },
-                waitComplete: false,
-            },
             precision: 1,
         }
     );

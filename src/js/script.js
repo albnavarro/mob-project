@@ -13,7 +13,7 @@
 // BASE MODULE
 import { vh } from './utility/vh.js';
 import { findElement } from './utility/findElement.js';
-import { handleSetUp, parallax, mobbu } from './core/';
+import { mobbu } from './core/';
 
 // NEW VANILLA COMPONENT MODULE
 import { totop } from '../component/to-top/js/toTop.js';
@@ -66,11 +66,8 @@ import { masterSequencer } from './test/masterSequencer.js';
 import { sequencerStaggerTime } from './test/sequencerStaggerTime.js';
 import { createStagger } from './test/createStagger.js';
 
-// import { test } from './test/explosion/explosionbase.js';
-// test();
-
 mobbu.use('load', () => {
-    handleSetUp.set({
+    mobbu.default('set', {
         fpsThreshold: 25,
         deferredNextTick: true,
     });
@@ -183,8 +180,8 @@ mobbu.use('load', () => {
         createStagger();
     }
 
+    mobbu.run('parallax');
     pageScroll.init();
-    parallax.init();
     tBlocks.init();
     showElement.init();
     toolTip.init();

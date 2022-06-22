@@ -1,14 +1,7 @@
 import { forceRedraw } from '../../../js/utility/redrowNode.js';
 import { detectSafari } from '../../../js/utility/isSafari.js';
 import { tUtils } from './predictiveTurbolenceUtils.js';
-import {
-    mq,
-    outerHeight,
-    outerWidth,
-    offset,
-    mobbu,
-    springConfig,
-} from '.../../../js/core';
+import { outerHeight, outerWidth, offset, mobbu } from '.../../../js/core';
 
 export class PredictiveTurbolenceItemClass {
     constructor(data) {
@@ -43,7 +36,7 @@ export class PredictiveTurbolenceItemClass {
     }
 
     init() {
-        if (!mq[this.queryType](this.breackpoint)) return;
+        if (!mobbu.mq(this.queryType, this.breackpoint)) return;
 
         this.spring.setData({ baseFrequency: 0, scale: 0 });
 
@@ -58,8 +51,6 @@ export class PredictiveTurbolenceItemClass {
                     this.displacementMap.setAttribute('scale', `${scale}`);
             }
         );
-
-        this.spring.updateConfig(springConfig.linear);
 
         this.inzializeSvg();
         this.onResize();

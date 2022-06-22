@@ -5,7 +5,15 @@ export const gridStaggerTween = () => {
         '.grid-stagger-tween .grid-stagger__item'
     );
 
-    const tween = mobbu.create('tween', { ease: 'easeInOutQuad' });
+    const tween = mobbu.create('tween', {
+        ease: 'easeInOutQuad',
+        stagger: {
+            each: 15,
+            from: 'center',
+            grid: { col: 7, row: 7, direction: 'row' },
+            waitComplete: false,
+        },
+    });
     tween.setData({ scale: 1 });
 
     items.forEach((item, i) => {
@@ -19,12 +27,6 @@ export const gridStaggerTween = () => {
         tween,
         { scale: 0.5 },
         {
-            stagger: {
-                each: 15,
-                from: 'center',
-                grid: { col: 7, row: 7, direction: 'row' },
-                waitComplete: false,
-            },
             duration: 500,
         }
     );

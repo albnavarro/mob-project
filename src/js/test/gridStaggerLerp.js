@@ -5,7 +5,14 @@ export const gridStaggerLerp = () => {
         '.grid-stagger-lerp .grid-stagger__item'
     );
 
-    const tween = mobbu.create('lerp');
+    const tween = mobbu.create('lerp', {
+        stagger: {
+            each: 15,
+            from: 'center',
+            grid: { col: 7, row: 7, direction: 'row' },
+            waitComplete: false,
+        },
+    });
     tween.setData({ scale: 1 });
 
     items.forEach((item, i) => {
@@ -15,18 +22,7 @@ export const gridStaggerLerp = () => {
     });
 
     const timeline = mobbu.create('asyncTimeline', { repeat: -1, yoyo: true });
-    timeline.goTo(
-        tween,
-        { scale: 0.5 },
-        {
-            stagger: {
-                each: 15,
-                from: 'center',
-                grid: { col: 7, row: 7, direction: 'row' },
-                waitComplete: false,
-            },
-        }
-    );
+    timeline.goTo(tween, { scale: 0.5 });
 
     tween.set({ scale: 1 }).then((value) => {
         timeline.play();

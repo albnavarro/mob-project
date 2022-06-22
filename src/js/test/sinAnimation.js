@@ -7,7 +7,10 @@ export const sinAnimation = () => {
     const pause = document.querySelector('.sin .anim-pause');
     const resume = document.querySelector('.sin .anim-resume');
 
-    const tween = mobbu.create('tween', { ease: 'easeInOutQuad' });
+    const tween = mobbu.create('tween', {
+        ease: 'easeInOutQuad',
+        stagger: { each: 3 },
+    });
     tween.setData({ x: 0 });
     tween.set({ x: 0 });
 
@@ -30,7 +33,6 @@ export const sinAnimation = () => {
         { x: 0 },
         { x: distance },
         {
-            stagger: { each: 3 },
             duration,
         }
     );

@@ -10,8 +10,9 @@ import {
     handleNextTick,
     handleFrameIndex,
 } from '../../events/rafutils/rafUtils.js';
-import { setStagger } from '../../animation/utils/stagger/setStagger.js';
-import { DIRECTION_COL } from '../../animation/utils/stagger/staggerCostant.js';
+import { setStagger } from '../utils/stagger/setStagger.js';
+import { getStaggerFromProps } from '../utils/stagger/staggerUtils.js';
+import { DIRECTION_COL } from '../utils/stagger/staggerCostant.js';
 
 // Stagger and eade is defined at tween creation
 export class ParallaxTween {
@@ -27,18 +28,7 @@ export class ParallaxTween {
         this.type = 'tween';
         // Stagger
 
-        this.stagger = {
-            each: data?.stagger?.each ? data.stagger.each : 0,
-            from: data?.stagger?.from ? data.stagger.from : 'start',
-            grid: {
-                col: data?.stagger?.grid?.col ? data.stagger.grid.col : -1,
-                row: data?.stagger?.grid?.row ? data.stagger.grid.row : -1,
-                direction: data?.stagger?.grid?.direction
-                    ? data.stagger.grid.direction
-                    : DIRECTION_COL,
-            },
-        };
-
+        this.stagger = getStaggerFromProps(data);
         this.firstRun = true;
     }
 

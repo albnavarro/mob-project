@@ -19,7 +19,9 @@ export function staggerTweenTest() {
         target.style.transform = `translate3D(0px,0px,0px) translate(${x}px, ${y}px)`;
     });
 
-    const myStagger = mobbu.create('tween');
+    const myStagger = mobbu.create('tween', {
+        stagger: { each: 4, from: 'start' },
+    });
     myStagger.setData({ x: 0 });
     myStagger.set({ x: 0 });
 
@@ -47,11 +49,7 @@ export function staggerTweenTest() {
         .goTo(myTween, { y: 500 })
         .createGroup({ waitComplete: false })
         .goTo(myTween, { x: 0 })
-        .goTo(
-            myStagger,
-            { x: 500 },
-            { duration: 1500, stagger: { each: 4, from: 'start' } }
-        )
+        .goTo(myStagger, { x: 500 }, { duration: 1500 })
         .closeGroup()
         .goTo(myTween, { y: 0 })
 

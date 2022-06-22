@@ -7,7 +7,6 @@ import {
     outerWidth,
     getTranslateValues,
     mobbu,
-    mq,
 } from '../../../js/core';
 
 export class GsapHorizontalCustomClass {
@@ -64,7 +63,7 @@ export class GsapHorizontalCustomClass {
     }
 
     getWidth() {
-        if (!mq[this.queryType](this.breackpoint)) return;
+        if (!mobbu.mq(this.queryType, this.breackpoint)) return;
 
         const horizontalWidth = [...this.cards]
             .map((item) => {
@@ -76,7 +75,7 @@ export class GsapHorizontalCustomClass {
     }
 
     createShadow() {
-        if (!mq[this.queryType](this.breackpoint)) return;
+        if (!mobbu.mq(this.queryType, this.breackpoint)) return;
 
         const shadowsTransition = `
             ${[...this.shadow]
@@ -124,7 +123,7 @@ export class GsapHorizontalCustomClass {
     }
 
     updateShadow() {
-        if (!mq[this.queryType](this.breackpoint)) return;
+        if (!mobbu.mq(this.queryType, this.breackpoint)) return;
 
         const shadowEl = this.mainContainer.querySelectorAll(
             `.${this.shadowMainClass}`
@@ -220,7 +219,10 @@ export class GsapHorizontalCustomClass {
     }
 
     initGsap() {
-        if (!this.triggerContainer || !mq[this.queryType](this.breackpoint))
+        if (
+            !this.triggerContainer ||
+            !mobbu.mq(this.queryType, this.breackpoint)
+        )
             return;
         this.setDimension();
         this.updateShadow();
@@ -263,18 +265,24 @@ export class GsapHorizontalCustomClass {
     onResize() {
         const gsapisActive = this.store.getProp('gsapisActive');
 
-        if (gsapisActive && mq[this.queryType](this.breackpoint)) {
+        if (gsapisActive && mobbu.mq(this.queryType, this.breackpoint)) {
             this.getWidth();
             this.setDimension();
             this.updateShadow();
             this.killGsap();
             this.initGsap();
-        } else if (!gsapisActive && mq[this.queryType](this.breackpoint)) {
+        } else if (
+            !gsapisActive &&
+            mobbu.mq(this.queryType, this.breackpoint)
+        ) {
             this.getWidth();
             this.createShadow();
             this.updateShadow();
             this.initGsap();
-        } else if (gsapisActive && !mq[this.queryType](this.breackpoint)) {
+        } else if (
+            gsapisActive &&
+            !mobbu.mq(this.queryType, this.breackpoint)
+        ) {
             gsap.set('.gsap-scroller__row', {
                 xPercent: 0,
             });

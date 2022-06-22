@@ -5,7 +5,10 @@ export const sinRevertAnimation = () => {
     const play = document.querySelector('.sin-revert .anim-play');
     const stop = document.querySelector('.sin-revert .anim-stop');
 
-    const tween = mobbu.create('tween', { ease: 'easeLinear' });
+    const tween = mobbu.create('tween', {
+        ease: 'easeLinear',
+        stagger: { each: 3 },
+    });
     tween.setData({ x: 0 });
     tween.set({ x: 0 });
 
@@ -32,7 +35,6 @@ export const sinRevertAnimation = () => {
         { x: 0 },
         { x: distance },
         {
-            stagger: { each: 3 },
             duration,
         }
     );

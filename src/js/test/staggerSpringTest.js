@@ -19,7 +19,9 @@ export function staggerSpringTest() {
         target.style.transform = `translate3D(0px,0px,0px) translate(${x}px, ${y}px)`;
     });
 
-    const myStagger = mobbu.create('spring');
+    const myStagger = mobbu.create('spring', {
+        stagger: { each: 4, from: 'center' },
+    });
     myStagger.setData({ x: 0 });
     myStagger.set({ x: 0 });
 
@@ -47,7 +49,7 @@ export function staggerSpringTest() {
         .goTo(myTween, { y: 500 }, { config: { precision: 1 } })
         .createGroup({ waitComplete: false })
         .goTo(myTween, { x: 0 }, { config: { precision: 1 } })
-        .goTo(myStagger, { x: 500 }, { stagger: { each: 4, from: 'center' } })
+        .goTo(myStagger, { x: 500 })
         .closeGroup()
         .goTo(myTween, { y: 0 }, { config: { precision: 1 } })
 

@@ -11,7 +11,10 @@ export const circleAnimationTimeline = () => {
         '.circle-tween-timeline .anim-resume'
     );
 
-    const tween = mobbu.create('tween', { ease: 'easeLinear' });
+    const tween = mobbu.create('tween', {
+        ease: 'easeLinear',
+        stagger: { each: 3 },
+    });
     tween.setData({ x: 0 });
     tween.set({ x: 0 });
 
@@ -41,7 +44,6 @@ export const circleAnimationTimeline = () => {
         { x: 0 },
         { x: distance },
         {
-            stagger: { each: 3 },
             duration,
         }
     );

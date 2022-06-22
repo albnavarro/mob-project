@@ -5,7 +5,15 @@ export const radialStaggerTween = () => {
         '.radial-stagger .radial-stagger__item'
     );
 
-    const tween = mobbu.create('tween', { ease: 'easeInOutQuad' });
+    const tween = mobbu.create('tween', {
+        ease: 'easeInOutQuad',
+        stagger: {
+            each: 15,
+            from: { x: 4, y: 4 },
+            grid: { col: 9, row: 9, direction: 'radial' },
+            waitComplete: false,
+        },
+    });
     tween.setData({ scale: 1 });
 
     items.forEach((item, i) => {
@@ -21,19 +29,7 @@ export const radialStaggerTween = () => {
         .goTo(tween, { scale: 2.5 }, { duration: 500 });
 
     // Exmple set and go
-    tween
-        .set(
-            { scale: 1.5 },
-            {
-                stagger: {
-                    each: 15,
-                    from: { x: 4, y: 4 },
-                    grid: { col: 9, row: 9, direction: 'radial' },
-                    waitComplete: false,
-                },
-            }
-        )
-        .then((value) => {
-            timeline.play();
-        });
+    tween.set({ scale: 1.5 }).then((value) => {
+        timeline.play();
+    });
 };

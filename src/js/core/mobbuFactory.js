@@ -47,8 +47,21 @@ import {
 // Body scroll
 import { bodyScroll } from './animation/bodyScroll/bodyScroll.js';
 import { slide } from './animation/slide/slide.js';
+import { LoadImages } from './utils/loadImages.js';
+import { mq } from './utils/mediaManager.js';
+import { handleSetUp } from './setup.js';
+import { parallax } from './animation/parallax/parallax.js';
 
 export const mobbu = {
+    default(action, props) {
+        switch (action) {
+            case 'get':
+                return handleSetUp.get(props);
+
+            case 'set':
+                return handleSetUp.set(props);
+        }
+    },
     create(type, obj) {
         switch (type) {
             case 'lerp':
@@ -179,6 +192,27 @@ export const mobbu = {
 
             case 'down':
                 return slide.down(el);
+        }
+    },
+    loadImages(images) {
+        return new LoadImages(images);
+    },
+    mq(action, breackpoint) {
+        switch (action) {
+            case 'min':
+                return mq.min(breackpoint);
+
+            case 'max':
+                return mq.max(breackpoint);
+
+            case 'get':
+                return mq.getBreackpoint(breackpoint);
+        }
+    },
+    run(prop) {
+        switch (prop) {
+            case 'parallax':
+                return parallax.init();
         }
     },
 };

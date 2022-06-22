@@ -18,9 +18,9 @@ import { handleSetUp } from '../../setup.js';
 import { setStagger } from '../utils/stagger/setStagger.js';
 import {
     DIRECTION_COL,
-    STAGGER_DEFAULT_OBJ,
     STAGGER_DEFAULT_INDEX_OBJ,
 } from '../utils/stagger/staggerCostant.js';
+import { getStaggerFromProps } from '../utils/stagger/staggerUtils.js';
 import {
     defaultCallbackOnComplete,
     defaultCallback,
@@ -65,18 +65,19 @@ export class HandleLerp {
             velocity: this.velocity,
             precision: LERP_DEFAULT_PRECISION,
             immediate: false,
-            stagger: STAGGER_DEFAULT_OBJ,
         };
 
         /**
         Stagger value
          **/
-        this.stagger = STAGGER_DEFAULT_OBJ;
+        this.stagger = getStaggerFromProps(data);
         this.slowlestStagger = STAGGER_DEFAULT_INDEX_OBJ;
         this.fastestStagger = STAGGER_DEFAULT_INDEX_OBJ;
     }
 
     onReuqestAnim(timestamp, fps, res) {
+        if (this.firstRun) this.setStagger();
+
         this.values.forEach((item, i) => {
             item.currentValue = parseFloat(item.fromValue);
         });
@@ -193,6 +194,38 @@ export class HandleLerp {
         };
 
         draw(timestamp, fps);
+    }
+
+    setStagger() {
+        if (this.stagger.each > 0 && this.firstRun) {
+            if (this.stagger.grid.col > this.callback.length) {
+                console.warn(
+                    'stagger col of grid is out of range, it must be less than the number of staggers '
+                );
+                this.firstRun = false;
+                return;
+            }
+
+            const {
+                cbNow,
+                cbCompleteNow,
+                fastestStagger,
+                slowlestStagger,
+            } = setStagger({
+                cb: this.callback,
+                endCb: this.callbackOnComplete,
+                stagger: this.stagger,
+                slowlestStagger: this.slowlestStagger,
+                fastestStagger: this.fastestStagger,
+            });
+
+            this.callback = [...cbNow];
+            this.callbackOnComplete = [...cbCompleteNow];
+            this.slowlestStagger = { ...slowlestStagger };
+            this.fastestStagger = { ...fastestStagger };
+
+            this.firstRun = false;
+        }
     }
 
     startRaf(res, reject) {
@@ -321,48 +354,9 @@ export class HandleLerp {
      */
     mergeProps(props) {
         const newProps = mergeDeep(this.defaultProps, props);
-        const { velocity, precision, stagger } = newProps;
+        const { velocity, precision } = newProps;
         this.velocity = velocity;
         this.precision = precision;
-
-        /*
-        CREATE STAGGER INDEX
-        */
-
-        if (this.firstRun) {
-            // Update stagger global value first time
-            this.stagger = mergeDeep(this.stagger, stagger);
-        }
-
-        if (this.stagger.each > 0 && this.firstRun) {
-            if (this.stagger.grid.col > this.callback.length) {
-                console.warn(
-                    'stagger col of grid is out of range, it must be less than the number of staggers '
-                );
-                this.firstRun = false;
-                return;
-            }
-
-            const {
-                cbNow,
-                cbCompleteNow,
-                fastestStagger,
-                slowlestStagger,
-            } = setStagger({
-                cb: this.callback,
-                endCb: this.callbackOnComplete,
-                stagger: this.stagger,
-                slowlestStagger: this.slowlestStagger,
-                fastestStagger: this.fastestStagger,
-            });
-
-            this.callback = [...cbNow];
-            this.callbackOnComplete = [...cbCompleteNow];
-            this.slowlestStagger = { ...slowlestStagger };
-            this.fastestStagger = { ...fastestStagger };
-
-            this.firstRun = false;
-        }
 
         return newProps;
     }

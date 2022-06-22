@@ -1,18 +1,15 @@
+import { handleSetUp } from '../setup.js';
+
 export const mq = (() => {
-    let media = {
-        'x-small': '320',
-        small: '360',
-        medium: '600',
-        tablet: '768',
-        desktop: '992',
-        large: '1200',
-        'x-large': '1400',
+    const max = (breakpoint) => {
+        return window.innerWidth < handleSetUp.get('mq')[breakpoint];
+    };
+    const min = (breakpoint) => {
+        return window.innerWidth >= handleSetUp.get('mq')[breakpoint];
+    };
+    const getBreackpoint = (breakpoint) => {
+        return handleSetUp.get('mq')[breakpoint];
     };
 
-    const max = (breakpoint) => window.innerWidth < media[breakpoint];
-    const min = (breakpoint) => window.innerWidth >= media[breakpoint];
-    const update = (obj) => (media = { ...obj });
-    const getBreackpoint = (breakpoint) => media[breakpoint];
-
-    return { max, min, update, getBreackpoint };
+    return { max, min, getBreackpoint };
 })();

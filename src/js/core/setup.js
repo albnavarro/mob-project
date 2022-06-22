@@ -1,23 +1,22 @@
-import { compareKeys } from './animation/utils/animationUtils.js';
+import { mergeDeep } from './utils/mergeDeep.js';
 
 export const handleSetUp = (() => {
     let data = {
         fpsThreshold: 15,
         deferredNextTick: true,
+        mq: {
+            xSmall: 320,
+            small: 360,
+            medium: 600,
+            tablet: 768,
+            desktop: 992,
+            large: 1200,
+            xLarge: 1400,
+        },
     };
 
     const set = (obj) => {
-        const dataIsValid = compareKeys(data, obj);
-
-        if (dataIsValid) {
-            data = { ...data, ...obj };
-        } else {
-            console.warn(
-                `handleSetUp: ${JSON.stringify(data)} and to ${JSON.stringify(
-                    obj
-                )} is not equal`
-            );
-        }
+        data = mergeDeep(data, obj);
     };
 
     const get = (prop) => {

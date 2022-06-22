@@ -5,7 +5,7 @@ export const infiniteAnimation = () => {
     const play = document.querySelector('.infinite-tween .anim-play');
     const stop = document.querySelector('.infinite-tween .anim-stop');
 
-    const tween = mobbu.create('spring');
+    const tween = mobbu.create('spring', { stagger: { each: 3 } });
     tween.setData({ x: 0 });
     tween.set({ x: 0 });
 
@@ -27,7 +27,7 @@ export const infiniteAnimation = () => {
     let isRunning = false;
     const loop = () => {
         counter++;
-        tween.goTo({ x: counter }, { stagger: { each: 3 } }).catch((err) => {});
+        tween.goTo({ x: counter }).catch((err) => {});
         if (isRunning) mobbu.use('nextFrame', () => loop());
     };
 

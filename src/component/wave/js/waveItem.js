@@ -1,4 +1,4 @@
-import { mq } from '../../../js/core';
+import { mobbu } from '../../../js/core';
 import { forceRedraw } from '../../../js/utility/redrowNode.js';
 import { detectSafari } from '../../../js/utility/isSafari.js';
 
@@ -30,7 +30,7 @@ export class WaveItemClass {
     }
 
     inzializeSvg() {
-        if (!mq[this.queryType](this.breackpoint)) return;
+        if (!mobbu.mq(this.queryType, this.breackpoint)) return;
 
         // Create svg filter element
         const div = document.createElement('div');

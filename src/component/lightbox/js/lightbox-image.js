@@ -1,7 +1,7 @@
 import { lightDescription } from './lightbox-description.js';
 import { lightboxUtils } from './lightbox-utils.js';
 import { lightPichZoom } from './lightbox-zoom-pinch.js';
-import { loadImages, mobbu } from '.../../../js/core';
+import { mobbu } from '.../../../js/core';
 
 class LightBoxImageClass {
     constructor() {
@@ -28,7 +28,7 @@ class LightBoxImageClass {
 
         this.isLoading = true;
 
-        this.loadimage = new loadImages([url]);
+        this.loadimage = mobbu.loadImages([url]);
         this.loadimage
             .init()
             .then(() => {

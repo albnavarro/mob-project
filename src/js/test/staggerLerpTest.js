@@ -20,7 +20,9 @@ export function staggerLerpTest() {
         target.style.transform = `translate3D(0px,0px,0px) translate(${x}px, ${y}px)`;
     });
 
-    const myStagger = mobbu.create('lerp');
+    const myStagger = mobbu.create('lerp', {
+        stagger: { each: 4, from: 'edges' },
+    });
     myStagger.setData({ x: 0 });
     myStagger.set({ x: 0 });
 
@@ -48,7 +50,7 @@ export function staggerLerpTest() {
         .goTo(myTween, { y: 500 }, { precision: 1 })
         .createGroup({ waitComplete: false })
         .goTo(myTween, { x: 0 }, { precision: 1 })
-        .goTo(myStagger, { x: 500 }, { stagger: { each: 4, from: 'edges' } })
+        .goTo(myStagger, { x: 500 })
         .closeGroup()
         .goTo(myTween, { y: 0 }, { precision: 1 })
 

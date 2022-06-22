@@ -11,6 +11,7 @@ import {
     handleFrameIndex,
 } from '../../events/rafutils/rafUtils.js';
 import { setStagger } from '../utils/stagger/setStagger.js';
+import { getStaggerFromProps } from '../utils/stagger/staggerUtils.js';
 import { DIRECTION_COL } from '../utils/stagger/staggerCostant.js';
 import { SEQUENCER_DEFAULT_DURATION } from './sequencerUtils.js';
 
@@ -36,18 +37,7 @@ export class HandleSequencer {
         };
 
         // Stagger
-        this.stagger = {
-            each: data?.stagger?.each ? data.stagger.each : 0,
-            from: data?.stagger?.from ? data.stagger.from : 'start',
-            grid: {
-                col: data?.stagger?.grid?.col ? data.stagger.grid.col : -1,
-                row: data?.stagger?.grid?.row ? data.stagger.grid.row : -1,
-                direction: data?.stagger?.grid?.direction
-                    ? data.stagger.grid.direction
-                    : DIRECTION_COL,
-            },
-        };
-
+        this.stagger = getStaggerFromProps(data);
         this.useStagger = true;
         this.firstRun = true;
     }

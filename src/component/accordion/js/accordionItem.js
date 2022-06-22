@@ -1,9 +1,9 @@
-import { mq, mobbu } from '../../../js/core';
+import { mobbu } from '../../../js/core';
 
 export class AccordionItemClass {
     constructor(data) {
         this.container = data.container;
-        this.breackpoint = data.breackpoint || 'x-small';
+        this.breackpoint = data.breackpoint || 'xSmall';
         this.notAllClose = data.notAllClose || false;
         this.queryType = data.queryType || 'min';
         this.multiple = data.multiple;
@@ -33,7 +33,7 @@ export class AccordionItemClass {
     }
 
     openItem(e) {
-        if (!mq[this.queryType](this.breackpoint)) return;
+        if (!mobbu.mq(this.queryType, this.breackpoint)) return;
 
         const btn = e.currentTarget;
         const item = btn.closest(this.itemClass);

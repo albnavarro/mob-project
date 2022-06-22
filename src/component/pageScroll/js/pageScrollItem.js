@@ -1,4 +1,4 @@
-import { mq, outerHeight, outerWidth, offset, mobbu } from '.../../../js/core';
+import { outerHeight, outerWidth, offset, mobbu } from '.../../../js/core';
 
 export class PageScrollItemClass {
     constructor(data) {
@@ -47,7 +47,7 @@ export class PageScrollItemClass {
         const width = outerWidth(this.content);
         const height = outerHeight(this.content);
 
-        const style = mq[this.queryType](this.breackpoint)
+        const style = mobbu.mq(this.queryType, this.breackpoint)
             ? {
                   width: `${width}px`,
                   height: `${height}px`,
@@ -69,7 +69,7 @@ export class PageScrollItemClass {
     setContent() {
         this.endValue = window.pageYOffset - this.offsetTop;
         const rect = this.root.getBoundingClientRect();
-        const style = mq[this.queryType](this.breackpoint)
+        const style = mobbu.mq(this.queryType, this.breackpoint)
             ? {
                   position: 'fixed',
                   top: '0',
@@ -85,7 +85,7 @@ export class PageScrollItemClass {
 
         Object.assign(this.content.style, style);
 
-        if (mq[this.queryType](this.breackpoint)) {
+        if (mobbu.mq(this.queryType, this.breackpoint)) {
             this.lerp.set({ y: this.endValue }).catch((err) => {});
         } else {
             this.lerp.set({ y: 0 }).catch((err) => {});
@@ -93,10 +93,10 @@ export class PageScrollItemClass {
     }
 
     onScroll() {
-        if (!mq[this.queryType](this.breackpoint)) return;
+        if (!mobbu.mq(this.queryType, this.breackpoint)) return;
         this.endValue = window.pageYOffset - this.offsetTop;
 
-        if (mq[this.queryType](this.breackpoint)) {
+        if (mobbu.mq(this.queryType, this.breackpoint)) {
             if (this.firstTime) {
                 this.lerp.set({ y: this.endValue }).catch((err) => {});
             } else {

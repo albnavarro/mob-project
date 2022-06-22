@@ -1,5 +1,4 @@
 import {
-    mq,
     offset,
     outerHeight,
     outerWidth,
@@ -75,7 +74,7 @@ export class horizontalCustomClass {
     getWidth() {
         return new Promise((resolve, reject) => {
             mobbu.use('frame', () => {
-                if (!mq[this.queryType](this.breackpoint)) {
+                if (!mobbu.mq(this.queryType, this.breackpoint)) {
                     resolve();
                     return;
                 }
@@ -94,7 +93,7 @@ export class horizontalCustomClass {
     createShadow() {
         return new Promise((resolve, reject) => {
             mobbu.use('frame', () => {
-                if (!mq[this.queryType](this.breackpoint)) {
+                if (!mobbu.mq(this.queryType, this.breackpoint)) {
                     resolve();
                     return;
                 }
@@ -151,7 +150,7 @@ export class horizontalCustomClass {
 
     updateShadow() {
         return new Promise((resolve, reject) => {
-            if (!mq[this.queryType](this.breackpoint)) {
+            if (!mobbu.mq(this.queryType, this.breackpoint)) {
                 resolve();
                 return;
             }
@@ -259,14 +258,17 @@ export class horizontalCustomClass {
     }
 
     initScroller() {
-        if (!this.triggerContainer || !mq[this.queryType](this.breackpoint))
+        if (
+            !this.triggerContainer ||
+            !mobbu.mq(this.queryType, this.breackpoint)
+        )
             return;
 
         const scroller = mobbu.create('scrolltrigger', {
             item: this.row,
             trigger: this.triggerContainer,
             propierties: 'x',
-            breackpoint: 'x-small',
+            breackpoint: 'xSmall',
             pin: true,
             dynamicRange: () => {
                 return -(this.horizontalWidth - window.innerWidth);
@@ -354,16 +356,16 @@ export class horizontalCustomClass {
     }
 
     onResize(horizontalResize) {
-        if (this.moduleisActive && mq[this.queryType](this.breackpoint)) {
+        if (this.moduleisActive && mobbu.mq(this.queryType, this.breackpoint)) {
             if (horizontalResize) this.update();
         } else if (
             !this.moduleisActive &&
-            mq[this.queryType](this.breackpoint)
+            mobbu.mq(this.queryType, this.breackpoint)
         ) {
             this.createScroller();
         } else if (
             this.moduleisActive &&
-            !mq[this.queryType](this.breackpoint)
+            !mobbu.mq(this.queryType, this.breackpoint)
         ) {
             this.killScroller();
         }

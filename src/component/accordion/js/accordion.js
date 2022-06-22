@@ -26,7 +26,7 @@ class AccordionClass {
     getItemData(item) {
         const data = {};
         data.container = item;
-        data.breackpoint = item.getAttribute('data-breackpoint') || 'x-small';
+        data.breackpoint = item.getAttribute('data-breackpoint') || 'xSmall';
         data.queryType = item.getAttribute('data-queryType') || 'min';
         data.multiple = item.hasAttribute('data-multiple');
         data.notAllClose = item.hasAttribute('data-notAllClose');

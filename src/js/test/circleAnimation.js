@@ -5,7 +5,9 @@ export const circleAnimation = () => {
     const play = document.querySelector('.circle-tween .anim-play');
     const stop = document.querySelector('.circle-tween .anim-stop');
 
-    const tween = mobbu.create('spring');
+    const tween = mobbu.create('spring', {
+        stagger: { each: 3, from: 'start' },
+    });
     tween.setData({ x: 0 });
     tween.set({ x: 0 });
 
@@ -24,9 +26,7 @@ export const circleAnimation = () => {
     let isRunning = false;
     const loop = () => {
         counter++;
-        tween
-            .goTo({ x: counter }, { stagger: { each: 3, from: 'start' } })
-            .catch((err) => {});
+        tween.goTo({ x: counter }).catch((err) => {});
         if (isRunning) mobbu.use('nextFrame', () => loop());
     };
 
