@@ -21,5 +21,8 @@ export const getStaggerFromProps = (props) => {
                 ? props.stagger.grid.direction
                 : DIRECTION_COL,
         },
+        waitComplete: props?.stagger?.waitComplete
+            ? props.stagger.waitComplete
+            : false,
     };
 };
