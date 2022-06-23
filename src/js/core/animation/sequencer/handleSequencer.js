@@ -72,8 +72,7 @@ export class HandleSequencer {
                 isLastUsableProp: null,
                 nextActiveItem: null,
                 duration: null,
-                minVal: null,
-                maxVal: null,
+                inactivePosition: null,
             };
 
             this.values.forEach((item, i) => {
@@ -116,14 +115,8 @@ export class HandleSequencer {
 
                     // At least we get the current value
                     GC.duration = end - start;
-                    GC.minVal =
-                        item.toValue > item.fromValue
-                            ? item.fromValue
-                            : item.toValue;
-                    GC.maxVal =
-                        item.toValue > item.fromValue
-                            ? item.toValue
-                            : item.fromValue;
+                    GC.inactivePosition =
+                        partial < end ? item.fromValue : item.toValue;
 
                     item.currentValue =
                         partial >= start && partial <= end
@@ -133,25 +126,11 @@ export class HandleSequencer {
                                   item.toValue - item.fromValue,
                                   GC.duration
                               )
-                            : clamp(
-                                  item.ease(
-                                      partial - start,
-                                      item.fromValue,
-                                      item.toValue - item.fromValue,
-                                      GC.duration
-                                  ),
-                                  GC.minVal,
-                                  GC.maxVal
-                              );
+                            : GC.inactivePosition;
 
                     item.currentValue = getRoundedValue(item.currentValue);
-
-                    if (!Number.isNaN(item.currentValue)) {
-                        GC.currentEl.currentValue = item.currentValue.toFixed(
-                            4
-                        );
-                        GC.currentEl.settled = true;
-                    }
+                    GC.currentEl.currentValue = item.currentValue;
+                    GC.currentEl.settled = true;
                 });
             });
 

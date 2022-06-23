@@ -11,6 +11,7 @@ import { HandleSyncTimeline } from './animation/syncTimeline/handleSyncTimeline.
 import { HandleMasterSequencer } from './animation/sequencer/handleMasterSequencer.js';
 import { ParallaxItemClass } from './animation/parallax/parallaxItem.js';
 import { ParallaxTween } from './animation/parallax/parallaxTween.js';
+import { MouseParallaxItemClass } from './animation/mouseParallax/mouseParallaxitem.js';
 import { SmoothScrollClass } from './animation/smoothScroller/smoothScroll.js';
 import { SimpleStore } from './store/simpleStore.js';
 import { createStaggers } from './animation/sequencer/sequencerUtils.js';
@@ -51,6 +52,7 @@ import { LoadImages } from './utils/loadImages.js';
 import { mq } from './utils/mediaManager.js';
 import { handleSetUp } from './setup.js';
 import { parallax } from './animation/parallax/parallax.js';
+import { mouseParallax } from './animation/mouseParallax/mouseParallax.js';
 
 export const mobbu = {
     default(action, props) {
@@ -60,6 +62,12 @@ export const mobbu = {
 
             case 'set':
                 return handleSetUp.set(props);
+
+            case 'print':
+                return handleSetUp.print();
+
+            default:
+                console.warn(`${action} in mobbu.default not exist`);
         }
     },
     create(type, obj) {
@@ -103,11 +111,17 @@ export const mobbu = {
             case 'parallaxTween':
                 return new ParallaxTween(obj);
 
+            case 'mouseParallax':
+                return new MouseParallaxItemClass(obj);
+
             case 'smoothScroll':
                 return new SmoothScrollClass(obj);
 
             case 'store':
                 return new SimpleStore(obj);
+
+            default:
+                console.warn(`${type} in mobbu.create not exist`);
         }
     },
     use(type, fn, option) {
@@ -174,6 +188,9 @@ export const mobbu = {
 
             case 'scrollEnd':
                 return handleScrollEnd(fn);
+
+            default:
+                console.warn(`${type} in mobbu.use not exist`);
         }
     },
     scrollTo(obj) {
@@ -192,6 +209,9 @@ export const mobbu = {
 
             case 'down':
                 return slide.down(el);
+
+            default:
+                console.warn(`${action} in mobbu.slide not exist`);
         }
     },
     loadImages(images) {
@@ -207,12 +227,21 @@ export const mobbu = {
 
             case 'get':
                 return mq.getBreackpoint(breackpoint);
+
+            default:
+                console.warn(`${action} in mobbu.mq not exist`);
         }
     },
     run(prop) {
         switch (prop) {
             case 'parallax':
                 return parallax.init();
+
+            case 'mouseParallax':
+                return mouseParallax.init();
+
+            default:
+                console.warn(`${prop} in mobbu.run not exist`);
         }
     },
 };

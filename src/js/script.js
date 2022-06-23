@@ -25,7 +25,6 @@ import { LightBoxClass } from '../component/lightbox/js/lightbox.js';
 import { menuClass } from '../component/navigation/js/menu.js';
 import { toolTip } from '../component/tooltip/js/tooltip.js';
 import { move3D } from '../component/move3D/js/move3D.js';
-import { mouseParallax } from '../component/mouseParallax/js/mouseParallax.js';
 import { glitch } from '../component/glitch/js/glitch.js';
 import { wave } from '../component/wave/js/wave.js';
 import { predictiveTurbolence } from '../component/predictiveTurbolence/js/predictiveTurbolence.js';
@@ -72,6 +71,7 @@ mobbu.use('load', () => {
         deferredNextTick: true,
     });
 
+    mobbu.default('print');
     mobbu.use('loadFps', () => console.log('fps ready'));
 
     const body = document.querySelector('body');
@@ -181,6 +181,7 @@ mobbu.use('load', () => {
     }
 
     mobbu.run('parallax');
+    mobbu.run('mouseParallax');
     pageScroll.init();
     tBlocks.init();
     showElement.init();
@@ -188,7 +189,6 @@ mobbu.use('load', () => {
     totop.init();
     vh.init();
     move3D.init();
-    mouseParallax.init();
     dragger.init();
 
     accordion.init();

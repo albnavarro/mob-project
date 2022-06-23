@@ -27,8 +27,13 @@ export const handleSetUp = (() => {
         }
     };
 
+    const print = () => {
+        console.log(data);
+    };
+
     return {
         set,
         get,
+        print,
     };
 })();

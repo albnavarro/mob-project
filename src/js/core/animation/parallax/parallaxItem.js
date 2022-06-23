@@ -10,11 +10,11 @@ import { handleResize } from '../../events/resizeUtils/handleResize.js';
 import { handleScroll } from '../../events/scrollUtils/handleScroll.js';
 import { handleScrollImmediate } from '../../events/scrollUtils/handleScrollImmediate.js';
 import { handleScrollStart } from '../../events/scrollUtils/handleScrollUtils.js';
-import { HandleSpring } from '../../animation/spring/handleSpring.js';
-import { HandleLerp } from '../../animation/lerp/handleLerp.js';
-import { springConfig } from '../../animation/spring/springConfig.js';
+import { HandleSpring } from '../spring/handleSpring.js';
+import { HandleLerp } from '../lerp/handleLerp.js';
+import { springConfig } from '../spring/springConfig.js';
+import { getRoundedValue } from '../utils/animationUtils.js';
 import { getTranslateValues } from '../../utils/vanillaFunction.js';
-import { getRoundedValue } from '../../animation/utils/animationUtils.js';
 
 export class ParallaxItemClass {
     constructor(data) {

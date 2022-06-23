@@ -62,13 +62,13 @@ export const handleNextTick = ((cb) => {
 export const handleFrameIndex = (fn, index) => {
     let start = 0;
 
-    const loop = () => {
+    const loop = (time, fps) => {
         if (start === index) {
-            fn();
+            fn(time, fps);
             return;
         }
         start++;
-        handleNextFrame.add(() => loop());
+        handleNextFrame.add((time, fps) => loop(time, fps));
     };
     handleNextFrame.add(() => loop());
 };

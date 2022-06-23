@@ -3,8 +3,11 @@ import {
     outerWidth,
     offset,
     getTranslateValues,
-    mobbu,
-} from '.../../../js/core';
+} from '../../utils/vanillaFunction.js';
+import { HandleSpring } from '../spring/handleSpring.js';
+import { handleResize } from '../../events/resizeUtils/handleResize.js';
+import { handleScroll } from '../../events/scrollUtils/handleScroll.js';
+import { handleMouseMove } from '../../events/mouseUtils/handleMouse.js';
 
 export class MouseParallaxItemClass {
     constructor(data) {
@@ -17,7 +20,7 @@ export class MouseParallaxItemClass {
         this.offSetTop = 0;
         this.offSetLeft = 0;
         this.smooth = 10;
-        this.spring = mobbu.create('spring');
+        this.spring = new HandleSpring();
         this.unsubscribeSpring = () => {};
         this.unsubscribeOnComplete = () => {};
 
@@ -34,19 +37,16 @@ export class MouseParallaxItemClass {
     init() {
         this.getDimension();
 
-        this.unsubscribeMouseMove = mobbu.use(
-            'mouseMove',
-            ({ page, client }) => {
-                this.setGlobalCoord({ page, client });
-                this.onMove();
-            }
-        );
+        this.unsubscribeMouseMove = handleMouseMove(({ page, client }) => {
+            this.setGlobalCoord({ page, client });
+            this.onMove();
+        });
 
-        this.unsubscribeResize = mobbu.use('resize', () => {
+        this.unsubscribeResize = handleResize(() => {
             this.getDimension();
         });
 
-        this.unsubscribeScroll = mobbu.use('scroll', ({ scrollY }) => {
+        this.unsubscribeScroll = handleScroll(({ scrollY }) => {
             this.onScroll(scrollY);
         });
 
