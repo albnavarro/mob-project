@@ -15,20 +15,13 @@
  */
 
 import { handleFrame, handleNextTick } from '../rafutils/rafUtils.js';
+import { handleScrollImmediate } from './handleScrollImmediate.js';
 
 export const handleScroll = (() => {
     let inizialized = false;
     let callback = [];
     let id = 0;
-    const UP = 'UP';
-    const DOWN = 'DOWN';
-    let prev = window.pageYOffset;
-    let val = window.pageYOffset;
-    let direction = DOWN;
-    let scrollData = {
-        scrollY: val,
-        direction,
-    };
+    let unsubscribe = () => {};
 
     /**
      * handler - handler for mouse move
@@ -36,12 +29,12 @@ export const handleScroll = (() => {
      * @param  {event} e mouse move event
      * @return {void}   description
      */
-    function handler() {
+    function handler(scrollData) {
         /**
          * if - if there is no subscritor remove handler
          */
         if (callback.length === 0) {
-            window.removeEventListener('scroll', handler);
+            unsubscribe();
 
             inizialized = false;
             return;
@@ -49,16 +42,6 @@ export const handleScroll = (() => {
 
         handleFrame.add(() => {
             handleNextTick.add(() => {
-                prev = val;
-                val = window.pageYOffset;
-                direction = val > prev ? DOWN : UP;
-
-                // Prepare data to callback
-                scrollData = {
-                    scrollY: val,
-                    direction,
-                };
-
                 callback.forEach(({ cb }) => {
                     cb(scrollData);
                 });
@@ -75,9 +58,7 @@ export const handleScroll = (() => {
         if (inizialized) return;
         inizialized = true;
 
-        window.addEventListener('scroll', handler, {
-            passive: false,
-        });
+        unsubscribe = handleScrollImmediate(handler);
     }
 
     /**

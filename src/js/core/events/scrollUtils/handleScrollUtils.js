@@ -1,4 +1,4 @@
-import { handleScroll } from './handleScroll.js';
+import { handleScrollImmediate } from './handleScrollImmediate.js';
 import { debounceFuncion } from '../debounce.js';
 import { handleFrame, handleNextTick } from '../rafutils/rafUtils.js';
 
@@ -73,7 +73,7 @@ function handleScrollUtils(type) {
 
         // Use normal scroll event ( no debuonce ) to detect if page is scrolling
         if (type === 'START') {
-            unsubscribeScroll = handleScroll(({ scrollY }) => {
+            unsubscribeScroll = handleScrollImmediate(({ scrollY }) => {
                 const scrollData = {
                     scrollY,
                 };

@@ -9,6 +9,7 @@ import { handleFrame, handleNextTick } from '../../events/rafutils/rafUtils.js';
 import { handleResize } from '../../events/resizeUtils/handleResize.js';
 import { handleScroll } from '../../events/scrollUtils/handleScroll.js';
 import { handleScrollImmediate } from '../../events/scrollUtils/handleScrollImmediate.js';
+import { handleScrollThrottle } from '../../events/scrollUtils/handleScrollThrottle.js';
 import { handleScrollStart } from '../../events/scrollUtils/handleScrollUtils.js';
 import { HandleSpring } from '../spring/handleSpring.js';
 import { HandleLerp } from '../lerp/handleLerp.js';
@@ -221,8 +222,15 @@ export class ParallaxItemClass {
                 this.unsubscribeScroll = handleScrollImmediate(cb);
                 return handleScrollImmediate;
             } else {
-                this.unsubscribeScroll = handleScroll(cb);
-                return handleScroll;
+                (() => {
+                    if (this.ease) {
+                        this.unsubscribeScroll = handleScrollThrottle(cb);
+                        return handleScrollThrottle;
+                    } else {
+                        this.unsubscribeScroll = handleScroll(cb);
+                        return handleScroll;
+                    }
+                })();
             }
         };
 
