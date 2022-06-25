@@ -102,12 +102,7 @@ export const handleFrame = (() => {
     let lastUpdate = 0;
     let elapsed = 0;
     let isStopped = false;
-
     let fps = 60;
-
-    // Clamp fps
-    const maxFps = 150;
-    const minFps = 10;
 
     // Fps data
     let fpsStack = [];

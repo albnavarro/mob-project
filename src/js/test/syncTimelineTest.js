@@ -60,10 +60,10 @@ export function syncTimelineTest() {
     const syncTimeline = mobbu.create('syncTimeline', {
         repeat: 4,
         yoyo: false,
+        duration: 10000,
     });
     syncTimeline.add(seq1);
     syncTimeline.add(seqStagger);
-    syncTimeline.setDuration('10000');
 
     // callback
     syncTimeline.onLoopEnd(({ direction, loop }) => {

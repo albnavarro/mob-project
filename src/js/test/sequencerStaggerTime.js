@@ -24,7 +24,6 @@ export const sequencerStaggerTime = () => {
     const createSequencer = () => {
         staggers.forEach(({ item, start, end }) => {
             const sequencer = mobbu.create('sequencer');
-            sequencer.setDuration(duration);
 
             sequencer
                 .setData({ y: 0 })
@@ -47,9 +46,12 @@ export const sequencerStaggerTime = () => {
     /**
      *  Animation
      **/
-    const timeline = mobbu.create('syncTimeline', { repeat: -1, yoyo: true });
+    const timeline = mobbu.create('syncTimeline', {
+        repeat: -1,
+        yoyo: true,
+        duration,
+    });
     timeline.add(masterSequencer);
-    timeline.setDuration(duration);
 
     play.addEventListener('click', () => {
         timeline.play();

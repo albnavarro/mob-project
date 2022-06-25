@@ -13,18 +13,19 @@ import {
 import { setStagger } from '../utils/stagger/setStagger.js';
 import { getStaggerFromProps } from '../utils/stagger/staggerUtils.js';
 import { DIRECTION_COL } from '../utils/stagger/staggerCostant.js';
+import { handleSetUp } from '../../setup.js';
 
 // Stagger and eade is defined at tween creation
 export class ParallaxTween {
     constructor(data = {}) {
         this.ease = data?.ease
             ? tweenConfig[data.ease]
-            : tweenConfig['easeLinear'];
+            : tweenConfig[handleSetUp.get('parallaxTween').ease];
         this.values = [];
         this.id = 0;
         this.callbackOnStop = [];
         this.callback = [];
-        this.duration = 1000;
+        this.duration = handleSetUp.get('parallaxTween').duration;
         this.type = 'tween';
         // Stagger
 

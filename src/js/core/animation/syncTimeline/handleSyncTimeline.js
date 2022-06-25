@@ -4,6 +4,7 @@ import {
     handleNextTick,
 } from '../../events/rafutils/rafUtils.js';
 import { clamp } from '../utils/animationUtils.js';
+import { handleSetUp } from '../../setup.js';
 
 export class HandleSyncTimeline {
     constructor(data = {}) {
@@ -11,7 +12,9 @@ export class HandleSyncTimeline {
         this.timeElapsed = 0;
         this.endTime = 0;
         this.pauseTime = 0;
-        this.duration = 1000;
+        this.duration = data?.duration
+            ? data.duration
+            : handleSetUp.get('sequencer').duration;
         this.isStopped = true;
         this.isReverse = false;
         this.timeAtReverse = 0;

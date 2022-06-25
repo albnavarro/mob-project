@@ -4,6 +4,7 @@ export const gridStaggerSequencer = () => {
     const items = document.querySelectorAll(
         '.grid-stagger-sequencer .grid-stagger__item'
     );
+    const duration = 5000;
 
     const tween = mobbu.create('sequencer', {
         stagger: {
@@ -24,8 +25,11 @@ export const gridStaggerSequencer = () => {
         });
     });
 
-    const timeline = mobbu.create('syncTimeline', { repeat: -1, yoyo: false });
+    const timeline = mobbu.create('syncTimeline', {
+        repeat: -1,
+        yoyo: false,
+        duration,
+    });
     timeline.add(tween);
-    timeline.setDuration('5000');
     timeline.play();
 };

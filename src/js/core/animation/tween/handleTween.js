@@ -58,8 +58,11 @@ export class HandleTween {
         this.ease =
             'ease' in data
                 ? tweenConfig[data.ease]
-                : tweenConfig['easeOutBack'];
-        this.duration = 'duration' in data ? data.duration : 1000;
+                : tweenConfig[handleSetUp.get('tween').ease];
+        this.duration =
+            'duration' in data
+                ? data.duration
+                : handleSetUp.get('tween').duration;
 
         /**
         This value is the base value merged with new value in custom prop
@@ -67,7 +70,7 @@ export class HandleTween {
          **/
         this.defaultProps = {
             duration: this.duration,
-            ease: 'ease' in data ? data.ease : 'easeOutBack',
+            ease: 'ease' in data ? data.ease : handleSetUp.get('tween').ease,
             reverse: false,
             immediate: false,
         };

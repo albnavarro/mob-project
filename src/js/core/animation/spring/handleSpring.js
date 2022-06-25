@@ -1,4 +1,3 @@
-import { springConfig } from './springConfig.js';
 import {
     getUnivoqueId,
     getValueObj,
@@ -42,7 +41,7 @@ export class HandleSpring {
         this.pauseStatus = false;
         this.firstRun = true;
 
-        // Store max fps so is the fops of monitor using
+        // Store max fps so is the fops of monitor using;
         this.maxFps = 60;
         // If fps is under this.maxFps by this.fpsThreshold is algging, so skip to not overload
         this.fpsThreshold = handleSetUp.get('fpsThreshold');
@@ -52,8 +51,8 @@ export class HandleSpring {
          **/
         this.config =
             'config' in data
-                ? springConfig[data.config]
-                : springConfig['default'];
+                ? handleSetUp.get('spring')[data.config]
+                : handleSetUp.get('spring').default;
 
         /**
         This value is the base value merged with new value in custom prop
@@ -366,10 +365,8 @@ export class HandleSpring {
      */
     mergeProps(props) {
         const newProps = mergeDeep(this.defaultProps, props);
-
-        // Merge news config prop if there is some
-        const config = props?.config ? props.config : {};
-        this.config = { ...this.config, ...config };
+        const { config } = newProps;
+        this.config = config;
 
         return newProps;
     }
@@ -632,8 +629,8 @@ export class HandleSpring {
      *
      */
     updatePreset(preset) {
-        if (preset in springConfig) {
-            this.config = springConfig[preset];
+        if (preset in handleSetUp.get('spring')) {
+            this.config = handleSetUp.get('spring')[preset];
         }
 
         this.defaultProps = mergeDeep(this.defaultProps, {

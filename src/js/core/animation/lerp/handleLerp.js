@@ -27,8 +27,6 @@ import {
     getDeltaFps,
 } from '../utils/callbacks/defaultCallback.js';
 
-const LERP_DEFAULT_PRECISION = 0.01;
-
 export class HandleLerp {
     constructor(data = {}) {
         this.uniqueId = getUnivoqueId();
@@ -53,8 +51,15 @@ export class HandleLerp {
         /**
         This value lives from user call ( goTo etc..) until next call
          **/
-        this.velocity = 'velocity' in data ? data.velocity : 0.06;
-        this.precision = LERP_DEFAULT_PRECISION;
+        this.velocity =
+            'velocity' in data
+                ? data.velocity
+                : handleSetUp.get('lerp').velocity;
+
+        this.precision =
+            'precision' in data
+                ? data.precision
+                : handleSetUp.get('lerp').precision;
 
         /**
         This value is the base value merged with new value in custom prop
@@ -63,7 +68,7 @@ export class HandleLerp {
         this.defaultProps = {
             reverse: false,
             velocity: this.velocity,
-            precision: LERP_DEFAULT_PRECISION,
+            precision: this.precision,
             immediate: false,
         };
 

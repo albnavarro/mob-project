@@ -5,13 +5,14 @@ import {
     STAGGER_DEFAULT_OBJ,
     STAGGER_DEFAULT_INDEX_OBJ,
 } from '../utils/stagger/staggerCostant.js';
-
-export const SEQUENCER_DEFAULT_DURATION = 10;
+import { handleSetUp } from '../../setup.js';
 
 export const createStaggers = ({ items, stagger, duration }) => {
     const EQUAL = 'equal';
     const STAGGER_RANGE = 100;
-    const durationNow = duration ? duration : SEQUENCER_DEFAULT_DURATION;
+    const durationNow = duration
+        ? duration
+        : handleSetUp.get('sequencer').duration;
     const staggerNow = { ...STAGGER_DEFAULT_OBJ, ...stagger };
 
     if (staggerNow.grid.col > items.length) {

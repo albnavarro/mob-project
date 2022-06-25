@@ -11,7 +11,7 @@ export function staggerTweenTest() {
     const stagger = document.querySelectorAll('.tween .target-stagger');
 
     // DEFINE SPRING
-    const myTween = mobbu.create('tween');
+    const myTween = mobbu.create('tween', { ease: 'easeInOutBack' });
     myTween.setData({ x: 0, y: 0 });
     myTween.set({ x: 0, y: 0 });
 
@@ -21,6 +21,7 @@ export function staggerTweenTest() {
 
     const myStagger = mobbu.create('tween', {
         stagger: { each: 4, from: 'start' },
+        ease: 'easeInOutBack',
     });
     myStagger.setData({ x: 0 });
     myStagger.set({ x: 0 });

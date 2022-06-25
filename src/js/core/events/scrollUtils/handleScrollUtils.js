@@ -12,7 +12,8 @@ function handleScrollUtils(type) {
     let callback = [];
     let id = 0;
     let isScrolling = false;
-    let unsubscribeScroll = () => {};
+    let unsubscribeScrollStart = () => {};
+    let unsubscribeScrollEnd = () => {};
     let debouceFunctionReference = () => {};
 
     /**
@@ -28,11 +29,11 @@ function handleScrollUtils(type) {
          * if - if there is no subscritor remove handler
          */
         if (callback.length === 0) {
-            window.removeEventListener('scroll', debouceFunctionReference);
+            unsubscribeScrollEnd();
 
             // Unsubscribe from scroll callback
             if (type === 'START') {
-                unsubscribeScroll();
+                unsubscribeScrollStart();
             }
 
             inizialized = false;
@@ -67,13 +68,11 @@ function handleScrollUtils(type) {
 
         // Add debunce function to detect scroll end
         debouceFunctionReference = debounceFuncion((e) => handler(e));
-        window.addEventListener('scroll', debouceFunctionReference, {
-            passive: false,
-        });
+        unsubscribeScrollEnd = handleScrollImmediate(debouceFunctionReference);
 
         // Use normal scroll event ( no debuonce ) to detect if page is scrolling
         if (type === 'START') {
-            unsubscribeScroll = handleScrollImmediate(({ scrollY }) => {
+            unsubscribeScrollStart = handleScrollImmediate(({ scrollY }) => {
                 const scrollData = {
                     scrollY,
                 };

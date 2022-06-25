@@ -13,7 +13,7 @@ import {
 import { setStagger } from '../utils/stagger/setStagger.js';
 import { getStaggerFromProps } from '../utils/stagger/staggerUtils.js';
 import { DIRECTION_COL } from '../utils/stagger/staggerCostant.js';
-import { SEQUENCER_DEFAULT_DURATION } from './sequencerUtils.js';
+import { handleSetUp } from '../../setup.js';
 
 export class HandleSequencer {
     constructor(data = {}) {
@@ -28,12 +28,14 @@ export class HandleSequencer {
         this.id = 0;
         this.callback = [];
         this.callbackOnStop = [];
-        this.duration = SEQUENCER_DEFAULT_DURATION;
+        this.duration = data?.duration
+            ? data.duration
+            : handleSetUp.get('sequencer').duration;
         this.type = 'sequencer';
         this.defaultProp = {
             start: 0,
             end: this.duration,
-            ease: data?.ease ? data.ease : 'easeLinear',
+            ease: data?.ease ? data.ease : handleSetUp.get('sequencer').ease,
         };
 
         // Stagger

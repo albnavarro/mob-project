@@ -13,9 +13,10 @@ import { handleScrollThrottle } from '../../events/scrollUtils/handleScrollThrot
 import { handleScrollStart } from '../../events/scrollUtils/handleScrollUtils.js';
 import { HandleSpring } from '../spring/handleSpring.js';
 import { HandleLerp } from '../lerp/handleLerp.js';
-import { springConfig } from '../spring/springConfig.js';
 import { getRoundedValue } from '../utils/animationUtils.js';
 import { getTranslateValues } from '../../utils/vanillaFunction.js';
+import { clamp } from '../utils/animationUtils.js';
+import { handleSetUp } from '../../setup.js';
 
 export class ParallaxItemClass {
     constructor(data) {
@@ -345,8 +346,11 @@ export class ParallaxItemClass {
                 break;
             case parallaxConstant.EASE_SPRING:
             default:
-                if (this.springConfig && this.springConfig in springConfig) {
-                    const config = springConfig[this.springConfig];
+                if (
+                    this.springConfig &&
+                    this.springConfig in handleSetUp.get('spring')
+                ) {
+                    const config = handleSetUp.get('spring')[this.springConfig];
                     this.motion.updateConfig(config);
                 }
                 break;
@@ -829,16 +833,8 @@ export class ParallaxItemClass {
 
         this.GC.clamp =
             this.GC.maxVal > 0
-                ? -parallaxUtils.clamp(
-                      this.GC.valPerDirection,
-                      0,
-                      this.GC.maxVal
-                  )
-                : -parallaxUtils.clamp(
-                      this.GC.valPerDirection,
-                      this.GC.maxVal,
-                      0
-                  );
+                ? -clamp(this.GC.valPerDirection, 0, this.GC.maxVal)
+                : -clamp(this.GC.valPerDirection, this.GC.maxVal, 0);
 
         this.fixedShouldRender =
             this.prevFixedClamp === this.GC.clamp ? false : true;
@@ -931,7 +927,7 @@ export class ParallaxItemClass {
                   this.GC.val /
                       (this.scrollerHeight - this.GC.vhStart - this.GC.vhLimit);
 
-        return parallaxUtils.clamp(this.GC.valClamped, 0, 1);
+        return clamp(this.GC.valClamped, 0, 1);
     }
 
     getIsNaNValue() {

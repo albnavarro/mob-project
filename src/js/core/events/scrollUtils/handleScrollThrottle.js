@@ -17,6 +17,7 @@
 import { handleFrame, handleNextTick } from '../rafutils/rafUtils.js';
 import { throttle } from '../throttle.js';
 import { handleScrollImmediate } from './handleScrollImmediate.js';
+import { handleSetUp } from '../../setup.js';
 
 export const handleScrollThrottle = (() => {
     let inizialized = false;
@@ -62,7 +63,7 @@ export const handleScrollThrottle = (() => {
 
         throttleFunctionReference = throttle(
             (scrollData) => handler(scrollData),
-            60
+            handleSetUp.get('throttle')
         );
         unsubscribe = handleScrollImmediate(throttleFunctionReference);
     }

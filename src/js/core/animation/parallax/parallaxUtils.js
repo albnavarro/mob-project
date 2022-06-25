@@ -137,8 +137,12 @@ export const parallaxUtils = {
         const str = String(data);
         const values = str.split(' ');
 
-        const { numberVal, unitMisure, additionalVal, position } =
-            parallaxUtils.getStartEndValue(values, direction);
+        const {
+            numberVal,
+            unitMisure,
+            additionalVal,
+            position,
+        } = parallaxUtils.getStartEndValue(values, direction);
 
         // CHECK IF NUMBER IS NEGATIVE
         const firstChar = String(numberVal).charAt(0);
@@ -176,8 +180,12 @@ export const parallaxUtils = {
         // SPLIT INTO CHUNK DATA
         const str = String(data);
         const values = str.split(' ');
-        const { numberVal, unitMisure, additionalVal, position } =
-            parallaxUtils.getStartEndValue(values, direction);
+        const {
+            numberVal,
+            unitMisure,
+            additionalVal,
+            position,
+        } = parallaxUtils.getStartEndValue(values, direction);
 
         // CHECK IF NUMBER IS NEGATIVE
         const firstChar = String(numberVal).charAt(0);
@@ -314,9 +322,5 @@ export const parallaxUtils = {
             default:
                 return -val;
         }
-    },
-
-    clamp(num, min, max) {
-        return Math.min(Math.max(num, min), max);
     },
 };

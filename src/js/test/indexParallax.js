@@ -4,7 +4,7 @@ export function indexParallax() {
     const item = document.querySelector('.index-parallax-1');
     const trigger = document.querySelector('.index-timeline');
 
-    const myParallaxTimeline = mobbu.create('sequencer');
+    const myParallaxTimeline = mobbu.create('sequencer', { duration: 10 });
     myParallaxTimeline
         .setData({
             x: 0,

@@ -69,6 +69,16 @@ mobbu.use('load', () => {
     mobbu.default('set', {
         fpsThreshold: 25,
         deferredNextTick: true,
+        throttle: 120,
+        spring: {
+            customSpring: {
+                friction: 1,
+                mass: 1,
+                precision: 0.01,
+                tension: 180,
+                velocity: 0,
+            },
+        },
     });
 
     mobbu.default('print');
