@@ -118,9 +118,8 @@ export class HandleSpring {
 
                 o.isDisplacement =
                     o.tension !== 0
-                        ? Math.abs(
-                              getRoundedValue(item.toValue - item.currentValue)
-                          ) <= o.precision
+                        ? Math.abs(item.toValue - item.currentValue) <=
+                          o.precision
                         : true;
 
                 item.settled = o.isVelocity && o.isDisplacement;
