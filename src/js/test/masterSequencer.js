@@ -24,15 +24,11 @@ export const masterSequencer = () => {
                 .goTo({ y: 300 }, { start, end, ease: 'easeInOutBack' });
 
             const unsubscribe = sequencer.subscribe(({ y }) => {
-                item.style.transform = `translate3D(0px,0px,0px) translate(0, ${y}px)`;
-            });
-
-            const unsubscribeStop = sequencer.onStop(({ y }) => {
                 item.style.transform = `translate(0, ${y}px)`;
             });
 
             masterSequencer.add(sequencer);
-            return { sequencer, unsubscribe, unsubscribeStop };
+            return { sequencer, unsubscribe };
         });
     };
 
@@ -41,7 +37,6 @@ export const masterSequencer = () => {
     // Test destroy and create sequencer on resize
     mobbu.use('resize', () => {
         sequencers.forEach(({ unsubscribe }, i) => unsubscribe());
-        sequencers.forEach(({ unsubscribeStop }, i) => unsubscribeStop());
         masterSequencer.destroy();
         createSequencer();
     });

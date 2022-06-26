@@ -207,6 +207,10 @@ class ParallaxClass {
         data.queryType = item.getAttribute('data-queryType');
 
         // Boolean
+        // Diable force3D to create new layer
+        data.disableForce3D = item.hasAttribute('data-disableForce3D');
+
+        // Boolean
         // By default the calculations are performed when the element is visible in the viewport,
         // with this attribute they will always be performed
         data.limiterOff = item.hasAttribute('data-limiterOff');

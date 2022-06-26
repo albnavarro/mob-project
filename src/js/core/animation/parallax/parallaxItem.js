@@ -91,6 +91,7 @@ export class ParallaxItemClass {
         this.opacityEnd = data.opacityEnd || 0;
 
         // Common prop
+        this.disableForce3D = data.disableForce3D || false;
         this.type = data.type
             ? data.type.toLowerCase()
             : parallaxConstant.TYPE_DEFAULT;
@@ -238,7 +239,7 @@ export class ParallaxItemClass {
         if (this.ease) {
             // Force transform3D onscroll start
             this.unsubscribeScrollStart = handleScrollStart(() => {
-                this.force3D = true;
+                if (!this.disableForce3D) this.force3D = true;
             });
 
             if (this.scroller === window) {
