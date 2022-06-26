@@ -210,6 +210,9 @@ class ParallaxClass {
         // Diable force3D to create new layer
         data.disableForce3D = item.hasAttribute('data-disableForce3D');
 
+        // use thorttle when ease is active and no pin used
+        this.useThrottle = item.hasAttribute('data-useThrottle');
+
         // Boolean
         // By default the calculations are performed when the element is visible in the viewport,
         // with this attribute they will always be performed

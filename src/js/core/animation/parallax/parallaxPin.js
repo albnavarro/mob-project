@@ -427,7 +427,7 @@ export class ParallaxPin {
             cb();
         });
 
-        if (this.animatePin && this.pin) {
+        if (this.animatePin && !this.firstTime && this.pin) {
             this.spring
                 .goFrom({ collision: gap })
                 .then(() => {
@@ -606,7 +606,10 @@ export class ParallaxPin {
     }
 
     getAnticipateValue(scrollTop, scrollDirection) {
-        if (this.animatePin || (this.firstTime && !this.anticipatePinOnLoad)) {
+        if (
+            (this.animatePin && !this.firstTime) ||
+            (this.firstTime && !this.anticipatePinOnLoad)
+        ) {
             return {
                 anticipateBottom: 0,
                 anticipateInnerIn: 0,
@@ -636,7 +639,10 @@ export class ParallaxPin {
     }
 
     getAnticipateValueInverted(scrollTop, scrollDirection) {
-        if (this.animatePin || (this.firstTime && !this.anticipatePinOnLoad)) {
+        if (
+            (this.animatePin && !this.firstTime) ||
+            (this.firstTime && !this.anticipatePinOnLoad)
+        ) {
             return {
                 anticipateBottom: 0,
                 anticipateInnerIn: 0,

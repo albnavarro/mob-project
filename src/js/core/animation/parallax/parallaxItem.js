@@ -92,6 +92,7 @@ export class ParallaxItemClass {
 
         // Common prop
         this.disableForce3D = data.disableForce3D || false;
+        this.useThrottle = data.useThrottle || false;
         this.type = data.type
             ? data.type.toLowerCase()
             : parallaxConstant.TYPE_DEFAULT;
@@ -225,7 +226,7 @@ export class ParallaxItemClass {
                 return handleScrollImmediate;
             } else {
                 (() => {
-                    if (this.ease) {
+                    if (this.ease && this.useThrottle) {
                         this.unsubscribeScroll = handleScrollThrottle(cb);
                         return handleScrollThrottle;
                     } else {
