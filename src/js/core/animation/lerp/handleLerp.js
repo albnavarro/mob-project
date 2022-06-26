@@ -113,8 +113,9 @@ export class HandleLerp {
                 item.currentValue = getRoundedValue(item.currentValue);
 
                 item.settled =
-                    Math.abs(item.toValue - item.currentValue) <=
-                    this.precision;
+                    Math.abs(
+                        getRoundedValue(item.toValue - item.currentValue)
+                    ) <= this.precision;
 
                 if (item.settled) {
                     item.currentValue = item.toValue;
