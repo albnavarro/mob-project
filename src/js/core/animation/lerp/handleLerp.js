@@ -114,7 +114,7 @@ export class HandleLerp {
 
                 item.settled =
                     Math.abs(
-                        getRoundedValue(item.toValue - item.currentValue)
+                        parseFloat(item.toValue - item.currentValue).toFixed(4)
                     ) <= this.precision;
 
                 if (item.settled) {
