@@ -8,8 +8,8 @@ export const sinRevertAnimation = () => {
     const tween = mobbu.create('tween', {
         ease: 'easeLinear',
         stagger: { each: 3 },
+        data: { x: 0 },
     });
-    tween.setData({ x: 0 });
     tween.set({ x: 0 });
 
     const distance = window.innerWidth / 2;

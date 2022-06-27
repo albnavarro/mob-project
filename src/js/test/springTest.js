@@ -12,8 +12,10 @@ export function springTest() {
     const target = document.querySelector('.spring-target');
 
     // DEFINE SPRING
-    const mySpring = mobbu.create('spring');
-    mySpring.setData({ x: 0, y: 0, rotate: 0 });
+    const mySpring = mobbu.create('spring', {
+        data: { x: 0, y: 0, rotate: 0 },
+    });
+
     mySpring.subscribe(({ x, y, rotate }) => {
         target.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg)`;
     });

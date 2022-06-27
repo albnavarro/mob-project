@@ -12,8 +12,7 @@ export function tweenTest() {
     const target = document.querySelector('.tween-target');
 
     // DEFINE SPRING
-    const myTween = mobbu.create('tween');
-    myTween.setData({ x: 0, y: 0, rotate: 0 });
+    const myTween = mobbu.create('tween', { data: { x: 0, y: 0, rotate: 0 } });
     myTween.subscribe(({ x, y, rotate }) => {
         target.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg)`;
     });

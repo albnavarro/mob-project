@@ -13,8 +13,8 @@ export const radialStaggerTween = () => {
             grid: { col: 9, row: 9, direction: 'radial' },
             waitComplete: false,
         },
+        data: { scale: 1 },
     });
-    tween.setData({ scale: 1 });
 
     items.forEach((item, i) => {
         tween.subscribe(({ scale }) => {
@@ -22,9 +22,8 @@ export const radialStaggerTween = () => {
         });
     });
 
-    const timeline = mobbu.create('asyncTimeline', { repeat: -1, yoyo: true });
-
-    timeline
+    const timeline = mobbu
+        .create('asyncTimeline', { repeat: -1, yoyo: true })
         .goTo(tween, { scale: 0.5 }, { duration: 1000 })
         .goTo(tween, { scale: 2.5 }, { duration: 500 });
 

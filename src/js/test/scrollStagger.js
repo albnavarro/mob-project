@@ -8,8 +8,8 @@ export const scrollStagger = () => {
         .create('parallaxTween', {
             stagger: { each: 3, from: 'center' },
             ease: 'easeLinear',
+            data: { rotate: 70 },
         })
-        .setData({ rotate: 70 })
         .goTo({ rotate: 800 });
 
     const unit = 1.4;

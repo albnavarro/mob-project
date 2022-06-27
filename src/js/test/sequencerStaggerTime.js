@@ -23,10 +23,8 @@ export const sequencerStaggerTime = () => {
     // Create sequencer
     const createSequencer = () => {
         staggers.forEach(({ item, start, end }) => {
-            const sequencer = mobbu.create('sequencer');
-
-            sequencer
-                .setData({ y: 0 })
+            const sequencer = mobbu
+                .create('sequencer', { data: { y: 0 } })
                 .goTo({ y: 300 }, { start, end, ease: 'easeInOutBack' });
 
             const unsubscribe = sequencer.subscribe(({ y }) => {

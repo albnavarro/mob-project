@@ -81,6 +81,13 @@ export class HandleTween {
         this.stagger = getStaggerFromProps(data);
         this.slowlestStagger = STAGGER_DEFAULT_INDEX_OBJ;
         this.fastestStagger = STAGGER_DEFAULT_INDEX_OBJ;
+
+        /**
+         * Set initial store data if defined in constructor props
+         * If not use setData methods
+         */
+        const props = data?.data ? data.data : null;
+        if (props) this.setData(props);
     }
 
     onReuqestAnim(timestamp, fps, res) {

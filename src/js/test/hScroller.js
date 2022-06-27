@@ -52,9 +52,10 @@ export const hScroller = () => {
     const pluto = document.querySelector('.pluto3');
     pluto.style.webkitTransition = 'background-color .35s';
 
-    const myParallaxTimeline = mobbu.create('sequencer');
-    myParallaxTimeline
-        .setData({ x: 0, y: 0 })
+    const myParallaxTimeline = mobbu
+        .create('sequencer', {
+            data: { x: 0, y: 0 },
+        })
         .goTo({ x: pluto.offsetWidth / 2 }, { start: 0, end: 2 })
         .goTo({ y: pluto.offsetHeight }, { start: 2.5, end: 5 })
         .goTo({ x: pluto.offsetWidth }, { start: 5, end: 7.5 })
@@ -104,9 +105,11 @@ export const hScroller = () => {
     parallaxIn.init();
 
     const target2 = document.querySelector('.parallax-via-js-out');
-    const myParallaxTween = mobbu.create('parallaxTween');
-    myParallaxTween.setData({ x: 0, y: 0 });
-    myParallaxTween.goTo({ x: -pluto.offsetWidth, y: pluto.offsetHeight });
+    const myParallaxTween = mobbu
+        .create('parallaxTween', {
+            data: { x: 0, y: 0 },
+        })
+        .goTo({ x: -pluto.offsetWidth, y: pluto.offsetHeight });
 
     myParallaxTween.subscribe(({ x, y }) => {
         target2.style.transform = `translate3D(0,0,0) translate(${x}px, ${y}px)`;

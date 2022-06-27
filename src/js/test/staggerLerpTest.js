@@ -12,8 +12,7 @@ export function staggerLerpTest() {
     const stagger = document.querySelectorAll('.lerp .target-stagger');
 
     // DEFINE SPRING
-    const myTween = mobbu.create('lerp');
-    myTween.setData({ x: 0, y: 0 });
+    const myTween = mobbu.create('lerp', { data: { x: 0, y: 0 } });
     myTween.set({ x: 0, y: 0 });
 
     myTween.subscribe(({ x, y }) => {
@@ -22,8 +21,8 @@ export function staggerLerpTest() {
 
     const myStagger = mobbu.create('lerp', {
         stagger: { each: 4, from: 'edges' },
+        data: { x: 0 },
     });
-    myStagger.setData({ x: 0 });
     myStagger.set({ x: 0 });
 
     stagger.forEach((item, i) => {

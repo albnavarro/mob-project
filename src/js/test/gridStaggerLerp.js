@@ -12,8 +12,8 @@ export const gridStaggerLerp = () => {
             grid: { col: 7, row: 7, direction: 'row' },
             waitComplete: false,
         },
+        data: { scale: 1 },
     });
-    tween.setData({ scale: 1 });
 
     items.forEach((item, i) => {
         tween.subscribe(({ scale }) => {

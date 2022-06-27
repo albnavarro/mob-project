@@ -7,8 +7,8 @@ export const mouseStagger = () => {
     const spring = mobbu.create('spring', {
         config: 'gentle',
         stagger: { each: 4 },
+        data: { x: 0, y: 0 },
     });
-    spring.setData({ x: 0, y: 0 });
 
     cursor.forEach((item, i) => {
         spring.subscribe(({ x, y }) => {
@@ -34,9 +34,8 @@ export const mouseStagger = () => {
         ease: 'easeInOutQuad',
         duration: 1000,
         stagger: { each: 10, from: 'start' },
+        data: { scale: 1 },
     });
-    tween.setData({ scale: 1 });
-    tween.set({ scale: 1 });
 
     stagger.forEach((item, i) => {
         tween.subscribe(({ scale }) => {
@@ -44,8 +43,10 @@ export const mouseStagger = () => {
         });
     });
 
-    const timeline = mobbu.create('asyncTimeline', { repeat: -1, yoyo: true });
-    timeline.goTo(tween, { scale: 2 });
+    const timeline = mobbu
+        .create('asyncTimeline', { repeat: -1, yoyo: true })
+        .goTo(tween, { scale: 2 })
+        .play();
 
-    timeline.play();
+    // timeline.play();
 };

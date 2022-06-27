@@ -42,6 +42,13 @@ export class HandleSequencer {
         this.stagger = getStaggerFromProps(data);
         this.useStagger = true;
         this.firstRun = true;
+
+        /**
+         * Set initial store data if defined in constructor props
+         * If not use setData methods
+         */
+        const props = data?.data ? data.data : null;
+        if (props) this.setData(props);
     }
 
     setStagger() {

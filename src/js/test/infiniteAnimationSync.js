@@ -16,9 +16,11 @@ export const infiniteAnimationSync = () => {
     const duration = 3000;
     const friction = duration / 2 / Math.PI;
 
-    const infinite = mobbu.create('sequencer', { stagger: { each: 5 } });
-    infinite
-        .setData({ x: duration / 4, opacity: 1 }) // duration / 4 => start from center
+    const infinite = mobbu
+        .create('sequencer', {
+            stagger: { each: 5 },
+            data: { x: duration / 4, opacity: 1 },
+        })
         .goTo(
             { x: duration + duration / 4 },
             { start: 0, end: duration, ease: 'easeLinear' }

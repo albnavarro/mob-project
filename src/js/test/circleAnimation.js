@@ -7,8 +7,8 @@ export const circleAnimation = () => {
 
     const tween = mobbu.create('spring', {
         stagger: { each: 3, from: 'start' },
+        data: { x: 0 },
     });
-    tween.setData({ x: 0 });
     tween.set({ x: 0 });
 
     const step = 0.06;

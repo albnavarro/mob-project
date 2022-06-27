@@ -11,8 +11,7 @@ export function staggerSpringTest() {
     const stagger = document.querySelectorAll('.spring .target-stagger');
 
     // DEFINE SPRING
-    const myTween = mobbu.create('spring');
-    myTween.setData({ x: 0, y: 0 });
+    const myTween = mobbu.create('spring', { data: { x: 0, y: 0 } });
     myTween.set({ x: 0, y: 0 });
 
     myTween.subscribe(({ x, y }) => {
@@ -21,8 +20,8 @@ export function staggerSpringTest() {
 
     const myStagger = mobbu.create('spring', {
         stagger: { each: 4, from: 'center' },
+        data: { x: 0 },
     });
-    myStagger.setData({ x: 0 });
     myStagger.set({ x: 0 });
 
     stagger.forEach((item, i) => {

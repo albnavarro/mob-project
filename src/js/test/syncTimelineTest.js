@@ -14,8 +14,11 @@ export function syncTimelineTest() {
     );
 
     // SINGLE
-    const seq1 = mobbu.create('sequencer', { ease: 'easeInOutCubic' });
-    seq1.setData({ x: 0, y: 0, rotate: 0, scale: 1 })
+    const seq1 = mobbu
+        .create('sequencer', {
+            ease: 'easeInOutCubic',
+            data: { x: 0, y: 0, rotate: 0, scale: 1 },
+        })
         .goTo({ x: 800 }, { start: 0, end: 2500, ease: 'easeInOutBack' })
         .goTo({ y: 450 }, { start: 2500, end: 5000, ease: 'easeInOutBack' })
         .goTo({ x: 0 }, { start: 5000, end: 7500, ease: 'easeInOutBack' })
@@ -35,11 +38,11 @@ export function syncTimelineTest() {
     });
 
     // STAGGER
-    const seqStagger = mobbu.create('sequencer', {
-        stagger: { each: 10, from: 'end' },
-    });
-    seqStagger
-        .setData({ x: 0, scale: 1 })
+    const seqStagger = mobbu
+        .create('sequencer', {
+            stagger: { each: 10, from: 'end' },
+            data: { x: 0, scale: 1 },
+        })
         .goTo({ x: 800 }, { start: 3000, end: 5000, ease: 'easeInOutBack' })
         .goTo({ x: 0 }, { start: 5000, end: 7000, ease: 'easeInOutBack' })
         .goTo({ scale: 2 }, { start: 3500, end: 5000, ease: 'easeOutCubic' })

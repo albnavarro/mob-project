@@ -4,14 +4,16 @@ export function indexParallax() {
     const item = document.querySelector('.index-parallax-1');
     const trigger = document.querySelector('.index-timeline');
 
-    const myParallaxTimeline = mobbu.create('sequencer', { duration: 10 });
-    myParallaxTimeline
-        .setData({
-            x: 0,
-            rotate: 0,
-            scale: 1,
-            opacity: 1,
-            y: 0,
+    const myParallaxTimeline = mobbu
+        .create('sequencer', {
+            duration: 10,
+            data: {
+                x: 0,
+                rotate: 0,
+                scale: 1,
+                opacity: 1,
+                y: 0,
+            },
         })
         .goFrom({ y: -100, opacity: 0 }, { start: 0, end: 3 })
         .goTo({ rotate: 90, scale: 1.5 }, { start: 2, end: 8 })

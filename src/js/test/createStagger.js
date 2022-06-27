@@ -21,10 +21,11 @@ export const createStagger = () => {
     // Create sequencer
     const createSequencer = () => {
         sequencers = staggers.map(({ item, start, end, index }) => {
-            const sequencer = mobbu.create('sequencer', { duration });
-
-            sequencer
-                .setData({ scale: 0.5 })
+            const sequencer = mobbu
+                .create('sequencer', {
+                    duration,
+                    data: { scale: 0.5 },
+                })
                 .goTo({ scale: 1 }, { start, end });
 
             const unsubscribe = sequencer.subscribe(({ scale }) => {
