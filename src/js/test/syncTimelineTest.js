@@ -60,13 +60,14 @@ export function syncTimelineTest() {
         });
     });
 
-    const syncTimeline = mobbu.create('syncTimeline', {
-        repeat: 4,
-        yoyo: false,
-        duration: 10000,
-    });
-    syncTimeline.add(seq1);
-    syncTimeline.add(seqStagger);
+    const syncTimeline = mobbu
+        .create('syncTimeline', {
+            repeat: 4,
+            yoyo: false,
+            duration: 10000,
+        })
+        .add(seq1)
+        .add(seqStagger);
 
     // callback
     syncTimeline.onLoopEnd(({ direction, loop }) => {

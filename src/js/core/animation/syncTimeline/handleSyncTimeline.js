@@ -306,10 +306,14 @@ export class HandleSyncTimeline {
     add(sequencer) {
         sequencer.setDuration(this.duration);
         this.squencers.push(sequencer);
+
+        return this;
     }
 
     setDuration(duration) {
         this.duration = duration;
+
+        return this;
     }
 
     onLoopEnd(cb) {

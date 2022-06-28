@@ -24,11 +24,12 @@ export const gridStaggerSequencer = () => {
         });
     });
 
-    const timeline = mobbu.create('syncTimeline', {
-        repeat: -1,
-        yoyo: false,
-        duration,
-    });
-    timeline.add(tween);
-    timeline.play();
+    const timeline = mobbu
+        .create('syncTimeline', {
+            repeat: -1,
+            yoyo: false,
+            duration,
+        })
+        .add(tween)
+        .play();
 };

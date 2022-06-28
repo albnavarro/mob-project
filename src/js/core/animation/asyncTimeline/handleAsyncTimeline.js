@@ -35,6 +35,7 @@ export class HandleAsyncTimeline {
         this.isReverse = false;
         this.isInPause = false;
         this.isSuspended = false;
+        this.addAsyncIsActive = false;
         this.isStopped = false;
         this.delayIsRunning = false;
         this.startOnDelay = false;
@@ -105,6 +106,9 @@ export class HandleAsyncTimeline {
                     });
                 },
                 addAsync: () => {
+                    // Activate addAsyncFlag
+                    this.addAsyncIsActive = true;
+
                     return new Promise((res, reject) => {
                         if (!isImmediate) {
                             // Custom function that fire the result of the promise
@@ -208,6 +212,12 @@ export class HandleAsyncTimeline {
 
         Promise[promiseType](tweenPromises)
             .then(() => {
+                /**
+                Primise was completed
+                AddAsync is resolved
+                */
+                this.addAsyncIsActive = false;
+
                 this.currentTween = [];
 
                 if (this.isSuspended || this.isStopped) return;
@@ -299,36 +309,39 @@ export class HandleAsyncTimeline {
 
     revertTween() {
         this.isReverse = !this.isReverse;
-        this.tweenList.reverse();
-        this.tweenList.forEach((group) => {
-            group.reverse();
-            group.forEach((item) => {
+        this.tweenList.reverse().forEach((group) => {
+            group.reverse().forEach((item) => {
                 const { data } = item;
                 const { tween, action, valuesFrom, valuesTo, syncProp } = data;
 
-                if (action === 'goTo') {
-                    const prevValueTo = item.data.prevValueTo
-                        ? item.data.prevValueTo
-                        : valuesFrom; //Fallback if there is no preveValue Settled
-                    const currentValueTo = item.data.valuesTo;
-                    item.data.valuesTo = prevValueTo;
-                    item.data.prevValueTo = currentValueTo;
-                }
+                switch (action) {
+                    case 'goTo':
+                        const prevValueTo = item.data.prevValueTo
+                            ? item.data.prevValueTo
+                            : valuesFrom; //Fallback if there is no preveValue Settled
 
-                if (action === 'goFrom') {
-                    // item.data.valuesTo = tween.get();
-                    // TODO:
-                }
+                        const currentValueTo = item.data.valuesTo;
+                        item.data.valuesTo = prevValueTo;
+                        item.data.prevValueTo = currentValueTo;
+                        break;
 
-                if (action === 'goFromTo') {
-                    item.data.valuesFrom = valuesTo;
-                    item.data.valuesTo = valuesFrom;
-                }
+                    case 'goFromTo':
+                        item.data.valuesFrom = valuesTo;
+                        item.data.valuesTo = valuesFrom;
+                        break;
 
-                if (action === 'sync') {
-                    const { from, to } = syncProp;
-                    item.data.syncProp.from = to;
-                    item.data.syncProp.to = from;
+                    case 'sync':
+                        const { from, to } = syncProp;
+                        item.data.syncProp.from = to;
+                        item.data.syncProp.to = from;
+                        break;
+
+                    case 'goFrom':
+                        console.warn(
+                            `SyncTimeline: in revese ( or yoyo mode) only goTo || goFromTo || set action is allowed.
+                            Using goFrom makes no sense in this context. Timeline will stopped.`
+                        );
+                        this.stop();
                 }
             });
         });
@@ -502,6 +515,9 @@ export class HandleAsyncTimeline {
     }
 
     play() {
+        // Skip of there is nothing to run
+        if (this.tweenList.length === 0 || this.addAsyncIsActive) return;
+
         if (this.delayIsRunning) {
             this.startOnDelay = true;
             this.actionAfterReject.push(() => this.play());
@@ -517,6 +533,9 @@ export class HandleAsyncTimeline {
     }
 
     playFrom(label) {
+        // Skip of there is nothing to run
+        if (this.tweenList.length === 0 || this.addAsyncIsActive) return;
+
         if (this.delayIsRunning) {
             this.startOnDelay = true;
             this.actionAfterReject.push(() => this.playFrom(label));
@@ -539,6 +558,9 @@ export class HandleAsyncTimeline {
     }
 
     reverse() {
+        // Skip of there is nothing to run
+        if (this.tweenList.length === 0 || this.addAsyncIsActive) return;
+
         if (this.delayIsRunning) {
             this.startOnDelay = true;
             this.actionAfterReject.push(() => this.reverse());
@@ -569,6 +591,7 @@ export class HandleAsyncTimeline {
         this.forceYoyo = false;
         this.isInPause = false;
         this.isSuspended = false;
+        this.addAsyncIsActive = false;
 
         // Stop all Tween
         this.currentTween.forEach(({ tween }) => {

@@ -402,23 +402,7 @@ export class HandleSpring {
             };
         });
 
-        this.values = mergeArray(data, this.values);
-        const { reverse, immediate } = this.mergeProps(props);
-
-        if (reverse) this.reverse(obj);
-
-        if (immediate) {
-            this.immediate();
-            return new Promise((res) => res());
-        }
-
-        if (!this.req) {
-            this.promise = new Promise((res, reject) => {
-                this.startRaf(res, reject);
-            });
-        }
-
-        return this.promise;
+        return this.doAction(data, props, obj);
     }
 
     /**
@@ -443,23 +427,7 @@ export class HandleSpring {
             };
         });
 
-        this.values = mergeArray(data, this.values);
-        const { reverse, immediate } = this.mergeProps(props);
-
-        if (reverse) this.reverse(obj);
-
-        if (immediate) {
-            this.immediate();
-            return new Promise((res) => res());
-        }
-
-        if (!this.req) {
-            this.promise = new Promise((res, reject) => {
-                this.startRaf(res, reject);
-            });
-        }
-
-        return this.promise;
+        return this.doAction(data, props, obj);
     }
 
     /**
@@ -497,23 +465,7 @@ export class HandleSpring {
             };
         });
 
-        this.values = mergeArray(data, this.values);
-        const { reverse, immediate } = this.mergeProps(props);
-
-        if (reverse) this.reverse(fromObj);
-
-        if (immediate) {
-            this.immediate();
-            return new Promise((res) => res());
-        }
-
-        if (!this.req) {
-            this.promise = new Promise((res, reject) => {
-                this.startRaf(res, reject);
-            });
-        }
-
-        return this.promise;
+        return this.doAction(data, props, fromObj);
     }
 
     /**
@@ -539,6 +491,13 @@ export class HandleSpring {
             };
         });
 
+        return this.doAction(data, props, obj);
+    }
+
+    /**
+     * Commen oparation for set/goTo/goFrom/goFromTo
+     */
+    doAction(data, props, obj) {
         this.values = mergeArray(data, this.values);
         const { reverse, immediate } = this.mergeProps(props);
 

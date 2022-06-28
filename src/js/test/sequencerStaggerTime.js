@@ -44,12 +44,13 @@ export const sequencerStaggerTime = () => {
     /**
      *  Animation
      **/
-    const timeline = mobbu.create('syncTimeline', {
-        repeat: -1,
-        yoyo: true,
-        duration,
-    });
-    timeline.add(masterSequencer);
+    const timeline = mobbu
+        .create('syncTimeline', {
+            repeat: -1,
+            yoyo: true,
+            duration,
+        })
+        .add(masterSequencer);
 
     play.addEventListener('click', () => {
         timeline.play();

@@ -425,27 +425,7 @@ export class HandleTween {
             };
         });
 
-        this.values = mergeArrayTween(data, this.values);
-        if (this.req) this.updateDataWhileRunning();
-        const { reverse, immediate } = this.mergeProps(props);
-
-        // if revert switch fromValue and toValue
-        if (reverse) this.reverse(obj);
-
-        this.setToValProcessed();
-
-        if (immediate) {
-            this.immediate();
-            return new Promise((res) => res());
-        }
-
-        if (!this.req) {
-            this.promise = new Promise((res, reject) => {
-                this.startRaf(res, reject);
-            });
-        }
-
-        return this.promise;
+        return this.doAction(data, props, obj);
     }
 
     /**
@@ -468,27 +448,7 @@ export class HandleTween {
             };
         });
 
-        this.values = mergeArrayTween(data, this.values);
-        if (this.req) this.updateDataWhileRunning();
-        const { reverse, immediate } = this.mergeProps(props);
-
-        // if revert switch fromValue and toValue
-        if (reverse) this.reverse(obj);
-
-        this.setToValProcessed();
-
-        if (immediate) {
-            this.immediate();
-            return new Promise((res) => res());
-        }
-
-        if (!this.req) {
-            this.promise = new Promise((res, reject) => {
-                this.startRaf(res, reject);
-            });
-        }
-
-        return this.promise;
+        return this.doAction(data, props, obj);
     }
 
     /**
@@ -524,27 +484,7 @@ export class HandleTween {
             };
         });
 
-        this.values = mergeArrayTween(data, this.values);
-        if (this.req) this.updateDataWhileRunning();
-        const { reverse, immediate } = this.mergeProps(props);
-
-        // if revert switch fromValue and toValue
-        if (reverse) this.reverse(fromObj);
-
-        this.setToValProcessed();
-
-        if (immediate) {
-            this.immediate();
-            return new Promise((res) => res());
-        }
-
-        if (!this.req) {
-            this.promise = new Promise((res, reject) => {
-                this.startRaf(res, reject);
-            });
-        }
-
-        return this.promise;
+        return this.doAction(data, props, fromObj);
     }
 
     /**
@@ -569,11 +509,18 @@ export class HandleTween {
             };
         });
 
+        // In set mode duration is small as possible
+        props.duration = 1;
+        return this.doAction(data, props, obj);
+    }
+
+    /**
+     * Commen oparation for set/goTo/goFrom/goFromTo
+     */
+    doAction(data, props, obj) {
         this.values = mergeArrayTween(data, this.values);
         if (this.req) this.updateDataWhileRunning();
 
-        // In set mode duration is small as possible
-        props.duration = 1;
         const { reverse, immediate } = this.mergeProps(props);
         // if revert switch fromValue and toValue
         if (reverse) this.reverse(obj);

@@ -41,12 +41,14 @@ export const infiniteAnimationSync = () => {
         });
     });
 
-    const syncTimeline = mobbu.create('syncTimeline', {
-        repeat: -1,
-        yoyo: false,
-    });
-    syncTimeline.add(infinite);
-    syncTimeline.setDuration(duration);
+    const syncTimeline = mobbu
+        .create('syncTimeline', {
+            repeat: -1,
+            yoyo: false,
+            duration,
+        })
+        .add(infinite);
+
     syncTimeline.onComplete(({ direction, loop }) => {
         console.log(`direction: ${direction}, loop index: ${loop}`);
     });
