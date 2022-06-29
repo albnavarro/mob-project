@@ -6,6 +6,7 @@ import {
     STAGGER_DEFAULT_INDEX_OBJ,
 } from '../utils/stagger/staggerCostant.js';
 import { handleSetUp } from '../../setup.js';
+import { checkType } from '../../store/storeType.js';
 
 export const createStaggers = ({ items, stagger, duration }) => {
     const EQUAL = 'equal';
@@ -14,12 +15,24 @@ export const createStaggers = ({ items, stagger, duration }) => {
         ? duration
         : handleSetUp.get('sequencer').duration;
     const staggerNow = { ...STAGGER_DEFAULT_OBJ, ...stagger };
+    const eachList = [EQUAL];
 
     if (staggerNow.grid.col > items.length) {
         console.warn(
             'stagger col of grid is out of range, it must be less than the number of staggers '
         );
-        return;
+        stagger.each = 0;
+    }
+
+    if (
+        (!checkType(String, stagger.each) &&
+            !checkType(Number, stagger.each)) ||
+        (checkType(String, stagger.each) && !eachList.includes(stagger.each))
+    ) {
+        console.warn(
+            `Stagger error: in each must be a number or a string setted to equal`
+        );
+        stagger.each = 0;
     }
 
     const isEqual = 'each' in stagger && stagger.each === EQUAL;

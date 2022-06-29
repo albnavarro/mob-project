@@ -1,7 +1,14 @@
 import { getDefaultStagger } from './getDefaultStagger.js';
 import { getRadialArray } from './getRadialStagger.js';
-import { DIRECTION_RADIAL } from './staggerCostant.js';
+import {
+    DIRECTION_RADIAL,
+    STAGGER_START,
+    STAGGER_END,
+    STAGGER_CENTER,
+    STAGGER_EDGES,
+} from './staggerCostant.js';
 import { getEachByFps } from './staggerUtils.js';
+import { checkType } from '../../../store/storeType.js';
 
 export const setStagger = ({
     cb,
@@ -17,8 +24,7 @@ export const setStagger = ({
              * Check if from is a valid parameters
              * **/
             if (
-                Object.prototype.toString.call(stagger.from) !==
-                    '[object Object]' ||
+                !checkType(Object, stagger.from) ||
                 !('x' in stagger?.from) ||
                 !('y' in stagger?.from)
             ) {
@@ -32,6 +38,22 @@ export const setStagger = ({
                     slowlestStagger: {},
                 };
             }
+
+            /**
+             * Check if col and row is a valid parameters
+             * **/
+            if (stagger?.grid?.col <= 0 || stagger?.grid?.row <= 0) {
+                console.warn(
+                    `Stagger error: in radial direction 'col' or 'row' is not setted`
+                );
+                return {
+                    cbNow: [],
+                    cbCompleteNow: [],
+                    fastestStagger: {},
+                    slowlestStagger: {},
+                };
+            }
+
             /**
              * GRID STAGGER
              * stagger: {
@@ -103,12 +125,21 @@ export const setStagger = ({
             /**
              * Check if from is a valid parameters
              * **/
+            const fromList = [
+                STAGGER_START,
+                STAGGER_END,
+                STAGGER_CENTER,
+                STAGGER_EDGES,
+            ];
+
             if (
-                Object.prototype.toString.call(stagger.from) ===
-                '[object Object]'
+                (!checkType(String, stagger.from) &&
+                    !checkType(Number, stagger.from)) ||
+                (checkType(String, stagger.from) &&
+                    !fromList.includes(stagger.from))
             ) {
                 console.warn(
-                    `Stagger error: in col/row direction 'from' propierties must be a string start/end/center/edges`
+                    `Stagger error: in col/row direction 'from' propierties must be a string start/end/center/edges or a number`
                 );
                 return {
                     cbNow: [],
