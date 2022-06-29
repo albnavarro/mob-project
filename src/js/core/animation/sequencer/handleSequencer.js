@@ -1,4 +1,4 @@
-import { tweenConfig } from '../tween/tweenConfig.js';
+import { getTweenFn } from '../tween/tweenConfig.js';
 import {
     clamp,
     getValueObj,
@@ -203,7 +203,7 @@ export class HandleSequencer {
                 currentValue: value,
                 active: false,
                 settled: false,
-                ease: tweenConfig['easeLinear'],
+                ease: getTweenFn('easeLinear'),
             };
         });
 
@@ -310,7 +310,7 @@ export class HandleSequencer {
             return {
                 prop: item,
                 toValue: obj[item],
-                ease: tweenConfig[ease],
+                ease: getTweenFn(ease),
             };
         });
 
@@ -343,7 +343,7 @@ export class HandleSequencer {
             return {
                 prop: item,
                 fromValue: obj[item],
-                ease: tweenConfig[ease],
+                ease: getTweenFn(ease),
             };
         });
 
@@ -384,7 +384,7 @@ export class HandleSequencer {
                 prop: item,
                 fromValue: fromObj[item],
                 toValue: toObj[item],
-                ease: tweenConfig[ease],
+                ease: getTweenFn(ease),
             };
         });
 

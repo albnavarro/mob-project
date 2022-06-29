@@ -1,4 +1,4 @@
-import { tweenConfig } from './tweenConfig.js';
+import { tweenConfig, getTweenFn } from './tweenConfig.js';
 import {
     getUnivoqueId,
     getValueObj,
@@ -46,6 +46,7 @@ export class HandleTween {
         this.timeElapsed = 0;
         this.pauseTime = 0;
         this.firstRun = true;
+        this.useStagger = true;
 
         // Store max fps so is the fops of monitor using
         this.maxFps = 60;
@@ -57,8 +58,8 @@ export class HandleTween {
          **/
         this.ease =
             'ease' in data
-                ? tweenConfig[data.ease]
-                : tweenConfig[handleSetUp.get('tween').ease];
+                ? getTweenFn(data.ease)
+                : getTweenFn(handleSetUp.get('tween').ease);
         this.duration =
             'duration' in data
                 ? data.duration
@@ -160,6 +161,7 @@ export class HandleTween {
                 maxFps: this.maxFps,
                 fps,
                 cbObject: o.cbObject,
+                useStagger: this.useStagger,
             });
 
             this.isRunning = true;
@@ -208,6 +210,7 @@ export class HandleTween {
                     stagger: this.stagger,
                     slowlestStagger: this.slowlestStagger,
                     fastestStagger: this.fastestStagger,
+                    useStagger: this.useStagger,
                 });
             }
         };
@@ -399,7 +402,7 @@ export class HandleTween {
     mergeProps(props) {
         const newProps = mergeDeep(this.defaultProps, props);
         const { ease, duration } = newProps;
-        this.ease = tweenConfig[ease];
+        this.ease = getTweenFn(ease);
         this.duration = duration;
 
         return newProps;
@@ -417,6 +420,8 @@ export class HandleTween {
      */
     goTo(obj, props = {}) {
         if (this.pauseStatus || this.comeFromResume) this.stop();
+
+        this.useStagger = true;
 
         const data = Object.keys(obj).map((item) => {
             return {
@@ -441,6 +446,8 @@ export class HandleTween {
     goFrom(obj, props = {}) {
         if (this.pauseStatus || this.comeFromResume) this.stop();
 
+        this.useStagger = true;
+
         const data = Object.keys(obj).map((item) => {
             return {
                 prop: item,
@@ -464,6 +471,8 @@ export class HandleTween {
      */
     goFromTo(fromObj, toObj, props = {}) {
         if (this.pauseStatus || this.comeFromResume) this.stop();
+
+        this.useStagger = true;
 
         // Check if fromObj has the same keys of toObj
         const dataIsValid = compareKeys(fromObj, toObj);
@@ -500,6 +509,8 @@ export class HandleTween {
      */
     set(obj, props = {}) {
         if (this.pauseStatus || this.comeFromResume) this.stop();
+
+        this.useStagger = false;
 
         const data = Object.keys(obj).map((item) => {
             return {

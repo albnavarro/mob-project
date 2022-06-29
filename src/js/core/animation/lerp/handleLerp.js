@@ -42,6 +42,7 @@ export class HandleLerp {
         this.callbackStartInPause = [];
         this.pauseStatus = false;
         this.firstRun = true;
+        this.useStagger = true;
 
         // Store max fps so is the fops of monitor using
         this.maxFps = 60;
@@ -155,6 +156,7 @@ export class HandleLerp {
                 maxFps: this.maxFps,
                 fps,
                 cbObject: o.cbObject,
+                useStagger: this.useStagger,
             });
 
             // Check if all values is completed
@@ -202,6 +204,7 @@ export class HandleLerp {
                     stagger: this.stagger,
                     slowlestStagger: this.slowlestStagger,
                     fastestStagger: this.fastestStagger,
+                    useStagger: this.useStagger,
                 });
             }
         };
@@ -340,7 +343,6 @@ export class HandleLerp {
                 currentValue: value,
                 previousValue: 0,
                 settled: false,
-                onPause: false,
             };
         });
     }
@@ -386,6 +388,8 @@ export class HandleLerp {
     goTo(obj, props = {}) {
         if (this.pauseStatus) return;
 
+        this.useStagger = true;
+
         const data = Object.keys(obj).map((item) => {
             return {
                 prop: item,
@@ -409,6 +413,8 @@ export class HandleLerp {
      */
     goFrom(obj, props = {}) {
         if (this.pauseStatus) return;
+
+        this.useStagger = true;
 
         const data = Object.keys(obj).map((item) => {
             return {
@@ -435,6 +441,8 @@ export class HandleLerp {
      */
     goFromTo(fromObj, toObj, props = {}) {
         if (this.pauseStatus) return;
+
+        this.useStagger = true;
 
         // Check if fromObj has the same keys of toObj
         const dataIsValid = compareKeys(fromObj, toObj);
@@ -472,6 +480,8 @@ export class HandleLerp {
      */
     set(obj, props = {}) {
         if (this.pauseStatus) return;
+
+        this.useStagger = false;
 
         const data = Object.keys(obj).map((item) => {
             return {

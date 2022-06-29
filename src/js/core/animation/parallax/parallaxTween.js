@@ -1,4 +1,4 @@
-import { tweenConfig } from '../../animation/tween/tweenConfig.js';
+import { getTweenFn } from '../../animation/tween/tweenConfig.js';
 import {
     getValueObj,
     compareKeys,
@@ -19,8 +19,8 @@ import { handleSetUp } from '../../setup.js';
 export class ParallaxTween {
     constructor(data = {}) {
         this.ease = data?.ease
-            ? tweenConfig[data.ease]
-            : tweenConfig[handleSetUp.get('parallaxTween').ease];
+            ? getTweenFn(data.ease)
+            : getTweenFn(handleSetUp.get('parallaxTween').ease);
         this.values = [];
         this.id = 0;
         this.callbackOnStop = [];

@@ -22,9 +22,10 @@ export const defaultCallback = ({
     maxFps,
     fps,
     cbObject,
+    useStagger,
 }) => {
     handleFrame.add(() => {
-        if (stagger.each === 0) {
+        if (stagger.each === 0 || !useStagger) {
             // No stagger, run immediatly
             callback.forEach(({ cb }) => {
                 if (deltaFps < fpsThreshold || fps > maxFps) cb(cbObject);
@@ -51,8 +52,9 @@ export const defaultCallbackOnComplete = ({
     stagger,
     slowlestStagger,
     fastestStagger,
+    useStagger,
 }) => {
-    if (stagger.each === 0) {
+    if (stagger.each === 0 || !useStagger) {
         onComplete();
 
         handleNextFrame.add(() => {

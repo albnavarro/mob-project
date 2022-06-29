@@ -348,12 +348,8 @@ export class ParallaxItemClass {
                 break;
             case parallaxConstant.EASE_SPRING:
             default:
-                if (
-                    this.springConfig &&
-                    this.springConfig in handleSetUp.get('spring')
-                ) {
-                    const config = handleSetUp.get('spring')[this.springConfig];
-                    this.motion.updateConfig(config);
+                if (this.springConfig) {
+                    this.motion.updatePreset(this.springConfig);
                 }
                 break;
         }

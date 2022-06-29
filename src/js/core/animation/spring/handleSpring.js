@@ -40,6 +40,7 @@ export class HandleSpring {
         this.lostFrameTresold = 64;
         this.pauseStatus = false;
         this.firstRun = true;
+        this.useStagger = true;
 
         // Store max fps so is the fops of monitor using;
         this.maxFps = 60;
@@ -51,7 +52,7 @@ export class HandleSpring {
          **/
         this.config =
             'config' in data
-                ? handleSetUp.get('spring')[data.config]
+                ? this.springValidator(data.config)
                 : handleSetUp.get('spring').default;
 
         /**
@@ -77,6 +78,17 @@ export class HandleSpring {
          */
         const props = data?.data ? data.data : null;
         if (props) this.setData(props);
+    }
+
+    springValidator(config) {
+        if (config in handleSetUp.get('spring')) {
+            return handleSetUp.get('spring')[config];
+        } else {
+            console.warn(
+                `${config} doasn't exist in spring configuration list`
+            );
+            return handleSetUp.get('spring').default;
+        }
     }
 
     onReuqestAnim(timestamp, fps, res) {
@@ -161,6 +173,7 @@ export class HandleSpring {
                 maxFps: this.maxFps,
                 fps,
                 cbObject: o.cbObject,
+                useStagger: this.useStagger,
             });
 
             // Check if all values is completed
@@ -208,6 +221,7 @@ export class HandleSpring {
                     stagger: this.stagger,
                     slowlestStagger: this.slowlestStagger,
                     fastestStagger: this.fastestStagger,
+                    useStagger: this.useStagger,
                 });
             }
         };
@@ -394,6 +408,8 @@ export class HandleSpring {
     goTo(obj, props = {}) {
         if (this.pauseStatus) return;
 
+        this.useStagger = true;
+
         const data = Object.keys(obj).map((item) => {
             return {
                 prop: item,
@@ -417,6 +433,8 @@ export class HandleSpring {
      */
     goFrom(obj, props = {}) {
         if (this.pauseStatus) return;
+
+        this.useStagger = true;
 
         const data = Object.keys(obj).map((item) => {
             return {
@@ -443,6 +461,8 @@ export class HandleSpring {
      */
     goFromTo(fromObj, toObj, props = {}) {
         if (this.pauseStatus) return;
+
+        this.useStagger = true;
 
         // Check if fromObj has the same keys of toObj
         const dataIsValid = compareKeys(fromObj, toObj);
@@ -480,6 +500,8 @@ export class HandleSpring {
      */
     set(obj, props = {}) {
         if (this.pauseStatus) return;
+
+        this.useStagger = false;
 
         const data = Object.keys(obj).map((item) => {
             return {
@@ -600,6 +622,10 @@ export class HandleSpring {
     updatePreset(preset) {
         if (preset in handleSetUp.get('spring')) {
             this.config = handleSetUp.get('spring')[preset];
+        } else {
+            console.warn(
+                `${preset} doasn't exist in spring configuration list`
+            );
         }
 
         this.defaultProps = mergeDeep(this.defaultProps, {

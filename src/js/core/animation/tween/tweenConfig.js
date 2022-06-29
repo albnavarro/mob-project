@@ -1,4 +1,5 @@
 // https://github.com/bameyrick/js-easing-s/blob/master/src/index.ts
+import { handleSetUp } from '../../setup.js';
 
 export const tweenConfig = {
     easeLinear: (elapsed, initialValue, amountOfChange, duration) => {
@@ -404,4 +405,13 @@ export const tweenConfig = {
             initialValue
         );
     },
+};
+
+export const getTweenFn = (prop) => {
+    if (!(prop in tweenConfig)) {
+        console.warn(`${prop} doasn't exixst in tweens ease function`);
+        return tweenConfig[handleSetUp.get('tween').ease];
+    } else {
+        return tweenConfig[prop];
+    }
 };
