@@ -407,6 +407,11 @@ export const tweenConfig = {
     },
 };
 
+export const printEaseKey = () => {
+    console.log('Easing:');
+    console.log(Object.keys(tweenConfig));
+};
+
 export const getTweenFn = (prop) => {
     if (!(prop in tweenConfig)) {
         console.warn(`${prop} doasn't exixst in tweens ease function`);

@@ -28,9 +28,9 @@ class LightBoxImageClass {
 
         this.isLoading = true;
 
-        this.loadimage = mobbu.loadImages([url]);
+        this.loadimage = mobbu.create('loadImages', { images: [url] });
         this.loadimage
-            .init()
+            .load()
             .then(() => {
                 // Aggiungo l'immagine solo se la lightbox è ancora aperta.
                 if (!this.isOpen) return;

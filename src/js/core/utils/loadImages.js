@@ -5,7 +5,7 @@ export class LoadImages {
         this.active = true;
     }
 
-    init() {
+    load() {
         return new Promise((res, reject) => {
             const imageElArray = this.images.map((item) => {
                 const img = new Image();

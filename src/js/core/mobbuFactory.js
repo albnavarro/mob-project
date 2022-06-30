@@ -54,17 +54,28 @@ import { handleSetUp } from './setup.js';
 import { parallax } from './animation/parallax/parallax.js';
 import { mouseParallax } from './animation/mouseParallax/mouseParallax.js';
 
+// Easing list
+import { printEaseKey } from './animation/tween/tweenConfig.js';
+
 export const mobbu = {
     default(action, props) {
         switch (action) {
             case 'get':
-                return handleSetUp.get(props);
+                handleSetUp.get(props);
+                break;
 
             case 'set':
-                return handleSetUp.set(props);
+                handleSetUp.set(props);
+                break;
 
             case 'print':
-                return handleSetUp.print();
+                // Writable props
+                handleSetUp.print();
+
+                // Readable props
+                console.log('Readable props:');
+                printEaseKey();
+                break;
 
             default:
                 console.warn(`${action} in mobbu.default not exist`);
@@ -119,6 +130,15 @@ export const mobbu = {
 
             case 'store':
                 return new SimpleStore(obj);
+
+            case 'loadImages':
+                if (obj && 'images' in obj) {
+                    return new LoadImages(obj.images);
+                } else {
+                    console.warn(
+                        `loadImages need a Object with an array of images: {images: [...]}`
+                    );
+                }
 
             default:
                 console.warn(`${type} in mobbu.create not exist`);
@@ -214,9 +234,6 @@ export const mobbu = {
                 console.warn(`${action} in mobbu.slide not exist`);
         }
     },
-    loadImages(images) {
-        return new LoadImages(images);
-    },
     mq(action, breackpoint) {
         switch (action) {
             case 'min':
@@ -235,10 +252,12 @@ export const mobbu = {
     run(prop) {
         switch (prop) {
             case 'parallax':
-                return parallax.init();
+                parallax.init();
+                return parallax;
 
             case 'mouseParallax':
-                return mouseParallax.init();
+                mouseParallax.init();
+                return mouseParallax;
 
             default:
                 console.warn(`${prop} in mobbu.run not exist`);

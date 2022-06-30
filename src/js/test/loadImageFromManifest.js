@@ -10,17 +10,19 @@ class loadImageFromManifestClass {
         axios.get('/assets/dist/manifest.json').then((response) => {
             const data = response.data;
 
-            const images = [
+            const imagelist = [
                 `${this.distPath}${data['flower1.jpg']}`,
                 `${this.distPath}${data['pic1.jpg']}`,
                 `${this.distPath}${data['pic2.jpg']}`,
                 `${this.distPath}${data['pic3.jpg']}`,
             ];
 
-            const imageLoader = mobbu.loadImages(images);
+            const imageLoader = mobbu.create('loadImages', {
+                images: imagelist,
+            });
 
             imageLoader
-                .init()
+                .load()
                 .then(() => console.log('image loaded'))
                 .catch((e) => console.log(e));
         });

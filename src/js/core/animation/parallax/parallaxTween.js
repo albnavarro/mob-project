@@ -1,4 +1,4 @@
-import { getTweenFn } from '../../animation/tween/tweenConfig.js';
+import { getTweenFn, tweenConfig } from '../../animation/tween/tweenConfig.js';
 import {
     getValueObj,
     compareKeys,
@@ -176,6 +176,10 @@ export class ParallaxTween {
             };
         });
 
+        if (props?.ease && props?.ease in tweenConfig) {
+            this.ease = tweenConfig[props.ease];
+        }
+
         this.mergeData(newDataArray);
         this.setToValProcessed();
         return this;
@@ -196,6 +200,10 @@ export class ParallaxTween {
                 fromValue: obj[item],
             };
         });
+
+        if (props?.ease && props?.ease in tweenConfig) {
+            this.ease = tweenConfig[props.ease];
+        }
 
         this.mergeData(newDataArray);
         this.setToValProcessed();
@@ -221,6 +229,10 @@ export class ParallaxTween {
                 )} and to ${JSON.stringify(toObj)} is not equal`
             );
             return;
+        }
+
+        if (props?.ease && props?.ease in tweenConfig) {
+            this.ease = tweenConfig[props.ease];
         }
 
         const newDataArray = Object.keys(fromObj).map((item) => {

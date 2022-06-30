@@ -103,6 +103,11 @@ export const handleSetUp = (() => {
     };
 
     const print = () => {
+        /**
+         * Writable props
+         * This prop can be changed by the user using set methods
+         */
+        console.log(`Writable props:`);
         console.log(data);
     };
 
