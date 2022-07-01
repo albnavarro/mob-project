@@ -10,7 +10,7 @@ export const sequencerStaggerTime = () => {
     const resume = document.querySelector('.animation-resume');
 
     let masterSequencer = mobbu.create('masterSequencer');
-    const duration = 2000;
+    const duration = 10;
 
     const staggers = mobbu.create('stagger', {
         items,
@@ -24,7 +24,7 @@ export const sequencerStaggerTime = () => {
     const createSequencer = () => {
         staggers.forEach(({ item, start, end }) => {
             const sequencer = mobbu
-                .create('sequencer', { data: { y: 0 } })
+                .create('sequencer', { data: { y: 0 }, duration })
                 .goTo({ y: 300 }, { start, end, ease: 'easeInOutBack' });
 
             const unsubscribe = sequencer.subscribe(({ y }) => {
@@ -48,7 +48,7 @@ export const sequencerStaggerTime = () => {
         .create('syncTimeline', {
             repeat: -1,
             yoyo: true,
-            duration,
+            duration: 2000,
         })
         .add(masterSequencer);
 

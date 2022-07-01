@@ -24,6 +24,12 @@ export class HandleMasterSequencer {
         return this.children.length > 0 ? this.children[0].getDuration() : 0;
     }
 
+    setStretchFactor(val) {
+        this.children.forEach((item, i) => {
+            item.setStretchFactor(val);
+        });
+    }
+
     disableStagger() {
         this.children.forEach((item, i) => {
             item.disableStagger();

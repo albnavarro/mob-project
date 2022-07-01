@@ -13,22 +13,23 @@ export const infiniteAnimationSync = () => {
 
     const xAmplitude = 500;
     const yAmplitude = 400;
-    const duration = 3000;
+    const duration = 10;
     const friction = duration / 2 / Math.PI;
 
     const infinite = mobbu
         .create('sequencer', {
             stagger: { each: 5 },
             data: { x: duration / 4, opacity: 1 },
+            duration,
         })
         .goTo(
             { x: duration + duration / 4 },
             { start: 0, end: duration, ease: 'easeLinear' }
         )
-        .goTo({ opacity: 0 }, { start: 0, end: 750, ease: 'easeOutQuad' })
-        .goTo({ opacity: 1 }, { start: 750, end: 1500, ease: 'easeInQuad' })
-        .goTo({ opacity: 0 }, { start: 1500, end: 2250, ease: 'easeOutQuad' })
-        .goTo({ opacity: 1 }, { start: 2250, end: 3000, ease: 'easeInQuad' });
+        .goTo({ opacity: 0 }, { start: 0, end: 2.5, ease: 'easeOutQuad' })
+        .goTo({ opacity: 1 }, { start: 2.5, end: 5, ease: 'easeInQuad' })
+        .goTo({ opacity: 0 }, { start: 5, end: 7.5, ease: 'easeOutQuad' })
+        .goTo({ opacity: 1 }, { start: 7.5, end: 10, ease: 'easeInQuad' });
 
     stagger.forEach((item, i) => {
         infinite.subscribe(({ x, opacity }) => {
@@ -45,7 +46,7 @@ export const infiniteAnimationSync = () => {
         .create('syncTimeline', {
             repeat: -1,
             yoyo: false,
-            duration,
+            duration: 3000,
         })
         .add(infinite);
 

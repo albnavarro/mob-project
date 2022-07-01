@@ -18,14 +18,15 @@ export function syncTimelineTest() {
         .create('sequencer', {
             ease: 'easeInOutCubic',
             data: { x: 0, y: 0, rotate: 0, scale: 1 },
+            duration: 10,
         })
-        .goTo({ x: 800 }, { start: 0, end: 2500, ease: 'easeInOutBack' })
-        .goTo({ y: 450 }, { start: 2500, end: 5000, ease: 'easeInOutBack' })
-        .goTo({ x: 0 }, { start: 5000, end: 7500, ease: 'easeInOutBack' })
-        .goTo({ y: 0 }, { start: 7500, end: 10000, ease: 'easeInOutBack' })
-        .goTo({ rotate: 720 }, { start: 0, end: 10000 })
-        .goTo({ scale: 2 }, { start: 3500, end: 5000, ease: 'easeInOutBack' })
-        .goTo({ scale: 1 }, { start: 5000, end: 6500, ease: 'easeInOutBack' });
+        .goTo({ x: 800 }, { start: 0, end: 2.5, ease: 'easeInOutBack' })
+        .goTo({ y: 450 }, { start: 2.5, end: 5, ease: 'easeInOutBack' })
+        .goTo({ x: 0 }, { start: 5, end: 7.5, ease: 'easeInOutBack' })
+        .goTo({ y: 0 }, { start: 7.5, end: 10, ease: 'easeInOutBack' })
+        .goTo({ rotate: 720 }, { start: 0, end: 10 })
+        .goTo({ scale: 2 }, { start: 3.5, end: 5, ease: 'easeInOutBack' })
+        .goTo({ scale: 1 }, { start: 5, end: 6.5, ease: 'easeInOutBack' });
 
     seq1.subscribe(({ x, y, rotate, scale }) => {
         target.style.transform = `translate3D(0,0,0) translate(${x}px, ${y}px) scale(${scale}) rotate(${rotate}deg)`;
@@ -42,11 +43,12 @@ export function syncTimelineTest() {
         .create('sequencer', {
             stagger: { each: 10, from: 'end' },
             data: { x: 0, scale: 1 },
+            duration: 10,
         })
-        .goTo({ x: 800 }, { start: 3000, end: 5000, ease: 'easeInOutBack' })
-        .goTo({ x: 0 }, { start: 5000, end: 7000, ease: 'easeInOutBack' })
-        .goTo({ scale: 2 }, { start: 3500, end: 5000, ease: 'easeOutCubic' })
-        .goTo({ scale: 1 }, { start: 5000, end: 6000, ease: 'easeOutCubic' });
+        .goTo({ x: 800 }, { start: 3, end: 5, ease: 'easeInOutBack' })
+        .goTo({ x: 0 }, { start: 5, end: 7, ease: 'easeInOutBack' })
+        .goTo({ scale: 2 }, { start: 3.5, end: 5, ease: 'easeOutCubic' })
+        .goTo({ scale: 1 }, { start: 5, end: 6, ease: 'easeOutCubic' });
 
     starger.forEach((item, i) => {
         seqStagger.subscribe(({ x, scale }) => {

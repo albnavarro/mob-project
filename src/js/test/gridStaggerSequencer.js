@@ -14,6 +14,7 @@ export const gridStaggerSequencer = () => {
                 grid: { col: 7, row: 7, direction: 'row' },
             },
             data: { scale: 1 },
+            duration,
         })
         .goTo({ scale: 0.5 }, { start: 0, end: 4000, ease: 'easeInOutBack' })
         .goTo({ scale: 1 }, { start: 4000, end: 5000, ease: 'easeInOutBack' });
