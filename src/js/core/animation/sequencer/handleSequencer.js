@@ -194,8 +194,8 @@ export class HandleSequencer {
         const stretchFactor = duration / this.duration;
 
         this.timeline.forEach(({ start, end }, i) => {
-            this.timeline[i].start = start * stretchFactor;
-            this.timeline[i].end = end * stretchFactor;
+            this.timeline[i].start = getRoundedValue(start * stretchFactor);
+            this.timeline[i].end = getRoundedValue(end * stretchFactor);
         });
     }
 
