@@ -44,11 +44,6 @@ export class HandleSequencer {
         this.firstRun = true;
 
         /**
-         *  Start and end value ​​will be proportionate to the duration of the timeline
-         */
-        this.stretchFactor = 1;
-
-        /**
          * Set initial store data if defined in constructor props
          * If not use setData methods
          */
@@ -87,8 +82,6 @@ export class HandleSequencer {
                 nextActiveItem: null,
                 duration: null,
                 inactivePosition: null,
-                startStretched: 0,
-                endStretched: 0,
             };
 
             this.values.forEach((item, i) => {
@@ -117,10 +110,7 @@ export class HandleSequencer {
                                         );
                                     }
                                 );
-                                if (
-                                    GC.nextActiveItem &&
-                                    nextStart * this.stretchFactor <= partial
-                                ) {
+                                if (GC.nextActiveItem && nextStart <= partial) {
                                     return false;
                                 } else {
                                     return p;
@@ -131,21 +121,16 @@ export class HandleSequencer {
 
                     // If in the next step the same props is active and start before partial skip
                     if (!GC.isLastUsableProp) return;
-                    GC.startStretched = start * this.stretchFactor;
-                    GC.endStretched = end * this.stretchFactor;
 
                     // At least we get the current value
-                    GC.duration = GC.endStretched - GC.startStretched;
+                    GC.duration = end - start;
                     GC.inactivePosition =
-                        partial < GC.endStretched
-                            ? item.fromValue
-                            : item.toValue;
+                        partial < end ? item.fromValue : item.toValue;
 
                     item.currentValue =
-                        partial >= GC.startStretched &&
-                        partial <= GC.endStretched
+                        partial >= start && partial <= end
                             ? item.ease(
-                                  partial - GC.startStretched,
+                                  partial - start,
                                   item.fromValue,
                                   item.toValue - item.fromValue,
                                   GC.duration
@@ -202,11 +187,16 @@ export class HandleSequencer {
 
     /**
      * Set factor between timeline duration and sequencer getDuration
-     * So in draw methods start and end will be proportionate to the duration of the timeline
+     * So start and end propierties will be proportionate to the duration of the timeline
      * This methods is called by SyncTimeline
      */
     setStretchFactor(duration) {
-        this.stretchFactor = duration / this.duration;
+        const stretchFactor = duration / this.duration;
+
+        this.timeline.forEach(({ start, end }, i) => {
+            this.timeline[i].start = start * stretchFactor;
+            this.timeline[i].end = end * stretchFactor;
+        });
     }
 
     /**
