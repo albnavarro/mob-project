@@ -34,7 +34,6 @@ export const tweenRealtive = () => {
 
     const spring = mobbu.create('spring', {
         data: { x: 0, rotate: 0 },
-        duration: 500,
         relative: true,
     });
 
@@ -57,7 +56,6 @@ export const tweenRealtive = () => {
 
     const lerp = mobbu.create('lerp', {
         data: { x: 0, rotate: 0 },
-        duration: 500,
         relative: true,
     });
 

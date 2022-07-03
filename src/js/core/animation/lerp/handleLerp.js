@@ -63,7 +63,7 @@ export class HandleLerp {
                 : handleSetUp.get('lerp').precision;
 
         this.relative =
-            'duration' in data
+            'relative' in data
                 ? data.relative
                 : handleSetUp.get('lerp').relative;
 

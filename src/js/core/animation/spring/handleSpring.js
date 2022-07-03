@@ -56,7 +56,7 @@ export class HandleSpring {
                 : handleSetUp.get('spring').default;
 
         this.relative =
-            'duration' in data
+            'relative' in data
                 ? data.relative
                 : handleSetUp.get('spring').relative;
 
