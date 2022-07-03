@@ -54,12 +54,6 @@ export const mergeArrayTween = (newData, data) => {
     });
 };
 
-export const getTime = () => {
-    return typeof window !== 'undefined'
-        ? window.performance.now()
-        : Date.now();
-};
-
 export const clamp = (num, min, max) => {
     return Math.min(Math.max(num, min), max);
 };
