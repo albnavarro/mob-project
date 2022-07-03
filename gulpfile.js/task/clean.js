@@ -23,8 +23,12 @@ function cleanDist(done) {
  * @return {function}
  */
 function cleanAll(done) {
-    fs.rmSync(destPath, { recursive: true });
-    done();
+    if (fs.existsSync(destPath)) {
+        fs.rmSync(destPath, { recursive: true });
+        done();
+    } else {
+        done();
+    }
 }
 
 exports.cleanDist = cleanDist;
