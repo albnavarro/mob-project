@@ -8,9 +8,31 @@ block content
             include ../includes/navigation.pug
     main
       .container
-        button.tween-relative-play(type="button")
+        h2
+          |tween
+        button.tween-play(type="button")
           |play
-        button.tween-relative-reset(type="button")
+        button.tween-reset(type="button")
           |reset
         .tween-relative-container
-            .tween-relative-item
+            .tween-relative-item.tween-relative-item--tween
+              
+      .container
+        h2
+          |spring
+        button.spring-play(type="button")
+          |play
+        button.spring-reset(type="button")
+          |reset
+        .tween-relative-container
+            .tween-relative-item.tween-relative-item--spring
+              
+      .container
+        h2
+          |lerp
+        button.lerp-play(type="button")
+          |play
+        button.lerp-reset(type="button")
+          |reset
+        .tween-relative-container
+            .tween-relative-item.tween-relative-item--lerp

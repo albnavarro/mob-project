@@ -55,6 +55,11 @@ export class HandleSpring {
                 ? this.springValidator(data.config)
                 : handleSetUp.get('spring').default;
 
+        this.relative =
+            'duration' in data
+                ? data.relative
+                : handleSetUp.get('spring').relative;
+
         /**
         This value is the base value merged with new value in custom prop
         passed form user in goTo etc..
@@ -62,6 +67,7 @@ export class HandleSpring {
         this.defaultProps = {
             reverse: false,
             config: this.config,
+            relative: this.relative,
             immediate: false,
         };
 
@@ -389,10 +395,22 @@ export class HandleSpring {
      */
     mergeProps(props) {
         const newProps = mergeDeep(this.defaultProps, props);
-        const { config } = newProps;
+        const { config, relative } = newProps;
         this.config = config;
+        this.relative = relative;
 
         return newProps;
+    }
+
+    /**
+     * Realtive toValue from current position
+     */
+    setToValProcessed() {
+        this.values.forEach((item, i) => {
+            item.toValue = this.relative
+                ? item.toValue + item.currentValue
+                : item.toValue;
+        });
     }
 
     /**
@@ -524,6 +542,8 @@ export class HandleSpring {
         const { reverse, immediate } = this.mergeProps(props);
 
         if (reverse) this.reverse(obj);
+
+        this.setToValProcessed();
 
         if (immediate) {
             this.immediate();

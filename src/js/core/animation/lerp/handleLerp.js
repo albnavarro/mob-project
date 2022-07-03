@@ -62,6 +62,11 @@ export class HandleLerp {
                 ? data.precision
                 : handleSetUp.get('lerp').precision;
 
+        this.relative =
+            'duration' in data
+                ? data.relative
+                : handleSetUp.get('lerp').relative;
+
         /**
         This value is the base value merged with new value in custom prop
         passed form user in goTo etc..
@@ -70,6 +75,7 @@ export class HandleLerp {
             reverse: false,
             velocity: this.velocity,
             precision: this.precision,
+            relative: this.relative,
             immediate: false,
         };
 
@@ -369,11 +375,23 @@ export class HandleLerp {
      */
     mergeProps(props) {
         const newProps = mergeDeep(this.defaultProps, props);
-        const { velocity, precision } = newProps;
+        const { velocity, precision, relative } = newProps;
         this.velocity = velocity;
         this.precision = precision;
+        this.relative = relative;
 
         return newProps;
+    }
+
+    /**
+     * Realtive toValue from current position
+     */
+    setToValProcessed() {
+        this.values.forEach((item, i) => {
+            item.toValue = this.relative
+                ? item.toValue + item.currentValue
+                : item.toValue;
+        });
     }
 
     /**
@@ -504,6 +522,8 @@ export class HandleLerp {
         const { reverse, immediate } = this.mergeProps(props);
 
         if (reverse) this.reverse(obj);
+
+        this.setToValProcessed();
 
         if (immediate) {
             this.immediate();

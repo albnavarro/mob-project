@@ -28,6 +28,7 @@ export const handleSetUp = (() => {
             relative: false,
         },
         spring: {
+            relative: false,
             default: {
                 tension: 20,
                 mass: 1,
@@ -86,6 +87,7 @@ export const handleSetUp = (() => {
             },
         },
         lerp: {
+            relative: false,
             precision: 0.01,
             velocity: 0.06,
         },

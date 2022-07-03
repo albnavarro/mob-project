@@ -160,6 +160,12 @@ export class ParallaxTween {
         });
     }
 
+    setEasingWhileRunning(props) {
+        if (props?.ease && props?.ease in tweenConfig) {
+            this.ease = tweenConfig[props.ease];
+        }
+    }
+
     /**
      * goTo - go from fromValue stored to new toValue
      *
@@ -176,10 +182,7 @@ export class ParallaxTween {
             };
         });
 
-        if (props?.ease && props?.ease in tweenConfig) {
-            this.ease = tweenConfig[props.ease];
-        }
-
+        this.setEasingWhileRunning(props);
         this.mergeData(newDataArray);
         this.setToValProcessed();
         return this;
@@ -201,10 +204,7 @@ export class ParallaxTween {
             };
         });
 
-        if (props?.ease && props?.ease in tweenConfig) {
-            this.ease = tweenConfig[props.ease];
-        }
-
+        this.setEasingWhileRunning(props);
         this.mergeData(newDataArray);
         this.setToValProcessed();
         return this;
@@ -231,9 +231,7 @@ export class ParallaxTween {
             return;
         }
 
-        if (props?.ease && props?.ease in tweenConfig) {
-            this.ease = tweenConfig[props.ease];
-        }
+        this.setEasingWhileRunning(props);
 
         const newDataArray = Object.keys(fromObj).map((item) => {
             return {
