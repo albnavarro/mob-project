@@ -1,0 +1,12 @@
+.tween-relative-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.tween-relative-item {
+    width: 100px;
+    height: 100px;
+    background: red;
+}

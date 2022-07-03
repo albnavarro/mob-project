@@ -1,0 +1,7 @@
+{
+    "template": "tweenRelative",
+    "pageTitle": "tweenRelative",
+    "description": "custom description",
+    "additionalData": ["nav.json"],
+    "registerComponent": ["to-top/pug/toTop.pug"]
+}

@@ -1,0 +1,16 @@
+extends default/_wrapper.pug
+
+block content
+    header
+        .container
+            include ../includes/langSelector.pug
+        .container.menu-container.menu-container--top
+            include ../includes/navigation.pug
+    main
+      .container
+        button.tween-relative-play(type="button")
+          |play
+        button.tween-relative-reset(type="button")
+          |reset
+        .tween-relative-container
+            .tween-relative-item

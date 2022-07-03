@@ -25,6 +25,7 @@ export const handleSetUp = (() => {
         tween: {
             duration: 1000,
             ease: 'easeLinear',
+            relative: false,
         },
         spring: {
             default: {

@@ -47,6 +47,7 @@ export class HandleTween {
         this.pauseTime = 0;
         this.firstRun = true;
         this.useStagger = true;
+        this.smallNumber = 0.00001;
 
         // Store max fps so is the fops of monitor using
         this.maxFps = 60;
@@ -60,10 +61,16 @@ export class HandleTween {
             'ease' in data
                 ? getTweenFn(data.ease)
                 : getTweenFn(handleSetUp.get('tween').ease);
+
         this.duration =
             'duration' in data
                 ? data.duration
                 : handleSetUp.get('tween').duration;
+
+        this.relative =
+            'duration' in data
+                ? data.relative
+                : handleSetUp.get('tween').relative;
 
         /**
         This value is the base value merged with new value in custom prop
@@ -72,6 +79,7 @@ export class HandleTween {
         this.defaultProps = {
             duration: this.duration,
             ease: 'ease' in data ? data.ease : handleSetUp.get('tween').ease,
+            relative: this.relative,
             reverse: false,
             immediate: false,
         };
@@ -374,7 +382,9 @@ export class HandleTween {
                 Prevent error on tween revert if is 0 some easeType can't run
                 es: easeInElastic
                 */
-                item.toValProcessed = item.toValue - item.fromValue + 0.00001;
+                item.toValProcessed = this.relative
+                    ? item.toValue + this.smallNumber
+                    : item.toValue - item.fromValue + this.smallNumber;
             }
         });
     }
@@ -401,9 +411,10 @@ export class HandleTween {
      */
     mergeProps(props) {
         const newProps = mergeDeep(this.defaultProps, props);
-        const { ease, duration } = newProps;
+        const { ease, duration, relative } = newProps;
         this.ease = getTweenFn(ease);
         this.duration = duration;
+        this.relative = relative;
 
         return newProps;
     }

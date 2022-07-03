@@ -64,6 +64,7 @@ import { radialStaggerTween } from './test/radialStaggerTween.js';
 import { masterSequencer } from './test/masterSequencer.js';
 import { sequencerStaggerTime } from './test/sequencerStaggerTime.js';
 import { createStagger } from './test/createStagger.js';
+import { tweenRealtive } from './test/tweenRelative.js';
 
 mobbu.use('load', () => {
     mobbu.default('set', {
@@ -188,6 +189,10 @@ mobbu.use('load', () => {
 
     if (body.classList.contains('page-createStagger')) {
         createStagger();
+    }
+
+    if (body.classList.contains('page-tweenRelative')) {
+        tweenRealtive();
     }
 
     mobbu.run('parallax');
