@@ -24,7 +24,6 @@ import { getStaggerFromProps } from '../utils/stagger/staggerUtils.js';
 import {
     defaultCallbackOnComplete,
     defaultCallback,
-    getDeltaFps,
 } from '../utils/callbacks/defaultCallback.js';
 
 export class HandleLerp {
@@ -43,11 +42,6 @@ export class HandleLerp {
         this.pauseStatus = false;
         this.firstRun = true;
         this.useStagger = true;
-
-        // Store max fps so is the fops of monitor using
-        this.maxFps = 60;
-        // If fps is under this.maxFps by this.fpsThreshold is algging, so skip to not overload
-        this.fpsThreshold = handleSetUp.get('fpsThreshold');
 
         /**
         This value lives from user call ( goTo etc..) until next call
@@ -103,17 +97,9 @@ export class HandleLerp {
 
         let o = {};
         o.velocity = parseFloat(this.velocity);
-        o.inMotion = false;
-
-        // Reset maxFos when animartion start
-        this.maxFps = 0;
 
         const draw = (timestamp, fps) => {
             this.req = true;
-            o.isRealFps = handleFrame.isRealFps();
-
-            // Get max fps upper limit
-            if (fps > this.maxFps && o.isRealFps) this.maxFps = fps;
 
             this.values.forEach((item, i) => {
                 if (item.settled) return;
@@ -139,28 +125,9 @@ export class HandleLerp {
             // Prepare an obj to pass to the callback
             o.cbObject = getValueObj(this.values, 'currentValue');
 
-            /**
-            Check if we lost some fps so we skip update to not overload browser rendering
-            Not first time, only inside motion and once fps is real ( stable )
-            **/
-            o.deltaFps = getDeltaFps({
-                inMotion: o.inMotion,
-                isRealFps: o.isRealFps,
-                maxFps: this.maxFps,
-                fps,
-            });
-            o.inMotion = true;
-
-            /**
-            Fire CallBack
-             **/
             defaultCallback({
                 stagger: this.stagger,
                 callback: this.callback,
-                deltaFps: o.deltaFps,
-                fpsThreshold: this.fpsThreshold,
-                maxFps: this.maxFps,
-                fps,
                 cbObject: o.cbObject,
                 useStagger: this.useStagger,
             });

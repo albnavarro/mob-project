@@ -5,36 +5,33 @@ import {
 } from '../../../events/rafutils/rafUtils.js';
 
 /**
-Get delta fps compared to the maximum fps detected
- **/
-export const getDeltaFps = ({ inMotion, isRealFps, maxFps, fps }) => {
-    return !inMotion || !isRealFps ? 0 : Math.abs(maxFps - fps);
-};
-
-/**
 Callback while Running
  **/
 export const defaultCallback = ({
     stagger,
     callback,
-    deltaFps,
-    fpsThreshold,
-    maxFps,
-    fps,
     cbObject,
     useStagger,
 }) => {
     handleFrame.add(() => {
         if (stagger.each === 0 || !useStagger) {
+            const lostFrameCounter = handleFrame.getDropFrameCounter();
+
             // No stagger, run immediatly
-            callback.forEach(({ cb }) => {
-                if (deltaFps < fpsThreshold || fps > maxFps) cb(cbObject);
-            });
+            if (lostFrameCounter === 2 || lostFrameCounter === -1) {
+                callback.forEach(({ cb }) => {
+                    cb(cbObject);
+                });
+            }
         } else {
             // Stagger
             callback.forEach(({ cb, index, frame }, i) => {
                 handleFrameIndex(() => {
-                    if (deltaFps < fpsThreshold || fps > maxFps) cb(cbObject);
+                    const lostFrameCounter = handleFrame.getDropFrameCounter();
+
+                    if (lostFrameCounter === 2 || lostFrameCounter === -1) {
+                        cb(cbObject);
+                    }
                 }, frame);
             });
         }

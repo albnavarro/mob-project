@@ -71,13 +71,17 @@ export class HandleSyncTimeline {
 
             // When come from playReverse skip first frame becouse is 0
             if (!this.skipFirstRender) {
-                this.squencers.forEach((item, i) => {
-                    item.draw({
-                        partial: this.endTime,
-                        isLastDraw: false,
-                        useFrame: true,
+                const lostFrameCounter = handleFrame.getDropFrameCounter();
+
+                if (lostFrameCounter === 2 || lostFrameCounter === -1) {
+                    this.squencers.forEach((item, i) => {
+                        item.draw({
+                            partial: this.endTime,
+                            isLastDraw: false,
+                            useFrame: true,
+                        });
                     });
-                });
+                }
             }
         }
 

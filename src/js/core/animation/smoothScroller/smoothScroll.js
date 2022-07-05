@@ -27,13 +27,25 @@ export class SmoothScrollClass {
         this.VERTICAL = 'VERTICAL';
         this.HORIZONTAL = 'HORIZONTAL';
         this.direction = data.direction || this.VERTICAL;
-        this.targetClass = data.target;
-        this.target =
-            document.querySelector(data.target) || document.documentElement;
+
+        this.target = data.target
+            ? (() => {
+                  return typeof data.target === 'string'
+                      ? document.querySelector(data.target)
+                      : data.target;
+              })()
+            : document.documentElement;
+
+        this.container = data.container
+            ? (() => {
+                  return typeof data.container === 'string'
+                      ? document.querySelector(data.container)
+                      : data.container;
+              })()
+            : document.documentElement;
+
         this.speed = data.speed || 60;
         this.drag = data.drag || false;
-        this.container =
-            document.querySelector(data.container) || document.documentElement;
         this.endValue = window.pageYOffset;
         this.startValue = 0;
         this.endValue = 0;

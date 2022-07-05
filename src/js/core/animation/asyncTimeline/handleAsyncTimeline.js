@@ -573,6 +573,12 @@ export class HandleAsyncTimeline {
         this.forceYoyo = true;
         this.goToLabelIndex = this.tweenList.length;
 
+        /**
+         * When start form end first loop is lost in immediate
+         * so increment the loop number by 1
+         **/
+        this.repeat >= 1 && this.repeat++;
+
         Promise.resolve().then(() => this.run());
     }
 

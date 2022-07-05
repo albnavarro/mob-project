@@ -102,13 +102,16 @@ export const handleFrame = (() => {
     let lastUpdate = 0;
     let elapsed = 0;
     let isStopped = false;
-    let fps = 60;
+    let fps = handleSetUp.get('startFps');
+    let maxFps = fps;
+    let frames = 0;
+    let fpsPrevTime = time;
 
-    // Fps data
-    let fpsStack = [];
-
-    // Indicate that fps is a real calucaltion and not the initial approssimation
-    let _isRealFps = false;
+    /**
+     * Check if frame drop by fpsThreshold value
+     * when value is -1 || 2 animation ( or whoever use it ) is rendered
+     * */
+    let dropFrameCounter = -1;
 
     // Stop timer when user change tab
     handleVisibilityChange(({ visibilityState }) => {
@@ -123,26 +126,31 @@ export const handleFrame = (() => {
         lastUpdate += elapsed;
         time = lastUpdate - startTime;
 
-        /*
-        Fps calculation
-        */
-        while (fpsStack.length > 0 && fpsStack[0] <= time - 1000) {
-            fpsStack.shift();
-            fps = fpsStack.length;
+        /**
+         * Get fps
+         * Update fps every second
+         **/
+        if (!isStopped) frames++;
 
-            /*
-            After two loop fps should be stable
-            So stop loadFps function and fire the callback
-            */
-            if (fpsLoopCounter > 1) {
-                _isRealFps = true;
-                loadFpsComplete = true;
-            } else {
-                fpsLoopCounter++;
-            }
+        if (time > fpsPrevTime + 1000) {
+            fps = Math.round((frames * 1000) / (time - fpsPrevTime));
+            fpsPrevTime = time;
+            frames = 0;
+            loadFpsComplete = true;
         }
 
-        fpsStack.push(time);
+        /**
+         * Update max fps
+         * */
+        if (fps > maxFps) maxFps = fps;
+
+        /**
+         * Update dropFrameCounter ( form 0 to 2 use % operator) if drop frame or reset
+         * */
+        dropFrameCounter =
+            Math.abs(maxFps - fps) < handleSetUp.get('fpsThreshold')
+                ? -1
+                : (dropFrameCounter + 1) % 3;
 
         /*
         Fire callbnack
@@ -204,14 +212,14 @@ export const handleFrame = (() => {
     };
 
     /**
-     * Get fps status , approxuimation or real calculation
-     */
-    const isRealFps = () => _isRealFps;
-
-    /**
      * Get fps value
      */
     const getFps = () => fps;
+
+    /**
+     * Get dropFrameCounter value
+     */
+    const getDropFrameCounter = () => dropFrameCounter;
 
     /**
      *  Add callback
@@ -232,8 +240,8 @@ export const handleFrame = (() => {
     return {
         add,
         addMultiple,
-        isRealFps,
         getFps,
+        getDropFrameCounter,
     };
 })();
 
