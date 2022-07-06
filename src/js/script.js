@@ -70,6 +70,7 @@ mobbu.use('load', () => {
     mobbu.default('set', {
         fpsThreshold: 25,
         deferredNextTick: true,
+        fpsCheckDuration: 500,
         throttle: 120,
         spring: {
             customSpring: {

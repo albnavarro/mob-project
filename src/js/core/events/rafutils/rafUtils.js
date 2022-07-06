@@ -91,7 +91,6 @@ export const handleFrameIndex = (fn, index) => {
  Global props use to get an fps much real as possibile
  */
 let loadFpsComplete = false;
-let fpsLoopCounter = 0;
 
 export const handleFrame = (() => {
     let frameIsRuning = false;
@@ -106,6 +105,11 @@ export const handleFrame = (() => {
     let maxFps = fps;
     let frames = 0;
     let fpsPrevTime = time;
+
+    /**
+     * First fps loop is 1 second;
+     **/
+    let fpsCheckDuration = 1000;
 
     /**
      * Check if frame drop by fpsThreshold value
@@ -132,7 +136,15 @@ export const handleFrame = (() => {
          **/
         if (!isStopped) frames++;
 
-        if (time > fpsPrevTime + 1000) {
+        if (time > fpsPrevTime + fpsCheckDuration) {
+            /**
+             * Update fpsCheckDuration time
+             **/
+            fpsCheckDuration = handleSetUp.get('fpsCheckDuration');
+
+            /**
+             * Calc fps
+             **/
             fps = Math.round((frames * 1000) / (time - fpsPrevTime));
             fpsPrevTime = time;
             frames = 0;
@@ -254,7 +266,6 @@ export const loadFps = () => {
     Reset prop to get some requestAnimationFrame and get a stable fps
     */
     loadFpsComplete = false;
-    fpsLoopCounter = 0;
 
     return new Promise((resolve, reject) => {
         const loop = () => {
