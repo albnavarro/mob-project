@@ -5,11 +5,7 @@ import {
     getRoundedValue,
 } from '../../animation/utils/animationUtils.js';
 import { mergeDeep } from '../../utils/mergeDeep.js';
-import {
-    handleFrame,
-    handleNextTick,
-    handleFrameIndex,
-} from '../../events/rafutils/rafUtils.js';
+import { handleFrame, handleNextTick } from '../../events/rafutils/rafUtils.js';
 import { setStagger } from '../utils/stagger/setStagger.js';
 import { getStaggerFromProps } from '../utils/stagger/staggerUtils.js';
 import { DIRECTION_COL } from '../utils/stagger/staggerCostant.js';
@@ -82,7 +78,7 @@ export class ParallaxTween {
             } else {
                 // Stagger
                 this.callback.forEach(({ cb, index, frame }, i) => {
-                    handleFrameIndex(() => cb(cbObject), frame);
+                    handleFrame.addIndex(() => cb(cbObject), frame);
                 });
             }
 
@@ -95,7 +91,7 @@ export class ParallaxTween {
                 } else {
                     // Stagger
                     this.callbackOnStop.forEach(({ cb, index, frame }, i) => {
-                        handleFrameIndex(() => cb(cbObject), frame + 1);
+                        handleFrame.addIndex(() => cb(cbObject), frame + 1);
                     });
                 }
             }

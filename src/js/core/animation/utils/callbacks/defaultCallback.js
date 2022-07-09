@@ -1,7 +1,6 @@
 import {
     handleFrame,
     handleNextFrame,
-    handleFrameIndex,
 } from '../../../events/rafutils/rafUtils.js';
 
 /**
@@ -13,8 +12,8 @@ export const defaultCallback = ({
     cbObject,
     useStagger,
 }) => {
-    handleFrame.add(() => {
-        if (stagger.each === 0 || !useStagger) {
+    if (stagger.each === 0 || !useStagger) {
+        handleFrame.add(() => {
             const lostFrameCounter = handleFrame.getDropFrameCounter();
 
             // No stagger, run immediatly
@@ -23,19 +22,19 @@ export const defaultCallback = ({
                     cb(cbObject);
                 });
             }
-        } else {
-            // Stagger
-            callback.forEach(({ cb, index, frame }, i) => {
-                handleFrameIndex(() => {
-                    const lostFrameCounter = handleFrame.getDropFrameCounter();
+        });
+    } else {
+        // Stagger
+        callback.forEach(({ cb, index, frame }, i) => {
+            handleFrame.addIndex(() => {
+                const lostFrameCounter = handleFrame.getDropFrameCounter();
 
-                    if (lostFrameCounter === 2 || lostFrameCounter === -1) {
-                        cb(cbObject);
-                    }
-                }, frame);
-            });
-        }
-    });
+                if (lostFrameCounter === 2 || lostFrameCounter === -1) {
+                    cb(cbObject);
+                }
+            }, frame);
+        });
+    }
 };
 
 /**
@@ -66,7 +65,7 @@ export const defaultCallbackOnComplete = ({
         });
     } else {
         callback.forEach(({ cb, index, frame }, i) => {
-            handleFrameIndex(() => {
+            handleFrame.addIndex(() => {
                 cb(cbObject);
 
                 if (stagger.waitComplete) {
@@ -82,7 +81,7 @@ export const defaultCallbackOnComplete = ({
         });
 
         callbackOnComplete.forEach(({ cb, index, frame }, i) => {
-            handleFrameIndex(() => {
+            handleFrame.addIndex(() => {
                 cb(cbObject);
             }, frame + 1);
         });

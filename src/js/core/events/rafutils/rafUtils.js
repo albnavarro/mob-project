@@ -57,23 +57,6 @@ export const handleNextTick = ((cb) => {
 })();
 
 /**
- *  Go to X frame from now
- */
-export const handleFrameIndex = (fn, index) => {
-    let start = 0;
-
-    const loop = (time, fps) => {
-        if (start === index) {
-            fn(time, fps);
-            return;
-        }
-        start++;
-        handleNextFrame.add((time, fps) => loop(time, fps));
-    };
-    handleNextFrame.add(() => loop());
-};
-
-/**
  * Utils to centralize all action form all components in one Request Animation Frame,
  * All subsciber use the same frame
  * handleFrame run once then delete all subscriber
@@ -95,6 +78,7 @@ let loadFpsComplete = false;
 export const handleFrame = (() => {
     let frameIsRuning = false;
     let callback = [];
+    let indexCallback = [];
     let time = getTime();
     let prevTime = getTime();
     let startTime = 0;
@@ -105,6 +89,7 @@ export const handleFrame = (() => {
     let maxFps = fps;
     let frames = 0;
     let fpsPrevTime = time;
+    let frameCounter = 0;
 
     /**
      * First fps loop is 1 second;
@@ -167,7 +152,37 @@ export const handleFrame = (() => {
         /*
         Fire callbnack
         */
-        callback.forEach((item) => item(time, fps));
+        callback.forEach((item, i) => item(time, fps));
+
+        /*
+        Update frameCounter
+        */
+        frameCounter++;
+
+        /*
+        Fire callback related to specific index frame
+        */
+
+        /*
+        Get arrays of callBack related to the current frameCounter
+        */
+        const item = indexCallback.find(
+            ({ index }, i) => index === frameCounter
+        );
+
+        /*
+        If there is some callback related to the current frameCounter
+        fire all the callback
+        */
+        if (item && item?.cb) {
+            item.cb.forEach((item) => item(time, fps));
+
+            // Get current index and remove item from array
+            const index = indexCallback.findIndex(
+                ({ index }, i) => index === frameCounter
+            );
+            indexCallback.splice(index, 1);
+        }
 
         /*
         Reset props
@@ -191,11 +206,13 @@ export const handleFrame = (() => {
             Get next callback
             */
             callback = [...callback, ...handleNextFrame.get()];
-            if (callback.length > 0) {
+
+            if (callback.length > 0 || indexCallback.length) {
                 // Call Next animationFrame
                 initFrame();
             } else {
                 isStopped = true;
+                frameCounter = 0;
             }
         };
 
@@ -242,6 +259,25 @@ export const handleFrame = (() => {
     };
 
     /**
+     *  Add callback at index
+     */
+    const addIndex = (cb, index) => {
+        const frameIndex = index + 1 + frameCounter;
+
+        /**
+         *  Add callback to array related to specific index idf exxist or create
+         */
+        const item = indexCallback.find(({ index }) => index === frameIndex);
+        if (item && item?.cb) {
+            item.cb.push(cb);
+        } else {
+            indexCallback.push({ index: frameIndex, cb: [cb] });
+        }
+
+        initFrame();
+    };
+
+    /**
      *  Add multiple callback
      */
     const addMultiple = (arr) => {
@@ -254,6 +290,7 @@ export const handleFrame = (() => {
         addMultiple,
         getFps,
         getDropFrameCounter,
+        addIndex,
     };
 })();
 

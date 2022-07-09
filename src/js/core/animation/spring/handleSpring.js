@@ -9,7 +9,6 @@ import {
     handleFrame,
     handleNextFrame,
     handleNextTick,
-    handleFrameIndex,
 } from '../../events/rafutils/rafUtils.js';
 import { mergeDeep } from '../../utils/mergeDeep.js';
 import { handleSetUp } from '../../setup.js';
