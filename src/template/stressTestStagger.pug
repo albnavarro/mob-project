@@ -1,0 +1,19 @@
+extends default/_wrapper.pug
+
+block content
+    header
+        .container
+            include ../includes/langSelector.pug
+        .container.menu-container.menu-container--top
+            include ../includes/navigation.pug
+    main
+        - const items = 990;
+        .container.clearfix       
+          .radial-stress-stagger
+            h1
+              | radial-stress
+            .radial-stress-stagger__container
+                each i in [...Array(items).keys()]
+                  .radial-stress-stagger__item
+                    
+        

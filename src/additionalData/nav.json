@@ -101,6 +101,10 @@
                 {
                     "label": "",
                     "univoqueId": "tweenRelative"
+                },
+                {
+                    "label": "",
+                    "univoqueId": "stressTestStagger"
                 }
             ]
         },

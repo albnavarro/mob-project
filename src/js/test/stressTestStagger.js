@@ -1,0 +1,39 @@
+import { mobbu } from '../core';
+
+export const stressTestStagger = () => {
+    const items = document.querySelectorAll(
+        '.radial-stress-stagger .radial-stress-stagger__item'
+    );
+
+    const tween = mobbu.create('tween', {
+        ease: 'easeInOutQuad',
+        stagger: {
+            each: 15,
+            from: { x: 22, y: 12 },
+            grid: { col: 45, row: 45, direction: 'radial' },
+            waitComplete: false,
+        },
+        data: { scale: 1, rotate: 0, opacity: 1 },
+    });
+
+    items.forEach((item, i) => {
+        tween.subscribe(({ scale, rotate, opacity }) => {
+            item.style.transform = `scale(${scale}) rotate(${rotate}deg)`;
+            item.style.opacity = opacity;
+        });
+    });
+
+    const timeline = mobbu
+        .create('asyncTimeline', { repeat: -1, yoyo: true })
+        .goTo(tween, { scale: 2 }, { duration: 1000 })
+        .goTo(tween, { scale: 0.5 }, { duration: 500 })
+        .goTo(tween, { rotate: 180, scale: 2.5 }, { duration: 500 })
+        .goTo(tween, { scale: 2 }, { duration: 500 })
+        .goTo(tween, { opacity: 0.5 }, { duration: 1200 })
+        .goTo(tween, { opacity: 1, scale: 1 }, { duration: 1200 });
+
+    // Exmple set and go
+    tween.set({ scale: 1.5, rotate: 0 }).then((value) => {
+        timeline.play();
+    });
+};

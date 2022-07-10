@@ -1,0 +1,21 @@
+.radial-stress-stagger {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    &__container {
+        display: grid;
+        grid-template-columns: repeat(45, 1fr);
+        grid-gap: 20px;
+    }
+
+    &__item {
+        width: 20px;
+        height: 20px;
+        background: #ccc;
+        // border-radius: 100%;
+        transform: scale(1.5);
+    }
+}

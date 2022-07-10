@@ -61,6 +61,7 @@ import { gridStaggerSpring } from './test/gridStaggerSpring.js';
 import { gridStaggerLerp } from './test/gridStaggerLerp.js';
 import { gridStaggerSequencer } from './test/gridStaggerSequencer.js';
 import { radialStaggerTween } from './test/radialStaggerTween.js';
+import { stressTestStagger } from './test/stressTestStagger.js';
 import { masterSequencer } from './test/masterSequencer.js';
 import { sequencerStaggerTime } from './test/sequencerStaggerTime.js';
 import { createStagger } from './test/createStagger.js';
@@ -177,6 +178,12 @@ mobbu.use('load', () => {
     if (body.classList.contains('page-radialStagger')) {
         mobbu.use('loadFps', () => {
             radialStaggerTween();
+        });
+    }
+
+    if (body.classList.contains('page-stressTestStagger')) {
+        mobbu.use('loadFps', () => {
+            stressTestStagger();
         });
     }
 
