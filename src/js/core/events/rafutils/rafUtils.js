@@ -22,7 +22,7 @@ export const handleNextFrame = ((cb) => {
 
     const get = () => {
         const cb = [...callback];
-        callback = [];
+        callback.length = 0;
         return cb;
     };
 
@@ -50,7 +50,7 @@ export const handleNextTick = ((cb) => {
 
         callback.sort((a, b) => a.priority - b.priority);
         callback.forEach(({ cb }) => cb(time, fps));
-        callback = [];
+        callback.length = 0;
     };
 
     return { add, fire };
@@ -76,6 +76,11 @@ export const handleNextTick = ((cb) => {
 let loadFpsComplete = false;
 
 export const handleFrame = (() => {
+    /*
+    10000 is maximum stagger frame delay
+    */
+    const maxFramecounter = 10000;
+
     let frameIsRuning = false;
     let callback = [];
     let indexCallback = [];
@@ -155,11 +160,6 @@ export const handleFrame = (() => {
         callback.forEach((item, i) => item(time, fps));
 
         /*
-        Update frameCounter
-        */
-        frameCounter++;
-
-        /*
         Fire callback related to specific index frame
         */
 
@@ -185,10 +185,26 @@ export const handleFrame = (() => {
         }
 
         /*
+        Update frameCounter
+        */
+        frameCounter++;
+
+        /*
+        If frameCounter reach maxFramecounter back to zero to avoid big numbers
+        */
+        if (frameCounter === maxFramecounter) {
+            frameCounter = 0;
+            indexCallback.forEach((item, i) => {
+                indexCallback[i].index =
+                    indexCallback[i].index - maxFramecounter;
+            });
+        }
+
+        /*
         Reset props
         */
         prevTime = time;
-        callback = [];
+        callback.length = 0;
         isStopped = false;
 
         const nextTickFn = () => {
@@ -262,7 +278,7 @@ export const handleFrame = (() => {
      *  Add callback at index
      */
     const addIndex = (cb, index) => {
-        const frameIndex = index + 1 + frameCounter;
+        const frameIndex = index + frameCounter;
 
         /**
          *  Add callback to array related to specific index idf exxist or create

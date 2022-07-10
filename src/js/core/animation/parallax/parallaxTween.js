@@ -278,4 +278,13 @@ export class ParallaxTween {
     getType() {
         return this.type;
     }
+
+    /**
+     * Remove all reference from tween
+     */
+    destroy() {
+        this.values = [];
+        this.callbackOnStop = [];
+        this.callback = [];
+    }
 }

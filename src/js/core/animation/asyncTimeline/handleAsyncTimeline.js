@@ -655,13 +655,6 @@ export class HandleAsyncTimeline {
         return this.currentTween;
     }
 
-    destroy() {
-        this.tweenList = [];
-        this.currentTween = [];
-        this.callback = [];
-        this.currentIndex = 0;
-    }
-
     onComplete(cb) {
         this.callback.push({ cb, id: this.id });
         const cbId = this.id;
@@ -670,5 +663,16 @@ export class HandleAsyncTimeline {
         return () => {
             this.callback = this.callback.filter((item) => item.id !== cbId);
         };
+    }
+
+    /**
+     * Remove all reference from tween
+     */
+    destroy() {
+        this.tweenList = [];
+        this.currentTween = [];
+        this.callback = [];
+        this.currentIndex = 0;
+        this.actionAfterReject = [];
     }
 }

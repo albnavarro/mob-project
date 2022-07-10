@@ -625,4 +625,16 @@ export class HandleLerp {
             );
         };
     }
+
+    /**
+     * Remove all reference from tween
+     */
+    destroy() {
+        if (this.promise) this.stop();
+        this.callbackOnComplete = [];
+        this.callbackStartInPause = [];
+        this.callback = [];
+        this.values = [];
+        this.promise = null;
+    }
 }

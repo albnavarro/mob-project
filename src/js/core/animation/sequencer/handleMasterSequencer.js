@@ -41,6 +41,9 @@ export class HandleMasterSequencer {
     }
 
     destroy() {
+        this.children.forEach((item, i) => {
+            item.destroy();
+        });
         this.children = [];
     }
 }

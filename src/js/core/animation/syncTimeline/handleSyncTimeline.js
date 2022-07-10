@@ -344,7 +344,12 @@ export class HandleSyncTimeline {
         };
     }
 
+    /**
+     * Remove all reference from tween
+     */
     destroy() {
         this.squencers = [];
+        this.callbackLoop = [];
+        this.callbackComplete = [];
     }
 }

@@ -451,10 +451,22 @@ export class HandleSequencer {
         return this.type;
     }
 
-    // Disable stagger for one run
-    // To place object immediatly without "delay"
+    /**
+     * Disable stagger for one run
+     * To place object immediatly without "delay"
+     **/
     disableStagger() {
         this.useStagger = false;
+    }
+
+    /**
+     * Remove all reference from tween
+     */
+    destroy() {
+        this.values = [];
+        this.timeline = [];
+        this.callback = [];
+        this.callbackOnStop = [];
     }
 }
 
