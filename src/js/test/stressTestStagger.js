@@ -9,8 +9,9 @@ export const stressTestStagger = () => {
         ease: 'easeInOutQuad',
         stagger: {
             each: 15,
-            from: { x: 22, y: 12 },
-            grid: { col: 45, row: 45, direction: 'radial' },
+            from: 'center',
+            // Row is 22 but for diagonal animation use 45
+            grid: { col: 45, row: 45, direction: 'row' },
             waitComplete: false,
         },
         data: { scale: 1, rotate: 0, opacity: 1 },

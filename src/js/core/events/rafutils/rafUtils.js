@@ -83,7 +83,7 @@ export const handleFrame = (() => {
 
     let frameIsRuning = false;
     let callback = [];
-    let indexCallback = [];
+    let indexCallback = {};
     let time = getTime();
     let prevTime = getTime();
     let startTime = 0;
@@ -95,6 +95,7 @@ export const handleFrame = (() => {
     let frames = 0;
     let fpsPrevTime = time;
     let frameCounter = 0;
+    let indexCb = null;
 
     /**
      * First fps loop is 1 second;
@@ -165,40 +166,24 @@ export const handleFrame = (() => {
 
         /*
         Get arrays of callBack related to the current frameCounter
+        indexCb is a 'global' variables instead constant to reduce garbage collector
         */
-        const item = indexCallback.find(
-            ({ index }, i) => index === frameCounter
-        );
-
-        /*
-        If there is some callback related to the current frameCounter
-        fire all the callback
-        */
-        if (item && item?.cb) {
-            item.cb.forEach((item) => item(time, fps));
-
-            // Get current index and remove item from array
-            const index = indexCallback.findIndex(
-                ({ index }, i) => index === frameCounter
-            );
-            indexCallback.splice(index, 1);
+        indexCb = indexCallback?.[`${frameCounter}`];
+        if (indexCb) {
+            indexCb.forEach((item) => item(time, fps));
+            /*
+            Remove cb array once fired
+            */
+            indexCallback[`${frameCounter}`] = null;
+            delete indexCallback[`${frameCounter}`];
+        } else {
+            indexCb = null;
         }
 
         /*
         Update frameCounter
         */
         frameCounter++;
-
-        /*
-        If frameCounter reach maxFramecounter back to zero to avoid big numbers
-        */
-        if (frameCounter === maxFramecounter) {
-            frameCounter = 0;
-            indexCallback.forEach((item, i) => {
-                indexCallback[i].index =
-                    indexCallback[i].index - maxFramecounter;
-            });
-        }
 
         /*
         Reset props
@@ -208,6 +193,22 @@ export const handleFrame = (() => {
         isStopped = false;
 
         const nextTickFn = () => {
+            /*
+             * If frameCounter reach maxFramecounter back to zero to avoid big numbers
+             * executte the opration outside requestAnimationFrame if deferredNextTick is active
+             */
+            if (frameCounter === maxFramecounter) {
+                frameCounter = 0;
+
+                Object.keys(indexCallback).forEach((key, i) => {
+                    delete Object.assign(indexCallback, {
+                        [`${parseInt(key) - maxFramecounter}`]: indexCallback[
+                            key
+                        ],
+                    })[key];
+                });
+            }
+
             /*
             RequestAnimationFrame is ended, ready for another
             */
@@ -223,7 +224,7 @@ export const handleFrame = (() => {
             */
             callback = [...callback, ...handleNextFrame.get()];
 
-            if (callback.length > 0 || indexCallback.length) {
+            if (callback.length > 0 || Object.keys(indexCallback).length) {
                 // Call Next animationFrame
                 initFrame();
             } else {
@@ -282,14 +283,15 @@ export const handleFrame = (() => {
 
         /**
          *  Add callback to array related to specific index idf exxist or create
+         *  use frameIndex for key of Object so i can get the sb array in in the fastest way possible
+         *  in a bigger set of callaback
          */
-        const item = indexCallback.find(({ index }) => index === frameIndex);
-        if (item && item?.cb) {
-            item.cb.push(cb);
-        } else {
-            indexCallback.push({ index: frameIndex, cb: [cb] });
-        }
 
+        if (indexCallback?.[`${frameIndex}`]) {
+            indexCallback[`${frameIndex}`].push(cb);
+        } else {
+            indexCallback[`${frameIndex}`] = [cb];
+        }
         initFrame();
     };
 
