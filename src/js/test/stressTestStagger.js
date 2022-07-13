@@ -1,4 +1,5 @@
 import { mobbu } from '../core';
+import { detectSafari } from '../utility/isSafari.js';
 
 export const stressTestStagger = () => {
     const items = document.querySelectorAll(
@@ -16,6 +17,17 @@ export const stressTestStagger = () => {
         },
         data: { scale: 1, rotate: 0, opacity: 1 },
     });
+
+    /**
+     * On safari complex animation with 500/1000 items probably lag
+     * In this case will-change fix the problem
+     * Chrome and firefix have no problem, will-change is destructive, absolutly not use
+     **/
+    if (detectSafari()) {
+        items.forEach((item, i) => {
+            item.style.willChange = 'transform';
+        });
+    }
 
     items.forEach((item, i) => {
         tween.subscribe(({ scale, rotate, opacity }) => {

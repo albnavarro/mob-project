@@ -87,8 +87,8 @@ export const handleFrame = (() => {
     let time = getTime();
     let prevTime = getTime();
     let startTime = 0;
-    let lastUpdate = 0;
-    let elapsed = 0;
+    let rawTime = 0;
+    let timeElapsed = 0;
     let isStopped = false;
     let fps = handleSetUp.get('startFps');
     let maxFps = fps;
@@ -98,15 +98,11 @@ export const handleFrame = (() => {
     let indexCb = null;
 
     /**
-     * First fps loop is 1 second;
-     **/
-    let fpsCheckDuration = 1000;
-
-    /**
      * Check if frame drop by fpsThreshold value
      * when value is -1 || 2 animation ( or whoever use it ) is rendered
      * */
     let dropFrameCounter = -1;
+    let fpsThreshold = handleSetUp.get('fpsThreshold');
 
     // Stop timer when user change tab
     handleVisibilityChange(({ visibilityState }) => {
@@ -114,12 +110,16 @@ export const handleFrame = (() => {
     });
 
     const render = () => {
+        /**
+         * Update time
+         **/
         time = getTime();
-        elapsed = time - lastUpdate;
+        timeElapsed = time - rawTime;
 
-        if (isStopped) startTime += elapsed;
-        lastUpdate += elapsed;
-        time = lastUpdate - startTime;
+        if (isStopped) startTime += timeElapsed;
+
+        rawTime += timeElapsed;
+        time = rawTime - startTime;
 
         /**
          * Get fps
@@ -127,12 +127,7 @@ export const handleFrame = (() => {
          **/
         if (!isStopped) frames++;
 
-        if (time > fpsPrevTime + fpsCheckDuration) {
-            /**
-             * Update fpsCheckDuration time
-             **/
-            fpsCheckDuration = handleSetUp.get('fpsCheckDuration');
-
+        if (time > fpsPrevTime + 1000) {
             /**
              * Calc fps
              **/
@@ -140,6 +135,11 @@ export const handleFrame = (() => {
             fpsPrevTime = time;
             frames = 0;
             loadFpsComplete = true;
+
+            /**
+             * Update value every seconds
+             **/
+            fpsThreshold = handleSetUp.get('fpsThreshold');
         }
 
         /**
@@ -151,7 +151,7 @@ export const handleFrame = (() => {
          * Update dropFrameCounter ( form 0 to 2 use % operator) if drop frame or reset
          * */
         dropFrameCounter =
-            Math.abs(maxFps - fps) < handleSetUp.get('fpsThreshold')
+            Math.abs(maxFps - fps) < fpsThreshold
                 ? -1
                 : (dropFrameCounter + 1) % 3;
 
@@ -168,14 +168,14 @@ export const handleFrame = (() => {
         Get arrays of callBack related to the current frameCounter
         indexCb is a 'global' variables instead constant to reduce garbage collector
         */
-        indexCb = indexCallback?.[`${frameCounter}`];
+        indexCb = indexCallback[frameCounter];
         if (indexCb) {
             indexCb.forEach((item) => item(time, fps));
             /*
             Remove cb array once fired
             */
-            indexCallback[`${frameCounter}`] = null;
-            delete indexCallback[`${frameCounter}`];
+            indexCallback[frameCounter] = null;
+            delete indexCallback[frameCounter];
         } else {
             indexCb = null;
         }
@@ -286,11 +286,10 @@ export const handleFrame = (() => {
          *  use frameIndex for key of Object so i can get the sb array in in the fastest way possible
          *  in a bigger set of callaback
          */
-
-        if (indexCallback?.[`${frameIndex}`]) {
-            indexCallback[`${frameIndex}`].push(cb);
+        if (indexCallback[frameIndex]) {
+            indexCallback[frameIndex].push(cb);
         } else {
-            indexCallback[`${frameIndex}`] = [cb];
+            indexCallback[frameIndex] = [cb];
         }
         initFrame();
     };
