@@ -144,7 +144,7 @@ export const handleFrame = (() => {
     let instantFps = fps;
     let maxFps = fps;
     let frames = 0;
-    let fpsPrevTime = time;
+    let fpsPrevTime = 0;
     let frameCounter = 0;
     let indexCb = null;
 
