@@ -71,7 +71,7 @@ export const handleNextTick = ((cb) => {
  */
 
 /*
- Global props use to get an fps much real as possibile
+ * Global props use to get an fps much real as possibile
  */
 let loadFpsComplete = false;
 

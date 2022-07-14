@@ -80,6 +80,9 @@ export const mobbu = {
                 console.warn(`${action} in mobbu.default not exist`);
         }
     },
+    getFps() {
+        return handleFrame.getFps();
+    },
     create(type, obj) {
         switch (type) {
             case 'lerp':

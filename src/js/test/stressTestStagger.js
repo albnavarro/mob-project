@@ -18,23 +18,21 @@ export const stressTestStagger = () => {
         data: { scale: 1, rotate: 0, opacity: 1 },
     });
 
-    /**
-     * On safari complex animation with 500/1000 items probably lag
-     * In this case will-change fix the problem
-     * Chrome and firefix have no problem, will-change is destructive, absolutly not use
-     **/
     if (detectSafari()) {
         items.forEach((item, i) => {
-            item.style.willChange = 'transform';
+            tween.subscribe(({ scale, rotate, opacity }) => {
+                item.style.transform = `translate3D(-50%, -50%, 1px) scale(${scale}) rotate(${rotate}deg)`;
+                item.style.opacity = opacity;
+            });
+        });
+    } else {
+        items.forEach((item, i) => {
+            tween.subscribe(({ scale, rotate, opacity }) => {
+                item.style.transform = `scale(${scale}) rotate(${rotate}deg)`;
+                item.style.opacity = opacity;
+            });
         });
     }
-
-    items.forEach((item, i) => {
-        tween.subscribe(({ scale, rotate, opacity }) => {
-            item.style.transform = `scale(${scale}) rotate(${rotate}deg)`;
-            item.style.opacity = opacity;
-        });
-    });
 
     const timeline = mobbu
         .create('asyncTimeline', { repeat: -1, yoyo: true })

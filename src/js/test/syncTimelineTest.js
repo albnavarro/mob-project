@@ -18,7 +18,6 @@ export function syncTimelineTest() {
         .create('sequencer', {
             ease: 'easeInOutCubic',
             data: { x: 0, y: 0, rotate: 0, scale: 1 },
-            duration: 10,
         })
         .goTo({ x: 800 }, { start: 0, end: 2.5, ease: 'easeInOutBack' })
         .goTo({ y: 450 }, { start: 2.5, end: 5, ease: 'easeInOutBack' })
@@ -43,7 +42,6 @@ export function syncTimelineTest() {
         .create('sequencer', {
             stagger: { each: 10, from: 'end' },
             data: { x: 0, scale: 1 },
-            duration: 10,
         })
         .goTo({ x: 800 }, { start: 3, end: 5, ease: 'easeInOutBack' })
         .goTo({ x: 0 }, { start: 5, end: 7, ease: 'easeInOutBack' })
