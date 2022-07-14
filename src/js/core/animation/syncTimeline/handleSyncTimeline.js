@@ -40,7 +40,7 @@ export class HandleSyncTimeline {
         this.callbackComplete = [];
     }
 
-    updateTime(timestamp, fps) {
+    updateTime(timestamp, fps, dropFrameCounter) {
         if (this.isStopped || this.isInInzializing) return;
 
         // If loop anitcipate by half frame ( in millsenconds ) next loop so we a have more precise animation
@@ -71,9 +71,7 @@ export class HandleSyncTimeline {
 
             // When come from playReverse skip first frame becouse is 0
             if (!this.skipFirstRender) {
-                const lostFrameCounter = handleFrame.getDropFrameCounter();
-
-                if (lostFrameCounter === 2 || lostFrameCounter === -1) {
+                if (dropFrameCounter === 2 || dropFrameCounter === -1) {
                     this.squencers.forEach((item, i) => {
                         item.draw({
                             partial: this.endTime,
@@ -180,9 +178,10 @@ export class HandleSyncTimeline {
 
     goToNextFrame() {
         handleFrame.add(() => {
-            handleNextTick.add((timestamp, fps) => {
+            handleNextTick.add((timestamp, fps, dropFrameCounter) => {
                 // Prevent fire too many raf
-                if (!this.isInInzializing) this.updateTime(timestamp, fps);
+                if (!this.isInInzializing)
+                    this.updateTime(timestamp, fps, dropFrameCounter);
             });
         });
     }
@@ -218,10 +217,10 @@ export class HandleSyncTimeline {
         });
 
         handleFrame.add(() => {
-            handleNextTick.add((timestamp, fps) => {
+            handleNextTick.add((timestamp, fps, dropFrameCounter) => {
                 this.startTime = timestamp;
                 this.isInInzializing = false;
-                this.updateTime(timestamp, fps);
+                this.updateTime(timestamp, fps, dropFrameCounter);
             });
         });
     }
@@ -260,10 +259,10 @@ export class HandleSyncTimeline {
         });
 
         handleFrame.add(() => {
-            handleNextTick.add((timestamp, fps) => {
+            handleNextTick.add((timestamp, fps, dropFrameCounter) => {
                 this.isInInzializing = false;
                 this.startTime = timestamp;
-                this.updateTime(timestamp, fps);
+                this.updateTime(timestamp, fps, dropFrameCounter);
             });
         });
     }

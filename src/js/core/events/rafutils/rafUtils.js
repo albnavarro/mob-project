@@ -5,6 +5,56 @@ import { handleSetUp } from '../../setup.js';
 import { handleVisibilityChange } from '../visibilityChange/handleVisibilityChange.js';
 
 /**
+ *  Intial loop fo reach the right fps
+ *  loadFps().then(() => ... );
+ *  To get the right FPS immediatly use a different calcultation respect handleFrame
+ *  More Havier but run in a very limited time
+ */
+export const loadFps = () => {
+    return new Promise((resolve, reject) => {
+        const frameTimes = [];
+        const maxFrames = 20;
+        let frameCursor = 0;
+        let numFrames = 0;
+        let totalFPS = 0;
+        let then = 0;
+        let frameCounter = 0;
+
+        const render = (now) => {
+            now *= 0.001; // convert to seconds
+            const deltaTime = now - then; // compute time since last frame
+            then = now; // remember time for next frame
+            const fps = 1 / deltaTime; // compute frames per second
+
+            // add the current fps and remove the oldest fps
+            totalFPS += fps - (frameTimes[frameCursor] || 0);
+
+            // record the newest fps
+            frameTimes[frameCursor++] = fps;
+
+            // needed so the first N frames, before we have maxFrames, is correct.
+            numFrames = Math.max(numFrames, frameCursor);
+
+            // wrap the cursor
+            frameCursor %= maxFrames;
+
+            const averageFPS = parseInt(totalFPS / numFrames);
+
+            frameCounter++;
+
+            if (frameCounter >= 50) {
+                handleFrame.setInstantFps(averageFPS);
+                resolve();
+                return;
+            }
+
+            handleNextFrame.add(() => render(getTime()));
+        };
+        handleFrame.add(() => render(getTime()));
+    });
+};
+
+/**
  *
  * @example:
  *
@@ -45,11 +95,11 @@ export const handleNextTick = ((cb) => {
         callback.push({ cb, priority });
     };
 
-    const fire = (time, fps) => {
+    const fire = (time, fps, dropFrameCounter) => {
         if (callback.length === 0) return;
 
         callback.sort((a, b) => a.priority - b.priority);
-        callback.forEach(({ cb }) => cb(time, fps));
+        callback.forEach(({ cb }) => cb(time, fps, dropFrameCounter));
         callback.length = 0;
     };
 
@@ -91,6 +141,7 @@ export const handleFrame = (() => {
     let timeElapsed = 0;
     let isStopped = false;
     let fps = handleSetUp.get('startFps');
+    let instantFps = fps;
     let maxFps = fps;
     let frames = 0;
     let fpsPrevTime = time;
@@ -158,7 +209,7 @@ export const handleFrame = (() => {
         /*
         Fire callbnack
         */
-        callback.forEach((item, i) => item(time, fps));
+        callback.forEach((item, i) => item(time, fps, dropFrameCounter));
 
         /*
         Fire callback related to specific index frame
@@ -170,7 +221,7 @@ export const handleFrame = (() => {
         */
         indexCb = indexCallback[frameCounter];
         if (indexCb) {
-            indexCb.forEach((item) => item(time, fps));
+            indexCb.forEach((item) => item(time, fps, dropFrameCounter));
             /*
             Remove cb array once fired
             */
@@ -217,7 +268,7 @@ export const handleFrame = (() => {
             /*
             Fire next tick
             */
-            handleNextTick.fire(time, fps);
+            handleNextTick.fire(time, fps, dropFrameCounter);
 
             /*
             Get next callback
@@ -258,9 +309,16 @@ export const handleFrame = (() => {
     };
 
     /**
-     * Get fps value
+     * Get/set fps value
      */
     const getFps = () => fps;
+
+    /**
+     * Get/set initial fps value
+     */
+    const getInstantFps = () => instantFps;
+
+    const setInstantFps = (val) => (instantFps = val);
 
     /**
      * Get dropFrameCounter value
@@ -306,39 +364,9 @@ export const handleFrame = (() => {
         add,
         addMultiple,
         getFps,
+        getInstantFps,
+        setInstantFps,
         getDropFrameCounter,
         addIndex,
     };
 })();
-
-/**
- *  Intial loop fo reach the right fps
- *  loadFps().then(() => ... );
- */
-export const loadFps = () => {
-    /*
-    Reset prop to get some requestAnimationFrame and get a stable fps
-    */
-    loadFpsComplete = false;
-
-    return new Promise((resolve, reject) => {
-        const loop = () => {
-            if (loadFpsComplete) {
-                resolve();
-                return;
-            }
-
-            handleFrame.add(() => {
-                handleNextTick.add(() => {
-                    loop();
-                });
-            });
-        };
-
-        handleFrame.add(() => {
-            handleNextTick.add(() => {
-                loop();
-            });
-        });
-    });
-};

@@ -11,7 +11,7 @@ export const stressTestStagger = () => {
         stagger: {
             each: 15,
             from: 'center',
-            // Row is 22 but for diagonal animation use 45
+            // // Row is 22 but for diagonal animation use 45
             grid: { col: 45, row: 45, direction: 'row' },
             waitComplete: false,
         },

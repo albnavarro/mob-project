@@ -85,7 +85,7 @@ mobbu.use('load', () => {
 
     mobbu.default('print');
     mobbu.use('loadFps', () => {
-        console.log('fps ready at:', mobbu.getFps());
+        console.log('fps ready at:', mobbu.getInstantFps());
     });
 
     const body = document.querySelector('body');

@@ -83,6 +83,9 @@ export const mobbu = {
     getFps() {
         return handleFrame.getFps();
     },
+    getInstantFps() {
+        return handleFrame.getInstantFps();
+    },
     create(type, obj) {
         switch (type) {
             case 'lerp':
