@@ -1,0 +1,7 @@
+{
+    "template": "canvas",
+    "pageTitle": "canvas",
+    "description": "canvas",
+    "additionalData": ["nav.json"],
+    "registerComponent": ["to-top/pug/toTop.pug"]
+}

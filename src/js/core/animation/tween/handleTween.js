@@ -91,20 +91,20 @@ export class HandleTween {
         if (props) this.setData(props);
     }
 
-    onReuqestAnim(timestamp, fps, res) {
+    onReuqestAnim(time, res) {
         if (this.firstRun) this.setStagger();
 
-        this.startTime = timestamp;
+        this.startTime = time;
 
         let o = {};
 
-        const draw = (timestamp, fps) => {
+        const draw = (time) => {
             this.req = true;
 
             if (this.pauseStatus) {
-                this.pauseTime = timestamp - this.startTime - this.timeElapsed;
+                this.pauseTime = time - this.startTime - this.timeElapsed;
             }
-            this.timeElapsed = timestamp - this.startTime - this.pauseTime;
+            this.timeElapsed = time - this.startTime - this.pauseTime;
 
             if (this.isRunning && parseInt(this.timeElapsed) >= this.duration) {
                 this.timeElapsed = this.duration;
@@ -140,8 +140,8 @@ export class HandleTween {
 
             if (!o.isSettled) {
                 handleNextFrame.add(() => {
-                    handleNextTick.add((timestamp, fps) => {
-                        if (this.req) draw(timestamp, fps);
+                    handleNextTick.add(({ time }) => {
+                        if (this.req) draw(time);
                     });
                 });
             } else {
@@ -187,7 +187,7 @@ export class HandleTween {
             }
         };
 
-        draw(timestamp, fps);
+        draw(time);
     }
 
     setStagger() {
@@ -227,12 +227,12 @@ export class HandleTween {
         this.currentResolve = res;
 
         handleFrame.add(() => {
-            handleNextTick.add((timestamp, fps) => {
+            handleNextTick.add(({ time }) => {
                 const prevent = this.callbackStartInPause
                     .map(({ cb }) => cb())
                     .some((item) => item === true);
 
-                this.onReuqestAnim(timestamp, fps, res);
+                this.onReuqestAnim(time, res);
                 if (prevent) this.pause();
             });
         });

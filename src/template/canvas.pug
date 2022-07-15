@@ -1,0 +1,14 @@
+extends default/_wrapper.pug
+
+block content
+            
+    header
+        .container
+            include ../includes/langSelector.pug
+        .container.menu-container.menu-container--top
+            include ../includes/navigation.pug
+            
+    main
+        canvas(id='test-canvas' width="100%" height="100%")
+
+    

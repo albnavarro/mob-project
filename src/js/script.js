@@ -66,6 +66,7 @@ import { masterSequencer } from './test/masterSequencer.js';
 import { sequencerStaggerTime } from './test/sequencerStaggerTime.js';
 import { createStagger } from './test/createStagger.js';
 import { tweenRealtive } from './test/tweenRelative.js';
+import { testCanvas } from './test/testCanvas.js';
 
 mobbu.use('load', () => {
     mobbu.default('set', {
@@ -202,6 +203,10 @@ mobbu.use('load', () => {
 
     if (body.classList.contains('page-tweenRelative')) {
         tweenRealtive();
+    }
+
+    if (body.classList.contains('page-canvas')) {
+        testCanvas();
     }
 
     mobbu.run('parallax');

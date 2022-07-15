@@ -13,7 +13,7 @@ export const defaultCallback = ({
     useStagger,
 }) => {
     if (stagger.each === 0 || !useStagger) {
-        handleFrame.add((time, fps, dropFrameCounter) => {
+        handleFrame.add(({ dropFrameCounter }) => {
             // No stagger, run immediatly
             if (dropFrameCounter === 2 || dropFrameCounter === -1) {
                 callback.forEach(({ cb }) => {
@@ -24,7 +24,7 @@ export const defaultCallback = ({
     } else {
         // Stagger
         callback.forEach(({ cb, index, frame }, i) => {
-            handleFrame.addIndex((time, fps, dropFrameCounter) => {
+            handleFrame.addIndex(({ dropFrameCounter }) => {
                 if (dropFrameCounter === 2 || dropFrameCounter === -1) {
                     cb(cbObject);
                 }

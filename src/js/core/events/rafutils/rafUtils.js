@@ -95,11 +95,11 @@ export const handleNextTick = ((cb) => {
         callback.push({ cb, priority });
     };
 
-    const fire = (time, fps, dropFrameCounter) => {
+    const fire = ({ time, fps, dropFrameCounter }) => {
         if (callback.length === 0) return;
 
         callback.sort((a, b) => a.priority - b.priority);
-        callback.forEach(({ cb }) => cb(time, fps, dropFrameCounter));
+        callback.forEach(({ cb }) => cb({ time, fps, dropFrameCounter }));
         callback.length = 0;
     };
 
@@ -120,16 +120,12 @@ export const handleNextTick = ((cb) => {
  *
  */
 
-/*
- * Global props use to get an fps much real as possibile
- */
-let loadFpsComplete = false;
-
 export const handleFrame = (() => {
     /*
     10000 is maximum stagger frame delay
     */
     const maxFramecounter = 10000;
+    const firstRunDuration = 2000;
 
     let frameIsRuning = false;
     let callback = [];
@@ -181,11 +177,14 @@ export const handleFrame = (() => {
         if (time > fpsPrevTime + 1000) {
             /**
              * Calc fps
+             * Set fps when stable after 2 seconds otherwise use instantFps
              **/
-            fps = Math.round((frames * 1000) / (time - fpsPrevTime));
+            fps =
+                time > firstRunDuration
+                    ? Math.round((frames * 1000) / (time - fpsPrevTime))
+                    : instantFps;
             fpsPrevTime = time;
             frames = 0;
-            loadFpsComplete = true;
 
             /**
              * Update value every seconds
@@ -209,7 +208,7 @@ export const handleFrame = (() => {
         /*
         Fire callbnack
         */
-        callback.forEach((item, i) => item(time, fps, dropFrameCounter));
+        callback.forEach((item, i) => item({ time, fps, dropFrameCounter }));
 
         /*
         Fire callback related to specific index frame
@@ -221,7 +220,7 @@ export const handleFrame = (() => {
         */
         indexCb = indexCallback[frameCounter];
         if (indexCb) {
-            indexCb.forEach((item) => item(time, fps, dropFrameCounter));
+            indexCb.forEach((item) => item({ time, fps, dropFrameCounter }));
             /*
             Remove cb array once fired
             */
@@ -268,14 +267,21 @@ export const handleFrame = (() => {
             /*
             Fire next tick
             */
-            handleNextTick.fire(time, fps, dropFrameCounter);
+            handleNextTick.fire({ time, fps, dropFrameCounter });
 
             /*
             Get next callback
             */
             callback = [...callback, ...handleNextFrame.get()];
 
-            if (callback.length > 0 || Object.keys(indexCallback).length) {
+            /*
+            Next frame condition
+            */
+            if (
+                callback.length > 0 ||
+                Object.keys(indexCallback).length ||
+                time < firstRunDuration
+            ) {
                 // Call Next animationFrame
                 initFrame();
             } else {
@@ -370,3 +376,8 @@ export const handleFrame = (() => {
         addIndex,
     };
 })();
+
+/**
+ *  Load fos to set initial stabel fps
+ */
+loadFps();

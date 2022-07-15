@@ -90,7 +90,7 @@ export class HandleSpring {
         }
     }
 
-    onReuqestAnim(timestamp, fps, res) {
+    onReuqestAnim(time, fps, res) {
         if (this.firstRun) this.setStagger();
 
         this.values.forEach((item, i) => {
@@ -109,7 +109,7 @@ export class HandleSpring {
         o.mass = parseFloat(this.config.mass);
         o.precision = parseFloat(this.config.precision);
 
-        const draw = (timestamp, fps) => {
+        const draw = (time, fps) => {
             this.req = true;
 
             this.values.forEach((item, i) => {
@@ -153,8 +153,8 @@ export class HandleSpring {
 
             if (!o.allSettled) {
                 handleFrame.add(() => {
-                    handleNextTick.add((timestamp, fps) => {
-                        if (this.req) draw(timestamp, fps);
+                    handleNextTick.add(({ time, fps }) => {
+                        if (this.req) draw(time, fps);
                     });
                 });
             } else {
@@ -198,7 +198,7 @@ export class HandleSpring {
             }
         };
 
-        draw(timestamp, fps);
+        draw(time, fps);
     }
 
     setStagger() {
@@ -238,12 +238,12 @@ export class HandleSpring {
         this.currentResolve = res;
 
         handleFrame.add(() => {
-            handleNextTick.add((timestamp, fps) => {
+            handleNextTick.add(({ time, fps }) => {
                 const prevent = this.callbackStartInPause
                     .map(({ cb }) => cb())
                     .some((item) => item === true);
 
-                this.onReuqestAnim(timestamp, fps, res);
+                this.onReuqestAnim(time, fps, res);
                 if (prevent) this.pause();
             });
         });
@@ -310,8 +310,8 @@ export class HandleSpring {
 
         if (!this.req && this.currentResolve) {
             handleFrame.add(() => {
-                handleNextTick.add((timestamp, fps) => {
-                    this.onReuqestAnim(timestamp, fps, this.currentResolve);
+                handleNextTick.add(({ time, fps }) => {
+                    this.onReuqestAnim(time, fps, this.currentResolve);
                 });
             });
         }

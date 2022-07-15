@@ -87,7 +87,7 @@ export class HandleLerp {
         if (props) this.setData(props);
     }
 
-    onReuqestAnim(timestamp, fps, res) {
+    onReuqestAnim(time, fps, res) {
         if (this.firstRun) this.setStagger();
 
         this.values.forEach((item, i) => {
@@ -97,7 +97,7 @@ export class HandleLerp {
         let o = {};
         o.velocity = parseFloat(this.velocity);
 
-        const draw = (timestamp, fps) => {
+        const draw = (time, fps) => {
             this.req = true;
 
             this.values.forEach((item, i) => {
@@ -136,8 +136,8 @@ export class HandleLerp {
 
             if (!o.allSettled) {
                 handleNextFrame.add(() => {
-                    handleNextTick.add((timestamp, fps) => {
-                        if (this.req) draw(timestamp, fps);
+                    handleNextTick.add(({ time, fps }) => {
+                        if (this.req) draw(time, fps);
                     });
                 });
             } else {
@@ -181,7 +181,7 @@ export class HandleLerp {
             }
         };
 
-        draw(timestamp, fps);
+        draw(time, fps);
     }
 
     setStagger() {
@@ -221,13 +221,13 @@ export class HandleLerp {
         this.currentResolve = res;
 
         handleFrame.add(() => {
-            handleNextTick.add((timestamp, fps) => {
+            handleNextTick.add(({ time, fps }) => {
                 // this.req = true;
                 const prevent = this.callbackStartInPause
                     .map(({ cb }) => cb())
                     .some((item) => item === true);
 
-                this.onReuqestAnim(timestamp, fps, res);
+                this.onReuqestAnim(time, fps, res);
                 if (prevent) this.pause();
             });
         });
@@ -290,8 +290,8 @@ export class HandleLerp {
 
         if (!this.req && this.currentResolve) {
             handleFrame.add(() => {
-                handleNextTick.add((timestamp, fps) => {
-                    this.onReuqestAnim(timestamp, fps, this.currentResolve);
+                handleNextTick.add(({ time, fps }) => {
+                    this.onReuqestAnim(time, fps, this.currentResolve);
                 });
             });
         }

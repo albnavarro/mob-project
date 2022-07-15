@@ -105,6 +105,10 @@
                 {
                     "label": "",
                     "univoqueId": "stressTestStagger"
+                },
+                {
+                    "label": "",
+                    "univoqueId": "canvas"
                 }
             ]
         },
