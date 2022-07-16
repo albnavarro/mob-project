@@ -36,15 +36,11 @@ export const stressTestStagger = () => {
 
     const timeline = mobbu
         .create('asyncTimeline', { repeat: -1, yoyo: true })
-        .goTo(tween, { scale: 2 }, { duration: 1000 })
+        .goTo(tween, { scale: 1.5 }, { duration: 1000 })
         .goTo(tween, { scale: 0.5 }, { duration: 500 })
-        .goTo(tween, { rotate: 180, scale: 2.5 }, { duration: 500 })
-        .goTo(tween, { scale: 2 }, { duration: 500 })
+        .goTo(tween, { rotate: 180, scale: 1.2 }, { duration: 500 })
+        .goTo(tween, { scale: 1.3 }, { duration: 500 })
         .goTo(tween, { opacity: 0.5 }, { duration: 1200 })
-        .goTo(tween, { opacity: 1, scale: 1 }, { duration: 1200 });
-
-    // Exmple set and go
-    tween.set({ scale: 1.5, rotate: 0 }).then((value) => {
-        timeline.play();
-    });
+        .goTo(tween, { opacity: 1, scale: 1 }, { duration: 1200 })
+        .play();
 };

@@ -8,14 +8,12 @@
     &__container {
         display: grid;
         grid-template-columns: repeat(45, 1fr);
-        grid-gap: 20px;
+        grid-gap: 10px;
     }
 
     &__item {
-        width: 20px;
-        height: 20px;
+        width: 30px;
+        height: 30px;
         background: #ccc;
-        // border-radius: 100%;
-        transform: scale(1.5);
     }
 }
