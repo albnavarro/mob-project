@@ -206,7 +206,9 @@ mobbu.use('load', () => {
     }
 
     if (body.classList.contains('page-canvas')) {
-        testCanvas();
+        mobbu.use('loadFps', () => {
+            testCanvas();
+        });
     }
 
     mobbu.run('parallax');

@@ -3,18 +3,13 @@ import { mobbu } from '../core';
 export const testCanvas = () => {
     const canvas = document.querySelector('#test-canvas');
     const context = canvas.getContext('2d');
-    canvas.width = document.body.clientWidth;
-    canvas.height = document.body.clientHeight;
-    let canvasW = canvas.width;
-    let canvasH = canvas.height;
-    let ratioX = canvasW / canvasH;
-    let ratioY = canvasH / canvasW;
-
-    const items = 900;
-    const numColumn = 30;
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+    const items = 990;
+    const numColumn = 44;
     const gutter = 10;
-    const width = 40;
-    const height = 40 / ratioY;
+    const width = 30;
+    const height = 30;
 
     let col = -1;
     let row = -2;
@@ -23,8 +18,8 @@ export const testCanvas = () => {
         col = col < numColumn ? col + 1 : 0;
         if (col === 0) row++;
 
-        const x = (width + gutter) * col;
-        const y = (height + gutter) * (row + 1);
+        const x = (width + gutter) * col + gutter * 2;
+        const y = (height + gutter) * (row + 1) + gutter;
 
         return {
             width,
@@ -39,12 +34,8 @@ export const testCanvas = () => {
     });
 
     mobbu.use('resize', () => {
-        canvas.width = document.body.clientWidth;
-        canvas.height = document.body.clientHeight;
-        canvasW = canvas.width;
-        canvasH = canvas.height;
-        ratioX = canvasW / canvasH;
-        ratioY = canvasH / canvasW;
+        canvas.width = canvas.clientWidth;
+        canvas.height = canvas.clientHeight;
         draw();
     });
 
@@ -52,15 +43,25 @@ export const testCanvas = () => {
         ease: 'easeInOutQuad',
         stagger: {
             each: 15,
-            from: { x: 15, y: 10 },
-            grid: { col: 31, row: 31, direction: 'radial' },
+            from: 'center',
+            // from: { x: 23, y: 10 },
+            grid: { col: 45, row: 45, direction: 'row' },
             waitComplete: false,
         },
         data: { scale: 1, rotate: 0, opacity: 1 },
     });
 
+    itemsArr.forEach((item, i) => {
+        tween.subscribe(({ scale, rotate, opacity }) => {
+            item.scale = scale;
+            item.rotate = rotate;
+            item.opacity = opacity;
+        });
+    });
+
     const draw = () => {
-        context.clearRect(0, 0, canvas.width, canvas.height);
+        // context.clearRect(0, 0, canvas.width, canvas.height);
+        canvas.width = canvas.width;
 
         itemsArr.forEach(
             ({ width, height, x, y, color, scale, rotate, opacity }, i) => {
@@ -81,20 +82,12 @@ export const testCanvas = () => {
         );
     };
 
-    itemsArr.forEach((item, i) => {
-        tween.subscribe(({ scale, rotate, opacity }) => {
-            item.scale = scale;
-            item.rotate = rotate;
-            item.opacity = opacity;
-        });
-    });
-
     const timeline = mobbu
         .create('asyncTimeline', { repeat: -1, yoyo: true })
-        .goTo(tween, { scale: 0.5 }, { duration: 1000 })
+        .goTo(tween, { scale: 1.5 }, { duration: 1000 })
         .goTo(tween, { scale: 0.5 }, { duration: 500 })
-        .goTo(tween, { rotate: 180, scale: 1.5 }, { duration: 500 })
-        .goTo(tween, { scale: 2 }, { duration: 500 })
+        .goTo(tween, { rotate: 180, scale: 1.2 }, { duration: 500 })
+        .goTo(tween, { scale: 1.5 }, { duration: 500 })
         .goTo(tween, { opacity: 0.5 }, { duration: 1200 })
         .goTo(tween, { opacity: 1, scale: 1 }, { duration: 1200 })
         .play();
