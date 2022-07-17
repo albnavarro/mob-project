@@ -130,6 +130,7 @@ export const handleFrame = (() => {
     let frameIsRuning = false;
     let callback = [];
     let indexCallback = {};
+    let indexCallbackLength = 0;
     let time = getTime();
     let prevTime = getTime();
     let startTime = 0;
@@ -226,6 +227,7 @@ export const handleFrame = (() => {
             */
             indexCallback[frameCounter] = null;
             delete indexCallback[frameCounter];
+            indexCallbackLength--;
         } else {
             indexCb = null;
         }
@@ -279,7 +281,7 @@ export const handleFrame = (() => {
             */
             if (
                 callback.length > 0 ||
-                Object.keys(indexCallback).length ||
+                indexCallbackLength > 0 ||
                 time < firstRunDuration
             ) {
                 // Call Next animationFrame
@@ -354,6 +356,7 @@ export const handleFrame = (() => {
             indexCallback[frameIndex].push(cb);
         } else {
             indexCallback[frameIndex] = [cb];
+            indexCallbackLength++;
         }
         initFrame();
     };
