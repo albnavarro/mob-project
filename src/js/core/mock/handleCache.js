@@ -1,3 +1,5 @@
+// USARE new Map anche per addIndex
+
 const unsubscribers = items.map((item, i) => {
     const { id, unsubscribe } = handleCache.add(item, ({ rotate }, el) => {
         el.transform = `rotate(${rotate}px)`;
@@ -54,6 +56,7 @@ const handleCache = () => {
             ...obj.action,
             ...{ [frame + currentFrame]: cbObject },
         };
+        subscriber.delete(id);
         subscriber.set(id, { ...obj, ...newAction });
     };
 
@@ -71,11 +74,10 @@ const handleCache = () => {
             if (frameItem) {
                 value.fn(cbObject, value.el);
 
-                // E' necessario salvare _value per poi cacellare il frame ??
-                let _value = value;
-                delete _value.action[frame];
-                // E' necessario firar eils set ???
-                subscriber.set(key, _value);
+                delete value.action[frame];
+
+                subscriber.delete(key);
+                subscriber.set(key, value);
             }
         }
     };
