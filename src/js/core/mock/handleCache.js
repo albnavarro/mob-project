@@ -23,6 +23,7 @@ callbackCache.forEach(({ cb, index, frame }) => {
 // handleCache
 const handleCache = () => {
     let id = 0;
+    let cacheCoutner = 0;
     const subscriber = new Map();
 
     // Add item and callback
@@ -58,6 +59,9 @@ const handleCache = () => {
         };
         subscriber.delete(id);
         subscriber.set(id, { ...obj, ...newAction });
+
+        // A ognicbObject aggiunto alzo di 1
+        cacheCoutner++;
     };
 
     // Remove item from id
@@ -78,15 +82,23 @@ const handleCache = () => {
 
                 subscriber.delete(key);
                 subscriber.set(key, value);
+                matches = true;
+
+                // A ogni cbObject tolto abbasso di 1
+                cacheCoutner--;
             }
         }
     };
+
+    // Condizione da aggiungere per fare andare avanti la RF
+    const getCacheCounter = () => cacheCoutner;
 
     return {
         add,
         update,
         remove,
         fire,
+        getCacheCounter,
     };
 };
 
