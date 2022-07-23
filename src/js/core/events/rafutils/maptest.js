@@ -13,7 +13,7 @@ export const handleCache = (() => {
         subscriber.set(id, {
             el,
             fn,
-            action: new Map(),
+            data: new Map(),
         });
 
         const prevId = id;
@@ -29,10 +29,10 @@ export const handleCache = (() => {
         if (!subscriber.has(id)) return;
 
         const currentFrame = handleFrame.getCurrentFrame();
-        const { action } = subscriber.get(id);
-        if (action.has(frame + currentFrame)) return;
-
-        action.set(frame + currentFrame, cbObject);
+        const obj = subscriber.get(id);
+        const { data } = obj;
+        if (data.has(frame + currentFrame)) return;
+        data.set(frame + currentFrame, cbObject);
         cacheCoutner++;
     };
 
@@ -45,15 +45,14 @@ export const handleCache = (() => {
     };
 
     const fire = (frameCounter) => {
-        for (const [key, value] of subscriber) {
-            const { el, fn, action } = value;
-            if (action.has(frameCounter)) {
-                const cbObject = action.get(frameCounter);
-                value.fn(cbObject, el);
-                action.delete(frameCounter);
+        subscriber.forEach(({ data, el, fn }, key, map) => {
+            const cbObject = data.get(frameCounter);
+            if (cbObject) {
+                fn(cbObject, el);
+                data.delete(frameCounter);
                 cacheCoutner--;
             }
-        }
+        });
     };
 
     const fireObject = ({ id, obj }) => {
@@ -63,6 +62,16 @@ export const handleCache = (() => {
 
     const getCacheCounter = () => cacheCoutner;
 
+    const updateFrameId = (maxFramecounter) => {
+        subscriber.forEach(({ data }, key, map) => {
+            Object.keys(data).forEach((key, i) => {
+                delete Object.assign(data, {
+                    [`${parseInt(key) - maxFramecounter}`]: data[key],
+                })[key];
+            });
+        });
+    };
+
     return {
         add,
         get,
@@ -71,6 +80,7 @@ export const handleCache = (() => {
         fire,
         fireObject,
         getCacheCounter,
+        updateFrameId,
     };
 })();
 
@@ -194,7 +204,7 @@ export const handleFrame = (() => {
     /*
     10000 is maximum stagger frame delay
     */
-    const maxFramecounter = 10000;
+    const maxFramecounter = 1000000;
     const firstRunDuration = 2000;
 
     let frameIsRuning = false;
@@ -209,7 +219,6 @@ export const handleFrame = (() => {
     let isStopped = false;
     let fps = handleSetUp.get('startFps');
     let instantFps = fps;
-    let maxFps = fps;
     let frames = 0;
     let fpsPrevTime = 0;
     let frameCounter = 0;
@@ -251,11 +260,6 @@ export const handleFrame = (() => {
             frames = 0;
         }
 
-        /**
-         * Update max fps
-         * */
-        if (fps > maxFps) maxFps = fps;
-
         /*
         Fire callbnack
         */
@@ -287,7 +291,6 @@ export const handleFrame = (() => {
         */
         handleCache.fire(frameCounter);
         //
-        console.log('render');
 
         /*
         Update frameCounter
@@ -302,6 +305,24 @@ export const handleFrame = (() => {
         isStopped = false;
 
         const nextTickFn = () => {
+            /*
+             * If frameCounter reach maxFramecounter back to zero to avoid big numbers
+             * executte the opration outside requestAnimationFrame if deferredNextTick is active
+             */
+            // if (frameCounter === maxFramecounter) {
+            //     frameCounter = 0;
+            //
+            //     Object.keys(indexCallback).forEach((key, i) => {
+            //         delete Object.assign(indexCallback, {
+            //             [`${parseInt(key) - maxFramecounter}`]: indexCallback[
+            //                 key
+            //             ],
+            //         })[key];
+            //     });
+            //
+            //     handleCache.updateFrameId(maxFramecounter);
+            // }
+
             /*
             RequestAnimationFrame is ended, ready for another
             */

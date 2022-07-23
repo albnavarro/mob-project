@@ -229,6 +229,54 @@ export const handleFrame = (() => {
         isStopped = visibilityState === 'visible';
     });
 
+    const nextTickFn = () => {
+        /*
+         * If frameCounter reach maxFramecounter back to zero to avoid big numbers
+         * executte the opration outside requestAnimationFrame if deferredNextTick is active
+         */
+        if (frameCounter === maxFramecounter) {
+            frameCounter = 0;
+
+            Object.keys(indexCallback).forEach((key, i) => {
+                delete Object.assign(indexCallback, {
+                    [`${parseInt(key) - maxFramecounter}`]: indexCallback[key],
+                })[key];
+            });
+
+            handleCache.updateFrameId(maxFramecounter);
+        }
+
+        /*
+        RequestAnimationFrame is ended, ready for another
+        */
+        frameIsRuning = false;
+
+        /*
+        Fire next tick
+        */
+        handleNextTick.fire({ time, fps });
+
+        /*
+        Get next callback
+        */
+        callback = [...callback, ...handleNextFrame.get()];
+        /*
+        Next frame condition
+        */
+        if (
+            callback.length > 0 ||
+            indexCallbackLength > 0 ||
+            handleCache.getCacheCounter() > 0 ||
+            time < firstRunDuration
+        ) {
+            // Call Next animationFrame
+            initFrame();
+        } else {
+            isStopped = true;
+            frameCounter = 0;
+        }
+    };
+
     const render = () => {
         /**
          * Update time
@@ -303,56 +351,6 @@ export const handleFrame = (() => {
         prevTime = time;
         callback.length = 0;
         isStopped = false;
-
-        const nextTickFn = () => {
-            /*
-             * If frameCounter reach maxFramecounter back to zero to avoid big numbers
-             * executte the opration outside requestAnimationFrame if deferredNextTick is active
-             */
-            if (frameCounter === maxFramecounter) {
-                frameCounter = 0;
-
-                Object.keys(indexCallback).forEach((key, i) => {
-                    delete Object.assign(indexCallback, {
-                        [`${parseInt(key) - maxFramecounter}`]: indexCallback[
-                            key
-                        ],
-                    })[key];
-                });
-
-                handleCache.updateFrameId(maxFramecounter);
-            }
-
-            /*
-            RequestAnimationFrame is ended, ready for another
-            */
-            frameIsRuning = false;
-
-            /*
-            Fire next tick
-            */
-            handleNextTick.fire({ time, fps });
-
-            /*
-            Get next callback
-            */
-            callback = [...callback, ...handleNextFrame.get()];
-            /*
-            Next frame condition
-            */
-            if (
-                callback.length > 0 ||
-                indexCallbackLength > 0 ||
-                handleCache.getCacheCounter() > 0 ||
-                time < firstRunDuration
-            ) {
-                // Call Next animationFrame
-                initFrame();
-            } else {
-                isStopped = true;
-                frameCounter = 0;
-            }
-        };
 
         const deferredNextTick = handleSetUp.get('deferredNextTick');
 
