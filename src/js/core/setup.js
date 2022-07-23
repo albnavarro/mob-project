@@ -3,8 +3,7 @@ import { mergeDeep } from './utils/mergeDeep.js';
 export const handleSetUp = (() => {
     let data = {
         startFps: 60,
-        fpsThreshold: 25,
-        deferredNextTick: true,
+        deferredNextTick: false,
         throttle: 100,
         mq: {
             xSmall: 320,

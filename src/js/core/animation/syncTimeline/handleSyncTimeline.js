@@ -40,7 +40,7 @@ export class HandleSyncTimeline {
         this.callbackComplete = [];
     }
 
-    updateTime(time, fps, dropFrameCounter) {
+    updateTime(time, fps) {
         if (this.isStopped || this.isInInzializing) return;
 
         // If loop anitcipate by half frame ( in millsenconds ) next loop so we a have more precise animation
@@ -71,15 +71,13 @@ export class HandleSyncTimeline {
 
             // When come from playReverse skip first frame becouse is 0
             if (!this.skipFirstRender) {
-                if (dropFrameCounter === 2 || dropFrameCounter === -1) {
-                    this.squencers.forEach((item, i) => {
-                        item.draw({
-                            partial: this.endTime,
-                            isLastDraw: false,
-                            useFrame: true,
-                        });
+                this.squencers.forEach((item, i) => {
+                    item.draw({
+                        partial: this.endTime,
+                        isLastDraw: false,
+                        useFrame: true,
                     });
-                }
+                });
             }
         }
 
@@ -178,10 +176,9 @@ export class HandleSyncTimeline {
 
     goToNextFrame() {
         handleFrame.add(() => {
-            handleNextTick.add(({ time, fps, dropFrameCounter }) => {
+            handleNextTick.add(({ time, fps }) => {
                 // Prevent fire too many raf
-                if (!this.isInInzializing)
-                    this.updateTime(time, fps, dropFrameCounter);
+                if (!this.isInInzializing) this.updateTime(time, fps);
             });
         });
     }
@@ -217,10 +214,10 @@ export class HandleSyncTimeline {
         });
 
         handleFrame.add(() => {
-            handleNextTick.add(({ time, fps, dropFrameCounter }) => {
+            handleNextTick.add(({ time, fps }) => {
                 this.startTime = time;
                 this.isInInzializing = false;
-                this.updateTime(time, fps, dropFrameCounter);
+                this.updateTime(time, fps);
             });
         });
     }
@@ -259,10 +256,10 @@ export class HandleSyncTimeline {
         });
 
         handleFrame.add(() => {
-            handleNextTick.add(({ time, fps, dropFrameCounter }) => {
+            handleNextTick.add(({ time, fps }) => {
                 this.isInInzializing = false;
                 this.startTime = time;
-                this.updateTime(time, fps, dropFrameCounter);
+                this.updateTime(time, fps);
             });
         });
     }

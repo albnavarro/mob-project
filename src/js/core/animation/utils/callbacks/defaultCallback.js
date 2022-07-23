@@ -1,4 +1,5 @@
 import {
+    handleCache,
     handleFrame,
     handleNextFrame,
 } from '../../../events/rafutils/rafUtils.js';
@@ -9,26 +10,32 @@ Callback while Running
 export const defaultCallback = ({
     stagger,
     callback,
+    callbackCache,
     cbObject,
     useStagger,
 }) => {
     if (stagger.each === 0 || !useStagger) {
-        handleFrame.add(({ dropFrameCounter }) => {
-            // No stagger, run immediatly
-            if (dropFrameCounter === 2 || dropFrameCounter === -1) {
-                callback.forEach(({ cb }) => {
-                    cb(cbObject);
-                });
-            }
+        handleFrame.add(() => {
+            callback.forEach(({ cb }) => {
+                cb(cbObject);
+            });
+        });
+
+        handleFrame.add(() => {
+            callbackCache.forEach(({ cb }, i) => {
+                handleCache.fireObject({ id: cb, obj: cbObject });
+            });
         });
     } else {
         // Stagger
-        callback.forEach(({ cb, index, frame }, i) => {
-            handleFrame.addIndex(({ dropFrameCounter }) => {
-                if (dropFrameCounter === 2 || dropFrameCounter === -1) {
-                    cb(cbObject);
-                }
+        callback.forEach(({ cb, frame }, i) => {
+            handleFrame.addIndex(() => {
+                cb(cbObject);
             }, frame);
+        });
+
+        callbackCache.forEach(({ cb, frame }) => {
+            handleCache.update({ id: cb, cbObject, frame });
         });
     }
 };
@@ -39,6 +46,7 @@ Callback on complete
 export const defaultCallbackOnComplete = ({
     onComplete,
     callback,
+    callbackCache,
     callbackOnComplete,
     cbObject,
     stagger,
@@ -53,6 +61,10 @@ export const defaultCallbackOnComplete = ({
             // Fire callback with exact end value
             callback.forEach(({ cb }) => {
                 cb(cbObject);
+            });
+
+            callbackCache.forEach(({ cb }, i) => {
+                handleCache.fireObject({ id: cb, obj: cbObject });
             });
 
             callbackOnComplete.forEach(({ cb }) => {
@@ -76,7 +88,23 @@ export const defaultCallbackOnComplete = ({
             }, frame);
         });
 
-        callbackOnComplete.forEach(({ cb, index, frame }, i) => {
+        callbackCache.forEach(({ cb, index, frame }, i) => {
+            handleFrame.addIndex(() => {
+                handleCache.fireObject({ id: cb, obj: cbObject });
+
+                if (stagger.waitComplete) {
+                    if (i === slowlestStagger.index) {
+                        onComplete();
+                    }
+                } else {
+                    if (i === fastestStagger.index) {
+                        onComplete();
+                    }
+                }
+            }, frame);
+        });
+
+        callbackOnComplete.forEach(({ cb, frame }, i) => {
             handleFrame.addIndex(() => {
                 cb(cbObject);
             }, frame + 1);

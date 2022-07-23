@@ -5,7 +5,11 @@ import {
     getRoundedValue,
 } from '../../animation/utils/animationUtils.js';
 import { mergeDeep } from '../../utils/mergeDeep.js';
-import { handleFrame, handleNextTick } from '../../events/rafutils/rafUtils.js';
+import {
+    handleCache,
+    handleFrame,
+    handleNextTick,
+} from '../../events/rafutils/rafUtils.js';
 import { setStagger } from '../utils/stagger/setStagger.js';
 import { getStaggerFromProps } from '../utils/stagger/staggerUtils.js';
 import { DIRECTION_COL } from '../utils/stagger/staggerCostant.js';
@@ -21,6 +25,8 @@ export class ParallaxTween {
         this.id = 0;
         this.callbackOnStop = [];
         this.callback = [];
+        this.callbackCache = [];
+        this.unsubscribeCache = [];
         this.duration = handleSetUp.get('parallaxTween').duration;
         this.type = 'tween';
         // Stagger
@@ -37,16 +43,35 @@ export class ParallaxTween {
     }
 
     setStagger() {
-        if (this.stagger.each > 0) {
+        if (
+            this.stagger.each > 0 &&
+            (this.callbackCache.length || this.callback.length)
+        ) {
+            const cb =
+                this.callbackCache.length > this.callback.length
+                    ? this.callbackCache
+                    : this.callback;
+
+            if (this.stagger.grid.col > cb.length) {
+                console.warn(
+                    'stagger col of grid is out of range, it must be less than the number of staggers '
+                );
+                return;
+            }
+
             const { cbNow, cbCompleteNow } = setStagger({
-                cb: this.callback,
+                cb,
                 endCb: this.callbackOnStop,
                 stagger: this.stagger,
                 slowlestStagger: {},
                 fastestStagger: {},
             });
 
-            this.callback = [...cbNow];
+            if (this.callbackCache.length > this.callback.length) {
+                this.callbackCache = [...cbNow];
+            } else {
+                this.callback = [...cbNow];
+            }
             this.callbackOnStop = [...cbCompleteNow];
         }
     }
@@ -75,10 +100,20 @@ export class ParallaxTween {
                 handleFrame.add(() => {
                     this.callback.forEach(({ cb }) => cb(cbObject));
                 });
+
+                handleFrame.add(() => {
+                    this.callbackCache.forEach(({ cb }) => {
+                        handleCache.fireObject({ id: cb, obj: cbObject });
+                    });
+                });
             } else {
                 // Stagger
-                this.callback.forEach(({ cb, index, frame }, i) => {
+                this.callback.forEach(({ cb, frame }, i) => {
                     handleFrame.addIndex(() => cb(cbObject), frame);
+                });
+
+                this.callbackCache.forEach(({ cb, frame }) => {
+                    handleCache.update({ id: cb, cbObject, frame });
                 });
             }
 
@@ -259,6 +294,29 @@ export class ParallaxTween {
         };
     }
 
+    /**
+     * subscribeCache - add callback to stack
+     *
+     * @param  {item} htmlElement
+     * @return {function}
+     *
+     */
+    subscribeCache(item, fn) {
+        const { id, unsubscribe } = handleCache.add(item, fn);
+        this.callbackCache.push({ cb: id, id: this.id });
+        this.unsubscribeCache.push(unsubscribe);
+
+        const cbId = this.id;
+        this.id++;
+
+        return () => {
+            unsubscribe();
+            this.callbackCache = this.callbackCache.filter(
+                (item) => item.id !== cbId
+            );
+        };
+    }
+
     onStop(cb) {
         this.callbackOnStop.push({ cb, id: this.id });
         const cbId = this.id;
@@ -286,5 +344,7 @@ export class ParallaxTween {
         this.values = [];
         this.callbackOnStop = [];
         this.callback = [];
+        this.callbackCache = [];
+        this.unsubscribeCache.forEach((unsubscribe) => unsubscribe());
     }
 }

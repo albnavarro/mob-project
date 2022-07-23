@@ -35,7 +35,13 @@ export const scrollStagger = () => {
     items.forEach((item, i) => {
         const unitInverse = items.length - i;
 
-        myParallaxTween.subscribe(({ rotate }) => {
+        // myParallaxTween.subscribe(({ rotate }) => {
+        //     item.style.transform = `translate3D(0,0,0) translate(${
+        //         50 - unitInverse * unit
+        //     }px, ${50 - unitInverse * unit}px) rotate(${rotate}deg)`;
+        // });
+
+        myParallaxTween.subscribeCache(item, ({ rotate }) => {
             item.style.transform = `translate3D(0,0,0) translate(${
                 50 - unitInverse * unit
             }px, ${50 - unitInverse * unit}px) rotate(${rotate}deg)`;

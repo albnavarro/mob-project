@@ -19,8 +19,14 @@ export const gridStaggerSequencer = () => {
         .goTo({ scale: 0.5 }, { start: 0, end: 4000, ease: 'easeInOutBack' })
         .goTo({ scale: 1 }, { start: 4000, end: 5000, ease: 'easeInOutBack' });
 
+    // items.forEach((item, i) => {
+    //     tween.subscribe(({ scale }) => {
+    //         item.style.transform = `scale(${scale})`;
+    //     });
+    // });
+
     items.forEach((item, i) => {
-        tween.subscribe(({ scale }) => {
+        tween.subscribeCache(item, ({ scale }) => {
             item.style.transform = `scale(${scale})`;
         });
     });

@@ -6,6 +6,7 @@ import {
     getRoundedValue,
 } from '../utils/animationUtils.js';
 import {
+    handleCache,
     handleFrame,
     handleNextFrame,
     handleNextTick,
@@ -33,8 +34,10 @@ export class HandleSpring {
         this.values = [];
         this.id = 0;
         this.callback = [];
+        this.callbackCache = [];
         this.callbackOnComplete = [];
         this.callbackStartInPause = [];
+        this.unsubscribeCache = [];
         this.lostFrameTresold = 64;
         this.pauseStatus = false;
         this.firstRun = true;
@@ -144,6 +147,7 @@ export class HandleSpring {
             defaultCallback({
                 stagger: this.stagger,
                 callback: this.callback,
+                callbackCache: this.callbackCache,
                 cbObject: o.cbObject,
                 useStagger: this.useStagger,
             });
@@ -188,6 +192,7 @@ export class HandleSpring {
                 defaultCallbackOnComplete({
                     onComplete,
                     callback: this.callback,
+                    callbackCache: this.callbackCache,
                     callbackOnComplete: this.callbackOnComplete,
                     cbObject: cbObjectSettled,
                     stagger: this.stagger,
@@ -202,8 +207,17 @@ export class HandleSpring {
     }
 
     setStagger() {
-        if (this.stagger.each > 0 && this.firstRun) {
-            if (this.stagger.grid.col > this.callback.length) {
+        if (
+            this.stagger.each > 0 &&
+            this.firstRun &&
+            (this.callbackCache.length || this.callback.length)
+        ) {
+            const cb =
+                this.callbackCache.length > this.callback.length
+                    ? this.callbackCache
+                    : this.callback;
+
+            if (this.stagger.grid.col > cb.length) {
                 console.warn(
                     'stagger col of grid is out of range, it must be less than the number of staggers '
                 );
@@ -217,14 +231,18 @@ export class HandleSpring {
                 fastestStagger,
                 slowlestStagger,
             } = setStagger({
-                cb: this.callback,
+                cb,
                 endCb: this.callbackOnComplete,
                 stagger: this.stagger,
                 slowlestStagger: this.slowlestStagger,
                 fastestStagger: this.fastestStagger,
             });
 
-            this.callback = [...cbNow];
+            if (this.callbackCache.length > this.callback.length) {
+                this.callbackCache = [...cbNow];
+            } else {
+                this.callback = [...cbNow];
+            }
             this.callbackOnComplete = [...cbCompleteNow];
             this.slowlestStagger = { ...slowlestStagger };
             this.fastestStagger = { ...fastestStagger };
@@ -637,6 +655,29 @@ export class HandleSpring {
     }
 
     /**
+     * subscribeCache - add callback to stack
+     *
+     * @param  {item} htmlElement
+     * @return {function}
+     *
+     */
+    subscribeCache(item, fn) {
+        const { id, unsubscribe } = handleCache.add(item, fn);
+        this.callbackCache.push({ cb: id, id: this.id });
+        this.unsubscribeCache.push(unsubscribe);
+
+        const cbId = this.id;
+        this.id++;
+
+        return () => {
+            unsubscribe();
+            this.callbackCache = this.callbackCache.filter(
+                (item) => item.id !== cbId
+            );
+        };
+    }
+
+    /**
      * subscribe - add callback to start in pause to stack
      *
      * @param  {function} cb cal function
@@ -675,7 +716,9 @@ export class HandleSpring {
         this.callbackOnComplete = [];
         this.callbackStartInPause = [];
         this.callback = [];
+        this.callbackCache = [];
         this.values = [];
         this.promise = null;
+        this.unsubscribeCache.forEach((unsubscribe) => unsubscribe());
     }
 }

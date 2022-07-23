@@ -70,8 +70,7 @@ import { testCanvas } from './test/testCanvas.js';
 
 mobbu.use('load', () => {
     mobbu.default('set', {
-        fpsThreshold: 25,
-        deferredNextTick: true,
+        deferredNextTick: false,
         throttle: 120,
         spring: {
             customSpring: {

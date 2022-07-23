@@ -16,8 +16,14 @@ export const radialStaggerTween = () => {
         data: { scale: 1 },
     });
 
+    // items.forEach((item, i) => {
+    //     tween.subscribe(({ scale }) => {
+    //         item.style.transform = `scale(${scale})`;
+    //     });
+    // });
+
     items.forEach((item, i) => {
-        tween.subscribe(({ scale }) => {
+        tween.subscribeCache(item, ({ scale }) => {
             item.style.transform = `scale(${scale})`;
         });
     });
