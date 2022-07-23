@@ -6,6 +6,7 @@ import {
     STAGGER_END,
     STAGGER_CENTER,
     STAGGER_EDGES,
+    STAGGER_RANDOM,
 } from './staggerCostant.js';
 import { getEachByFps } from './staggerUtils.js';
 import { checkType } from '../../../store/storeType.js';
@@ -130,6 +131,7 @@ export const setStagger = ({
                 STAGGER_END,
                 STAGGER_CENTER,
                 STAGGER_EDGES,
+                STAGGER_RANDOM,
             ];
 
             if (
