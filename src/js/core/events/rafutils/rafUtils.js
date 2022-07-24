@@ -86,6 +86,7 @@ export const handleCache = (() => {
 })();
 
 /**
+ * https://itecnote.com/tecnote/javascript-recording-fps-in-webgl/
  *  Intial loop fo reach the right fps
  *  loadFps().then(() => ... );
  *  To get the right FPS immediatly use a different calcultation respect handleFrame
@@ -123,15 +124,15 @@ export const loadFps = () => {
 
             frameCounter++;
 
-            if (frameCounter >= 50) {
+            if (frameCounter >= 60) {
                 handleFrame.setInstantFps(averageFPS);
                 resolve();
                 return;
             }
 
-            handleNextFrame.add(() => render(getTime()));
+            requestAnimationFrame(render);
         };
-        handleFrame.add(() => render(getTime()));
+        requestAnimationFrame(render);
     });
 };
 
