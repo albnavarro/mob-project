@@ -14,6 +14,12 @@ export class HandleMasterSequencer {
         this.children.push(item);
     }
 
+    setStagger() {
+        this.children.forEach((item, i) => {
+            item.setStagger();
+        });
+    }
+
     setDuration(val) {
         this.children.forEach((item, i) => {
             item.setDuration(val);

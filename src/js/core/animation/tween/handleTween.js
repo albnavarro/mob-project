@@ -95,8 +95,6 @@ export class HandleTween {
     }
 
     onReuqestAnim(time, res) {
-        if (this.firstRun) this.setStagger();
-
         this.startTime = time;
 
         let o = {};
@@ -244,6 +242,8 @@ export class HandleTween {
     startRaf(res, reject) {
         this.currentReject = reject;
         this.currentResolve = res;
+
+        if (this.firstRun) this.setStagger();
 
         handleFrame.add(() => {
             handleNextTick.add(({ time }) => {

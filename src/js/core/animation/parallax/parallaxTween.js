@@ -32,7 +32,6 @@ export class ParallaxTween {
         // Stagger
 
         this.stagger = getStaggerFromProps(data);
-        this.firstRun = true;
 
         /**
          * Set initial store data if defined in constructor props
@@ -78,9 +77,6 @@ export class ParallaxTween {
 
     draw({ partial, isLastDraw }) {
         const mainFn = () => {
-            if (this.firstRun) this.setStagger();
-            this.firstRun = false;
-
             this.values.forEach((item, i) => {
                 item.currentValue = this.ease(
                     partial,

@@ -91,8 +91,6 @@ export class HandleLerp {
     }
 
     onReuqestAnim(time, fps, res) {
-        if (this.firstRun) this.setStagger();
-
         this.values.forEach((item, i) => {
             item.currentValue = parseFloat(item.fromValue);
         });
@@ -237,6 +235,8 @@ export class HandleLerp {
     startRaf(res, reject) {
         this.currentReject = reject;
         this.currentResolve = res;
+
+        if (this.firstRun) this.setStagger();
 
         handleFrame.add(() => {
             handleNextTick.add(({ time, fps }) => {

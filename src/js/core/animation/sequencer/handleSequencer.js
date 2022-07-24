@@ -43,7 +43,6 @@ export class HandleSequencer {
         // Stagger
         this.stagger = getStaggerFromProps(data);
         this.useStagger = true;
-        this.firstRun = true;
 
         /**
          * Set initial store data if defined in constructor props
@@ -89,9 +88,6 @@ export class HandleSequencer {
 
     draw({ partial, isLastDraw, useFrame }) {
         const mainFn = () => {
-            if (this.firstRun) this.setStagger();
-            this.firstRun = false;
-
             /*
             Obj utils to avoid new GC allocation during animation
             Try to reduce the GC timing

@@ -213,6 +213,7 @@ export class ParallaxItemClass {
             this.limiterOff = true;
             if (this.propierties === parallaxConstant.PROP_TWEEN) {
                 this.range = this.tween.getDuration();
+                if (this.tween?.setStagger) this.tween.setStagger();
             }
             this.calcRangeAndUnitMiusure();
             this.calcFixedLimit();

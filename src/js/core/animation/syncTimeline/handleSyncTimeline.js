@@ -305,6 +305,7 @@ export class HandleSyncTimeline {
 
     add(sequencer) {
         sequencer.setStretchFactor(this.duration);
+        sequencer.setStagger();
         this.squencers.push(sequencer);
 
         return this;

@@ -94,8 +94,6 @@ export class HandleSpring {
     }
 
     onReuqestAnim(time, fps, res) {
-        if (this.firstRun) this.setStagger();
-
         this.values.forEach((item, i) => {
             item.velocity = parseFloat(this.config.velocity);
             item.currentValue = parseFloat(item.fromValue);
@@ -254,6 +252,8 @@ export class HandleSpring {
     startRaf(res, reject) {
         this.currentReject = reject;
         this.currentResolve = res;
+
+        if (this.firstRun) this.setStagger();
 
         handleFrame.add(() => {
             handleNextTick.add(({ time, fps }) => {
