@@ -7,46 +7,45 @@ import { handleVisibilityChange } from '../visibilityChange/handleVisibilityChan
 export const handleCache = (() => {
     let id = 0;
     let cacheCoutner = 0;
-    const subscriber = {};
+    const subscriber = new Map();
 
     const add = (el, fn) => {
-        subscriber[id] = {
+        subscriber.set(id, {
             el,
             fn,
             data: {},
-        };
+        });
 
         const prevId = id;
         id++;
 
         return {
             id: prevId,
-            unsubscribe: () => delete subscriber[prevId],
+            unsubscribe: () => subscriber.delete(prevId),
         };
     };
 
     const update = ({ id, cbObject, frame }) => {
-        if (!subscriber[id]) return;
+        if (!subscriber.has(id)) return;
 
         const currentFrame = handleFrame.getCurrentFrame();
-        const { data } = subscriber[id];
-        if (data[frame + currentFrame]) return;
-        data[frame + currentFrame] = cbObject;
+        const obj = subscriber.get(id);
+        if (obj?.data[frame + currentFrame]) return;
+        obj.data[frame + currentFrame] = cbObject;
         cacheCoutner++;
     };
 
     const remove = (id) => {
-        if (id in subscriber) delete subscriber[id];
+        subscriber.delete(id);
     };
 
     const get = (id) => {
-        return subscriber?.[id];
+        return subscriber.get(id);
     };
 
     const fire = (frameCounter) => {
-        Object.values(subscriber).forEach(({ data, fn, el }) => {
-            const cbObject = data?.[frameCounter];
-
+        subscriber.forEach(({ data, el, fn }, key, map) => {
+            const cbObject = data[frameCounter];
             if (cbObject) {
                 fn(cbObject, el);
                 data[frameCounter] = null;
@@ -57,14 +56,14 @@ export const handleCache = (() => {
     };
 
     const fireObject = ({ id, obj }) => {
-        const { el, fn } = subscriber[id];
+        const { el, fn } = subscriber.get(id);
         fn(obj, el);
     };
 
     const getCacheCounter = () => cacheCoutner;
 
     const updateFrameId = (maxFramecounter) => {
-        Object.values(subscriber).forEach(({ data }) => {
+        subscriber.forEach(({ data }, key, map) => {
             Object.keys(data).forEach((key, i) => {
                 delete Object.assign(data, {
                     [`${parseInt(key) - maxFramecounter}`]: data[key],
@@ -205,7 +204,7 @@ export const handleFrame = (() => {
     /*
     10000 is maximum stagger frame delay
     */
-    const maxFramecounter = 10000000;
+    const maxFramecounter = 1000000;
     const firstRunDuration = 2000;
 
     let frameIsRuning = false;
