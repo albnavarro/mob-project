@@ -164,7 +164,7 @@ export const mobbu = {
                 return handleFrame.addIndex(fn, option);
 
             case 'loadFps':
-                return loadFps().then(() => fn());
+                return loadFps(option).then(() => fn());
 
             case 'load':
                 return handleLoad(fn);
