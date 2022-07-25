@@ -43,12 +43,14 @@ export const handleCache = (() => {
         return subscriber?.[id];
     };
 
-    const fire = (frameCounter) => {
+    const fire = (frameCounter, dropFrameCounter) => {
         Object.values(subscriber).forEach(({ data, fn, el }) => {
             const cbObject = data?.[frameCounter];
 
             if (cbObject) {
-                fn(cbObject, el);
+                if (dropFrameCounter === 2 || dropFrameCounter === -1) {
+                    fn(cbObject, el);
+                }
                 data[frameCounter] = null;
                 delete data[frameCounter];
                 cacheCoutner--;
@@ -177,11 +179,11 @@ export const handleNextTick = ((cb) => {
         callback.push({ cb, priority });
     };
 
-    const fire = ({ time, fps }) => {
+    const fire = ({ time, fps, dropFrameCounter }) => {
         if (callback.length === 0) return;
 
         callback.sort((a, b) => a.priority - b.priority);
-        callback.forEach(({ cb }) => cb({ time, fps }));
+        callback.forEach(({ cb }) => cb({ time, fps, dropFrameCounter }));
         callback.length = 0;
     };
 
@@ -221,10 +223,18 @@ export const handleFrame = (() => {
     let isStopped = false;
     let fps = handleSetUp.get('startFps');
     let instantFps = fps;
+    let maxFps = fps;
     let frames = 0;
     let fpsPrevTime = 0;
     let frameCounter = 0;
     let indexCb = null;
+
+    /**
+     * Check if frame drop by fpsThreshold value
+     * when value is -1 || 2 animation ( or whoever use it ) is rendered
+     * */
+    let dropFrameCounter = -1;
+    let fpsThreshold = handleSetUp.get('fpsThreshold');
 
     // Stop timer when user change tab
     handleVisibilityChange(({ visibilityState }) => {
@@ -256,7 +266,7 @@ export const handleFrame = (() => {
         /*
         Fire next tick
         */
-        handleNextTick.fire({ time, fps });
+        handleNextTick.fire({ time, fps, dropFrameCounter });
 
         /*
         Get next callback
@@ -308,12 +318,30 @@ export const handleFrame = (() => {
                     : instantFps;
             fpsPrevTime = time;
             frames = 0;
+
+            /**
+             * Update value every seconds
+             **/
+            fpsThreshold = handleSetUp.get('fpsThreshold');
         }
+
+        /**
+         * Update max fps
+         * */
+        if (fps > maxFps) maxFps = fps;
+
+        /**
+         * Update dropFrameCounter ( form 0 to 2 use % operator) if drop frame or reset
+         * */
+        dropFrameCounter =
+            Math.abs(maxFps - fps) < fpsThreshold
+                ? -1
+                : (dropFrameCounter + 1) % 3;
 
         /*
         Fire callbnack
         */
-        callback.forEach((item, i) => item({ time, fps }));
+        callback.forEach((item, i) => item({ time, fps, dropFrameCounter }));
 
         /*
         Fire callback related to specific index frame
@@ -325,7 +353,7 @@ export const handleFrame = (() => {
         */
         indexCb = indexCallback[frameCounter];
         if (indexCb) {
-            indexCb.forEach((item) => item({ time, fps }));
+            indexCb.forEach((item) => item({ time, fps, dropFrameCounter }));
             /*
             Remove cb array once fired
             */
@@ -339,7 +367,7 @@ export const handleFrame = (() => {
         /*
         Fire handleCache callBack
         */
-        handleCache.fire(frameCounter);
+        handleCache.fire(frameCounter, dropFrameCounter);
         //
 
         /*
@@ -392,6 +420,8 @@ export const handleFrame = (() => {
 
     const getCurrentFrame = () => frameCounter;
 
+    const getDropFrameCounter = () => dropFrameCounter;
+
     /**
      *  Add callback
      */
@@ -435,6 +465,7 @@ export const handleFrame = (() => {
         getInstantFps,
         setInstantFps,
         getCurrentFrame,
+        getDropFrameCounter,
         addIndex,
     };
 })();
