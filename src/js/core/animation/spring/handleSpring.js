@@ -6,6 +6,7 @@ import {
     getRoundedValue,
 } from '../utils/animationUtils.js';
 import {
+    loadFps,
     handleCache,
     handleFrame,
     handleNextFrame,
@@ -42,6 +43,7 @@ export class HandleSpring {
         this.pauseStatus = false;
         this.firstRun = true;
         this.useStagger = true;
+        this.fpsInLoading = false;
 
         /**
         This value lives from user call ( goTo etc..) until next call
@@ -205,11 +207,7 @@ export class HandleSpring {
     }
 
     setStagger() {
-        if (
-            this.stagger.each > 0 &&
-            this.firstRun &&
-            (this.callbackCache.length || this.callback.length)
-        ) {
+        const getStagger = () => {
             const cb =
                 this.callbackCache.length > this.callback.length
                     ? this.callbackCache
@@ -246,25 +244,61 @@ export class HandleSpring {
             this.fastestStagger = { ...fastestStagger };
 
             this.firstRun = false;
+        };
+
+        /**
+         * First time il there is a stagger load fps then go next step
+         * next time no need to calcaulte stagger and jump directly next step
+         *
+         **/
+        if (
+            this.stagger.each > 0 &&
+            this.firstRun &&
+            (this.callbackCache.length || this.callback.length)
+        ) {
+            return new Promise((resolve) => {
+                loadFps().then(({ averageFPS }) => {
+                    console.log(`stagger spring loaded at: ${averageFPS} fps`);
+                    getStagger();
+                    resolve();
+                });
+            });
+        } else {
+            return new Promise((resolve) => {
+                resolve();
+            });
         }
     }
 
     startRaf(res, reject) {
+        if (this.fpsInLoading) return;
+
         this.currentReject = reject;
         this.currentResolve = res;
 
-        if (this.firstRun) this.setStagger();
+        const cb = () => {
+            handleFrame.add(() => {
+                handleNextTick.add(({ time, fps }) => {
+                    const prevent = this.callbackStartInPause
+                        .map(({ cb }) => cb())
+                        .some((item) => item === true);
 
-        handleFrame.add(() => {
-            handleNextTick.add(({ time, fps }) => {
-                const prevent = this.callbackStartInPause
-                    .map(({ cb }) => cb())
-                    .some((item) => item === true);
-
-                this.onReuqestAnim(time, fps, res);
-                if (prevent) this.pause();
+                    this.onReuqestAnim(time, fps, res);
+                    if (prevent) this.pause();
+                });
             });
-        });
+        };
+
+        if (this.firstRun) {
+            this.fpsInLoading = true;
+            this.setStagger().then(() => {
+                cb();
+                this.fpsInLoading = false;
+            });
+        } else {
+            cb();
+            this.firstRun = false;
+        }
     }
 
     /**

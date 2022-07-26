@@ -43,6 +43,7 @@ export class HandleSequencer {
         // Stagger
         this.stagger = getStaggerFromProps(data);
         this.useStagger = true;
+        this.staggerIsReady = false;
 
         /**
          * Set initial store data if defined in constructor props
@@ -53,6 +54,8 @@ export class HandleSequencer {
     }
 
     setStagger() {
+        if (this.staggerIsReady) return;
+
         if (
             this.stagger.each > 0 &&
             (this.callbackCache.length || this.callback.length)
@@ -84,6 +87,8 @@ export class HandleSequencer {
             }
             this.callbackOnStop = [...cbCompleteNow];
         }
+
+        this.staggerIsReady = true;
     }
 
     draw({ partial, isLastDraw, useFrame }) {

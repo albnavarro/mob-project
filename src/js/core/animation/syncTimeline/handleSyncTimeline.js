@@ -1,4 +1,5 @@
 import {
+    loadFps,
     handleFrame,
     handleNextFrame,
     handleNextTick,
@@ -28,6 +29,7 @@ export class HandleSyncTimeline {
         this.isPlayngReverse = false;
         this.BACKWARD = 'backward';
         this.FORWARD = 'forward';
+        this.fpsInLoading = false;
 
         // Onlu one loop , prevent sideEffct of this.frameThreshold
         if (this.repeat === 1 || this.repeat === 0) {
@@ -195,7 +197,7 @@ export class HandleSyncTimeline {
     }
 
     play() {
-        if (this.isInInzializing) return;
+        if (this.isInInzializing || this.fpsInLoading) return;
 
         this.resetTime();
         this.isStopped = false;
@@ -207,26 +209,35 @@ export class HandleSyncTimeline {
         this.isPlayngReverse = false;
         this.loopCounter = 0;
 
-        this.squencers.forEach((item, i) => {
-            item.disableStagger();
-            item.draw({
-                partial: 0,
-                isLastDraw: false,
-                useFrame: true,
-            });
-        });
+        // Prevent multiple play whild fps is loading
+        this.fpsInLoading = true;
 
-        handleFrame.add(() => {
-            handleNextTick.add(({ time, fps, dropFrameCounter }) => {
-                this.startTime = time;
-                this.isInInzializing = false;
-                this.updateTime(time, fps, dropFrameCounter);
+        loadFps().then(({ averageFPS }) => {
+            console.log(`Fps on syncTimeline loaded at: ${averageFPS} fps`);
+
+            this.squencers.forEach((item, i) => {
+                item.setStagger();
+                item.disableStagger();
+                item.draw({
+                    partial: 0,
+                    isLastDraw: false,
+                    useFrame: true,
+                });
+            });
+
+            handleFrame.add(() => {
+                handleNextTick.add(({ time, fps, dropFrameCounter }) => {
+                    this.startTime = time;
+                    this.isInInzializing = false;
+                    this.fpsInLoading = false;
+                    this.updateTime(time, fps, dropFrameCounter);
+                });
             });
         });
     }
 
     playReverse() {
-        if (this.isInInzializing) return;
+        if (this.isInInzializing || this.fpsInLoading) return;
 
         // Jump to last time
         this.timeElapsed = this.duration;
@@ -249,20 +260,29 @@ export class HandleSyncTimeline {
         // While start isInInzializing fa fallire le altre raf
         this.isInInzializing = true;
 
-        this.squencers.forEach((item, i) => {
-            item.disableStagger();
-            item.draw({
-                partial: this.duration,
-                isLastDraw: false,
-                useFrame: true,
-            });
-        });
+        // Prevent multiple play whild fps is loading
+        this.fpsInLoading = true;
 
-        handleFrame.add(() => {
-            handleNextTick.add(({ time, fps, dropFrameCounter }) => {
-                this.isInInzializing = false;
-                this.startTime = time;
-                this.updateTime(time, fps, dropFrameCounter);
+        loadFps().then(({ averageFPS }) => {
+            console.log(`Fps on syncTimeline loaded at: ${averageFPS} fps`);
+
+            this.squencers.forEach((item, i) => {
+                item.setStagger();
+                item.disableStagger();
+                item.draw({
+                    partial: this.duration,
+                    isLastDraw: false,
+                    useFrame: true,
+                });
+            });
+
+            handleFrame.add(() => {
+                handleNextTick.add(({ time, fps, dropFrameCounter }) => {
+                    this.isInInzializing = false;
+                    this.startTime = time;
+                    this.fpsInLoading = false;
+                    this.updateTime(time, fps, dropFrameCounter);
+                });
             });
         });
     }
@@ -308,7 +328,6 @@ export class HandleSyncTimeline {
 
     add(sequencer) {
         sequencer.setStretchFactor(this.duration);
-        sequencer.setStagger();
         this.squencers.push(sequencer);
 
         return this;

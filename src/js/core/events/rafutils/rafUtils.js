@@ -94,7 +94,15 @@ export const handleCache = (() => {
  *  To get the right FPS immediatly use a different calcultation respect handleFrame
  *  More Havier but run in a very limited time
  */
+let loadFpsIsReady = false;
+
 export const loadFps = (duration = 30) => {
+    if (loadFpsIsReady) {
+        return new Promise((resolve) => {
+            resolve({ averageFPS: handleFrame.getInstantFps() });
+        });
+    }
+
     return new Promise((resolve, reject) => {
         const frameTimes = [];
         const maxFrames = 20;
@@ -128,7 +136,10 @@ export const loadFps = (duration = 30) => {
 
             if (frameCounter >= duration) {
                 handleFrame.setInstantFps(averageFPS);
-                resolve();
+                loadFpsIsReady = true;
+                resolve({
+                    averageFPS: averageFPS,
+                });
                 return;
             }
 

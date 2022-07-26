@@ -85,9 +85,9 @@ mobbu.use('load', () => {
     });
 
     mobbu.default('print');
-    mobbu.use('loadFps', () => {
-        console.log('fps ready at:', mobbu.getInstantFps());
-    });
+    // mobbu.use('loadFps', () => {
+    //     console.log('fps ready at:', mobbu.getInstantFps());
+    // });
 
     const body = document.querySelector('body');
 
@@ -103,39 +103,29 @@ mobbu.use('load', () => {
     }
 
     if (body.classList.contains('page-asyncTimelineStagger')) {
-        mobbu.use('loadFps', () => {
-            staggerTweenTest();
-            staggerSpringTest();
-            staggerLerpTest();
-        });
+        staggerTweenTest();
+        staggerSpringTest();
+        staggerLerpTest();
     }
 
     if (body.classList.contains('page-asyncShape')) {
-        mobbu.use('loadFps', () => {
-            sinAnimation();
-            sinRevertAnimation();
-            circleAnimation();
-            circleAnimationTimeline();
-            infiniteAnimation();
-        });
+        sinAnimation();
+        sinRevertAnimation();
+        circleAnimation();
+        circleAnimationTimeline();
+        infiniteAnimation();
     }
 
     if (body.classList.contains('page-syncShape')) {
-        mobbu.use('loadFps', () => {
-            infiniteAnimationSync();
-        });
+        infiniteAnimationSync();
     }
 
     if (body.classList.contains('page-syncTimeline')) {
-        mobbu.use('loadFps', () => {
-            syncTimelineTest();
-        });
+        syncTimelineTest();
     }
 
     if (body.classList.contains('page-mouseStagger')) {
-        mobbu.use('loadFps', () => {
-            mouseStagger();
-        });
+        mouseStagger();
     }
 
     if (body.classList.contains('template-fixed')) {
@@ -164,29 +154,21 @@ mobbu.use('load', () => {
     }
 
     if (body.classList.contains('page-scrollStagger')) {
-        mobbu.use('loadFps', () => {
-            scrollStagger();
-        });
+        scrollStagger();
     }
     if (body.classList.contains('page-gridStagger')) {
-        mobbu.use('loadFps', () => {
-            gridStaggerTween();
-            gridStaggerSpring();
-            gridStaggerLerp();
-            gridStaggerSequencer();
-        });
+        gridStaggerTween();
+        gridStaggerSpring();
+        gridStaggerLerp();
+        gridStaggerSequencer();
     }
 
     if (body.classList.contains('page-radialStagger')) {
-        mobbu.use('loadFps', () => {
-            radialStaggerTween();
-        });
+        radialStaggerTween();
     }
 
     if (body.classList.contains('page-stressTestStagger')) {
-        mobbu.use('loadFps', () => {
-            stressTestStagger();
-        });
+        stressTestStagger();
     }
 
     if (body.classList.contains('page-masterSequencer')) {
@@ -206,9 +188,7 @@ mobbu.use('load', () => {
     }
 
     if (body.classList.contains('page-canvas')) {
-        mobbu.use('loadFps', () => {
-            testCanvas();
-        });
+        testCanvas();
     }
 
     mobbu.run('parallax');
