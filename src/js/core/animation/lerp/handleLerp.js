@@ -189,7 +189,7 @@ export class HandleLerp {
         draw(time, fps);
     }
 
-    setStagger() {
+    inzializeStagger() {
         const getStagger = () => {
             const cb =
                 this.callbackCache.length > this.callback.length
@@ -274,7 +274,7 @@ export class HandleLerp {
 
         if (this.firstRun) {
             this.fpsInLoading = true;
-            this.setStagger().then(() => {
+            this.inzializeStagger().then(() => {
                 cb();
                 this.fpsInLoading = false;
             });

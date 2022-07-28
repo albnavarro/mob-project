@@ -53,7 +53,7 @@ export class HandleSequencer {
         if (props) this.setData(props);
     }
 
-    setStagger() {
+    inzializeStagger() {
         if (this.staggerIsReady) return;
 
         if (

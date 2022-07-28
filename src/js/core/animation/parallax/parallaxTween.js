@@ -41,7 +41,7 @@ export class ParallaxTween {
         if (props) this.setData(props);
     }
 
-    setStagger() {
+    inzializeStagger() {
         if (
             this.stagger.each > 0 &&
             (this.callbackCache.length || this.callback.length)

@@ -216,7 +216,7 @@ export class HandleSyncTimeline {
             console.log(`Fps on syncTimeline loaded at: ${averageFPS} fps`);
 
             this.squencers.forEach((item, i) => {
-                item.setStagger();
+                item.inzializeStagger();
                 item.disableStagger();
                 item.draw({
                     partial: 0,
@@ -267,7 +267,7 @@ export class HandleSyncTimeline {
             console.log(`Fps on syncTimeline loaded at: ${averageFPS} fps`);
 
             this.squencers.forEach((item, i) => {
-                item.setStagger();
+                item.inzializeStagger();
                 item.disableStagger();
                 item.draw({
                     partial: this.duration,

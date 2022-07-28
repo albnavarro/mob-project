@@ -96,7 +96,7 @@ export class HandleTween {
         if (props) this.setData(props);
     }
 
-    onReuqestAnim(time, res) {
+    onReuqestAnim(time, fps, res) {
         this.startTime = time;
 
         let o = {};
@@ -195,7 +195,7 @@ export class HandleTween {
         draw(time);
     }
 
-    setStagger() {
+    inzializeStagger() {
         const getStagger = () => {
             const cb =
                 this.callbackCache.length > this.callback.length
@@ -267,12 +267,12 @@ export class HandleTween {
 
         const cb = () => {
             handleFrame.add(() => {
-                handleNextTick.add(({ time }) => {
+                handleNextTick.add(({ time, fps }) => {
                     const prevent = this.callbackStartInPause
                         .map(({ cb }) => cb())
                         .some((item) => item === true);
 
-                    this.onReuqestAnim(time, res);
+                    this.onReuqestAnim(time, fps, res);
                     if (prevent) this.pause();
                 });
             });
@@ -280,7 +280,7 @@ export class HandleTween {
 
         if (this.firstRun) {
             this.fpsInLoading = true;
-            this.setStagger().then(() => {
+            this.inzializeStagger().then(() => {
                 cb();
                 this.fpsInLoading = false;
             });

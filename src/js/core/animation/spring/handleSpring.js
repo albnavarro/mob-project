@@ -39,7 +39,6 @@ export class HandleSpring {
         this.callbackOnComplete = [];
         this.callbackStartInPause = [];
         this.unsubscribeCache = [];
-        this.lostFrameTresold = 64;
         this.pauseStatus = false;
         this.firstRun = true;
         this.useStagger = true;
@@ -206,7 +205,7 @@ export class HandleSpring {
         draw(time, fps);
     }
 
-    setStagger() {
+    inzializeStagger() {
         const getStagger = () => {
             const cb =
                 this.callbackCache.length > this.callback.length
@@ -291,7 +290,7 @@ export class HandleSpring {
 
         if (this.firstRun) {
             this.fpsInLoading = true;
-            this.setStagger().then(() => {
+            this.inzializeStagger().then(() => {
                 cb();
                 this.fpsInLoading = false;
             });
