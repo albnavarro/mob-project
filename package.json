@@ -57,6 +57,7 @@
         "gulp-notify": "^4.0.0",
         "gulp-pug-3": "^1.2.2",
         "postcss": "^8.4.12",
+        "prettier-eslint-cli": "^6.0.1",
         "rollup": "^2.70.1",
         "sass": "^1.49.9",
         "stylelint-config-standard": "^25.0.0",
