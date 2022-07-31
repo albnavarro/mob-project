@@ -15,6 +15,7 @@ set scrolloff=8
 set nohlsearch
 set belloff=all
 syntax on
+vnoremap p "_dP
 
 let g:ale_fixers = {
     \   'javascript': ['prettier'],
