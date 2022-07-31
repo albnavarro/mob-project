@@ -42,7 +42,7 @@ export class HandleSyncTimeline {
         this.callbackComplete = [];
     }
 
-    updateTime(time, fps, dropFrameCounter) {
+    updateTime(time, fps, shouldRender) {
         if (this.isStopped || this.isInInzializing) return;
 
         // If loop anitcipate by half frame ( in millsenconds ) next loop so we a have more precise animation
@@ -73,7 +73,7 @@ export class HandleSyncTimeline {
 
             // When come from playReverse skip first frame becouse is 0
             if (!this.skipFirstRender) {
-                if (dropFrameCounter === 2 || dropFrameCounter === -1) {
+                if (shouldRender) {
                     this.squencers.forEach((item, i) => {
                         item.draw({
                             partial: this.endTime,
@@ -180,10 +180,10 @@ export class HandleSyncTimeline {
 
     goToNextFrame() {
         handleFrame.add(() => {
-            handleNextTick.add(({ time, fps, dropFrameCounter }) => {
+            handleNextTick.add(({ time, fps, shouldRender }) => {
                 // Prevent fire too many raf
                 if (!this.isInInzializing)
-                    this.updateTime(time, fps, dropFrameCounter);
+                    this.updateTime(time, fps, shouldRender);
             });
         });
     }
@@ -226,11 +226,11 @@ export class HandleSyncTimeline {
             });
 
             handleFrame.add(() => {
-                handleNextTick.add(({ time, fps, dropFrameCounter }) => {
+                handleNextTick.add(({ time, fps, shouldRender }) => {
                     this.startTime = time;
                     this.isInInzializing = false;
                     this.fpsInLoading = false;
-                    this.updateTime(time, fps, dropFrameCounter);
+                    this.updateTime(time, fps, shouldRender);
                 });
             });
         });
@@ -277,11 +277,11 @@ export class HandleSyncTimeline {
             });
 
             handleFrame.add(() => {
-                handleNextTick.add(({ time, fps, dropFrameCounter }) => {
+                handleNextTick.add(({ time, fps, shouldRender }) => {
                     this.isInInzializing = false;
                     this.startTime = time;
                     this.fpsInLoading = false;
-                    this.updateTime(time, fps, dropFrameCounter);
+                    this.updateTime(time, fps, shouldRender);
                 });
             });
         });

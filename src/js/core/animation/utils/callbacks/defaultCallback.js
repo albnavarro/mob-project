@@ -15,17 +15,17 @@ export const defaultCallback = ({
     useStagger,
 }) => {
     if (stagger.each === 0 || !useStagger) {
-        handleFrame.add(({ dropFrameCounter }) => {
-            if (dropFrameCounter === 2 || dropFrameCounter === -1) {
+        handleFrame.add(({ shouldRender }) => {
+            if (shouldRender) {
                 callback.forEach(({ cb }) => {
                     cb(cbObject);
                 });
             }
         });
 
-        handleFrame.add(({ dropFrameCounter }) => {
+        handleFrame.add(({ shouldRender }) => {
             callbackCache.forEach(({ cb }, i) => {
-                if (dropFrameCounter === 2 || dropFrameCounter === -1) {
+                if (shouldRender) {
                     handleCache.fireObject({ id: cb, obj: cbObject });
                 }
             });
@@ -33,8 +33,8 @@ export const defaultCallback = ({
     } else {
         // Stagger
         callback.forEach(({ cb, frame }, i) => {
-            handleFrame.addIndex(({ dropFrameCounter }) => {
-                if (dropFrameCounter === 2 || dropFrameCounter === -1) {
+            handleFrame.addIndex(({ shouldRender }) => {
+                if (shouldRender) {
                     cb(cbObject);
                 }
             }, frame);

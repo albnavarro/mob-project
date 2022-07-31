@@ -1,0 +1,46 @@
+set number
+set tabstop=4
+set softtabstop=4
+set shiftwidth=4
+set expandtab
+set mouse=a
+set autoindent
+set colorcolumn=80
+set signcolumn=yes
+set hlsearch
+set guicursor=
+set relativenumber
+set nowrap
+set incsearch
+set scrolloff=8
+set nohlsearch
+set belloff=all
+syntax on
+
+let g:ale_fixers = {
+    \   'javascript': ['prettier'],
+    \   'scss': ['prettier'],
+    \}
+let g:ale_linters = {
+    \   'javascript': ['eslint'],
+    \   'scss': ['stylelint'],
+    \}
+let g:ale_fix_on_save = 1
+
+
+
+let g:user_emmet_install_global = 0
+autocmd FileType html,css EmmetInstall
+let g:user_emmet_leader_key='<C-Z>'
+
+
+call plug#begin()
+Plug 'mattn/emmet-vim'
+Plug 'tpope/vim-fugitive'
+Plug 'vim-airline/vim-airline'
+Plug 'joshdick/onedark.vim'
+Plug 'dense-analysis/ale'
+call plug#end()
+
+packloadall
+colorscheme onedark

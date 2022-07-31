@@ -43,12 +43,12 @@ export const handleCache = (() => {
         return subscriber?.[id];
     };
 
-    const fire = (frameCounter, dropFrameCounter) => {
+    const fire = (frameCounter, shouldRender) => {
         Object.values(subscriber).forEach(({ data, fn, el }) => {
             const cbObject = data?.[frameCounter];
 
             if (cbObject) {
-                if (dropFrameCounter === 2 || dropFrameCounter === -1) {
+                if (shouldRender) {
                     fn(cbObject, el);
                 }
                 data[frameCounter] = null;
@@ -190,11 +190,11 @@ export const handleNextTick = ((cb) => {
         callback.push({ cb, priority });
     };
 
-    const fire = ({ time, fps, dropFrameCounter }) => {
+    const fire = ({ time, fps, shouldRender }) => {
         if (callback.length === 0) return;
 
         callback.sort((a, b) => a.priority - b.priority);
-        callback.forEach(({ cb }) => cb({ time, fps, dropFrameCounter }));
+        callback.forEach(({ cb }) => cb({ time, fps, shouldRender }));
         callback.length = 0;
     };
 
@@ -246,11 +246,29 @@ export const handleFrame = (() => {
      * */
     let dropFrameCounter = -1;
     let fpsThreshold = handleSetUp.get('fpsThreshold');
+    let shouldRender = true;
 
     // Stop timer when user change tab
     handleVisibilityChange(({ visibilityState }) => {
         isStopped = visibilityState === 'visible';
     });
+
+    /*
+     * Check if animation is renderable in current frame
+     *
+     **/
+    const getRenderStatus = () => {
+        const activeModule = Object.entries(fpsThreshold).reduce(
+            (acc, [fpsValue, fpsModule]) => {
+                const delta = Math.abs(maxFps - fps) > parseInt(fpsValue);
+                return delta ? fpsModule : acc;
+            },
+            1
+        );
+
+        dropFrameCounter = (dropFrameCounter + 1) % activeModule;
+        return dropFrameCounter === activeModule - 1;
+    };
 
     const nextTickFn = () => {
         /*
@@ -277,7 +295,7 @@ export const handleFrame = (() => {
         /*
         Fire next tick
         */
-        handleNextTick.fire({ time, fps, dropFrameCounter });
+        handleNextTick.fire({ time, fps, shouldRender });
 
         /*
         Get next callback
@@ -342,17 +360,14 @@ export const handleFrame = (() => {
         if (fps > maxFps) maxFps = fps;
 
         /**
-         * Update dropFrameCounter ( form 0 to 2 use % operator) if drop frame or reset
+         * Chek if current frame can fire animation
          * */
-        dropFrameCounter =
-            Math.abs(maxFps - fps) < fpsThreshold
-                ? -1
-                : (dropFrameCounter + 1) % 3;
+        shouldRender = getRenderStatus();
 
         /*
         Fire callbnack
         */
-        callback.forEach((item, i) => item({ time, fps, dropFrameCounter }));
+        callback.forEach((item, i) => item({ time, fps, shouldRender }));
 
         /*
         Fire callback related to specific index frame
@@ -364,7 +379,7 @@ export const handleFrame = (() => {
         */
         indexCb = indexCallback[frameCounter];
         if (indexCb) {
-            indexCb.forEach((item) => item({ time, fps, dropFrameCounter }));
+            indexCb.forEach((item) => item({ time, fps, shouldRender }));
             /*
             Remove cb array once fired
             */
@@ -378,7 +393,7 @@ export const handleFrame = (() => {
         /*
         Fire handleCache callBack
         */
-        handleCache.fire(frameCounter, dropFrameCounter);
+        handleCache.fire(frameCounter, shouldRender);
         //
 
         /*
@@ -431,8 +446,6 @@ export const handleFrame = (() => {
 
     const getCurrentFrame = () => frameCounter;
 
-    const getDropFrameCounter = () => dropFrameCounter;
-
     /**
      *  Add callback
      */
@@ -476,7 +489,6 @@ export const handleFrame = (() => {
         getInstantFps,
         setInstantFps,
         getCurrentFrame,
-        getDropFrameCounter,
         addIndex,
     };
 })();
