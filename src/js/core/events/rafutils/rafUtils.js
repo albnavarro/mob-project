@@ -241,11 +241,11 @@ export const handleFrame = (() => {
     let indexCb = null;
 
     /**
-     * Check if frame drop by fpsThreshold value
+     * Check if frame drop by fpsScalePercent value
      * when value is -1 || 2 animation ( or whoever use it ) is rendered
      * */
     let dropFrameCounter = -1;
-    let fpsThreshold = handleSetUp.get('fpsThreshold');
+    let fpsScalePercent = handleSetUp.get('fpsScalePercent');
     let shouldRender = true;
 
     // Stop timer when user change tab
@@ -258,10 +258,18 @@ export const handleFrame = (() => {
      *
      **/
     const getRenderStatus = () => {
-        const activeModule = Object.entries(fpsThreshold).reduce(
+        const activeModule = Object.entries(fpsScalePercent).reduce(
             (acc, [fpsValue, fpsModule]) => {
-                const delta = Math.abs(maxFps - fps) > parseInt(fpsValue);
-                return delta ? fpsModule : acc;
+                const delta = Math.abs(maxFps - fps);
+
+                /**
+                 * Get delta value in percent
+                 * Assuming that fpsValue in in percent
+                 * Compare and check if we are under fpsValue
+                 **/
+                const deltaPercent = Math.round((delta * 100) / maxFps);
+                const isOutOfRange = deltaPercent > parseInt(fpsValue);
+                return isOutOfRange ? fpsModule : acc;
             },
             1
         );
@@ -270,6 +278,9 @@ export const handleFrame = (() => {
         return dropFrameCounter === activeModule - 1;
     };
 
+    /*
+     * Next tick function
+     **/
     const nextTickFn = () => {
         /*
          * If frameCounter reach maxFramecounter back to zero to avoid big numbers
@@ -351,7 +362,7 @@ export const handleFrame = (() => {
             /**
              * Update value every seconds
              **/
-            fpsThreshold = handleSetUp.get('fpsThreshold');
+            fpsScalePercent = handleSetUp.get('fpsScalePercent');
         }
 
         /**

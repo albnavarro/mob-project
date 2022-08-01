@@ -3,7 +3,7 @@ import { mergeDeep } from './utils/mergeDeep.js';
 export const handleSetUp = (() => {
     let data = {
         startFps: 60,
-        fpsThreshold: { 0: 1, 15: 2, 30: 3, 45: 4 },
+        fpsScalePercent: { 0: 1, 15: 2, 30: 3, 45: 4 },
         deferredNextTick: false,
         throttle: 100,
         mq: {
