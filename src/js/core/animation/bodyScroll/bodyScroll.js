@@ -64,7 +64,7 @@ export const bodyScroll = (() => {
                         if (ease) tween.updatePreset(defaultPreset);
                         res();
                     })
-                    .catch((err) => {
+                    .catch(() => {
                         reject();
                     });
             });

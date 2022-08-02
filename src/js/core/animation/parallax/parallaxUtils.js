@@ -137,12 +137,8 @@ export const parallaxUtils = {
         const str = String(data);
         const values = str.split(' ');
 
-        const {
-            numberVal,
-            unitMisure,
-            additionalVal,
-            position,
-        } = parallaxUtils.getStartEndValue(values, direction);
+        const { numberVal, unitMisure, additionalVal, position } =
+            parallaxUtils.getStartEndValue(values, direction);
 
         // CHECK IF NUMBER IS NEGATIVE
         const firstChar = String(numberVal).charAt(0);
@@ -180,12 +176,8 @@ export const parallaxUtils = {
         // SPLIT INTO CHUNK DATA
         const str = String(data);
         const values = str.split(' ');
-        const {
-            numberVal,
-            unitMisure,
-            additionalVal,
-            position,
-        } = parallaxUtils.getStartEndValue(values, direction);
+        const { numberVal, unitMisure, additionalVal, position } =
+            parallaxUtils.getStartEndValue(values, direction);
 
         // CHECK IF NUMBER IS NEGATIVE
         const firstChar = String(numberVal).charAt(0);
@@ -314,7 +306,7 @@ export const parallaxUtils = {
         }
     },
 
-    getRetReverseValue(propierties, val, opacity) {
+    getRetReverseValue(propierties, val) {
         switch (propierties) {
             case parallaxConstant.PROP_OPACITY:
                 return 1 - val;

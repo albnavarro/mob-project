@@ -1,5 +1,4 @@
 import { handleResize } from '../../events/resizeUtils/handleResize.js';
-import { handleScroll } from '../../events/scrollUtils/handleScroll.js';
 import {
     handleScrollStart,
     handleScrollEnd,
@@ -155,7 +154,7 @@ export class SmoothScrollClass {
                 }
             }
 
-            this.onTickCallback.forEach((item, i) => {
+            this.onTickCallback.forEach((item) => {
                 item({
                     scrollValue: -val,
                     percent: this.percent,
@@ -178,7 +177,7 @@ export class SmoothScrollClass {
                 }
             }
 
-            this.onTickCallback.forEach((item, i) => {
+            this.onTickCallback.forEach((item) => {
                 item(-val);
             });
         });
@@ -186,7 +185,7 @@ export class SmoothScrollClass {
         // Set link and button to draggable false, prevent mousemouve fail
         this.target.style['user-select'] = 'none';
         const activeElement = this.target.querySelectorAll('a, button');
-        [...activeElement].forEach((item, i) => {
+        [...activeElement].forEach((item) => {
             item.setAttribute('draggable', false);
             item.style['user-select'] = 'none';
         });
@@ -272,7 +271,7 @@ export class SmoothScrollClass {
         })();
 
         this.endValue = resetValue;
-        this.motion.set({ val: resetValue }).catch((err) => {});
+        this.motion.set({ val: resetValue }).catch(() => {});
 
         this.maxValue = (() => {
             if (this.direction === this.VERTICAL) {
@@ -314,7 +313,7 @@ export class SmoothScrollClass {
         }
     }
 
-    onMouseUp({ target, client }) {
+    onMouseUp() {
         this.dragEnable = false;
         this.scrollbarIsRunning = false;
     }
@@ -362,7 +361,7 @@ export class SmoothScrollClass {
         this.scrollbarIsRunning = true;
         this.percent = percent;
         this.endValue = (this.percent * this.maxValue) / 100;
-        this.motion.goTo({ val: this.endValue }).catch((err) => {});
+        this.motion.goTo({ val: this.endValue }).catch(() => {});
     }
 
     // COMMON CALCULATE VALUE
@@ -370,7 +369,7 @@ export class SmoothScrollClass {
         const percentValue = (this.endValue * 100) / this.maxValue;
         this.percent = clamp(percentValue, 0, 100);
         this.endValue = clamp(this.endValue, 0, this.maxValue);
-        this.motion.goTo({ val: this.endValue }).catch((err) => {});
+        this.motion.goTo({ val: this.endValue }).catch(() => {});
 
         if (!this.scrollbarIsRunning) {
             this.onUpdateScrollBar({

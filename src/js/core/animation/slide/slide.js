@@ -67,10 +67,10 @@ export const slide = (() => {
 
             tween
                 .goFromTo({ val: currentHeight }, { val: 0 }, { duration: 500 })
-                .then((value) => {
+                .then(() => {
                     res();
                 })
-                .catch((err) => {});
+                .catch(() => {});
         });
     }
 
@@ -89,11 +89,11 @@ export const slide = (() => {
 
             tween
                 .goTo({ val: height }, { duration: 500 })
-                .then((value) => {
+                .then(() => {
                     item.style.height = `auto`;
                     res();
                 })
-                .catch((err) => {});
+                .catch(() => {});
         });
     }
 

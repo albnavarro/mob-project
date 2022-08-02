@@ -16,7 +16,6 @@ import { HandleLerp } from '../lerp/handleLerp.js';
 import { getRoundedValue } from '../utils/animationUtils.js';
 import { getTranslateValues } from '../../utils/vanillaFunction.js';
 import { clamp } from '../utils/animationUtils.js';
-import { handleSetUp } from '../../setup.js';
 
 export class ParallaxItemClass {
     constructor(data) {
@@ -702,7 +701,7 @@ export class ParallaxItemClass {
         this.motion[action](
             { val: this.endValue },
             this.motionParameters
-        ).catch((err) => {});
+        ).catch(() => {});
     }
 
     computeValue(scrollVal = null) {
@@ -736,8 +735,7 @@ export class ParallaxItemClass {
 
         switch (this.type) {
             case parallaxConstant.TYPE_SCROLLTRIGGER:
-                const val = this.getFixedValue();
-                this.endValue = getRoundedValue(val);
+                this.endValue = getRoundedValue(this.getFixedValue());
                 break;
 
             default:
@@ -865,44 +863,38 @@ export class ParallaxItemClass {
         switch (this.propierties) {
             case parallaxConstant.PROP_HORIZONTAL:
             case parallaxConstant.PROP_VERTICAL:
-                const value = (() => {
-                    switch (this.unitMisure) {
-                        case parallaxConstant.VW:
-                            return (
-                                (this.windowInnerWidth / 100) * -this.GC.percent
-                            );
-
-                        case parallaxConstant.VH:
-                            return (
-                                (this.windowInnerHeight / 100) *
-                                -this.GC.percent
-                            );
-
-                        case parallaxConstant.WPERCENT:
-                            return this.direction ===
-                                parallaxConstant.DIRECTION_VERTICAL
-                                ? (this.width / 100) * -this.GC.percent
-                                : (this.height / 100) * -this.GC.percent;
-
-                        case parallaxConstant.HPERCENT:
-                            return this.direction ===
-                                parallaxConstant.DIRECTION_VERTICAL
-                                ? (this.height / 100) * -this.GC.percent
-                                : (this.width / 100) * -this.GC.percent;
-
-                        case parallaxConstant.PX:
-                        case parallaxConstant.DEGREE:
-                        case parallaxConstant.PROP_TWEEN:
-                        default:
-                            return -this.GC.percent;
-                    }
-                })();
-                return value;
+                return this.getHVval();
 
             case parallaxConstant.PROP_SCALE:
             case parallaxConstant.PROP_OPACITY:
                 return 1 - this.GC.percent;
 
+            default:
+                return -this.GC.percent;
+        }
+    }
+
+    getHVval() {
+        switch (this.unitMisure) {
+            case parallaxConstant.VW:
+                return (this.windowInnerWidth / 100) * -this.GC.percent;
+
+            case parallaxConstant.VH:
+                return (this.windowInnerHeight / 100) * -this.GC.percent;
+
+            case parallaxConstant.WPERCENT:
+                return this.direction === parallaxConstant.DIRECTION_VERTICAL
+                    ? (this.width / 100) * -this.GC.percent
+                    : (this.height / 100) * -this.GC.percent;
+
+            case parallaxConstant.HPERCENT:
+                return this.direction === parallaxConstant.DIRECTION_VERTICAL
+                    ? (this.height / 100) * -this.GC.percent
+                    : (this.width / 100) * -this.GC.percent;
+
+            case parallaxConstant.PX:
+            case parallaxConstant.DEGREE:
+            case parallaxConstant.PROP_TWEEN:
             default:
                 return -this.GC.percent;
         }
@@ -1019,7 +1011,6 @@ export class ParallaxItemClass {
                 return {
                     transform: `${this.GC.force3DStyle} rotate(${this.GC.typeVal}deg)`,
                 };
-                break;
 
             case parallaxConstant.PROP_ROTATEY:
                 return {

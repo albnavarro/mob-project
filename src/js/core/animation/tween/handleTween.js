@@ -16,10 +16,7 @@ import {
 import { mergeDeep } from '../../utils/mergeDeep.js';
 import { handleSetUp } from '../../setup.js';
 import { setStagger } from '../utils/stagger/setStagger.js';
-import {
-    DIRECTION_COL,
-    STAGGER_DEFAULT_INDEX_OBJ,
-} from '../utils/stagger/staggerCostant.js';
+import { STAGGER_DEFAULT_INDEX_OBJ } from '../utils/stagger/staggerCostant.js';
 import { getStaggerFromProps } from '../utils/stagger/staggerUtils.js';
 import {
     defaultCallbackOnComplete,
@@ -113,7 +110,7 @@ export class HandleTween {
                 this.timeElapsed = this.duration;
             }
 
-            this.values.forEach((item, i) => {
+            this.values.forEach((item) => {
                 if (item.shouldUpdate) {
                     item.currentValue = this.ease(
                         this.timeElapsed,
@@ -157,7 +154,7 @@ export class HandleTween {
                     // End of animation
                     // Set fromValue with ended value
                     // At the next call fromValue become the start value
-                    this.values.forEach((item, i) => {
+                    this.values.forEach((item) => {
                         if (item.shouldUpdate) {
                             item.toValue = item.currentValue;
                             item.fromValue = item.currentValue;
@@ -210,18 +207,14 @@ export class HandleTween {
                 return;
             }
 
-            const {
-                cbNow,
-                cbCompleteNow,
-                fastestStagger,
-                slowlestStagger,
-            } = setStagger({
-                cb,
-                endCb: this.callbackOnComplete,
-                stagger: this.stagger,
-                slowlestStagger: this.slowlestStagger,
-                fastestStagger: this.fastestStagger,
-            });
+            const { cbNow, cbCompleteNow, fastestStagger, slowlestStagger } =
+                setStagger({
+                    cb,
+                    endCb: this.callbackOnComplete,
+                    stagger: this.stagger,
+                    slowlestStagger: this.slowlestStagger,
+                    fastestStagger: this.fastestStagger,
+                });
 
             if (this.callbackCache.length > this.callback.length) {
                 this.callbackCache = [...cbNow];
@@ -301,7 +294,7 @@ export class HandleTween {
         this.comeFromResume = false;
 
         // Update local values with last
-        this.values.forEach((item, i) => {
+        this.values.forEach((item) => {
             item.toValue = item.currentValue;
             item.fromValue = item.toValue;
         });
@@ -378,7 +371,7 @@ export class HandleTween {
             this.promise = null;
         }
 
-        this.values.forEach((item, i) => {
+        this.values.forEach((item) => {
             if (item.shouldUpdate) {
                 item.fromValue = item.currentValue;
             }
@@ -392,7 +385,7 @@ export class HandleTween {
      *
      */
     setToValProcessed() {
-        this.values.forEach((item, i) => {
+        this.values.forEach((item) => {
             if (item.shouldUpdate) {
                 /*
                 Prevent error on tween revert if is 0 some easeType can't run
@@ -412,7 +405,7 @@ export class HandleTween {
     immediate() {
         this.req = false;
 
-        this.values.forEach((item, i) => {
+        this.values.forEach((item) => {
             item.fromValue = item.toValue;
             item.currentValue = item.toValue;
         });
@@ -644,7 +637,7 @@ export class HandleTween {
      */
     reverse(obj) {
         const keysTorevert = Object.keys(obj);
-        this.values.forEach((item, i) => {
+        this.values.forEach((item) => {
             if (keysTorevert.includes(item.prop)) {
                 const fromValue = item.fromValue;
                 const toValue = item.toValue;

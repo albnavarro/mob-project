@@ -24,7 +24,7 @@ export const defaultCallback = ({
         });
 
         handleFrame.add(({ shouldRender }) => {
-            callbackCache.forEach(({ cb }, i) => {
+            callbackCache.forEach(({ cb }) => {
                 if (shouldRender) {
                     handleCache.fireObject({ id: cb, obj: cbObject });
                 }
@@ -32,7 +32,7 @@ export const defaultCallback = ({
         });
     } else {
         // Stagger
-        callback.forEach(({ cb, frame }, i) => {
+        callback.forEach(({ cb, frame }) => {
             handleFrame.addIndex(({ shouldRender }) => {
                 if (shouldRender) {
                     cb(cbObject);
@@ -69,7 +69,7 @@ export const defaultCallbackOnComplete = ({
                 cb(cbObject);
             });
 
-            callbackCache.forEach(({ cb }, i) => {
+            callbackCache.forEach(({ cb }) => {
                 handleCache.fireObject({ id: cb, obj: cbObject });
             });
 
@@ -78,7 +78,7 @@ export const defaultCallbackOnComplete = ({
             });
         });
     } else {
-        callback.forEach(({ cb, index, frame }, i) => {
+        callback.forEach(({ cb, frame }, i) => {
             handleFrame.addIndex(() => {
                 cb(cbObject);
 
@@ -94,7 +94,7 @@ export const defaultCallbackOnComplete = ({
             }, frame);
         });
 
-        callbackCache.forEach(({ cb, index, frame }, i) => {
+        callbackCache.forEach(({ cb, frame }, i) => {
             handleFrame.addIndex(() => {
                 handleCache.fireObject({ id: cb, obj: cbObject });
 
@@ -110,7 +110,7 @@ export const defaultCallbackOnComplete = ({
             }, frame);
         });
 
-        callbackOnComplete.forEach(({ cb, frame }, i) => {
+        callbackOnComplete.forEach(({ cb, frame }) => {
             handleFrame.addIndex(() => {
                 cb(cbObject);
             }, frame + 1);

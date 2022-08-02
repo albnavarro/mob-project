@@ -4,6 +4,7 @@ export const handleSetUp = (() => {
     let data = {
         startFps: 60,
         fpsScalePercent: { 0: 1, 15: 2, 30: 3, 45: 4 },
+        useScaleFps: true,
         deferredNextTick: false,
         throttle: 100,
         mq: {

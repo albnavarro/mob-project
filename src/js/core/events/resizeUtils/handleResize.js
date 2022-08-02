@@ -14,7 +14,7 @@ export const handleResize = (() => {
      * @param  {event} e mouse move event
      * @return {void}   description
      */
-    function handler(e) {
+    function handler() {
         /**
          * if - if there is no subscritor remove handler
          */

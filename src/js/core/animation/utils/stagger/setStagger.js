@@ -26,8 +26,8 @@ export const setStagger = ({
              * **/
             if (
                 !checkType(Object, stagger.from) ||
-                !('x' in stagger?.from) ||
-                !('y' in stagger?.from)
+                !stagger?.from?.x ||
+                !stagger?.from?.y
             ) {
                 console.warn(
                     `Stagger error: in radial direction 'from' propierties must be a object {x:val,y:val}`
@@ -69,7 +69,7 @@ export const setStagger = ({
             // Get stagger index the minumn and the fastest and the slowest
             let counter = 0;
             cleanCb.forEach((chunk, i) => {
-                chunk.forEach((item, iChunk) => {
+                chunk.forEach((item) => {
                     /*
                     Get stagger each by fps
                     */

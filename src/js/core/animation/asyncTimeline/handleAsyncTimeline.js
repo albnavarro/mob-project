@@ -48,16 +48,14 @@ export class HandleAsyncTimeline {
 
     run(index = this.currentIndex) {
         const tweenPromises = this.tweenList[index].map((item) => {
-            const { group, data } = item;
+            const { data } = item;
 
             const {
-                id,
                 tween,
                 action,
                 valuesFrom,
                 valuesTo,
                 tweenProps,
-                groupProps,
                 syncProp,
             } = data;
 
@@ -87,15 +85,15 @@ export class HandleAsyncTimeline {
                     return tween[action](valuesFrom, valuesTo, newTweenProps);
                 },
                 sync: () => {
-                    return new Promise((res, reject) => {
+                    return new Promise((res) => {
                         const { from, to } = syncProp;
-                        to.set(from.get(), { immediate: true }).then((value) =>
+                        to.set(from.get(), { immediate: true }).then(() =>
                             res()
                         );
                     });
                 },
                 add: () => {
-                    return new Promise((res, reject) => {
+                    return new Promise((res) => {
                         if (!isImmediate) {
                             // Custom function
                             tween({ reverse: this.isReverse });
@@ -109,7 +107,7 @@ export class HandleAsyncTimeline {
                     // Activate addAsyncFlag
                     this.addAsyncIsActive = true;
 
-                    return new Promise((res, reject) => {
+                    return new Promise((res) => {
                         if (!isImmediate) {
                             // Custom function that fire the result of the promise
                             tween({ reverse: this.isReverse, resolve: res });
@@ -119,16 +117,16 @@ export class HandleAsyncTimeline {
                     });
                 },
                 createGroup: () => {
-                    return new Promise((res, reject) => res());
+                    return new Promise((res) => res());
                 },
                 closeGroup: () => {
-                    return new Promise((res, reject) => res());
+                    return new Promise((res) => res());
                 },
                 label: () => {
-                    return new Promise((res, reject) => res());
+                    return new Promise((res) => res());
                 },
                 suspend: () => {
-                    return new Promise((res, reject) => {
+                    return new Promise((res) => {
                         if (!isImmediate) {
                             this.isSuspended = true;
                         }
@@ -258,13 +256,13 @@ export class HandleAsyncTimeline {
                     });
                 }
             })
-            .catch((error) => {
+            .catch(() => {
                 this.currentTween = [];
 
                 // If play or reverse or playFromLabel is fired diring delay tween fail
                 // Afte fail we can fire the action
                 if (this.actionAfterReject.length > 0) {
-                    this.actionAfterReject.forEach((item, i) => item());
+                    this.actionAfterReject.forEach((item) => item());
                     this.actionAfterReject = [];
                     return;
                 }
@@ -312,15 +310,13 @@ export class HandleAsyncTimeline {
         this.tweenList.reverse().forEach((group) => {
             group.reverse().forEach((item) => {
                 const { data } = item;
-                const { tween, action, valuesFrom, valuesTo, syncProp } = data;
+                const { action, valuesFrom, valuesTo, syncProp } = data;
+                const prevValueTo = item.data.prevValueTo || valuesFrom;
+                const currentValueTo = item.data.valuesTo;
+                const { from, to } = syncProp;
 
                 switch (action) {
                     case 'goTo':
-                        const prevValueTo = item.data.prevValueTo
-                            ? item.data.prevValueTo
-                            : valuesFrom; //Fallback if there is no preveValue Settled
-
-                        const currentValueTo = item.data.valuesTo;
                         item.data.valuesTo = prevValueTo;
                         item.data.prevValueTo = currentValueTo;
                         break;
@@ -331,7 +327,6 @@ export class HandleAsyncTimeline {
                         break;
 
                     case 'sync':
-                        const { from, to } = syncProp;
                         item.data.syncProp.from = to;
                         item.data.syncProp.to = from;
                         break;

@@ -9,16 +9,12 @@ import {
     loadFps,
     handleCache,
     handleFrame,
-    handleNextFrame,
     handleNextTick,
 } from '../../events/rafutils/rafUtils.js';
 import { mergeDeep } from '../../utils/mergeDeep.js';
 import { handleSetUp } from '../../setup.js';
 import { setStagger } from '../utils/stagger/setStagger.js';
-import {
-    DIRECTION_COL,
-    STAGGER_DEFAULT_INDEX_OBJ,
-} from '../utils/stagger/staggerCostant.js';
+import { STAGGER_DEFAULT_INDEX_OBJ } from '../utils/stagger/staggerCostant.js';
 import { getStaggerFromProps } from '../utils/stagger/staggerUtils.js';
 import {
     defaultCallbackOnComplete,
@@ -95,7 +91,7 @@ export class HandleSpring {
     }
 
     onReuqestAnim(time, fps, res) {
-        this.values.forEach((item, i) => {
+        this.values.forEach((item) => {
             item.velocity = parseFloat(this.config.velocity);
             item.currentValue = parseFloat(item.fromValue);
 
@@ -114,7 +110,7 @@ export class HandleSpring {
         const draw = (time, fps) => {
             this.req = true;
 
-            this.values.forEach((item, i) => {
+            this.values.forEach((item) => {
                 o.tensionForce =
                     -o.tension * (item.currentValue - item.toValue);
                 o.dampingForce = -o.friction * item.velocity;
@@ -167,7 +163,7 @@ export class HandleSpring {
                     // End of animation
                     // Set fromValue with ended value
                     // At the next call fromValue become the start value
-                    this.values.forEach((item, i) => {
+                    this.values.forEach((item) => {
                         item.fromValue = item.toValue;
                     });
 
@@ -220,18 +216,14 @@ export class HandleSpring {
                 return;
             }
 
-            const {
-                cbNow,
-                cbCompleteNow,
-                fastestStagger,
-                slowlestStagger,
-            } = setStagger({
-                cb,
-                endCb: this.callbackOnComplete,
-                stagger: this.stagger,
-                slowlestStagger: this.slowlestStagger,
-                fastestStagger: this.fastestStagger,
-            });
+            const { cbNow, cbCompleteNow, fastestStagger, slowlestStagger } =
+                setStagger({
+                    cb,
+                    endCb: this.callbackOnComplete,
+                    stagger: this.stagger,
+                    slowlestStagger: this.slowlestStagger,
+                    fastestStagger: this.fastestStagger,
+                });
 
             if (this.callbackCache.length > this.callback.length) {
                 this.callbackCache = [...cbNow];
@@ -309,7 +301,7 @@ export class HandleSpring {
         if (this.pauseStatus) this.pauseStatus = false;
 
         // Update local values with last
-        this.values.forEach((item, i) => {
+        this.values.forEach((item) => {
             item.toValue = item.currentValue;
             item.fromValue = item.toValue;
         });
@@ -343,7 +335,7 @@ export class HandleSpring {
             this.req = false;
         }
 
-        this.values.forEach((item, i) => {
+        this.values.forEach((item) => {
             if (!item.settled) {
                 item.fromValue = item.currentValue;
             }
@@ -397,7 +389,7 @@ export class HandleSpring {
     immediate() {
         this.req = false;
 
-        this.values.forEach((item, i) => {
+        this.values.forEach((item) => {
             item.fromValue = item.toValue;
             item.currentValue = item.toValue;
         });
@@ -423,7 +415,7 @@ export class HandleSpring {
      * Realtive toValue from current position
      */
     setToValProcessed() {
-        this.values.forEach((item, i) => {
+        this.values.forEach((item) => {
             item.toValue = this.relative
                 ? item.toValue + item.currentValue
                 : item.toValue;
@@ -625,7 +617,7 @@ export class HandleSpring {
     reverse(obj) {
         const keysTorevert = Object.keys(obj);
 
-        this.values.forEach((item, i) => {
+        this.values.forEach((item) => {
             if (keysTorevert.includes(item.prop)) {
                 const fromValue = item.fromValue;
                 const toValue = item.toValue;

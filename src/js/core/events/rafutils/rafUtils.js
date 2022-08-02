@@ -1,6 +1,4 @@
-import { SimpleStore } from '../../store/simpleStore.js';
 import { getTime, defaultTimestep } from '../../utils/time.js';
-import { clamp } from '../../animation/utils/animationUtils.js';
 import { handleSetUp } from '../../setup.js';
 import { handleVisibilityChange } from '../visibilityChange/handleVisibilityChange.js';
 
@@ -67,7 +65,7 @@ export const handleCache = (() => {
 
     const updateFrameId = (maxFramecounter) => {
         Object.values(subscriber).forEach(({ data }) => {
-            Object.keys(data).forEach((key, i) => {
+            Object.keys(data).forEach((key) => {
                 delete Object.assign(data, {
                     [`${parseInt(key) - maxFramecounter}`]: data[key],
                 })[key];
@@ -103,7 +101,7 @@ export const loadFps = (duration = 30) => {
         });
     }
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         const frameTimes = [];
         const maxFrames = 20;
         let frameCursor = 0;
@@ -158,7 +156,7 @@ export const loadFps = (duration = 30) => {
  * });
  *
  */
-export const handleNextFrame = ((cb) => {
+export const handleNextFrame = (() => {
     let callback = [];
 
     const add = (cb) => {
@@ -183,7 +181,7 @@ export const handleNextFrame = ((cb) => {
  * });
  *
  */
-export const handleNextTick = ((cb) => {
+export const handleNextTick = (() => {
     let callback = [];
 
     const add = (cb, priority = 100) => {
@@ -227,7 +225,6 @@ export const handleFrame = (() => {
     let indexCallback = {};
     let indexCallbackLength = 0;
     let time = getTime();
-    let prevTime = getTime();
     let startTime = 0;
     let rawTime = 0;
     let timeElapsed = 0;
@@ -245,8 +242,9 @@ export const handleFrame = (() => {
      * when value is -1 || 2 animation ( or whoever use it ) is rendered
      * */
     let dropFrameCounter = -1;
-    let fpsScalePercent = handleSetUp.get('fpsScalePercent');
     let shouldRender = true;
+    let fpsScalePercent = handleSetUp.get('fpsScalePercent');
+    let useScaleFpsf = handleSetUp.get('useScaleFps');
 
     // Stop timer when user change tab
     handleVisibilityChange(({ visibilityState }) => {
@@ -258,6 +256,8 @@ export const handleFrame = (() => {
      *
      **/
     const getRenderStatus = () => {
+        if (!useScaleFpsf) return true;
+
         const activeModule = Object.entries(fpsScalePercent).reduce(
             (acc, [fpsValue, fpsModule]) => {
                 const delta = Math.abs(maxFps - fps);
@@ -289,7 +289,7 @@ export const handleFrame = (() => {
         if (frameCounter === maxFramecounter) {
             frameCounter = 0;
 
-            Object.keys(indexCallback).forEach((key, i) => {
+            Object.keys(indexCallback).forEach((key) => {
                 delete Object.assign(indexCallback, {
                     [`${parseInt(key) - maxFramecounter}`]: indexCallback[key],
                 })[key];
@@ -363,6 +363,7 @@ export const handleFrame = (() => {
              * Update value every seconds
              **/
             fpsScalePercent = handleSetUp.get('fpsScalePercent');
+            useScaleFpsf = handleSetUp.get('useScaleFps');
         }
 
         /**
@@ -378,7 +379,7 @@ export const handleFrame = (() => {
         /*
         Fire callbnack
         */
-        callback.forEach((item, i) => item({ time, fps, shouldRender }));
+        callback.forEach((item) => item({ time, fps, shouldRender }));
 
         /*
         Fire callback related to specific index frame
@@ -415,7 +416,6 @@ export const handleFrame = (() => {
         /*
         Reset props
         */
-        prevTime = time;
         callback.length = 0;
         isStopped = false;
 

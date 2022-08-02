@@ -144,6 +144,7 @@ export const mobbu = {
                         `loadImages need a Object with an array of images: {images: [...]}`
                     );
                 }
+                break;
 
             default:
                 console.warn(`${type} in mobbu.create not exist`);

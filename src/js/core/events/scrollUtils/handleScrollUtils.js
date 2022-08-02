@@ -22,7 +22,7 @@ function handleScrollUtils(type) {
      * @param  {event} e mouse move event
      * @return {void}   description
      */
-    function handler(e) {
+    function handler() {
         isScrolling = false;
 
         /**

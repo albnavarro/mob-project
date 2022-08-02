@@ -1,4 +1,4 @@
-import { sliceIntoChunks, arrayColumn } from '../animationUtils.js';
+import { sliceIntoChunks } from '../animationUtils.js';
 import { MERGE_FROM_UP, MERGE_FROM_DOWN } from './staggerCostant';
 
 export const getRadialArray = (arr, stagger) => {
@@ -8,7 +8,7 @@ export const getRadialArray = (arr, stagger) => {
     const chunk = sliceIntoChunks(arr, col);
 
     // Add empy row (one row for each column) at the end to prevent missing cell form matrix calc
-    [...Array(col).keys()].forEach((item, i) => {
+    [...Array(col).keys()].forEach(() => {
         chunk.push([]);
     });
 

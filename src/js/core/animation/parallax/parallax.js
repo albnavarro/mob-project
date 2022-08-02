@@ -16,7 +16,7 @@ class ParallaxClass {
             return this.getItemData(item);
         });
 
-        dataArray.forEach((item, i) => {
+        dataArray.forEach((item) => {
             this.id++;
             const parallaxItem = new ParallaxItemClass(item);
             this.instances.push({ id: this.id, istance: parallaxItem });

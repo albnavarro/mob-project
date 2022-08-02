@@ -4,7 +4,6 @@ import {
     compareKeys,
     getRoundedValue,
 } from '../../animation/utils/animationUtils.js';
-import { mergeDeep } from '../../utils/mergeDeep.js';
 import {
     handleCache,
     handleFrame,
@@ -12,7 +11,6 @@ import {
 } from '../../events/rafutils/rafUtils.js';
 import { setStagger } from '../utils/stagger/setStagger.js';
 import { getStaggerFromProps } from '../utils/stagger/staggerUtils.js';
-import { DIRECTION_COL } from '../utils/stagger/staggerCostant.js';
 import { handleSetUp } from '../../setup.js';
 
 // Stagger and eade is defined at tween creation
@@ -77,7 +75,7 @@ export class ParallaxTween {
 
     draw({ partial, isLastDraw }) {
         const mainFn = () => {
-            this.values.forEach((item, i) => {
+            this.values.forEach((item) => {
                 item.currentValue = this.ease(
                     partial,
                     item.fromValue,
@@ -104,7 +102,7 @@ export class ParallaxTween {
                 });
             } else {
                 // Stagger
-                this.callback.forEach(({ cb, frame }, i) => {
+                this.callback.forEach(({ cb, frame }) => {
                     handleFrame.addIndex(() => cb(cbObject), frame);
                 });
 
@@ -121,7 +119,7 @@ export class ParallaxTween {
                     });
                 } else {
                     // Stagger
-                    this.callbackOnStop.forEach(({ cb, index, frame }, i) => {
+                    this.callbackOnStop.forEach(({ cb, frame }) => {
                         handleFrame.addIndex(() => cb(cbObject), frame + 1);
                     });
                 }
@@ -182,7 +180,7 @@ export class ParallaxTween {
      *
      */
     setToValProcessed() {
-        this.values.forEach((item, i) => {
+        this.values.forEach((item) => {
             item.toValProcessed = item.toValue - item.fromValue;
         });
     }

@@ -1,10 +1,6 @@
-import { clamp, getRoundedValue } from '../utils/animationUtils.js';
+import { getRoundedValue } from '../utils/animationUtils.js';
 import { setStagger } from '../utils/stagger/setStagger.js';
-import {
-    DIRECTION_COL,
-    STAGGER_DEFAULT_OBJ,
-    STAGGER_DEFAULT_INDEX_OBJ,
-} from '../utils/stagger/staggerCostant.js';
+import { STAGGER_DEFAULT_OBJ } from '../utils/stagger/staggerCostant.js';
 import { handleSetUp } from '../../setup.js';
 import { checkType } from '../../store/storeType.js';
 

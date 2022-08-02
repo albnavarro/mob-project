@@ -1,6 +1,5 @@
 import { getTweenFn } from '../tween/tweenConfig.js';
 import {
-    clamp,
     getValueObj,
     compareKeys,
     getRoundedValue,
@@ -12,7 +11,6 @@ import {
 } from '../../events/rafutils/rafUtils.js';
 import { setStagger } from '../utils/stagger/setStagger.js';
 import { getStaggerFromProps } from '../utils/stagger/staggerUtils.js';
-import { DIRECTION_COL } from '../utils/stagger/staggerCostant.js';
 import { handleSetUp } from '../../setup.js';
 
 export class HandleSequencer {
@@ -106,7 +104,7 @@ export class HandleSequencer {
                 inactivePosition: null,
             };
 
-            this.values.forEach((item, i) => {
+            this.values.forEach((item) => {
                 item.settled = false;
             });
 
@@ -179,7 +177,7 @@ export class HandleSequencer {
                 });
             } else {
                 // Stagger
-                this.callback.forEach(({ cb, frame }, i) => {
+                this.callback.forEach(({ cb, frame }) => {
                     handleFrame.addIndex(() => cb(cbObject), frame);
                 });
 
@@ -197,7 +195,7 @@ export class HandleSequencer {
                     handleFrame.add(() => fn());
                 } else {
                     // Stagger
-                    this.callbackOnStop.forEach(({ cb, index, frame }, i) => {
+                    this.callbackOnStop.forEach(({ cb, frame }) => {
                         handleFrame.addIndex(() => cb(cbObject), frame + 1);
                     });
                 }
@@ -261,7 +259,7 @@ export class HandleSequencer {
      * @return {Array} main store Array merged with new data
      */
     mergeArray(newData, data) {
-        return data.map((item, i) => {
+        return data.map((item) => {
             const itemToMerge = newData.find((newItem) => {
                 return newItem.prop === item.prop;
             });

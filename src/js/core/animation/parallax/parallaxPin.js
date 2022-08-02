@@ -1,11 +1,9 @@
 import { HandleSpring } from '../../animation/spring/handleSpring.js';
 import { handleFrame } from '../../events/rafutils/rafUtils.js';
 import { parallaxConstant } from './parallaxConstant.js';
-import { parallaxUtils } from './parallaxUtils.js';
 import { position } from '../../utils/vanillaFunction.js';
 import { handleScroll } from '../../events/scrollUtils/handleScroll.js';
 import { handleScrollStart } from '../../events/scrollUtils/handleScrollUtils.js';
-import { getTranslateValues } from '../../utils/vanillaFunction.js';
 import { clamp } from '../../animation/utils/animationUtils.js';
 
 export class ParallaxPin {
@@ -205,9 +203,7 @@ export class ParallaxPin {
 
     resetSpring() {
         if (this.pin)
-            this.spring
-                .set({ collision: 0, verticalGap: 0 })
-                .catch((err) => {});
+            this.spring.set({ collision: 0, verticalGap: 0 }).catch(() => {});
     }
 
     createPin() {
@@ -433,7 +429,7 @@ export class ParallaxPin {
                 .then(() => {
                     this.resetPinTransform();
                 })
-                .catch((err) => {});
+                .catch(() => {});
         }
     }
 
@@ -696,16 +692,13 @@ export class ParallaxPin {
                 : position(this.wrapper).left;
 
         // Get anticipate value
-        const {
-            anticipateBottom,
-            anticipateInnerIn,
-            anticipateInnerOut,
-        } = !this.invertSide
-            ? this.getAnticipateValue(scrollTop, this.GC.scrollDirection)
-            : this.getAnticipateValueInverted(
-                  scrollTop,
-                  this.GC.scrollDirection
-              );
+        const { anticipateBottom, anticipateInnerIn, anticipateInnerOut } =
+            !this.invertSide
+                ? this.getAnticipateValue(scrollTop, this.GC.scrollDirection)
+                : this.getAnticipateValueInverted(
+                      scrollTop,
+                      this.GC.scrollDirection
+                  );
 
         this.GC.bottomCondition = !this.invertSide
             ? this.GC.offsetTop >

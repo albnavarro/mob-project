@@ -263,7 +263,7 @@ export const getDefaultStagger = ({
     });
 
     // Set other chunk, copy from first [0]
-    chuncked.forEach((chunkItem, chunkIndex) => {
+    chuncked.forEach((chunkItem) => {
         chunkItem.forEach((item, i) => {
             if (item) {
                 item.index = chuncked[0][i].index;

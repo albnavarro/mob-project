@@ -65,7 +65,7 @@ export const getValidateRecursive = (data) => {
         ) {
             return { ...p, ...{ [key]: functionResult.validate } };
         } else {
-            return { ...p, ...{ [key]: (val) => true } };
+            return { ...p, ...{ [key]: () => true } };
         }
     }, {});
 };

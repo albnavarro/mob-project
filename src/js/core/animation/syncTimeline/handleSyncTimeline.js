@@ -74,7 +74,7 @@ export class HandleSyncTimeline {
             // When come from playReverse skip first frame becouse is 0
             if (!this.skipFirstRender) {
                 if (shouldRender) {
-                    this.squencers.forEach((item, i) => {
+                    this.squencers.forEach((item) => {
                         item.draw({
                             partial: this.endTime,
                             isLastDraw: false,
@@ -132,7 +132,7 @@ export class HandleSyncTimeline {
                 // Fire callbackLoop onStop of each sequencr
                 // Prevent async problem, endTime back to start, so store the value
                 const endTime = this.endTime;
-                this.squencers.forEach((item, i) => {
+                this.squencers.forEach((item) => {
                     item.draw({
                         partial: endTime,
                         isLastDraw: true,
@@ -146,7 +146,7 @@ export class HandleSyncTimeline {
                 if (this.isReverse) this.isReverse = false;
 
                 // Fire last callback on Complete
-                this.callbackComplete.forEach(({ cb }, i) => cb());
+                this.callbackComplete.forEach(({ cb }) => cb());
             } else {
                 if (this.yoyo) {
                     this.reverse();
@@ -215,7 +215,7 @@ export class HandleSyncTimeline {
         loadFps().then(({ averageFPS }) => {
             console.log(`Fps on syncTimeline loaded at: ${averageFPS} fps`);
 
-            this.squencers.forEach((item, i) => {
+            this.squencers.forEach((item) => {
                 item.inzializeStagger();
                 item.disableStagger();
                 item.draw({
@@ -266,7 +266,7 @@ export class HandleSyncTimeline {
         loadFps().then(({ averageFPS }) => {
             console.log(`Fps on syncTimeline loaded at: ${averageFPS} fps`);
 
-            this.squencers.forEach((item, i) => {
+            this.squencers.forEach((item) => {
                 item.inzializeStagger();
                 item.disableStagger();
                 item.draw({
@@ -317,7 +317,7 @@ export class HandleSyncTimeline {
         this.pauseStatus = false;
 
         // Fire callbackLoop onStop of each sequencr
-        this.squencers.forEach((item, i) => {
+        this.squencers.forEach((item) => {
             item.draw({
                 partial: this.endTime,
                 isLastDraw: true,

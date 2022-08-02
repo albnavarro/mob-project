@@ -19,7 +19,7 @@ export function SimpleStore(data) {
      * @param  {string} propChanged keys of prop changed
      */
     function fireComputed(propChanged) {
-        fnComputed.forEach((item, i) => {
+        fnComputed.forEach((item) => {
             const {
                 prop: propToUpdate,
                 keys: propsShouldChange,
@@ -46,9 +46,8 @@ export function SimpleStore(data) {
 
             // Controllo che la prop in entrata sia una dipendenza del computed
             // E' il controlo chiave che scatena il computed
-            const propChangedIsDependency = propsShouldChange.includes(
-                propChanged
-            );
+            const propChangedIsDependency =
+                propsShouldChange.includes(propChanged);
 
             if (!propChangedIsDependency) return;
 
@@ -152,7 +151,7 @@ export function SimpleStore(data) {
 
         if (fireCallback) {
             const fnByProp = fnStore.filter((item) => item.prop === prop);
-            fnByProp.forEach((item, i) => {
+            fnByProp.forEach((item) => {
                 item.fn(val, oldVal, validateResult[prop]);
             });
         }
@@ -220,7 +219,7 @@ export function SimpleStore(data) {
 
         // Check type of eachpropierties
         const isValidType = Object.entries(val)
-            .map((item, i) => {
+            .map((item) => {
                 const [subProp, subVal] = item;
                 const typeResponse = checkType(type[prop][subProp], subVal);
 
@@ -246,7 +245,7 @@ export function SimpleStore(data) {
          * id there is no validation return true, otherwse get boolean value from fnValidate obj
          */
 
-        Object.entries(val).forEach((item, i) => {
+        Object.entries(val).forEach((item) => {
             const [subProp, subVal] = item;
             validateResult[prop][subProp] = fnValidate[prop][subProp](subVal);
         });
@@ -259,7 +258,7 @@ export function SimpleStore(data) {
 
         if (fireCallback) {
             const fnByProp = fnStore.filter((item) => item.prop === prop);
-            fnByProp.forEach((item, i) => {
+            fnByProp.forEach((item) => {
                 item.fn(store[prop], oldVal, validateResult[prop]);
             });
         }
@@ -344,7 +343,7 @@ export function SimpleStore(data) {
     const emit = (prop) => {
         if (prop in store) {
             const fnByProp = fnStore.filter((item) => item.prop === prop);
-            fnByProp.forEach((item, i) => {
+            fnByProp.forEach((item) => {
                 // Val , OldVal, Validate
                 item.fn(store[prop], store[prop], validateResult[prop]);
             });
@@ -499,7 +498,7 @@ export function SimpleStore(data) {
     }
 
     // First run execute each propierites to check validation without fire event
-    Object.entries(store).forEach((item, i) => {
+    Object.entries(store).forEach((item) => {
         const [key, value] = item;
         set(key, value, false);
     });
