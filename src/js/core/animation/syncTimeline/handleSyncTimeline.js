@@ -211,29 +211,7 @@ export class HandleSyncTimeline {
 
         // Prevent multiple play whild fps is loading
         this.fpsInLoading = true;
-
-        loadFps().then(({ averageFPS }) => {
-            console.log(`Fps on syncTimeline loaded at: ${averageFPS} fps`);
-
-            this.squencers.forEach((item) => {
-                item.inzializeStagger();
-                item.disableStagger();
-                item.draw({
-                    partial: 0,
-                    isLastDraw: false,
-                    useFrame: true,
-                });
-            });
-
-            handleFrame.add(() => {
-                handleNextTick.add(({ time, fps, shouldRender }) => {
-                    this.startTime = time;
-                    this.isInInzializing = false;
-                    this.fpsInLoading = false;
-                    this.updateTime(time, fps, shouldRender);
-                });
-            });
-        });
+        this.startAnimation(0);
     }
 
     playReverse() {
@@ -262,7 +240,10 @@ export class HandleSyncTimeline {
 
         // Prevent multiple play whild fps is loading
         this.fpsInLoading = true;
+        this.startAnimation(this.duration);
+    }
 
+    startAnimation(partial) {
         loadFps().then(({ averageFPS }) => {
             console.log(`Fps on syncTimeline loaded at: ${averageFPS} fps`);
 
@@ -270,7 +251,7 @@ export class HandleSyncTimeline {
                 item.inzializeStagger();
                 item.disableStagger();
                 item.draw({
-                    partial: this.duration,
+                    partial,
                     isLastDraw: false,
                     useFrame: true,
                 });
@@ -278,8 +259,8 @@ export class HandleSyncTimeline {
 
             handleFrame.add(() => {
                 handleNextTick.add(({ time, fps, shouldRender }) => {
-                    this.isInInzializing = false;
                     this.startTime = time;
+                    this.isInInzializing = false;
                     this.fpsInLoading = false;
                     this.updateTime(time, fps, shouldRender);
                 });
