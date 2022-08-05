@@ -1,6 +1,7 @@
 import { handleScrollImmediate } from './handleScrollImmediate.js';
 import { debounceFuncion } from '../debounce.js';
-import { handleFrame, handleNextTick } from '../rafutils/rafUtils.js';
+import { handleFrame } from '../rafutils/handleFrame.js';
+import { handleNextTick } from '../rafutils/handleNextTick.js';
 
 /**
  * Same of handleScroll but trigger scrollEnd and scrollStart event

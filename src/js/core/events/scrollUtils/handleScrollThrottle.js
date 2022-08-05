@@ -14,7 +14,8 @@
  *
  */
 
-import { handleFrame, handleNextTick } from '../rafutils/rafUtils.js';
+import { handleFrame } from '../rafutils/handleFrame.js';
+import { handleNextTick } from '../rafutils/handleNextTick.js';
 import { throttle } from '../throttle.js';
 import { handleScrollImmediate } from './handleScrollImmediate.js';
 import { handleSetUp } from '../../setup.js';

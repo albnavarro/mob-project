@@ -14,7 +14,8 @@
  *
  */
 
-import { handleFrame, handleNextTick } from '../rafutils/rafUtils.js';
+import { handleFrame } from '../rafutils/handleFrame.js';
+import { handleNextTick } from '../rafutils/handleNextTick.js';
 import { handleScrollImmediate } from './handleScrollImmediate.js';
 
 export const handleScroll = (() => {

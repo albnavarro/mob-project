@@ -1,9 +1,7 @@
 import { handleScroll } from '../core/events/scrollUtils/handleScroll.js';
 import { handleResize } from '../core/events/resizeUtils/handleResize.js';
-import {
-    handleFrame,
-    handleNextTick,
-} from '../core/events/rafutils/rafUtils.js';
+import { handleNextTick } from '../core/events/rafutils/handleNextTick.js';
+import { handleFrame } from '../core/events/rafutils/handleFrame.js';
 
 class vhClass {
     constructor(images, callback) {

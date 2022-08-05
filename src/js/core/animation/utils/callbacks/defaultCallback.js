@@ -1,8 +1,6 @@
-import {
-    handleCache,
-    handleFrame,
-    handleNextFrame,
-} from '../../../events/rafutils/rafUtils.js';
+import { handleFrame } from '../../../events/rafutils/handleFrame.js';
+import { handleNextFrame } from '../../../events/rafutils/handleNextFrame.js';
+import { handleCache } from '../../../events/rafutils/handleCache.js';
 
 /**
 Callback while Running

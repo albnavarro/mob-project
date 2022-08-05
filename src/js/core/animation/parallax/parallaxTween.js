@@ -4,11 +4,9 @@ import {
     compareKeys,
     getRoundedValue,
 } from '../../animation/utils/animationUtils.js';
-import {
-    handleCache,
-    handleFrame,
-    handleNextTick,
-} from '../../events/rafutils/rafUtils.js';
+import { handleCache } from '../../events/rafutils/handleCache.js';
+import { handleFrame } from '../../events/rafutils/handleFrame.js';
+import { handleNextTick } from '../../events/rafutils/handleNextTick.js';
 import { setStagger } from '../utils/stagger/setStagger.js';
 import { getStaggerFromProps } from '../utils/stagger/staggerUtils.js';
 import { handleSetUp } from '../../setup.js';

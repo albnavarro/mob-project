@@ -17,12 +17,10 @@ import { SimpleStore } from './store/simpleStore.js';
 import { createStaggers } from './animation/sequencer/sequencerUtils.js';
 
 // Event
-import {
-    handleNextFrame,
-    handleNextTick,
-    handleFrame,
-    loadFps,
-} from './events/rafutils/rafUtils.js';
+import { handleNextFrame } from './events/rafutils/handleNextFrame.js';
+import { handleNextTick } from './events/rafutils/handleNextTick.js';
+import { handleFrame } from './events/rafutils/handleFrame.js';
+import { loadFps } from './events/rafutils/loadFps.js';
 import { handleLoad } from './events/loadutils/handleLoad.js';
 import { handleResize } from './events/resizeUtils/handleResize.js';
 import { handleVisibilityChange } from './events/visibilityChange/handleVisibilityChange.js';

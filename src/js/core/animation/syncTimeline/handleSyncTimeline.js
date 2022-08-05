@@ -1,9 +1,7 @@
-import {
-    loadFps,
-    handleFrame,
-    handleNextFrame,
-    handleNextTick,
-} from '../../events/rafutils/rafUtils.js';
+import { loadFps } from '../../events/rafutils/loadFps.js';
+import { handleFrame } from '../../events/rafutils/handleFrame.js';
+import { handleNextFrame } from '../../events/rafutils/handleNextFrame.js';
+import { handleNextTick } from '../../events/rafutils/handleNextTick.js';
 import { clamp } from '../utils/animationUtils.js';
 import { handleSetUp } from '../../setup.js';
 

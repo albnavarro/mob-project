@@ -1,8 +1,9 @@
-import { handleFrame } from '../../../events/rafutils/rafUtils.js';
+import { frameStore } from '../../../events/rafutils/frameStore.js';
 import { DIRECTION_COL } from './staggerCostant.js';
 
 export const getEachByFps = (each) => {
-    const eachByFps = Math.round(each * (handleFrame.getInstantFps() / 60));
+    const { instantFps } = frameStore.get();
+    const eachByFps = Math.round(each * (instantFps / 60));
 
     /*
     If each is 1 but fps is too low use the original, otherwise the result is 0

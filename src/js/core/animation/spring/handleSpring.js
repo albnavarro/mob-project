@@ -5,12 +5,10 @@ import {
     compareKeys,
     getRoundedValue,
 } from '../utils/animationUtils.js';
-import {
-    loadFps,
-    handleCache,
-    handleFrame,
-    handleNextTick,
-} from '../../events/rafutils/rafUtils.js';
+import { loadFps } from '../../events/rafutils/loadFps.js';
+import { handleFrame } from '../../events/rafutils/handleFrame.js';
+import { handleNextTick } from '../../events/rafutils/handleNextTick.js';
+import { handleCache } from '../../events/rafutils/handleCache.js';
 import { mergeDeep } from '../../utils/mergeDeep.js';
 import { handleSetUp } from '../../setup.js';
 import { setStagger } from '../utils/stagger/setStagger.js';
