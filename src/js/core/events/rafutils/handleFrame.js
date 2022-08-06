@@ -4,6 +4,7 @@ import { handleVisibilityChange } from '../visibilityChange/handleVisibilityChan
 import { handleCache } from './handleCache.js';
 import { handleNextTick } from './handleNextTick.js';
 import { handleNextFrame } from './handleNextFrame.js';
+import { handleFrameIndex } from './handleFrameIndex';
 import { frameStore } from './frameStore.js';
 
 export const handleFrame = (() => {
@@ -15,8 +16,6 @@ export const handleFrame = (() => {
 
     let frameIsRuning = false;
     let callback = [];
-    let indexCallback = {};
-    let indexCallbackLength = 0;
     let time = getTime();
     let prevTime = time;
     let startTime = 0;
@@ -28,10 +27,9 @@ export const handleFrame = (() => {
     let maxFps = fps;
     let frames = 0;
     let fpsPrevTime = 0;
-    // fosScale fps
+    // fpsScale fps
     let dropFps = fps;
     let currentFrame = 0;
-    let indexCb = null;
 
     /**
      * Check if frame drop by fpsScalePercent value
@@ -47,6 +45,10 @@ export const handleFrame = (() => {
         isStopped = visibilityState === 'visible';
     });
 
+    // Call new requestAnimationFrame on event emit
+    frameStore.watch('requestFrame', () => {
+        initFrame();
+    });
     /*
      * Check if animation is renderable in current frame
      *
@@ -84,14 +86,7 @@ export const handleFrame = (() => {
         if (currentFrame === currentFrameLimit) {
             currentFrame = 0;
             frameStore.set('currentFrame', currentFrame);
-
-            Object.keys(indexCallback).forEach((key) => {
-                delete Object.assign(indexCallback, {
-                    [`${parseInt(key) - currentFrameLimit}`]:
-                        indexCallback[key],
-                })[key];
-            });
-
+            handleFrameIndex.updateKeys(currentFrameLimit);
             handleCache.updateFrameId(currentFrameLimit);
         }
 
@@ -114,7 +109,7 @@ export const handleFrame = (() => {
         */
         if (
             callback.length > 0 ||
-            indexCallbackLength > 0 ||
+            handleFrameIndex.getIndexCallbackLenght() > 0 ||
             handleCache.getCacheCounter() > 0 ||
             time < firstRunDuration
         ) {
@@ -192,29 +187,12 @@ export const handleFrame = (() => {
         /*
         Fire callback related to specific index frame
         */
-
-        /*
-        Get arrays of callBack related to the current currentFrame
-        indexCb is a 'global' variables instead constant to reduce garbage collector
-        */
-        indexCb = indexCallback[currentFrame];
-        if (indexCb) {
-            indexCb.forEach((item) => item({ time, fps, shouldRender }));
-            /*
-            Remove cb array once fired
-            */
-            indexCallback[currentFrame] = null;
-            delete indexCallback[currentFrame];
-            indexCallbackLength--;
-        } else {
-            indexCb = null;
-        }
+        handleFrameIndex.fire({ currentFrame, time, fps, shouldRender });
 
         /*
         Fire handleCache callBack
         */
         handleCache.fire(currentFrame, shouldRender);
-        //
 
         /*
         Update currentFrame
@@ -261,26 +239,6 @@ export const handleFrame = (() => {
     };
 
     /**
-     *  Add callback at index
-     */
-    const addIndex = (cb, index) => {
-        const frameIndex = index + currentFrame;
-
-        /**
-         *  Add callback to array related to specific index idf exxist or create
-         *  use frameIndex for key of Object so i can get the sb array in in the fastest way possible
-         *  in a bigger set of callaback
-         */
-        if (indexCallback[frameIndex]) {
-            indexCallback[frameIndex].push(cb);
-        } else {
-            indexCallback[frameIndex] = [cb];
-            indexCallbackLength++;
-        }
-        initFrame();
-    };
-
-    /**
      *  Add multiple callback
      */
     const addMultiple = (arr) => {
@@ -291,6 +249,5 @@ export const handleFrame = (() => {
     return {
         add,
         addMultiple,
-        addIndex,
     };
 })();

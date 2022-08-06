@@ -1,6 +1,7 @@
 import { handleFrame } from '../../../events/rafutils/handleFrame.js';
 import { handleNextFrame } from '../../../events/rafutils/handleNextFrame.js';
 import { handleCache } from '../../../events/rafutils/handleCache.js';
+import { handleFrameIndex } from '../../../events/rafutils/handleFrameIndex.js';
 
 /**
 Callback while Running
@@ -31,7 +32,7 @@ export const defaultCallback = ({
     } else {
         // Stagger
         callback.forEach(({ cb, frame }) => {
-            handleFrame.addIndex(({ shouldRender }) => {
+            handleFrameIndex.add(({ shouldRender }) => {
                 if (shouldRender) {
                     cb(cbObject);
                 }
@@ -77,7 +78,7 @@ export const defaultCallbackOnComplete = ({
         });
     } else {
         callback.forEach(({ cb, frame }, i) => {
-            handleFrame.addIndex(() => {
+            handleFrameIndex.add(() => {
                 cb(cbObject);
 
                 if (stagger.waitComplete) {
@@ -93,7 +94,7 @@ export const defaultCallbackOnComplete = ({
         });
 
         callbackCache.forEach(({ cb, frame }, i) => {
-            handleFrame.addIndex(() => {
+            handleFrameIndex.add(() => {
                 handleCache.fireObject({ id: cb, obj: cbObject });
 
                 if (stagger.waitComplete) {
@@ -109,7 +110,7 @@ export const defaultCallbackOnComplete = ({
         });
 
         callbackOnComplete.forEach(({ cb, frame }) => {
-            handleFrame.addIndex(() => {
+            handleFrameIndex.add(() => {
                 cb(cbObject);
             }, frame + 1);
         });

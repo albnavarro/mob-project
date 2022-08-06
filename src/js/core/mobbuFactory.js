@@ -20,6 +20,7 @@ import { createStaggers } from './animation/sequencer/sequencerUtils.js';
 import { handleNextFrame } from './events/rafutils/handleNextFrame.js';
 import { handleNextTick } from './events/rafutils/handleNextTick.js';
 import { handleFrame } from './events/rafutils/handleFrame.js';
+import { handleFrameIndex } from './events/rafutils/handleFrameIndex';
 import { loadFps } from './events/rafutils/loadFps.js';
 import { handleLoad } from './events/loadutils/handleLoad.js';
 import { handleResize } from './events/resizeUtils/handleResize.js';
@@ -160,7 +161,7 @@ export const mobbu = {
                 return handleNextFrame.add(fn);
 
             case 'frameIndex':
-                return handleFrame.addIndex(fn, option);
+                return handleFrameIndex.add(fn, option);
 
             case 'loadFps':
                 return loadFps(option).then((obj) => fn(obj));

@@ -7,6 +7,7 @@ import {
 import { handleFrame } from '../../events/rafutils/handleFrame.js';
 import { handleNextTick } from '../../events/rafutils/handleNextTick.js';
 import { handleCache } from '../../events/rafutils/handleCache.js';
+import { handleFrameIndex } from '../../events/rafutils/handleFrameIndex.js';
 import { setStagger } from '../utils/stagger/setStagger.js';
 import { getStaggerFromProps } from '../utils/stagger/staggerUtils.js';
 import { handleSetUp } from '../../setup.js';
@@ -176,7 +177,7 @@ export class HandleSequencer {
             } else {
                 // Stagger
                 this.callback.forEach(({ cb, frame }) => {
-                    handleFrame.addIndex(() => cb(cbObject), frame);
+                    handleFrameIndex.add(() => cb(cbObject), frame);
                 });
 
                 this.callbackCache.forEach(({ cb, frame }) => {
@@ -194,7 +195,7 @@ export class HandleSequencer {
                 } else {
                     // Stagger
                     this.callbackOnStop.forEach(({ cb, frame }) => {
-                        handleFrame.addIndex(() => cb(cbObject), frame + 1);
+                        handleFrameIndex.add(() => cb(cbObject), frame + 1);
                     });
                 }
             }
