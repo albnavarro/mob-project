@@ -86,9 +86,19 @@ mobbu.use('load', () => {
     });
 
     mobbu.default('print');
+
     // mobbu.use('loadFps', () => {
     //     console.log('fps ready at:', mobbu.getInstantFps());
     // });
+
+    // mobbu.use(
+    //     'frameIndex',
+    //     () => {
+    //         console.log('test');
+    //         console.log('fps: ', mobbu.getFps());
+    //     },
+    //     500
+    // );
 
     const body = document.querySelector('body');
 

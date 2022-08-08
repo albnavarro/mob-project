@@ -21,6 +21,7 @@ import { handleNextFrame } from './events/rafutils/handleNextFrame.js';
 import { handleNextTick } from './events/rafutils/handleNextTick.js';
 import { handleFrame } from './events/rafutils/handleFrame.js';
 import { handleFrameIndex } from './events/rafutils/handleFrameIndex';
+import { frameStore } from './events/rafutils/frameStore';
 import { loadFps } from './events/rafutils/loadFps.js';
 import { handleLoad } from './events/loadutils/handleLoad.js';
 import { handleResize } from './events/resizeUtils/handleResize.js';
@@ -83,7 +84,7 @@ export const mobbu = {
         return handleFrame.getFps();
     },
     getInstantFps() {
-        return handleFrame.getInstantFps();
+        return frameStore.getProp('instantFps');
     },
     create(type, obj) {
         switch (type) {

@@ -230,6 +230,8 @@ export const handleFrame = (() => {
         frameIsRuning = true;
     };
 
+    const getFps = () => fps;
+
     /**
      *  Add callback
      */
@@ -249,5 +251,6 @@ export const handleFrame = (() => {
     return {
         add,
         addMultiple,
+        getFps,
     };
 })();
