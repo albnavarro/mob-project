@@ -23,11 +23,14 @@ export const setStagger = ({
         if (stagger.grid.direction === DIRECTION_RADIAL) {
             /**
              * Check if from is a valid parameters
+             * Option chaing doasn't work beacouse we have a valid 0 value
              * **/
             if (
                 !checkType(Object, stagger.from) ||
-                !stagger?.from?.x ||
-                !stagger?.from?.y
+                // !stagger ||
+                !('from' in stagger) ||
+                !('x' in stagger.from) ||
+                !('y' in stagger.from)
             ) {
                 console.warn(
                     `Stagger error: in radial direction 'from' propierties must be a object {x:val,y:val}`
