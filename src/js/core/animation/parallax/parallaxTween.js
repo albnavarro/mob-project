@@ -11,6 +11,10 @@ import { handleFrameIndex } from '../../events/rafutils/handleFrameIndex.js';
 import { setStagger } from '../utils/stagger/setStagger.js';
 import { getStaggerFromProps } from '../utils/stagger/staggerUtils.js';
 import { handleSetUp } from '../../setup.js';
+import {
+    setCallBack,
+    setCallBackCache,
+} from '../utils/callbacks/setCallback.js';
 
 // Stagger and eade is defined at tween creation
 export class ParallaxTween {
@@ -19,7 +23,6 @@ export class ParallaxTween {
             ? getTweenFn(data.ease)
             : getTweenFn(handleSetUp.get('parallaxTween').ease);
         this.values = [];
-        this.id = 0;
         this.callbackOnStop = [];
         this.callback = [];
         this.callbackCache = [];
@@ -278,13 +281,27 @@ export class ParallaxTween {
      *
      */
     subscribe(cb) {
-        this.callback.push({ cb, id: this.id });
-        const cbId = this.id;
-        this.id++;
+        const { unsubscribeCb } = setCallBack({
+            cb,
+            cbArray: 'callback',
+            context: this,
+        });
+        return () => unsubscribeCb();
+    }
 
-        return () => {
-            this.callback = this.callback.filter((item) => item.id !== cbId);
-        };
+    /**
+     * subscribe - add callback onStop
+     * @param  {function} cb cal function
+     * @return {function} unsubscribe callback
+     *
+     */
+    onStop(cb) {
+        const { unsubscribeCb } = setCallBack({
+            cb,
+            cbArray: 'callbackOnStop',
+            context: this,
+        });
+        return () => unsubscribeCb();
     }
 
     /**
@@ -295,31 +312,14 @@ export class ParallaxTween {
      *
      */
     subscribeCache(item, fn) {
-        const { id, unsubscribe } = handleCache.add(item, fn);
-        this.callbackCache.push({ cb: id, id: this.id });
-        this.unsubscribeCache.push(unsubscribe);
-
-        const cbId = this.id;
-        this.id++;
-
-        return () => {
-            unsubscribe();
-            this.callbackCache = this.callbackCache.filter(
-                (item) => item.id !== cbId
-            );
-        };
-    }
-
-    onStop(cb) {
-        this.callbackOnStop.push({ cb, id: this.id });
-        const cbId = this.id;
-        this.id++;
-
-        return () => {
-            this.callbackOnStop = this.callbackOnStop.filter(
-                (item) => item.id !== cbId
-            );
-        };
+        const { unsubscribeCb } = setCallBackCache({
+            item,
+            fn,
+            cbArray: 'callbackCache',
+            cbUnsubScribe: 'unsubscribeCache',
+            context: this,
+        });
+        return () => unsubscribeCb();
     }
 
     getDuration() {

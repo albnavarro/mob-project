@@ -55,6 +55,8 @@ export const handleCache = (() => {
     };
 
     const fireObject = ({ id, obj }) => {
+        if (!subscriber[id]) return;
+
         const { el, fn } = subscriber[id];
         fn(obj, el);
     };

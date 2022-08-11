@@ -8,7 +8,6 @@ import {
 import { loadFps } from '../../events/rafutils/loadFps.js';
 import { handleFrame } from '../../events/rafutils/handleFrame.js';
 import { handleNextTick } from '../../events/rafutils/handleNextTick.js';
-import { handleCache } from '../../events/rafutils/handleCache.js';
 import { mergeDeep } from '../../utils/mergeDeep.js';
 import { handleSetUp } from '../../setup.js';
 import { setStagger } from '../utils/stagger/setStagger.js';
@@ -18,6 +17,10 @@ import {
     defaultCallbackOnComplete,
     defaultCallback,
 } from '../utils/callbacks/defaultCallback.js';
+import {
+    setCallBack,
+    setCallBackCache,
+} from '../utils/callbacks/setCallback.js';
 
 export class HandleSpring {
     constructor(data = {}) {
@@ -27,7 +30,6 @@ export class HandleSpring {
         this.currentReject = null;
         this.promise = null;
         this.values = [];
-        this.id = 0;
         this.callback = [];
         this.callbackCache = [];
         this.callbackOnComplete = [];
@@ -668,36 +670,12 @@ export class HandleSpring {
      *
      */
     subscribe(cb) {
-        this.callback.push({ cb, id: this.id });
-        const cbId = this.id;
-        this.id++;
-
-        return () => {
-            this.callback = this.callback.filter((item) => item.id !== cbId);
-        };
-    }
-
-    /**
-     * subscribeCache - add callback to stack
-     *
-     * @param  {item} htmlElement
-     * @return {function}
-     *
-     */
-    subscribeCache(item, fn) {
-        const { id, unsubscribe } = handleCache.add(item, fn);
-        this.callbackCache.push({ cb: id, id: this.id });
-        this.unsubscribeCache.push(unsubscribe);
-
-        const cbId = this.id;
-        this.id++;
-
-        return () => {
-            unsubscribe();
-            this.callbackCache = this.callbackCache.filter(
-                (item) => item.id !== cbId
-            );
-        };
+        const { unsubscribeCb } = setCallBack({
+            cb,
+            cbArray: 'callback',
+            context: this,
+        });
+        return () => unsubscribeCb();
     }
 
     /**
@@ -708,27 +686,45 @@ export class HandleSpring {
      *
      */
     onStartInPause(cb) {
-        this.callbackStartInPause.push({ cb, id: this.id });
-        const cbId = this.id;
-        this.id++;
-
-        return () => {
-            this.callbackStartInPause = this.callbackStartInPause.filter(
-                (item) => item.id !== cbId
-            );
-        };
+        const { unsubscribeCb } = setCallBack({
+            cb,
+            cbArray: 'callbackStartInPause',
+            context: this,
+        });
+        return () => unsubscribeCb();
     }
 
+    /**
+     * subscribe - add callback Complete
+     * @param  {function} cb cal function
+     * @return {function} unsubscribe callback
+     *
+     */
     onComplete(cb) {
-        this.callbackOnComplete.push({ cb, id: this.id });
-        const cbId = this.id;
-        this.id++;
+        const { unsubscribeCb } = setCallBack({
+            cb,
+            cbArray: 'callbackOnComplete',
+            context: this,
+        });
+        return () => unsubscribeCb();
+    }
 
-        return () => {
-            this.callbackOnComplete = this.callbackOnComplete.filter(
-                (item) => item.id !== cbId
-            );
-        };
+    /**
+     * subscribeCache - add callback to stack
+     *
+     * @param  {item} htmlElement
+     * @return {function}
+     *
+     */
+    subscribeCache(item, fn) {
+        const { unsubscribeCb } = setCallBackCache({
+            item,
+            fn,
+            cbArray: 'callbackCache',
+            cbUnsubScribe: 'unsubscribeCache',
+            context: this,
+        });
+        return () => unsubscribeCb();
     }
 
     /**
