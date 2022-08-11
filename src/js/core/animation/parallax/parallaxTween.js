@@ -122,7 +122,7 @@ export class ParallaxTween {
                 } else {
                     // Stagger
                     this.callbackOnStop.forEach(({ cb, frame }) => {
-                        handleFrameIndex(() => cb(cbObject), frame + 1);
+                        handleFrameIndex.add(() => cb(cbObject), frame + 1);
                     });
                 }
             }
