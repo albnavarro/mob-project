@@ -274,12 +274,12 @@ export class ParallaxItemClass {
         });
 
         if (this.pin) {
-            this.pinInstance = new ParallaxPin({ instance: this });
+            this.pinInstance = new ParallaxPin();
 
             if (mq[this.queryType](this.breackpoint)) {
                 handleNextTick.add(() => {
                     this.getScrollerOffset();
-                    this.pinInstance.init();
+                    this.pinInstance.init({ instance: this });
                     this.pinInstance.onScroll(this.scrollerScroll);
                 });
             }
@@ -630,7 +630,7 @@ export class ParallaxItemClass {
 
             if (this.pin && this.pinInstance) {
                 if (mq[this.queryType](this.breackpoint)) {
-                    this.pinInstance.init();
+                    this.pinInstance.init({ instance: this });
                 }
             }
         }

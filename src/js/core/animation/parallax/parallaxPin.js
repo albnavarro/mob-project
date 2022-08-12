@@ -8,7 +8,7 @@ import { clamp } from '../../animation/utils/animationUtils.js';
 
 export class ParallaxPin {
     constructor(data) {
-        this.parallaxInstance = data.instance;
+        this.parallaxInstance = null;
         this.trasponderActive = false;
         this.scrollerHeight = 0;
         this.start = 0;
@@ -103,7 +103,8 @@ export class ParallaxPin {
         };
     }
 
-    init() {
+    init({ instance }) {
+        this.parallaxInstance = instance;
         // Get baisc element item ad if exist trigger
         this.item = this.parallaxInstance.item;
         this.marker = this.parallaxInstance.marker;
@@ -373,6 +374,7 @@ export class ParallaxPin {
     destroy() {
         if (!this.isInizialized) return;
 
+        this.parallaxInstance = null;
         this.spring.stop();
         this.unsubscribeSpring();
         this.unsubscribeScroll();
