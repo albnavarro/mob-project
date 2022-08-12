@@ -452,12 +452,8 @@ export class HandleSequencer {
      *
      */
     subscribe(cb) {
-        const { unsubscribeCb } = setCallBack({
-            cb,
-            cbArray: 'callback',
-            context: this,
-        });
-        return () => unsubscribeCb();
+        const unsubscribeCb = setCallBack(cb, this.callback);
+        return () => (this.callback = unsubscribeCb());
     }
 
     /**
@@ -467,12 +463,8 @@ export class HandleSequencer {
      *
      */
     onStop(cb) {
-        const { unsubscribeCb } = setCallBack({
-            cb,
-            cbArray: 'callbackOnStop',
-            context: this,
-        });
-        return () => unsubscribeCb();
+        const unsubscribeCb = setCallBack(cb, this.callbackOnStop);
+        return () => (this.callbackOnStop = unsubscribeCb());
     }
 
     /**
@@ -483,14 +475,15 @@ export class HandleSequencer {
      *
      */
     subscribeCache(item, fn) {
-        const { unsubscribeCb } = setCallBackCache({
+        const { unsubscribeCb, unsubscribeCache } = setCallBackCache(
             item,
             fn,
-            cbArray: 'callbackCache',
-            cbUnsubScribe: 'unsubscribeCache',
-            context: this,
-        });
-        return () => unsubscribeCb();
+            this.callbackCache,
+            this.unsubscribeCache
+        );
+
+        this.unsubscribeCache = unsubscribeCache;
+        return () => (this.callbackCache = unsubscribeCb());
     }
 
     getDuration() {
@@ -523,6 +516,7 @@ export class HandleSequencer {
         this.callbackCache = [];
         this.callbackOnStop = [];
         this.unsubscribeCache.forEach((unsubscribe) => unsubscribe());
+        this.unsubscribeCache = [];
     }
 }
 

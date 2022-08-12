@@ -655,12 +655,8 @@ export class HandleTween {
      *
      */
     subscribe(cb) {
-        const { unsubscribeCb } = setCallBack({
-            cb,
-            cbArray: 'callback',
-            context: this,
-        });
-        return () => unsubscribeCb();
+        const unsubscribeCb = setCallBack(cb, this.callback);
+        return () => (this.callback = unsubscribeCb());
     }
 
     /**
@@ -671,12 +667,8 @@ export class HandleTween {
      *
      */
     onStartInPause(cb) {
-        const { unsubscribeCb } = setCallBack({
-            cb,
-            cbArray: 'callbackStartInPause',
-            context: this,
-        });
-        return () => unsubscribeCb();
+        const unsubscribeCb = setCallBack(cb, this.callbackStartInPause);
+        return () => (this.callbackStartInPause = unsubscribeCb());
     }
 
     /**
@@ -686,12 +678,8 @@ export class HandleTween {
      *
      */
     onComplete(cb) {
-        const { unsubscribeCb } = setCallBack({
-            cb,
-            cbArray: 'callbackOnComplete',
-            context: this,
-        });
-        return () => unsubscribeCb();
+        const unsubscribeCb = setCallBack(cb, this.callbackOnComplete);
+        return () => (this.callbackOnComplete = unsubscribeCb());
     }
 
     /**
@@ -702,14 +690,15 @@ export class HandleTween {
      *
      */
     subscribeCache(item, fn) {
-        const { unsubscribeCb } = setCallBackCache({
+        const { unsubscribeCb, unsubscribeCache } = setCallBackCache(
             item,
             fn,
-            cbArray: 'callbackCache',
-            cbUnsubScribe: 'unsubscribeCache',
-            context: this,
-        });
-        return () => unsubscribeCb();
+            this.callbackCache,
+            this.unsubscribeCache
+        );
+
+        this.unsubscribeCache = unsubscribeCache;
+        return () => (this.callbackCache = unsubscribeCb());
     }
 
     /**
@@ -724,5 +713,6 @@ export class HandleTween {
         this.values = [];
         this.promise = null;
         this.unsubscribeCache.forEach((unsubscribe) => unsubscribe());
+        this.unsubscribeCache = [];
     }
 }
