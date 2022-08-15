@@ -6,9 +6,13 @@ import {
     compareKeys,
     getRoundedValue,
 } from '../utils/animationUtils.js';
+import {
+    setFromCurrentByTo,
+    setFromToByCurrent,
+    reverseValues,
+} from '../utils/setValues.js';
 import { loadFps } from '../../events/rafutils/loadFps.js';
 import { handleFrame } from '../../events/rafutils/handleFrame.js';
-import { handleNextFrame } from '../../events/rafutils/handleNextFrame.js';
 import { handleNextTick } from '../../events/rafutils/handleNextTick.js';
 import { mergeDeep } from '../../utils/mergeDeep.js';
 import { handleSetUp } from '../../setup.js';
@@ -23,6 +27,8 @@ import {
     setCallBack,
     setCallBackCache,
 } from '../utils/callbacks/setCallback.js';
+import { goTo, goFrom, goFromTo, set } from '../utils/actions.js';
+import { initRaf } from '../utils/initRaf.js';
 
 export class HandleTween {
     constructor(data = {}) {
@@ -140,7 +146,7 @@ export class HandleTween {
             this.isRunning = true;
 
             if (!o.isSettled) {
-                handleNextFrame.add(() => {
+                handleFrame.add(() => {
                     handleNextTick.add(({ time }) => {
                         if (this.req) draw(time);
                     });
@@ -254,22 +260,16 @@ export class HandleTween {
 
     startRaf(res, reject) {
         if (this.fpsInLoading) return;
-
-        this.currentReject = reject;
         this.currentResolve = res;
+        this.currentReject = reject;
 
-        const cb = () => {
-            handleFrame.add(() => {
-                handleNextTick.add(({ time, fps }) => {
-                    const prevent = this.callbackStartInPause
-                        .map(({ cb }) => cb())
-                        .some((item) => item === true);
-
-                    this.onReuqestAnim(time, fps, res);
-                    if (prevent) this.pause();
-                });
-            });
-        };
+        const cb = () =>
+            initRaf(
+                this.callbackStartInPause,
+                this.onReuqestAnim.bind(this),
+                this.pause.bind(this),
+                res
+            );
 
         if (this.firstRun) {
             this.fpsInLoading = true;
@@ -292,12 +292,7 @@ export class HandleTween {
         this.pauseTime = 0;
         this.pauseStatus = false;
         this.comeFromResume = false;
-
-        // Update local values with last
-        this.values.forEach((item) => {
-            item.toValue = item.currentValue;
-            item.fromValue = item.toValue;
-        });
+        this.values = setFromToByCurrent(this.values);
 
         // Abort promise
         if (this.currentReject) {
@@ -352,6 +347,7 @@ export class HandleTween {
                 fromValue: value,
                 currentValue: value,
                 shouldUpdate: false,
+                settled: false, // not used, only for uniformity with lerp and spring
             };
         });
     }
@@ -375,39 +371,6 @@ export class HandleTween {
             if (item.shouldUpdate) {
                 item.fromValue = item.currentValue;
             }
-        });
-    }
-
-    /**
-     * setToValProcessed - Update to value to match an absolute destination
-     *
-     * @return {void}  onComplete promise
-     *
-     */
-    setToValProcessed() {
-        this.values.forEach((item) => {
-            if (item.shouldUpdate) {
-                /*
-                Prevent error on tween revert if is 0 some easeType can't run
-                es: easeInElastic
-                */
-                item.toValProcessed = this.relative
-                    ? item.toValue + this.smallNumber
-                    : item.toValue - item.fromValue + this.smallNumber;
-            }
-        });
-    }
-
-    /**
-     * immediate - Jump immaediate to the end of tween
-     *
-     */
-    immediate() {
-        this.req = false;
-
-        this.values.forEach((item) => {
-            item.fromValue = item.toValue;
-            item.currentValue = item.toValue;
         });
     }
 
@@ -440,16 +403,8 @@ export class HandleTween {
      */
     goTo(obj, props = {}) {
         if (this.pauseStatus || this.comeFromResume) this.stop();
-
         this.useStagger = true;
-
-        const data = Object.keys(obj).map((item) => {
-            return {
-                prop: item,
-                toValue: obj[item],
-            };
-        });
-
+        const data = goTo(obj);
         return this.doAction(data, props, obj);
     }
 
@@ -465,16 +420,8 @@ export class HandleTween {
      */
     goFrom(obj, props = {}) {
         if (this.pauseStatus || this.comeFromResume) this.stop();
-
         this.useStagger = true;
-
-        const data = Object.keys(obj).map((item) => {
-            return {
-                prop: item,
-                fromValue: obj[item],
-            };
-        });
-
+        const data = goFrom(obj);
         return this.doAction(data, props, obj);
     }
 
@@ -491,28 +438,20 @@ export class HandleTween {
      */
     goFromTo(fromObj, toObj, props = {}) {
         if (this.pauseStatus || this.comeFromResume) this.stop();
-
         this.useStagger = true;
 
         // Check if fromObj has the same keys of toObj
         const dataIsValid = compareKeys(fromObj, toObj);
         if (!dataIsValid) {
             console.warn(
-                `HandleTween: ${JSON.stringify(
-                    fromObj
-                )} and to ${JSON.stringify(toObj)} is not equal`
+                `HandleLerp: ${JSON.stringify(fromObj)} and to ${JSON.stringify(
+                    toObj
+                )} is not equal`
             );
             return this.promise;
         }
 
-        const data = Object.keys(fromObj).map((item) => {
-            return {
-                prop: item,
-                fromValue: fromObj[item],
-                toValue: toObj[item],
-            };
-        });
-
+        const data = goFromTo(fromObj, toObj);
         return this.doAction(data, props, fromObj);
     }
 
@@ -529,16 +468,8 @@ export class HandleTween {
      */
     set(obj, props = {}) {
         if (this.pauseStatus || this.comeFromResume) this.stop();
-
         this.useStagger = false;
-
-        const data = Object.keys(obj).map((item) => {
-            return {
-                prop: item,
-                fromValue: obj[item],
-                toValue: obj[item],
-            };
-        });
+        const data = set(obj);
 
         // In set mode duration is small as possible
         props.duration = 1;
@@ -553,13 +484,23 @@ export class HandleTween {
         if (this.req) this.updateDataWhileRunning();
 
         const { reverse, immediate } = this.mergeProps(props);
-        // if revert switch fromValue and toValue
-        if (reverse) this.reverse(obj);
+        if (reverse) this.value = reverseValues(obj, this.values);
 
-        this.setToValProcessed();
+        this.values.forEach((item) => {
+            if (item.shouldUpdate) {
+                /*
+                Prevent error on tween revert if is 0 some easeType can't run
+                es: easeInElastic
+                */
+                item.toValProcessed = this.relative
+                    ? item.toValue + this.smallNumber
+                    : item.toValue - item.fromValue + this.smallNumber;
+            }
+        });
 
         if (immediate) {
-            this.immediate();
+            this.req = false;
+            this.values = setFromCurrentByTo(this.values);
             return new Promise((res) => res());
         }
 
@@ -608,6 +549,14 @@ export class HandleTween {
         return getValueObj(this.values, 'toValue');
     }
 
+    /**
+     * getType - get tween type
+     *
+     * @return {string} tween type
+     *
+     * @example
+     * const type = mySpring.getType();
+     */
     getType() {
         return 'TWEEN';
     }
@@ -630,24 +579,6 @@ export class HandleTween {
     }
 
     /**
-     * reverse - sitch fromValue and ToValue for specific input value
-     *
-     * @return {void}
-     *
-     */
-    reverse(obj) {
-        const keysTorevert = Object.keys(obj);
-        this.values.forEach((item) => {
-            if (keysTorevert.includes(item.prop)) {
-                const fromValue = item.fromValue;
-                const toValue = item.toValue;
-                item.fromValue = toValue;
-                item.toValue = fromValue;
-            }
-        });
-    }
-
-    /**
      * subscribe - add callback to stack
      *
      * @param  {function} cb cal function
@@ -656,7 +587,7 @@ export class HandleTween {
      */
     subscribe(cb) {
         const unsubscribeCb = setCallBack(cb, this.callback);
-        return () => (this.callback = unsubscribeCb());
+        return () => (this.callback = unsubscribeCb(this.callback));
     }
 
     /**
@@ -668,7 +599,10 @@ export class HandleTween {
      */
     onStartInPause(cb) {
         const unsubscribeCb = setCallBack(cb, this.callbackStartInPause);
-        return () => (this.callbackStartInPause = unsubscribeCb());
+        return () =>
+            (this.callbackStartInPause = unsubscribeCb(
+                this.callbackStartInPause
+            ));
     }
 
     /**
@@ -679,7 +613,8 @@ export class HandleTween {
      */
     onComplete(cb) {
         const unsubscribeCb = setCallBack(cb, this.callbackOnComplete);
-        return () => (this.callbackOnComplete = unsubscribeCb());
+        return () =>
+            (this.callbackOnComplete = unsubscribeCb(this.callbackOnComplete));
     }
 
     /**
@@ -698,7 +633,7 @@ export class HandleTween {
         );
 
         this.unsubscribeCache = unsubscribeCache;
-        return () => (this.callbackCache = unsubscribeCb());
+        return () => (this.callbackCache = unsubscribeCb(this.callbackCache));
     }
 
     /**

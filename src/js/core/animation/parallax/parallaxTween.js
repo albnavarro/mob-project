@@ -15,6 +15,7 @@ import {
     setCallBack,
     setCallBackCache,
 } from '../utils/callbacks/setCallback.js';
+import { goTo, goFrom, goFromTo } from '../utils/actions.js';
 
 // Stagger and eade is defined at tween creation
 export class ParallaxTween {
@@ -150,6 +151,7 @@ export class ParallaxTween {
                 toValProcessed: value,
                 fromValue: value,
                 currentValue: value,
+                settled: false,
             };
         });
 
@@ -202,15 +204,9 @@ export class ParallaxTween {
      * myTween.goTo({ val: 100 });
      */
     goTo(obj, props = {}) {
-        const newDataArray = Object.keys(obj).map((item) => {
-            return {
-                prop: item,
-                toValue: obj[item],
-            };
-        });
-
+        const data = goTo(obj);
         this.setEasingWhileRunning(props);
-        this.mergeData(newDataArray);
+        this.mergeData(data);
         this.setToValProcessed();
         return this;
     }
@@ -224,15 +220,9 @@ export class ParallaxTween {
      * myTween.goFrom({ val: 100 });
      */
     goFrom(obj, props = {}) {
-        const newDataArray = Object.keys(obj).map((item) => {
-            return {
-                prop: item,
-                fromValue: obj[item],
-            };
-        });
-
+        const data = goFrom(obj);
         this.setEasingWhileRunning(props);
-        this.mergeData(newDataArray);
+        this.mergeData(data);
         this.setToValProcessed();
         return this;
     }
@@ -259,16 +249,8 @@ export class ParallaxTween {
         }
 
         this.setEasingWhileRunning(props);
-
-        const newDataArray = Object.keys(fromObj).map((item) => {
-            return {
-                prop: item,
-                fromValue: fromObj[item],
-                toValue: toObj[item],
-            };
-        });
-
-        this.mergeData(newDataArray);
+        const data = goFromTo(fromObj, toObj);
+        this.mergeData(data);
         this.setToValProcessed();
         return this;
     }
@@ -282,7 +264,7 @@ export class ParallaxTween {
      */
     subscribe(cb) {
         const unsubscribeCb = setCallBack(cb, this.callback);
-        return () => (this.callback = unsubscribeCb());
+        return () => (this.callback = unsubscribeCb(this.callback));
     }
 
     /**
@@ -293,7 +275,7 @@ export class ParallaxTween {
      */
     onStop(cb) {
         const unsubscribeCb = setCallBack(cb, this.callbackOnStop);
-        return () => (this.callbackOnStop = unsubscribeCb());
+        return () => (this.callbackOnStop = unsubscribeCb(this.callbackOnStop));
     }
 
     /**
@@ -312,7 +294,7 @@ export class ParallaxTween {
         );
 
         this.unsubscribeCache = unsubscribeCache;
-        return () => (this.callbackCache = unsubscribeCb());
+        return () => (this.callbackCache = unsubscribeCb(this.callbackCache));
     }
 
     getDuration() {

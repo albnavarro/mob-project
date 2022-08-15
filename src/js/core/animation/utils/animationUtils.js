@@ -10,9 +10,6 @@ export const getValueObj = (arr, key) => {
         .reduce((p, c) => ({ ...p, ...c }), {});
 };
 
-/*
-Riound value
-*/
 export const getRoundedValue = (x) => {
     if (storeType.isNumber(x)) {
         return Math.round(x * 10000) / 10000 || 0;
@@ -68,14 +65,6 @@ export const lerp = (start, end, amt) => {
     return (1 - amt) * start + amt * end;
 };
 
-/**
- * this.compareKeys - Compare two Object
- * Check if has the same keys
- *
- * @param  {Object} a fromObj Object
- * @param  {Object} b toObj Object
- * @return {bollean} has thew same keys
- */
 export const compareKeys = (a, b) => {
     const aKeys = Object.keys(a).sort();
     const bKeys = Object.keys(b).sort();

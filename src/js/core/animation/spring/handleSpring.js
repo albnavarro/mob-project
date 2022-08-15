@@ -5,6 +5,13 @@ import {
     compareKeys,
     getRoundedValue,
 } from '../utils/animationUtils.js';
+import {
+    setFromByCurrent,
+    setFromCurrentByTo,
+    setFromToByCurrent,
+    reverseValues,
+    setRelative,
+} from '../utils/setValues.js';
 import { loadFps } from '../../events/rafutils/loadFps.js';
 import { handleFrame } from '../../events/rafutils/handleFrame.js';
 import { handleNextTick } from '../../events/rafutils/handleNextTick.js';
@@ -21,6 +28,9 @@ import {
     setCallBack,
     setCallBackCache,
 } from '../utils/callbacks/setCallback.js';
+import { goTo, goFrom, goFromTo, set } from '../utils/actions.js';
+import { initRaf } from '../utils/initRaf.js';
+import { resume } from '../utils/resume.js';
 
 export class HandleSpring {
     constructor(data = {}) {
@@ -263,22 +273,16 @@ export class HandleSpring {
 
     startRaf(res, reject) {
         if (this.fpsInLoading) return;
-
-        this.currentReject = reject;
         this.currentResolve = res;
+        this.currentReject = reject;
 
-        const cb = () => {
-            handleFrame.add(() => {
-                handleNextTick.add(({ time, fps }) => {
-                    const prevent = this.callbackStartInPause
-                        .map(({ cb }) => cb())
-                        .some((item) => item === true);
-
-                    this.onReuqestAnim(time, fps, res);
-                    if (prevent) this.pause();
-                });
-            });
-        };
+        const cb = () =>
+            initRaf(
+                this.callbackStartInPause,
+                this.onReuqestAnim.bind(this),
+                this.pause.bind(this),
+                res
+            );
 
         if (this.firstRun) {
             this.fpsInLoading = true;
@@ -299,12 +303,7 @@ export class HandleSpring {
      */
     stop() {
         if (this.pauseStatus) this.pauseStatus = false;
-
-        // Update local values with last
-        this.values.forEach((item) => {
-            item.toValue = item.currentValue;
-            item.fromValue = item.toValue;
-        });
+        this.values = setFromToByCurrent(this.values);
 
         // Abort promise
         if (this.currentReject) {
@@ -329,17 +328,8 @@ export class HandleSpring {
     pause() {
         if (this.pauseStatus) return;
         this.pauseStatus = true;
-
-        // Reset RAF
-        if (this.req) {
-            this.req = false;
-        }
-
-        this.values.forEach((item) => {
-            if (!item.settled) {
-                item.fromValue = item.currentValue;
-            }
-        });
+        if (this.req) this.req = false;
+        this.values = setFromByCurrent(this.values);
     }
 
     /**
@@ -352,11 +342,7 @@ export class HandleSpring {
         this.pauseStatus = false;
 
         if (!this.req && this.currentResolve) {
-            handleFrame.add(() => {
-                handleNextTick.add(({ time, fps }) => {
-                    this.onReuqestAnim(time, fps, this.currentResolve);
-                });
-            });
+            resume(this.onReuqestAnim.bind(this), this.currentResolve);
         }
     }
 
@@ -383,19 +369,6 @@ export class HandleSpring {
     }
 
     /**
-     * immediate - Jump immaediate to the end of tween
-     *
-     */
-    immediate() {
-        this.req = false;
-
-        this.values.forEach((item) => {
-            item.fromValue = item.toValue;
-            item.currentValue = item.toValue;
-        });
-    }
-
-    /**
      * mergeProps - Mege special props with default props
      *
      * @param  {Object} props { reverse: <>, config: <> , immediate <> }
@@ -412,17 +385,6 @@ export class HandleSpring {
     }
 
     /**
-     * Realtive toValue from current position
-     */
-    setToValProcessed() {
-        this.values.forEach((item) => {
-            item.toValue = this.relative
-                ? item.toValue + item.currentValue
-                : item.toValue;
-        });
-    }
-
-    /**
      * goTo - go from fromValue stored to new toValue
      *
      * @param  {object} obj new toValue
@@ -434,17 +396,8 @@ export class HandleSpring {
      */
     goTo(obj, props = {}) {
         if (this.pauseStatus) return;
-
         this.useStagger = true;
-
-        const data = Object.keys(obj).map((item) => {
-            return {
-                prop: item,
-                toValue: obj[item],
-                settled: false,
-            };
-        });
-
+        const data = goTo(obj);
         return this.doAction(data, props, obj);
     }
 
@@ -460,18 +413,8 @@ export class HandleSpring {
      */
     goFrom(obj, props = {}) {
         if (this.pauseStatus) return;
-
         this.useStagger = true;
-
-        const data = Object.keys(obj).map((item) => {
-            return {
-                prop: item,
-                fromValue: obj[item],
-                currentValue: obj[item],
-                settled: false,
-            };
-        });
-
+        const data = goFrom(obj);
         return this.doAction(data, props, obj);
     }
 
@@ -488,30 +431,20 @@ export class HandleSpring {
      */
     goFromTo(fromObj, toObj, props = {}) {
         if (this.pauseStatus) return;
-
         this.useStagger = true;
 
         // Check if fromObj has the same keys of toObj
         const dataIsValid = compareKeys(fromObj, toObj);
         if (!dataIsValid) {
             console.warn(
-                `HandleSpring: ${JSON.stringify(
-                    fromObj
-                )} and to ${JSON.stringify(toObj)} is not equal`
+                `HandleLerp: ${JSON.stringify(fromObj)} and to ${JSON.stringify(
+                    toObj
+                )} is not equal`
             );
             return this.promise;
         }
 
-        const data = Object.keys(fromObj).map((item) => {
-            return {
-                prop: item,
-                fromValue: fromObj[item],
-                currentValue: fromObj[item],
-                toValue: toObj[item],
-                settled: false,
-            };
-        });
-
+        const data = goFromTo(fromObj, toObj);
         return this.doAction(data, props, fromObj);
     }
 
@@ -527,19 +460,8 @@ export class HandleSpring {
      */
     set(obj, props = {}) {
         if (this.pauseStatus) return;
-
         this.useStagger = false;
-
-        const data = Object.keys(obj).map((item) => {
-            return {
-                prop: item,
-                fromValue: obj[item],
-                currentValue: obj[item],
-                toValue: obj[item],
-                settled: false,
-            };
-        });
-
+        const data = set(obj);
         return this.doAction(data, props, obj);
     }
 
@@ -550,12 +472,12 @@ export class HandleSpring {
         this.values = mergeArray(data, this.values);
         const { reverse, immediate } = this.mergeProps(props);
 
-        if (reverse) this.reverse(obj);
-
-        this.setToValProcessed();
+        if (reverse) this.values = reverseValues(obj, this.values);
+        this.values = setRelative(this.values, this.relative);
 
         if (immediate) {
-            this.immediate();
+            this.req = false;
+            this.values = setFromCurrentByTo(this.values);
             return new Promise((res) => res());
         }
 
@@ -604,27 +526,16 @@ export class HandleSpring {
         return getValueObj(this.values, 'toValue');
     }
 
+    /**
+     * getType - get tween type
+     *
+     * @return {string} tween type
+     *
+     * @example
+     * const type = mySpring.getType();
+     */
     getType() {
         return 'SPRING';
-    }
-
-    /**
-     * reverse - sitch fromValue and ToValue for specific input value
-     *
-     * @return {void}
-     *
-     */
-    reverse(obj) {
-        const keysTorevert = Object.keys(obj);
-
-        this.values.forEach((item) => {
-            if (keysTorevert.includes(item.prop)) {
-                const fromValue = item.fromValue;
-                const toValue = item.toValue;
-                item.fromValue = toValue;
-                item.toValue = fromValue;
-            }
-        });
     }
 
     /**
@@ -661,6 +572,7 @@ export class HandleSpring {
             config: this.config,
         });
     }
+
     /**
      * subscribe - add callback to stack
      *
@@ -670,7 +582,7 @@ export class HandleSpring {
      */
     subscribe(cb) {
         const unsubscribeCb = setCallBack(cb, this.callback);
-        return () => (this.callback = unsubscribeCb());
+        return () => (this.callback = unsubscribeCb(this.callback));
     }
 
     /**
@@ -682,7 +594,10 @@ export class HandleSpring {
      */
     onStartInPause(cb) {
         const unsubscribeCb = setCallBack(cb, this.callbackStartInPause);
-        return () => (this.callbackStartInPause = unsubscribeCb());
+        return () =>
+            (this.callbackStartInPause = unsubscribeCb(
+                this.callbackStartInPause
+            ));
     }
 
     /**
@@ -693,7 +608,8 @@ export class HandleSpring {
      */
     onComplete(cb) {
         const unsubscribeCb = setCallBack(cb, this.callbackOnComplete);
-        return () => (this.callbackOnComplete = unsubscribeCb());
+        return () =>
+            (this.callbackOnComplete = unsubscribeCb(this.callbackOnComplete));
     }
 
     /**
@@ -712,7 +628,7 @@ export class HandleSpring {
         );
 
         this.unsubscribeCache = unsubscribeCache;
-        return () => (this.callbackCache = unsubscribeCb());
+        return () => (this.callbackCache = unsubscribeCb(this.callbackCache));
     }
 
     /**

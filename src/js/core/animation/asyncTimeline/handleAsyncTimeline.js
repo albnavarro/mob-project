@@ -512,19 +512,17 @@ export class HandleAsyncTimeline {
     play() {
         // Skip of there is nothing to run
         if (this.tweenList.length === 0 || this.addAsyncIsActive) return;
-
         if (this.delayIsRunning) {
             this.startOnDelay = true;
             this.actionAfterReject.push(() => this.play());
             return;
         }
         this.startOnDelay = false;
-
         this.stop();
         this.isStopped = false;
         if (this.isReverse) this.revertTween();
-
         Promise.resolve().then(() => this.run());
+        return this;
     }
 
     playFrom(label) {
@@ -537,32 +535,28 @@ export class HandleAsyncTimeline {
             return;
         }
         this.startOnDelay = false;
-
         this.stop();
         this.isStopped = false;
         if (this.isReverse) this.revertTween();
-
         this.goToLabelIndex = this.tweenList.findIndex((item) => {
             // Get first item of group, unnecessary use of label inside a group becouse is parallel
             const [firstItem] = item;
             const labelCheck = firstItem.data.labelProps?.name;
             return labelCheck === label;
         });
-
         Promise.resolve().then(() => this.run());
+        return this;
     }
 
     reverse() {
         // Skip of there is nothing to run
         if (this.tweenList.length === 0 || this.addAsyncIsActive) return;
-
         if (this.delayIsRunning) {
             this.startOnDelay = true;
             this.actionAfterReject.push(() => this.reverse());
             return;
         }
         this.startOnDelay = false;
-
         this.stop();
         this.isStopped = false;
         this.forceYoyo = true;
@@ -573,8 +567,8 @@ export class HandleAsyncTimeline {
          * so increment the loop number by 1
          **/
         this.repeat >= 1 && this.repeat++;
-
         Promise.resolve().then(() => this.run());
+        return this;
     }
 
     reverseNext() {

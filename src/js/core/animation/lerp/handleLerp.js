@@ -6,10 +6,15 @@ import {
     compareKeys,
     getRoundedValue,
 } from '../utils/animationUtils.js';
-
+import {
+    setFromByCurrent,
+    setFromCurrentByTo,
+    setFromToByCurrent,
+    reverseValues,
+    setRelative,
+} from '../utils/setValues.js';
 import { loadFps } from '../../events/rafutils/loadFps.js';
 import { handleFrame } from '../../events/rafutils/handleFrame.js';
-import { handleNextFrame } from '../../events/rafutils/handleNextFrame.js';
 import { handleNextTick } from '../../events/rafutils/handleNextTick.js';
 import { mergeDeep } from '../../utils/mergeDeep.js';
 import { handleSetUp } from '../../setup.js';
@@ -24,6 +29,9 @@ import {
     setCallBack,
     setCallBackCache,
 } from '../utils/callbacks/setCallback.js';
+import { goTo, goFrom, goFromTo, set } from '../utils/actions.js';
+import { initRaf } from '../utils/initRaf.js';
+import { resume } from '../utils/resume.js';
 
 export class HandleLerp {
     constructor(data = {}) {
@@ -137,7 +145,7 @@ export class HandleLerp {
             o.allSettled = this.values.every((item) => item.settled === true);
 
             if (!o.allSettled) {
-                handleNextFrame.add(() => {
+                handleFrame.add(() => {
                     handleNextTick.add(({ time, fps }) => {
                         if (this.req) draw(time, fps);
                     });
@@ -249,22 +257,16 @@ export class HandleLerp {
 
     startRaf(res, reject) {
         if (this.fpsInLoading) return;
-
-        this.currentReject = reject;
         this.currentResolve = res;
+        this.currentReject = reject;
 
-        const cb = () => {
-            handleFrame.add(() => {
-                handleNextTick.add(({ time, fps }) => {
-                    const prevent = this.callbackStartInPause
-                        .map(({ cb }) => cb())
-                        .some((item) => item === true);
-
-                    this.onReuqestAnim(time, fps, res);
-                    if (prevent) this.pause();
-                });
-            });
-        };
+        const cb = () =>
+            initRaf(
+                this.callbackStartInPause,
+                this.onReuqestAnim.bind(this),
+                this.pause.bind(this),
+                res
+            );
 
         if (this.firstRun) {
             this.fpsInLoading = true;
@@ -285,14 +287,9 @@ export class HandleLerp {
      */
     stop() {
         if (this.pauseStatus) this.pauseStatus = false;
+        this.values = setFromToByCurrent(this.values);
 
-        // Update local values with last
-        this.values.forEach((item) => {
-            item.toValue = item.currentValue;
-            item.fromValue = item.toValue;
-        });
-
-        // Abort promise
+        // Reject promise
         if (this.currentReject) {
             this.currentReject();
             this.promise = null;
@@ -313,15 +310,8 @@ export class HandleLerp {
     pause() {
         if (this.pauseStatus) return;
         this.pauseStatus = true;
-
-        // Reset RAF
         if (this.req) this.req = false;
-
-        this.values.forEach((item) => {
-            if (!item.settled) {
-                item.fromValue = item.currentValue;
-            }
-        });
+        this.values = setFromByCurrent(this.values);
     }
 
     /**
@@ -334,11 +324,7 @@ export class HandleLerp {
         this.pauseStatus = false;
 
         if (!this.req && this.currentResolve) {
-            handleFrame.add(() => {
-                handleNextTick.add(({ time, fps }) => {
-                    this.onReuqestAnim(time, fps, this.currentResolve);
-                });
-            });
+            resume(this.onReuqestAnim.bind(this), this.currentResolve);
         }
     }
 
@@ -365,19 +351,6 @@ export class HandleLerp {
     }
 
     /**
-     * immediate - Jump immaediate to the end of tween
-     *
-     */
-    immediate() {
-        this.req = false;
-
-        this.values.forEach((item) => {
-            item.fromValue = item.toValue;
-            item.currentValue = item.toValue;
-        });
-    }
-
-    /**
      * mergeProps - Mege special props with default props
      *
      * @param  {Object} props { reverse: <>, velocity: <> , precision <>, immediate <> }
@@ -395,17 +368,6 @@ export class HandleLerp {
     }
 
     /**
-     * Realtive toValue from current position
-     */
-    setToValProcessed() {
-        this.values.forEach((item) => {
-            item.toValue = this.relative
-                ? item.toValue + item.currentValue
-                : item.toValue;
-        });
-    }
-
-    /**
      * goTo - go from fromValue stored to new toValue
      *
      * @param  {number} to new toValue
@@ -416,17 +378,8 @@ export class HandleLerp {
      */
     goTo(obj, props = {}) {
         if (this.pauseStatus) return;
-
         this.useStagger = true;
-
-        const data = Object.keys(obj).map((item) => {
-            return {
-                prop: item,
-                toValue: obj[item],
-                settled: false,
-            };
-        });
-
+        const data = goTo(obj);
         return this.doAction(data, props, obj);
     }
 
@@ -442,18 +395,8 @@ export class HandleLerp {
      */
     goFrom(obj, props = {}) {
         if (this.pauseStatus) return;
-
         this.useStagger = true;
-
-        const data = Object.keys(obj).map((item) => {
-            return {
-                prop: item,
-                fromValue: obj[item],
-                currentValue: obj[item],
-                settled: false,
-            };
-        });
-
+        const data = goFrom(obj);
         return this.doAction(data, props, obj);
     }
 
@@ -470,7 +413,6 @@ export class HandleLerp {
      */
     goFromTo(fromObj, toObj, props = {}) {
         if (this.pauseStatus) return;
-
         this.useStagger = true;
 
         // Check if fromObj has the same keys of toObj
@@ -484,16 +426,7 @@ export class HandleLerp {
             return this.promise;
         }
 
-        const data = Object.keys(fromObj).map((item) => {
-            return {
-                prop: item,
-                fromValue: fromObj[item],
-                currentValue: fromObj[item],
-                toValue: toObj[item],
-                settled: false,
-            };
-        });
-
+        const data = goFromTo(fromObj, toObj);
         return this.doAction(data, props, fromObj);
     }
 
@@ -509,19 +442,8 @@ export class HandleLerp {
      */
     set(obj, props = {}) {
         if (this.pauseStatus) return;
-
         this.useStagger = false;
-
-        const data = Object.keys(obj).map((item) => {
-            return {
-                prop: item,
-                fromValue: obj[item],
-                currentValue: obj[item],
-                toValue: obj[item],
-                settled: false,
-            };
-        });
-
+        const data = set(obj);
         return this.doAction(data, props, obj);
     }
 
@@ -532,12 +454,12 @@ export class HandleLerp {
         this.values = mergeArray(data, this.values);
         const { reverse, immediate } = this.mergeProps(props);
 
-        if (reverse) this.reverse(obj);
-
-        this.setToValProcessed();
+        if (reverse) this.values = reverseValues(obj, this.values);
+        this.values = setRelative(this.values, this.relative);
 
         if (immediate) {
-            this.immediate();
+            this.req = false;
+            this.values = setFromCurrentByTo(this.values);
             return new Promise((res) => res());
         }
 
@@ -586,6 +508,14 @@ export class HandleLerp {
         return getValueObj(this.values, 'toValue');
     }
 
+    /**
+     * getType - get tween type
+     *
+     * @return {string} tween type
+     *
+     * @example
+     * const type = mySpring.getType();
+     */
     getType() {
         return 'LERP';
     }
@@ -605,25 +535,6 @@ export class HandleLerp {
     }
 
     /**
-     * reverse - sitch fromValue and ToValue for specific input value
-     *
-     * @return {void}
-     *
-     */
-    reverse(obj) {
-        const keysTorevert = Object.keys(obj);
-
-        this.values.forEach((item) => {
-            if (keysTorevert.includes(item.prop)) {
-                const fromValue = item.fromValue;
-                const toValue = item.toValue;
-                item.fromValue = toValue;
-                item.toValue = fromValue;
-            }
-        });
-    }
-
-    /**
      * subscribe - add callback to stack
      *
      * @param  {function} cb cal function
@@ -632,7 +543,7 @@ export class HandleLerp {
      */
     subscribe(cb) {
         const unsubscribeCb = setCallBack(cb, this.callback);
-        return () => (this.callback = unsubscribeCb());
+        return () => (this.callback = unsubscribeCb(this.callback));
     }
 
     /**
@@ -644,7 +555,10 @@ export class HandleLerp {
      */
     onStartInPause(cb) {
         const unsubscribeCb = setCallBack(cb, this.callbackStartInPause);
-        return () => (this.callbackStartInPause = unsubscribeCb());
+        return () =>
+            (this.callbackStartInPause = unsubscribeCb(
+                this.callbackStartInPause
+            ));
     }
 
     /**
@@ -655,7 +569,8 @@ export class HandleLerp {
      */
     onComplete(cb) {
         const unsubscribeCb = setCallBack(cb, this.callbackOnComplete);
-        return () => (this.callbackOnComplete = unsubscribeCb());
+        return () =>
+            (this.callbackOnComplete = unsubscribeCb(this.callbackOnComplete));
     }
 
     /**
@@ -674,7 +589,7 @@ export class HandleLerp {
         );
 
         this.unsubscribeCache = unsubscribeCache;
-        return () => (this.callbackCache = unsubscribeCb());
+        return () => (this.callbackCache = unsubscribeCb(this.callbackCache));
     }
 
     /**

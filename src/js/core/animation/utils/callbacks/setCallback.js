@@ -1,13 +1,18 @@
 import { callBackStore } from './callBackStore';
 import { handleCache } from '../../../events/rafutils/handleCache.js';
 
-export const setCallBack = (cb, cbArray) => {
+export const setCallBack = (cb, arr) => {
     const { id } = callBackStore.get();
-    cbArray.push({ cb, id });
+    arr.push({ cb, id });
     const prevId = id;
     callBackStore.set('id', id + 1);
 
-    return () => cbArray.filter((item) => item.id !== prevId);
+    // Disable single stagger without modify staggers order
+    return (arr) =>
+        arr.map(({ id, cb }) => {
+            if (id === prevId) cb = () => {};
+            return { id, cb };
+        });
 };
 
 export const setCallBackCache = (item, fn, cbArray, unsubscribeCache) => {
@@ -21,9 +26,13 @@ export const setCallBackCache = (item, fn, cbArray, unsubscribeCache) => {
 
     return {
         unsubscribeCache,
-        unsubscribeCb: () => {
+        unsubscribeCb: (arr) => {
             unsubscribe();
-            return (cbArray = cbArray.filter((item) => item.id !== prevId));
+            // Disable single stagger without modify staggers order
+            return arr.map(({ id, cb }) => {
+                if (id === prevId) cb = () => {};
+                return { id, cb };
+            });
         },
     };
 };

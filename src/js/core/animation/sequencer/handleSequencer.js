@@ -453,7 +453,7 @@ export class HandleSequencer {
      */
     subscribe(cb) {
         const unsubscribeCb = setCallBack(cb, this.callback);
-        return () => (this.callback = unsubscribeCb());
+        return () => (this.callback = unsubscribeCb(this.callback));
     }
 
     /**
@@ -464,7 +464,7 @@ export class HandleSequencer {
      */
     onStop(cb) {
         const unsubscribeCb = setCallBack(cb, this.callbackOnStop);
-        return () => (this.callbackOnStop = unsubscribeCb());
+        return () => (this.callbackOnStop = unsubscribeCb(this.callbackOnStop));
     }
 
     /**
@@ -483,7 +483,7 @@ export class HandleSequencer {
         );
 
         this.unsubscribeCache = unsubscribeCache;
-        return () => (this.callbackCache = unsubscribeCb());
+        return () => (this.callbackCache = unsubscribeCb(this.callbackCache));
     }
 
     getDuration() {
