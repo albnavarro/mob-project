@@ -10,7 +10,7 @@ import {
     setFromByCurrent,
     setFromCurrentByTo,
     setFromToByCurrent,
-    reverseValues,
+    setReverseValues,
     setRelative,
 } from '../utils/setValues.js';
 import { loadFps } from '../../events/rafutils/loadFps.js';
@@ -32,6 +32,11 @@ import {
 import { goTo, goFrom, goFromTo, set } from '../utils/actions.js';
 import { initRaf } from '../utils/initRaf.js';
 import { resume } from '../utils/resume.js';
+import {
+    compareKeysWarning,
+    staggerIsOutOfRangeWarning,
+} from '../utils/warning.js';
+import { fpsLoadedLog } from '../utils/log.js';
 
 export class HandleLerp {
     constructor(data = {}) {
@@ -203,9 +208,7 @@ export class HandleLerp {
                     : this.callback;
 
             if (this.stagger.grid.col > cb.length) {
-                console.warn(
-                    'stagger col of grid is out of range, it must be less than the number of staggers '
-                );
+                staggerIsOutOfRangeWarning(cb.length);
                 this.firstRun = false;
                 return;
             }
@@ -220,14 +223,13 @@ export class HandleLerp {
                 });
 
             if (this.callbackCache.length > this.callback.length) {
-                this.callbackCache = [...cbNow];
+                this.callbackCache = cbNow;
             } else {
-                this.callback = [...cbNow];
+                this.callback = cbNow;
             }
-            this.callbackOnComplete = [...cbCompleteNow];
-            this.slowlestStagger = { ...slowlestStagger };
-            this.fastestStagger = { ...fastestStagger };
-
+            this.callbackOnComplete = cbCompleteNow;
+            this.slowlestStagger = slowlestStagger;
+            this.fastestStagger = fastestStagger;
             this.firstRun = false;
         };
 
@@ -243,7 +245,7 @@ export class HandleLerp {
         ) {
             return new Promise((resolve) => {
                 loadFps().then(({ averageFPS }) => {
-                    console.log(`stagger lerp loaded at: ${averageFPS} fps`);
+                    fpsLoadedLog('lerp', averageFPS);
                     getStagger();
                     resolve();
                 });
@@ -416,13 +418,8 @@ export class HandleLerp {
         this.useStagger = true;
 
         // Check if fromObj has the same keys of toObj
-        const dataIsValid = compareKeys(fromObj, toObj);
-        if (!dataIsValid) {
-            console.warn(
-                `HandleLerp: ${JSON.stringify(fromObj)} and to ${JSON.stringify(
-                    toObj
-                )} is not equal`
-            );
+        if (!compareKeys(fromObj, toObj)) {
+            compareKeysWarning('lerp goFromTo:', fromObj, toObj);
             return this.promise;
         }
 
@@ -454,7 +451,7 @@ export class HandleLerp {
         this.values = mergeArray(data, this.values);
         const { reverse, immediate } = this.mergeProps(props);
 
-        if (reverse) this.values = reverseValues(obj, this.values);
+        if (reverse) this.values = setReverseValues(obj, this.values);
         this.values = setRelative(this.values, this.relative);
 
         if (immediate) {

@@ -16,6 +16,10 @@ import {
     setCallBackCache,
 } from '../utils/callbacks/setCallback.js';
 import { goTo, goFrom, goFromTo } from '../utils/actions.js';
+import {
+    compareKeysWarning,
+    staggerIsOutOfRangeWarning,
+} from '../utils/warning.js';
 
 // Stagger and eade is defined at tween creation
 export class ParallaxTween {
@@ -53,9 +57,7 @@ export class ParallaxTween {
                     : this.callback;
 
             if (this.stagger.grid.col > cb.length) {
-                console.warn(
-                    'stagger col of grid is out of range, it must be less than the number of staggers '
-                );
+                staggerIsOutOfRangeWarning(cb.length);
                 return;
             }
 
@@ -68,11 +70,11 @@ export class ParallaxTween {
             });
 
             if (this.callbackCache.length > this.callback.length) {
-                this.callbackCache = [...cbNow];
+                this.callbackCache = cbNow;
             } else {
-                this.callback = [...cbNow];
+                this.callback = cbNow;
             }
-            this.callbackOnStop = [...cbCompleteNow];
+            this.callbackOnStop = cbCompleteNow;
         }
     }
 
@@ -238,13 +240,8 @@ export class ParallaxTween {
      */
     goFromTo(fromObj, toObj, props = {}) {
         // Check if fromObj has the same keys of toObj
-        const dataIsValid = compareKeys(fromObj, toObj);
-        if (!dataIsValid) {
-            console.warn(
-                `parallaxTween: ${JSON.stringify(
-                    fromObj
-                )} and to ${JSON.stringify(toObj)} is not equal`
-            );
+        if (!compareKeys(fromObj, toObj)) {
+            compareKeysWarning('spring goFromTo:', fromObj, toObj);
             return;
         }
 

@@ -9,7 +9,8 @@ import {
 import {
     setFromCurrentByTo,
     setFromToByCurrent,
-    reverseValues,
+    setReverseValues,
+    setRelativeTween,
 } from '../utils/setValues.js';
 import { loadFps } from '../../events/rafutils/loadFps.js';
 import { handleFrame } from '../../events/rafutils/handleFrame.js';
@@ -29,6 +30,11 @@ import {
 } from '../utils/callbacks/setCallback.js';
 import { goTo, goFrom, goFromTo, set } from '../utils/actions.js';
 import { initRaf } from '../utils/initRaf.js';
+import {
+    compareKeysWarning,
+    staggerIsOutOfRangeWarning,
+} from '../utils/warning.js';
+import { fpsLoadedLog } from '../utils/log.js';
 
 export class HandleTween {
     constructor(data = {}) {
@@ -51,7 +57,6 @@ export class HandleTween {
         this.pauseTime = 0;
         this.firstRun = true;
         this.useStagger = true;
-        this.smallNumber = 0.00001;
         this.fpsInLoading = false;
 
         /**
@@ -206,9 +211,7 @@ export class HandleTween {
                     : this.callback;
 
             if (this.stagger.grid.col > cb.length) {
-                console.warn(
-                    'stagger col of grid is out of range, it must be less than the number of staggers '
-                );
+                staggerIsOutOfRangeWarning(cb.length);
                 this.firstRun = false;
                 return;
             }
@@ -223,14 +226,13 @@ export class HandleTween {
                 });
 
             if (this.callbackCache.length > this.callback.length) {
-                this.callbackCache = [...cbNow];
+                this.callbackCache = cbNow;
             } else {
-                this.callback = [...cbNow];
+                this.callback = cbNow;
             }
-            this.callbackOnComplete = [...cbCompleteNow];
-            this.slowlestStagger = { ...slowlestStagger };
-            this.fastestStagger = { ...fastestStagger };
-
+            this.callbackOnComplete = cbCompleteNow;
+            this.slowlestStagger = slowlestStagger;
+            this.fastestStagger = fastestStagger;
             this.firstRun = false;
         };
 
@@ -246,7 +248,7 @@ export class HandleTween {
         ) {
             return new Promise((resolve) => {
                 loadFps().then(({ averageFPS }) => {
-                    console.log(`stagger tween loaded at: ${averageFPS} fps`);
+                    fpsLoadedLog('tween', averageFPS);
                     getStagger();
                     resolve();
                 });
@@ -439,15 +441,8 @@ export class HandleTween {
     goFromTo(fromObj, toObj, props = {}) {
         if (this.pauseStatus || this.comeFromResume) this.stop();
         this.useStagger = true;
-
-        // Check if fromObj has the same keys of toObj
-        const dataIsValid = compareKeys(fromObj, toObj);
-        if (!dataIsValid) {
-            console.warn(
-                `HandleLerp: ${JSON.stringify(fromObj)} and to ${JSON.stringify(
-                    toObj
-                )} is not equal`
-            );
+        if (!compareKeys(fromObj, toObj)) {
+            compareKeysWarning('tween goFromTo:', fromObj, toObj);
             return this.promise;
         }
 
@@ -482,21 +477,9 @@ export class HandleTween {
     doAction(data, props, obj) {
         this.values = mergeArrayTween(data, this.values);
         if (this.req) this.updateDataWhileRunning();
-
         const { reverse, immediate } = this.mergeProps(props);
-        if (reverse) this.value = reverseValues(obj, this.values);
-
-        this.values.forEach((item) => {
-            if (item.shouldUpdate) {
-                /*
-                Prevent error on tween revert if is 0 some easeType can't run
-                es: easeInElastic
-                */
-                item.toValProcessed = this.relative
-                    ? item.toValue + this.smallNumber
-                    : item.toValue - item.fromValue + this.smallNumber;
-            }
-        });
+        if (reverse) this.value = setReverseValues(obj, this.values);
+        this.values = setRelativeTween(this.values, this.relative);
 
         if (immediate) {
             this.req = false;

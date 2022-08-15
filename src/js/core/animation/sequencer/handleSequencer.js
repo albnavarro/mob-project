@@ -15,6 +15,10 @@ import {
     setCallBack,
     setCallBackCache,
 } from '../utils/callbacks/setCallback.js';
+import {
+    compareKeysWarning,
+    staggerIsOutOfRangeWarning,
+} from '../utils/warning.js';
 
 export class HandleSequencer {
     constructor(data = {}) {
@@ -66,9 +70,7 @@ export class HandleSequencer {
                     : this.callback;
 
             if (this.stagger.grid.col > cb.length) {
-                console.warn(
-                    'stagger col of grid is out of range, it must be less than the number of staggers '
-                );
+                staggerIsOutOfRangeWarning(cb.length);
                 return;
             }
 
@@ -76,16 +78,16 @@ export class HandleSequencer {
                 cb,
                 endCb: this.callbackOnStop,
                 stagger: this.stagger,
-                slowlestStagger: {},
-                fastestStagger: {},
+                slowlestStagger: {}, //sequencer doasn't support slowlestStagger
+                fastestStagger: {}, //sequencer doasn't support fastestStagger
             });
 
             if (this.callbackCache.length > this.callback.length) {
-                this.callbackCache = [...cbNow];
+                this.callbackCache = cbNow;
             } else {
-                this.callback = [...cbNow];
+                this.callback = cbNow;
             }
-            this.callbackOnStop = [...cbCompleteNow];
+            this.callbackOnStop = cbCompleteNow;
         }
 
         this.staggerIsReady = true;
@@ -417,9 +419,8 @@ export class HandleSequencer {
         const propMerged = { ...this.defaultProp, ...props };
         const { start, end, ease } = propMerged;
 
-        const dataIsValid = compareKeys(fromObj, toObj);
-        if (!dataIsValid) {
-            console.warn('sequencer: fromValue and toValue is different');
+        if (!compareKeys(fromObj, toObj)) {
+            compareKeysWarning('lerp goFromTo:', fromObj, toObj);
             return;
         }
 

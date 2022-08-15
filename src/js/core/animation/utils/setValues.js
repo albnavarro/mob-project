@@ -26,7 +26,7 @@ export const setFromToByCurrent = (arr) => {
     });
 };
 
-export const reverseValues = (obj, arr) => {
+export const setReverseValues = (obj, arr) => {
     const keysTorevert = Object.keys(obj);
     return arr.map((item) => {
         if (keysTorevert.includes(item.prop)) {
@@ -44,6 +44,22 @@ export const setRelative = (arr, relative) => {
         item.toValue = relative
             ? item.toValue + item.currentValue
             : item.toValue;
+        return item;
+    });
+};
+
+const tweenSmallNumber = 0.00001;
+export const setRelativeTween = (arr, relative) => {
+    return arr.map((item) => {
+        if (item.shouldUpdate) {
+            /*
+                Prevent error on tween revert if is 0 some easeType can't run
+                es: easeInElastic
+                */
+            item.toValProcessed = relative
+                ? item.toValue + tweenSmallNumber
+                : item.toValue - item.fromValue + tweenSmallNumber;
+        }
         return item;
     });
 };

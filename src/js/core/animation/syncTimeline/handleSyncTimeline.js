@@ -4,6 +4,7 @@ import { handleNextFrame } from '../../events/rafutils/handleNextFrame.js';
 import { handleNextTick } from '../../events/rafutils/handleNextTick.js';
 import { clamp } from '../utils/animationUtils.js';
 import { handleSetUp } from '../../setup.js';
+import { fpsLoadedLog } from '../utils/log.js';
 
 export class HandleSyncTimeline {
     constructor(data = {}) {
@@ -243,7 +244,7 @@ export class HandleSyncTimeline {
 
     startAnimation(partial) {
         loadFps().then(({ averageFPS }) => {
-            console.log(`Fps on syncTimeline loaded at: ${averageFPS} fps`);
+            fpsLoadedLog('sequencer', averageFPS);
 
             this.squencers.forEach((item) => {
                 item.inzializeStagger();
