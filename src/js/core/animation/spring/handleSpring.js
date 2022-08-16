@@ -19,7 +19,10 @@ import { mergeDeep } from '../../utils/mergeDeep.js';
 import { handleSetUp } from '../../setup.js';
 import { setStagger } from '../utils/stagger/setStagger.js';
 import { STAGGER_DEFAULT_INDEX_OBJ } from '../utils/stagger/staggerCostant.js';
-import { getStaggerFromProps } from '../utils/stagger/staggerUtils.js';
+import {
+    getStaggerFromProps,
+    getStaggerArray,
+} from '../utils/stagger/staggerUtils.js';
 import {
     defaultCallbackOnComplete,
     defaultCallback,
@@ -36,6 +39,7 @@ import {
     staggerIsOutOfRangeWarning,
 } from '../utils/warning.js';
 import { fpsLoadedLog } from '../utils/log.js';
+import { shouldInizializzeStagger } from '../utils/condition.js';
 
 export class HandleSpring {
     constructor(data = {}) {
@@ -218,10 +222,7 @@ export class HandleSpring {
 
     inzializeStagger() {
         const getStagger = () => {
-            const cb =
-                this.callbackCache.length > this.callback.length
-                    ? this.callbackCache
-                    : this.callback;
+            const cb = getStaggerArray(this.callbackCache, this.callback);
 
             if (this.stagger.grid.col > cb.length) {
                 staggerIsOutOfRangeWarning(cb.length);
@@ -255,9 +256,12 @@ export class HandleSpring {
          *
          **/
         if (
-            this.stagger.each > 0 &&
-            this.firstRun &&
-            (this.callbackCache.length || this.callback.length)
+            shouldInizializzeStagger(
+                this.stagger.each,
+                this.firstRun,
+                this.callbackCache,
+                this.callback
+            )
         ) {
             return new Promise((resolve) => {
                 loadFps().then(({ averageFPS }) => {

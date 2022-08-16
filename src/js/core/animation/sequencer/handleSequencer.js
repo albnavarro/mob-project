@@ -9,7 +9,10 @@ import { handleNextTick } from '../../events/rafutils/handleNextTick.js';
 import { handleCache } from '../../events/rafutils/handleCache.js';
 import { handleFrameIndex } from '../../events/rafutils/handleFrameIndex.js';
 import { setStagger } from '../utils/stagger/setStagger.js';
-import { getStaggerFromProps } from '../utils/stagger/staggerUtils.js';
+import {
+    getStaggerFromProps,
+    getStaggerArray,
+} from '../utils/stagger/staggerUtils.js';
 import { handleSetUp } from '../../setup.js';
 import {
     setCallBack,
@@ -64,10 +67,7 @@ export class HandleSequencer {
             this.stagger.each > 0 &&
             (this.callbackCache.length || this.callback.length)
         ) {
-            const cb =
-                this.callbackCache.length > this.callback.length
-                    ? this.callbackCache
-                    : this.callback;
+            const cb = getStaggerArray(this.callbackCache, this.callback);
 
             if (this.stagger.grid.col > cb.length) {
                 staggerIsOutOfRangeWarning(cb.length);

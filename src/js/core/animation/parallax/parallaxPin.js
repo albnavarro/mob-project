@@ -7,7 +7,7 @@ import { handleScrollStart } from '../../events/scrollUtils/handleScrollUtils.js
 import { clamp } from '../../animation/utils/animationUtils.js';
 
 export class ParallaxPin {
-    constructor(data) {
+    constructor() {
         this.parallaxInstance = null;
         this.trasponderActive = false;
         this.scrollerHeight = 0;
@@ -379,6 +379,7 @@ export class ParallaxPin {
         this.unsubscribeSpring();
         this.unsubscribeScroll();
         this.unsubscribeScrollStart();
+        this.spring.destroy();
         this.spring = null;
         this.afterPinCounter = 0;
         this.justPinned = false;

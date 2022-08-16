@@ -600,6 +600,7 @@ export class ParallaxItemClass {
         this.unsubscribeMotion();
         this.unsubscribeOnComplete();
         this.unsubscribeMarker();
+        this.motion.destroy();
         this.dynamicRange = null;
         this.onEnter = () => {};
         this.onEnterBack = () => {};
@@ -609,6 +610,7 @@ export class ParallaxItemClass {
         if (this.pin && this.pinInstance) this.pinInstance.destroy();
         if (this.startMarker) this.startMarker.remove();
         if (this.endMarker) this.endMarker.remove();
+        this.motion = null;
         this.startMarker = null;
         this.endMarker = null;
         this.pinInstance = null;

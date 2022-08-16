@@ -206,6 +206,8 @@ export class SmoothScrollClass {
         this.unsubscribeMotion();
         this.unsubscribeOnComplete();
         this.onUpdateScrollBar = () => {};
+        this.motion.destroy();
+        this.motion = null;
     }
 
     onTick(fn) {
