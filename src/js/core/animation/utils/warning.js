@@ -11,3 +11,7 @@ export const staggerIsOutOfRangeWarning = (max) => {
         `stagger col of grid is out of range, it must be less than ${max} ( staggers length )`
     );
 };
+
+export const valueIsNotValidWarning = (label) => {
+    console.warn(`${label} value is not valid, must be a number or a string`);
+};

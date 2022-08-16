@@ -1,6 +1,6 @@
 import { storeType } from '../../store/storeType.js';
 
-const valueIsValid = (val) => {
+export const valueIsValid = (val) => {
     return storeType.isNumber(val) || storeType.isFunction(val);
 };
 

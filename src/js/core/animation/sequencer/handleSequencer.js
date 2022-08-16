@@ -22,6 +22,9 @@ import {
     compareKeysWarning,
     staggerIsOutOfRangeWarning,
 } from '../utils/warning.js';
+import { storeType } from '../../store/storeType.js';
+import { valueIsValid } from '../utils/actions.js';
+import { valueIsNotValidWarning } from '../utils/warning.js';
 
 export class HandleSequencer {
     constructor(data = {}) {
@@ -106,6 +109,8 @@ export class HandleSequencer {
                 nextActiveItem: null,
                 duration: null,
                 inactivePosition: null,
+                toValue: null,
+                fromValue: null,
             };
 
             this.values.forEach((item) => {
@@ -146,17 +151,25 @@ export class HandleSequencer {
                     // If in the next step the same props is active and start before partial skip
                     if (!GC.isLastUsableProp) return;
 
+                    GC.toValue = storeType.isNumber(item.toValue)
+                        ? item.toValue
+                        : item.toValue();
+
+                    GC.fromValue = storeType.isNumber(item.fromValue)
+                        ? item.fromValue
+                        : item.fromValue();
+
                     // At least we get the current value
                     GC.duration = end - start;
                     GC.inactivePosition =
-                        partial < end ? item.fromValue : item.toValue;
+                        partial < end ? GC.fromValue : GC.toValue;
 
                     item.currentValue =
                         partial >= start && partial <= end
                             ? item.ease(
                                   partial - start,
-                                  item.fromValue,
-                                  item.toValue - item.fromValue,
+                                  GC.fromValue,
+                                  GC.toValue - GC.fromValue,
                                   GC.duration
                               )
                             : GC.inactivePosition;
@@ -353,6 +366,15 @@ export class HandleSequencer {
         const { start, end, ease } = propMerged;
 
         const data = Object.keys(obj).map((item) => {
+            if (!valueIsValid(obj[item])) {
+                valueIsNotValidWarning('sequencer');
+                return {
+                    prop: item,
+                    toValue: 0,
+                    ease: getTweenFn(ease),
+                };
+            }
+
             return {
                 prop: item,
                 toValue: obj[item],
@@ -386,6 +408,15 @@ export class HandleSequencer {
         const { start, end, ease } = propMerged;
 
         const data = Object.keys(obj).map((item) => {
+            if (!valueIsValid(obj[item])) {
+                valueIsNotValidWarning('sequencer');
+                return {
+                    prop: item,
+                    fromValue: 0,
+                    ease: getTweenFn(ease),
+                };
+            }
+
             return {
                 prop: item,
                 fromValue: obj[item],
@@ -425,6 +456,16 @@ export class HandleSequencer {
         }
 
         const data = Object.keys(fromObj).map((item) => {
+            if (!valueIsValid(toObj[item]) || !valueIsValid(fromObj[item])) {
+                valueIsNotValidWarning('sequencer');
+                return {
+                    prop: item,
+                    fromValue: 0,
+                    toValue: 0,
+                    ease: getTweenFn(ease),
+                };
+            }
+
             return {
                 prop: item,
                 fromValue: fromObj[item],

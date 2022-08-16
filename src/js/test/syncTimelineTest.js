@@ -9,9 +9,25 @@ export function syncTimelineTest() {
     const btnPause = document.querySelector('.syncTimeline .pause');
     const btnResume = document.querySelector('.syncTimeline .resume');
     const btnReverse = document.querySelector('.syncTimeline .reverse');
+    const btnMoreRotation = document.querySelector(
+        '.syncTimeline .moreRotation'
+    );
+    const btnLessRotation = document.querySelector(
+        '.syncTimeline .lessRotation'
+    );
     const btnStartReverse = document.querySelector(
         '.syncTimeline .startReverse'
     );
+
+    let rotation = 720;
+
+    btnMoreRotation.addEventListener('click', () => {
+        rotation = 2880;
+    });
+
+    btnLessRotation.addEventListener('click', () => {
+        rotation = 720;
+    });
 
     // SINGLE
     const seq1 = mobbu
@@ -23,7 +39,10 @@ export function syncTimelineTest() {
         .goTo({ y: 450 }, { start: 2.5, end: 5, ease: 'easeInOutBack' })
         .goTo({ x: 0 }, { start: 5, end: 7.5, ease: 'easeInOutBack' })
         .goTo({ y: 0 }, { start: 7.5, end: 10, ease: 'easeInOutBack' })
-        .goTo({ rotate: 720 }, { start: 0, end: 10 })
+        .goTo(
+            { rotate: () => rotation },
+            { start: 0, end: 10, ease: 'easeLinear' }
+        )
         .goTo({ scale: 2 }, { start: 3.5, end: 5, ease: 'easeInOutBack' })
         .goTo({ scale: 1 }, { start: 5, end: 6.5, ease: 'easeInOutBack' });
 
