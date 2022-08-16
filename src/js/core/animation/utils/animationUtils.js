@@ -10,6 +10,24 @@ export const getValueObj = (arr, key) => {
         .reduce((p, c) => ({ ...p, ...c }), {});
 };
 
+export const getValueObjTo = (arr) => {
+    return arr
+        .map((item) => {
+            if (item.toIsFn) return { [item.prop]: item.toFn };
+            else return { [item.prop]: parseFloat(item.toValue) };
+        })
+        .reduce((p, c) => ({ ...p, ...c }), {});
+};
+
+export const getValueObjFrom = (arr) => {
+    return arr
+        .map((item) => {
+            if (item.fromIsFn) return { [item.prop]: item.fromFn };
+            else return { [item.prop]: parseFloat(item.fromValue) };
+        })
+        .reduce((p, c) => ({ ...p, ...c }), {});
+};
+
 export const getRoundedValue = (x) => {
     if (storeType.isNumber(x)) {
         return Math.round(x * 10000) / 10000 || 0;

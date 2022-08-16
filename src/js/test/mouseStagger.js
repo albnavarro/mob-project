@@ -3,6 +3,9 @@ import { mobbu } from '../core';
 export const mouseStagger = () => {
     // 1
     const cursor = document.querySelectorAll('.mouseStagger__item');
+    const biggerBtn = document.querySelector('.up');
+    const smallerBtn = document.querySelector('.down');
+    console.log(biggerBtn, smallerBtn);
 
     const spring = mobbu.create('spring', {
         config: 'gentle',
@@ -43,10 +46,12 @@ export const mouseStagger = () => {
         });
     });
 
+    let val = 1;
+    biggerBtn.addEventListener('click', () => (val += 0.5));
+    smallerBtn.addEventListener('click', () => (val -= 0.5));
+
     const timeline = mobbu
         .create('asyncTimeline', { repeat: -1, yoyo: true })
-        .goTo(tween, { scale: 2 })
+        .goTo(tween, { scale: () => val * 2 })
         .play();
-
-    // timeline.play();
 };

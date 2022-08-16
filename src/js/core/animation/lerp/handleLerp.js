@@ -1,6 +1,8 @@
 import {
     getUnivoqueId,
     getValueObj,
+    getValueObjTo,
+    getValueObjFrom,
     mergeArray,
     lerp,
     compareKeys,
@@ -350,6 +352,10 @@ export class HandleLerp {
                 toValue: value,
                 fromValue: value,
                 currentValue: value,
+                fromFn: () => {},
+                fromIsFn: false,
+                toFn: () => {},
+                toIsFn: false,
                 settled: false,
             };
         });
@@ -506,6 +512,30 @@ export class HandleLerp {
      */
     getTo() {
         return getValueObj(this.values, 'toValue');
+    }
+
+    /**
+     * getFrom - get fromValue value
+     *
+     * @return {Object} fromValue value obj { prop: value, prop2: value2 }
+     *
+     * @example
+     * const { prop } = mySpring.get();
+     */
+    getFromIfFn() {
+        return getValueObjFrom(this.values);
+    }
+
+    /**
+     * getFrom - get toValue value
+     *
+     * @return {Object} toValue value obj { prop: value, prop2: value2 }
+     *
+     * @example
+     * const { prop } = mySpring.get();
+     */
+    getToIfFn() {
+        return getValueObjTo(this.values);
     }
 
     /**

@@ -2,6 +2,8 @@ import { tweenConfig, getTweenFn } from './tweenConfig.js';
 import {
     getUnivoqueId,
     getValueObj,
+    getValueObjTo,
+    getValueObjFrom,
     mergeArrayTween,
     compareKeys,
     getRoundedValue,
@@ -353,6 +355,10 @@ export class HandleTween {
                 fromValue: value,
                 currentValue: value,
                 shouldUpdate: false,
+                fromFn: () => {},
+                fromIsFn: false,
+                toFn: () => {},
+                toIsFn: false,
                 settled: false, // not used, only for uniformity with lerp and spring
             };
         });
@@ -534,6 +540,30 @@ export class HandleTween {
      */
     getTo() {
         return getValueObj(this.values, 'toValue');
+    }
+
+    /**
+     * getFrom - get fromValue value
+     *
+     * @return {Object} fromValue value obj { prop: value, prop2: value2 }
+     *
+     * @example
+     * const { prop } = mySpring.get();
+     */
+    getFromIfFn() {
+        return getValueObjFrom(this.values);
+    }
+
+    /**
+     * getFrom - get toValue value
+     *
+     * @return {Object} toValue value obj { prop: value, prop2: value2 }
+     *
+     * @example
+     * const { prop } = mySpring.get();
+     */
+    getToIfFn() {
+        return getValueObjTo(this.values);
     }
 
     /**
