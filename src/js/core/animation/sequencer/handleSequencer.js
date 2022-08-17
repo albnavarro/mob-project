@@ -367,7 +367,7 @@ export class HandleSequencer {
 
         const data = Object.keys(obj).map((item) => {
             if (!valueIsValid(obj[item])) {
-                valueIsNotValidWarning('sequencer');
+                valueIsNotValidWarning(`${item}: ${obj[item]}`);
                 return {
                     prop: item,
                     toValue: 0,
@@ -409,7 +409,7 @@ export class HandleSequencer {
 
         const data = Object.keys(obj).map((item) => {
             if (!valueIsValid(obj[item])) {
-                valueIsNotValidWarning('sequencer');
+                valueIsNotValidWarning(`${item}: ${obj[item]}`);
                 return {
                     prop: item,
                     fromValue: 0,
@@ -457,7 +457,9 @@ export class HandleSequencer {
 
         const data = Object.keys(fromObj).map((item) => {
             if (!valueIsValid(toObj[item]) || !valueIsValid(fromObj[item])) {
-                valueIsNotValidWarning('sequencer');
+                valueIsNotValidWarning(
+                    `${item}: ${toObj[item]} || ${item}: ${fromObj[item]}`
+                );
                 return {
                     prop: item,
                     fromValue: 0,

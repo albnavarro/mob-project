@@ -69,8 +69,8 @@ export class HandleAsyncTimeline {
             if (isImmediate) newTweenProps.immediate = true;
 
             // Get current valueTo for to use in reverse methods
-            if (tween && tween?.getToIfFn)
-                item.data.prevValueTo = tween.getToIfFn();
+            if (tween && tween?.getToNativeType)
+                item.data.prevValueTo = tween.getToNativeType();
 
             const fn = {
                 set: () => {

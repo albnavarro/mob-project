@@ -2,8 +2,8 @@ import { tweenConfig, getTweenFn } from './tweenConfig.js';
 import {
     getUnivoqueId,
     getValueObj,
-    getValueObjTo,
-    getValueObjFrom,
+    getValueObjToNative,
+    getValueObjFromNative,
     mergeArrayTween,
     compareKeys,
     getRoundedValue,
@@ -550,8 +550,8 @@ export class HandleTween {
      * @example
      * const { prop } = mySpring.get();
      */
-    getFromIfFn() {
-        return getValueObjFrom(this.values);
+    getFromNativeType() {
+        return getValueObjFromNative(this.values);
     }
 
     /**
@@ -562,8 +562,8 @@ export class HandleTween {
      * @example
      * const { prop } = mySpring.get();
      */
-    getToIfFn() {
-        return getValueObjTo(this.values);
+    getToNativeType() {
+        return getValueObjToNative(this.values);
     }
 
     /**

@@ -10,7 +10,7 @@ export const getValueObj = (arr, key) => {
         .reduce((p, c) => ({ ...p, ...c }), {});
 };
 
-export const getValueObjTo = (arr) => {
+export const getValueObjToNative = (arr) => {
     return arr
         .map((item) => {
             if (item.toIsFn) return { [item.prop]: item.toFn };
@@ -19,7 +19,7 @@ export const getValueObjTo = (arr) => {
         .reduce((p, c) => ({ ...p, ...c }), {});
 };
 
-export const getValueObjFrom = (arr) => {
+export const getValueObjFromNative = (arr) => {
     return arr
         .map((item) => {
             if (item.fromIsFn) return { [item.prop]: item.fromFn };

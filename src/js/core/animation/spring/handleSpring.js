@@ -1,8 +1,8 @@
 import {
     getUnivoqueId,
     getValueObj,
-    getValueObjTo,
-    getValueObjFrom,
+    getValueObjToNative,
+    getValueObjFromNative,
     mergeArray,
     compareKeys,
     getRoundedValue,
@@ -539,8 +539,8 @@ export class HandleSpring {
      * @example
      * const { prop } = mySpring.get();
      */
-    getFromIfFn() {
-        return getValueObjFrom(this.values);
+    getFromNativeType() {
+        return getValueObjFromNative(this.values);
     }
 
     /**
@@ -551,8 +551,8 @@ export class HandleSpring {
      * @example
      * const { prop } = mySpring.get();
      */
-    getToIfFn() {
-        return getValueObjTo(this.values);
+    getToNativeType() {
+        return getValueObjToNative(this.values);
     }
 
     /**
