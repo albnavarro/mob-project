@@ -81,10 +81,16 @@ export class ParallaxTween {
     draw({ partial, isLastDraw }) {
         const mainFn = () => {
             this.values.forEach((item) => {
+                const toValue = item.toIsFn ? item.toFn() : item.toValue;
+                const fromValue = item.fromIsFn
+                    ? item.fromFn()
+                    : item.fromValue;
+                const toValProcessed = toValue - fromValue;
+
                 item.currentValue = this.ease(
                     partial,
-                    item.fromValue,
-                    item.toValProcessed,
+                    fromValue,
+                    toValProcessed,
                     this.duration
                 );
                 item.currentValue = getRoundedValue(item.currentValue);
@@ -209,7 +215,6 @@ export class ParallaxTween {
         const data = goTo(obj);
         this.setEasingWhileRunning(props);
         this.mergeData(data);
-        this.setToValProcessed();
         return this;
     }
 
@@ -225,7 +230,6 @@ export class ParallaxTween {
         const data = goFrom(obj);
         this.setEasingWhileRunning(props);
         this.mergeData(data);
-        this.setToValProcessed();
         return this;
     }
 
@@ -248,7 +252,6 @@ export class ParallaxTween {
         this.setEasingWhileRunning(props);
         const data = goFromTo(fromObj, toObj);
         this.mergeData(data);
-        this.setToValProcessed();
         return this;
     }
 

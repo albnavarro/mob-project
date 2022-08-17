@@ -3,14 +3,27 @@ import { mobbu, offset, outerHeight } from '../core';
 export const scrollStagger = () => {
     const items = document.querySelectorAll('rect');
     const trigger = document.querySelector('.scrollStagger');
+    const more = document.querySelector('.more');
+    const less = document.querySelector('.less');
+    const valEl = document.querySelector('.val');
+
+    let val = 200;
+    more.addEventListener('click', () => {
+        val += 100;
+        valEl.innerHTML = val;
+    });
+    less.addEventListener('click', () => {
+        val -= 100;
+        valEl.innerHTML = val;
+    });
 
     const myParallaxTween = mobbu
         .create('parallaxTween', {
             stagger: { each: 3, from: 'center' },
             ease: 'easeLinear',
-            data: { rotate: 70 },
+            data: { rotate: 0 },
         })
-        .goTo({ rotate: 800 });
+        .goTo({ rotate: () => val });
 
     const unit = 1.4;
 

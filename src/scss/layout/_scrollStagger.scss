@@ -1,12 +1,12 @@
-.page-scrollStagger {
-    // background: $black;
-    footer {
-        // background: $white;
-    }
-}
-
 .scrollStagger {
     height: 400vh;
+
+    &__btns {
+        position: fixed;
+        top: 100px;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
 }
 
 .mySvg {
@@ -22,7 +22,6 @@
         @for $i from 1 through 30 {
             &:nth-of-type(#{$i}) {
                 fill: none;
-                // stroke: red;
                 fill: white;
                 stroke-width: 0.1;
                 opacity: #{$i * 0.05};

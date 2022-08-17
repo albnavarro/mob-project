@@ -7,15 +7,19 @@ block content
         .container.menu-container.menu-container--top
             include ../includes/navigation.pug
     main
+        .scrollStagger__btns
+            button.more more
+            button.less less
+            .val 200
       
-      - const items = 30;
-      svg.mySvg(viewBox="0 0 100 100")
-        lineargradient#gradient()
-          stop(offset='0%' stop-color='#ccc')
-          stop(offset='100%' stop-color='#FF0000')
-        each i in [...Array(items).keys()]
-          rect(stroke='url(#gradient)' rx='20')
+        - const items = 30;
+        svg.mySvg(viewBox="0 0 100 100")
+            lineargradient#gradient()
+                stop(offset='0%' stop-color='#ccc')
+                stop(offset='100%' stop-color='#FF0000')
+            each i in [...Array(items).keys()]
+                rect(stroke='url(#gradient)' rx='20')
         
 
-      .scrollStagger
+        .scrollStagger
       
