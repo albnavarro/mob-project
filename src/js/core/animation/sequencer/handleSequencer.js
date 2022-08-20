@@ -4,10 +4,7 @@ import {
     compareKeys,
     getRoundedValue,
 } from '../utils/animationUtils.js';
-import { handleFrame } from '../../events/rafutils/handleFrame.js';
 import { handleNextTick } from '../../events/rafutils/handleNextTick.js';
-import { handleCache } from '../../events/rafutils/handleCache.js';
-import { handleFrameIndex } from '../../events/rafutils/handleFrameIndex.js';
 import { setStagger } from '../utils/stagger/setStagger.js';
 import {
     getStaggerFromProps,
@@ -18,13 +15,18 @@ import {
     setCallBack,
     setCallBackCache,
 } from '../utils/callbacks/setCallback.js';
+import { syncCallback } from '../utils/callbacks/syncCallback.js';
 import {
     compareKeysWarning,
     staggerIsOutOfRangeWarning,
 } from '../utils/warning.js';
 import { storeType } from '../../store/storeType.js';
-import { valueIsValid } from '../utils/actions.js';
-import { valueIsNotValidWarning } from '../utils/warning.js';
+import { goToSync, goFromSync, goFromToSync } from './syncActions.js';
+import {
+    propToSet,
+    getFirstValidValueBack,
+    checkIsLastUsableProp,
+} from './reduceFunction.js';
 
 export class HandleSequencer {
     constructor(data = {}) {
@@ -106,7 +108,6 @@ export class HandleSequencer {
             let GC = {
                 currentEl: null,
                 isLastUsableProp: null,
-                nextActiveItem: null,
                 duration: null,
                 inactivePosition: null,
                 toValue: null,
@@ -127,26 +128,12 @@ export class HandleSequencer {
                     if (GC.currentEl.settled || !item.active) return;
 
                     // Check if in the next step of timeline the same prop is active an start before partial
-                    GC.isLastUsableProp = this.timeline
-                        .slice(i + 1, this.timeline.length)
-                        .reduce(
-                            (p, { start: nextStart, values: nextValues }) => {
-                                GC.nextActiveItem = nextValues.find(
-                                    (nextItem) => {
-                                        return (
-                                            nextItem.prop === item.prop &&
-                                            nextItem.active
-                                        );
-                                    }
-                                );
-                                if (GC.nextActiveItem && nextStart <= partial) {
-                                    return false;
-                                } else {
-                                    return p;
-                                }
-                            },
-                            true
-                        );
+                    GC.isLastUsableProp = checkIsLastUsableProp(
+                        this.timeline,
+                        i,
+                        item.prop,
+                        partial
+                    );
 
                     // If in the next step the same props is active and start before partial skip
                     if (!GC.isLastUsableProp) return;
@@ -182,41 +169,15 @@ export class HandleSequencer {
 
             const cbObject = getValueObj(this.values, 'currentValue');
 
-            if (this.stagger.each === 0 || this.useStagger === false) {
-                handleFrame.add(() => {
-                    this.callback.forEach(({ cb }) => cb(cbObject));
-                });
-
-                handleFrame.add(() => {
-                    this.callbackCache.forEach(({ cb }) => {
-                        handleCache.fireObject({ id: cb, obj: cbObject });
-                    });
-                });
-            } else {
-                // Stagger
-                this.callback.forEach(({ cb, frame }) => {
-                    handleFrameIndex.add(() => cb(cbObject), frame);
-                });
-
-                this.callbackCache.forEach(({ cb, frame }) => {
-                    handleCache.update({ id: cb, cbObject, frame });
-                });
-            }
-
-            if (isLastDraw) {
-                if (this.stagger.each === 0 || this.useStagger === false) {
-                    // No stagger, run immediatly
-                    const fn = () =>
-                        this.callbackOnStop.forEach(({ cb }) => cb(cbObject));
-
-                    handleFrame.add(() => fn());
-                } else {
-                    // Stagger
-                    this.callbackOnStop.forEach(({ cb, frame }) => {
-                        handleFrameIndex.add(() => cb(cbObject), frame + 1);
-                    });
-                }
-            }
+            syncCallback({
+                each: this.stagger.each,
+                useStagger: this.useStagger,
+                isLastDraw,
+                cbObject,
+                callback: this.callback,
+                callbackCache: this.callbackCache,
+                callbackOnStop: this.callbackOnStop,
+            });
 
             this.useStagger = true;
             // Remove reference to o Object
@@ -300,7 +261,7 @@ export class HandleSequencer {
     }
 
     /**
-     * setPropFormAncestor
+     * setPropFromAncestor
      * - Example when we come from goTo methods:
      *
      *  When we define the toValue we have to associate the right fromValue value
@@ -310,44 +271,23 @@ export class HandleSequencer {
      *
      * @param  {string} propToFind first ancestor prop <toValue> || <fromValue>
      */
-    setPropFormAncestor(propToFind) {
-        // If we need fromValue take previuse usable toValue and aplly as fromValue
-        const pairing = {
-            fromValue: {
-                get: 'toValue',
-                set: 'fromValue',
-            },
-            toValue: {
-                get: 'fromValue',
-                set: 'toValue',
-            },
-        };
-
-        this.timeline.forEach(({ values }, iTimeline) => {
+    setPropFromAncestor(propToFind) {
+        this.timeline.forEach(({ values }, i) => {
             values.forEach(({ prop, active }, iValues) => {
                 if (!active) return;
 
                 // Goback into the array
-                const propToFindValue = this.timeline
-                    .slice(0, iTimeline)
-                    .reduceRight((p, { values: valuesForward }) => {
-                        // Find active prop if exist
-                        const result = valuesForward.find(
-                            ({ prop: propForward, active: activeForward }) => {
-                                return activeForward && propForward === prop;
-                            }
-                        );
-
-                        // Return only first valid value then skip the successive
-                        // we return the value only when the accumulatore is null, so the first time we fond a value
-                        return result && p === null
-                            ? result[pairing[propToFind].get]
-                            : p;
-                    }, null);
+                const previousValidValue = getFirstValidValueBack(
+                    this.timeline,
+                    i,
+                    prop,
+                    propToFind
+                );
 
                 // If we found a value apply it
-                if (propToFindValue !== null) {
-                    values[iValues][pairing[propToFind].set] = propToFindValue;
+                if (previousValidValue !== null) {
+                    values[iValues][propToSet[propToFind].set] =
+                        previousValidValue;
                 }
             });
         });
@@ -364,24 +304,7 @@ export class HandleSequencer {
     goTo(obj, props) {
         const propMerged = { ...this.defaultProp, ...props };
         const { start, end, ease } = propMerged;
-
-        const data = Object.keys(obj).map((item) => {
-            if (!valueIsValid(obj[item])) {
-                valueIsNotValidWarning(`${item}: ${obj[item]}`);
-                return {
-                    prop: item,
-                    toValue: 0,
-                    ease: getTweenFn(ease),
-                };
-            }
-
-            return {
-                prop: item,
-                toValue: obj[item],
-                ease: getTweenFn(ease),
-            };
-        });
-
+        const data = goToSync(obj, ease);
         const newValues = this.mergeArray(data, this.values);
         this.timeline.push({
             values: newValues,
@@ -390,8 +313,7 @@ export class HandleSequencer {
         });
 
         this.timeline = this.orderByStart(this.timeline);
-        this.setPropFormAncestor('fromValue');
-
+        this.setPropFromAncestor('fromValue');
         return this;
     }
 
@@ -406,24 +328,7 @@ export class HandleSequencer {
     goFrom(obj, props) {
         const propMerged = { ...this.defaultProp, ...props };
         const { start, end, ease } = propMerged;
-
-        const data = Object.keys(obj).map((item) => {
-            if (!valueIsValid(obj[item])) {
-                valueIsNotValidWarning(`${item}: ${obj[item]}`);
-                return {
-                    prop: item,
-                    fromValue: 0,
-                    ease: getTweenFn(ease),
-                };
-            }
-
-            return {
-                prop: item,
-                fromValue: obj[item],
-                ease: getTweenFn(ease),
-            };
-        });
-
+        const data = goFromSync(obj, ease);
         const newValues = this.mergeArray(data, this.values);
         this.timeline.push({
             values: newValues,
@@ -432,8 +337,7 @@ export class HandleSequencer {
         });
 
         this.timeline = this.orderByStart(this.timeline);
-        this.setPropFormAncestor('toValue');
-
+        this.setPropFromAncestor('toValue');
         return this;
     }
 
@@ -455,27 +359,7 @@ export class HandleSequencer {
             return;
         }
 
-        const data = Object.keys(fromObj).map((item) => {
-            if (!valueIsValid(toObj[item]) || !valueIsValid(fromObj[item])) {
-                valueIsNotValidWarning(
-                    `${item}: ${toObj[item]} || ${item}: ${fromObj[item]}`
-                );
-                return {
-                    prop: item,
-                    fromValue: 0,
-                    toValue: 0,
-                    ease: getTweenFn(ease),
-                };
-            }
-
-            return {
-                prop: item,
-                fromValue: fromObj[item],
-                toValue: toObj[item],
-                ease: getTweenFn(ease),
-            };
-        });
-
+        const data = goFromToSync(fromObj, toObj, ease);
         const newValues = this.mergeArray(data, this.values);
         this.timeline.push({
             values: newValues,
@@ -484,7 +368,6 @@ export class HandleSequencer {
         });
 
         this.timeline = this.orderByStart(this.timeline);
-
         return this;
     }
 

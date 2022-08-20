@@ -4,10 +4,7 @@ import {
     compareKeys,
     getRoundedValue,
 } from '../../animation/utils/animationUtils.js';
-import { handleCache } from '../../events/rafutils/handleCache.js';
-import { handleFrame } from '../../events/rafutils/handleFrame.js';
 import { handleNextTick } from '../../events/rafutils/handleNextTick.js';
-import { handleFrameIndex } from '../../events/rafutils/handleFrameIndex.js';
 import { setStagger } from '../utils/stagger/setStagger.js';
 import {
     getStaggerFromProps,
@@ -18,6 +15,7 @@ import {
     setCallBack,
     setCallBackCache,
 } from '../utils/callbacks/setCallback.js';
+import { syncCallback } from '../utils/callbacks/syncCallback.js';
 import { goTo, goFrom, goFromTo } from '../utils/actions.js';
 import {
     compareKeysWarning,
@@ -100,41 +98,15 @@ export class ParallaxTween {
             const cbObject = getValueObj(this.values, 'currentValue');
 
             // Fire callback
-            if (this.stagger.each === 0) {
-                // No stagger, run immediatly
-                handleFrame.add(() => {
-                    this.callback.forEach(({ cb }) => cb(cbObject));
-                });
-
-                handleFrame.add(() => {
-                    this.callbackCache.forEach(({ cb }) => {
-                        handleCache.fireObject({ id: cb, obj: cbObject });
-                    });
-                });
-            } else {
-                // Stagger
-                this.callback.forEach(({ cb, frame }) => {
-                    handleFrameIndex.add(() => cb(cbObject), frame);
-                });
-
-                this.callbackCache.forEach(({ cb, frame }) => {
-                    handleCache.update({ id: cb, cbObject, frame });
-                });
-            }
-
-            if (isLastDraw) {
-                if (this.stagger.each === 0) {
-                    // No stagger, run immediatly
-                    handleFrame.add(() => {
-                        this.callbackOnStop.forEach(({ cb }) => cb(cbObject));
-                    });
-                } else {
-                    // Stagger
-                    this.callbackOnStop.forEach(({ cb, frame }) => {
-                        handleFrameIndex.add(() => cb(cbObject), frame + 1);
-                    });
-                }
-            }
+            syncCallback({
+                each: this.stagger.each,
+                useStagger: true,
+                isLastDraw,
+                cbObject,
+                callback: this.callback,
+                callbackCache: this.callbackCache,
+                callbackOnStop: this.callbackOnStop,
+            });
         };
 
         handleNextTick.add(() => mainFn());
