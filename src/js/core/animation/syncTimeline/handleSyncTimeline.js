@@ -29,6 +29,7 @@ export class HandleSyncTimeline {
         this.BACKWARD = 'backward';
         this.FORWARD = 'forward';
         this.fpsInLoading = false;
+        this.numIteration = 0;
 
         // Onlu one loop , prevent sideEffct of this.frameThreshold
         if (this.repeat === 1 || this.repeat === 0) {
@@ -85,7 +86,12 @@ export class HandleSyncTimeline {
         }
 
         this.skipFirstRender = false;
+        this.numIteration++;
 
+        /**
+         * Loop control
+         * Check if end of time has been achieved
+         * */
         if (
             partial <= this.duration - frameThreshold &&
             partial >= 0 + frameThreshold &&
@@ -93,84 +99,115 @@ export class HandleSyncTimeline {
         ) {
             this.completed = false;
             this.goToNextFrame();
-        } else {
-            // START reverse
-            if (this.startReverse) {
-                this.isReverse = true;
-                this.timeAtReverse = 0;
-                this.timeAtReverseBack = 0;
-                this.startReverse = false;
-                this.goToNextFrame();
-                return;
-            }
-
-            // onLoopEnd callbackLoop condition by direction of animation
-            const onLoopEndCondition = !this.isReverse
-                ? partial >= this.duration - frameThreshold
-                : partial <= 0 + frameThreshold;
-
-            if (onLoopEndCondition) {
-                handleNextFrame.add(() => {
-                    // Prevent multiple fire of complete event
-                    // Send direction BACKWARD || FORWARD as argument
-                    if (!this.isInInzializing && !this.completed) {
-                        this.loopCounter++;
-                        this.completed = true;
-
-                        this.callbackLoop.forEach(({ cb }) =>
-                            cb({
-                                direction: this.getDirection(),
-                                loop: this.loopCounter,
-                            })
-                        );
-                    }
-                });
-            }
-
-            if (!this.repeat || this.loopCounter === this.repeat - 1) {
-                // Fire callbackLoop onStop of each sequencr
-                // Prevent async problem, endTime back to start, so store the value
-                const endTime = this.endTime;
-                this.squencers.forEach((item) => {
-                    item.draw({
-                        partial: endTime,
-                        isLastDraw: true,
-                        useFrame: true,
-                    });
-                });
-
-                this.isStopped = true;
-                this.resetTime();
-                this.startTime = time;
-                if (this.isReverse) this.isReverse = false;
-
-                // Fire last callback on Complete
-                this.callbackComplete.forEach(({ cb }) => cb());
-            } else {
-                if (this.yoyo) {
-                    this.reverse();
-                } else {
-                    this.resetTime();
-                    this.startTime = time;
-
-                    if (this.isPlayngReverse) {
-                        if (!this.isReverse) {
-                            this.isPlayngReverse = !this.isPlayngReverse;
-                            if (this.isReverse) this.reverse();
-                        }
-                        this.timeElapsed = this.duration;
-                        this.endTime = this.duration;
-                        this.pauseTime = this.duration;
-                    } else {
-                        if (this.isReverse) {
-                            this.isPlayngReverse = !this.isPlayngReverse;
-                            if (!this.isReverse) this.reverse();
-                        }
-                    }
-                }
-                this.goToNextFrame();
-            }
+            return;
         }
+
+        /*
+         * Start revere animation
+         * In start reverse the first framme jump directly here
+         **/
+        if (this.startReverse) {
+            this.isReverse = true;
+            this.timeAtReverse = 0;
+            this.timeAtReverseBack = 0;
+            this.startReverse = false;
+            this.goToNextFrame();
+            return;
+        }
+
+        /**
+         * End of single cycle
+         * OnLoopEnd callbackLoop condition by direction of animation
+         **/
+        const onLoopEndCondition = !this.isReverse
+            ? partial >= this.duration - frameThreshold
+            : partial <= 0 + frameThreshold;
+
+        if (onLoopEndCondition) {
+            /*
+             * Store direction value before chengee during nextFrame
+             **/
+            const direction = this.getDirection();
+
+            handleNextFrame.add(() => {
+                // Prevent multiple fire of complete event
+                // Send direction BACKWARD || FORWARD as argument
+                if (!this.isInInzializing && !this.completed) {
+                    /*
+                     * If loop is too fast consider end of loop invalid
+                     * Prevent error from cycle that start fromm end
+                     * in reverse mode
+                     **/
+                    if (this.numIteration < 10) return;
+                    this.completed = true;
+                    this.loopCounter++;
+                    this.numIteration = 0;
+
+                    this.callbackLoop.forEach(({ cb }) =>
+                        cb({
+                            direction,
+                            loop: this.loopCounter,
+                        })
+                    );
+                }
+            });
+        }
+
+        /**
+         * Timelinee is ended, no repeat or loop number is achieved
+         **/
+        if (!this.repeat || this.loopCounter === this.repeat - 1) {
+            // Fire callbackLoop onStop of each sequencr
+            // Prevent async problem, endTime back to start, so store the value
+            const endTime = this.endTime;
+            this.squencers.forEach((item) => {
+                item.draw({
+                    partial: endTime,
+                    isLastDraw: true,
+                    useFrame: true,
+                });
+            });
+
+            this.isStopped = true;
+            this.resetTime();
+            this.startTime = time;
+            if (this.isReverse) this.isReverse = false;
+
+            // Fire last callback on Complete
+            this.callbackComplete.forEach(({ cb }) => cb());
+            return;
+        }
+
+        /**
+         * In yoyo mode time line haave to reverst at the end of cycle
+         **/
+        if (this.yoyo) {
+            this.reverse();
+            this.goToNextFrame();
+            return;
+        }
+
+        /**
+         * Reverse playing
+         **/
+        if (this.isPlayngReverse) {
+            this.resetTime();
+            this.startTime = time;
+            if (!this.isReverse) this.isPlayngReverse = !this.isPlayngReverse;
+            this.timeElapsed = this.duration;
+            this.endTime = this.duration;
+            this.pauseTime = this.duration;
+            this.goToNextFrame();
+            return;
+        }
+
+        /**
+         * Default playing
+         **/
+        this.resetTime();
+        this.startTime = time;
+        if (this.isReverse) this.isPlayngReverse = !this.isPlayngReverse;
+        this.goToNextFrame();
     }
 
     getDirection() {
