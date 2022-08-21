@@ -91,11 +91,6 @@ export const handleFrame = (() => {
         }
 
         /*
-        RequestAnimationFrame is ended, ready for another
-        */
-        frameIsRuning = false;
-
-        /*
         Fire next tick
         */
         handleNextTick.fire({ time, fps, shouldRender });
@@ -107,6 +102,12 @@ export const handleFrame = (() => {
         /*
         Next frame condition
         */
+
+        /*
+        RequestAnimationFrame is ended, ready for another
+        */
+        frameIsRuning = false;
+
         if (
             callback.length > 0 ||
             handleFrameIndex.getIndexCallbackLenght() > 0 ||
