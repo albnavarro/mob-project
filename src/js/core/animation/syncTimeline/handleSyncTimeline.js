@@ -29,7 +29,8 @@ export class HandleSyncTimeline {
         this.BACKWARD = 'backward';
         this.FORWARD = 'forward';
         this.fpsInLoading = false;
-        this.numIteration = 0;
+        this.loopIteration = 0;
+        this.minLoopIteration = 10;
 
         // Onlu one loop , prevent sideEffct of this.frameThreshold
         if (this.repeat === 1 || this.repeat === 0) {
@@ -86,7 +87,7 @@ export class HandleSyncTimeline {
         }
 
         this.skipFirstRender = false;
-        this.numIteration++;
+        this.loopIteration++;
 
         /**
          * Loop control
@@ -115,48 +116,47 @@ export class HandleSyncTimeline {
             return;
         }
 
-        /**
-         * End of single cycle
-         * OnLoopEnd callbackLoop condition by direction of animation
+        /*
+         * Store direction value before chengee during nextFrame
          **/
-        const onLoopEndCondition = !this.isReverse
-            ? partial >= this.duration - frameThreshold
-            : partial <= 0 + frameThreshold;
-
-        if (onLoopEndCondition) {
+        const direction = this.getDirection();
+        handleNextFrame.add(() => {
             /*
-             * Store direction value before chengee during nextFrame
+             *
+             * Prevent multiple fire of complete event
+             * Send direction BACKWARD || FORWARD as argument
+             * If loop is too fast consider end of loop invalid
+             * Prevent error from cycle that start fromm end
+             * in reverse mode
              **/
-            const direction = this.getDirection();
+            if (
+                !this.isInInzializing &&
+                !this.completed &&
+                this.loopIteration > this.minLoopIteration
+            ) {
+                this.completed = true;
+                this.loopCounter++;
+                // this callback is fired after a frame so
+                // check end timeline use the right value not resetted
+                this.loopIteration = 0;
 
-            handleNextFrame.add(() => {
-                // Prevent multiple fire of complete event
-                // Send direction BACKWARD || FORWARD as argument
-                if (!this.isInInzializing && !this.completed) {
-                    /*
-                     * If loop is too fast consider end of loop invalid
-                     * Prevent error from cycle that start fromm end
-                     * in reverse mode
-                     **/
-                    if (this.numIteration < 10) return;
-                    this.completed = true;
-                    this.loopCounter++;
-                    this.numIteration = 0;
-
-                    this.callbackLoop.forEach(({ cb }) =>
-                        cb({
-                            direction,
-                            loop: this.loopCounter,
-                        })
-                    );
-                }
-            });
-        }
+                this.callbackLoop.forEach(({ cb }) =>
+                    cb({
+                        direction,
+                        loop: this.loopCounter,
+                    })
+                );
+            }
+        });
 
         /**
-         * Timelinee is ended, no repeat or loop number is achieved
+         * Timelinee is ended, no repeat or loop max iteration is reached
          **/
-        if (!this.repeat || this.loopCounter === this.repeat - 1) {
+        if (
+            !this.repeat ||
+            (this.loopCounter === this.repeat - 1 &&
+                this.loopIteration > this.minLoopIteration)
+        ) {
             // Fire callbackLoop onStop of each sequencr
             // Prevent async problem, endTime back to start, so store the value
             const endTime = this.endTime;
@@ -179,7 +179,7 @@ export class HandleSyncTimeline {
         }
 
         /**
-         * In yoyo mode time line haave to reverst at the end of cycle
+         * In yoyo mode time line have to reverst at the end of cycle
          **/
         if (this.yoyo) {
             this.reverse();
