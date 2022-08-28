@@ -2,11 +2,11 @@ import { mobbu } from '../core';
 
 export function timlineMixTest() {
     const btnStart = document.querySelector('.mix-btn-start');
-    const btnBack = document.querySelector('.mix-btn-back');
     const btnStop = document.querySelector('.mix-btn-stop');
     const btnPause = document.querySelector('.mix-btn-pause');
     const btnPlay = document.querySelector('.mix-btn-play');
     const btnFrom = document.querySelector('.mix-btn-playFrom');
+    const btnFromReverse = document.querySelector('.mix-btn-playFromReverse');
     const btnReverseNext = document.querySelector('.mix-btn-reverseNext');
     const btnReverse = document.querySelector('.mix-btn-reverse');
     const target = document.querySelector('.mix-target');
@@ -36,7 +36,7 @@ export function timlineMixTest() {
     });
 
     // DEFINE TIMELINE
-    const timeline = mobbu.create('asyncTimeline', { repeat: -1, yoyo: true });
+    const timeline = mobbu.create('asyncTimeline', { repeat: -1, yoyo: false });
 
     timeline
         .add(() => springBox1.updatePreset('wobbly'))
@@ -92,6 +92,10 @@ export function timlineMixTest() {
 
     btnFrom.addEventListener('click', () => {
         timeline.playFrom('label1');
+    });
+
+    btnFromReverse.addEventListener('click', () => {
+        timeline.playFromReverse('label1');
     });
 
     btnReverseNext.addEventListener('click', () => {

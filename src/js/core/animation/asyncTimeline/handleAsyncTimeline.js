@@ -40,6 +40,11 @@ export class HandleAsyncTimeline {
         this.delayIsRunning = false;
         this.startOnDelay = false;
         this.actionAfterReject = [];
+        this.isPlayingFromLabelReverse = false;
+        this.starterFunction = this.NOOP;
+        this.timelineIsInTestMode = false;
+        this.currentLabel = null;
+        this.currentLabelIsReversed = false;
 
         // Callback
         this.id = 0;
@@ -69,8 +74,14 @@ export class HandleAsyncTimeline {
             if (isImmediate) newTweenProps.immediate = true;
 
             // Get current valueTo for to use in reverse methods
-            if (tween && tween?.getToNativeType)
+            if (tween && tween?.getToNativeType && isImmediate)
                 item.data.prevValueTo = tween.getToNativeType();
+
+            /*
+             * on firt run after test mode the tween back to start data
+             */
+            if (tween && tween?.resetData && !isImmediate && this.firstRun)
+                tween.resetData();
 
             const fn = {
                 set: () => {
@@ -138,17 +149,25 @@ export class HandleAsyncTimeline {
 
             return new Promise((res, reject) => {
                 const cb = () => {
-                    // If after delay tween is stopped or some action start are started we fail tween
+                    this.firstRun = false;
+                    /*
+                     * If after delay tween is stopped or some action
+                     * start are started we fail tween
+                     */
                     if (this.isStopped || this.startOnDelay) {
                         reject();
                         return;
                     }
 
-                    // Add tween to active stack
+                    /*
+                     * Add tween to active stack
+                     */
                     this.addToActiveTween(tween, valuesTo);
 
-                    // Add tween to active stack, if timelienstatus is in pause
-                    //  onStartInPause methids trigger pause status inside
+                    /*
+                     * Add tween to active stack, if timelienstatus is in pause
+                     * onStartInPause methods trigger pause status inside
+                     */
                     const unsubscribeTweenStartInPause =
                         tween && tween?.onStartInPause
                             ? tween.onStartInPause(() => {
@@ -178,8 +197,12 @@ export class HandleAsyncTimeline {
                         let current = getTime();
                         let delta = current - start;
 
-                        // If play, resume, playFromLabel is fired whith another tween in delay
-                        // fire this tween immediatly, so avoid probem with musch much delay in same group
+                        /*
+                         * If play, resume, playFromLabel is fired whith
+                         * another tween in delay
+                         * fire this tween immediatly, so avoid probem
+                         * with much delay in same group
+                         */
                         if (this.actionAfterReject.length > 0) delta = delay;
 
                         // Start after dealy or immediate in caso of stop or reverse Next
@@ -216,13 +239,38 @@ export class HandleAsyncTimeline {
                 AddAsync is resolved
                 */
                 this.addAsyncIsActive = false;
-
                 this.currentTween = [];
-
                 if (this.isSuspended || this.isStopped) return;
 
+                /*
+                 * Timeline line end test cycle
+                 */
+                if (
+                    this.timelineIsInTestMode &&
+                    this.currentIndex === this.goToLabelIndex - 1
+                ) {
+                    this.timelineIsInTestMode = false;
+                    this.goToLabelIndex = null;
+                    this.starterFunction();
+                    return;
+                }
+
+                /*
+                 * If play from label in reverse mode
+                 * reverse next step, current step is immediate
+                 **/
+                if (
+                    this.isPlayingFromLabelReverse &&
+                    this.goToLabelIndex &&
+                    this.currentIndex === this.goToLabelIndex - 1
+                ) {
+                    this.reverseNext();
+                }
+
+                /**
+                 * Reverse on next step
+                 **/
                 if (this.isReverseNext) {
-                    // Check if need reverse at next step
                     this.isReverseNext = false;
                     this.currentIndex =
                         this.tweenList.length - this.currentIndex - 1;
@@ -232,30 +280,34 @@ export class HandleAsyncTimeline {
                     return;
                 }
 
+                /**
+                 * Run next step default
+                 **/
                 if (this.currentIndex < this.tweenList.length - 1) {
-                    // Inside timeline pipe
                     this.currentIndex++;
                     this.run();
-                } else if (
-                    // At the end : Loop
-                    this.loopCounter < this.repeat ||
-                    this.repeat === -1
-                ) {
+                    return;
+                }
+
+                /**
+                 * End of timeline, check repeat
+                 **/
+                if (this.loopCounter < this.repeat || this.repeat === -1) {
                     this.loopCounter++;
                     this.currentIndex = 0;
                     this.goToLabelIndex = null;
                     if (this.yoyo || this.forceYoyo) this.revertTween();
                     this.run();
                     this.forceYoyo = false;
-                } else {
-                    // Rest all timeline is ended
-                    this.stop();
-
-                    // Fire and of timeline
-                    this.callback.forEach(({ cb }) => {
-                        cb();
-                    });
+                    return;
                 }
+
+                /**
+                 * End of timeline, check repeat
+                 **/
+                this.stop();
+                // Fire and of timeline
+                this.callback.forEach(({ cb }) => cb());
             })
             .catch(() => {
                 this.currentTween = [];
@@ -343,7 +395,7 @@ export class HandleAsyncTimeline {
         });
     }
 
-    addToMainArray(tweenProps, obj) {
+    addToMainArray(obj) {
         const rowIndex = this.tweenList.findIndex((item) => {
             return item[0]?.group && item[0].group === this.groupId;
         });
@@ -368,7 +420,7 @@ export class HandleAsyncTimeline {
         this.currentTweenCounter++;
 
         const mergedObj = { ...this.defaultObj, ...obj };
-        this.addToMainArray(tweenProps, mergedObj);
+        this.addToMainArray(mergedObj);
         return this;
     }
 
@@ -385,7 +437,7 @@ export class HandleAsyncTimeline {
         this.currentTweenCounter++;
 
         const mergedObj = { ...this.defaultObj, ...obj };
-        this.addToMainArray(tweenProps, mergedObj);
+        this.addToMainArray(mergedObj);
         return this;
     }
 
@@ -402,7 +454,7 @@ export class HandleAsyncTimeline {
         this.currentTweenCounter++;
 
         const mergedObj = { ...this.defaultObj, ...obj };
-        this.addToMainArray(tweenProps, mergedObj);
+        this.addToMainArray(mergedObj);
         return this;
     }
 
@@ -420,11 +472,11 @@ export class HandleAsyncTimeline {
         this.currentTweenCounter++;
 
         const mergedObj = { ...this.defaultObj, ...obj };
-        this.addToMainArray(tweenProps, mergedObj);
+        this.addToMainArray(mergedObj);
         return this;
     }
 
-    add(fn, tweenProps = {}) {
+    add(fn) {
         const obj = {
             tween: fn,
             action: 'add',
@@ -432,11 +484,11 @@ export class HandleAsyncTimeline {
         };
 
         const mergedObj = { ...this.defaultObj, ...obj };
-        this.addToMainArray(tweenProps, mergedObj);
+        this.addToMainArray(mergedObj);
         return this;
     }
 
-    addAsync(fn, tweenProps = {}) {
+    addAsync(fn) {
         const obj = {
             tween: fn,
             action: 'addAsync',
@@ -444,11 +496,11 @@ export class HandleAsyncTimeline {
         };
 
         const mergedObj = { ...this.defaultObj, ...obj };
-        this.addToMainArray(tweenProps, mergedObj);
+        this.addToMainArray(mergedObj);
         return this;
     }
 
-    sync(syncProp, tweenProps = {}) {
+    sync(syncProp) {
         const obj = {
             action: 'sync',
             groupProps: { waitComplete: this.waitComplete },
@@ -456,18 +508,18 @@ export class HandleAsyncTimeline {
         };
 
         const mergedObj = { ...this.defaultObj, ...obj };
-        this.addToMainArray(tweenProps, mergedObj);
+        this.addToMainArray(mergedObj);
         return this;
     }
 
-    createGroup(groupProps = {}, tweenProps = {}) {
+    createGroup(groupProps = {}) {
         const obj = {
             action: 'createGroup',
             groupProps,
         };
 
         const mergedObj = { ...this.defaultObj, ...obj };
-        this.addToMainArray(tweenProps, mergedObj);
+        this.addToMainArray(mergedObj);
         this.waitComplete = groupProps?.waitComplete
             ? groupProps.waitComplete
             : false;
@@ -475,82 +527,99 @@ export class HandleAsyncTimeline {
         return this;
     }
 
-    closeGroup(tweenProps = {}) {
+    closeGroup() {
         this.groupId = null;
         const obj = {
             action: 'closeGroup',
         };
 
         const mergedObj = { ...this.defaultObj, ...obj };
-        this.addToMainArray(tweenProps, mergedObj);
+        this.addToMainArray(mergedObj);
         this.waitComplete = false;
         return this;
     }
 
     // Don't use inside group
-    suspend(tweenProps = {}) {
+    suspend() {
         const obj = {
             action: 'suspend',
         };
 
         const mergedObj = { ...this.defaultObj, ...obj };
-        this.addToMainArray(tweenProps, mergedObj);
+        this.addToMainArray(mergedObj);
         return this;
     }
 
     // Don't use inside group
-    label(labelProps = {}, tweenProps = {}) {
+    label(labelProps = {}) {
         const obj = {
             action: 'label',
             labelProps,
         };
 
         const mergedObj = { ...this.defaultObj, ...obj };
-        this.addToMainArray(tweenProps, mergedObj);
+        this.addToMainArray(mergedObj);
         return this;
     }
 
     play() {
-        // Skip of there is nothing to run
-        if (this.tweenList.length === 0 || this.addAsyncIsActive) return;
-        if (this.delayIsRunning) {
-            this.startOnDelay = true;
-            this.actionAfterReject.push(() => this.play());
-            return;
-        }
-        this.startOnDelay = false;
-        this.stop();
-        this.isStopped = false;
-        if (this.isReverse) this.revertTween();
-        Promise.resolve().then(() => this.run());
+        const cb = () => {
+            this.stop();
+            this.isStopped = false;
+            this.firstRun = true;
+            Promise.resolve().then(() => this.run());
+        };
+
+        this.starterFunction = cb;
+        this.timelineIsInTestMode = true;
+        this.currentLabel = null;
+        this.currentLabelIsReversed = false;
+        this.reverse();
         return this;
     }
 
-    playFrom(label) {
-        // Skip of there is nothing to run
-        if (this.tweenList.length === 0 || this.addAsyncIsActive) return;
-
-        if (this.delayIsRunning) {
-            this.startOnDelay = true;
-            this.actionAfterReject.push(() => this.playFrom(label));
-            return;
-        }
-        this.startOnDelay = false;
-        this.stop();
-        this.isStopped = false;
+    playFromLabel() {
+        /*
+         * Set props
+         */
         if (this.isReverse) this.revertTween();
+        this.isPlayingFromLabelReverse = this.currentLabelIsReversed;
+
+        /*
+         * Get first item of group, unnecessary.
+         * Use of label inside a group becouse is parallel
+         */
+
+        this.firstRun = true;
+        this.currentIndex = 0;
         this.goToLabelIndex = this.tweenList.findIndex((item) => {
-            // Get first item of group, unnecessary use of label inside a group becouse is parallel
             const [firstItem] = item;
             const labelCheck = firstItem.data.labelProps?.name;
-            return labelCheck === label;
+            return labelCheck === this.currentLabel;
         });
+
         Promise.resolve().then(() => this.run());
+    }
+
+    playFrom(label) {
+        this.starterFunction = this.playFromLabel;
+        this.timelineIsInTestMode = true;
+        this.currentLabel = label;
+        this.currentLabelIsReversed = false;
+        this.reverse();
+        return this;
+    }
+
+    playFromReverse(label) {
+        this.starterFunction = this.playFromLabel;
+        this.timelineIsInTestMode = true;
+        this.currentLabel = label;
+        this.currentLabelIsReversed = true;
+        this.reverse();
         return this;
     }
 
     reverse() {
-        // Skip of there is nothing to run
         if (this.tweenList.length === 0 || this.addAsyncIsActive) return;
         if (this.delayIsRunning) {
             this.startOnDelay = true;

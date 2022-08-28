@@ -51,6 +51,7 @@ export class HandleSpring {
         this.currentReject = null;
         this.promise = null;
         this.values = [];
+        this.initialData = [];
         this.callback = [];
         this.callbackCache = [];
         this.callbackOnComplete = [];
@@ -356,6 +357,7 @@ export class HandleSpring {
 
     /**
      * setData - Set initial data structure
+     * save the original dato to reset when needed
      *
      * @return {void}  description
      *
@@ -378,6 +380,22 @@ export class HandleSpring {
                 settled: false,
             };
         });
+
+        this.initialData = this.values.map((item) => {
+            return {
+                prop: item.prop,
+                toValue: item.toValue,
+                fromValue: item.fromValue,
+                currentValue: item.currentValue,
+            };
+        });
+    }
+
+    /*
+     * Reset data value with initial
+     */
+    resetData() {
+        this.values = mergeDeep(this.values, this.initialData);
     }
 
     /**

@@ -31,10 +31,6 @@ export const radialStaggerTween = () => {
     const timeline = mobbu
         .create('asyncTimeline', { repeat: -1, yoyo: true })
         .goTo(tween, { scale: 0.5 }, { duration: 1000 })
-        .goTo(tween, { scale: 2.5 }, { duration: 500 });
-
-    // Exmple set and go
-    tween.set({ scale: 1.5 }).then((value) => {
-        timeline.play();
-    });
+        .goTo(tween, { scale: 2.5 }, { duration: 500 })
+        .play();
 };
