@@ -45,6 +45,7 @@ export class HandleAsyncTimeline {
         this.timelineIsInTestMode = false;
         this.currentLabel = null;
         this.currentLabelIsReversed = false;
+        this.resetTweenData = false;
 
         // Callback
         this.id = 0;
@@ -80,7 +81,12 @@ export class HandleAsyncTimeline {
             /*
              * on firt run after test mode the tween back to start data
              */
-            if (tween && tween?.resetData && !isImmediate && this.firstRun)
+            if (
+                tween &&
+                tween?.resetData &&
+                !isImmediate &&
+                this.resetTweenData
+            )
                 tween.resetData();
 
             const fn = {
@@ -149,7 +155,7 @@ export class HandleAsyncTimeline {
 
             return new Promise((res, reject) => {
                 const cb = () => {
-                    this.firstRun = false;
+                    this.resetTweenData = false;
                     /*
                      * If after delay tween is stopped or some action
                      * start are started we fail tween
@@ -566,7 +572,7 @@ export class HandleAsyncTimeline {
         const cb = () => {
             this.stop();
             this.isStopped = false;
-            this.firstRun = true;
+            this.resetTweenData = true;
             Promise.resolve().then(() => this.run());
         };
 
@@ -590,8 +596,9 @@ export class HandleAsyncTimeline {
          * Use of label inside a group becouse is parallel
          */
 
-        this.firstRun = true;
+        this.resetTweenData = true;
         this.currentIndex = 0;
+        this.forceYoyo = false;
         this.goToLabelIndex = this.tweenList.findIndex((item) => {
             const [firstItem] = item;
             const labelCheck = firstItem.data.labelProps?.name;
