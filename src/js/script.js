@@ -67,6 +67,7 @@ import { sequencerStaggerTime } from './test/sequencerStaggerTime.js';
 import { createStagger } from './test/createStagger.js';
 import { tweenRealtive } from './test/tweenRelative.js';
 import { testCanvas } from './test/testCanvas.js';
+import { freeMode } from './test/freemode.js';
 
 mobbu.use('load', () => {
     mobbu.default('set', {
@@ -200,6 +201,10 @@ mobbu.use('load', () => {
 
     if (body.classList.contains('page-canvas')) {
         testCanvas();
+    }
+
+    if (body.classList.contains('page-freemode')) {
+        freeMode();
     }
 
     mobbu.run('parallax');

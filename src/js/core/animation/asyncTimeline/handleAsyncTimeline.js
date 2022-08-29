@@ -45,7 +45,6 @@ export class HandleAsyncTimeline {
         this.timelineIsInTestMode = false;
         this.currentLabel = null;
         this.currentLabelIsReversed = false;
-        this.resetTweenData = false;
 
         // Callback
         this.id = 0;
@@ -75,19 +74,8 @@ export class HandleAsyncTimeline {
             if (isImmediate) newTweenProps.immediate = true;
 
             // Get current valueTo for to use in reverse methods
-            if (tween && tween?.getToNativeType && isImmediate)
+            if (tween && tween?.getToNativeType)
                 item.data.prevValueTo = tween.getToNativeType();
-
-            /*
-             * on firt run after test mode the tween back to start data
-             */
-            if (
-                tween &&
-                tween?.resetData &&
-                !isImmediate &&
-                this.resetTweenData
-            )
-                tween.resetData();
 
             const fn = {
                 set: () => {
@@ -155,7 +143,6 @@ export class HandleAsyncTimeline {
 
             return new Promise((res, reject) => {
                 const cb = () => {
-                    this.resetTweenData = false;
                     /*
                      * If after delay tween is stopped or some action
                      * start are started we fail tween
@@ -248,9 +235,6 @@ export class HandleAsyncTimeline {
                 this.currentTween = [];
                 if (this.isSuspended || this.isStopped) return;
 
-                /*
-                 * Timeline line end test cycle
-                 */
                 if (
                     this.timelineIsInTestMode &&
                     this.currentIndex === this.goToLabelIndex - 1
@@ -569,22 +553,26 @@ export class HandleAsyncTimeline {
     }
 
     play() {
-        const cb = () => {
-            this.stop();
-            this.isStopped = false;
-            this.resetTweenData = true;
-            Promise.resolve().then(() => this.run());
-        };
+        if (this.tweenList.length === 0 || this.addAsyncIsActive) return;
+        if (this.delayIsRunning) {
+            this.startOnDelay = true;
+            this.actionAfterReject.push(() => this.play());
+            return;
+        }
+        this.startOnDelay = false;
+        this.stop();
+        this.isStopped = false;
+        this.isPlayingFromLabelReverse = false;
+        if (this.isReverse) this.revertTween();
+        Promise.resolve().then(() => this.run());
 
-        this.starterFunction = cb;
-        this.timelineIsInTestMode = true;
-        this.currentLabel = null;
-        this.currentLabelIsReversed = false;
-        this.reverse();
         return this;
     }
 
     playFromLabel() {
+        // Skip of there is nothing to run
+        if (this.tweenList.length === 0 || this.addAsyncIsActive) return;
+
         /*
          * Set props
          */
@@ -596,9 +584,7 @@ export class HandleAsyncTimeline {
          * Use of label inside a group becouse is parallel
          */
 
-        this.resetTweenData = true;
         this.currentIndex = 0;
-        this.forceYoyo = false;
         this.goToLabelIndex = this.tweenList.findIndex((item) => {
             const [firstItem] = item;
             const labelCheck = firstItem.data.labelProps?.name;
@@ -627,6 +613,7 @@ export class HandleAsyncTimeline {
     }
 
     reverse() {
+        // Skip of there is nothing to run
         if (this.tweenList.length === 0 || this.addAsyncIsActive) return;
         if (this.delayIsRunning) {
             this.startOnDelay = true;
@@ -643,7 +630,7 @@ export class HandleAsyncTimeline {
          * When start form end first loop is lost in immediate
          * so increment the loop number by 1
          **/
-        this.repeat >= 1 && this.repeat++;
+        this.loopCounter--;
         Promise.resolve().then(() => this.run());
         return this;
     }
@@ -664,6 +651,7 @@ export class HandleAsyncTimeline {
         this.isInPause = false;
         this.isSuspended = false;
         this.addAsyncIsActive = false;
+        this.isPlayingFromLabelReverse = false;
 
         // Stop all Tween
         this.currentTween.forEach(({ tween }) => {

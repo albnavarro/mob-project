@@ -1,0 +1,16 @@
+.freemode-container {
+    display: flex;
+    justify-content: space-between;
+    max-width: 600px;
+    margin: auto;
+    height: 100vh;
+    padding-top: 100px;
+}
+
+.freemode-item {
+    height: 100px;
+    width: 100px;
+    background: #000;
+    display: block;
+    position: relative;
+}

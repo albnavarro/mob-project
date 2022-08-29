@@ -1,0 +1,21 @@
+extends default/_wrapper.pug
+
+block content
+    header
+        .container
+            include ../includes/langSelector.pug
+        .container.menu-container.menu-container--top
+            include ../includes/navigation.pug
+    main
+        .container.clearfix
+            .freemode-nav
+                button.freemode-go(type="button")
+                    |go
+                button.freemode-back(type="button")
+                    |back
+            .freemode-container
+                .freemode-item.freemode-item--1
+                .freemode-item.freemode-item--2
+                .freemode-item.freemode-item--3
+                    
+                

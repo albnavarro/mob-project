@@ -109,6 +109,10 @@
                 {
                     "label": "",
                     "univoqueId": "canvas"
+                },
+                {
+                    "label": "",
+                    "univoqueId": "freemode"
                 }
             ]
         },

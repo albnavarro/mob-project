@@ -1,0 +1,8 @@
+{
+    "template": "freemode",
+    "slug": "freemode",
+    "pageTitle": "freemode",
+    "description": "custom description",
+    "additionalData": ["nav.json"],
+    "registerComponent": ["to-top/pug/toTop.pug"]
+}
