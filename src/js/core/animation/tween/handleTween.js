@@ -371,6 +371,12 @@ export class HandleTween {
                 toValue: item.toValue,
                 fromValue: item.fromValue,
                 currentValue: item.currentValue,
+                shouldUpdate: false,
+                fromFn: () => {},
+                fromIsFn: false,
+                toFn: () => {},
+                toIsFn: false,
+                settled: false, // not used, only for uniformity with lerp and spring
             };
         });
     }
@@ -633,11 +639,8 @@ export class HandleTween {
      *
      */
     onStartInPause(cb) {
-        const unsubscribeCb = setCallBack(cb, this.callbackStartInPause);
-        return () =>
-            (this.callbackStartInPause = unsubscribeCb(
-                this.callbackStartInPause
-            ));
+        setCallBack(cb, this.callbackStartInPause);
+        return () => (this.callbackStartInPause = []);
     }
 
     /**

@@ -5,10 +5,12 @@ export class HandleAsyncTimeline {
         // Secure check timeline start with a close gruop action
         this.tweenList = [];
         this.currentTween = [];
+        this.tweenStore = [];
         this.currentTweenCounter = 0;
         this.currentIndex = 0;
         this.repeat = config.repeat || 1;
         this.yoyo = config.yoyo || false;
+        this.freeMode = config.freeMode || false;
         this.loopCounter = 1;
         this.groupId = null;
         // group "name" star from 1 to avoid 0 = falsa
@@ -397,6 +399,26 @@ export class HandleAsyncTimeline {
         }
     }
 
+    addTweenToStore(tween) {
+        const uniqueId = tween.uniqueId;
+        const tweenIsStored = this.tweenStore.find(({ id }) => id === uniqueId);
+
+        if (tweenIsStored) return;
+
+        const obj = {
+            id: tween.uniqueId,
+            tween,
+        };
+
+        this.tweenStore.push(obj);
+    }
+
+    resetAllTween() {
+        this.tweenStore.forEach(({ tween }) => {
+            tween.resetData();
+        });
+    }
+
     set(tween, valuesFrom, tweenProps = {}) {
         const obj = {
             id: this.currentTweenCounter,
@@ -411,6 +433,7 @@ export class HandleAsyncTimeline {
 
         const mergedObj = { ...this.defaultObj, ...obj };
         this.addToMainArray(mergedObj);
+        this.addTweenToStore(tween);
         return this;
     }
 
@@ -428,6 +451,7 @@ export class HandleAsyncTimeline {
 
         const mergedObj = { ...this.defaultObj, ...obj };
         this.addToMainArray(mergedObj);
+        this.addTweenToStore(tween);
         return this;
     }
 
@@ -445,6 +469,7 @@ export class HandleAsyncTimeline {
 
         const mergedObj = { ...this.defaultObj, ...obj };
         this.addToMainArray(mergedObj);
+        this.addTweenToStore(tween);
         return this;
     }
 
@@ -463,6 +488,7 @@ export class HandleAsyncTimeline {
 
         const mergedObj = { ...this.defaultObj, ...obj };
         this.addToMainArray(mergedObj);
+        this.addTweenToStore(tween);
         return this;
     }
 
@@ -553,20 +579,35 @@ export class HandleAsyncTimeline {
     }
 
     play() {
-        if (this.tweenList.length === 0 || this.addAsyncIsActive) return;
-        if (this.delayIsRunning) {
-            this.startOnDelay = true;
-            this.actionAfterReject.push(() => this.play());
-            return;
-        }
-        this.startOnDelay = false;
-        this.stop();
-        this.isStopped = false;
-        this.isPlayingFromLabelReverse = false;
-        if (this.isReverse) this.revertTween();
-        Promise.resolve().then(() => this.run());
+        if (this.freeMode) {
+            if (this.tweenList.length === 0 || this.addAsyncIsActive) return;
+            if (this.delayIsRunning) {
+                this.startOnDelay = true;
+                this.actionAfterReject.push(() => this.play());
+                return;
+            }
+            this.startOnDelay = false;
+            this.stop();
+            this.isStopped = false;
+            this.isPlayingFromLabelReverse = false;
+            if (this.isReverse) this.revertTween();
+            Promise.resolve().then(() => this.run());
+            return this;
+        } else {
+            const cb = () => {
+                this.stop();
+                this.isStopped = false;
+                this.resetAllTween();
+                Promise.resolve().then(() => this.run());
+            };
 
-        return this;
+            this.starterFunction = cb;
+            this.timelineIsInTestMode = true;
+            this.currentLabel = null;
+            this.currentLabelIsReversed = false;
+            this.reverse();
+            return this;
+        }
     }
 
     playFromLabel() {
@@ -654,7 +695,7 @@ export class HandleAsyncTimeline {
         this.isPlayingFromLabelReverse = false;
 
         // Stop all Tween
-        this.currentTween.forEach(({ tween }) => {
+        this.tweenStore.forEach(({ tween }) => {
             if (tween?.stop) tween.stop();
         });
 
@@ -726,6 +767,7 @@ export class HandleAsyncTimeline {
         this.tweenList = [];
         this.currentTween = [];
         this.callback = [];
+        this.tweenStore = [];
         this.currentIndex = 0;
         this.actionAfterReject = [];
     }

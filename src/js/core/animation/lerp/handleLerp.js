@@ -601,11 +601,8 @@ export class HandleLerp {
      *
      */
     onStartInPause(cb) {
-        const unsubscribeCb = setCallBack(cb, this.callbackStartInPause);
-        return () =>
-            (this.callbackStartInPause = unsubscribeCb(
-                this.callbackStartInPause
-            ));
+        setCallBack(cb, this.callbackStartInPause);
+        return () => (this.callbackStartInPause = []);
     }
 
     /**
