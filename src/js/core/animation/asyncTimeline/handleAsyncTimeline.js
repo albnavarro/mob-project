@@ -1,3 +1,4 @@
+import { handleFrameIndex } from '../../events/rafutils/handleFrameIndex.js';
 import { getTime } from '../../utils/time.js';
 
 export class HandleAsyncTimeline {
@@ -13,7 +14,7 @@ export class HandleAsyncTimeline {
         this.freeMode = config.freeMode || false;
         this.loopCounter = 1;
         this.groupId = null;
-        // group "name" star from 1 to avoid 0 = falsa
+        // group "name" star from 1 to avoid 0 = false
         this.groupCounter = 1;
         this.waitComplete = false;
         this.defaultObj = {
@@ -47,6 +48,7 @@ export class HandleAsyncTimeline {
         this.timelineIsInTestMode = false;
         this.currentLabel = null;
         this.currentLabelIsReversed = false;
+        this.sessionId = 0;
 
         // Callback
         this.id = 0;
@@ -114,11 +116,20 @@ export class HandleAsyncTimeline {
                 addAsync: () => {
                     // Activate addAsyncFlag
                     this.addAsyncIsActive = true;
+                    const sessionId = this.sessionId;
 
-                    return new Promise((res) => {
+                    return new Promise((res, reject) => {
                         if (!isImmediate) {
-                            // Custom function that fire the result of the promise
-                            tween({ reverse: this.isReverse, resolve: res });
+                            tween({
+                                reverse: this.isReverse,
+                                resolve: () => {
+                                    if (sessionId === this.sessionId) {
+                                        res();
+                                    } else {
+                                        reject();
+                                    }
+                                },
+                            });
                         } else {
                             res();
                         }
@@ -146,10 +157,25 @@ export class HandleAsyncTimeline {
             return new Promise((res, reject) => {
                 const cb = () => {
                     /*
-                     * If after delay tween is stopped or some action
-                     * start are started we fail tween
+                     * IF:
+                     * --
+                     * this.isStopped: Timelie is stopped
+                     * --
+                     * this.startOnDelay: play() etc.. is firedin delay
+                     * --
+                     * sessionId: another tween is fired and this tween is in a
+                     * { waitComplete: false }, so the promise is resolved but
+                     * this tween is in delay status, if antther session start
+                     * the value of this.sessionId change,
+                     * in this case isStopped doasn't work becouse next
+                     * session set it to true
+                     * --
                      */
-                    if (this.isStopped || this.startOnDelay) {
+                    if (
+                        this.isStopped ||
+                        this.startOnDelay ||
+                        sessionId !== this.sessionId
+                    ) {
                         reject();
                         return;
                     }
@@ -182,6 +208,7 @@ export class HandleAsyncTimeline {
 
                 // Get delay
                 const delay = isImmediate ? false : tweenProps?.delay;
+                const sessionId = this.sessionId;
 
                 if (delay) {
                     let start = getTime();
@@ -229,12 +256,6 @@ export class HandleAsyncTimeline {
 
         Promise[promiseType](tweenPromises)
             .then(() => {
-                /**
-                Primise was completed
-                AddAsync is resolved
-                */
-                this.addAsyncIsActive = false;
-                this.currentTween = [];
                 if (this.isSuspended || this.isStopped) return;
 
                 if (
@@ -295,15 +316,13 @@ export class HandleAsyncTimeline {
                 }
 
                 /**
-                 * End of timeline, check repeat
+                 * All ended
                  **/
                 this.stop();
                 // Fire and of timeline
                 this.callback.forEach(({ cb }) => cb());
             })
             .catch(() => {
-                this.currentTween = [];
-
                 // If play or reverse or playFromLabel is fired diring delay tween fail
                 // Afte fail we can fire the action
                 if (this.actionAfterReject.length > 0) {
@@ -311,6 +330,14 @@ export class HandleAsyncTimeline {
                     this.actionAfterReject = [];
                     return;
                 }
+            })
+            .finally(() => {
+                /**
+                Primise was completed
+                AddAsync is resolved
+                */
+                this.addAsyncIsActive = false;
+                this.currentTween = [];
             });
     }
 
@@ -402,21 +429,14 @@ export class HandleAsyncTimeline {
     addTweenToStore(tween) {
         const uniqueId = tween.uniqueId;
         const tweenIsStored = this.tweenStore.find(({ id }) => id === uniqueId);
-
         if (tweenIsStored) return;
 
-        const obj = {
-            id: tween.uniqueId,
-            tween,
-        };
-
+        const obj = { id: tween.uniqueId, tween };
         this.tweenStore.push(obj);
     }
 
     resetAllTween() {
-        this.tweenStore.forEach(({ tween }) => {
-            tween.resetData();
-        });
+        this.tweenStore.forEach(({ tween }) => tween.resetData());
     }
 
     set(tween, valuesFrom, tweenProps = {}) {
@@ -591,14 +611,19 @@ export class HandleAsyncTimeline {
             this.isStopped = false;
             this.isPlayingFromLabelReverse = false;
             if (this.isReverse) this.revertTween();
-            Promise.resolve().then(() => this.run());
-            return this;
+
+            /*
+             * Run one frame after stop to avoid overlap with promise resolve/reject
+             */
+
+            this.sessionId++;
+            handleFrameIndex.add(() => this.run(), 1);
         } else {
             const cb = () => {
                 this.stop();
                 this.isStopped = false;
                 this.resetAllTween();
-                Promise.resolve().then(() => this.run());
+                this.run();
             };
 
             this.starterFunction = cb;
@@ -606,7 +631,6 @@ export class HandleAsyncTimeline {
             this.currentLabel = null;
             this.currentLabelIsReversed = false;
             this.reverse();
-            return this;
         }
     }
 
@@ -624,7 +648,6 @@ export class HandleAsyncTimeline {
          * Get first item of group, unnecessary.
          * Use of label inside a group becouse is parallel
          */
-
         this.currentIndex = 0;
         this.goToLabelIndex = this.tweenList.findIndex((item) => {
             const [firstItem] = item;
@@ -632,7 +655,7 @@ export class HandleAsyncTimeline {
             return labelCheck === this.currentLabel;
         });
 
-        Promise.resolve().then(() => this.run());
+        this.run();
     }
 
     playFrom(label) {
@@ -672,7 +695,11 @@ export class HandleAsyncTimeline {
          * so increment the loop number by 1
          **/
         this.loopCounter--;
-        Promise.resolve().then(() => this.run());
+        this.sessionId++;
+        /*
+         * Run one frame after stop to avoid overlap with promise resolve/reject
+         */
+        handleFrameIndex.add(() => this.run(), 1);
         return this;
     }
 
