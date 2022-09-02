@@ -49,6 +49,7 @@ export class HandleAsyncTimeline {
         this.currentLabel = null;
         this.currentLabelIsReversed = false;
         this.sessionId = 0;
+        this.activetweenCounter = 0;
 
         // Callback
         this.id = 0;
@@ -183,7 +184,7 @@ export class HandleAsyncTimeline {
                     /*
                      * Add tween to active stack
                      */
-                    this.addToActiveTween(tween, valuesTo);
+                    const unsubscribeActiveTween = this.addToActiveTween(tween);
 
                     /*
                      * Add tween to active stack, if timelienstatus is in pause
@@ -192,7 +193,6 @@ export class HandleAsyncTimeline {
                     const unsubscribeTweenStartInPause =
                         tween && tween?.onStartInPause
                             ? tween.onStartInPause(() => {
-                                  this.addToActiveTween(tween, valuesTo);
                                   return this.isInPause ? true : false;
                               })
                             : this.NOOP;
@@ -201,7 +201,7 @@ export class HandleAsyncTimeline {
                         .then(() => res())
                         .catch(() => {})
                         .finally(() => {
-                            this.setctiveTweenCompleted(tween);
+                            unsubscribeActiveTween();
                             unsubscribeTweenStartInPause();
                         });
                 };
@@ -214,7 +214,9 @@ export class HandleAsyncTimeline {
                     let start = getTime();
                     this.delayIsRunning = true;
 
-                    // Delay loop
+                    /*
+                     * Delay loop
+                     */
                     const loop = () => {
                         let current = getTime();
                         let delta = current - start;
@@ -337,44 +339,27 @@ export class HandleAsyncTimeline {
                 AddAsync is resolved
                 */
                 this.addAsyncIsActive = false;
-                this.currentTween = [];
             });
     }
 
-    addToActiveTween(tween, valuesTo = {}) {
-        // Add tween tif is not present in tack
-        const tweenIndex = this.currentTween.findIndex(
-            ({ tween: currentTween }) => {
-                if (!currentTween || !tween) return -1;
-                return currentTween.uniqueId === tween.uniqueId;
-            }
-        );
+    addToActiveTween(tween) {
+        const tweenId = tween?.uniqueId;
+        if (!tweenId) return this.NOOP;
 
-        // If tween is in stack update current value in use
-        if (tweenIndex === -1) {
-            this.currentTween.push({
-                tween,
-                propiertiesInUse: Object.keys(valuesTo),
-                valuesTo: tween && tween?.getTo ? tween.getTo() : {},
-                valuesFrom: tween && tween?.getTo ? tween.getFrom() : {},
-                completed: false,
-            });
-        }
-    }
+        const prevActiveTweenCounter = this.activetweenCounter;
+        this.activetweenCounter++;
 
-    // Set cerrent tween completed if needed
-    // At moment is not used
-    setctiveTweenCompleted(tween) {
-        const tweenIndex = this.currentTween.findIndex(
-            ({ tween: currentTween }) => {
-                if (!currentTween || !tween) return -1;
-                return currentTween.uniqueId === tween.uniqueId;
-            }
-        );
+        this.currentTween.push({
+            tween,
+            uniqueId: tween?.uniqueId,
+            id: prevActiveTweenCounter,
+        });
 
-        if (tweenIndex !== -1) {
-            this.currentTween[tweenIndex].completed = true;
-        }
+        return () => {
+            this.currentTween = this.currentTween.filter(
+                ({ id }) => id !== prevActiveTweenCounter
+            );
+        };
     }
 
     revertTween() {
@@ -711,6 +696,7 @@ export class HandleAsyncTimeline {
         this.isStopped = true;
         this.currentIndex = 0;
         this.loopCounter = 1;
+        // this.currentTween = [];
 
         // Reset state
         this.isReverseNext = false;
