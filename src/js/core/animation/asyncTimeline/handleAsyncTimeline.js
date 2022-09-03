@@ -50,6 +50,7 @@ export class HandleAsyncTimeline {
         this.currentLabelIsReversed = false;
         this.sessionId = 0;
         this.activetweenCounter = 0;
+        this.timeOnPause = 0;
 
         // Callback
         this.id = 0;
@@ -193,7 +194,7 @@ export class HandleAsyncTimeline {
                     const unsubscribeTweenStartInPause =
                         tween && tween?.onStartInPause
                             ? tween.onStartInPause(() => {
-                                  return this.isInPause ? true : false;
+                                  return this.isInPause;
                               })
                             : this.NOOP;
 
@@ -213,6 +214,7 @@ export class HandleAsyncTimeline {
                 if (delay) {
                     let start = getTime();
                     this.delayIsRunning = true;
+                    let deltaTimeOnpause = 0;
 
                     /*
                      * Delay loop
@@ -222,16 +224,25 @@ export class HandleAsyncTimeline {
                         let delta = current - start;
 
                         /*
+                         * Update delata value on pause to compensate delta velue
+                         */
+                        if (this.isInPause)
+                            deltaTimeOnpause = current - this.timeOnPause;
+
+                        /*
                          * If play, resume, playFromLabel is fired whith
                          * another tween in delay
                          * fire this tween immediatly, so avoid probem
                          * with much delay in same group
                          */
-                        if (this.actionAfterReject.length > 0) delta = delay;
+                        if (this.actionAfterReject.length > 0) {
+                            deltaTimeOnpause = 0;
+                            delta = delay;
+                        }
 
                         // Start after dealy or immediate in caso of stop or reverse Next
                         if (
-                            delta >= delay ||
+                            delta - deltaTimeOnpause >= delay ||
                             this.isStopped ||
                             this.isReverseNext
                         ) {
@@ -706,6 +717,7 @@ export class HandleAsyncTimeline {
         this.isSuspended = false;
         this.addAsyncIsActive = false;
         this.isPlayingFromLabelReverse = false;
+        this.timeOnPause = 0;
 
         // Stop all Tween
         this.tweenStore.forEach(({ tween }) => {
@@ -719,6 +731,7 @@ export class HandleAsyncTimeline {
 
     pause() {
         this.isInPause = true;
+        this.timeOnPause = getTime();
         this.currentTween.forEach(({ tween }) => {
             if (tween?.pause) tween.pause();
         });
@@ -733,11 +746,13 @@ export class HandleAsyncTimeline {
     resume() {
         if (this.isInPause) {
             this.isInPause = false;
+            this.timeOnPause = 0;
             this.resumeEachTween();
         }
 
         if (this.isSuspended) {
             this.isSuspended = false;
+            this.timeOnPause = 0;
 
             if (this.currentIndex <= this.tweenList.length - 2) {
                 this.currentIndex++;
