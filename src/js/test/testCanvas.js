@@ -14,7 +14,7 @@ export const testCanvas = () => {
     let col = -1;
     let row = -2;
 
-    const itemsArr = [...Array(items).keys()].map((item, i) => {
+    const itemsArr = [...Array(items).keys()].map(() => {
         col = col < numColumn ? col + 1 : 0;
         if (col === 0) row++;
 
@@ -59,7 +59,7 @@ export const testCanvas = () => {
     //     });
     // });
 
-    itemsArr.forEach((item, i) => {
+    itemsArr.forEach((item) => {
         tween.subscribeCache(item, ({ scale, rotate, opacity }) => {
             item.scale = scale;
             item.rotate = rotate;

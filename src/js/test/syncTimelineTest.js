@@ -67,13 +67,13 @@ export function syncTimelineTest() {
         .goTo({ scale: 2 }, { start: 3.5, end: 5, ease: 'easeOutCubic' })
         .goTo({ scale: 1 }, { start: 5, end: 6, ease: 'easeOutCubic' });
 
-    starger.forEach((item, i) => {
-        seqStagger.subscribe(({ x, scale }) => {
+    starger.forEach((item) => {
+        seqStagger.subscribeCache(item, ({ x, scale }) => {
             item.style.transform = `translate3D(0,0,0) translate(${x}px, 0px) scale(${scale})`;
         });
     });
 
-    starger.forEach((item, i) => {
+    starger.forEach((item) => {
         seqStagger.onStop(({ x, scale }) => {
             item.style.transform = `translate(${x}px, 0px) scale(${scale})`;
         });
@@ -92,11 +92,13 @@ export function syncTimelineTest() {
     syncTimeline.onLoopEnd(({ direction, loop }) => {
         console.log(`direction: ${direction}, loop index: ${loop}`);
     });
+
     syncTimeline.onComplete(() => {
         console.log(`complete`);
     });
 
     btnStart.addEventListener('click', () => {
+        syncTimeline.stop();
         syncTimeline.play();
     });
 
@@ -117,6 +119,7 @@ export function syncTimelineTest() {
     });
 
     btnStartReverse.addEventListener('click', () => {
+        syncTimeline.stop();
         syncTimeline.playReverse();
     });
 }

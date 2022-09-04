@@ -15,7 +15,6 @@ export function staggerTweenTest() {
         ease: 'easeInOutBack',
         data: { x: 0, y: 0 },
     });
-    myTween.set({ x: 0, y: 0 });
 
     myTween.subscribe(({ x, y }) => {
         target.style.transform = `translate3D(0px,0px,0px) translate(${x}px, ${y}px)`;
@@ -27,15 +26,13 @@ export function staggerTweenTest() {
         data: { x: 0 },
     });
 
-    myStagger.set({ x: 0 });
-
-    stagger.forEach((item, i) => {
-        myStagger.subscribe(({ x }) => {
+    stagger.forEach((item) => {
+        myStagger.subscribeCache(item, ({ x }) => {
             item.style.transform = `translate3D(0px,0px,0px) translate(${x}px, 0px)`;
         });
     });
 
-    stagger.forEach((item, i) => {
+    stagger.forEach((item) => {
         myStagger.onComplete(({ x }) => {
             item.style.transform = `translate(${x}px, 0px)`;
         });

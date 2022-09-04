@@ -27,6 +27,7 @@ import {
     getFirstValidValueBack,
     checkIsLastUsableProp,
 } from './reduceFunction.js';
+import { handleCache } from '../../events/rafutils/handleCache.js';
 
 export class HandleSequencer {
     constructor(data = {}) {
@@ -423,6 +424,10 @@ export class HandleSequencer {
 
     getType() {
         return this.type;
+    }
+
+    cleanCachedId() {
+        this.callbackCache.forEach(({ cb }) => handleCache.clean(cb));
     }
 
     /**

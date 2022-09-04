@@ -35,6 +35,13 @@ export const handleCache = (() => {
         if (id in subscriber) delete subscriber[id];
     };
 
+    const clean = (id) => {
+        const el = subscriber[id];
+        if (!el) return;
+
+        el.data = {};
+    };
+
     const get = (id) => {
         return subscriber?.[id];
     };
@@ -78,6 +85,7 @@ export const handleCache = (() => {
         get,
         update,
         remove,
+        clean,
         fire,
         fireObject,
         getCacheCounter,

@@ -42,6 +42,7 @@ import {
 } from '../utils/warning.js';
 import { fpsLoadedLog } from '../utils/log.js';
 import { shouldInizializzeStagger } from '../utils/condition.js';
+import { handleCache } from '../../events/rafutils/handleCache.js';
 
 export class HandleSpring {
     constructor(data = {}) {
@@ -313,6 +314,7 @@ export class HandleSpring {
     stop() {
         if (this.pauseStatus) this.pauseStatus = false;
         this.values = setFromToByCurrent(this.values);
+        this.callbackCache.forEach(({ cb }) => handleCache.clean(cb));
 
         // Abort promise
         if (this.currentReject) {
@@ -523,6 +525,18 @@ export class HandleSpring {
      */
     get() {
         return getValueObj(this.values, 'currentValue');
+    }
+
+    /**
+     * get - get initial value
+     *
+     * @return {Object} current value obj { prop: value, prop2: value2 }
+     *
+     * @example
+     * const { prop } = mySpring.getIntialData();
+     */
+    getInitialData() {
+        return getValueObj(this.initialData, 'currentValue');
     }
 
     /**

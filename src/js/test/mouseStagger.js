@@ -13,13 +13,13 @@ export const mouseStagger = () => {
         data: { x: 0, y: 0 },
     });
 
-    cursor.forEach((item, i) => {
+    cursor.forEach((item) => {
         spring.subscribe(({ x, y }) => {
             item.style.transform = `translate3D(0px,0px,0px) translate(${x}px, ${y}px)`;
         });
     });
 
-    cursor.forEach((item, i) => {
+    cursor.forEach((item) => {
         spring.onComplete(({ x, y }) => {
             item.style.transform = `translate(${x}px, ${y}px)`;
         });
@@ -28,7 +28,7 @@ export const mouseStagger = () => {
     // In real time (like mousemove) use waitComplete: false, to avoid moviemnt when promise in sot resolved
     mobbu.use('mouseMove', ({ client }) => {
         const { x, y } = client;
-        spring.goTo({ x, y }).catch((err) => {});
+        spring.goTo({ x, y }).catch(() => {});
     });
 
     // 2
@@ -40,7 +40,7 @@ export const mouseStagger = () => {
         data: { scale: 1 },
     });
 
-    stagger.forEach((item, i) => {
+    stagger.forEach((item) => {
         tween.subscribe(({ scale }) => {
             item.style.transform = `translate3D(0px,0px,0px) scale(${scale})`;
         });

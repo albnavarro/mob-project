@@ -70,7 +70,8 @@ export function timlineMixTest() {
             { config: { precision: 0.5 } }
         )
         .goTo(tweenBox2, { rotate: -180 }, { duration: 5000 })
-        .closeGroup();
+        .closeGroup()
+        .goTo(springBox1, { x: -400 });
     // .suspend();
 
     // LISTNER

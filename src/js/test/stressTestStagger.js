@@ -25,7 +25,7 @@ export const stressTestStagger = () => {
         //         item.style.opacity = opacity;
         //     });
         // });
-        items.forEach((item, i) => {
+        items.forEach((item) => {
             tween.subscribeCache(item, ({ scale, rotate, opacity }) => {
                 item.style.transform = `translate3D(0, 0, 1px) scale(${scale}) rotate(${rotate}deg)`;
                 item.style.opacity = opacity;
@@ -38,7 +38,7 @@ export const stressTestStagger = () => {
         //         item.style.opacity = opacity;
         //     });
         // });
-        items.forEach((item, i) => {
+        items.forEach((item) => {
             tween.subscribeCache(item, ({ scale, rotate, opacity }) => {
                 item.style.transform = `scale(${scale}) rotate(${rotate}deg)`;
                 item.style.opacity = opacity;

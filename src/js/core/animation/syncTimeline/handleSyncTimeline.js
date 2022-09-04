@@ -333,13 +333,8 @@ export class HandleSyncTimeline {
         this.isStopped = true;
         this.pauseStatus = false;
 
-        // Fire callbackLoop onStop of each sequencr
         this.squencers.forEach((item) => {
-            item.draw({
-                partial: this.endTime,
-                isLastDraw: true,
-                useFrame: true,
-            });
+            item.cleanCachedId();
         });
     }
 

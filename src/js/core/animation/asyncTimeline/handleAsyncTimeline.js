@@ -596,6 +596,9 @@ export class HandleAsyncTimeline {
 
     play() {
         if (this.freeMode) {
+            /*
+             * In freeMode every tween start form current value in use at the moment
+             */
             if (this.tweenList.length === 0 || this.addAsyncIsActive) return;
             if (this.delayIsRunning) {
                 this.startOnDelay = true;
@@ -618,8 +621,24 @@ export class HandleAsyncTimeline {
             const cb = () => {
                 this.stop();
                 this.isStopped = false;
-                this.resetAllTween();
-                this.run();
+
+                /*
+                 * When start form play in default mode ( no freeMode )
+                 * an automatic set method is Executed with initial data
+                 */
+                const tweenPromise = this.tweenStore.map(({ tween }) => {
+                    const data = tween.getInitialData();
+
+                    return new Promise((resolve, reject) => {
+                        tween
+                            .set(data)
+                            .then(() => resolve())
+                            .catch(() => reject());
+                    });
+                });
+                Promise.all(tweenPromise).then(() => {
+                    this.run();
+                });
             };
 
             this.starterFunction = cb;
