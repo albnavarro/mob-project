@@ -40,12 +40,6 @@ export function timlineMixTest() {
 
     timeline
         .add(() => springBox1.updatePreset('wobbly'))
-        .set(
-            springBox1,
-            { x: 0, y: 0, rotate: 0 },
-            { config: { precision: 0.5 } }
-        )
-        .set(tweenBox2, { rotate: 0 }, { config: { precision: 0.5 } })
         .goTo(springBox1, { x: -200 })
         .add(() => springBox1.updatePreset('default'))
         .goFromTo(
@@ -92,11 +86,27 @@ export function timlineMixTest() {
     });
 
     btnFrom.addEventListener('click', () => {
-        timeline.playFrom('label1');
+        /*
+         * tweenBox2 hanve a delay so rended position immediatly
+         * If we manipulate tween out side timeline call stop()
+         * for added security in timeline promise chain
+         */
+        timeline.stop();
+        tweenBox2.set({ rotate: 180 }).then(() => {
+            timeline.playFrom('label1');
+        });
     });
 
     btnFromReverse.addEventListener('click', () => {
-        timeline.playFromReverse('label1');
+        /*
+         * tweenBox2 hanve a delay so rended position immediatly
+         * If we manipulate tween out side timeline call stop()
+         * for added security in timeline promise chain
+         */
+        timeline.stop();
+        tweenBox2.set({ rotate: 180 }).then(() => {
+            timeline.playFromReverse('label1');
+        });
     });
 
     btnReverseNext.addEventListener('click', () => {
@@ -104,6 +114,14 @@ export function timlineMixTest() {
     });
 
     btnReverse.addEventListener('click', () => {
-        timeline.reverse();
+        /*
+         * tweenBox2 hanve a delay so rended position immediatly
+         * If we manipulate tween out side timeline call stop()
+         * for added security in timeline promise chain
+         */
+        timeline.stop();
+        tweenBox2.set({ rotate: -180 }).then(() => {
+            timeline.reverse();
+        });
     });
 }
