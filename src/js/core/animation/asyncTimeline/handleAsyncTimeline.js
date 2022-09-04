@@ -271,6 +271,11 @@ export class HandleAsyncTimeline {
             .then(() => {
                 if (this.isSuspended || this.isStopped) return;
 
+                /*
+                 * Check for loop in test mode, to get toValue of eche tween
+                 * necessary for reverse where the last
+                 * toValue and the current toValue is inverted
+                 */
                 if (
                     this.timelineIsInTestMode &&
                     this.currentIndex === this.goToLabelIndex - 1
@@ -283,7 +288,7 @@ export class HandleAsyncTimeline {
 
                 /*
                  * If play from label in reverse mode
-                 * reverse next step, current step is immediate
+                 * reverse next step
                  **/
                 if (
                     this.isPlayingFromLabelReverse &&
