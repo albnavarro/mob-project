@@ -76,14 +76,48 @@ export class HandleAsyncTimeline {
             const newTweenProps = { ...tweenProps };
             delete newTweenProps.delay;
 
+            /*
+             * activeate immediate prop if we walk thru tweens in test mode
+             */
             const isImmediate =
                 this.goToLabelIndex && index < this.goToLabelIndex;
 
             if (isImmediate) newTweenProps.immediate = true;
 
-            // Get current valueTo for to use in reverse methods
-            if (tween && tween?.getToNativeType)
-                item.data.prevValueTo = tween.getToNativeType();
+            /*
+             * If some tween use relative props the value is applied as relative
+             * only the in the rist loop
+             */
+            if ('relative' in tweenProps && tweenProps.relative) {
+                tweenProps.relative = false;
+                console.warn('relative prop is not allowed inside a timeline');
+            }
+
+            /*
+             * Get current valueTo for to use in reverse methods
+             */
+            if (tween && tween?.getToNativeType) {
+                const values = tween.getToNativeType();
+
+                /*
+                 * Get only the active prop
+                 * maybe unnecessary, if all prop ius used work fine
+                 * Only for a cliean code
+                 */
+                const propsInUse = Object.entries(values)
+                    .map((item) => {
+                        const [prop, val] = item;
+                        const valueIsValid = prop in valuesTo;
+                        return { data: { [prop]: val }, active: valueIsValid };
+                    })
+                    .filter(({ active }) => active)
+                    .map(({ data }) => data)
+                    .reduce((p, c) => {
+                        return { ...p, ...c };
+                    }, {});
+
+                item.data.prevValueTo = propsInUse;
+            }
 
             const fn = {
                 set: () => {
@@ -602,8 +636,10 @@ export class HandleAsyncTimeline {
 
     /*
      * Add a set 'tween' ati start and end of timeline.
+     *
      * ! this option can fail with sync methods becouse
      * the tween that use the prop get data during the animation
+     *
      */
     addSetBlocks() {
         // Create set only one time
