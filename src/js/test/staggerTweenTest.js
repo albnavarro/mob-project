@@ -41,22 +41,14 @@ export function staggerTweenTest() {
     // When use waitComplete: false all the stagger of same tween must have the same each value to syncronize
     // DEFINE TIMELINE
     const timeline = mobbu
-        .create('asyncTimeline', { repeat: -1, yoyo: true })
-        // At the start fix position ( useful to reverse while running)
-        .set(myTween, { x: 0, y: 0 })
-        .set(myStagger, { x: 0 })
-        //
+        .create('asyncTimeline', { repeat: -1, yoyo: true, autoSet: true })
         .goTo(myTween, { x: 500 })
         .goTo(myTween, { y: 500 })
         .createGroup({ waitComplete: false })
         .goTo(myTween, { x: 0 })
         .goTo(myStagger, { x: 500 }, { duration: 1500 })
         .closeGroup()
-        .goTo(myTween, { y: 0 })
-
-        // At the end fix position ( useful to reverse while running)
-        .set(myTween, { x: 0, y: 0 })
-        .set(myStagger, { x: 500 });
+        .goTo(myTween, { y: 0 });
 
     // LISTNER
     btnStart.addEventListener('click', () => {

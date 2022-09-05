@@ -12,6 +12,7 @@ export class HandleAsyncTimeline {
         this.repeat = config.repeat || 1;
         this.yoyo = config.yoyo || false;
         this.freeMode = config.freeMode || false;
+        this.autoSet = config.autoSet || false;
         this.loopCounter = 1;
         this.groupId = null;
         // group "name" star from 1 to avoid 0 = false
@@ -51,6 +52,7 @@ export class HandleAsyncTimeline {
         this.sessionId = 0;
         this.activetweenCounter = 0;
         this.timeOnPause = 0;
+        this.autoSetIsJustCreated = false;
 
         // Callback
         this.id = 0;
@@ -599,7 +601,76 @@ export class HandleAsyncTimeline {
         return this;
     }
 
+    /*
+     * Add a set 'tween' ati start and end of timeline.
+     * ! this option can fail with sync methods becouse
+     * the tween that use the prop get data during the animation
+     */
+    addSetBlocks() {
+        // Create set only one time
+        if (this.autoSetIsJustCreated) return;
+        this.autoSetIsJustCreated = true;
+
+        /*
+         * END Blocks
+         * Add set block at the end of timeline for every tween with last toValue
+         */
+        this.tweenStore.forEach(({ tween }) => {
+            const setValueTo = tween.getInitialData();
+
+            const obj = {
+                id: this.currentTweenCounter,
+                tween,
+                action: 'set',
+                valuesFrom: setValueTo,
+                tweenProps: {},
+                groupProps: { waitComplete: this.waitComplete },
+            };
+
+            this.currentTweenCounter++;
+
+            const mergedObj = { ...this.defaultObj, ...obj };
+            this.tweenList = [
+                [{ group: null, data: mergedObj }],
+                ...this.tweenList,
+            ];
+        });
+
+        /*
+         * END Blocks
+         * Add set block at the end of timeline for every tween with last toValue
+         */
+        this.tweenStore.forEach(({ id, tween }) => {
+            /*
+             * Create an object with all props updated with last
+             */
+            const setValueTo = this.tweenList.reduce((p, c) => {
+                const tweenItem = c.find(
+                    ({ data }) => data?.tween?.uniqueId === id
+                );
+                const currentValueTo = tweenItem?.data?.valuesTo;
+                return currentValueTo ? { ...p, ...currentValueTo } : p;
+            }, {});
+
+            const obj = {
+                id: this.currentTweenCounter,
+                tween,
+                action: 'set',
+                valuesFrom: setValueTo,
+                tweenProps: {},
+                groupProps: { waitComplete: this.waitComplete },
+            };
+
+            this.currentTweenCounter++;
+
+            const mergedObj = { ...this.defaultObj, ...obj };
+            this.tweenList.push([{ group: null, data: mergedObj }]);
+        });
+    }
+
     play() {
+        if (this.autoSet) this.addSetBlocks();
+
         if (this.freeMode) {
             /*
              * In freeMode every tween start form current value in use at the moment
@@ -697,6 +768,8 @@ export class HandleAsyncTimeline {
     }
 
     reverse() {
+        if (this.autoSet) this.addSetBlocks();
+
         // Skip of there is nothing to run
         if (this.tweenList.length === 0 || this.addAsyncIsActive) return;
         if (this.delayIsRunning) {
