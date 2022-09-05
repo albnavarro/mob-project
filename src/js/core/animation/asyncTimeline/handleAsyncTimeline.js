@@ -338,7 +338,6 @@ export class HandleAsyncTimeline {
                 /**
                  * All ended
                  **/
-                this.stop();
                 // Fire and of timeline
                 this.callback.forEach(({ cb }) => cb());
             })

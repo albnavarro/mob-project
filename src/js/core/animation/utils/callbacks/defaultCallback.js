@@ -90,7 +90,7 @@ export const defaultCallbackOnComplete = ({
                         onComplete();
                     }
                 }
-            }, frame);
+            }, frame + 1);
         });
 
         callbackCache.forEach(({ cb, frame }, i) => {
@@ -106,13 +106,13 @@ export const defaultCallbackOnComplete = ({
                         onComplete();
                     }
                 }
-            }, frame);
+            }, frame + 1);
         });
 
         callbackOnComplete.forEach(({ cb, frame }) => {
             handleFrameIndex.add(() => {
                 cb(cbObject);
-            }, frame + 1);
+            }, frame + 2);
         });
     }
 };
