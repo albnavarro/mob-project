@@ -776,18 +776,28 @@ export class HandleAsyncTimeline {
             this.actionAfterReject.push(() => this.reverse());
             return;
         }
+
+        /**
+         * Rest necessary props
+         */
         this.startOnDelay = false;
         this.stop();
         this.isStopped = false;
+
+        /*
+         * Walk thru timeline until the end,
+         * so we can run reverse next step with forceyoyo
+         */
         this.forceYoyo = true;
         this.goToLabelIndex = this.tweenList.length;
 
         /**
-         * When start form end first loop is lost in immediate
-         * so increment the loop number by 1
+         * When play reverse first loop is virtual
+         * So increment the loop number by 1
          **/
         this.loopCounter--;
         this.sessionId++;
+
         /*
          * Run one frame after stop to avoid overlap with promise resolve/reject
          */
@@ -820,9 +830,16 @@ export class HandleAsyncTimeline {
             if (tween?.stop) tween.stop();
         });
 
-        // Reset Reverse
+        // If reverse back to default direction
         if (this.isReverse) this.revertTween();
         this.isReverse = false;
+
+        /*
+         * If freeMode is false we
+         * set tween 'store' with original data.
+         * So we are sure that next loop start from initial data
+         */
+        if (!this.freeMode) this.resetAllTween();
     }
 
     pause() {
