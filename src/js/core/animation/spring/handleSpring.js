@@ -47,7 +47,7 @@ import { handleCache } from '../../events/rafutils/handleCache.js';
 export class HandleSpring {
     constructor(data = {}) {
         this.uniqueId = getUnivoqueId();
-        this.req = false;
+        this.isActive = false;
         this.currentResolve = null;
         this.currentReject = null;
         this.promise = null;
@@ -131,7 +131,7 @@ export class HandleSpring {
         o.precision = parseFloat(this.config.precision);
 
         const draw = (time, fps) => {
-            this.req = true;
+            this.isActive = true;
 
             this.values.forEach((item) => {
                 o.tensionForce =
@@ -176,12 +176,12 @@ export class HandleSpring {
             if (!o.allSettled) {
                 handleFrame.add(() => {
                     handleNextTick.add(({ time, fps }) => {
-                        if (this.req) draw(time, fps);
+                        if (this.isActive) draw(time, fps);
                     });
                 });
             } else {
                 const onComplete = () => {
-                    this.req = false;
+                    this.isActive = false;
 
                     // End of animation
                     // Set fromValue with ended value
@@ -325,8 +325,8 @@ export class HandleSpring {
         }
 
         // Reset RAF
-        if (this.req) {
-            this.req = false;
+        if (this.isActive) {
+            this.isActive = false;
         }
     }
 
@@ -339,7 +339,7 @@ export class HandleSpring {
     pause() {
         if (this.pauseStatus) return;
         this.pauseStatus = true;
-        if (this.req) this.req = false;
+        if (this.isActive) this.isActive = false;
         this.values = setFromByCurrent(this.values);
     }
 
@@ -352,7 +352,7 @@ export class HandleSpring {
         if (!this.pauseStatus) return;
         this.pauseStatus = false;
 
-        if (!this.req && this.currentResolve) {
+        if (!this.isActive && this.currentResolve) {
             resume(this.onReuqestAnim.bind(this), this.currentResolve);
         }
     }
@@ -501,12 +501,12 @@ export class HandleSpring {
         this.values = setRelative(this.values, this.relative);
 
         if (immediate) {
-            this.req = false;
+            this.isActive = false;
             this.values = setFromCurrentByTo(this.values);
             return new Promise((res) => res());
         }
 
-        if (!this.req) {
+        if (!this.isActive) {
             this.promise = new Promise((res, reject) => {
                 this.startRaf(res, reject);
             });

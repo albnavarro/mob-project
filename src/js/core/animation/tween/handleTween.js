@@ -46,7 +46,7 @@ import { handleCache } from '../../events/rafutils/handleCache.js';
 export class HandleTween {
     constructor(data = {}) {
         this.uniqueId = getUnivoqueId();
-        this.req = false;
+        this.isActive = false;
         this.currentResolve = null;
         this.currentReject = null;
         this.promise = null;
@@ -118,7 +118,7 @@ export class HandleTween {
         let o = {};
 
         const draw = (time) => {
-            this.req = true;
+            this.isActive = true;
 
             if (this.pauseStatus) {
                 this.pauseTime = time - this.startTime - this.timeElapsed;
@@ -161,12 +161,12 @@ export class HandleTween {
             if (!o.isSettled) {
                 handleFrame.add(() => {
                     handleNextTick.add(({ time }) => {
-                        if (this.req) draw(time);
+                        if (this.isActive) draw(time);
                     });
                 });
             } else {
                 const onComplete = () => {
-                    this.req = false;
+                    this.isActive = false;
                     this.isRunning = false;
                     this.pauseTime = 0;
 
@@ -314,7 +314,7 @@ export class HandleTween {
         }
 
         // Reset RAF
-        if (this.req) this.req = false;
+        if (this.isActive) this.isActive = false;
     }
 
     /**
@@ -397,7 +397,7 @@ export class HandleTween {
      * @return {void}
      */
     updateDataWhileRunning() {
-        this.req = false;
+        this.isActive = false;
 
         // Abort promise
         if (this.currentReject) {
@@ -512,18 +512,18 @@ export class HandleTween {
      */
     doAction(data, props, obj) {
         this.values = mergeArrayTween(data, this.values);
-        if (this.req) this.updateDataWhileRunning();
+        if (this.isActive) this.updateDataWhileRunning();
         const { reverse, immediate } = this.mergeProps(props);
         if (reverse) this.value = setReverseValues(obj, this.values);
         this.values = setRelativeTween(this.values, this.relative);
 
         if (immediate) {
-            this.req = false;
+            this.isActive = false;
             this.values = setFromCurrentByTo(this.values);
             return new Promise((res) => res());
         }
 
-        if (!this.req) {
+        if (!this.isActive) {
             this.promise = new Promise((res, reject) => {
                 this.startRaf(res, reject);
             });

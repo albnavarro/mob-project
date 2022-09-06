@@ -53,5 +53,9 @@ export const mouseStagger = () => {
     const timeline = mobbu
         .create('asyncTimeline', { repeat: -1, yoyo: true })
         .goTo(tween, { scale: () => val * 2 })
-        .play();
+        // .goTo(tween, { scale: () => val * 3 })
+        .play()
+        .onLoopEnd(({ loop, direction }) => {
+            // console.log('onLoopEnd', loop, direction);
+        });
 };

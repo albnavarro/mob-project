@@ -49,7 +49,7 @@ export class HandleLerp {
     constructor(data = {}) {
         this.uniqueId = getUnivoqueId();
         this.config = {};
-        this.req = false;
+        this.isActive = false;
         this.currentResolve = null;
         this.currentReject = null;
         this.promise = null;
@@ -119,7 +119,7 @@ export class HandleLerp {
         o.velocity = parseFloat(this.velocity);
 
         const draw = (time, fps) => {
-            this.req = true;
+            this.isActive = true;
 
             this.values.forEach((item) => {
                 if (item.settled) return;
@@ -159,12 +159,12 @@ export class HandleLerp {
             if (!o.allSettled) {
                 handleFrame.add(() => {
                     handleNextTick.add(({ time, fps }) => {
-                        if (this.req) draw(time, fps);
+                        if (this.isActive) draw(time, fps);
                     });
                 });
             } else {
                 const onComplete = () => {
-                    this.req = false;
+                    this.isActive = false;
 
                     // End of animation
                     // Set fromValue with ended value
@@ -308,7 +308,7 @@ export class HandleLerp {
         }
 
         // Reset RAF
-        if (this.req) this.req = false;
+        if (this.isActive) this.isActive = false;
     }
 
     /**
@@ -320,7 +320,7 @@ export class HandleLerp {
     pause() {
         if (this.pauseStatus) return;
         this.pauseStatus = true;
-        if (this.req) this.req = false;
+        if (this.isActive) this.isActive = false;
         this.values = setFromByCurrent(this.values);
     }
 
@@ -333,7 +333,7 @@ export class HandleLerp {
         if (!this.pauseStatus) return;
         this.pauseStatus = false;
 
-        if (!this.req && this.currentResolve) {
+        if (!this.isActive && this.currentResolve) {
             resume(this.onReuqestAnim.bind(this), this.currentResolve);
         }
     }
@@ -483,12 +483,12 @@ export class HandleLerp {
         this.values = setRelative(this.values, this.relative);
 
         if (immediate) {
-            this.req = false;
+            this.isActive = false;
             this.values = setFromCurrentByTo(this.values);
             return new Promise((res) => res());
         }
 
-        if (!this.req) {
+        if (!this.isActive) {
             this.promise = new Promise((res, reject) => {
                 this.startRaf(res, reject);
             });

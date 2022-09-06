@@ -25,6 +25,7 @@ export class HandleAsyncTimeline {
             valuesFrom: {},
             valuesTo: {},
             prevValueTo: null,
+            prevValueSettled: false,
             tweenProps: {},
             groupProps: {},
             syncProp: {},
@@ -53,13 +54,23 @@ export class HandleAsyncTimeline {
         this.activetweenCounter = 0;
         this.timeOnPause = 0;
         this.autoSetIsJustCreated = false;
+        this.currentAction = [];
+        this.BACKWARD = 'backward';
+        this.FORWARD = 'forward';
 
         // Callback
         this.id = 0;
-        this.callback = [];
+        this.callbackLoop = [];
+        this.callbackComplete = [];
     }
 
     run(index = this.currentIndex) {
+        /**
+         * Store previous caction to prevent tiw add/addAsync consegutive
+         */
+        const lastAction = this.currentAction;
+        this.currentAction = [];
+
         const tweenPromises = this.tweenList[index].map((item) => {
             const { data } = item;
 
@@ -70,6 +81,7 @@ export class HandleAsyncTimeline {
                 valuesTo,
                 tweenProps,
                 syncProp,
+                id,
             } = data;
 
             // Clone teen prop and clean from timeline props
@@ -95,8 +107,13 @@ export class HandleAsyncTimeline {
 
             /*
              * Get current valueTo for to use in reverse methods
+             * Get the value only first immediate loop
              */
-            if (tween && tween?.getToNativeType) {
+            if (
+                tween &&
+                tween?.getToNativeType &&
+                !item.data?.prevValueSettled
+            ) {
                 const values = tween.getToNativeType();
 
                 /*
@@ -117,7 +134,22 @@ export class HandleAsyncTimeline {
                     }, {});
 
                 item.data.prevValueTo = propsInUse;
+                item.data.prevValueSettled = true;
             }
+
+            /*
+             * Store current action
+             */
+            this.currentAction.push({ id, action });
+
+            /*
+             * Check if the previus block i running again
+             */
+            const prevActionIsCurrent = lastAction.find(
+                ({ id: prevId, action: prevAction }) => {
+                    return prevId === id && prevAction === action;
+                }
+            );
 
             const fn = {
                 set: () => {
@@ -135,16 +167,28 @@ export class HandleAsyncTimeline {
                 sync: () => {
                     return new Promise((res) => {
                         const { from, to } = syncProp;
-                        to.set(from.get(), { immediate: true }).then(() =>
-                            res()
-                        );
+                        to.set(from.getToNativeType(), {
+                            immediate: true,
+                        }).then(() => res());
                     });
                 },
                 add: () => {
+                    /*
+                     * Prevent fire the same last add
+                     * Es reverseNext inside it cause an infinite loop
+                     */
+                    if (prevActionIsCurrent) {
+                        return new Promise((res) => res());
+                    }
+
                     return new Promise((res) => {
                         if (!isImmediate) {
                             // Custom function
-                            tween({ reverse: this.isReverse });
+                            const direction = this.getDirection();
+                            tween({
+                                direction,
+                                loop: this.loopCounter,
+                            });
                             res();
                         } else {
                             res();
@@ -156,10 +200,21 @@ export class HandleAsyncTimeline {
                     this.addAsyncIsActive = true;
                     const sessionId = this.sessionId;
 
+                    /*
+                     * Prevent fire the same last addAsync
+                     * Es reverseNext inside it cause an infinite loop
+                     */
+                    if (prevActionIsCurrent) {
+                        return new Promise((res) => res());
+                    }
+
                     return new Promise((res, reject) => {
                         if (!isImmediate) {
+                            const direction = this.getDirection();
+
                             tween({
-                                reverse: this.isReverse,
+                                direction,
+                                loop: this.loopCounter,
                                 resolve: () => {
                                     if (sessionId === this.sessionId) {
                                         res();
@@ -360,12 +415,25 @@ export class HandleAsyncTimeline {
                  * End of timeline, check repeat
                  **/
                 if (this.loopCounter < this.repeat || this.repeat === -1) {
+                    /*
+                     * Fire callbackLoop
+                     */
+                    if (!this.goToLabelIndex) {
+                        const direction = this.getDirection();
+                        this.callbackLoop.forEach(({ cb }) =>
+                            cb({
+                                direction,
+                                loop: this.loopCounter,
+                            })
+                        );
+                    }
+
                     this.loopCounter++;
                     this.currentIndex = 0;
                     this.goToLabelIndex = null;
                     if (this.yoyo || this.forceYoyo) this.revertTween();
-                    this.run();
                     this.forceYoyo = false;
+                    this.run();
                     return;
                 }
 
@@ -373,7 +441,7 @@ export class HandleAsyncTimeline {
                  * All ended
                  **/
                 // Fire and of timeline
-                this.callback.forEach(({ cb }) => cb());
+                this.callbackComplete.forEach(({ cb }) => cb());
             })
             .catch(() => {
                 // If play or reverse or playFromLabel is fired diring delay tween fail
@@ -391,6 +459,10 @@ export class HandleAsyncTimeline {
                 */
                 this.addAsyncIsActive = false;
             });
+    }
+
+    getDirection() {
+        return this.isReverse ? this.BACKWARD : this.FORWARD;
     }
 
     addToActiveTween(tween) {
@@ -419,7 +491,7 @@ export class HandleAsyncTimeline {
             group.reverse().forEach((item) => {
                 const { data } = item;
                 const { action, valuesFrom, valuesTo, syncProp } = data;
-                const prevValueTo = item.data.prevValueTo || valuesFrom;
+                const prevValueTo = item.data.prevValueTo;
                 const currentValueTo = item.data.valuesTo;
                 const { from, to } = syncProp;
 
@@ -550,10 +622,13 @@ export class HandleAsyncTimeline {
 
     add(fn) {
         const obj = {
+            id: this.currentTweenCounter,
             tween: fn,
             action: 'add',
             groupProps: { waitComplete: this.waitComplete },
         };
+
+        this.currentTweenCounter++;
 
         const mergedObj = { ...this.defaultObj, ...obj };
         this.addToMainArray(mergedObj);
@@ -562,10 +637,13 @@ export class HandleAsyncTimeline {
 
     addAsync(fn) {
         const obj = {
+            id: this.currentTweenCounter,
             tween: fn,
             action: 'addAsync',
             groupProps: { waitComplete: this.waitComplete },
         };
+
+        this.currentTweenCounter++;
 
         const mergedObj = { ...this.defaultObj, ...obj };
         this.addToMainArray(mergedObj);
@@ -574,10 +652,13 @@ export class HandleAsyncTimeline {
 
     sync(syncProp) {
         const obj = {
+            id: this.currentTweenCounter,
             action: 'sync',
             groupProps: { waitComplete: this.waitComplete },
             syncProp,
         };
+
+        this.currentTweenCounter++;
 
         const mergedObj = { ...this.defaultObj, ...obj };
         this.addToMainArray(mergedObj);
@@ -586,9 +667,12 @@ export class HandleAsyncTimeline {
 
     createGroup(groupProps = {}) {
         const obj = {
+            id: this.currentTweenCounter,
             action: 'createGroup',
             groupProps,
         };
+
+        this.currentTweenCounter++;
 
         const mergedObj = { ...this.defaultObj, ...obj };
         this.addToMainArray(mergedObj);
@@ -602,8 +686,11 @@ export class HandleAsyncTimeline {
     closeGroup() {
         this.groupId = null;
         const obj = {
+            id: this.currentTweenCounter,
             action: 'closeGroup',
         };
+
+        this.currentTweenCounter++;
 
         const mergedObj = { ...this.defaultObj, ...obj };
         this.addToMainArray(mergedObj);
@@ -614,8 +701,11 @@ export class HandleAsyncTimeline {
     // Don't use inside group
     suspend() {
         const obj = {
+            id: this.currentTweenCounter,
             action: 'suspend',
         };
+
+        this.currentTweenCounter++;
 
         const mergedObj = { ...this.defaultObj, ...obj };
         this.addToMainArray(mergedObj);
@@ -625,9 +715,12 @@ export class HandleAsyncTimeline {
     // Don't use inside group
     label(labelProps = {}) {
         const obj = {
+            id: this.currentTweenCounter,
             action: 'label',
             labelProps,
         };
+
+        this.currentTweenCounter++;
 
         const mergedObj = { ...this.defaultObj, ...obj };
         this.addToMainArray(mergedObj);
@@ -728,6 +821,7 @@ export class HandleAsyncTimeline {
 
             this.sessionId++;
             handleFrameIndex.add(() => this.run(), 1);
+            return this;
         } else {
             const cb = () => {
                 this.stop();
@@ -757,6 +851,7 @@ export class HandleAsyncTimeline {
             this.currentLabel = null;
             this.currentLabelIsReversed = false;
             this.reverse();
+            return this;
         }
     }
 
@@ -927,13 +1022,27 @@ export class HandleAsyncTimeline {
         return this.currentTween;
     }
 
+    onLoopEnd(cb) {
+        this.callbackLoop.push({ cb, id: this.id });
+        const cbId = this.id;
+        this.callbackId++;
+
+        return () => {
+            this.callbackLoop = this.callbackLoop.filter(
+                (item) => item.id !== cbId
+            );
+        };
+    }
+
     onComplete(cb) {
-        this.callback.push({ cb, id: this.id });
+        this.callbackComplete.push({ cb, id: this.id });
         const cbId = this.id;
         this.id++;
 
         return () => {
-            this.callback = this.callback.filter((item) => item.id !== cbId);
+            this.callbackComplete = this.callbackComplete.filter(
+                (item) => item.id !== cbId
+            );
         };
     }
 
@@ -943,7 +1052,7 @@ export class HandleAsyncTimeline {
     destroy() {
         this.tweenList = [];
         this.currentTween = [];
-        this.callback = [];
+        this.callbackComplete = [];
         this.tweenStore = [];
         this.currentIndex = 0;
         this.actionAfterReject = [];

@@ -15,6 +15,7 @@ export function timlineMixTest() {
     // DEFINE SPRING
     const springBox1 = mobbu.create('spring', {
         data: { x: 0, y: 0, rotate: 0 },
+        config: 'wobbly',
     });
     springBox1.subscribe(({ x, y, rotate }) => {
         target.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg)`;
@@ -36,12 +37,18 @@ export function timlineMixTest() {
     });
 
     // DEFINE TIMELINE
-    const timeline = mobbu.create('asyncTimeline', { repeat: -1, yoyo: false });
+    const timeline = mobbu.create('asyncTimeline', { repeat: 4, yoyo: false });
+
+    timeline.onComplete(() => {
+        console.log('complete');
+    });
+
+    timeline.onLoopEnd(({ loop, direction }) => {
+        console.log('onLoopEnd', loop, direction);
+    });
 
     timeline
-        .add(() => springBox1.updatePreset('wobbly'))
         .goTo(springBox1, { x: -200 })
-        .add(() => springBox1.updatePreset('default'))
         .goFromTo(
             springBox1,
             { x: -200 },
@@ -55,8 +62,8 @@ export function timlineMixTest() {
         .closeGroup()
         .label({ name: 'label1' })
         .goTo(tweenBox1, { x: -100, rotate: 180 }, { ease: 'easeInElastic' })
+        // .add(() => timeline.reverseNext())
         .sync({ from: tweenBox1, to: springBox1 })
-        .add(() => springBox1.updatePreset('gentle'))
         .createGroup({ waitComplete: false })
         .goTo(
             springBox1,
@@ -66,6 +73,7 @@ export function timlineMixTest() {
         .goTo(tweenBox2, { rotate: -180 }, { duration: 5000 })
         .closeGroup()
         .goTo(springBox1, { x: -400 });
+
     // .suspend();
 
     // LISTNER
