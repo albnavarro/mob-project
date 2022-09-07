@@ -9,8 +9,19 @@ export function timlineMixTest() {
     const btnFromReverse = document.querySelector('.mix-btn-playFromReverse');
     const btnReverseNext = document.querySelector('.mix-btn-reverseNext');
     const btnReverse = document.querySelector('.mix-btn-reverse');
+    const btnFast = document.querySelector('.mix-btn-fast-step3');
+    const btnSlow = document.querySelector('.mix-btn-slow-step3');
     const target = document.querySelector('.mix-target');
     const target2 = document.querySelector('.mix-target2');
+    let durationTest = 850;
+
+    btnFast.addEventListener('click', () => {
+        durationTest = 200;
+    });
+
+    btnSlow.addEventListener('click', () => {
+        durationTest = 1000;
+    });
 
     // DEFINE SPRING
     const springBox1 = mobbu.create('spring', {
@@ -57,7 +68,7 @@ export function timlineMixTest() {
         )
         .sync({ from: springBox1, to: tweenBox1 })
         .createGroup({ waitComplete: false })
-        .goTo(tweenBox1, { y: 400 }, { duration: 850 })
+        .goTo(tweenBox1, { y: 400 }, { duration: () => durationTest })
         .goTo(tweenBox2, { rotate: 360 }, { duration: 2000, delay: 1000 })
         .closeGroup()
         .label({ name: 'label1' })

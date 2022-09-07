@@ -42,6 +42,7 @@ import {
 import { fpsLoadedLog } from '../utils/log.js';
 import { shouldInizializzeStagger } from '../utils/condition.js';
 import { handleCache } from '../../events/rafutils/handleCache.js';
+import { storeType } from '../../store/storeType.js';
 
 export class HandleTween {
     constructor(data = {}) {
@@ -423,9 +424,13 @@ export class HandleTween {
         const newProps = mergeDeep(this.defaultProps, props);
         const { ease, duration, relative } = newProps;
         this.ease = getTweenFn(ease);
-        this.duration = duration;
         this.relative = relative;
 
+        /*
+         * Chek if duration is a function
+         */
+        const durationIsFn = storeType.isFunction(duration);
+        this.duration = durationIsFn ? duration() : duration;
         return newProps;
     }
 

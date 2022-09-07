@@ -9,6 +9,10 @@ export function syncTimelineTest() {
     const btnPause = document.querySelector('.syncTimeline .pause');
     const btnResume = document.querySelector('.syncTimeline .resume');
     const btnReverse = document.querySelector('.syncTimeline .reverse');
+    const btnPlayFrom = document.querySelector('.syncTimeline .playFrom');
+    const btnPlayFromReverse = document.querySelector(
+        '.syncTimeline .playFromReverse'
+    );
     const btnMoreRotation = document.querySelector(
         '.syncTimeline .moreRotation'
     );
@@ -20,14 +24,6 @@ export function syncTimelineTest() {
     );
 
     let rotation = 720;
-
-    btnMoreRotation.addEventListener('click', () => {
-        rotation = 2880;
-    });
-
-    btnLessRotation.addEventListener('click', () => {
-        rotation = 720;
-    });
 
     // SINGLE
     const seq1 = mobbu
@@ -121,5 +117,23 @@ export function syncTimelineTest() {
     btnStartReverse.addEventListener('click', () => {
         syncTimeline.stop();
         syncTimeline.playReverse();
+    });
+
+    btnPlayFrom.addEventListener('click', () => {
+        syncTimeline.stop();
+        syncTimeline.playFrom(5000);
+    });
+
+    btnPlayFromReverse.addEventListener('click', () => {
+        syncTimeline.stop();
+        syncTimeline.playFromReverse(5000);
+    });
+
+    btnMoreRotation.addEventListener('click', () => {
+        rotation = 2880;
+    });
+
+    btnLessRotation.addEventListener('click', () => {
+        rotation = 720;
     });
 }

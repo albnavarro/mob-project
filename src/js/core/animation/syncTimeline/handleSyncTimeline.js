@@ -232,7 +232,18 @@ export class HandleSyncTimeline {
         this.timeAtReverseBack = 0;
     }
 
+    /**
+     * Control play on forward direction
+     */
     play() {
+        this.playFromTime();
+    }
+
+    playFrom(time) {
+        this.playFromTime(time);
+    }
+
+    playFromTime(time = 0) {
         if (this.isInInzializing || this.fpsInLoading) return;
 
         this.resetTime();
@@ -245,30 +256,45 @@ export class HandleSyncTimeline {
         this.isPlayngReverse = false;
         this.loopCounter = 0;
 
+        this.endTime = time;
+        this.timeAtReverseBack = -this.endTime;
+
         // Prevent multiple play whild fps is loading
         this.fpsInLoading = true;
-        this.startAnimation(0);
+        this.startAnimation(time);
+    }
+
+    /**
+     * Control play on backward direction
+     */
+    playFromReverse(time) {
+        this.playFromTimeReverse(time, true);
     }
 
     playReverse() {
+        this.playFromTimeReverse(this.duration, true);
+    }
+
+    playFromTimeReverse(time = 0) {
         if (this.isInInzializing || this.fpsInLoading) return;
 
         // Jump to last time
-        this.timeElapsed = this.duration;
-        this.endTime = this.duration;
-        this.pauseTime = this.duration;
+        this.timeElapsed = time;
+        this.endTime = time;
+        this.pauseTime = time;
 
         // reset
         this.timeAtReverse = 0;
         this.timeAtReverseBack = 0;
         this.isStopped = false;
         this.pauseStatus = false;
-        this.isReverse = false;
-        this.isPlayngReverse = true;
         this.loopCounter = 0;
+        this.isReverse = false;
 
         // playReverse props
         this.startReverse = true;
+        this.isPlayngReverse = true;
+
         this.skipFirstRender = true;
 
         // While start isInInzializing fa fallire le altre raf
@@ -276,7 +302,7 @@ export class HandleSyncTimeline {
 
         // Prevent multiple play whild fps is loading
         this.fpsInLoading = true;
-        this.startAnimation(this.duration);
+        this.startAnimation(time);
     }
 
     startAnimation(partial) {

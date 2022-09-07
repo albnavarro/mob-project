@@ -165,6 +165,12 @@ export class HandleAsyncTimeline {
                     return tween[action](valuesFrom, valuesTo, newTweenProps);
                 },
                 sync: () => {
+                    if (this.autoSet)
+                        console.warn(
+                            `With autoSet active sync methods can produce sideEffect,
+                            the set added at the end of pipiline doas not contemplate the prop inherited from other tween`
+                        );
+
                     return new Promise((res) => {
                         const { from, to } = syncProp;
                         to.set(from.getToNativeType(), {
@@ -1050,6 +1056,9 @@ export class HandleAsyncTimeline {
      * Remove all reference from tween
      */
     destroy() {
+        this.tweenStore.forEach((tween) => {
+            if ('destroy' in tween) tween.destroy();
+        });
         this.tweenList = [];
         this.currentTween = [];
         this.callbackComplete = [];
