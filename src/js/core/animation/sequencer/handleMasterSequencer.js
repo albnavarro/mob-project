@@ -36,9 +36,19 @@ export class HandleMasterSequencer {
         });
     }
 
+    getLabels() {
+        return this.children.map((item) => item.getLabels()).flat();
+    }
+
     disableStagger() {
         this.children.forEach((item) => {
             item.disableStagger();
+        });
+    }
+
+    cleanCachedId() {
+        this.children.forEach((item) => {
+            item.cleanCachedId();
         });
     }
 

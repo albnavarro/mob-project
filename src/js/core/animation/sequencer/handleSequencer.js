@@ -35,10 +35,9 @@ export class HandleSequencer {
         // in draw methods currentValue and settled will be updated for each prop
         // it is used as a mock to create the array to add to the timeline
         this.values = [];
-
         // Timeline array
         this.timeline = [];
-
+        this.labels = [];
         this.callback = [];
         this.callbackCache = [];
         this.callbackOnStop = [];
@@ -203,6 +202,10 @@ export class HandleSequencer {
         this.timeline.forEach(({ start, end }, i) => {
             this.timeline[i].start = getRoundedValue(start * stretchFactor);
             this.timeline[i].end = getRoundedValue(end * stretchFactor);
+        });
+
+        this.labels.forEach(({ time }, i) => {
+            this.labels[i].time = getRoundedValue(time * stretchFactor);
         });
     }
 
@@ -370,6 +373,21 @@ export class HandleSequencer {
 
         this.timeline = this.orderByStart(this.timeline);
         return this;
+    }
+
+    /**
+     * Set label
+     */
+    label(name, time = 0) {
+        this.labels.push({ name, time });
+        return this;
+    }
+
+    /**
+     * Get labels array
+     */
+    getLabels() {
+        return this.labels;
     }
 
     /**

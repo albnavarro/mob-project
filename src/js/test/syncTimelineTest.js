@@ -40,7 +40,8 @@ export function syncTimelineTest() {
             { start: 0, end: 10, ease: 'easeLinear' }
         )
         .goTo({ scale: 2 }, { start: 3.5, end: 5, ease: 'easeInOutBack' })
-        .goTo({ scale: 1 }, { start: 5, end: 6.5, ease: 'easeInOutBack' });
+        .goTo({ scale: 1 }, { start: 5, end: 6.5, ease: 'easeInOutBack' })
+        .label('label1', 5);
 
     seq1.subscribe(({ x, y, rotate, scale }) => {
         target.style.transform = `translate3D(0,0,0) translate(${x}px, ${y}px) scale(${scale}) rotate(${rotate}deg)`;
@@ -61,7 +62,8 @@ export function syncTimelineTest() {
         .goTo({ x: 800 }, { start: 3, end: 5, ease: 'easeInOutBack' })
         .goTo({ x: 0 }, { start: 5, end: 7, ease: 'easeInOutBack' })
         .goTo({ scale: 2 }, { start: 3.5, end: 5, ease: 'easeOutCubic' })
-        .goTo({ scale: 1 }, { start: 5, end: 6, ease: 'easeOutCubic' });
+        .goTo({ scale: 1 }, { start: 5, end: 6, ease: 'easeOutCubic' })
+        .label('label2', 7);
 
     starger.forEach((item) => {
         seqStagger.subscribeCache(item, ({ x, scale }) => {
@@ -121,12 +123,12 @@ export function syncTimelineTest() {
 
     btnPlayFrom.addEventListener('click', () => {
         syncTimeline.stop();
-        syncTimeline.playFrom(5000);
+        syncTimeline.playFrom('label1');
     });
 
     btnPlayFromReverse.addEventListener('click', () => {
         syncTimeline.stop();
-        syncTimeline.playFromReverse(5000);
+        syncTimeline.playFromReverse('label2');
     });
 
     btnMoreRotation.addEventListener('click', () => {

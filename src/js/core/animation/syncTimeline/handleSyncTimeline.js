@@ -5,6 +5,7 @@ import { handleNextTick } from '../../events/rafutils/handleNextTick.js';
 import { clamp } from '../utils/animationUtils.js';
 import { handleSetUp } from '../../setup.js';
 import { fpsLoadedLog } from '../utils/log.js';
+import { storeType } from '../../store/storeType.js';
 
 export class HandleSyncTimeline {
     constructor(data = {}) {
@@ -233,14 +234,34 @@ export class HandleSyncTimeline {
     }
 
     /**
+     * Find label tha match the occurrency and return the time
+     */
+    getTimeFromLabel(name) {
+        const labelObj = this.squencers.reduce((p, c) => {
+            const currentLabels = c.getLabels();
+            const labelsMatched = currentLabels.find(
+                ({ name: currentName }) => currentName === name
+            );
+
+            return labelsMatched || p;
+        }, null);
+
+        if (!labelObj) console.warn(`label ${name} not founded`);
+
+        return labelObj?.time;
+    }
+
+    /**
      * Control play on forward direction
      */
     play() {
         this.playFromTime();
     }
 
-    playFrom(time) {
-        this.playFromTime(time);
+    playFrom(value) {
+        const isNumber = storeType.isNumber(value);
+        const currentTime = isNumber ? value : this.getTimeFromLabel(value);
+        this.playFromTime(currentTime);
     }
 
     playFromTime(time = 0) {
@@ -267,8 +288,10 @@ export class HandleSyncTimeline {
     /**
      * Control play on backward direction
      */
-    playFromReverse(time) {
-        this.playFromTimeReverse(time, true);
+    playFromReverse(value) {
+        const isNumber = storeType.isNumber(value);
+        const currentTime = isNumber ? value : this.getTimeFromLabel(value);
+        this.playFromTimeReverse(currentTime, true);
     }
 
     playReverse() {
@@ -358,6 +381,18 @@ export class HandleSyncTimeline {
     stop() {
         this.isStopped = true;
         this.pauseStatus = false;
+
+        // TO DO: con lo stagger il render del last frame ( es senza translate3d)
+        // va in conflitto con cleanCachedId
+
+        // Fire callbackLoop onStop of each sequencr
+        // this.squencers.forEach((item) => {
+        //     item.draw({
+        //         partial: this.endTime,
+        //         isLastDraw: true,
+        //         useFrame: true,
+        //     });
+        // });
 
         this.squencers.forEach((item) => {
             item.cleanCachedId();

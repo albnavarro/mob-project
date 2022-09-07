@@ -8,6 +8,10 @@ export const sequencerStaggerTime = () => {
     const stop = document.querySelector('.animation-stop');
     const pause = document.querySelector('.animation-pause');
     const resume = document.querySelector('.animation-resume');
+    const playFrom = document.querySelector('.animation-playFrom');
+    const playFromReverse = document.querySelector(
+        '.animation-playFromReverse'
+    );
 
     let masterSequencer = mobbu.create('masterSequencer');
     const duration = 10;
@@ -22,10 +26,11 @@ export const sequencerStaggerTime = () => {
 
     // Create sequencer
     const createSequencer = () => {
-        staggers.forEach(({ item, start, end }) => {
+        staggers.forEach(({ item, start, end, index }) => {
             const sequencer = mobbu
                 .create('sequencer', { data: { y: 0 }, duration })
-                .goTo({ y: 300 }, { start, end, ease: 'easeInOutBack' });
+                .goTo({ y: 300 }, { start, end, ease: 'easeInOutBack' })
+                .label(`label${index}`, start);
 
             const unsubscribe = sequencer.subscribe(({ y }) => {
                 item.style.transform = `translate3D(0px,0px,0px) translate(0, ${y}px)`;
@@ -46,7 +51,7 @@ export const sequencerStaggerTime = () => {
      **/
     const timeline = mobbu
         .create('syncTimeline', {
-            repeat: -1,
+            repeat: 3,
             yoyo: true,
             duration: 2000,
         })
@@ -74,5 +79,13 @@ export const sequencerStaggerTime = () => {
 
     resume.addEventListener('click', () => {
         timeline.resume();
+    });
+
+    playFrom.addEventListener('click', () => {
+        timeline.playFrom('label4');
+    });
+
+    playFromReverse.addEventListener('click', () => {
+        timeline.playFromReverse('label4');
     });
 };
