@@ -166,12 +166,6 @@ export class HandleAsyncTimeline {
                     return tween[action](valuesFrom, valuesTo, newTweenProps);
                 },
                 sync: () => {
-                    if (this.autoSet)
-                        console.warn(
-                            `With autoSet active sync methods can produce sideEffect,
-                            the set added at the end of pipiline doas not contemplate the prop inherited from other tween`
-                        );
-
                     return new Promise((res) => {
                         const { from, to } = syncProp;
                         to.set(from.getToNativeType(), {
@@ -764,10 +758,6 @@ export class HandleAsyncTimeline {
 
     /*
      * Add a set 'tween' ati start and end of timeline.
-     *
-     * ! this option can fail with sync methods becouse
-     * the tween that use the prop get data during the animation
-     *
      */
     addSetBlocks() {
         // Create set only one time
@@ -805,13 +795,45 @@ export class HandleAsyncTimeline {
          */
         this.tweenStore.forEach(({ id, tween }) => {
             /*
-             * Create an object with all props updated with last
+             * currenId can change if sync action require
              */
+            let currentId = id;
             const setValueTo = this.tweenList.reduce((p, c) => {
-                const tweenItem = c.find(
-                    ({ data }) => data?.tween?.uniqueId === id
+                /*
+                 * Sync must be outside group so is at 0
+                 */
+                const currentData = c[0].data;
+                const action = currentData.action;
+
+                /*
+                 * If tween is syncronize with another tween,
+                 * switch currenTween to the new one
+                 */
+                if (action === 'sync') {
+                    const syncProp = currentData?.syncProp;
+
+                    const from = {
+                        tween: syncProp.from,
+                        id: syncProp.from.uniqueId,
+                    };
+                    const to = {
+                        tween: syncProp.to,
+                        id: syncProp.to.uniqueId,
+                    };
+
+                    /*
+                     * Switch current id ( uniqueID )
+                     */
+                    if (from.id === currentId) {
+                        currentId = to.id;
+                    }
+                }
+
+                const currentTween = c.find(
+                    ({ data }) => data?.tween?.uniqueId === currentId
                 );
-                const currentValueTo = tweenItem?.data?.valuesTo;
+
+                const currentValueTo = currentTween?.data?.valuesTo;
                 return currentValueTo ? { ...p, ...currentValueTo } : p;
             }, {});
 

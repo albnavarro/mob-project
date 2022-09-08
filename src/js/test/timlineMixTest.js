@@ -52,7 +52,11 @@ export function timlineMixTest() {
     });
 
     // DEFINE TIMELINE
-    const timeline = mobbu.create('asyncTimeline', { repeat: 4, yoyo: false });
+    const timeline = mobbu.create('asyncTimeline', {
+        repeat: 4,
+        yoyo: false,
+        autoSet: true,
+    });
 
     timeline.onComplete(() => {
         console.log('complete');
@@ -95,6 +99,10 @@ export function timlineMixTest() {
         timeline.play();
     });
 
+    btnReverse.addEventListener('click', () => {
+        timeline.reverse();
+    });
+
     btnStop.addEventListener('click', () => {
         timeline.stop();
     });
@@ -105,6 +113,10 @@ export function timlineMixTest() {
 
     btnPlay.addEventListener('click', () => {
         timeline.resume();
+    });
+
+    btnReverseNext.addEventListener('click', () => {
+        timeline.reverseNext();
     });
 
     btnFrom.addEventListener('click', () => {
@@ -128,22 +140,6 @@ export function timlineMixTest() {
         timeline.stop();
         tweenBox2.set({ rotate: 180 }).then(() => {
             timeline.playFromReverse('label1');
-        });
-    });
-
-    btnReverseNext.addEventListener('click', () => {
-        timeline.reverseNext();
-    });
-
-    btnReverse.addEventListener('click', () => {
-        /*
-         * tweenBox2 hanve a delay so rended position immediatly
-         * If we manipulate tween out side timeline call stop()
-         * for added security in timeline promise chain
-         */
-        timeline.stop();
-        tweenBox2.set({ rotate: -180 }).then(() => {
-            timeline.reverse();
         });
     });
 
