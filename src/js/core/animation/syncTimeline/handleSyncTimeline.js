@@ -24,7 +24,7 @@ export class HandleSyncTimeline {
         this.repeat = data?.repeat ? data.repeat : false;
         this.yoyo = data?.yoyo ? data.yoyo : false;
         this.loopCounter = 0;
-        this.squencers = [];
+        this.sequencers = [];
         this.completed = false;
         this.isPlayngReverse = false;
         this.BACKWARD = 'backward';
@@ -76,7 +76,7 @@ export class HandleSyncTimeline {
             // When come from playReverse skip first frame becouse is 0
             if (!this.skipFirstRender) {
                 if (shouldRender) {
-                    this.squencers.forEach((item) => {
+                    this.sequencers.forEach((item) => {
                         item.draw({
                             partial: this.endTime,
                             isLastDraw: false,
@@ -161,7 +161,7 @@ export class HandleSyncTimeline {
             // Fire callbackLoop onStop of each sequencr
             // Prevent async problem, endTime back to start, so store the value
             const endTime = this.endTime;
-            this.squencers.forEach((item) => {
+            this.sequencers.forEach((item) => {
                 item.draw({
                     partial: endTime,
                     isLastDraw: true,
@@ -237,7 +237,7 @@ export class HandleSyncTimeline {
      * Find label tha match the occurrency and return the time
      */
     getTimeFromLabel(name) {
-        const labelObj = this.squencers.reduce((p, c) => {
+        const labelObj = this.sequencers.reduce((p, c) => {
             const currentLabels = c.getLabels();
             const labelsMatched = currentLabels.find(
                 ({ name: currentName }) => currentName === name
@@ -332,7 +332,7 @@ export class HandleSyncTimeline {
         loadFps().then(({ averageFPS }) => {
             fpsLoadedLog('sequencer', averageFPS);
 
-            this.squencers.forEach((item) => {
+            this.sequencers.forEach((item) => {
                 item.inzializeStagger();
                 item.disableStagger();
                 item.draw({
@@ -386,7 +386,7 @@ export class HandleSyncTimeline {
         // va in conflitto con cleanCachedId
 
         // Fire callbackLoop onStop of each sequencr
-        // this.squencers.forEach((item) => {
+        // this.sequencers.forEach((item) => {
         //     item.draw({
         //         partial: this.endTime,
         //         isLastDraw: true,
@@ -394,14 +394,14 @@ export class HandleSyncTimeline {
         //     });
         // });
 
-        this.squencers.forEach((item) => {
+        this.sequencers.forEach((item) => {
             item.cleanCachedId();
         });
     }
 
     add(sequencer) {
         sequencer.setStretchFactor(this.duration);
-        this.squencers.push(sequencer);
+        this.sequencers.push(sequencer);
 
         return this;
     }
@@ -440,7 +440,7 @@ export class HandleSyncTimeline {
      * Remove all reference from tween
      */
     destroy() {
-        this.squencers = [];
+        this.sequencers = [];
         this.callbackLoop = [];
         this.callbackComplete = [];
     }

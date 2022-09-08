@@ -11,9 +11,13 @@ export function timlineMixTest() {
     const btnReverse = document.querySelector('.mix-btn-reverse');
     const btnFast = document.querySelector('.mix-btn-fast-step3');
     const btnSlow = document.querySelector('.mix-btn-slow-step3');
+    const btnToggleSuspend = document.querySelector('.mix-btn-toggle-suspend');
+    const suspendLabel = btnToggleSuspend.querySelector('span');
     const target = document.querySelector('.mix-target');
     const target2 = document.querySelector('.mix-target2');
     let durationTest = 850;
+    let toggleSuspend = false;
+    suspendLabel.innerHTML = `: ${toggleSuspend}`;
 
     btnFast.addEventListener('click', () => {
         durationTest = 200;
@@ -73,6 +77,7 @@ export function timlineMixTest() {
         .closeGroup()
         .label({ name: 'label1' })
         .goTo(tweenBox1, { x: -100, rotate: 180 }, { ease: 'easeInElastic' })
+        .suspend(() => toggleSuspend)
         // .add(() => timeline.reverseNext())
         .sync({ from: tweenBox1, to: springBox1 })
         .createGroup({ waitComplete: false })
@@ -84,8 +89,6 @@ export function timlineMixTest() {
         .goTo(tweenBox2, { rotate: -180 }, { duration: 5000 })
         .closeGroup()
         .goTo(springBox1, { x: -400 });
-
-    // .suspend();
 
     // LISTNER
     btnStart.addEventListener('click', () => {
@@ -142,5 +145,10 @@ export function timlineMixTest() {
         tweenBox2.set({ rotate: -180 }).then(() => {
             timeline.reverse();
         });
+    });
+
+    btnToggleSuspend.addEventListener('click', () => {
+        toggleSuspend = !toggleSuspend;
+        suspendLabel.innerHTML = `: ${toggleSuspend}`;
     });
 }

@@ -1,4 +1,5 @@
 import { handleFrameIndex } from '../../events/rafutils/handleFrameIndex.js';
+import { storeType } from '../../store/storeType.js';
 import { getTime } from '../../utils/time.js';
 
 export class HandleAsyncTimeline {
@@ -244,8 +245,26 @@ export class HandleAsyncTimeline {
                     return new Promise((res) => res());
                 },
                 suspend: () => {
+                    /*
+                     * Prevent fire the same last add
+                     * Es reverseNext inside it cause an infinite loop
+                     */
+                    if (prevActionIsCurrent) {
+                        return new Promise((res) => res());
+                    }
+
+                    /*
+                     * Check callback that return a bollean to fire supend
+                     */
+                    const valueIsValid = storeType.isBoolean(tween());
+                    if (!valueIsValid)
+                        console.warn(
+                            `Supend: ${tween()} is not a valid value, must be a boolean`
+                        );
+
+                    const sholudSuspend = valueIsValid ? tween() : true;
                     return new Promise((res) => {
-                        if (!isImmediate) {
+                        if (!isImmediate && sholudSuspend) {
                             this.isSuspended = true;
                         }
                         res();
@@ -331,6 +350,9 @@ export class HandleAsyncTimeline {
                          * another tween in delay
                          * fire this tween immediatly, so avoid probem
                          * with much delay in same group
+                         *
+                         * ! when stop the timeline manually ( es timeline.stop() )
+                         * It will not activate
                          */
                         if (this.actionAfterReject.length > 0) {
                             deltaTimeOnpause = 0;
@@ -704,11 +726,17 @@ export class HandleAsyncTimeline {
         return this;
     }
 
-    // Don't use inside group
-    suspend() {
+    /**
+     * Don't use inside group !
+     * Is different from pause
+     * Suspend prevent go next step but dont't pause the current tween
+     */
+    suspend(fn = () => true) {
         const obj = {
             id: this.currentTweenCounter,
+            tween: fn,
             action: 'suspend',
+            groupProps: { waitComplete: this.waitComplete },
         };
 
         this.currentTweenCounter++;
@@ -724,6 +752,7 @@ export class HandleAsyncTimeline {
             id: this.currentTweenCounter,
             action: 'label',
             labelProps,
+            groupProps: { waitComplete: this.waitComplete },
         };
 
         this.currentTweenCounter++;
