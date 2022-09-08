@@ -927,6 +927,13 @@ export class HandleAsyncTimeline {
          * Use of label inside a group becouse is parallel
          */
         this.currentIndex = 0;
+
+        /**
+         * Come from reverse so we have to reset forceYoyo
+         * Becouse reverse need to walk the timeline and go back
+         * And the test loop doasn't reach the code were forceYoYo is resetted
+         */
+        this.forceYoyo = false;
         this.goToLabelIndex = this.tweenList.findIndex((item) => {
             const [firstItem] = item;
             const labelCheck = firstItem.data.labelProps?.name;
