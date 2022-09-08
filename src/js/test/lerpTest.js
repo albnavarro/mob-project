@@ -26,23 +26,23 @@ export function lerpTest() {
 
     // DEFINE TIMELINE
     const timeline = mobbu
-        .create('asyncTimeline', { repeat: 2, yoyo: true })
+        .create('asyncTimeline', { repeat: 2, yoyo: true, freeMode: true })
         .set(mylerp, { x: 0, y: 0, rotate: 0 })
         .goTo(mylerp, { x: -200 }, { velocity: 0.02, precision: 1 })
         .goFromTo(mylerp, { x: -200 }, { x: 400 })
-        .add(({ reverse }) => {
-            console.log('custom function, is reversed:', reverse);
+        .add(({ loop, direction }) => {
+            console.log('custom function:', loop, direction);
         })
-        .addAsync(({ reverse, resolve }) => {
+        .addAsync(({ loop, direction, resolve }) => {
             console.log('start async function');
             setTimeout(() => {
-                console.log('end async function, is reversed:', reverse);
+                console.log('end async function:', loop, direction);
                 resolve();
             }, 2000);
         })
         .goTo(mylerp, { y: 400 }, { velocity: 0.05, precision: 1 })
-        .add(({ reverse }) => {
-            console.log('custom function, is reversed:', reverse);
+        .add(({ loop, direction }) => {
+            console.log('custom function:', loop, direction);
         })
         .label({ name: 'label1' })
         .goTo(mylerp, { x: -100, rotate: 90 }, { velocity: 0.09, precision: 1 })

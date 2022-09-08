@@ -33,7 +33,7 @@ export function springTest() {
 
     // DEFINE TIMELINE
     const timeline = mobbu
-        .create('asyncTimeline', { repeat: 2, yoyo: true })
+        .create('asyncTimeline', { repeat: 2, yoyo: true, freeMode: true })
         .add(() => mySpring.updatePreset('wobbly'))
         .set(
             mySpring,
