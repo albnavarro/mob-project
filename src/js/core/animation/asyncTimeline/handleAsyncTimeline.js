@@ -927,13 +927,6 @@ export class HandleAsyncTimeline {
          * Use of label inside a group becouse is parallel
          */
         this.currentIndex = 0;
-
-        /**
-         * Come from reverse so we have to reset forceYoyo
-         * Becouse reverse need to walk the timeline and go back
-         * And the test loop doasn't reach the code were forceYoYo is resetted
-         */
-        this.forceYoyo = false;
         this.goToLabelIndex = this.tweenList.findIndex((item) => {
             const [firstItem] = item;
             const labelCheck = firstItem.data.labelProps?.name;
@@ -948,7 +941,7 @@ export class HandleAsyncTimeline {
         this.timelineIsInTestMode = true;
         this.currentLabel = label;
         this.currentLabelIsReversed = false;
-        this.reverse();
+        this.reverse(false);
         return this;
     }
 
@@ -957,11 +950,11 @@ export class HandleAsyncTimeline {
         this.timelineIsInTestMode = true;
         this.currentLabel = label;
         this.currentLabelIsReversed = true;
-        this.reverse();
+        this.reverse(false);
         return this;
     }
 
-    reverse() {
+    reverse(forceYoYo = true) {
         if (this.autoSet) this.addSetBlocks();
 
         // Skip of there is nothing to run
@@ -982,8 +975,10 @@ export class HandleAsyncTimeline {
         /*
          * Walk thru timeline until the end,
          * so we can run reverse next step with forceyoyo
+         * forceyoyo is used only if we play directly from end
+         * PlayFrom wich use reverse() need to go in forward direction
          */
-        this.forceYoyo = true;
+        if (forceYoYo) this.forceYoyo = true;
         this.goToLabelIndex = this.tweenList.length;
 
         /**
