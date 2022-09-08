@@ -2,6 +2,11 @@ import { frameStore } from './frameStore.js';
 
 export const handleCache = (() => {
     let id = 0;
+
+    /**
+     * Incremoene and decrement when we add or fire a item
+     * hadleFrme use that to check if the requestAnimationFrame have to go on
+     */
     let cacheCoutner = 0;
     const subscriber = {};
 
@@ -39,6 +44,12 @@ export const handleCache = (() => {
         const el = subscriber[id];
         if (!el) return;
 
+        /*
+         * When we remove some items before fired we have to update the
+         * cachecounter so handleFrame can stop
+         */
+        const frameToSubstract = Object.keys(el.data).length;
+        cacheCoutner = cacheCoutner - frameToSubstract;
         el.data = {};
     };
 
