@@ -582,6 +582,13 @@ export class HandleLerp {
     }
 
     /**
+     * Get uniqueId
+     */
+    getId() {
+        return this.uniqueId;
+    }
+
+    /**
      * updatePreset - Update config object with new preset
      *
      * @param  {String} preset new preset

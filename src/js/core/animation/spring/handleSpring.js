@@ -600,6 +600,13 @@ export class HandleSpring {
     }
 
     /**
+     * Get uniqueId
+     */
+    getId() {
+        return this.uniqueId;
+    }
+
+    /**
      * updateConfig - Update config object
      *
      * @param  {Object} config udate single prop of config object

@@ -488,7 +488,7 @@ export class HandleAsyncTimeline {
     }
 
     addToActiveTween(tween) {
-        const tweenId = tween?.uniqueId;
+        const tweenId = tween?.getId && tween.getId();
         if (!tweenId) return this.NOOP;
 
         const prevActiveTweenCounter = this.activetweenCounter;
@@ -496,7 +496,7 @@ export class HandleAsyncTimeline {
 
         this.currentTween.push({
             tween,
-            uniqueId: tween?.uniqueId,
+            uniqueId: tweenId,
             id: prevActiveTweenCounter,
         });
 
@@ -557,11 +557,11 @@ export class HandleAsyncTimeline {
     }
 
     addTweenToStore(tween) {
-        const uniqueId = tween.uniqueId;
+        const uniqueId = tween?.getId && tween.getId();
         const tweenIsStored = this.tweenStore.find(({ id }) => id === uniqueId);
         if (tweenIsStored) return;
 
-        const obj = { id: tween.uniqueId, tween };
+        const obj = { id: uniqueId, tween };
         this.tweenStore.push(obj);
     }
 
@@ -673,6 +673,31 @@ export class HandleAsyncTimeline {
     }
 
     sync(syncProp) {
+        /*
+         * Check if from and to is a tween
+         */
+        const fromIsTween =
+            syncProp?.from?.getType &&
+            (syncProp.from.getType() === 'LERP' ||
+                syncProp.from.getType() === 'SPRING' ||
+                syncProp.from.getType() === 'TWEEN');
+
+        const toIsTween =
+            syncProp?.to?.getType &&
+            (syncProp.to.getType() === 'LERP' ||
+                syncProp.to.getType() === 'SPRING' ||
+                syncProp.to.getType() === 'TWEEN');
+
+        if (!fromIsTween) {
+            console.warn(`timeline.sync(): from is not a tween`);
+        }
+
+        if (!toIsTween) {
+            console.warn(`timeline.sync(): to is not a tween`);
+        }
+
+        if (!toIsTween || !fromIsTween) return this;
+
         const obj = {
             id: this.currentTweenCounter,
             action: 'sync',
@@ -814,11 +839,11 @@ export class HandleAsyncTimeline {
 
                     const from = {
                         tween: syncProp.from,
-                        id: syncProp.from.uniqueId,
+                        id: syncProp.from.getId && syncProp.from.getId(),
                     };
                     const to = {
                         tween: syncProp.to,
-                        id: syncProp.to.uniqueId,
+                        id: syncProp.to.getId && syncProp.to.getId(),
                     };
 
                     /*
@@ -829,9 +854,10 @@ export class HandleAsyncTimeline {
                     }
                 }
 
-                const currentTween = c.find(
-                    ({ data }) => data?.tween?.uniqueId === currentId
-                );
+                const currentTween = c.find(({ data }) => {
+                    const uniqueId = data?.tween?.getId && data.tween.getId();
+                    return uniqueId === currentId;
+                });
 
                 const currentValueTo = currentTween?.data?.valuesTo;
                 return currentValueTo ? { ...p, ...currentValueTo } : p;
