@@ -230,8 +230,8 @@ export class HandleSequencer {
     }
 
     /**
-     * Methods call by timeline, everty time fired play, playFrom etcc..
-     * or loop end reset the data that control add claback to have a new clean check
+     * Methods call by timeline, everty time user use play, playFrom etcc.. or loop end.
+     * Reset the data that control add callback to have a new clean state
      */
     resetLastValue() {
         this.firstRun = true;
@@ -240,10 +240,10 @@ export class HandleSequencer {
     }
 
     /**
-     * Fire add callback first time without check the previous position
-     * bicouse forst time we can start from any position and we doasn't a have previous position
-     * so we fir the callback once
-     * To skip thi sfiring check isForce prop in callback
+     * Fire addCallback first time without check the previous position.
+     * becouse first time we can start from any position and we doasn't a have previous position
+     * So we fir the callback once
+     * To skip this callback, check isForce prop in callback
      */
     actionAtFirstRender(time) {
         if (!this.forceAddFnAtFirstRun) return;
@@ -259,14 +259,15 @@ export class HandleSequencer {
                 direction: this.BACKWARD,
             };
 
-            const direction = mustFireForward.shouldFire
-                ? mustFireForward.direction
-                : mustFireBackward.direction;
-
             const mustFire =
                 mustFireForward.shouldFire || mustFireBackward.shouldFire;
 
             if (!mustFire) return;
+
+            const direction = mustFireForward.shouldFire
+                ? mustFireForward.direction
+                : mustFireBackward.direction;
+
             fn({ direction, value: time, isForced: true });
         });
 
