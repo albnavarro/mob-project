@@ -33,7 +33,12 @@ import {
     setCallBack,
     setCallBackCache,
 } from '../utils/callbacks/setCallback.js';
-import { goTo, goFrom, goFromTo, set } from '../utils/actions.js';
+import {
+    goToUtils,
+    goFromUtils,
+    goFromToUtils,
+    setUtils,
+} from '../utils/actions.js';
 import { initRaf } from '../utils/initRaf.js';
 import {
     compareKeysWarning,
@@ -447,7 +452,7 @@ export class HandleTween {
     goTo(obj, props = {}) {
         if (this.pauseStatus || this.comeFromResume) this.stop();
         this.useStagger = true;
-        const data = goTo(obj);
+        const data = goToUtils(obj);
         return this.doAction(data, props, obj);
     }
 
@@ -464,7 +469,7 @@ export class HandleTween {
     goFrom(obj, props = {}) {
         if (this.pauseStatus || this.comeFromResume) this.stop();
         this.useStagger = true;
-        const data = goFrom(obj);
+        const data = goFromUtils(obj);
         return this.doAction(data, props, obj);
     }
 
@@ -487,7 +492,7 @@ export class HandleTween {
             return this.promise;
         }
 
-        const data = goFromTo(fromObj, toObj);
+        const data = goFromToUtils(fromObj, toObj);
         return this.doAction(data, props, fromObj);
     }
 
@@ -505,7 +510,7 @@ export class HandleTween {
     set(obj, props = {}) {
         if (this.pauseStatus || this.comeFromResume) this.stop();
         this.useStagger = false;
-        const data = set(obj);
+        const data = setUtils(obj);
 
         // In set mode duration is small as possible
         props.duration = 1;

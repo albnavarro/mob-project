@@ -20,13 +20,21 @@ export const createStagger = () => {
 
     // Create sequencer
     const createSequencer = () => {
-        sequencers = staggers.map(({ item, start, end, index }) => {
+        sequencers = staggers.map(({ item, start, end }) => {
             const sequencer = mobbu
                 .create('sequencer', {
                     duration,
                     data: { scale: 0.5 },
                 })
-                .goTo({ scale: 1 }, { start, end });
+                .goTo({ scale: 1 }, { start, end })
+                .add(({ direction, isForced }) => {
+                    console.log('add function', direction, isForced);
+                    if (direction == 'forward') {
+                        item.classList.add('is-red');
+                    } else {
+                        item.classList.remove('is-red');
+                    }
+                }, end - 1);
 
             const unsubscribe = sequencer.subscribe(({ scale }) => {
                 item.style.transform = `translate3D(0px,0px,0px) scale(${scale})`;

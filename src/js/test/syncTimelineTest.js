@@ -41,7 +41,11 @@ export function syncTimelineTest() {
         )
         .goTo({ scale: 2 }, { start: 3.5, end: 5, ease: 'easeInOutBack' })
         .goTo({ scale: 1 }, { start: 5, end: 6.5, ease: 'easeInOutBack' })
-        .label('label1', 5);
+        .label('label1', 5)
+        .add(({ direction, value, isForced }) => {
+            if (isForced) return;
+            console.log(`add fired at ${value} in ${direction} direction`);
+        }, 2);
 
     seq1.subscribe(({ x, y, rotate, scale }) => {
         target.style.transform = `translate3D(0,0,0) translate(${x}px, ${y}px) scale(${scale}) rotate(${rotate}deg)`;

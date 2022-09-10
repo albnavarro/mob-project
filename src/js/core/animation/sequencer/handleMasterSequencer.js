@@ -40,6 +40,10 @@ export class HandleMasterSequencer {
         return this.children.map((item) => item.getLabels()).flat();
     }
 
+    resetLastValue() {
+        this.children.forEach((item) => item.resetLastValue());
+    }
+
     disableStagger() {
         this.children.forEach((item) => {
             item.disableStagger();

@@ -81,6 +81,7 @@ export class HandleSyncTimeline {
                             partial: this.endTime,
                             isLastDraw: false,
                             useFrame: true,
+                            direction: this.getDirection(),
                         });
                     });
                 }
@@ -103,6 +104,9 @@ export class HandleSyncTimeline {
             this.goToNextFrame();
             return;
         }
+
+        // Reset sequancer callback add function state
+        this.resetSequencerLastValue();
 
         /*
          * Start revere animation
@@ -166,6 +170,7 @@ export class HandleSyncTimeline {
                     partial: endTime,
                     isLastDraw: true,
                     useFrame: true,
+                    direction: this.getDirection(),
                 });
             });
 
@@ -267,6 +272,9 @@ export class HandleSyncTimeline {
     playFromTime(time = 0) {
         if (this.isInInzializing || this.fpsInLoading) return;
 
+        // Reset sequancer callback add function state
+        this.resetSequencerLastValue();
+
         this.resetTime();
         this.isStopped = false;
         this.pauseStatus = false;
@@ -300,6 +308,9 @@ export class HandleSyncTimeline {
 
     playFromTimeReverse(time = 0) {
         if (this.isInInzializing || this.fpsInLoading) return;
+
+        // Reset sequancer callback add function state
+        this.resetSequencerLastValue();
 
         // Jump to last time
         this.timeElapsed = time;
@@ -339,6 +350,7 @@ export class HandleSyncTimeline {
                     partial,
                     isLastDraw: false,
                     useFrame: true,
+                    direction: this.getDirection(),
                 });
             });
 
@@ -370,6 +382,8 @@ export class HandleSyncTimeline {
     reverse() {
         if (this.isStopped || this.pauseStatus || this.isInInzializing) return;
 
+        // Reset sequancer callback add function state
+        this.resetSequencerLastValue();
         this.isReverse = !this.isReverse;
         if (this.isReverse) {
             this.timeAtReverse = this.timeElapsed;
@@ -391,6 +405,7 @@ export class HandleSyncTimeline {
         //         partial: this.endTime,
         //         isLastDraw: true,
         //         useFrame: true,
+        //         direction: this.getDirection(),
         //     });
         // });
 
@@ -410,6 +425,10 @@ export class HandleSyncTimeline {
         this.duration = duration;
 
         return this;
+    }
+
+    resetSequencerLastValue() {
+        this.sequencers.forEach((item) => item.resetLastValue());
     }
 
     onLoopEnd(cb) {

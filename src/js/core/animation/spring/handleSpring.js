@@ -33,7 +33,12 @@ import {
     setCallBack,
     setCallBackCache,
 } from '../utils/callbacks/setCallback.js';
-import { goTo, goFrom, goFromTo, set } from '../utils/actions.js';
+import {
+    goToUtils,
+    goFromUtils,
+    goFromToUtils,
+    setUtils,
+} from '../utils/actions.js';
 import { initRaf } from '../utils/initRaf.js';
 import { resume } from '../utils/resume.js';
 import {
@@ -429,7 +434,7 @@ export class HandleSpring {
     goTo(obj, props = {}) {
         if (this.pauseStatus) return;
         this.useStagger = true;
-        const data = goTo(obj);
+        const data = goToUtils(obj);
         return this.doAction(data, props, obj);
     }
 
@@ -446,7 +451,7 @@ export class HandleSpring {
     goFrom(obj, props = {}) {
         if (this.pauseStatus) return;
         this.useStagger = true;
-        const data = goFrom(obj);
+        const data = goFromUtils(obj);
         return this.doAction(data, props, obj);
     }
 
@@ -469,7 +474,7 @@ export class HandleSpring {
             return this.promise;
         }
 
-        const data = goFromTo(fromObj, toObj);
+        const data = goFromToUtils(fromObj, toObj);
         return this.doAction(data, props, fromObj);
     }
 
@@ -486,7 +491,7 @@ export class HandleSpring {
     set(obj, props = {}) {
         if (this.pauseStatus) return;
         this.useStagger = false;
-        const data = set(obj);
+        const data = setUtils(obj);
         return this.doAction(data, props, obj);
     }
 

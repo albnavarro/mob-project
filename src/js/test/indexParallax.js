@@ -17,7 +17,12 @@ export function indexParallax() {
         })
         .goFrom({ y: -100, opacity: 0 }, { start: 0, end: 3 })
         .goTo({ rotate: 90, scale: 1.5 }, { start: 2, end: 8 })
-        .goTo({ y: 100, opacity: 0 }, { start: 7, end: 10 });
+        .goTo({ y: 100, opacity: 0 }, { start: 7, end: 10 })
+        .add(({ direction, value, isForced }) => {
+            console.log(
+                `add fired at ${value} in ${direction} direction, isForced:${isForced}`
+            );
+        }, 5);
 
     myParallaxTimeline.subscribe(({ scale, rotate, opacity, y, x }) => {
         const xW = (x * window.innerWidth) / 100;

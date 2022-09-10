@@ -41,6 +41,7 @@ export class HandleSequencer {
         this.callback = [];
         this.callbackCache = [];
         this.callbackOnStop = [];
+        this.callbackAdd = [];
         this.unsubscribeCache = [];
         this.duration = data?.duration
             ? data.duration
@@ -51,6 +52,13 @@ export class HandleSequencer {
             end: this.duration,
             ease: data?.ease ? data.ease : handleSetUp.get('sequencer').ease,
         };
+        this.firstRun = true;
+        this.forceAddFnAtFirstRun = true;
+        this.direction = null;
+        this.lastPartial = null;
+        this.lastDirection = null;
+        this.BACKWARD = 'backward';
+        this.FORWARD = 'forward';
 
         // Stagger
         this.stagger = getStaggerFromProps(data);
@@ -98,8 +106,33 @@ export class HandleSequencer {
         this.staggerIsReady = true;
     }
 
-    draw({ partial, isLastDraw, useFrame }) {
+    draw({ partial, isLastDraw, useFrame, direction }) {
         const mainFn = () => {
+            /*
+             * First time run or atfer reset lasValue
+             * all the last value is null so get the current value
+             */
+            if (this.firstRun) {
+                this.lastPartial = partial;
+                this.actionAtFirstRender(partial);
+            }
+
+            /**
+             * Inside a timeline the direction is controlled by timeline and pass the value
+             * becouse timeline konw the loop state and direction is stable
+             * Inside a parallax we have a fallback, but we don't have a loop
+             *
+             * On first run check is jumped
+             */
+            if (!this.firstRun && !direction) {
+                this.direction =
+                    partial >= this.lastPartial ? this.FORWARD : this.BACKWARD;
+            }
+
+            if (!this.firstRun && direction) {
+                this.direction = direction;
+            }
+
             /*
             Obj utils to avoid new GC allocation during animation
             Try to reduce the GC timing
@@ -179,9 +212,14 @@ export class HandleSequencer {
                 callbackOnStop: this.callbackOnStop,
             });
 
+            this.fireAddCallBack(partial);
+
             this.useStagger = true;
             // Remove reference to o Object
             GC = null;
+            this.lastPartial = partial;
+            this.lastDirection = this.direction;
+            this.firstRun = false;
         };
 
         if (useFrame) {
@@ -189,6 +227,84 @@ export class HandleSequencer {
         } else {
             handleNextTick.add(() => mainFn());
         }
+    }
+
+    /**
+     * Methods call by timeline, everty time fired play, playFrom etcc..
+     * or loop end reset the data that control add claback to have a new clean check
+     */
+    resetLastValue() {
+        this.firstRun = true;
+        this.lastPartial = null;
+        this.lastDirection = null;
+    }
+
+    /**
+     * Fire add callback first time without check the previous position
+     * bicouse forst time we can start from any position and we doasn't a have previous position
+     * so we fir the callback once
+     * To skip thi sfiring check isForce prop in callback
+     */
+    actionAtFirstRender(time) {
+        if (!this.forceAddFnAtFirstRun) return;
+
+        this.callbackAdd.forEach(({ fn, time: fnTime }) => {
+            const mustFireForward = {
+                shouldFire: time >= fnTime,
+                direction: this.FORWARD,
+            };
+
+            const mustFireBackward = {
+                shouldFire: time <= fnTime,
+                direction: this.BACKWARD,
+            };
+
+            const direction = mustFireForward.shouldFire
+                ? mustFireForward.direction
+                : mustFireBackward.direction;
+
+            const mustFire =
+                mustFireForward.shouldFire || mustFireBackward.shouldFire;
+
+            if (!mustFire) return;
+            fn({ direction, value: time, isForced: true });
+        });
+
+        this.forceAddFnAtFirstRun = false;
+    }
+
+    fireAddCallBack(time) {
+        this.callbackAdd.forEach(({ fn, time: fnTime }) => {
+            /*
+             * In forward mode current time must be greater or equel than fn time
+             * and the last current time must be minor than fn time to prevent
+             * the the fn is fired before fn time is reached
+             */
+            const mustFireForward =
+                this.direction === this.FORWARD &&
+                time > fnTime &&
+                this.lastPartial <= fnTime;
+
+            /*
+             * In backward mode current time must be minor or equal than fn time
+             * and the last current time must be greater than fn time to prevent
+             * the the fn is fired before fn time is reached
+             * time and fnTime cannot be the same, becouse fnTime
+             * is equal max duration of timeline/parallax the previous value
+             * can be equal max duration, so we avoid double firing of fn
+             */
+            const mustFireBackward =
+                this.direction === this.BACKWARD &&
+                time < fnTime &&
+                this.lastPartial >= fnTime;
+
+            // const mustFire =
+            //     (mustFireForward || mustFireBackward) && shouldFired;
+            const mustFire = mustFireForward || mustFireBackward;
+            if (!mustFire) return;
+
+            fn({ direction: this.direction, value: time, isForced: false });
+        });
     }
 
     /**
@@ -206,6 +322,10 @@ export class HandleSequencer {
 
         this.labels.forEach(({ time }, i) => {
             this.labels[i].time = getRoundedValue(time * stretchFactor);
+        });
+
+        this.callbackAdd.forEach(({ time }, i) => {
+            this.callbackAdd[i].time = getRoundedValue(time * stretchFactor);
         });
     }
 
@@ -391,6 +511,24 @@ export class HandleSequencer {
     }
 
     /**
+     * add to fire at x time
+     */
+    add(fn, time = 0) {
+        const fnIsValid = storeType.isFunction(fn);
+        const timeIsValid = storeType.isNumber(time);
+        const addIsValid = fnIsValid && timeIsValid;
+
+        if (!fnIsValid)
+            console.warn('sequencer.add(fn,time) fn is not a function');
+        if (!timeIsValid)
+            console.warn('sequencer.add(fn,time) time is not a a number');
+        if (!addIsValid) return this;
+
+        this.callbackAdd.push({ fn, time });
+        return this;
+    }
+
+    /**
      * subscribe - add callback to stack
      *
      * @param  {function} cb cal function
@@ -465,6 +603,7 @@ export class HandleSequencer {
         this.callback = [];
         this.callbackCache = [];
         this.callbackOnStop = [];
+        this.callbackAdd = [];
         this.unsubscribeCache.forEach((unsubscribe) => unsubscribe());
         this.unsubscribeCache = [];
     }

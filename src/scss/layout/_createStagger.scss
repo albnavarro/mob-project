@@ -24,5 +24,10 @@
         height: 100px;
         background: #ccc;
         transform: scale(0.5);
+        transition: background 0.65s;
+
+        &.is-red {
+            background: red;
+        }
     }
 }

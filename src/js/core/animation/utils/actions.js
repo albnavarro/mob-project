@@ -13,7 +13,7 @@ export const valueIsValid = (val) => {
  * Set goTo value, used by spring and lerp
  *
  **/
-export const goTo = (obj) => {
+export const goToUtils = (obj) => {
     return Object.keys(obj).map((item) => {
         if (!valueIsValid(obj[item])) {
             valueIsNotValidWarning(`${item}: ${obj[item]}`);
@@ -43,7 +43,7 @@ export const goTo = (obj) => {
  * Set goFrom value, used by spring and lerp
  *
  **/
-export const goFrom = (obj) => {
+export const goFromUtils = (obj) => {
     return Object.keys(obj).map((item) => {
         if (!valueIsValid(obj[item])) {
             valueIsNotValidWarning(`${item}: ${obj[item]}`);
@@ -74,7 +74,7 @@ export const goFrom = (obj) => {
  * Set goFromTo value, used by spring and lerp
  *
  **/
-export const goFromTo = (fromObj, toObj) => {
+export const goFromToUtils = (fromObj, toObj) => {
     return Object.keys(fromObj).map((item) => {
         if (!valueIsValid(toObj[item]) || !valueIsValid(fromObj[item])) {
             valueIsNotValidWarning(
@@ -116,7 +116,7 @@ export const goFromTo = (fromObj, toObj) => {
     });
 };
 
-export const set = (obj) => {
+export const setUtils = (obj) => {
     return Object.keys(obj).map((item) => {
         if (!valueIsValid(obj[item])) {
             valueIsNotValidWarning(`${item}: ${obj[item]}`);

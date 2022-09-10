@@ -16,7 +16,7 @@ import {
     setCallBackCache,
 } from '../utils/callbacks/setCallback.js';
 import { syncCallback } from '../utils/callbacks/syncCallback.js';
-import { goTo, goFrom, goFromTo } from '../utils/actions.js';
+import { goToUtils, goFromUtils, goFromToUtils } from '../utils/actions.js';
 import {
     compareKeysWarning,
     staggerIsOutOfRangeWarning,
@@ -184,7 +184,7 @@ export class ParallaxTween {
      * myTween.goTo({ val: 100 });
      */
     goTo(obj, props = {}) {
-        const data = goTo(obj);
+        const data = goToUtils(obj);
         this.setEasingWhileRunning(props);
         this.mergeData(data);
         return this;
@@ -199,7 +199,7 @@ export class ParallaxTween {
      * myTween.goFrom({ val: 100 });
      */
     goFrom(obj, props = {}) {
-        const data = goFrom(obj);
+        const data = goFromUtils(obj);
         this.setEasingWhileRunning(props);
         this.mergeData(data);
         return this;
@@ -222,7 +222,7 @@ export class ParallaxTween {
         }
 
         this.setEasingWhileRunning(props);
-        const data = goFromTo(fromObj, toObj);
+        const data = goFromToUtils(fromObj, toObj);
         this.mergeData(data);
         return this;
     }

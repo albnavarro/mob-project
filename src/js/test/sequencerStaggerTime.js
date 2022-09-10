@@ -30,7 +30,12 @@ export const sequencerStaggerTime = () => {
             const sequencer = mobbu
                 .create('sequencer', { data: { y: 0 }, duration })
                 .goTo({ y: 300 }, { start, end, ease: 'easeInOutBack' })
-                .label(`label${index}`, start);
+                .label(`label${index}`, start)
+                .add(({ direction, value }) => {
+                    console.log(
+                        `add fired at ${value} in ${direction} direction`
+                    );
+                }, start);
 
             const unsubscribe = sequencer.subscribe(({ y }) => {
                 item.style.transform = `translate3D(0px,0px,0px) translate(0, ${y}px)`;
