@@ -1,5 +1,5 @@
 import { handleFrameIndex } from '../../events/rafutils/handleFrameIndex.js';
-import { storeType } from '../../store/storeType.js';
+import { checkType } from '../../store/storeType.js';
 import { getTime } from '../../utils/time.js';
 
 export class HandleAsyncTimeline {
@@ -250,7 +250,7 @@ export class HandleAsyncTimeline {
                     /*
                      * Check callback that return a bollean to fire supend
                      */
-                    const valueIsValid = storeType.isBoolean(tween());
+                    const valueIsValid = checkType(Boolean, tween());
                     if (!valueIsValid)
                         console.warn(
                             `Supend: ${tween()} is not a valid value, must be a boolean`
@@ -557,7 +557,7 @@ export class HandleAsyncTimeline {
     }
 
     addTweenToStore(tween) {
-        const uniqueId = tween?.getId && tween.getId();
+        const uniqueId = tween?.getId?.() && tween.getId();
         const tweenIsStored = this.tweenStore.find(({ id }) => id === uniqueId);
         if (tweenIsStored) return;
 
@@ -677,13 +677,13 @@ export class HandleAsyncTimeline {
          * Check if from and to is a tween
          */
         const fromIsTween =
-            syncProp?.from?.getType &&
+            syncProp?.from?.getType?.() &&
             (syncProp.from.getType() === 'LERP' ||
                 syncProp.from.getType() === 'SPRING' ||
                 syncProp.from.getType() === 'TWEEN');
 
         const toIsTween =
-            syncProp?.to?.getType &&
+            syncProp?.to?.getType?.() &&
             (syncProp.to.getType() === 'LERP' ||
                 syncProp.to.getType() === 'SPRING' ||
                 syncProp.to.getType() === 'TWEEN');
@@ -839,11 +839,11 @@ export class HandleAsyncTimeline {
 
                     const from = {
                         tween: syncProp.from,
-                        id: syncProp.from.getId && syncProp.from.getId(),
+                        id: syncProp.from.getId?.() && syncProp.from.getId(),
                     };
                     const to = {
                         tween: syncProp.to,
-                        id: syncProp.to.getId && syncProp.to.getId(),
+                        id: syncProp.to.getId?.() && syncProp.to.getId(),
                     };
 
                     /*
@@ -855,11 +855,23 @@ export class HandleAsyncTimeline {
                 }
 
                 const currentTween = c.find(({ data }) => {
-                    const uniqueId = data?.tween?.getId && data.tween.getId();
+                    const uniqueId =
+                        data?.tween?.getId?.() && data.tween.getId();
                     return uniqueId === currentId;
                 });
 
-                const currentValueTo = currentTween?.data?.valuesTo;
+                /*
+                 * Align isntant without promise the tween so we have all the data of tween
+                 * the current and the previous merged
+                 */
+                if (currentTween?.data?.tween?.set) {
+                    currentTween.data.tween.set(currentTween?.data?.valuesTo, {
+                        immediateNoPromise: true,
+                    });
+                }
+
+                const currentValueTo =
+                    currentTween?.data?.tween.getToNativeType();
                 return currentValueTo ? { ...p, ...currentValueTo } : p;
             }, {});
 
@@ -1043,7 +1055,7 @@ export class HandleAsyncTimeline {
 
         // Stop all Tween
         this.tweenStore.forEach(({ tween }) => {
-            if (tween?.stop) tween.stop();
+            if (tween?.stop?.()) tween.stop();
         });
 
         // If reverse back to default direction
@@ -1062,7 +1074,7 @@ export class HandleAsyncTimeline {
         this.isInPause = true;
         this.timeOnPause = getTime();
         this.currentTween.forEach(({ tween }) => {
-            if (tween?.pause) tween.pause();
+            if (tween?.pause?.()) tween.pause();
         });
     }
 
@@ -1099,7 +1111,7 @@ export class HandleAsyncTimeline {
 
     resumeEachTween() {
         this.currentTween.forEach(({ tween }) => {
-            if (tween?.resume) tween.resume();
+            if (tween?.resume?.()) tween.resume();
         });
     }
 
@@ -1136,7 +1148,7 @@ export class HandleAsyncTimeline {
      */
     destroy() {
         this.tweenStore.forEach((tween) => {
-            if ('destroy' in tween) tween.destroy();
+            if (tween?.destroy?.()) tween.destroy();
         });
         this.tweenList = [];
         this.currentTween = [];

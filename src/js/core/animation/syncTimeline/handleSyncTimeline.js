@@ -13,16 +13,14 @@ export class HandleSyncTimeline {
         this.timeElapsed = 0;
         this.endTime = 0;
         this.pauseTime = 0;
-        this.duration = data?.duration
-            ? data.duration
-            : handleSetUp.get('sequencer').duration;
+        this.duration = data?.duration || handleSetUp.get('sequencer').duration;
         this.isStopped = true;
         this.isReverse = false;
         this.timeAtReverse = 0;
         this.timeAtReverseBack = 0;
         this.skipFirstRender = false;
-        this.repeat = data?.repeat ? data.repeat : false;
-        this.yoyo = data?.yoyo ? data.yoyo : false;
+        this.repeat = data?.repeat || 0;
+        this.yoyo = data?.yoyo || false;
         this.loopCounter = 0;
         this.sequencers = [];
         this.completed = false;
@@ -34,9 +32,7 @@ export class HandleSyncTimeline {
         this.minLoopIteration = 10;
 
         // Onlu one loop , prevent sideEffct of this.frameThreshold
-        if (this.repeat === 1 || this.repeat === 0) {
-            this.repeat = false;
-        }
+        if (this.repeat === 1) this.repeat = 0;
 
         // callbackLoop on complete
         this.callbackId = 0;

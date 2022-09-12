@@ -27,15 +27,15 @@ export const getRadialArray = (arr, stagger) => {
 
     const radialArrY = getRadialY(chunk, x, y);
 
+    const isAvailableIntoChunk = (arr, i, i2) => {
+        return arr[i] !== undefined && arr[i][i2] !== undefined;
+    };
+
     // Get radial in x direction
     const getRadialX = (arr, x, y) => {
         return arr.reduce((total, row, i) => {
             const offset = Math.abs(i - y);
             let newRow = [];
-
-            const isAvailable = (arr, i, i2) => {
-                return arr[i] !== undefined && chunk[i][i2] !== undefined;
-            };
 
             // Avoid duplicate form before and after y
             if (i >= y && i <= y * 2) {
@@ -47,21 +47,21 @@ export const getRadialArray = (arr, stagger) => {
             const xEnd = x + offset;
 
             for (let i = 0; i < offset; i++) {
-                if (isAvailable(chunk, y + i, xStart)) {
+                if (isAvailableIntoChunk(chunk, y + i, xStart)) {
                     newRow.push(chunk[y + i][xStart]);
                 }
 
-                if (isAvailable(chunk, y + i, xEnd)) {
+                if (isAvailableIntoChunk(chunk, y + i, xEnd)) {
                     newRow.push(chunk[y + i][xEnd]);
                 }
 
                 // Avoid duplicate
                 if (i > 0) {
-                    if (isAvailable(chunk, y - i, xStart)) {
+                    if (isAvailableIntoChunk(chunk, y - i, xStart)) {
                         newRow.push(chunk[y - i][xStart]);
                     }
 
-                    if (isAvailable(chunk, y - i, xEnd)) {
+                    if (isAvailableIntoChunk(chunk, y - i, xEnd)) {
                         newRow.push(chunk[y - i][xEnd]);
                     }
                 }

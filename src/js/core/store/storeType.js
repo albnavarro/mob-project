@@ -12,8 +12,7 @@ export const storeType = {
         Object.prototype.toString.call(value) === '[object Array]',
     isBoolean: (value) =>
         Object.prototype.toString.call(value) === '[object Boolean]',
-    isElement: (value) =>
-        value instanceof Element || value instanceof HTMLDocument,
+    isElement: (value) => value instanceof Element || value instanceof Document,
     isNodeList: (value) =>
         Object.prototype.isPrototypeOf.call(NodeList.prototype, value),
 };

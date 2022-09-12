@@ -13,18 +13,14 @@ export const getEachByFps = (each) => {
 
 export const getStaggerFromProps = (props) => {
     return {
-        each: props?.stagger?.each ? props.stagger.each : 0,
-        from: props?.stagger?.from ? props.stagger.from : 'start',
+        each: props?.stagger?.each || 0,
+        from: props?.stagger?.from || 'start',
         grid: {
-            col: props?.stagger?.grid?.col ? props.stagger.grid.col : -1,
-            row: props?.stagger?.grid?.row ? props.stagger.grid.row : -1,
-            direction: props?.stagger?.grid?.direction
-                ? props.stagger.grid.direction
-                : DIRECTION_COL,
+            col: props?.stagger?.grid?.col || -1,
+            row: props?.stagger?.grid?.row || -1,
+            direction: props?.stagger?.grid?.direction || DIRECTION_COL,
         },
-        waitComplete: props?.stagger?.waitComplete
-            ? props.stagger.waitComplete
-            : false,
+        waitComplete: props?.stagger?.waitComplete || false,
     };
 };
 

@@ -50,7 +50,11 @@ export const infiniteAnimationSync = () => {
         })
         .add(infinite);
 
-    syncTimeline.onComplete(({ direction, loop }) => {
+    syncTimeline.onComplete(() => {
+        console.log(`complete`);
+    });
+
+    syncTimeline.onLoopEnd(({ direction, loop }) => {
         console.log(`direction: ${direction}, loop index: ${loop}`);
     });
 

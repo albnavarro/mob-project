@@ -47,7 +47,7 @@ import {
 import { fpsLoadedLog } from '../utils/log.js';
 import { shouldInizializzeStagger } from '../utils/condition.js';
 import { handleCache } from '../../events/rafutils/handleCache.js';
-import { storeType } from '../../store/storeType.js';
+import { checkType } from '../../store/storeType.js';
 
 export class HandleTween {
     constructor(data = {}) {
@@ -101,6 +101,7 @@ export class HandleTween {
             relative: this.relative,
             reverse: false,
             immediate: false,
+            immediateNoPromise: false,
         };
 
         /**
@@ -114,7 +115,7 @@ export class HandleTween {
          * Set initial store data if defined in constructor props
          * If not use setData methods
          */
-        const props = data?.data ? data.data : null;
+        const props = data?.data || null;
         if (props) this.setData(props);
     }
 
@@ -227,21 +228,25 @@ export class HandleTween {
                 return;
             }
 
-            const { cbNow, cbCompleteNow, fastestStagger, slowlestStagger } =
-                setStagger({
-                    cb,
-                    endCb: this.callbackOnComplete,
-                    stagger: this.stagger,
-                    slowlestStagger: this.slowlestStagger,
-                    fastestStagger: this.fastestStagger,
-                });
+            const {
+                cbStagger,
+                cbCompleteStagger,
+                fastestStagger,
+                slowlestStagger,
+            } = setStagger({
+                arr: cb,
+                endArr: this.callbackOnComplete,
+                stagger: this.stagger,
+                slowlestStagger: this.slowlestStagger,
+                fastestStagger: this.fastestStagger,
+            });
 
             if (this.callbackCache.length > this.callback.length) {
-                this.callbackCache = cbNow;
+                this.callbackCache = cbStagger;
             } else {
-                this.callback = cbNow;
+                this.callback = cbStagger;
             }
-            this.callbackOnComplete = cbCompleteNow;
+            this.callbackOnComplete = cbCompleteStagger;
             this.slowlestStagger = slowlestStagger;
             this.fastestStagger = fastestStagger;
             this.firstRun = false;
@@ -434,7 +439,7 @@ export class HandleTween {
         /*
          * Chek if duration is a function
          */
-        const durationIsFn = storeType.isFunction(duration);
+        const durationIsFn = checkType(Function, duration);
         this.duration = durationIsFn ? duration() : duration;
         return newProps;
     }
@@ -523,7 +528,8 @@ export class HandleTween {
     doAction(data, props, obj) {
         this.values = mergeArrayTween(data, this.values);
         if (this.isActive) this.updateDataWhileRunning();
-        const { reverse, immediate } = this.mergeProps(props);
+        const { reverse, immediate, immediateNoPromise } =
+            this.mergeProps(props);
         if (reverse) this.value = setReverseValues(obj, this.values);
         this.values = setRelativeTween(this.values, this.relative);
 
@@ -531,6 +537,12 @@ export class HandleTween {
             this.isActive = false;
             this.values = setFromCurrentByTo(this.values);
             return new Promise((res) => res());
+        }
+
+        if (immediateNoPromise) {
+            this.isActive = false;
+            this.values = setFromCurrentByTo(this.values);
+            return;
         }
 
         if (!this.isActive) {

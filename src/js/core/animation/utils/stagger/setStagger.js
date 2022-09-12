@@ -2,6 +2,8 @@ import { getDefaultStagger } from './getDefaultStagger.js';
 import { getRadialArray } from './getRadialStagger.js';
 import {
     DIRECTION_RADIAL,
+    DIRECTION_COL,
+    DIRECTION_ROW,
     STAGGER_START,
     STAGGER_END,
     STAGGER_CENTER,
@@ -11,36 +13,60 @@ import {
 import { getEachByFps } from './staggerUtils.js';
 import { checkType } from '../../../store/storeType.js';
 
+const setStaggerErrorFallback = () => {
+    return {
+        cbStagger: [],
+        cbCompleteStagger: [],
+        fastestStagger: {},
+        slowlestStagger: {},
+    };
+};
+
 export const setStagger = ({
-    cb,
-    endCb,
+    arr,
+    endArr,
     stagger,
     slowlestStagger,
     fastestStagger,
 }) => {
+    /*
+     * Wait complete check type
+     */
+    if (!checkType(Boolean, stagger?.waitComplete)) {
+        console.warn(
+            'Stagger error: waitComplete propierties must be a Boolean'
+        );
+        return setStaggerErrorFallback();
+    }
+
+    /*
+     * Direction check type
+     * If grid is settled validate direction
+     * in simple mode grid can be omitted and this check jumped
+     */
+    const directionList = [DIRECTION_RADIAL, DIRECTION_ROW, DIRECTION_COL];
+    if (stagger?.grid && !directionList.includes(stagger?.grid?.direction)) {
+        console.warn(
+            `Stagger error: direction must be a string radial,col,row`
+        );
+        return setStaggerErrorFallback();
+    }
+
     const result = (() => {
         // Check if direction is an object like {x: n, y: n}
-        if (stagger.grid.direction === DIRECTION_RADIAL) {
+        if (stagger?.grid?.direction === DIRECTION_RADIAL) {
             /**
              * Check if from is a valid parameters
              * Option chaing doasn't work beacouse we have a valid 0 value
              * **/
             if (
-                !checkType(Object, stagger.from) ||
-                // !stagger ||
-                !('from' in stagger) ||
-                !('x' in stagger.from) ||
-                !('y' in stagger.from)
+                !checkType(Number, stagger?.from?.x) ||
+                !checkType(Number, stagger?.from?.y)
             ) {
                 console.warn(
-                    `Stagger error: in radial direction 'from' propierties must be a object {x:val,y:val}`
+                    `Stagger error: in radial direction 'from' propierties must be a object {x:Number,y:Number}`
                 );
-                return {
-                    cbNow: [],
-                    cbCompleteNow: [],
-                    fastestStagger: {},
-                    slowlestStagger: {},
-                };
+                return setStaggerErrorFallback();
             }
 
             /**
@@ -48,14 +74,9 @@ export const setStagger = ({
              * **/
             if (stagger?.grid?.col <= 0 || stagger?.grid?.row <= 0) {
                 console.warn(
-                    `Stagger error: in radial direction 'col' or 'row' is not setted`
+                    `Stagger error: in radial direction 'col' or 'row' is not setted, or is minor than 1, must be a number grater than 0`
                 );
-                return {
-                    cbNow: [],
-                    cbCompleteNow: [],
-                    fastestStagger: {},
-                    slowlestStagger: {},
-                };
+                return setStaggerErrorFallback();
             }
 
             /**
@@ -67,7 +88,7 @@ export const setStagger = ({
              *    waitComplete: false,
              *  },
              * **/
-            const { cleanArray: cleanCb } = getRadialArray(cb, stagger);
+            const { cleanArray: cleanCb } = getRadialArray(arr, stagger);
 
             // Get stagger index the minumn and the fastest and the slowest
             let counter = 0;
@@ -99,29 +120,29 @@ export const setStagger = ({
 
             // Get on Complete Callback
             const cleanEndCb = (() => {
-                if (endCb.length > 0) {
-                    const { cleanArray } = getRadialArray(endCb, stagger);
+                if (endArr.length > 0) {
+                    const { cleanArray } = getRadialArray(endArr, stagger);
                     return cleanArray.flat();
                 } else {
                     return [];
                 }
             })();
 
-            const cbNow = cleanCb.flat();
-            const endCbNow = cleanEndCb.flat();
+            const cbStagger = cleanCb.flat();
+            const endcbStagger = cleanEndCb.flat();
 
             // Update onComplete cb with right stagger
-            cbNow.forEach((item, i) => {
+            cbStagger.forEach((item, i) => {
                 // If there an OnCompelte callack
-                if (endCbNow.length > 0) {
-                    endCbNow[i].index = item.index;
-                    endCbNow[i].frame = item.frame;
+                if (endcbStagger.length > 0) {
+                    endcbStagger[i].index = item.index;
+                    endcbStagger[i].frame = item.frame;
                 }
             });
 
             return {
-                cbNow,
-                cbCompleteNow: endCbNow,
+                cbStagger,
+                cbCompleteStagger: endcbStagger,
                 fastestStagger,
                 slowlestStagger,
             };
@@ -138,28 +159,23 @@ export const setStagger = ({
             ];
 
             if (
-                (!checkType(String, stagger.from) &&
-                    !checkType(Number, stagger.from)) ||
-                (checkType(String, stagger.from) &&
-                    !fromList.includes(stagger.from))
+                (!checkType(String, stagger?.from) &&
+                    !checkType(Number, stagger?.from)) ||
+                (checkType(String, stagger?.from) &&
+                    !fromList.includes(stagger?.from))
             ) {
                 console.warn(
                     `Stagger error: in col/row direction 'from' propierties must be a string start/end/center/edges or a number`
                 );
-                return {
-                    cbNow: [],
-                    cbCompleteNow: [],
-                    fastestStagger: {},
-                    slowlestStagger: {},
-                };
+                return setStaggerErrorFallback();
             }
             /**
              * DEFAULT STAGGER
              * grid: { col: n, row: n, direction: 'row' },
              * **/
             return getDefaultStagger({
-                cb,
-                endCb,
+                arr,
+                endArr,
                 stagger,
                 slowlestStagger,
                 fastestStagger,
@@ -167,14 +183,14 @@ export const setStagger = ({
         }
     })();
 
-    const cbNow = result.cbNow;
-    const cbCompleteNow = result.cbCompleteNow;
+    const cbStagger = result.cbStagger;
+    const cbCompleteStagger = result.cbCompleteStagger;
     fastestStagger = result.fastestStagger;
     slowlestStagger = result.slowlestStagger;
 
     return {
-        cbNow,
-        cbCompleteNow,
+        cbStagger,
+        cbCompleteStagger,
         fastestStagger,
         slowlestStagger,
     };

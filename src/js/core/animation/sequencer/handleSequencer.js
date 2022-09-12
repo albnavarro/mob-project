@@ -21,7 +21,11 @@ import {
     staggerIsOutOfRangeWarning,
 } from '../utils/warning.js';
 import { storeType } from '../../store/storeType.js';
-import { goToSync, goFromSync, goFromToSync } from './syncActions.js';
+import {
+    goToSyncUtils,
+    goFromSyncUtils,
+    goFromToSyncUtils,
+} from './syncActions.js';
 import {
     propToSet,
     getFirstValidValueBack,
@@ -43,14 +47,12 @@ export class HandleSequencer {
         this.callbackOnStop = [];
         this.callbackAdd = [];
         this.unsubscribeCache = [];
-        this.duration = data?.duration
-            ? data.duration
-            : handleSetUp.get('sequencer').duration;
+        this.duration = data?.duration || handleSetUp.get('sequencer').duration;
         this.type = 'sequencer';
         this.defaultProp = {
             start: 0,
             end: this.duration,
-            ease: data?.ease ? data.ease : handleSetUp.get('sequencer').ease,
+            ease: data?.ease || handleSetUp.get('sequencer').ease,
         };
         this.firstRun = true;
         this.forceAddFnAtFirstRun = true;
@@ -69,7 +71,7 @@ export class HandleSequencer {
          * Set initial store data if defined in constructor props
          * If not use setData methods
          */
-        const props = data?.data ? data.data : null;
+        const props = data?.data || null;
         if (props) this.setData(props);
     }
 
@@ -87,20 +89,20 @@ export class HandleSequencer {
                 return;
             }
 
-            const { cbNow, cbCompleteNow } = setStagger({
-                cb,
-                endCb: this.callbackOnStop,
+            const { cbStagger, cbCompleteStagger } = setStagger({
+                arr: cb,
+                endArr: this.callbackOnStop,
                 stagger: this.stagger,
                 slowlestStagger: {}, //sequencer doasn't support slowlestStagger
                 fastestStagger: {}, //sequencer doasn't support fastestStagger
             });
 
             if (this.callbackCache.length > this.callback.length) {
-                this.callbackCache = cbNow;
+                this.callbackCache = cbStagger;
             } else {
-                this.callback = cbNow;
+                this.callback = cbStagger;
             }
-            this.callbackOnStop = cbCompleteNow;
+            this.callbackOnStop = cbCompleteStagger;
         }
 
         this.staggerIsReady = true;
@@ -429,7 +431,7 @@ export class HandleSequencer {
     goTo(obj, props) {
         const propMerged = { ...this.defaultProp, ...props };
         const { start, end, ease } = propMerged;
-        const data = goToSync(obj, ease);
+        const data = goToSyncUtils(obj, ease);
         const newValues = this.mergeArray(data, this.values);
         this.timeline.push({
             values: newValues,
@@ -453,7 +455,7 @@ export class HandleSequencer {
     goFrom(obj, props) {
         const propMerged = { ...this.defaultProp, ...props };
         const { start, end, ease } = propMerged;
-        const data = goFromSync(obj, ease);
+        const data = goFromSyncUtils(obj, ease);
         const newValues = this.mergeArray(data, this.values);
         this.timeline.push({
             values: newValues,
@@ -484,7 +486,7 @@ export class HandleSequencer {
             return;
         }
 
-        const data = goFromToSync(fromObj, toObj, ease);
+        const data = goFromToSyncUtils(fromObj, toObj, ease);
         const newValues = this.mergeArray(data, this.values);
         this.timeline.push({
             values: newValues,

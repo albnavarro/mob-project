@@ -180,19 +180,19 @@ const getStaggerIndex = (index, arraylenght, stagger, randomChoice = []) => {
 };
 
 export const getDefaultStagger = ({
-    cb,
-    endCb,
+    arr,
+    endArr,
     stagger,
     slowlestStagger,
     fastestStagger,
 }) => {
     // get chunk size by col if there is a size ( > -1 )
     const chunckSizeCol =
-        stagger.grid.col === -1 ? cb.length : stagger.grid.col;
+        stagger.grid.col === -1 ? arr.length : stagger.grid.col;
 
     // get chunk size by row if there is a size ( > -1 )
     const chunckSizeRow =
-        stagger.grid.row === -1 ? cb.length : stagger.grid.row;
+        stagger.grid.row === -1 ? arr.length : stagger.grid.row;
 
     // Function that convert row matrix to col matrix
     const getCbByRow = (arr) => {
@@ -214,15 +214,15 @@ export const getDefaultStagger = ({
     };
 
     // main callBack
-    const cbByRow = getCbByRow(cb);
-    const cbNow = cbByRow.map((item) => {
-        return item != undefined ? item : { cb: () => {} };
+    const cbByRow = getCbByRow(arr);
+    const cbStagger = cbByRow.map((item) => {
+        return item != undefined ? item : { arr: () => {} };
     });
 
     // onComplete callBack
-    const cbCompleteByRow = getCbByRow(endCb);
-    const cbCompleteNow = cbCompleteByRow.map((item) => {
-        return item != undefined ? item : { cb: () => {} };
+    const cbCompleteByRow = getCbByRow(endArr);
+    const cbCompleteStagger = cbCompleteByRow.map((item) => {
+        return item != undefined ? item : { arr: () => {} };
     });
 
     // get chunkes array
@@ -232,7 +232,7 @@ export const getDefaultStagger = ({
                 ? chunckSizeRow
                 : chunckSizeCol;
 
-        return sliceIntoChunks(cbNow, chunckSize);
+        return sliceIntoChunks(cbStagger, chunckSize);
     })();
 
     const firstChunk = chuncked[0];
@@ -277,19 +277,19 @@ export const getDefaultStagger = ({
 
     // set data to original (this.callback) array
     flat.forEach((item, i) => {
-        cbNow[i].index = item.index;
-        cbNow[i].frame = item.frame;
+        cbStagger[i].index = item.index;
+        cbStagger[i].frame = item.frame;
 
         // If there an OnCompelte callack
-        if (cbCompleteNow.length > 0) {
-            cbCompleteNow[i].index = item.index;
-            cbCompleteNow[i].frame = item.frame;
+        if (cbCompleteStagger.length > 0) {
+            cbCompleteStagger[i].index = item.index;
+            cbCompleteStagger[i].frame = item.frame;
         }
     });
 
     return {
-        cbNow,
-        cbCompleteNow,
+        cbStagger,
+        cbCompleteStagger,
         fastestStagger,
         slowlestStagger,
     };

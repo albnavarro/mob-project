@@ -98,6 +98,7 @@ export class HandleLerp {
             precision: this.precision,
             relative: this.relative,
             immediate: false,
+            immediateNoPromise: false,
         };
 
         /**
@@ -111,7 +112,7 @@ export class HandleLerp {
          * Set initial store data if defined in constructor props
          * If not use setData methods
          */
-        const props = data?.data ? data.data : null;
+        const props = data?.data || null;
         if (props) this.setData(props);
     }
 
@@ -222,21 +223,25 @@ export class HandleLerp {
                 return;
             }
 
-            const { cbNow, cbCompleteNow, fastestStagger, slowlestStagger } =
-                setStagger({
-                    cb,
-                    endCb: this.callbackOnComplete,
-                    stagger: this.stagger,
-                    slowlestStagger: this.slowlestStagger,
-                    fastestStagger: this.fastestStagger,
-                });
+            const {
+                cbStagger,
+                cbCompleteStagger,
+                fastestStagger,
+                slowlestStagger,
+            } = setStagger({
+                arr: cb,
+                endArr: this.callbackOnComplete,
+                stagger: this.stagger,
+                slowlestStagger: this.slowlestStagger,
+                fastestStagger: this.fastestStagger,
+            });
 
             if (this.callbackCache.length > this.callback.length) {
-                this.callbackCache = cbNow;
+                this.callbackCache = cbStagger;
             } else {
-                this.callback = cbNow;
+                this.callback = cbStagger;
             }
-            this.callbackOnComplete = cbCompleteNow;
+            this.callbackOnComplete = cbCompleteStagger;
             this.slowlestStagger = slowlestStagger;
             this.fastestStagger = fastestStagger;
             this.firstRun = false;
@@ -482,7 +487,8 @@ export class HandleLerp {
      */
     doAction(data, props, obj) {
         this.values = mergeArray(data, this.values);
-        const { reverse, immediate } = this.mergeProps(props);
+        const { reverse, immediate, immediateNoPromise } =
+            this.mergeProps(props);
 
         if (reverse) this.values = setReverseValues(obj, this.values);
         this.values = setRelative(this.values, this.relative);
@@ -491,6 +497,12 @@ export class HandleLerp {
             this.isActive = false;
             this.values = setFromCurrentByTo(this.values);
             return new Promise((res) => res());
+        }
+
+        if (immediateNoPromise) {
+            this.isActive = false;
+            this.values = setFromCurrentByTo(this.values);
+            return;
         }
 
         if (!this.isActive) {

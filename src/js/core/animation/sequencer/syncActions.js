@@ -2,7 +2,7 @@ import { getTweenFn } from '../tween/tweenConfig.js';
 import { valueIsValid } from '../utils/actions.js';
 import { valueIsNotValidWarning } from '../utils/warning.js';
 
-export const goToSync = (obj, ease) => {
+export const goToSyncUtils = (obj, ease) => {
     return Object.keys(obj).map((item) => {
         if (!valueIsValid(obj[item])) {
             valueIsNotValidWarning(`${item}: ${obj[item]}`);
@@ -21,7 +21,7 @@ export const goToSync = (obj, ease) => {
     });
 };
 
-export const goFromSync = (obj, ease) => {
+export const goFromSyncUtils = (obj, ease) => {
     return Object.keys(obj).map((item) => {
         if (!valueIsValid(obj[item])) {
             valueIsNotValidWarning(`${item}: ${obj[item]}`);
@@ -40,7 +40,7 @@ export const goFromSync = (obj, ease) => {
     });
 };
 
-export const goFromToSync = (fromObj, toObj, ease) => {
+export const goFromToSyncUtils = (fromObj, toObj, ease) => {
     return Object.keys(fromObj).map((item) => {
         if (!valueIsValid(toObj[item]) || !valueIsValid(fromObj[item])) {
             valueIsNotValidWarning(
