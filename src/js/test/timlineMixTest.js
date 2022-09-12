@@ -94,6 +94,20 @@ export function timlineMixTest() {
         .closeGroup()
         .goTo(springBox1, { x: -400 });
 
+    // timeline
+    //     .goTo(tweenBox1, { x: -200 })
+    //     .goFromTo(tweenBox1, { x: -200 }, { x: 400 })
+    //     .label({ name: 'label1' })
+    //     .createGroup({ waitComplete: false })
+    //     .goTo(tweenBox1, { y: 400 }, { duration: 850 })
+    //     .goTo(tweenBox2, { rotate: 360 }, { duration: 2000, delay: 1000 })
+    //     .closeGroup()
+    //     .goTo(tweenBox1, { x: -100, rotate: 180 }, { ease: 'easeInElastic' })
+    //     .createGroup({ waitComplete: false })
+    //     .goTo(tweenBox1, { x: 0, y: 0, rotate: 0 })
+    //     .goTo(tweenBox2, { rotate: -180 }, { duration: 5000 })
+    //     .closeGroup();
+
     // LISTNER
     btnStart.addEventListener('click', () => {
         timeline.play();
@@ -120,25 +134,13 @@ export function timlineMixTest() {
     });
 
     btnFrom.addEventListener('click', () => {
-        /*
-         * tweenBox2 hanve a delay so rended position immediatly
-         * If we manipulate tween out side timeline call stop()
-         * for added security in timeline promise chain
-         */
-        timeline.stop();
-        tweenBox2.set({ rotate: 180 }).then(() => {
+        timeline.setTween('label1', [tweenBox2]).then(() => {
             timeline.playFrom('label1');
         });
     });
 
     btnFromReverse.addEventListener('click', () => {
-        /*
-         * tweenBox2 hanve a delay so rended position immediatly
-         * If we manipulate tween out side timeline call stop()
-         * for added security in timeline promise chain
-         */
-        timeline.stop();
-        tweenBox2.set({ rotate: 180 }).then(() => {
+        timeline.setTween('label1', [tweenBox2]).then(() => {
             timeline.playFromReverse('label1');
         });
     });

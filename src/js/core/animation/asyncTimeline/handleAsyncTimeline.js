@@ -782,7 +782,67 @@ export class HandleAsyncTimeline {
     }
 
     /*
-     * Add a set 'tween' ati start and end of timeline.
+     * Get Obj data of tween in specific index
+     * Indlude check when multiple tween is syncronized
+     * index: get data until specific index
+     */
+    reduceDataTween(tween, index) {
+        let currentId = tween?.getId?.();
+        const initialData = tween?.getInitialData?.() || {};
+
+        return this.tweenList.slice(0, index).reduce((p, c) => {
+            /*
+             * Sync must be outside group so is at 0
+             */
+            const currentData = c[0].data;
+            const action = currentData.action;
+
+            /*
+             * If tween is syncronize with another tween,
+             * switch currenTween to the new one
+             */
+            if (action === 'sync') {
+                const syncProp = currentData?.syncProp;
+
+                const from = {
+                    tween: syncProp.from,
+                    id: syncProp.from.getId?.(),
+                };
+                const to = {
+                    tween: syncProp.to,
+                    id: syncProp.to.getId?.(),
+                };
+
+                /*
+                 * Switch current id ( uniqueID )
+                 */
+                if (from.id === currentId) {
+                    currentId = to.id;
+                }
+            }
+
+            const currentTween = c.find(({ data }) => {
+                const uniqueId = data?.tween?.getId?.();
+                return uniqueId === currentId;
+            });
+
+            /*
+             * Align isntant without promise the tween so we have all the data of tween
+             * the current and the previous merged
+             */
+            if (currentTween?.data?.tween?.set) {
+                currentTween.data.tween.set(currentTween?.data?.valuesTo, {
+                    immediateNoPromise: true,
+                });
+            }
+
+            const currentValueTo = currentTween?.data?.tween.getToNativeType();
+            return currentValueTo ? { ...p, ...currentValueTo } : p;
+        }, initialData);
+    }
+
+    /*
+     * Add a set 'tween' at start and end of timeline.
      */
     addSetBlocks() {
         // Create set only one time
@@ -818,63 +878,11 @@ export class HandleAsyncTimeline {
          * END Blocks
          * Add set block at the end of timeline for every tween with last toValue
          */
-        this.tweenStore.forEach(({ id, tween }) => {
-            /*
-             * currenId can change if sync action require
-             */
-            let currentId = id;
-            const setValueTo = this.tweenList.reduce((p, c) => {
-                /*
-                 * Sync must be outside group so is at 0
-                 */
-                const currentData = c[0].data;
-                const action = currentData.action;
-
-                /*
-                 * If tween is syncronize with another tween,
-                 * switch currenTween to the new one
-                 */
-                if (action === 'sync') {
-                    const syncProp = currentData?.syncProp;
-
-                    const from = {
-                        tween: syncProp.from,
-                        id: syncProp.from.getId?.() && syncProp.from.getId(),
-                    };
-                    const to = {
-                        tween: syncProp.to,
-                        id: syncProp.to.getId?.() && syncProp.to.getId(),
-                    };
-
-                    /*
-                     * Switch current id ( uniqueID )
-                     */
-                    if (from.id === currentId) {
-                        currentId = to.id;
-                    }
-                }
-
-                const currentTween = c.find(({ data }) => {
-                    const uniqueId =
-                        data?.tween?.getId?.() && data.tween.getId();
-                    return uniqueId === currentId;
-                });
-
-                /*
-                 * Align isntant without promise the tween so we have all the data of tween
-                 * the current and the previous merged
-                 */
-                if (currentTween?.data?.tween?.set) {
-                    currentTween.data.tween.set(currentTween?.data?.valuesTo, {
-                        immediateNoPromise: true,
-                    });
-                }
-
-                const currentValueTo =
-                    currentTween?.data?.tween.getToNativeType();
-                return currentValueTo ? { ...p, ...currentValueTo } : p;
-            }, {});
-
+        this.tweenStore.forEach(({ tween }) => {
+            const setValueTo = this.reduceDataTween(
+                tween,
+                this.tweenList.length
+            );
             const obj = {
                 id: this.currentTweenCounter,
                 tween,
@@ -885,9 +893,57 @@ export class HandleAsyncTimeline {
             };
 
             this.currentTweenCounter++;
-
             const mergedObj = { ...this.defaultObj, ...obj };
             this.tweenList.push([{ group: null, data: mergedObj }]);
+        });
+    }
+
+    setTween(label = '', items) {
+        this.stop();
+
+        /*
+         * Filter user tween from frameStore
+         */
+        const itemsId = items.map((item) => item?.getId?.());
+        const tweens = this.tweenStore.filter(({ id }) => {
+            return itemsId.includes(id);
+        });
+
+        /*
+         * Get index from label
+         */
+        const index = this.tweenList.findIndex((item) => {
+            const [firstItem] = item;
+            const labelCheck = firstItem.data.labelProps?.name;
+            return labelCheck === label;
+        });
+
+        if (index === -1) {
+            console.warn(`asyncTimeline.setTween() label: ${label} not found`);
+            return;
+        }
+
+        /*
+         * Fire set method of selected tween and resolve promise
+         */
+        return new Promise((resolve) => {
+            const tweenPromise = tweens.map(({ tween }) => {
+                const data = this.reduceDataTween(tween, index);
+
+                return new Promise((resolveTween, rejectTween) => {
+                    tween
+                        .set(data)
+                        .then(() => resolveTween())
+                        .catch(() => rejectTween());
+                });
+            });
+            Promise.all(tweenPromise)
+                .then(() => {
+                    resolve();
+                })
+                .catch(() => {
+                    console.log('setTween fail');
+                });
         });
     }
 
