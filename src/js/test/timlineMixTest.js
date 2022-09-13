@@ -134,15 +134,21 @@ export function timlineMixTest() {
     });
 
     btnFrom.addEventListener('click', () => {
-        timeline.setTween('label1', [tweenBox2]).then(() => {
-            timeline.playFrom('label1');
-        });
+        timeline
+            .setTween('label1', [tweenBox2])
+            .then(() => {
+                timeline.playFrom('label1');
+            })
+            .catch((error) => console.log(error));
     });
 
     btnFromReverse.addEventListener('click', () => {
-        timeline.setTween('label1', [tweenBox2]).then(() => {
-            timeline.playFromReverse('label1');
-        });
+        timeline
+            .setTween('label1', [tweenBox2])
+            .then(() => {
+                timeline.playFromReverse('label1');
+            })
+            .catch((error) => console.log(error));
     });
 
     btnToggleSuspend.addEventListener('click', () => {

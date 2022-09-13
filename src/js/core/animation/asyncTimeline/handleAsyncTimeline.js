@@ -607,12 +607,13 @@ export class HandleAsyncTimeline {
         this.tweenStore.forEach(({ tween }) => tween.resetData());
     }
 
-    set(tween, valuesFrom, tweenProps = {}) {
+    set(tween, valuesSet, tweenProps = {}) {
         const obj = {
             id: this.currentTweenCounter,
             tween,
             action: 'set',
-            valuesFrom,
+            valuesTo: valuesSet,
+            valuesFrom: valuesSet,
             tweenProps,
             groupProps: { waitComplete: this.waitComplete },
         };
@@ -839,6 +840,7 @@ export class HandleAsyncTimeline {
                 tween,
                 action: 'set',
                 valuesFrom: setValueTo,
+                valuesTo: setValueTo,
                 tweenProps: {},
                 groupProps: { waitComplete: this.waitComplete },
             };
@@ -867,6 +869,7 @@ export class HandleAsyncTimeline {
                 tween,
                 action: 'set',
                 valuesFrom: setValueTo,
+                valuesTo: setValueTo,
                 tweenProps: {},
                 groupProps: { waitComplete: this.waitComplete },
             };
@@ -879,6 +882,26 @@ export class HandleAsyncTimeline {
 
     setTween(label = '', items = []) {
         this.stop();
+
+        /**
+         * Props type check
+         */
+        const itemsIsArray = checkType(Array, items);
+        if (!itemsIsArray) {
+            console.warn(
+                `timeline setTween: ${items} is not an array of tween`
+            );
+        }
+
+        const labelIsString = checkType(String, label);
+        if (!labelIsString) {
+            console.warn(`timeline setTween: ${label} is not a string`);
+        }
+
+        if (!itemsIsArray || !labelIsString)
+            return Promise.reject(
+                new Error('timeline setTween: props is wrong')
+            );
 
         /*
          * Filter user tween from frameStore
