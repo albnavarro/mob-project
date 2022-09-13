@@ -385,9 +385,17 @@ export class HandleAsyncTimeline {
                 if (this.isSuspended || this.isStopped) return;
 
                 /*
-                 * Check for loop in test mode, to get toValue of eche tween
-                 * necessary for reverse where the last
-                 * toValue and the current toValue is inverted
+                 * End virtual loop to get prevValueTo
+                 * We have reach the end of timeline and we we fire
+                 * playFrom || playFromReverse (this.starterFunction)
+                 *
+                 * With this,timelineIsInTestMode active this.goToLabelIndex
+                 * is equal the timeline length
+                 *
+                 * Becouse we doasn't reach the repeat condition down
+                 * we manually increment loopCounter
+                 * The loop counter is decrtement in virutal loop
+                 *
                  */
                 if (
                     this.timelineIsInTestMode &&
@@ -395,13 +403,15 @@ export class HandleAsyncTimeline {
                 ) {
                     this.timelineIsInTestMode = false;
                     this.goToLabelIndex = null;
+                    this.loopCounter++;
                     this.starterFunction();
                     return;
                 }
 
                 /*
-                 * If play from label in reverse mode
-                 * reverse next step
+                 * This is fired when this.starterFunction is running
+                 * and playFromReverse is active
+                 * The timeline is reversed next step
                  **/
                 if (
                     this.isPlayingFromLabelReverse &&
@@ -412,7 +422,7 @@ export class HandleAsyncTimeline {
                 }
 
                 /**
-                 * Reverse on next step
+                 * Reverse on next step default
                  **/
                 if (this.isReverseNext) {
                     this.isReverseNext = false;
@@ -437,25 +447,61 @@ export class HandleAsyncTimeline {
                  * End of timeline, check repeat
                  **/
                 if (this.loopCounter < this.repeat || this.repeat === -1) {
+                    const cb = () => {
+                        /*
+                         * Fire callbackLoop
+                         */
+                        if (this.loopCounter > 0) {
+                            const direction = this.getDirection();
+                            this.callbackLoop.forEach(({ cb }) =>
+                                cb({
+                                    direction,
+                                    loop: this.loopCounter,
+                                })
+                            );
+                        }
+
+                        this.loopCounter++;
+                        this.currentIndex = 0;
+                        this.goToLabelIndex = null;
+                        if (this.yoyo || this.forceYoyo) this.revertTween();
+                        this.forceYoyo = false;
+                        this.run();
+                    };
+
                     /*
-                     * Fire callbackLoop
+                     * Start timeline in reverse mode here
+                     * set all tween to end position and go
                      */
-                    if (!this.goToLabelIndex) {
-                        const direction = this.getDirection();
-                        this.callbackLoop.forEach(({ cb }) =>
-                            cb({
-                                direction,
-                                loop: this.loopCounter,
-                            })
+                    if (
+                        this.goToLabelIndex === this.tweenList.length &&
+                        !this.freeMode
+                    ) {
+                        const tweenPromise = this.tweenStore.map(
+                            ({ tween }) => {
+                                const data = this.reduceDataTween(
+                                    tween,
+                                    this.tweenList.length
+                                );
+
+                                return new Promise((resolve, reject) => {
+                                    tween
+                                        .set(data)
+                                        .then(() => resolve())
+                                        .catch(() => reject());
+                                });
+                            }
                         );
+                        Promise.all(tweenPromise).then(() => {
+                            cb();
+                        });
+                        return;
                     }
 
-                    this.loopCounter++;
-                    this.currentIndex = 0;
-                    this.goToLabelIndex = null;
-                    if (this.yoyo || this.forceYoyo) this.revertTween();
-                    this.forceYoyo = false;
-                    this.run();
+                    /*
+                     * Go default
+                     */
+                    cb();
                     return;
                 }
 
@@ -837,7 +883,29 @@ export class HandleAsyncTimeline {
             }
 
             const currentValueTo = currentTween?.data?.tween.getToNativeType();
-            return currentValueTo ? { ...p, ...currentValueTo } : p;
+
+            /*
+             * Filter only the prop in use in this step
+             */
+            const propsInUse = currentValueTo
+                ? Object.entries(currentValueTo)
+                      .map((item) => {
+                          const [prop, val] = item;
+                          const valueIsValid =
+                              prop in currentTween.data.valuesTo;
+                          return {
+                              data: { [prop]: val },
+                              active: valueIsValid,
+                          };
+                      })
+                      .filter(({ active }) => active)
+                      .map(({ data }) => data)
+                      .reduce((p, c) => {
+                          return { ...p, ...c };
+                      }, {})
+                : {};
+
+            return { ...p, ...propsInUse };
         }, initialData);
     }
 
@@ -942,7 +1010,7 @@ export class HandleAsyncTimeline {
                     resolve();
                 })
                 .catch(() => {
-                    console.log('setTween fail');
+                    console.warn('setTween fail');
                 });
         });
     }
