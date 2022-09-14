@@ -6,6 +6,7 @@ import { clamp } from '../utils/animationUtils.js';
 import { handleSetUp } from '../../setup.js';
 import { fpsLoadedLog } from '../utils/log.js';
 import { storeType } from '../../store/storeType.js';
+import { directionConstant } from '../utils/constant.js';
 
 export class HandleSyncTimeline {
     constructor(data = {}) {
@@ -25,8 +26,6 @@ export class HandleSyncTimeline {
         this.sequencers = [];
         this.completed = false;
         this.isPlayngReverse = false;
-        this.BACKWARD = 'backward';
-        this.FORWARD = 'forward';
         this.fpsInLoading = false;
         this.loopIteration = 0;
         this.minLoopIteration = 10;
@@ -213,7 +212,9 @@ export class HandleSyncTimeline {
     }
 
     getDirection() {
-        return this.isReverse ? this.BACKWARD : this.FORWARD;
+        return this.isReverse
+            ? directionConstant.BACKWARD
+            : directionConstant.FORWARD;
     }
 
     goToNextFrame() {

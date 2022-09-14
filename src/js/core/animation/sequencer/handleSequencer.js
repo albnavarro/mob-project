@@ -32,6 +32,7 @@ import {
     checkIsLastUsableProp,
 } from './reduceFunction.js';
 import { handleCache } from '../../events/rafutils/handleCache.js';
+import { directionConstant } from '../utils/constant.js';
 
 export class HandleSequencer {
     constructor(data = {}) {
@@ -59,8 +60,6 @@ export class HandleSequencer {
         this.direction = null;
         this.lastPartial = null;
         this.lastDirection = null;
-        this.BACKWARD = 'backward';
-        this.FORWARD = 'forward';
 
         // Stagger
         this.stagger = getStaggerFromProps(data);
@@ -128,7 +127,9 @@ export class HandleSequencer {
              */
             if (!this.firstRun && !direction) {
                 this.direction =
-                    partial >= this.lastPartial ? this.FORWARD : this.BACKWARD;
+                    partial >= this.lastPartial
+                        ? directionConstant.FORWARD
+                        : directionConstant.BACKWARD;
             }
 
             if (!this.firstRun && direction) {
@@ -253,12 +254,12 @@ export class HandleSequencer {
         this.callbackAdd.forEach(({ fn, time: fnTime }) => {
             const mustFireForward = {
                 shouldFire: time >= fnTime,
-                direction: this.FORWARD,
+                direction: directionConstant.FORWARD,
             };
 
             const mustFireBackward = {
                 shouldFire: time <= fnTime,
-                direction: this.BACKWARD,
+                direction: directionConstant.BACKWARD,
             };
 
             const mustFire =
@@ -284,7 +285,7 @@ export class HandleSequencer {
              * the the fn is fired before fn time is reached
              */
             const mustFireForward =
-                this.direction === this.FORWARD &&
+                this.direction === directionConstant.FORWARD &&
                 time > fnTime &&
                 this.lastPartial <= fnTime;
 
@@ -297,7 +298,7 @@ export class HandleSequencer {
              * can be equal max duration, so we avoid double firing of fn
              */
             const mustFireBackward =
-                this.direction === this.BACKWARD &&
+                this.direction === directionConstant.BACKWARD &&
                 time < fnTime &&
                 this.lastPartial >= fnTime;
 
