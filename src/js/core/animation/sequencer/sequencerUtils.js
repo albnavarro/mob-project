@@ -1,15 +1,32 @@
 import { getRoundedValue } from '../utils/animationUtils.js';
 import { setStagger } from '../utils/stagger/setStagger.js';
-import { STAGGER_DEFAULT_OBJ } from '../utils/stagger/staggerCostant.js';
+import {
+    STAGGER_DEFAULT_OBJ,
+    STAGGER_TYPE_CLASSIC,
+    STAGGER_TYPE_EQUAL,
+} from '../utils/stagger/staggerCostant.js';
 import { handleSetUp } from '../../setup.js';
 import { checkType } from '../../store/storeType.js';
 
 export const createStaggers = ({ items, stagger, duration }) => {
-    const EQUAL = 'equal';
-    const STAGGER_RANGE = 100;
     const durationNow = duration || handleSetUp.get('sequencer').duration;
     const staggerNow = { ...STAGGER_DEFAULT_OBJ, ...stagger };
-    const eachList = [EQUAL];
+    const type = staggerNow.type;
+    let each = staggerNow.each;
+
+    /*
+     * Fallback is something goes wron
+     */
+    const fallBack = [...items].map((item, i) => {
+        return {
+            item,
+            start: 0,
+            end: duration,
+            index: i,
+        };
+    });
+
+    const stagerTypeList = [STAGGER_TYPE_EQUAL, STAGGER_TYPE_CLASSIC];
 
     /**
      * Secure check
@@ -18,32 +35,40 @@ export const createStaggers = ({ items, stagger, duration }) => {
         console.warn(
             'stagger col of grid is out of range, it must be less than the number of staggers '
         );
-        stagger.each = 0;
+        each = 0;
     }
 
-    const eachIsStrign = checkType(String, stagger?.each);
-    const eachIsNumber = checkType(Number, stagger?.each);
+    /**
+     * Check type prop
+     */
+    if (!stagerTypeList.includes(type)) {
+        console.warn(
+            `stager.type should be: ${STAGGER_TYPE_EQUAL} || ${STAGGER_TYPE_CLASSIC}`
+        );
+        return fallBack;
+    }
 
     /**
-     * Each Type check
-     * Must be a number or 'equal' string
-     **/
+     * In classic mode each must be between 1 and 100
+     */
     if (
-        (!eachIsStrign && !eachIsNumber) ||
-        (eachIsStrign && !eachList.includes(stagger.each))
+        type === STAGGER_TYPE_CLASSIC &&
+        checkType(Number, each) &&
+        (each > 100 || each < 1)
     ) {
         console.warn(
-            `Stagger error: in each must be a number or a string setted to equal`
+            `createStagger: in classic mode each must be between 1 and 100`
         );
-        stagger.each = 0;
+        each = 1;
     }
 
     /**
-     * Get the final stagger Object
-     **/
-    const isEqual = stagger?.each === EQUAL;
-    const each = isEqual ? 1 : stagger.each;
-    const staggerFinal = { ...staggerNow, ...{ each } };
+     * In equal mode each is always 1
+     */
+    if (type === STAGGER_TYPE_EQUAL && checkType(Number, each) && each !== 1) {
+        console.warn(`createStagger: in equal mode each is always 1`);
+        each = 1;
+    }
 
     /**
      * Create the arry for setStagger utils, add id, index and frame propierties
@@ -63,7 +88,7 @@ export const createStaggers = ({ items, stagger, duration }) => {
     const { cbStagger } = setStagger({
         arr: initialArray,
         endArr: [],
-        stagger: staggerFinal,
+        stagger: staggerNow,
         slowlestStagger: {},
         fastestStagger: {},
     });
@@ -71,9 +96,10 @@ export const createStaggers = ({ items, stagger, duration }) => {
     /**
      * Remove element with no dom item ,is possible with row and item fantasiose
      * In tween there is no problem beciuse use NOOP callback
+     * Accpt only dom element and object
      * */
-    const cbStaggerFiltered = cbStagger.filter(({ item }) =>
-        checkType(Element, item)
+    const cbStaggerFiltered = cbStagger.filter(
+        ({ item }) => checkType(Element, item) || checkType(Object, item)
     );
 
     /*
@@ -93,24 +119,25 @@ export const createStaggers = ({ items, stagger, duration }) => {
         const index = frameSet.findIndex((item) => item === frame);
 
         const { start, end } = (() => {
-            if (isEqual) {
+            if (type === STAGGER_TYPE_EQUAL) {
                 const stepDuration = durationNow / numItem;
                 const start = getRoundedValue(index * stepDuration);
                 const end = getRoundedValue(start + stepDuration);
 
                 return { start, end };
-            } else {
-                return (() => {
-                    const unit = durationNow / numItem;
-                    const cleanStart = unit * index;
-                    const noopSpace = durationNow - (durationNow - cleanStart);
-                    const gap = (noopSpace / STAGGER_RANGE) * stagger.each;
+            }
 
-                    return {
-                        start: getRoundedValue(cleanStart - gap),
-                        end: getRoundedValue(durationNow),
-                    };
-                })();
+            if (type === STAGGER_TYPE_CLASSIC) {
+                const STAGGER_RANGE = 100;
+                const unit = durationNow / numItem;
+                const cleanStart = unit * index;
+                const noopSpace = durationNow - (durationNow - cleanStart);
+                const gap = (noopSpace / STAGGER_RANGE) * each;
+
+                return {
+                    start: getRoundedValue(cleanStart - gap),
+                    end: getRoundedValue(durationNow),
+                };
             }
         })();
 

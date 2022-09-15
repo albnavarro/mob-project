@@ -29,6 +29,14 @@ export const setStagger = ({
     slowlestStagger,
     fastestStagger,
 }) => {
+    /**
+     * Each must be a number
+     */
+    if (!checkType(Number, stagger?.each)) {
+        console.warn(`stagger each must be a Number `);
+        return setStaggerErrorFallback();
+    }
+
     /*
      * Wait complete check type
      */

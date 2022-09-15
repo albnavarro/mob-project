@@ -19,6 +19,7 @@ export const sequencerStaggerTime = () => {
     const staggers = mobbu.create('stagger', {
         items,
         stagger: {
+            type: 'classic',
             each: 30,
         },
         duration,

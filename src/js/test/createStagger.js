@@ -11,7 +11,8 @@ export const createStagger = () => {
     const staggers = mobbu.create('stagger', {
         items,
         stagger: {
-            each: 'equal',
+            type: 'equal',
+            each: 1,
             from: { x: 4, y: 4 },
             grid: { col: 5, row: 5, direction: 'radial' },
         },
