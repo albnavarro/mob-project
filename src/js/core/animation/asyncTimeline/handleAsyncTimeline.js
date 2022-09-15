@@ -1030,7 +1030,7 @@ export class HandleAsyncTimeline {
         }
     }
 
-    playFromLabel({ isReverse, label }) {
+    playFromLabel({ isReverse = false, label = null } = {}) {
         // Skip of there is nothing to run
         if (this.tweenList.length === 0 || this.addAsyncIsActive) return;
         if (this.isReverse) this.revertTween();
@@ -1078,9 +1078,9 @@ export class HandleAsyncTimeline {
         return this;
     }
 
-    reverse(props = { forceYoYo: true }) {
+    reverse({ forceYoYo = true } = {}) {
         if (this.autoSet) this.addSetBlocks();
-        const forceYoYonow = props?.forceYoYo;
+        const forceYoYonow = forceYoYo;
 
         // Skip of there is nothing to run
         if (this.tweenList.length === 0 || this.addAsyncIsActive) return;
