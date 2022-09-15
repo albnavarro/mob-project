@@ -35,9 +35,7 @@ export class HandleAsyncTimeline {
         this.labelState = {
             active: false,
             index: -1,
-            currentLabel: '',
             isReverse: false,
-            isPlayngReverse: false,
         };
         this.starterFunction = {
             fn: this.NOOP,
@@ -384,7 +382,7 @@ export class HandleAsyncTimeline {
                 const {
                     active: labelIsActive,
                     index: labelIndex,
-                    isPlayngReverse: labelIsPlayngReverse,
+                    isReverse: labelIsReverse,
                 } = this.labelState;
 
                 const { fn: starterFunction, active: starterFunctionIsActive } =
@@ -417,12 +415,12 @@ export class HandleAsyncTimeline {
 
                 /*
                  * This is fired when this.starterFunction is running
-                 * and playFromReverse is active
+                 * and labelState.isReverse is active
                  * The timeline is reversed next step
                  **/
                 if (
-                    labelIsPlayngReverse &&
                     labelIsActive &&
+                    labelIsReverse &&
                     this.currentIndex === labelIndex - 1
                 ) {
                     this.reverseNext();
@@ -994,6 +992,9 @@ export class HandleAsyncTimeline {
             return this;
         } else {
             const cb = () => {
+                /**
+                 * need to reset current data after reverse() of tween so use stop()
+                 */
                 this.stop();
                 this.isStopped = false;
 
@@ -1018,80 +1019,76 @@ export class HandleAsyncTimeline {
 
             this.starterFunction.fn = () => cb();
             this.starterFunction.active = true;
-            this.labelState.isReverse = false;
-            this.labelState.currentLabel = null;
-            this.labelState.isPlayngReverse = false;
-            this.reverse();
+
+            /**
+             * First loop reverse at the end start function fired
+             * reverse set label.active at true
+             * so label.active && starterFunction.active is necessary to fire cb
+             */
+            this.reverse({ forceYoYo: true });
             return this;
         }
     }
 
-    playFromLabel() {
+    playFromLabel({ isReverse, label }) {
         // Skip of there is nothing to run
         if (this.tweenList.length === 0 || this.addAsyncIsActive) return;
-        const { currentLabel, isReverse: currentLabelIsReverse } =
-            this.labelState;
-
-        /*
-         * isPlayngReverse is used because
-         * 1 - virtual reverse loop default ( no label reverse )
-         * 2 - virutal loop until label index ( if is reverse now need information )
-         *
-         * So we set the prop inside starter function to not alterate the normale reverse mode
-         * Inside the main resole of twenList this prop is used
-         */
-        this.labelState.isPlayngReverse = currentLabelIsReverse;
+        if (this.isReverse) this.revertTween();
 
         /*
          * Set props
          */
-        if (this.isReverse) this.revertTween();
-        /*
-         * Get first item of group, unnecessary.
-         * Use of label inside a group becouse is parallel
-         */
         this.currentIndex = 0;
+        this.labelState.isReverse = isReverse;
         this.labelState.active = true;
         this.labelState.index = this.tweenList.findIndex((item) => {
             const [firstItem] = item;
             const labelCheck = firstItem.data.labelProps?.name;
-            return labelCheck === currentLabel;
+            return labelCheck === label;
         });
 
         this.run();
     }
 
     playFrom(label) {
-        this.starterFunction.fn = () => this.playFromLabel();
+        this.starterFunction.fn = () =>
+            this.playFromLabel({ isReverse: false, label });
         this.starterFunction.active = true;
-        this.labelState.currentLabel = label;
-        this.labelState.isReverse = false;
-        this.reverse(false);
-        return this;
-    }
 
-    disableLabel() {
-        this.labelState.active = false;
-        this.labelState.index = -1;
+        /**
+         * First loop reverse at the end start function fired
+         * reverse set label.active at true
+         * so label.active && starterFunction.active is necessary to fire cb
+         */
+        this.reverse({ forceYoYo: false });
+        return this;
     }
 
     playFromReverse(label) {
-        this.starterFunction.fn = () => this.playFromLabel();
+        this.starterFunction.fn = () =>
+            this.playFromLabel({ isReverse: true, label });
         this.starterFunction.active = true;
-        this.labelState.currentLabel = label;
-        this.labelState.isReverse = true;
-        this.reverse(false);
+
+        /**
+         * First loop reverse at the end start function fired
+         * reverse set label.active at true
+         * so label.active && starterFunction.active is necessary to fire cb
+         */
+        this.reverse({ forceYoYo: false });
         return this;
     }
 
-    reverse(forceYoYo = true) {
+    reverse(props = { forceYoYo: true }) {
         if (this.autoSet) this.addSetBlocks();
+        const forceYoYonow = props?.forceYoYo;
 
         // Skip of there is nothing to run
         if (this.tweenList.length === 0 || this.addAsyncIsActive) return;
         if (this.delayIsRunning) {
             this.startOnDelay = true;
-            this.actionAfterReject.push(() => this.reverse());
+            this.actionAfterReject.push(() =>
+                this.reverse({ forceYoYo: forceYoYonow })
+            );
             return;
         }
 
@@ -1108,7 +1105,7 @@ export class HandleAsyncTimeline {
          * forceyoyo is used only if we play directly from end
          * PlayFrom wich use reverse() need to go in forward direction
          */
-        if (forceYoYo) this.forceYoyo = true;
+        if (forceYoYonow) this.forceYoyo = true;
 
         /*
          * Lalbel state
@@ -1138,7 +1135,6 @@ export class HandleAsyncTimeline {
         this.isStopped = true;
         this.currentIndex = 0;
         this.loopCounter = 1;
-        // this.currentTween = [];
 
         // Reset state
         this.isReverseNext = false;
@@ -1147,8 +1143,12 @@ export class HandleAsyncTimeline {
         this.isInPause = false;
         this.isSuspended = false;
         this.addAsyncIsActive = false;
-        this.labelState.isPlayngReverse = false;
         this.timeOnPause = 0;
+
+        /*
+         * Reset necessary label state
+         */
+        this.labelState.isReverse = false;
 
         // Stop all Tween
         this.tweenStore.forEach(({ tween }) => {
@@ -1204,6 +1204,11 @@ export class HandleAsyncTimeline {
                 this.run();
             }
         }
+    }
+
+    disableLabel() {
+        this.labelState.active = false;
+        this.labelState.index = -1;
     }
 
     resumeEachTween() {
