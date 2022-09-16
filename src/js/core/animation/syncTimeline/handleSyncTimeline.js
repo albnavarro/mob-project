@@ -10,28 +10,49 @@ import { directionConstant } from '../utils/constant.js';
 
 export class HandleSyncTimeline {
     constructor(data = {}) {
+        this.duration = data?.duration || handleSetUp.get('sequencer').duration;
+        this.yoyo = data?.yoyo || false;
+        this.repeat = data?.repeat || 0;
+        // if (this.repeat === 1) this.repeat = 0;
+        // Only one loop , prevent sideEffct of this.frameThreshold
+
+        /**
+         * Child
+         */
+        this.sequencers = [];
+
+        /**
+         * Time prop
+         */
         this.startTime = null;
         this.timeElapsed = 0;
         this.endTime = 0;
         this.pauseTime = 0;
-        this.duration = data?.duration || handleSetUp.get('sequencer').duration;
-        this.isStopped = true;
-        this.isReverse = false;
         this.timeAtReverse = 0;
         this.timeAtReverseBack = 0;
-        this.skipFirstRender = false;
-        this.repeat = data?.repeat || 0;
-        this.yoyo = data?.yoyo || false;
-        this.loopCounter = 0;
-        this.sequencers = [];
-        this.completed = false;
+
+        /*
+         * Reverse prop
+         */
+        this.isReverse = false;
+        this.startReverse = false;
         this.isPlayngReverse = false;
-        this.fpsInLoading = false;
+
+        /**
+         * Loop prop
+         */
+        this.loopCounter = 0;
         this.loopIteration = 0;
         this.minLoopIteration = 10;
 
-        // Onlu one loop , prevent sideEffct of this.frameThreshold
-        if (this.repeat === 1) this.repeat = 0;
+        /*
+         * Generic prop
+         */
+        this.sequencers = [];
+        this.isStopped = true;
+        this.skipFirstRender = false;
+        this.completed = false;
+        this.fpsInLoading = false;
 
         // callbackLoop on complete
         this.callbackId = 0;
@@ -337,6 +358,8 @@ export class HandleSyncTimeline {
     }
 
     startAnimation(partial) {
+        if (this.repeat === 0) return;
+
         loadFps().then(({ averageFPS }) => {
             fpsLoadedLog('sequencer', averageFPS);
 
