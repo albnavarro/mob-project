@@ -3,6 +3,8 @@ import { setStagger } from '../utils/stagger/setStagger.js';
 import {
     STAGGER_DEFAULT_OBJ,
     STAGGER_TYPE_CLASSIC,
+    STAGGER_TYPE_CLASSIC_INVERSE,
+    STAGGER_TYPE_CLASSIC_CENTER,
     STAGGER_TYPE_EQUAL,
 } from '../utils/stagger/staggerCostant.js';
 import { handleSetUp } from '../../setup.js';
@@ -26,7 +28,12 @@ export const createStaggers = ({ items, stagger, duration }) => {
         };
     });
 
-    const stagerTypeList = [STAGGER_TYPE_EQUAL, STAGGER_TYPE_CLASSIC];
+    const stagerTypeList = [
+        STAGGER_TYPE_EQUAL,
+        STAGGER_TYPE_CLASSIC,
+        STAGGER_TYPE_CLASSIC_INVERSE,
+        STAGGER_TYPE_CLASSIC_CENTER,
+    ];
 
     /**
      * Secure check
@@ -43,7 +50,11 @@ export const createStaggers = ({ items, stagger, duration }) => {
      */
     if (!stagerTypeList.includes(type)) {
         console.warn(
-            `stager.type should be: ${STAGGER_TYPE_EQUAL} || ${STAGGER_TYPE_CLASSIC}`
+            `stager.type should be: 
+            ${STAGGER_TYPE_EQUAL} ||
+            ${STAGGER_TYPE_CLASSIC} || 
+            ${STAGGER_TYPE_CLASSIC_INVERSE} || 
+            ${STAGGER_TYPE_CLASSIC_CENTER}`
         );
         return fallBack;
     }
@@ -52,7 +63,9 @@ export const createStaggers = ({ items, stagger, duration }) => {
      * In classic mode each must be between 1 and 100
      */
     if (
-        type === STAGGER_TYPE_CLASSIC &&
+        (type === STAGGER_TYPE_CLASSIC ||
+            STAGGER_TYPE_CLASSIC_INVERSE ||
+            STAGGER_TYPE_CLASSIC_CENTER) &&
         checkType(Number, each) &&
         (each > 100 || each < 1)
     ) {
@@ -127,17 +140,38 @@ export const createStaggers = ({ items, stagger, duration }) => {
                 return { start, end };
             }
 
-            if (type === STAGGER_TYPE_CLASSIC) {
+            if (
+                type === STAGGER_TYPE_CLASSIC ||
+                type === STAGGER_TYPE_CLASSIC_INVERSE ||
+                type === STAGGER_TYPE_CLASSIC_CENTER
+            ) {
                 const STAGGER_RANGE = 100;
                 const unit = durationNow / numItem;
                 const cleanStart = unit * index;
                 const noopSpace = durationNow - (durationNow - cleanStart);
                 const gap = (noopSpace / STAGGER_RANGE) * each;
 
-                return {
-                    start: getRoundedValue(cleanStart - gap),
-                    end: getRoundedValue(durationNow),
-                };
+                if (type === STAGGER_TYPE_CLASSIC) {
+                    return {
+                        start: getRoundedValue(cleanStart - gap),
+                        end: getRoundedValue(durationNow),
+                    };
+                }
+
+                if (type === STAGGER_TYPE_CLASSIC_CENTER) {
+                    const space = (cleanStart - gap) / 2;
+                    return {
+                        start: getRoundedValue(space),
+                        end: getRoundedValue(durationNow - space),
+                    };
+                }
+
+                if (type === STAGGER_TYPE_CLASSIC_INVERSE) {
+                    return {
+                        start: 0,
+                        end: getRoundedValue(durationNow - (cleanStart - gap)),
+                    };
+                }
             }
         })();
 
