@@ -13,8 +13,6 @@ export class HandleSyncTimeline {
         this.duration = data?.duration || handleSetUp.get('sequencer').duration;
         this.yoyo = data?.yoyo || false;
         this.repeat = data?.repeat || 0;
-        // if (this.repeat === 1) this.repeat = 0;
-        // Only one loop , prevent sideEffct of this.frameThreshold
 
         /**
          * Child
