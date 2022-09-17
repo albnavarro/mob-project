@@ -1249,7 +1249,7 @@ export class HandleAsyncTimeline {
      * Remove all reference from tween
      */
     destroy() {
-        this.tweenStore.forEach((tween) => {
+        this.tweenStore.forEach(({ tween }) => {
             if (tween?.destroy?.()) tween.destroy();
         });
         this.tweenList = [];

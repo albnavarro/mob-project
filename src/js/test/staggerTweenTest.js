@@ -6,6 +6,9 @@ export function staggerTweenTest() {
     const btnPause = document.querySelector('.tween .pause');
     const btnPlay = document.querySelector('.tween .play');
     const btnReverseNext = document.querySelector('.tween .reverseNext');
+    const btnUnsubscribeStagger = document.querySelector(
+        '.tween .unsubscibeStagger'
+    );
     const btnReverse = document.querySelector('.tween .reverse');
     const target = document.querySelector('.tween .target');
     const stagger = document.querySelectorAll('.tween .target-stagger');
@@ -26,14 +29,20 @@ export function staggerTweenTest() {
         data: { x: 0 },
     });
 
-    stagger.forEach((item) => {
-        myStagger.subscribeCache(item, ({ x }) => {
+    const unsubscribeStagger = [...stagger].map((item) => {
+        return myStagger.subscribeCache(item, ({ x }) => {
             item.style.transform = `translate3D(0px,0px,0px) translate(${x}px, 0px)`;
         });
     });
 
-    stagger.forEach((item) => {
-        myStagger.onComplete(({ x }) => {
+    // const unsubscribeStagger = [...stagger].map((item) => {
+    //     return myStagger.subscribe(({ x }) => {
+    //         item.style.transform = `translate3D(0px,0px,0px) translate(${x}px, 0px)`;
+    //     });
+    // });
+
+    const unsubscribeStaggerOnComplete = [...stagger].map((item) => {
+        return myStagger.onComplete(({ x }) => {
             item.style.transform = `translate(${x}px, 0px)`;
         });
     });
@@ -61,6 +70,13 @@ export function staggerTweenTest() {
 
     btnPause.addEventListener('click', () => {
         timeline.pause();
+    });
+
+    btnUnsubscribeStagger.addEventListener('click', () => {
+        const unsubscribe = unsubscribeStagger[2];
+        unsubscribe();
+        const unsubscribeComplete = unsubscribeStaggerOnComplete[2];
+        unsubscribeComplete();
     });
 
     btnPlay.addEventListener('click', () => {

@@ -84,22 +84,10 @@ export const createStaggers = ({ items, stagger, duration }) => {
     }
 
     /**
-     * Create the arry for setStagger utils, add id, index and frame propierties
-     *
-     * Normally cb is the callback array
-     * In this case we have an arry of dom element
+     * Create stagger Array
      */
-    const initialArray = [...items].map((item, i) => {
-        return {
-            id: i,
-            index: 0,
-            frame: 0,
-            item,
-        };
-    });
-
-    const { cbStagger } = setStagger({
-        arr: initialArray,
+    const { staggerArray } = setStagger({
+        arr: [...items].map((item) => ({ item })),
         endArr: [],
         stagger: staggerNow,
         slowlestStagger: {},
@@ -111,7 +99,7 @@ export const createStaggers = ({ items, stagger, duration }) => {
      * In tween there is no problem beciuse use NOOP callback
      * Accpt only dom element and object
      * */
-    const cbStaggerFiltered = cbStagger.filter(
+    const staggerArrayFiltered = staggerArray.filter(
         ({ item }) => checkType(Element, item) || checkType(Object, item)
     );
 
@@ -121,14 +109,14 @@ export const createStaggers = ({ items, stagger, duration }) => {
      * 2 - Remove the duplicate frame es; [1,2,3]
      * 3 - The lenght of resulted array is the number of 'chunck' es: 3
      */
-    const frameArray = cbStaggerFiltered.map(({ frame }) => frame);
+    const frameArray = staggerArrayFiltered.map(({ frame }) => frame);
     const frameSet = [...new Set(frameArray)].sort((a, b) => a - b);
     const numItem = frameSet.length;
 
     /*
      * Final Array
      */
-    const staggers = cbStaggerFiltered.map(({ item, frame }) => {
+    const staggers = staggerArrayFiltered.map(({ item, frame }) => {
         const index = frameSet.findIndex((item) => item === frame);
 
         const { start, end } = (() => {

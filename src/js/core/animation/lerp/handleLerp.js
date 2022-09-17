@@ -224,8 +224,8 @@ export class HandleLerp {
             }
 
             const {
-                cbStagger,
-                cbCompleteStagger,
+                staggerArray,
+                staggerArrayOnComplete,
                 fastestStagger,
                 slowlestStagger,
             } = setStagger({
@@ -237,11 +237,11 @@ export class HandleLerp {
             });
 
             if (this.callbackCache.length > this.callback.length) {
-                this.callbackCache = cbStagger;
+                this.callbackCache = staggerArray;
             } else {
-                this.callback = cbStagger;
+                this.callback = staggerArray;
             }
-            this.callbackOnComplete = cbCompleteStagger;
+            this.callbackOnComplete = staggerArrayOnComplete;
             this.slowlestStagger = slowlestStagger;
             this.fastestStagger = fastestStagger;
             this.firstRun = false;

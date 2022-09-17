@@ -9,9 +9,9 @@ export const setCallBack = (cb, arr) => {
 
     // Disable single stagger without modify staggers order
     return (arr) =>
-        arr.map(({ id, cb }) => {
+        arr.map(({ id, cb, index, frame }) => {
             if (id === prevId) cb = () => {};
-            return { id, cb };
+            return { id, cb, index, frame };
         });
 };
 
@@ -29,9 +29,9 @@ export const setCallBackCache = (item, fn, cbArray, unsubscribeCache) => {
         unsubscribeCb: (arr) => {
             unsubscribe();
             // Disable single stagger without modify staggers order
-            return arr.map(({ id, cb }) => {
+            return arr.map(({ id, cb, index, frame }) => {
                 if (id === prevId) cb = () => {};
-                return { id, cb };
+                return { id, cb, index, frame };
             });
         },
     };

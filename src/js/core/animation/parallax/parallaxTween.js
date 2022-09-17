@@ -59,7 +59,7 @@ export class ParallaxTween {
                 return;
             }
 
-            const { cbStagger, cbCompleteStagger } = setStagger({
+            const { staggerArray, staggerArrayOnComplete } = setStagger({
                 arr: cb,
                 endArr: this.callbackOnStop,
                 stagger: this.stagger,
@@ -68,11 +68,11 @@ export class ParallaxTween {
             });
 
             if (this.callbackCache.length > this.callback.length) {
-                this.callbackCache = cbStagger;
+                this.callbackCache = staggerArray;
             } else {
-                this.callback = cbStagger;
+                this.callback = staggerArray;
             }
-            this.callbackOnStop = cbCompleteStagger;
+            this.callbackOnStop = staggerArrayOnComplete;
         }
     }
 

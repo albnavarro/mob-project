@@ -15,8 +15,8 @@ import { checkType } from '../../../store/storeType.js';
 
 const setStaggerErrorFallback = () => {
     return {
-        cbStagger: [],
-        cbCompleteStagger: [],
+        staggerArray: [],
+        staggerArrayOnComplete: [],
         fastestStagger: {},
         slowlestStagger: {},
     };
@@ -136,21 +136,21 @@ export const setStagger = ({
                 }
             })();
 
-            const cbStagger = cleanCb.flat();
-            const endcbStagger = cleanEndCb.flat();
+            const staggerArray = cleanCb.flat();
+            const endstaggerArray = cleanEndCb.flat();
 
             // Update onComplete cb with right stagger
-            cbStagger.forEach((item, i) => {
+            staggerArray.forEach((item, i) => {
                 // If there an OnCompelte callack
-                if (endcbStagger.length > 0) {
-                    endcbStagger[i].index = item.index;
-                    endcbStagger[i].frame = item.frame;
+                if (endstaggerArray.length > 0) {
+                    endstaggerArray[i].index = item.index;
+                    endstaggerArray[i].frame = item.frame;
                 }
             });
 
             return {
-                cbStagger,
-                cbCompleteStagger: endcbStagger,
+                staggerArray,
+                staggerArrayOnComplete: endstaggerArray,
                 fastestStagger,
                 slowlestStagger,
             };
@@ -191,14 +191,14 @@ export const setStagger = ({
         }
     })();
 
-    const cbStagger = result.cbStagger;
-    const cbCompleteStagger = result.cbCompleteStagger;
+    const staggerArray = result.staggerArray;
+    const staggerArrayOnComplete = result.staggerArrayOnComplete;
     fastestStagger = result.fastestStagger;
     slowlestStagger = result.slowlestStagger;
 
     return {
-        cbStagger,
-        cbCompleteStagger,
+        staggerArray,
+        staggerArrayOnComplete,
         fastestStagger,
         slowlestStagger,
     };

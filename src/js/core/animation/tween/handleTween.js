@@ -229,8 +229,8 @@ export class HandleTween {
             }
 
             const {
-                cbStagger,
-                cbCompleteStagger,
+                staggerArray,
+                staggerArrayOnComplete,
                 fastestStagger,
                 slowlestStagger,
             } = setStagger({
@@ -242,11 +242,11 @@ export class HandleTween {
             });
 
             if (this.callbackCache.length > this.callback.length) {
-                this.callbackCache = cbStagger;
+                this.callbackCache = staggerArray;
             } else {
-                this.callback = cbStagger;
+                this.callback = staggerArray;
             }
-            this.callbackOnComplete = cbCompleteStagger;
+            this.callbackOnComplete = staggerArrayOnComplete;
             this.slowlestStagger = slowlestStagger;
             this.fastestStagger = fastestStagger;
             this.firstRun = false;

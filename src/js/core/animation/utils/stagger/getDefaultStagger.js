@@ -215,13 +215,13 @@ export const getDefaultStagger = ({
 
     // main callBack
     const cbByRow = getCbByRow(arr);
-    const cbStagger = cbByRow.map((item) => {
+    const staggerArray = cbByRow.map((item) => {
         return item != undefined ? item : { arr: () => {} };
     });
 
     // onComplete callBack
     const cbCompleteByRow = getCbByRow(endArr);
-    const cbCompleteStagger = cbCompleteByRow.map((item) => {
+    const staggerArrayOnComplete = cbCompleteByRow.map((item) => {
         return item != undefined ? item : { arr: () => {} };
     });
 
@@ -232,7 +232,7 @@ export const getDefaultStagger = ({
                 ? chunckSizeRow
                 : chunckSizeCol;
 
-        return sliceIntoChunks(cbStagger, chunckSize);
+        return sliceIntoChunks(staggerArray, chunckSize);
     })();
 
     const firstChunk = chuncked[0];
@@ -277,19 +277,19 @@ export const getDefaultStagger = ({
 
     // set data to original (this.callback) array
     flat.forEach((item, i) => {
-        cbStagger[i].index = item.index;
-        cbStagger[i].frame = item.frame;
+        staggerArray[i].index = item.index;
+        staggerArray[i].frame = item.frame;
 
         // If there an OnCompelte callack
-        if (cbCompleteStagger.length > 0) {
-            cbCompleteStagger[i].index = item.index;
-            cbCompleteStagger[i].frame = item.frame;
+        if (staggerArrayOnComplete.length > 0) {
+            staggerArrayOnComplete[i].index = item.index;
+            staggerArrayOnComplete[i].frame = item.frame;
         }
     });
 
     return {
-        cbStagger,
-        cbCompleteStagger,
+        staggerArray,
+        staggerArrayOnComplete,
         fastestStagger,
         slowlestStagger,
     };

@@ -22,7 +22,19 @@ export const handleCache = (() => {
 
         return {
             id: prevId,
-            unsubscribe: () => delete subscriber[prevId],
+            unsubscribe: () => {
+                if (subscriber?.[prevId]) {
+                    /*
+                     * When we remove some items before fired we have to update the
+                     * cachecounter so handleFrame can stop
+                     */
+                    const frameToSubstract = Object.keys(
+                        subscriber[prevId].data
+                    ).length;
+                    cacheCoutner = cacheCoutner - frameToSubstract;
+                    delete subscriber[prevId];
+                }
+            },
         };
     };
 
