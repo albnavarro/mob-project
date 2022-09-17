@@ -416,9 +416,11 @@ export class HandleAsyncTimeline {
                 }
 
                 /*
-                 * This is fired when this.starterFunction is running
+                 * This is used after this.starterFunction is fired
+                 * ( starterFunction start from index = 0 )
+                 * and timeline running to right index in immediate
                  * and labelState.isReverse is active
-                 * The timeline is reversed next step
+                 * The timeline is reversed next step without increment currentIndex
                  **/
                 if (
                     labelIsActive &&
