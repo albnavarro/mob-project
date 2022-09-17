@@ -50,7 +50,7 @@ export class HandleSyncTimeline {
         this.isStopped = true;
         this.skipFirstRender = false;
         this.completed = false;
-        this.fpsInLoading = false;
+        this.fpsIsInLoading = false;
 
         // callbackLoop on complete
         this.callbackId = 0;
@@ -59,7 +59,7 @@ export class HandleSyncTimeline {
     }
 
     updateTime(time, fps, shouldRender) {
-        if (this.isStopped || this.isInInzializing) return;
+        if (this.isStopped || this.fpsIsInLoading) return;
 
         // If loop anitcipate by half frame ( in millsenconds ) next loop so we a have more precise animation
         const frameThreshold =
@@ -149,7 +149,7 @@ export class HandleSyncTimeline {
              * in reverse mode
              **/
             if (
-                !this.isInInzializing &&
+                !this.fpsIsInLoading &&
                 !this.completed &&
                 this.loopIteration > this.minLoopIteration
             ) {
@@ -240,7 +240,7 @@ export class HandleSyncTimeline {
         handleFrame.add(() => {
             handleNextTick.add(({ time, fps, shouldRender }) => {
                 // Prevent fire too many raf
-                if (!this.isInInzializing)
+                if (!this.fpsIsInLoading)
                     this.updateTime(time, fps, shouldRender);
             });
         });
@@ -276,36 +276,41 @@ export class HandleSyncTimeline {
      * Control play on forward direction
      */
     play() {
+        if (this.fpsIsInLoading) return;
+
         this.playFromTime();
+        return this;
     }
 
     playFrom(value) {
+        if (this.fpsIsInLoading) return;
+
         const isNumber = storeType.isNumber(value);
         const currentTime = isNumber ? value : this.getTimeFromLabel(value);
         this.playFromTime(currentTime);
+        return this;
     }
 
     playFromTime(time = 0) {
-        if (this.isInInzializing || this.fpsInLoading) return;
-
         // Reset sequancer callback add function state
         this.resetSequencerLastValue();
-
         this.resetTime();
-        this.isStopped = false;
-        this.pauseStatus = false;
-        this.isReverse = false;
 
-        // While start isInInzializing fa fallire le altre raf
-        this.isInInzializing = true;
-        this.isPlayngReverse = false;
-        this.loopCounter = 0;
-
+        /*
+         * Set time
+         */
         this.endTime = time;
         this.timeAtReverseBack = -this.endTime;
 
-        // Prevent multiple play whild fps is loading
-        this.fpsInLoading = true;
+        /*
+         * Generic prop
+         */
+        this.isPlayngReverse = false;
+
+        /*
+         * Prevent multile firing
+         */
+        this.fpsIsInLoading = true;
         this.startAnimation(time);
     }
 
@@ -313,45 +318,45 @@ export class HandleSyncTimeline {
      * Control play on backward direction
      */
     playFromReverse(value) {
+        if (this.fpsIsInLoading) return;
+
         const isNumber = storeType.isNumber(value);
         const currentTime = isNumber ? value : this.getTimeFromLabel(value);
         this.playFromTimeReverse(currentTime, true);
+        return this;
     }
 
     playReverse() {
+        if (this.fpsIsInLoading) return;
+
         this.playFromTimeReverse(this.duration, true);
+        return this;
     }
 
     playFromTimeReverse(time = 0) {
-        if (this.isInInzializing || this.fpsInLoading) return;
-
         // Reset sequancer callback add function state
         this.resetSequencerLastValue();
 
-        // Jump to last time
+        /*
+         * Set time
+         */
         this.timeElapsed = time;
         this.endTime = time;
         this.pauseTime = time;
-
-        // reset
         this.timeAtReverse = 0;
         this.timeAtReverseBack = 0;
-        this.isStopped = false;
-        this.pauseStatus = false;
-        this.loopCounter = 0;
-        this.isReverse = false;
 
-        // playReverse props
+        /*
+         * Generic prop
+         */
         this.startReverse = true;
         this.isPlayngReverse = true;
-
         this.skipFirstRender = true;
 
-        // While start isInInzializing fa fallire le altre raf
-        this.isInInzializing = true;
-
-        // Prevent multiple play whild fps is loading
-        this.fpsInLoading = true;
+        /*
+         * Prevent multile firing
+         */
+        this.fpsIsInLoading = true;
         this.startAnimation(time);
     }
 
@@ -360,6 +365,7 @@ export class HandleSyncTimeline {
 
         loadFps().then(({ averageFPS }) => {
             fpsLoadedLog('sequencer', averageFPS);
+            this.isReverse = false;
 
             this.sequencers.forEach((item) => {
                 item.inzializeStagger();
@@ -375,8 +381,10 @@ export class HandleSyncTimeline {
             handleFrame.add(() => {
                 handleNextTick.add(({ time, fps, shouldRender }) => {
                     this.startTime = time;
-                    this.isInInzializing = false;
-                    this.fpsInLoading = false;
+                    this.fpsIsInLoading = false;
+                    this.isStopped = false;
+                    this.pauseStatus = false;
+                    this.loopCounter = 0;
                     this.updateTime(time, fps, shouldRender);
                 });
             });
@@ -384,21 +392,21 @@ export class HandleSyncTimeline {
     }
 
     pause() {
-        if (this.isStopped || this.pauseStatus || this.isInInzializing) return;
+        if (this.isStopped || this.pauseStatus || this.fpsIsInLoading) return;
 
         this.isStopped = false;
         this.pauseStatus = true;
     }
 
     resume() {
-        if (this.isStopped || !this.pauseStatus || this.isInInzializing) return;
+        if (this.isStopped || !this.pauseStatus || this.fpsIsInLoading) return;
 
         this.isStopped = false;
         this.pauseStatus = false;
     }
 
     reverse() {
-        if (this.isStopped || this.pauseStatus || this.isInInzializing) return;
+        if (this.isStopped || this.pauseStatus || this.fpsIsInLoading) return;
 
         // Reset sequancer callback add function state
         this.resetSequencerLastValue();

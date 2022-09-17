@@ -1,4 +1,5 @@
 import { handleFrameIndex } from '../../events/rafutils/handleFrameIndex.js';
+import { loadFps } from '../../events/rafutils/loadFps.js';
 import { checkType } from '../../store/storeType.js';
 import { getTime } from '../../utils/time.js';
 import { directionConstant } from '../utils/constant.js';
@@ -63,6 +64,7 @@ export class HandleAsyncTimeline {
         this.timeOnPause = 0;
         this.autoSetIsJustCreated = false;
         this.currentAction = [];
+        this.fpsIsInLoading = false;
 
         // Callback
         this.id = 0;
@@ -498,9 +500,11 @@ export class HandleAsyncTimeline {
                                 });
                             }
                         );
-                        Promise.all(tweenPromise).then(() => {
-                            cb();
-                        });
+                        Promise.all(tweenPromise)
+                            .then(() => {
+                                cb();
+                            })
+                            .catch(() => {});
                         return;
                     }
 
@@ -966,68 +970,78 @@ export class HandleAsyncTimeline {
     }
 
     play() {
-        if (this.autoSet) this.addSetBlocks();
+        if (this.fpsIsInLoading) return;
+        this.fpsIsInLoading = true;
 
-        if (this.freeMode) {
-            /*
-             * In freeMode every tween start form current value in use at the moment
-             */
-            if (this.tweenList.length === 0 || this.addAsyncIsActive) return;
-            if (this.delayIsRunning) {
-                this.startOnDelay = true;
-                this.actionAfterReject.push(() => this.play());
-                return;
-            }
-            this.startOnDelay = false;
-            this.stop();
-            this.isStopped = false;
-            if (this.isReverse) this.revertTween();
+        loadFps().then(() => {
+            this.fpsIsInLoading = false;
 
-            /*
-             * Run one frame after stop to avoid overlap with promise resolve/reject
-             */
+            if (this.autoSet) this.addSetBlocks();
 
-            this.sessionId++;
-            handleFrameIndex.add(() => this.run(), 1);
-            return this;
-        } else {
-            const cb = () => {
-                /**
-                 * need to reset current data after reverse() of tween so use stop()
+            if (this.freeMode) {
+                /*
+                 * In freeMode every tween start form current value in use at the moment
                  */
+                if (this.tweenList.length === 0 || this.addAsyncIsActive)
+                    return;
+                if (this.delayIsRunning) {
+                    this.startOnDelay = true;
+                    this.actionAfterReject.push(() => this.play());
+                    return;
+                }
+                this.startOnDelay = false;
                 this.stop();
                 this.isStopped = false;
+                if (this.isReverse) this.revertTween();
 
                 /*
-                 * When start form play in default mode ( no freeMode )
-                 * an automatic set method is Executed with initial data
+                 * Run one frame after stop to avoid overlap with promise resolve/reject
                  */
-                const tweenPromise = this.tweenStore.map(({ tween }) => {
-                    const data = tween.getInitialData();
 
-                    return new Promise((resolve, reject) => {
-                        tween
-                            .set(data)
-                            .then(() => resolve())
-                            .catch(() => reject());
+                this.sessionId++;
+                handleFrameIndex.add(() => this.run(), 1);
+            } else {
+                const cb = () => {
+                    /**
+                     * need to reset current data after reverse() of tween so use stop()
+                     */
+                    this.stop();
+                    this.isStopped = false;
+
+                    /*
+                     * When start form play in default mode ( no freeMode )
+                     * an automatic set method is Executed with initial data
+                     */
+                    const tweenPromise = this.tweenStore.map(({ tween }) => {
+                        const data = tween.getInitialData();
+
+                        return new Promise((resolve, reject) => {
+                            tween
+                                .set(data)
+                                .then(() => resolve())
+                                .catch(() => reject());
+                        });
                     });
-                });
-                Promise.all(tweenPromise).then(() => {
-                    this.run();
-                });
-            };
+                    Promise.all(tweenPromise)
+                        .then(() => {
+                            this.run();
+                        })
+                        .catch(() => {});
+                };
 
-            this.starterFunction.fn = () => cb();
-            this.starterFunction.active = true;
+                this.starterFunction.fn = () => cb();
+                this.starterFunction.active = true;
 
-            /**
-             * First loop reverse at the end start function fired
-             * reverse set label.active at true
-             * so label.active && starterFunction.active is necessary to fire cb
-             */
-            this.reverse({ forceYoYo: true });
-            return this;
-        }
+                /**
+                 * First loop reverse at the end start function fired
+                 * reverse set label.active at true
+                 * so label.active && starterFunction.active is necessary to fire cb
+                 */
+                this.reverse({ forceYoYo: true });
+            }
+        });
+
+        return this;
     }
 
     playFromLabel({ isReverse = false, label = null } = {}) {
@@ -1051,79 +1065,103 @@ export class HandleAsyncTimeline {
     }
 
     playFrom(label) {
-        this.starterFunction.fn = () =>
-            this.playFromLabel({ isReverse: false, label });
-        this.starterFunction.active = true;
+        if (this.fpsIsInLoading) return;
+        this.fpsIsInLoading = true;
 
-        /**
-         * First loop reverse at the end start function fired
-         * reverse set label.active at true
-         * so label.active && starterFunction.active is necessary to fire cb
-         */
-        this.reverse({ forceYoYo: false });
+        loadFps().then(() => {
+            this.fpsIsInLoading = false;
+
+            this.starterFunction.fn = () =>
+                this.playFromLabel({ isReverse: false, label });
+            this.starterFunction.active = true;
+
+            /**
+             * First loop reverse at the end start function fired
+             * reverse set label.active at true
+             * so label.active && starterFunction.active is necessary to fire cb
+             */
+            this.reverse({ forceYoYo: false });
+        });
+
         return this;
     }
 
     playFromReverse(label) {
-        this.starterFunction.fn = () =>
-            this.playFromLabel({ isReverse: true, label });
-        this.starterFunction.active = true;
+        if (this.fpsIsInLoading) return;
+        this.fpsIsInLoading = true;
 
-        /**
-         * First loop reverse at the end start function fired
-         * reverse set label.active at true
-         * so label.active && starterFunction.active is necessary to fire cb
-         */
-        this.reverse({ forceYoYo: false });
+        loadFps().then(() => {
+            this.fpsIsInLoading = false;
+
+            this.starterFunction.fn = () =>
+                this.playFromLabel({ isReverse: true, label });
+            this.starterFunction.active = true;
+
+            /**
+             * First loop reverse at the end start function fired
+             * reverse set label.active at true
+             * so label.active && starterFunction.active is necessary to fire cb
+             */
+            this.reverse({ forceYoYo: false });
+        });
+
         return this;
     }
 
     reverse({ forceYoYo = true } = {}) {
-        if (this.autoSet) this.addSetBlocks();
-        const forceYoYonow = forceYoYo;
+        if (this.fpsIsInLoading) return;
+        this.fpsIsInLoading = true;
 
-        // Skip of there is nothing to run
-        if (this.tweenList.length === 0 || this.addAsyncIsActive) return;
-        if (this.delayIsRunning) {
-            this.startOnDelay = true;
-            this.actionAfterReject.push(() =>
-                this.reverse({ forceYoYo: forceYoYonow })
-            );
-            return;
-        }
+        loadFps().then(() => {
+            this.fpsIsInLoading = false;
 
-        /**
-         * Rest necessary props
-         */
-        this.startOnDelay = false;
-        this.stop();
-        this.isStopped = false;
+            if (this.autoSet) this.addSetBlocks();
+            const forceYoYonow = forceYoYo;
 
-        /*
-         * Walk thru timeline until the end,
-         * so we can run reverse next step with forceyoyo
-         * forceyoyo is used only if we play directly from end
-         * PlayFrom wich use reverse() need to go in forward direction
-         */
-        if (forceYoYonow) this.forceYoyo = true;
+            // Skip of there is nothing to run
+            if (this.tweenList.length === 0 || this.addAsyncIsActive) return;
+            if (this.delayIsRunning) {
+                this.startOnDelay = true;
+                this.actionAfterReject.push(() =>
+                    this.reverse({ forceYoYo: forceYoYonow })
+                );
+                return;
+            }
 
-        /*
-         * Lalbel state
-         */
-        this.labelState.active = true;
-        this.labelState.index = this.tweenList.length;
+            /**
+             * Rest necessary props
+             */
+            this.startOnDelay = false;
+            this.stop();
+            this.isStopped = false;
 
-        /**
-         * When play reverse first loop is virtual
-         * So increment the loop number by 1
-         **/
-        this.loopCounter--;
-        this.sessionId++;
+            /*
+             * Walk thru timeline until the end,
+             * so we can run reverse next step with forceyoyo
+             * forceyoyo is used only if we play directly from end
+             * PlayFrom wich use reverse() need to go in forward direction
+             */
+            if (forceYoYonow) this.forceYoyo = true;
 
-        /*
-         * Run one frame after stop to avoid overlap with promise resolve/reject
-         */
-        handleFrameIndex.add(() => this.run(), 1);
+            /*
+             * Lalbel state
+             */
+            this.labelState.active = true;
+            this.labelState.index = this.tweenList.length;
+
+            /**
+             * When play reverse first loop is virtual
+             * So increment the loop number by 1
+             **/
+            this.loopCounter--;
+            this.sessionId++;
+
+            /*
+             * Run one frame after stop to avoid overlap with promise resolve/reject
+             */
+            handleFrameIndex.add(() => this.run(), 1);
+        });
+
         return this;
     }
 
