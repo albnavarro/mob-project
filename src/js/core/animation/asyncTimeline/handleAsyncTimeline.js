@@ -481,6 +481,7 @@ export class HandleAsyncTimeline {
                      * set all tween to end position and go
                      */
                     if (
+                        labelIsActive &&
                         labelIndex === this.tweenList.length &&
                         !this.freeMode
                     ) {
