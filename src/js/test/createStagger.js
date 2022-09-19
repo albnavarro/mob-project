@@ -12,7 +12,7 @@ export const createStagger = () => {
         items,
         stagger: {
             type: 'equal',
-            each: 1,
+            each: 40,
             from: { x: 4, y: 4 },
             grid: { col: 5, row: 5, direction: 'radial' },
         },

@@ -10,8 +10,10 @@ export const masterSequencer = () => {
     const staggers = mobbu.create('stagger', {
         items,
         stagger: {
-            type: 'classic',
-            each: 30,
+            type: 'equal',
+            each: 60,
+            // type: 'equal',
+            // each: 40,
         },
     });
 

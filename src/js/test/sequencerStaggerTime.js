@@ -14,13 +14,17 @@ export const sequencerStaggerTime = () => {
     );
 
     let masterSequencer = mobbu.create('masterSequencer');
-    const duration = 10;
+
+    // Example , not necessary
+    const duration = 3000;
 
     const staggers = mobbu.create('stagger', {
         items,
         stagger: {
-            type: 'classic',
-            each: 30,
+            // type: 'classicInverse',
+            // each: 30,
+            type: 'equal',
+            each: 50,
         },
         duration,
     });

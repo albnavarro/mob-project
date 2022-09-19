@@ -11,6 +11,7 @@ import { handleSetUp } from '../../setup.js';
 import { checkType } from '../../store/storeType.js';
 
 export const createStaggers = ({ items, stagger, duration }) => {
+    const STAGGER_RANGE = 100;
     const durationNow = duration || handleSetUp.get('sequencer').duration;
     const staggerNow = { ...STAGGER_DEFAULT_OBJ, ...stagger };
     const type = staggerNow.type;
@@ -62,24 +63,10 @@ export const createStaggers = ({ items, stagger, duration }) => {
     /**
      * In classic mode each must be between 1 and 100
      */
-    if (
-        (type === STAGGER_TYPE_CLASSIC ||
-            STAGGER_TYPE_CLASSIC_INVERSE ||
-            STAGGER_TYPE_CLASSIC_CENTER) &&
-        checkType(Number, each) &&
-        (each > 100 || each < 1)
-    ) {
+    if (checkType(Number, each) && (each > 100 || each < 1)) {
         console.warn(
             `createStagger: in classic mode each must be between 1 and 100`
         );
-        each = 1;
-    }
-
-    /**
-     * In equal mode each is always 1
-     */
-    if (type === STAGGER_TYPE_EQUAL && checkType(Number, each) && each !== 1) {
-        console.warn(`createStagger: in equal mode each is always 1`);
         each = 1;
     }
 
@@ -121,11 +108,22 @@ export const createStaggers = ({ items, stagger, duration }) => {
 
         const { start, end } = (() => {
             if (type === STAGGER_TYPE_EQUAL) {
-                const stepDuration = durationNow / numItem;
-                const start = getRoundedValue(index * stepDuration);
-                const end = getRoundedValue(start + stepDuration);
-
-                return { start, end };
+                if (each === 1) {
+                    const stepDuration = durationNow / numItem;
+                    const start = getRoundedValue(index * stepDuration);
+                    const end = getRoundedValue(start + stepDuration);
+                    return { start, end };
+                } else {
+                    const unit = durationNow / STAGGER_RANGE;
+                    const staggerDuration = unit * each;
+                    const remainSpace = durationNow - staggerDuration;
+                    const remainSpaceUnit = remainSpace / (numItem - 1);
+                    const staggerStart = remainSpaceUnit * index;
+                    return {
+                        start: getRoundedValue(staggerStart),
+                        end: getRoundedValue(staggerDuration + staggerStart),
+                    };
+                }
             }
 
             if (
@@ -133,7 +131,6 @@ export const createStaggers = ({ items, stagger, duration }) => {
                 type === STAGGER_TYPE_CLASSIC_INVERSE ||
                 type === STAGGER_TYPE_CLASSIC_CENTER
             ) {
-                const STAGGER_RANGE = 100;
                 const unit = durationNow / numItem;
                 const cleanStart = unit * index;
                 const noopSpace = durationNow - (durationNow - cleanStart);
