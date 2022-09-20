@@ -22,9 +22,9 @@ export const sequencerStaggerTime = () => {
         items,
         stagger: {
             // type: 'classicInverse',
-            // each: 30,
+            // each: 3,
             type: 'equal',
-            each: 50,
+            each: 5,
         },
         duration,
     });

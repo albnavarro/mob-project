@@ -11,7 +11,7 @@ import { handleSetUp } from '../../setup.js';
 import { checkType } from '../../store/storeType.js';
 
 export const createStaggers = ({ items, stagger, duration }) => {
-    const STAGGER_RANGE = 100;
+    const eachProportion = 10;
     const durationNow = duration || handleSetUp.get('sequencer').duration;
     const staggerNow = { ...STAGGER_DEFAULT_OBJ, ...stagger };
     const type = staggerNow.type;
@@ -61,11 +61,11 @@ export const createStaggers = ({ items, stagger, duration }) => {
     }
 
     /**
-     * In classic mode each must be between 1 and 100
+     * In classic mode each must be between 1 and eachProportion
      */
-    if (checkType(Number, each) && (each > 100 || each < 1)) {
+    if (checkType(Number, each) && (each > eachProportion || each < 1)) {
         console.warn(
-            `createStagger: in classic mode each must be between 1 and 100`
+            `createStagger: in classic mode each must be between 1 and ${eachProportion}`
         );
         each = 1;
     }
@@ -105,6 +105,7 @@ export const createStaggers = ({ items, stagger, duration }) => {
      */
     const staggers = staggerArrayFiltered.map(({ item, frame }) => {
         const index = frameSet.findIndex((item) => item === frame);
+        const eachByNumItem = (each * numItem) / eachProportion;
 
         const { start, end } = (() => {
             if (type === STAGGER_TYPE_EQUAL) {
@@ -114,8 +115,8 @@ export const createStaggers = ({ items, stagger, duration }) => {
                     const end = getRoundedValue(start + stepDuration);
                     return { start, end };
                 } else {
-                    const unit = durationNow / STAGGER_RANGE;
-                    const staggerDuration = unit * each;
+                    const unit = durationNow / numItem;
+                    const staggerDuration = unit * eachByNumItem;
                     const remainSpace = durationNow - staggerDuration;
                     const remainSpaceUnit = remainSpace / (numItem - 1);
                     const staggerStart = remainSpaceUnit * index;
@@ -134,7 +135,7 @@ export const createStaggers = ({ items, stagger, duration }) => {
                 const unit = durationNow / numItem;
                 const cleanStart = unit * index;
                 const noopSpace = durationNow - (durationNow - cleanStart);
-                const gap = (noopSpace / STAGGER_RANGE) * each;
+                const gap = (noopSpace / numItem) * eachByNumItem;
 
                 if (type === STAGGER_TYPE_CLASSIC) {
                     return {

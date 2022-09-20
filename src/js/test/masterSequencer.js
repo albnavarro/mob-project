@@ -11,9 +11,9 @@ export const masterSequencer = () => {
         items,
         stagger: {
             type: 'equal',
-            each: 60,
+            each: 6,
             // type: 'equal',
-            // each: 40,
+            // each: 4,
         },
     });
 
