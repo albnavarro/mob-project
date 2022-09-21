@@ -12,6 +12,8 @@ export const staggerIsOutOfRangeWarning = (max) => {
     );
 };
 
-export const valueIsNotValidWarning = (label) => {
-    console.warn(`${label} is not valid value, must be a number or a function`);
+export const dataTweenValueIsNotValidWarning = (label) => {
+    console.warn(
+        `tween | sequencer: ${label} is not valid value, must be a number or a function`
+    );
 };

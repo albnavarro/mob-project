@@ -1,11 +1,11 @@
 import { getTweenFn } from '../tween/tweenConfig.js';
-import { valueIsValid } from '../utils/actions.js';
-import { valueIsNotValidWarning } from '../utils/warning.js';
+import { dataTweenValueIsValid } from '../utils/tweenValidation.js';
+import { dataTweenValueIsNotValidWarning } from '../utils/warning.js';
 
 export const goToSyncUtils = (obj, ease) => {
     return Object.keys(obj).map((item) => {
-        if (!valueIsValid(obj[item])) {
-            valueIsNotValidWarning(`${item}: ${obj[item]}`);
+        if (!dataTweenValueIsValid(obj[item])) {
+            dataTweenValueIsNotValidWarning(`${item}: ${obj[item]}`);
             return {
                 prop: item,
                 toValue: 0,
@@ -23,8 +23,8 @@ export const goToSyncUtils = (obj, ease) => {
 
 export const goFromSyncUtils = (obj, ease) => {
     return Object.keys(obj).map((item) => {
-        if (!valueIsValid(obj[item])) {
-            valueIsNotValidWarning(`${item}: ${obj[item]}`);
+        if (!dataTweenValueIsValid(obj[item])) {
+            dataTweenValueIsNotValidWarning(`${item}: ${obj[item]}`);
             return {
                 prop: item,
                 fromValue: 0,
@@ -42,8 +42,11 @@ export const goFromSyncUtils = (obj, ease) => {
 
 export const goFromToSyncUtils = (fromObj, toObj, ease) => {
     return Object.keys(fromObj).map((item) => {
-        if (!valueIsValid(toObj[item]) || !valueIsValid(fromObj[item])) {
-            valueIsNotValidWarning(
+        if (
+            !dataTweenValueIsValid(toObj[item]) ||
+            !dataTweenValueIsValid(fromObj[item])
+        ) {
+            dataTweenValueIsNotValidWarning(
                 `${item}: ${toObj[item]} || ${item}: ${fromObj[item]}`
             );
             return {

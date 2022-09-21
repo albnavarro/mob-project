@@ -1,13 +1,6 @@
 import { storeType } from '../../store/storeType.js';
-import { valueIsNotValidWarning } from './warning.js';
-
-/*
- * Check is value is number or function
- *
- **/
-export const valueIsValid = (val) => {
-    return storeType.isNumber(val) || storeType.isFunction(val);
-};
+import { dataTweenValueIsValid } from './tweenValidation.js';
+import { dataTweenValueIsNotValidWarning } from './warning.js';
 
 /*
  * Set goTo value, used by spring and lerp
@@ -15,8 +8,8 @@ export const valueIsValid = (val) => {
  **/
 export const goToUtils = (obj) => {
     return Object.keys(obj).map((item) => {
-        if (!valueIsValid(obj[item])) {
-            valueIsNotValidWarning(`${item}: ${obj[item]}`);
+        if (!dataTweenValueIsValid(obj[item])) {
+            dataTweenValueIsNotValidWarning(`${item}: ${obj[item]}`);
 
             return {
                 prop: item,
@@ -45,8 +38,8 @@ export const goToUtils = (obj) => {
  **/
 export const goFromUtils = (obj) => {
     return Object.keys(obj).map((item) => {
-        if (!valueIsValid(obj[item])) {
-            valueIsNotValidWarning(`${item}: ${obj[item]}`);
+        if (!dataTweenValueIsValid(obj[item])) {
+            dataTweenValueIsNotValidWarning(`${item}: ${obj[item]}`);
 
             return {
                 prop: item,
@@ -76,8 +69,11 @@ export const goFromUtils = (obj) => {
  **/
 export const goFromToUtils = (fromObj, toObj) => {
     return Object.keys(fromObj).map((item) => {
-        if (!valueIsValid(toObj[item]) || !valueIsValid(fromObj[item])) {
-            valueIsNotValidWarning(
+        if (
+            !dataTweenValueIsValid(toObj[item]) ||
+            !dataTweenValueIsValid(fromObj[item])
+        ) {
+            dataTweenValueIsNotValidWarning(
                 `${item}: ${toObj[item]} || ${item}: ${fromObj[item]}`
             );
 
@@ -118,8 +114,8 @@ export const goFromToUtils = (fromObj, toObj) => {
 
 export const setUtils = (obj) => {
     return Object.keys(obj).map((item) => {
-        if (!valueIsValid(obj[item])) {
-            valueIsNotValidWarning(`${item}: ${obj[item]}`);
+        if (!dataTweenValueIsValid(obj[item])) {
+            dataTweenValueIsNotValidWarning(`${item}: ${obj[item]}`);
 
             return {
                 prop: item,
