@@ -618,7 +618,7 @@ export class HandleAsyncTimeline {
     }
 
     addTweenToStore(tween) {
-        const uniqueId = tween?.getId?.() && tween.getId();
+        const uniqueId = tween?.getId?.();
         const tweenIsStored = this.tweenStore.find(({ id }) => id === uniqueId);
         if (tweenIsStored) return;
 
@@ -1212,7 +1212,7 @@ export class HandleAsyncTimeline {
         this.isInPause = true;
         this.timeOnPause = getTime();
         this.currentTween.forEach(({ tween }) => {
-            if (tween?.pause?.()) tween.pause();
+            tween?.pause?.();
         });
     }
 
@@ -1254,7 +1254,7 @@ export class HandleAsyncTimeline {
 
     resumeEachTween() {
         this.currentTween.forEach(({ tween }) => {
-            if (tween?.resume?.()) tween.resume();
+            tween?.resume?.();
         });
     }
 
@@ -1291,7 +1291,7 @@ export class HandleAsyncTimeline {
      */
     destroy() {
         this.tweenStore.forEach(({ tween }) => {
-            if (tween?.destroy?.()) tween.destroy();
+            tween?.destroy?.();
         });
         this.tweenList = [];
         this.currentTween = [];

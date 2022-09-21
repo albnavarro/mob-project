@@ -13,15 +13,15 @@ export const asyncReduceTween = (tweenList, tween, index) => {
         /*
          * Sync must be outside group so is at 0
          */
-        const currentData = c[0].data;
-        const action = currentData.action;
+        const currentFirstData = c[0].data;
+        const action = currentFirstData.action;
 
         /*
          * If tween is syncronize with another tween,
          * switch currenTween to the new one
          */
         if (action === 'sync') {
-            const syncProp = currentData?.syncProp;
+            const syncProp = currentFirstData?.syncProp;
 
             const from = {
                 tween: syncProp.from,
@@ -49,13 +49,11 @@ export const asyncReduceTween = (tweenList, tween, index) => {
          * Align isntant without promise the tween so we have all the data of tween
          * the current and the previous merged
          */
-        if (currentTween?.data?.tween?.set) {
-            currentTween.data.tween.set(currentTween?.data?.valuesTo, {
-                immediateNoPromise: true,
-            });
-        }
+        currentTween?.data?.tween?.set?.(currentTween?.data?.valuesTo, {
+            immediateNoPromise: true,
+        });
 
-        const currentValueTo = currentTween?.data?.tween.getToNativeType();
+        const currentValueTo = currentTween?.data?.tween?.getToNativeType?.();
 
         /*
          * Filter only the prop in use in this step
