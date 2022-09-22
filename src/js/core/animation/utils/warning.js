@@ -17,3 +17,19 @@ export const dataTweenValueIsNotValidWarning = (label) => {
         `tween | sequencer: ${label} is not valid value, must be a number or a function`
     );
 };
+
+export const sequencerRangeStartWarning = (val) => {
+    console.warn(
+        `sequencer, start option: ${val} value is not valid, must be a Number`
+    );
+};
+
+export const sequencerRangeEndWarning = (val) => {
+    console.warn(
+        `sequencer, end option: ${val} value is not valid, must be a Number`
+    );
+};
+
+export const relativePropInsideTimelineWarning = () => {
+    console.warn('relative prop is not allowed inside a timeline');
+};

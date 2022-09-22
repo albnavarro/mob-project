@@ -3,6 +3,7 @@ import { loadFps } from '../../events/rafutils/loadFps.js';
 import { checkType } from '../../store/storeType.js';
 import { getTime } from '../../utils/time.js';
 import { directionConstant } from '../utils/constant.js';
+import { relativePropInsideTimelineWarning } from '../utils/warning.js';
 import { asyncReduceData } from './asyncReduceData.js';
 import { asyncReduceTween } from './asyncReduceTween.js';
 
@@ -111,7 +112,7 @@ export class HandleAsyncTimeline {
              */
             if ('relative' in tweenProps && tweenProps.relative) {
                 tweenProps.relative = false;
-                console.warn('relative prop is not allowed inside a timeline');
+                relativePropInsideTimelineWarning();
             }
 
             /*

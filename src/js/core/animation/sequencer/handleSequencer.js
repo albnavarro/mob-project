@@ -33,6 +33,7 @@ import {
 } from './reduceFunction.js';
 import { handleCache } from '../../events/rafutils/handleCache.js';
 import { directionConstant } from '../utils/constant.js';
+import { sequencerRangeValidate } from '../utils/tweenValidation.js';
 
 export class HandleSequencer {
     constructor(data = {}) {
@@ -432,6 +433,9 @@ export class HandleSequencer {
     goTo(obj, props) {
         const propMerged = { ...this.defaultProp, ...props };
         const { start, end, ease } = propMerged;
+
+        if (!sequencerRangeValidate({ start, end })) return this;
+
         const data = goToSyncUtils(obj, ease);
         const newValues = this.mergeArray(data, this.values);
         this.timeline.push({
@@ -456,6 +460,9 @@ export class HandleSequencer {
     goFrom(obj, props) {
         const propMerged = { ...this.defaultProp, ...props };
         const { start, end, ease } = propMerged;
+
+        if (!sequencerRangeValidate({ start, end })) return this;
+
         const data = goFromSyncUtils(obj, ease);
         const newValues = this.mergeArray(data, this.values);
         this.timeline.push({
@@ -481,6 +488,8 @@ export class HandleSequencer {
     goFromTo(fromObj, toObj, props) {
         const propMerged = { ...this.defaultProp, ...props };
         const { start, end, ease } = propMerged;
+
+        if (!sequencerRangeValidate({ start, end })) return this;
 
         if (!compareKeys(fromObj, toObj)) {
             compareKeysWarning('lerp goFromTo:', fromObj, toObj);
