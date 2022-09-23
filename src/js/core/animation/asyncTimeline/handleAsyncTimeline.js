@@ -3,7 +3,16 @@ import { loadFps } from '../../events/rafutils/loadFps.js';
 import { checkType } from '../../store/storeType.js';
 import { getTime } from '../../utils/time.js';
 import { directionConstant } from '../utils/constant.js';
-import { relativePropInsideTimelineWarning } from '../utils/warning.js';
+import {
+    relativePropInsideTimelineWarning,
+    timelineReverseGoFromWarning,
+    timelineSetTweenArrayWarining,
+    timelineSetTweenFailWarining,
+    timelineSetTweenLabelNotFoundWarining,
+    timelineSetTweenLabelWarining,
+    timelineSuspendWarning,
+    timelineSyncWarning,
+} from '../utils/warning.js';
 import { asyncReduceData } from './asyncReduceData.js';
 import { asyncReduceTween } from './asyncReduceTween.js';
 
@@ -249,11 +258,7 @@ export class HandleAsyncTimeline {
                      * Check callback that return a bollean to fire supend
                      */
                     const valueIsValid = checkType(Boolean, tween());
-                    if (!valueIsValid)
-                        console.warn(
-                            `Supend: ${tween()} is not a valid value, must be a boolean`
-                        );
-
+                    if (!valueIsValid) timelineSuspendWarning(tween);
                     const sholudSuspend = valueIsValid ? tween() : true;
                     return new Promise((res) => {
                         if (!isImmediate && sholudSuspend) {
@@ -596,10 +601,7 @@ export class HandleAsyncTimeline {
                         break;
 
                     case 'goFrom':
-                        console.warn(
-                            `SyncTimeline: in revese ( or yoyo mode) only goTo || goFromTo || set action is allowed.
-                            Using goFrom makes no sense in this context. Timeline will stopped.`
-                        );
+                        timelineReverseGoFromWarning();
                         this.stop();
                 }
             });
@@ -752,11 +754,11 @@ export class HandleAsyncTimeline {
                 syncProp.to.getType() === 'TWEEN');
 
         if (!fromIsTween) {
-            console.warn(`timeline.sync(): from is not a tween`);
+            timelineSyncWarning('from');
         }
 
         if (!toIsTween) {
-            console.warn(`timeline.sync(): to is not a tween`);
+            timelineSyncWarning('to');
         }
 
         if (!toIsTween || !fromIsTween) return this;
@@ -912,14 +914,12 @@ export class HandleAsyncTimeline {
          */
         const itemsIsArray = checkType(Array, items);
         if (!itemsIsArray) {
-            console.warn(
-                `timeline setTween: ${items} is not an array of tween`
-            );
+            timelineSetTweenArrayWarining(items);
         }
 
         const labelIsString = checkType(String, label);
         if (!labelIsString) {
-            console.warn(`timeline setTween: ${label} is not a string`);
+            timelineSetTweenLabelWarining(label);
         }
 
         if (!itemsIsArray || !labelIsString)
@@ -945,8 +945,10 @@ export class HandleAsyncTimeline {
         });
 
         if (index === -1) {
-            console.warn(`asyncTimeline.setTween() label: ${label} not found`);
-            return;
+            timelineSetTweenLabelNotFoundWarining(label);
+            return Promise.reject(
+                new Error(`asyncTimeline.setTween() label: ${label} not found`)
+            );
         }
 
         /*
@@ -968,7 +970,7 @@ export class HandleAsyncTimeline {
                     resolve();
                 })
                 .catch(() => {
-                    console.warn('setTween fail');
+                    timelineSetTweenFailWarining();
                 });
         });
     }

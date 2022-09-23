@@ -12,6 +12,14 @@ import {
 } from './staggerCostant.js';
 import { getEachByFps } from './staggerUtils.js';
 import { checkType } from '../../../store/storeType.js';
+import {
+    staggerColRowWarning,
+    staggerEachWarning,
+    staggerGridDirectionWarning,
+    staggerRadialColRowWarning,
+    staggerRadialDirectionWarning,
+    staggerWaitCompleteWarning,
+} from '../warning.js';
 
 const setStaggerErrorFallback = () => {
     return {
@@ -33,7 +41,7 @@ export const setStagger = ({
      * Each must be a number
      */
     if (!checkType(Number, stagger?.each)) {
-        console.warn(`stagger each must be a Number `);
+        staggerEachWarning();
         return setStaggerErrorFallback();
     }
 
@@ -41,9 +49,7 @@ export const setStagger = ({
      * Wait complete check type
      */
     if (!checkType(Boolean, stagger?.waitComplete)) {
-        console.warn(
-            'Stagger error: waitComplete propierties must be a Boolean'
-        );
+        staggerWaitCompleteWarning();
         return setStaggerErrorFallback();
     }
 
@@ -54,9 +60,7 @@ export const setStagger = ({
      */
     const directionList = [DIRECTION_RADIAL, DIRECTION_ROW, DIRECTION_COL];
     if (stagger?.grid && !directionList.includes(stagger?.grid?.direction)) {
-        console.warn(
-            `Stagger error: direction must be a string radial,col,row`
-        );
+        staggerGridDirectionWarning();
         return setStaggerErrorFallback();
     }
 
@@ -71,9 +75,7 @@ export const setStagger = ({
                 !checkType(Number, stagger?.from?.x) ||
                 !checkType(Number, stagger?.from?.y)
             ) {
-                console.warn(
-                    `Stagger error: in radial direction 'from' propierties must be a object {x:Number,y:Number}`
-                );
+                staggerRadialDirectionWarning();
                 return setStaggerErrorFallback();
             }
 
@@ -81,9 +83,7 @@ export const setStagger = ({
              * Check if col and row is a valid parameters
              * **/
             if (stagger?.grid?.col <= 0 || stagger?.grid?.row <= 0) {
-                console.warn(
-                    `Stagger error: in radial direction 'col' or 'row' is not setted, or is minor than 1, must be a number grater than 0`
-                );
+                staggerRadialColRowWarning();
                 return setStaggerErrorFallback();
             }
 
@@ -172,9 +172,7 @@ export const setStagger = ({
                 (checkType(String, stagger?.from) &&
                     !fromList.includes(stagger?.from))
             ) {
-                console.warn(
-                    `Stagger error: in col/row direction 'from' propierties must be a string start/end/center/edges or a number`
-                );
+                staggerColRowWarning();
                 return setStaggerErrorFallback();
             }
             /**

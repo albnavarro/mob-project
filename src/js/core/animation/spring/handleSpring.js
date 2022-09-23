@@ -43,6 +43,7 @@ import { initRaf } from '../utils/initRaf.js';
 import { resume } from '../utils/resume.js';
 import {
     compareKeysWarning,
+    springPresetWarning,
     staggerIsOutOfRangeWarning,
 } from '../utils/warning.js';
 import { fpsLoadedLog } from '../utils/log.js';
@@ -112,9 +113,7 @@ export class HandleSpring {
         if (config in handleSetUp.get('spring')) {
             return handleSetUp.get('spring')[config];
         } else {
-            console.warn(
-                `${config} doasn't exist in spring configuration list`
-            );
+            springPresetWarning(config);
             return handleSetUp.get('spring').default;
         }
     }
@@ -648,9 +647,7 @@ export class HandleSpring {
         if (preset in handleSetUp.get('spring')) {
             this.config = handleSetUp.get('spring')[preset];
         } else {
-            console.warn(
-                `${preset} doasn't exist in spring configuration list`
-            );
+            springPresetWarning(preset);
         }
 
         this.defaultProps = mergeDeep(this.defaultProps, {

@@ -33,3 +33,85 @@ export const sequencerRangeEndWarning = (val) => {
 export const relativePropInsideTimelineWarning = () => {
     console.warn('relative prop is not allowed inside a timeline');
 };
+
+export const timelineSuspendWarning = (val) => {
+    console.warn(
+        `Timeline Supend: ${val()} is not a valid value, must be a boolean`
+    );
+};
+
+export const timelineReverseGoFromWarning = () => {
+    console.warn(
+        `SyncTimeline: in revese ( or yoyo mode) only goTo || goFromTo || set action is allowed. Using goFrom makes no sense in this context. Timeline will stopped.`
+    );
+};
+
+export const timelineSyncWarning = (val) => {
+    console.warn(`timeline.sync(): ${val} is not a tween`);
+};
+
+export const timelineSetTweenArrayWarining = (items) => {
+    console.warn(`timeline setTween: ${items} is not an array of tween`);
+};
+
+export const timelineSetTweenLabelWarining = (label) => {
+    console.warn(`timeline setTween: ${label} is not a string`);
+};
+
+export const timelineSetTweenLabelNotFoundWarining = (label) => {
+    console.warn(`asyncTimeline.setTween() label: ${label} not found`);
+};
+
+export const timelineSetTweenFailWarining = () => {
+    console.warn('setTween fail');
+};
+
+export const syncTimelineLabelWarning = (label) => {
+    console.warn(`label ${label} not founded`);
+};
+
+export const syncTimelineAddFnWarning = (fn) => {
+    console.warn(`sequencer.add(fn,time) ${fn}: fn must be Function`);
+};
+
+export const syncTimelineAddTimeWarning = (time) => {
+    console.warn(`sequencer.add(fn,time) ${time}: time must be a Number`);
+};
+
+export const springPresetWarning = (preset) => {
+    console.warn(`${preset} doasn't exist in spring configuration list`);
+};
+
+export const tweenEaseWarning = (preset) => {
+    console.warn(`${preset} doasn't exixst in tweens ease function`);
+};
+
+export const staggerEachWarning = () => {
+    console.warn(`stagger each must be a Number `);
+};
+
+export const staggerWaitCompleteWarning = () => {
+    console.warn('Stagger error: waitComplete propierties must be a Boolean');
+};
+
+export const staggerGridDirectionWarning = () => {
+    console.warn(`Stagger error: direction must be a string radial,col,row`);
+};
+
+export const staggerRadialDirectionWarning = () => {
+    console.warn(
+        `Stagger error: in radial direction 'from' propierties must be a object {x:Number,y:Number}`
+    );
+};
+
+export const staggerRadialColRowWarning = () => {
+    console.warn(
+        `Stagger error: in radial direction 'col' or 'row' is not setted, or is minor than 1, must be a number grater than 0`
+    );
+};
+
+export const staggerColRowWarning = () => {
+    console.warn(
+        `Stagger error: in col/row direction 'from' propierties must be a string start/end/center/edges or a number`
+    );
+};

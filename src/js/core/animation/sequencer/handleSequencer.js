@@ -19,6 +19,8 @@ import { syncCallback } from '../utils/callbacks/syncCallback.js';
 import {
     compareKeysWarning,
     staggerIsOutOfRangeWarning,
+    syncTimelineAddFnWarning,
+    syncTimelineAddTimeWarning,
 } from '../utils/warning.js';
 import { storeType } from '../../store/storeType.js';
 import {
@@ -531,10 +533,8 @@ export class HandleSequencer {
         const timeIsValid = storeType.isNumber(time);
         const addIsValid = fnIsValid && timeIsValid;
 
-        if (!fnIsValid)
-            console.warn('sequencer.add(fn,time) fn is not a function');
-        if (!timeIsValid)
-            console.warn('sequencer.add(fn,time) time is not a a number');
+        if (!fnIsValid) syncTimelineAddFnWarning(fn);
+        if (!timeIsValid) syncTimelineAddTimeWarning(time);
         if (!addIsValid) return this;
 
         this.callbackAdd.push({ fn, time });

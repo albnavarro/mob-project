@@ -7,6 +7,7 @@ import { handleSetUp } from '../../setup.js';
 import { fpsLoadedLog } from '../utils/log.js';
 import { storeType } from '../../store/storeType.js';
 import { directionConstant } from '../utils/constant.js';
+import { syncTimelineLabelWarning } from '../utils/warning.js';
 
 export class HandleSyncTimeline {
     constructor(data = {}) {
@@ -257,18 +258,17 @@ export class HandleSyncTimeline {
     /**
      * Find label tha match the occurrency and return the time
      */
-    getTimeFromLabel(name) {
+    getTimeFromLabel(label) {
         const labelObj = this.sequencers.reduce((p, c) => {
             const currentLabels = c.getLabels();
             const labelsMatched = currentLabels.find(
-                ({ name: currentName }) => currentName === name
+                ({ name: currentName }) => currentName === label
             );
 
             return labelsMatched || p;
         }, null);
 
-        if (!labelObj) console.warn(`label ${name} not founded`);
-
+        if (!labelObj) syncTimelineLabelWarning(label);
         return labelObj?.time;
     }
 

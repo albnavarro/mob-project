@@ -1,5 +1,6 @@
 // https://github.com/bameyrick/js-easing-s/blob/master/src/index.ts
 import { handleSetUp } from '../../setup.js';
+import { tweenEaseWarning } from '../utils/warning.js';
 
 export const tweenConfig = {
     easeLinear: (elapsed, initialValue, amountOfChange, duration) => {
@@ -414,7 +415,7 @@ export const printEaseKey = () => {
 
 export const getTweenFn = (prop) => {
     if (!(prop in tweenConfig)) {
-        console.warn(`${prop} doasn't exixst in tweens ease function`);
+        tweenEaseWarning(prop);
         return tweenConfig[handleSetUp.get('tween').ease];
     } else {
         return tweenConfig[prop];
