@@ -2,9 +2,9 @@ import { getRoundedValue } from '../utils/animationUtils.js';
 import { setStagger } from '../utils/stagger/setStagger.js';
 import {
     STAGGER_DEFAULT_OBJ,
-    STAGGER_TYPE_CLASSIC,
-    STAGGER_TYPE_CLASSIC_INVERSE,
-    STAGGER_TYPE_CLASSIC_CENTER,
+    STAGGER_TYPE_START,
+    STAGGER_TYPE_END,
+    STAGGER_TYPE_CENTER,
     STAGGER_TYPE_EQUAL,
 } from '../utils/stagger/staggerCostant.js';
 import { handleSetUp } from '../../setup.js';
@@ -31,9 +31,9 @@ export const createStaggers = ({ items, stagger, duration }) => {
 
     const stagerTypeList = [
         STAGGER_TYPE_EQUAL,
-        STAGGER_TYPE_CLASSIC,
-        STAGGER_TYPE_CLASSIC_INVERSE,
-        STAGGER_TYPE_CLASSIC_CENTER,
+        STAGGER_TYPE_START,
+        STAGGER_TYPE_END,
+        STAGGER_TYPE_CENTER,
     ];
 
     /**
@@ -53,9 +53,9 @@ export const createStaggers = ({ items, stagger, duration }) => {
         console.warn(
             `stager.type should be: 
             ${STAGGER_TYPE_EQUAL} ||
-            ${STAGGER_TYPE_CLASSIC} || 
-            ${STAGGER_TYPE_CLASSIC_INVERSE} || 
-            ${STAGGER_TYPE_CLASSIC_CENTER}`
+            ${STAGGER_TYPE_START} || 
+            ${STAGGER_TYPE_END} || 
+            ${STAGGER_TYPE_CENTER}`
         );
         return fallBack;
     }
@@ -128,23 +128,23 @@ export const createStaggers = ({ items, stagger, duration }) => {
             }
 
             if (
-                type === STAGGER_TYPE_CLASSIC ||
-                type === STAGGER_TYPE_CLASSIC_INVERSE ||
-                type === STAGGER_TYPE_CLASSIC_CENTER
+                type === STAGGER_TYPE_START ||
+                type === STAGGER_TYPE_END ||
+                type === STAGGER_TYPE_CENTER
             ) {
                 const unit = durationNow / numItem;
                 const cleanStart = unit * index;
                 const noopSpace = durationNow - (durationNow - cleanStart);
                 const gap = (noopSpace / numItem) * eachByNumItem;
 
-                if (type === STAGGER_TYPE_CLASSIC) {
+                if (type === STAGGER_TYPE_START) {
                     return {
-                        start: getRoundedValue(cleanStart - gap),
-                        end: getRoundedValue(durationNow),
+                        start: 0,
+                        end: getRoundedValue(durationNow - (cleanStart - gap)),
                     };
                 }
 
-                if (type === STAGGER_TYPE_CLASSIC_CENTER) {
+                if (type === STAGGER_TYPE_CENTER) {
                     const space = (cleanStart - gap) / 2;
                     return {
                         start: getRoundedValue(space),
@@ -152,10 +152,10 @@ export const createStaggers = ({ items, stagger, duration }) => {
                     };
                 }
 
-                if (type === STAGGER_TYPE_CLASSIC_INVERSE) {
+                if (type === STAGGER_TYPE_END) {
                     return {
-                        start: 0,
-                        end: getRoundedValue(durationNow - (cleanStart - gap)),
+                        start: getRoundedValue(cleanStart - gap),
+                        end: getRoundedValue(durationNow),
                     };
                 }
             }

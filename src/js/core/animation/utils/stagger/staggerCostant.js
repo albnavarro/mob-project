@@ -13,9 +13,9 @@ export const MERGE_FROM_UP = 'MERGE_FROM_UP';
 export const MERGE_FROM_DOWN = 'MERGE_FROM_DOWN';
 
 export const STAGGER_TYPE_EQUAL = 'equal';
-export const STAGGER_TYPE_CLASSIC = 'classic';
-export const STAGGER_TYPE_CLASSIC_INVERSE = 'classicInverse';
-export const STAGGER_TYPE_CLASSIC_CENTER = 'classicCenter';
+export const STAGGER_TYPE_START = 'start';
+export const STAGGER_TYPE_END = 'end';
+export const STAGGER_TYPE_CENTER = 'center';
 
 export const STAGGER_DEFAULT_OBJ = {
     type: STAGGER_TYPE_EQUAL,

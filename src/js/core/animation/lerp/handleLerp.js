@@ -398,7 +398,7 @@ export class HandleLerp {
      *
      */
     mergeProps(props) {
-        const newProps = mergeDeep(this.defaultProps, props);
+        const newProps = { ...this.defaultProps, ...props };
         const { velocity, precision, relative } = newProps;
         this.velocity = velocity;
         this.precision = precision;

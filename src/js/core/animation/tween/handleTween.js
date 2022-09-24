@@ -431,7 +431,7 @@ export class HandleTween {
      *
      */
     mergeProps(props) {
-        const newProps = mergeDeep(this.defaultProps, props);
+        const newProps = { ...this.defaultProps, ...props };
         const { ease, duration, relative } = newProps;
         this.ease = getTweenFn(ease);
         this.relative = relative;

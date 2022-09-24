@@ -417,7 +417,20 @@ export class HandleSpring {
      *
      */
     mergeProps(props) {
-        const newProps = mergeDeep(this.defaultProps, props);
+        /*
+         * Merge config Obj
+         */
+        const configToMerge = props?.config || {};
+        const newConfig = { ...this.defaultProps.config, ...configToMerge };
+
+        /*
+         * Merge all
+         */
+        const newProps = {
+            ...this.defaultProps,
+            ...props,
+            ...{ config: newConfig },
+        };
         const { config, relative } = newProps;
         this.config = config;
         this.relative = relative;
