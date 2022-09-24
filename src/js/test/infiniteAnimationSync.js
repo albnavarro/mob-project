@@ -17,7 +17,7 @@ export const infiniteAnimationSync = () => {
     const friction = duration / 2 / Math.PI;
 
     const infinite = mobbu
-        .create('sequencer', {
+        .createSequencer({
             stagger: { each: 5 },
             data: { x: duration / 4, opacity: 1 },
             duration,

@@ -7,7 +7,7 @@ export const gridStaggerSequencer = () => {
     const duration = 5000;
 
     const tween = mobbu
-        .create('sequencer', {
+        .createSequencer({
             stagger: {
                 each: 15,
                 from: 'start',

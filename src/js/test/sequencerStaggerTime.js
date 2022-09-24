@@ -33,7 +33,7 @@ export const sequencerStaggerTime = () => {
     const createSequencer = () => {
         staggers.forEach(({ item, start, end, index }) => {
             const sequencer = mobbu
-                .create('sequencer', { data: { y: 0 }, duration })
+                .createSequencer({ data: { y: 0 }, duration })
                 .goTo({ y: 300 }, { start, end, ease: 'easeInOutBack' })
                 .label(`label${index}`, start)
                 .add(({ direction, value }) => {

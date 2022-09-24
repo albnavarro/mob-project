@@ -21,7 +21,7 @@ export const masterSequencer = () => {
     const createSequencer = () => {
         sequencers = staggers.map(({ item, start, end }) => {
             const sequencer = mobbu
-                .create('sequencer', { data: { y: 0 } })
+                .createSequencer({ data: { y: 0 } })
                 .goTo({ y: 300 }, { start, end, ease: 'easeInOutBack' });
 
             const unsubscribe = sequencer.subscribe(({ y }) => {

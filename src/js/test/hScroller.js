@@ -53,7 +53,7 @@ export const hScroller = () => {
     pluto.style.webkitTransition = 'background-color .35s';
 
     const myParallaxTimeline = mobbu
-        .create('sequencer', {
+        .createSequencer({
             data: { x: 0, y: 0 },
         })
         .goTo({ x: pluto.offsetWidth / 2 }, { start: 0, end: 2 })

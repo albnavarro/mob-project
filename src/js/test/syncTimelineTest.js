@@ -30,7 +30,7 @@ export function syncTimelineTest() {
 
     // SINGLE
     const seq1 = mobbu
-        .create('sequencer', {
+        .createSequencer({
             ease: 'easeInOutCubic',
             data: { x: 0, y: 0, rotate: 0, scale: 1 },
         })
@@ -62,7 +62,7 @@ export function syncTimelineTest() {
 
     // STAGGER
     const seqStagger = mobbu
-        .create('sequencer', {
+        .createSequencer({
             stagger: { each: 10, from: 'end' },
             data: { x: 0, scale: 1 },
         })

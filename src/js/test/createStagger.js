@@ -23,7 +23,7 @@ export const createStagger = () => {
     const createSequencer = () => {
         sequencers = staggers.map(({ item, start, end }) => {
             const sequencer = mobbu
-                .create('sequencer', {
+                .createSequencer({
                     duration,
                     data: { scale: 0.5 },
                 })

@@ -57,7 +57,14 @@ import { mouseParallax } from './animation/mouseParallax/mouseParallax.js';
 import { printEaseKey } from './animation/tween/tweenConfig.js';
 
 export const mobbu = {
-    default(action, props) {
+    /**
+     * @typedef {('get'|'set'|'print')} defaultType - string
+     **/
+
+    /**
+     * @param action {defaultType} string
+     **/
+    default(action = '', props) {
         switch (action) {
             case 'get':
                 handleSetUp.get(props);
@@ -86,7 +93,31 @@ export const mobbu = {
     getInstantFps() {
         return frameStore.getProp('instantFps');
     },
-    create(type, obj) {
+
+    /**
+     * @typedef {Object} sequencerObj
+     * @prop {Object} data Object
+     * @prop {number} duration Number
+     * @prop {('easeLinear'|'easeInQuad'|'easeOutQuad'|'easeInOutQuad'|'easeInCubic'|'easeOutCubic'|'easeInOutCubic'|'easeInQuart'|'easeOutQuart'|'easeInOutQuart'|'easeInQuint'|'easeOutQuint'|'easeInOutQuint'|'easeInSine'|'easeOutSine'|'easeInOutSine'|'easeInExpo'|'easeOutExpo'|'easeInOutExpo'|'easeInCirc'|'easeOutCirc'|'easeInOutCirc'|'easeInElastic'|'easeOutElastic'|'easeInOutElastic'|'easeInBack'|'easeOutBack'|'easeInOutBack'|'easeInBounce'|'easeOutBounce'|'easeInOutBounce')}  ease String
+     * @prop {Object} stagger { each:Number, waitComplete:Boolean, from:Number|String|Object, grid:Object}
+     * @prop {number} stagger.each Number
+     * @prop {boolean} stagger.waitComplete Boolean
+     * @prop {('start'|'end'|'center'|'edges'|'random')} stagger.from Number|Object|String
+     * @prop {object} stagger.grid {col:Number, row:Number, direction:string}
+     * @prop {Number} stagger.grid.col Number
+     * @prop {Number} stagger.grid.row Number
+     * @prop {('row'|'col'|'radial')} stagger.grid.direction String
+     **/
+
+    /**
+     * @param {sequencerObj} obj
+     * @description {data:Object, stagger:{each: number, waitComplete: boolean, from: Number|String|Object, grid: {col:Number, row:Number, direction:string}}, duration: number, ease: string }
+     */
+    createSequencer(obj = {}) {
+        return new HandleSequencer(obj);
+    },
+
+    create(type = '', obj = {}) {
         switch (type) {
             case 'lerp':
                 return new HandleLerp(obj);
@@ -96,9 +127,6 @@ export const mobbu = {
 
             case 'tween':
                 return new HandleTween(obj);
-
-            case 'sequencer':
-                return new HandleSequencer(obj);
 
             case 'asyncTimeline':
                 return new HandleAsyncTimeline(obj);
@@ -150,7 +178,17 @@ export const mobbu = {
                 console.warn(`${type} in mobbu.create not exist`);
         }
     },
-    use(type, fn, option) {
+
+    /**
+     * @typedef {('frame'|'nextTick'|'nextFrame'|'frameIndex'|'loadFps'|'load'|'resize'|'visibilityChange'|'mouseClick'|'mouseDown'|'touchStart'|'mouseMove'|'touchMove'|'mouseUp'|'touchEnd'|'mouseWheel'|'scoll'|'scrollImmediate'|'scrollThrottle'|'scrollStart'|'scrollEnd')} useType - string
+     **/
+
+    /**
+     * @param type {useType} string
+     * @param {function} fn
+     * @param {number} [ frame=0 ]
+     **/
+    use(type = '', fn = () => {}, frame = 0) {
         switch (type) {
             case 'frame':
                 return handleFrame.add(fn);
@@ -162,10 +200,10 @@ export const mobbu = {
                 return handleNextFrame.add(fn);
 
             case 'frameIndex':
-                return handleFrameIndex.add(fn, option);
+                return handleFrameIndex.add(fn, frame);
 
             case 'loadFps':
-                return loadFps(option).then((obj) => fn(obj));
+                return loadFps().then((obj) => fn(obj));
 
             case 'load':
                 return handleLoad(fn);
@@ -219,9 +257,22 @@ export const mobbu = {
                 console.warn(`${type} in mobbu.use not exist`);
         }
     },
-    scrollTo(obj) {
+
+    /**
+     * @typedef {Object} scrollToObj
+     * @prop {number|HTMLElement} target
+     * @prop {number}  duration
+     * @prop {('easeLinear'|'easeInQuad'|'easeOutQuad'|'easeInOutQuad'|'easeInCubic'|'easeOutCubic'|'easeInOutCubic'|'easeInQuart'|'easeOutQuart'|'easeInOutQuart'|'easeInQuint'|'easeOutQuint'|'easeInOutQuint'|'easeInSine'|'easeOutSine'|'easeInOutSine'|'easeInExpo'|'easeOutExpo'|'easeInOutExpo'|'easeInCirc'|'easeOutCirc'|'easeInOutCirc'|'easeInElastic'|'easeOutElastic'|'easeInOutElastic'|'easeInBack'|'easeOutBack'|'easeInOutBack'|'easeInBounce'|'easeOutBounce'|'easeInOutBounce')}  ease
+     * @prop {boolean}  prevent
+     **/
+
+    /**
+     * @param {scrollToObj} obj {taget:Number|HTMLElement, duration: number, ease: string, prevent:boolean}
+     */
+    scrollTo(obj = {}) {
         return bodyScroll.to(obj);
     },
+
     slide(action, el) {
         switch (action) {
             case 'subscribe':
@@ -240,7 +291,15 @@ export const mobbu = {
                 console.warn(`${action} in mobbu.slide not exist`);
         }
     },
-    mq(action, breackpoint) {
+
+    /**
+     * @typedef {('min'|'max'|'get')} mqType - string
+     **/
+
+    /**
+     * @param action {mqType} string
+     **/
+    mq(action = '', breackpoint) {
         switch (action) {
             case 'min':
                 return mq.min(breackpoint);
@@ -255,7 +314,15 @@ export const mobbu = {
                 console.warn(`${action} in mobbu.mq not exist`);
         }
     },
-    run(prop) {
+
+    /**
+     * @typedef {('parallax'|'mouseParallax')} runType - string
+     **/
+
+    /**
+     * @param prop {runType} string
+     **/
+    run(prop = '') {
         switch (prop) {
             case 'parallax':
                 parallax.init();
