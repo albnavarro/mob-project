@@ -40,7 +40,7 @@ import { sequencerRangeValidate } from '../utils/tweenValidation.js';
 /**
  * @typedef {Object} sequencerTypes
  * @prop {Object.<string, number>} data Initial data Object es: { x: 0, rotate: 0 }
- * @prop {number} [ duration=10] Defines the temporal proportion of the instance, both syncTimeline and scrollTrigger will take care of processing the value as needed. The default value is 10 **/
+ * @prop {number} [ duration=10] Defines the time range of the animation, both syncTimeline and scrollTrigger will take care of processing the value as needed. The default value is 10 **/
 
 export class HandleSequencer {
     /**
