@@ -452,7 +452,7 @@ export class HandleSequencer {
     /**
      * @typedef {Object} sequencerGoSpecialProps
      * @prop {number} [ start=0 ] Defines the start of the transformation of the timeline in use, from 0 to the maximum surat set. The default is 0
-     * @prop {number} [ end=0 ] Defines the start of the transformation of the timeline in use, from 0 to the maximum surat set. The default value is the set duration
+     * @prop {number} [ end=duration ] Defines the start of the transformation of the timeline in use, from 0 to the maximum surat set. The default value is the set duration
      **/
 
     /**
