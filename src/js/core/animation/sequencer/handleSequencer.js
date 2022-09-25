@@ -54,7 +54,6 @@ export class HandleSequencer {
      *   ease: [ String ],
      *   stagger:{
      *      each: [ Number ],
-     *      waitComplete: [ Boolean ],
      *      from: [ Number|String|{x:number,y:number} ],
      *      grid: {
      *          col: [ Number ],
