@@ -1,4 +1,5 @@
 import { mobbu, outerHeight } from '../core';
+import { HandleSequencer } from '../core/animation/sequencer/handleSequencer';
 
 export const createStagger = () => {
     const items = document.querySelectorAll('.create-stagger__item');

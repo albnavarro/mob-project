@@ -95,26 +95,27 @@ export const mobbu = {
     },
 
     /**
-     * @typedef {Object} sequencerObj
-     * @prop {Object} data Object
-     * @prop {number} duration Number
-     * @prop {('easeLinear'|'easeInQuad'|'easeOutQuad'|'easeInOutQuad'|'easeInCubic'|'easeOutCubic'|'easeInOutCubic'|'easeInQuart'|'easeOutQuart'|'easeInOutQuart'|'easeInQuint'|'easeOutQuint'|'easeInOutQuint'|'easeInSine'|'easeOutSine'|'easeInOutSine'|'easeInExpo'|'easeOutExpo'|'easeInOutExpo'|'easeInCirc'|'easeOutCirc'|'easeInOutCirc'|'easeInElastic'|'easeOutElastic'|'easeInOutElastic'|'easeInBack'|'easeOutBack'|'easeInOutBack'|'easeInBounce'|'easeOutBounce'|'easeInOutBounce')}  ease String
-     * @prop {Object} stagger { each:Number, waitComplete:Boolean, from:Number|String|Object, grid:Object}
-     * @prop {number} stagger.each Number
-     * @prop {boolean} stagger.waitComplete Boolean
-     * @prop {('start'|'end'|'center'|'edges'|'random')} stagger.from Number|Object|String
-     * @prop {object} stagger.grid {col:Number, row:Number, direction:string}
-     * @prop {Number} stagger.grid.col Number
-     * @prop {Number} stagger.grid.row Number
-     * @prop {('row'|'col'|'radial')} stagger.grid.direction String
-     **/
-
-    /**
-     * @param {sequencerObj} obj
-     * @description {data:Object, stagger:{each: number, waitComplete: boolean, from: Number|String|Object, grid: {col:Number, row:Number, direction:string}}, duration: number, ease: string }
+     * @param {import('./animation/sequencer/handleSequencer.js').sequencerTypes & import('./animation/utils/stagger/setStagger.js').staggerTypes & import('../core/animation/tween/tweenConfig.js').easeTypes} data
+     *
+     * @description
+     * {
+     *   data: Object.<string, number>,
+     *   duration: [ Number ],
+     *   ease: [ String ],
+     *   stagger:{
+     *      each: [ Number ],
+     *      waitComplete: [ Boolean ],
+     *      from: [ Number|String|{x:number,y:number} ],
+     *      grid: {
+     *          col: [ Number ],
+     *          row: [ Number ],
+     *          direction: [ String ]
+     *      },
+     *   },
+     * }
      */
-    createSequencer(obj = {}) {
-        return new HandleSequencer(obj);
+    createSequencer(data = {}) {
+        return new HandleSequencer(data);
     },
 
     create(type = '', obj = {}) {
@@ -185,73 +186,73 @@ export const mobbu = {
 
     /**
      * @param type {useType} string
-     * @param {function} fn
-     * @param {number} [ frame=0 ]
+     * @param {function} callback
+     * @param {Number} [ frame=0 ]
      **/
-    use(type = '', fn = () => {}, frame = 0) {
+    use(type = '', callback = () => {}, frame = 0) {
         switch (type) {
             case 'frame':
-                return handleFrame.add(fn);
+                return handleFrame.add(callback);
 
             case 'nextTick':
-                return handleNextTick.add(fn);
+                return handleNextTick.add(callback);
 
             case 'nextFrame':
-                return handleNextFrame.add(fn);
+                return handleNextFrame.add(callback);
 
             case 'frameIndex':
-                return handleFrameIndex.add(fn, frame);
+                return handleFrameIndex.add(callback, frame);
 
             case 'loadFps':
-                return loadFps().then((obj) => fn(obj));
+                return loadFps().then((obj) => callback(obj));
 
             case 'load':
-                return handleLoad(fn);
+                return handleLoad(callback);
 
             case 'resize':
-                return handleResize(fn);
+                return handleResize(callback);
 
             case 'visibilityChange':
-                return handleVisibilityChange(fn);
+                return handleVisibilityChange(callback);
 
             case 'mouseClick':
-                return handleMouseClick(fn);
+                return handleMouseClick(callback);
 
             case 'mouseDown':
-                return handleMouseDown(fn);
+                return handleMouseDown(callback);
 
             case 'touchStart':
-                return handleTouchStart(fn);
+                return handleTouchStart(callback);
 
             case 'mouseMove':
-                return handleMouseMove(fn);
+                return handleMouseMove(callback);
 
             case 'touchMove':
-                return handleTouchMove(fn);
+                return handleTouchMove(callback);
 
             case 'mouseUp':
-                return handleMouseUp(fn);
+                return handleMouseUp(callback);
 
             case 'touchEnd':
-                return handleTouchEnd(fn);
+                return handleTouchEnd(callback);
 
             case 'mouseWheel':
-                return handleMouseWheel(fn);
+                return handleMouseWheel(callback);
 
             case 'scroll':
-                return handleScroll(fn);
+                return handleScroll(callback);
 
             case 'scrollImmediate':
-                return handleScrollImmediate(fn);
+                return handleScrollImmediate(callback);
 
             case 'scrollThrottle':
-                return handleScrollThrottle(fn);
+                return handleScrollThrottle(callback);
 
             case 'scrollStart':
-                return handleScrollStart(fn);
+                return handleScrollStart(callback);
 
             case 'scrollEnd':
-                return handleScrollEnd(fn);
+                return handleScrollEnd(callback);
 
             default:
                 console.warn(`${type} in mobbu.use not exist`);
@@ -267,7 +268,14 @@ export const mobbu = {
      **/
 
     /**
-     * @param {scrollToObj} obj {taget:Number|HTMLElement, duration: number, ease: string, prevent:boolean}
+     * @param {scrollToObj} obj
+     * @description
+     * {
+     *     target: Number|HTMLElement,
+     *     duration: number,
+     *     ease: string,
+     *     prevent: boolean
+     * }
      */
     scrollTo(obj = {}) {
         return bodyScroll.to(obj);

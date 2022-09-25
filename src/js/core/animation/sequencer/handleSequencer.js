@@ -37,7 +37,32 @@ import { handleCache } from '../../events/rafutils/handleCache.js';
 import { directionConstant } from '../utils/constant.js';
 import { sequencerRangeValidate } from '../utils/tweenValidation.js';
 
+/**
+ * @typedef {Object} sequencerTypes
+ * @prop {Object.<string, number>} data Initial data Object es: { x: 0, rotate: 0 }
+ * @prop {number} [ duration=10] Defines the temporal proportion of the instance, both syncTimeline and scrollTrigger will take care of processing the value as needed. The default value is 10 **/
+
 export class HandleSequencer {
+    /**
+     * @param { sequencerTypes & import('../utils/stagger/setStagger.js').staggerTypes & import('../tween/tweenConfig.js').easeTypes} data
+     *
+     * @description
+     * {
+     *   data: Object.<string, number>,
+     *   duration: [ Number ],
+     *   ease: [ String ],
+     *   stagger:{
+     *      each: [ Number ],
+     *      waitComplete: [ Boolean ],
+     *      from: [ Number|String|{x:number,y:number} ],
+     *      grid: {
+     *          col: [ Number ],
+     *          row: [ Number ],
+     *          direction: [ String ]
+     *      },
+     *   },
+     * }
+     */
     constructor(data = {}) {
         // Basic array with all the propierties, is creted in setData methods
         // in draw methods currentValue and settled will be updated for each prop
