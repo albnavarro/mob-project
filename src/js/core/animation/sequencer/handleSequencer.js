@@ -40,7 +40,8 @@ import { sequencerRangeValidate } from '../utils/tweenValidation.js';
 /**
  * @typedef {Object} sequencerTypes
  * @prop {Object.<string, number>} data Initial data Object es: { x: 0, rotate: 0 }
- * @prop {number} [ duration=10] Defines the time range of the animation, both syncTimeline and scrollTrigger will take care of processing the value as needed. The default value is 10 **/
+ * @prop {number} [ duration=10] Defines the time range of the animation, both syncTimeline and scrollTrigger will take care of processing the value as needed. The default value is 10
+ **/
 
 export class HandleSequencer {
     /**
@@ -450,12 +451,24 @@ export class HandleSequencer {
     }
 
     /**
-     * goTo - go from new toValue from last fromValue
+     * @typedef {Object} sequencerGoSpecialProps
+     * @prop {number} [ start=0 ] Defines the start of the transformation of the timeline in use, from 0 to the maximum surat set. The default is 0
+     * @prop {number} [ end=0 ] Defines the start of the transformation of the timeline in use, from 0 to the maximum surat set. The default value is the set duration
+     **/
+
+    /**
+     * @param {Object.<string, number|function>} obj Destination value of Object propierties
+     * @param {sequencerGoSpecialProps & import('../tween/tweenConfig.js').easeTypes} props special properties
      *
-     * @param  {obj} obj new toValue Object
-     *
-     * @example
-     * myTween.goTo({ val: 100 }, { start: 2, end: 5, ease: 'easeInBack' });
+     * @description
+     * Transform x optionally properties of the object from the current value to the indicated value, the transformation will start from the value associated with start and will end in the value associated with end.
+     * <br/>
+     * The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change in real time as the result of the function changes
+     * <br/>
+     * It is possible to associate an easing to the transformation, this easing will be applied only in this transformation.
+     * <br/>
+     * mySequencer.goTo({ string: number|function, ... }, { start: number, end: number, ease: string });
+     * <br/>
      */
     goTo(obj, props) {
         const propMerged = { ...this.defaultProp, ...props };
