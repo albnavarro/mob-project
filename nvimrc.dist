@@ -16,7 +16,7 @@ set nohlsearch
 set belloff=all
 syntax on
 
-
+let g:vim_json_conceal=0
 
 let g:ale_fixers = {
     \   'javascript': ['prettier'],
@@ -29,13 +29,9 @@ let g:ale_linters = {
     \}
 let g:ale_fix_on_save = 1
 
-
-
 let g:user_emmet_install_global = 0
 autocmd FileType html,css EmmetInstall
 let g:user_emmet_leader_key='<C-Z>'
-
-
 
 call plug#begin()
 Plug 'mattn/emmet-vim'
@@ -57,7 +53,6 @@ call plug#end()
 packloadall
 colorscheme onedark
 
-" autocmd Filetype json let g:indentLine_setConceal = 0
 
 
 "Use 24-bit (true-color) mode in Vim/Neovim when outside tmux.
