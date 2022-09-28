@@ -9,37 +9,43 @@ block content
     main
         .container.clearfix  
           .syncTimeline
-              h1
-                |Sync timeline animation
-              button.start(type="button")
-                |start
-              button.stop(type="button")
-                |stop
-              button.pause(type="button")
-                |pause
-              button.resume(type="button")
-                |resume
-              button.reverse(type="button")
-                |reverse
-              button.startReverse(type="button")
-                |startReverse
-              button.moreRotation(type="button")
-                |more rotation
-              button.lessRotation(type="button")
-                |less rotaation
-              button.playFrom(type="button")
-                |play from
-              button.playFromReverse(type="button")
-                |play from reverse
-              button.unsubscribeStagger(type="button")
-                |unsubscribe stagger 2
-              .sync-target
-              .sync-stagger
-              .sync-stagger
-              .sync-stagger
-              .sync-stagger
-              .sync-stagger
-            
+                h1
+                    |Sync timeline animation
+                button.start(type="button")
+                    |start
+                button.stop(type="button")
+                    |stop
+                button.pause(type="button")
+                    |pause
+                button.resume(type="button")
+                    |resume
+                button.reverse(type="button")
+                    |reverse
+                button.startReverse(type="button")
+                    |startReverse
+                button.moreRotation(type="button")
+                    |more rotation
+                button.lessRotation(type="button")
+                    |less rotaation
+                button.playFrom(type="button")
+                    |play from
+                button.playFromReverse(type="button")
+                    |play from reverse
+                button.unsubscribeStagger(type="button")
+                    |unsubscribe stagger 2
+                button.activeStatus(type="button")
+                    |is running: false
+                button.pauseStatus(type="button")
+                    |is paused: false
+                button.getDirection(type="button")
+                    |direction: none
+                .sync-target
+                .sync-stagger
+                .sync-stagger
+                .sync-stagger
+                .sync-stagger
+                .sync-stagger
+
 
     include ../component/lightbox/pug/lightbox-simple.pug
     include ../component/lightbox/pug/lightbox-image.pug

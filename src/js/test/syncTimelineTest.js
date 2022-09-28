@@ -25,6 +25,13 @@ export function syncTimelineTest() {
     const btnUnsubscribe = document.querySelector(
         '.syncTimeline .unsubscribeStagger'
     );
+    const btnActiveStatus = document.querySelector(
+        '.syncTimeline .activeStatus'
+    );
+    const btnPauseStatus = document.querySelector('.syncTimeline .pauseStatus');
+    const btnGetDirection = document.querySelector(
+        '.syncTimeline .getDirection'
+    );
 
     let rotation = 720;
 
@@ -86,7 +93,7 @@ export function syncTimelineTest() {
 
     const syncTimeline = mobbu
         .create('syncTimeline', {
-            repeat: 4,
+            repeat: 2,
             yoyo: false,
             duration: 10000,
         })
@@ -151,5 +158,17 @@ export function syncTimelineTest() {
         u1();
         const u2 = unsubscribeStaggerOnStop[2];
         u2();
+    });
+
+    btnActiveStatus.addEventListener('click', () => {
+        btnActiveStatus.innerHTML = `is running: ${syncTimeline.isActive()}`;
+    });
+
+    btnPauseStatus.addEventListener('click', () => {
+        btnPauseStatus.innerHTML = `is paused: ${syncTimeline.isPaused()}`;
+    });
+
+    btnGetDirection.addEventListener('click', () => {
+        btnGetDirection.innerHTML = `direction: ${syncTimeline.getDirection()}`;
     });
 }

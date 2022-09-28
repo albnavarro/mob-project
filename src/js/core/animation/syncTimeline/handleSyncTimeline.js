@@ -52,6 +52,7 @@ export class HandleSyncTimeline {
         this.skipFirstRender = false;
         this.completed = false;
         this.fpsIsInLoading = false;
+        this.isInPause = false;
 
         // callbackLoop on complete
         this.callbackId = 0;
@@ -69,7 +70,7 @@ export class HandleSyncTimeline {
                 ? 0
                 : 1000 / fps / 2;
 
-        if (this.pauseStatus) {
+        if (this.isInPause) {
             this.pauseTime =
                 time -
                 this.startTime -
@@ -85,7 +86,7 @@ export class HandleSyncTimeline {
             ? this.timeElapsed
             : this.timeAtReverse - (this.timeElapsed - this.timeAtReverse);
 
-        if (!this.pauseStatus) {
+        if (!this.isInPause) {
             this.endTime = clamp(partial, 0, this.duration);
 
             // When come from playReverse skip first frame becouse is 0
@@ -229,12 +230,6 @@ export class HandleSyncTimeline {
         this.startTime = time;
         if (this.isReverse) this.isPlayngReverse = !this.isPlayngReverse;
         this.goToNextFrame();
-    }
-
-    getDirection() {
-        return this.isReverse
-            ? directionConstant.BACKWARD
-            : directionConstant.FORWARD;
     }
 
     goToNextFrame() {
@@ -383,7 +378,7 @@ export class HandleSyncTimeline {
                     this.startTime = time;
                     this.fpsIsInLoading = false;
                     this.isStopped = false;
-                    this.pauseStatus = false;
+                    this.isInPause = false;
                     this.loopCounter = 0;
                     this.updateTime(time, fps, shouldRender);
                 });
@@ -392,21 +387,21 @@ export class HandleSyncTimeline {
     }
 
     pause() {
-        if (this.isStopped || this.pauseStatus || this.fpsIsInLoading) return;
+        if (this.isStopped || this.isInPause || this.fpsIsInLoading) return;
 
         this.isStopped = false;
-        this.pauseStatus = true;
+        this.isInPause = true;
     }
 
     resume() {
-        if (this.isStopped || !this.pauseStatus || this.fpsIsInLoading) return;
+        if (this.isStopped || !this.isInPause || this.fpsIsInLoading) return;
 
         this.isStopped = false;
-        this.pauseStatus = false;
+        this.isInPause = false;
     }
 
     reverse() {
-        if (this.isStopped || this.pauseStatus || this.fpsIsInLoading) return;
+        if (this.isStopped || this.isInPause || this.fpsIsInLoading) return;
 
         // Reset sequancer callback add function state
         this.resetSequencerLastValue();
@@ -420,7 +415,7 @@ export class HandleSyncTimeline {
 
     stop() {
         this.isStopped = true;
-        this.pauseStatus = false;
+        this.isInPause = false;
 
         // TO DO: con lo stagger il render del last frame ( es senza translate3d)
         // va in conflitto con cleanCachedId
@@ -455,6 +450,22 @@ export class HandleSyncTimeline {
 
     resetSequencerLastValue() {
         this.sequencers.forEach((item) => item.resetLastValue());
+    }
+
+    isActive() {
+        return !this.isStopped;
+    }
+
+    isPaused() {
+        return this.isInPause;
+    }
+
+    getDirection() {
+        if (this.isStopped) return directionConstant.NONE;
+
+        return this.isReverse
+            ? directionConstant.BACKWARD
+            : directionConstant.FORWARD;
     }
 
     onLoopEnd(cb) {

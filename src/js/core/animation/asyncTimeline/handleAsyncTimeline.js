@@ -62,9 +62,9 @@ export class HandleAsyncTimeline {
         this.forceYoyo = false;
         this.isReverse = false;
         this.isInPause = false;
-        this.isSuspended = false;
+        this.isInSuspension = false;
         this.addAsyncIsActive = false;
-        this.isStopped = false;
+        this.isStopped = true;
         this.delayIsRunning = false;
         this.startOnDelay = false;
         this.actionAfterReject = [];
@@ -262,7 +262,7 @@ export class HandleAsyncTimeline {
                     const sholudSuspend = valueIsValid ? tween() : true;
                     return new Promise((res) => {
                         if (!isImmediate && sholudSuspend) {
-                            this.isSuspended = true;
+                            this.isInSuspension = true;
                         }
                         res();
                     });
@@ -385,7 +385,7 @@ export class HandleAsyncTimeline {
 
         Promise[promiseType](tweenPromises)
             .then(() => {
-                if (this.isSuspended || this.isStopped) return;
+                if (this.isInSuspension || this.isStopped) return;
 
                 const {
                     active: labelIsActive,
@@ -529,6 +529,7 @@ export class HandleAsyncTimeline {
                  **/
                 // Fire and of timeline
                 this.callbackComplete.forEach(({ cb }) => cb());
+                this.isStopped = true;
             })
             .catch(() => {
                 // If play or reverse or playFromLabel is fired diring delay tween fail
@@ -546,12 +547,6 @@ export class HandleAsyncTimeline {
                 */
                 this.addAsyncIsActive = false;
             });
-    }
-
-    getDirection() {
-        return this.isReverse
-            ? directionConstant.BACKWARD
-            : directionConstant.FORWARD;
     }
 
     addToActiveTween(tween) {
@@ -1185,7 +1180,7 @@ export class HandleAsyncTimeline {
         this.disableLabel();
         this.forceYoyo = false;
         this.isInPause = false;
-        this.isSuspended = false;
+        this.isInSuspension = false;
         this.addAsyncIsActive = false;
         this.timeOnPause = 0;
 
@@ -1232,8 +1227,8 @@ export class HandleAsyncTimeline {
             this.resumeEachTween();
         }
 
-        if (this.isSuspended) {
-            this.isSuspended = false;
+        if (this.isInSuspension) {
+            this.isInSuspension = false;
             this.timeOnPause = 0;
 
             if (this.currentIndex <= this.tweenList.length - 2) {
@@ -1263,6 +1258,26 @@ export class HandleAsyncTimeline {
 
     get() {
         return this.currentTween;
+    }
+
+    isActive() {
+        return !this.isStopped;
+    }
+
+    isPaused() {
+        return this.isInPause;
+    }
+
+    isSuspended() {
+        return this.isInSuspension;
+    }
+
+    getDirection() {
+        if (this.isStopped) return directionConstant.NONE;
+
+        return this.isReverse
+            ? directionConstant.BACKWARD
+            : directionConstant.FORWARD;
     }
 
     onLoopEnd(cb) {

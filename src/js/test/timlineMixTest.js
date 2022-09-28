@@ -12,6 +12,12 @@ export function timlineMixTest() {
     const btnFast = document.querySelector('.mix-btn-fast-step3');
     const btnSlow = document.querySelector('.mix-btn-slow-step3');
     const btnToggleSuspend = document.querySelector('.mix-btn-toggle-suspend');
+    const btnActiveStatus = document.querySelector('.mix-btn-activeStatus');
+    const btnPauseStatus = document.querySelector('.mix-btn-pauseStatus');
+    const btnSuspensionStatus = document.querySelector(
+        '.mix-btn-suspensionStatus'
+    );
+    const btnGetDirection = document.querySelector('.mix-btn-getDirection');
     const suspendLabel = btnToggleSuspend.querySelector('span');
     const target = document.querySelector('.mix-target');
     const target2 = document.querySelector('.mix-target2');
@@ -154,5 +160,21 @@ export function timlineMixTest() {
     btnToggleSuspend.addEventListener('click', () => {
         toggleSuspend = !toggleSuspend;
         suspendLabel.innerHTML = `: ${toggleSuspend}`;
+    });
+
+    btnActiveStatus.addEventListener('click', () => {
+        btnActiveStatus.innerHTML = `is running: ${timeline.isActive()}`;
+    });
+
+    btnPauseStatus.addEventListener('click', () => {
+        btnPauseStatus.innerHTML = `is paused: ${timeline.isPaused()}`;
+    });
+
+    btnSuspensionStatus.addEventListener('click', () => {
+        btnSuspensionStatus.innerHTML = `is in suspension: ${timeline.isSuspended()}`;
+    });
+
+    btnGetDirection.addEventListener('click', () => {
+        btnGetDirection.innerHTML = `direction: ${timeline.getDirection()}`;
     });
 }
