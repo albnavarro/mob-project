@@ -623,7 +623,7 @@ export class HandleSequencer {
     }
 
     /**
-     * @param {import('../utils/callbacks/setCallback.js').subscribeCallback} cb - callback function.
+     * @param {import('../utils/callbacks/setCallback.js').subscribeCallbackType} cb - callback function.
      * @return {Function} unsubscribe callback.
      *
      * @description
@@ -657,7 +657,7 @@ export class HandleSequencer {
 
     /**
      * @param {('Object'|'HTMLElement')} item
-     * @param {import('../utils/callbacks/setCallback.js').subscribeCallback} fn - callback function.
+     * @param {import('../utils/callbacks/setCallback.js').subscribeCallbackType} fn - callback function.
      * @return {Function} unsubscribe callback
      *
      * @description

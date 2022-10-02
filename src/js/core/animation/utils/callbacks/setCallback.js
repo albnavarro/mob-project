@@ -2,7 +2,7 @@ import { callBackStore } from './callBackStore';
 import { handleCache } from '../../../events/rafutils/handleCache.js';
 
 /**
- * @callback subscribeCallback
+ * @callback subscribeCallbackType
  * @param {Object.<string, number>} props
  */
 
