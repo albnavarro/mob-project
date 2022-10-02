@@ -39,7 +39,7 @@ import { sequencerRangeValidate } from '../utils/tweenValidation.js';
 
 /**
  * @typedef {Object} sequencerTypes
- * @prop {Object.<string, number>} data Initial data Object es: { x: 0, rotate: 0 }
+ * @prop {Object.<string, number>} data Initial data Object Example: { x: 0, rotate: 0 }
  * @prop {number} [ duration=10] Defines the time range of the animation, both syncTimeline and scrollTrigger will take care of processing the value as needed. The default value is 10
  **/
 
@@ -453,7 +453,10 @@ export class HandleSequencer {
      *
      * @description
      * <br/>
-     * mySequencer.goTo({ string: number|function, ... }, { start: number, end: number, ease: string });
+     * mySequencer.goTo(
+     *     { string: number|function, ... },
+     *     { start: number, end: number, ease: string }
+     * );
      * <br/>
      * Transform some properties of your choice from the `current value` to the `entered value`, the transformation will start from the value associated with start and will end in the value associated with end.
      * <br/>
@@ -487,7 +490,10 @@ export class HandleSequencer {
      *
      * @description
      * <br/>
-     * mySequencer.goFrom({ string: number|function, ... }, { start: number, end: number, ease: string });
+     * mySequencer.goFrom(
+     *     { string: number|function, ... },
+     *     { start: number, end: number, ease: string }
+     * );
      * <br/>
      * Transform some properties of your choice from the `entered value` to the `current value`, the transformation will start from the value associated with start and will end in the value associated with end.
      * <br/>
@@ -522,7 +528,11 @@ export class HandleSequencer {
      *
      * @description
      * <br/>
-     * mySequencer.goFromTo({ string: number|function, ... }, { start: number, end: number, ease: string });
+     * mySequencer.goFromTo(
+     *     { string: number|function, ... },
+     *     { string: number|function, ... },
+     *     { start: number, end: number, ease: string }
+     * );
      * <br/>
      * Transform some properties of your choice from the `first entered value` to the `second entered value`, the transformation will start from the value associated with start and will end in the value associated with end.
      * <br/>
@@ -559,6 +569,9 @@ export class HandleSequencer {
      * @param {number} [ time = 0 ] time
      *
      * @description
+     * <br/>
+     * mySequencer.label('mylabel',5);
+     * <br/>
      * Adds a label associated with a specific step in a range between 0 and duration (default: 10)
      * Both syncTimeline and scrollTrigger will take care of processing the value as needed
      * <br/>
@@ -583,8 +596,8 @@ export class HandleSequencer {
      **/
 
     /**
-     * @param {function(import('../utils/constant.js').directionTypes & sequencerAddProps):void } fn Callback fired every time the FPS is computed
-     * @param {number} time
+     * @param {function(import('../utils/constant.js').directionTypes & sequencerAddProps):void } fn - callback function
+     * @param {number} time - value between 0 and duration (default 0)
      *
      * @description
      * <br/>
@@ -610,36 +623,56 @@ export class HandleSequencer {
     }
 
     /**
-     * subscribe - add callback to stack
+     * @param {import('../utils/callbacks/setCallback.js').subscribeCallback} cb - callback function.
+     * @return {Function} unsubscribe callback.
      *
-     * @param  {function} cb cal function
-     * @return {function} unsubscribe callback
+     * @description
+     * <br/>
+     * `Single DOM element`
+     * const unsubscribe = mySequencer.`subscribe`(({ x,y... }) => {
+     *      domEl.style.prop = `...`
+     * })
      *
+     * unsubscribe()
+     * <br/>
+     * `Multiple DOM element ( stagger )`
+     * const unsubscribeStagger = [...elements].map((item) => {
+     *   return mySequencer.`subscribe`(({ x, y... }) => {
+     *       item.style.prop = ...
+     *   });
+     * });
+     * unsubscribeStagger.forEach((item) => item());
+     * <br/>
+     * `Callback` that returns updated values ready to be usable, it is advisable to use it for single elements, although it works well on a not too large number of elements (approximately 200-300 elements) for large staggers it is advisable to use the `subscribeCache` method .
      */
-    subscribe(cb) {
+    subscribe(cb = () => {}) {
         const unsubscribeCb = setCallBack(cb, this.callback);
         return () => (this.callback = unsubscribeCb(this.callback));
     }
 
-    /**
-     * subscribe - add callback onStop
-     * @param  {function} cb cal function
-     * @return {function} unsubscribe callback
-     *
-     */
     onStop(cb) {
         const unsubscribeCb = setCallBack(cb, this.callbackOnStop);
         return () => (this.callbackOnStop = unsubscribeCb(this.callbackOnStop));
     }
 
     /**
-     * subscribeCache - add callback to stack
+     * @param {('Object'|'HTMLElement')} item
+     * @param {import('../utils/callbacks/setCallback.js').subscribeCallback} fn - callback function.
+     * @return {Function} unsubscribe callback
      *
-     * @param  {item} htmlElement
-     * @return {function}
-     *
+     * @description
+     * <br/>
+     * `Multiple DOM element ( stagger )`
+     * const unsubscribeStagger = [...elements].map((item) => {
+     *   return mySequencer.`subscribeCache`(`item`, ({ x, y... }) => {
+     *       item.style.prop = ...
+     *   });
+     * });
+     * unsubscribeStagger.forEach((item) => item());
+     * <br/>
+     * `Callback` that returns updated values ready to be usable, specific to manage large staggers.
      */
-    subscribeCache(item, fn) {
+    subscribeCache(item, fn = () => {}) {
         const { unsubscribeCb, unsubscribeCache } = setCallBackCache(
             item,
             fn,

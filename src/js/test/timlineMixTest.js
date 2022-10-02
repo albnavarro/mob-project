@@ -162,19 +162,13 @@ export function timlineMixTest() {
         suspendLabel.innerHTML = `: ${toggleSuspend}`;
     });
 
-    btnActiveStatus.addEventListener('click', () => {
-        btnActiveStatus.innerHTML = `is running: ${timeline.isActive()}`;
-    });
-
-    btnPauseStatus.addEventListener('click', () => {
-        btnPauseStatus.innerHTML = `is paused: ${timeline.isPaused()}`;
-    });
-
-    btnSuspensionStatus.addEventListener('click', () => {
-        btnSuspensionStatus.innerHTML = `is in suspension: ${timeline.isSuspended()}`;
-    });
-
-    btnGetDirection.addEventListener('click', () => {
+    const loop = () => {
         btnGetDirection.innerHTML = `direction: ${timeline.getDirection()}`;
-    });
+        btnSuspensionStatus.innerHTML = `is in suspension: ${timeline.isSuspended()}`;
+        btnPauseStatus.innerHTML = `is paused: ${timeline.isPaused()}`;
+        btnActiveStatus.innerHTML = `is running: ${timeline.isActive()}`;
+        mobbu.use('nextFrame', () => loop());
+    };
+
+    loop();
 }

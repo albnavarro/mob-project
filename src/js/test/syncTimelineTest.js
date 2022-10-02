@@ -182,20 +182,4 @@ export function syncTimelineTest() {
         const u2 = unsubscribeStaggerOnStop[2];
         u2();
     });
-
-    btnActiveStatus.addEventListener('click', () => {
-        updatePropTest();
-    });
-
-    btnPauseStatus.addEventListener('click', () => {
-        updatePropTest();
-    });
-
-    btnGetDirection.addEventListener('click', () => {
-        updatePropTest();
-    });
-
-    btnGetTime.addEventListener('click', () => {
-        updatePropTest();
-    });
 }

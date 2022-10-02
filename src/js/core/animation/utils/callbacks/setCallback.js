@@ -1,6 +1,11 @@
 import { callBackStore } from './callBackStore';
 import { handleCache } from '../../../events/rafutils/handleCache.js';
 
+/**
+ * @callback subscribeCallback
+ * @param {Object.<string, number>} props
+ */
+
 export const setCallBack = (cb, arr) => {
     const { id } = callBackStore.get();
     arr.push({ cb, id });

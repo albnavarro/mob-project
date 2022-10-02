@@ -1,6 +1,12 @@
 .syncTimeline {
     height: 800px;
 
+    .label {
+        border: 1px $black solid;
+        padding: 10px;
+        display: inline-block;
+    }
+
     .sync-target,
     .sync-stagger {
         width: 50px;

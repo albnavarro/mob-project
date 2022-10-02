@@ -6,7 +6,7 @@ block content
             include ../includes/langSelector.pug
         .container.menu-container.menu-container--top
             include ../includes/navigation.pug
-    main
+    main.async-timeline
         .container.clearfix
             .sidebar.menu-container--sidebar
                 include ../includes/navigation.pug
@@ -112,13 +112,14 @@ block content
                     button.mix-btn-toggle-suspend(type="button")
                         |toggle suspend
                         span
-                    button.mix-btn-activeStatus(type="button")
+                    hr
+                    .label.mix-btn-activeStatus
                         |is running: false
-                    button.mix-btn-pauseStatus(type="button")
+                    .label.mix-btn-pauseStatus
                         |is paused: false
-                    button.mix-btn-suspensionStatus(type="button")
+                    .label.mix-btn-suspensionStatus
                         |is in suspension: false
-                    button.mix-btn-getDirection(type="button")
+                    .label.mix-btn-getDirection
                         |direction: none
                     .parallax__item-test.mix-target
                     .parallax__item-test.mix-target2
