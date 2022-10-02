@@ -25,7 +25,7 @@ export class HandleSyncTimeline {
          */
         this.startTime = null;
         this.timeElapsed = 0;
-        this.endTime = 0;
+        this.currentTime = 0;
         this.pauseTime = 0;
         this.timeAtReverse = 0;
         this.timeAtReverseBack = 0;
@@ -58,6 +58,7 @@ export class HandleSyncTimeline {
         this.callbackId = 0;
         this.callbackLoop = [];
         this.callbackComplete = [];
+        this.callbackOnUpdate = [];
     }
 
     updateTime(time, fps, shouldRender) {
@@ -87,20 +88,27 @@ export class HandleSyncTimeline {
             : this.timeAtReverse - (this.timeElapsed - this.timeAtReverse);
 
         if (!this.isInPause) {
-            this.endTime = clamp(partial, 0, this.duration);
+            this.currentTime = clamp(partial, 0, this.duration);
 
             // When come from playReverse skip first frame becouse is 0
             if (!this.skipFirstRender) {
                 if (shouldRender) {
                     this.sequencers.forEach((item) => {
                         item.draw({
-                            partial: this.endTime,
+                            partial: this.currentTime,
                             isLastDraw: false,
                             useFrame: true,
                             direction: this.getDirection(),
                         });
                     });
                 }
+
+                /*
+                 * Fire callbackOnUpdate
+                 */
+                this.callbackOnUpdate.forEach(({ cb }) => {
+                    cb();
+                });
             }
         }
 
@@ -180,7 +188,7 @@ export class HandleSyncTimeline {
         ) {
             // Fire callbackLoop onStop of each sequencr
             // Prevent async problem, endTime back to start, so store the value
-            const endTime = this.endTime;
+            const endTime = this.currentTime;
             this.sequencers.forEach((item) => {
                 item.draw({
                     partial: endTime,
@@ -217,7 +225,7 @@ export class HandleSyncTimeline {
             this.startTime = time;
             if (!this.isReverse) this.isPlayngReverse = !this.isPlayngReverse;
             this.timeElapsed = this.duration;
-            this.endTime = this.duration;
+            this.currentTime = this.duration;
             this.pauseTime = this.duration;
             this.goToNextFrame();
             return;
@@ -245,7 +253,7 @@ export class HandleSyncTimeline {
     resetTime() {
         this.timeElapsed = 0;
         this.pauseTime = 0;
-        this.endTime = 0;
+        this.currentTime = 0;
         this.timeAtReverse = 0;
         this.timeAtReverseBack = 0;
     }
@@ -281,8 +289,8 @@ export class HandleSyncTimeline {
         if (this.fpsIsInLoading) return;
 
         const isNumber = storeType.isNumber(value);
-        const currentTime = isNumber ? value : this.getTimeFromLabel(value);
-        this.playFromTime(currentTime);
+        const labelTime = isNumber ? value : this.getTimeFromLabel(value);
+        this.playFromTime(labelTime);
         return this;
     }
 
@@ -294,8 +302,8 @@ export class HandleSyncTimeline {
         /*
          * Set time
          */
-        this.endTime = time;
-        this.timeAtReverseBack = -this.endTime;
+        this.currentTime = time;
+        this.timeAtReverseBack = -this.currentTime;
 
         /*
          * Generic prop
@@ -316,8 +324,8 @@ export class HandleSyncTimeline {
         if (this.fpsIsInLoading) return;
 
         const isNumber = storeType.isNumber(value);
-        const currentTime = isNumber ? value : this.getTimeFromLabel(value);
-        this.playFromTimeReverse(currentTime, true);
+        const labelTime = isNumber ? value : this.getTimeFromLabel(value);
+        this.playFromTimeReverse(labelTime, true);
         return this;
     }
 
@@ -336,7 +344,7 @@ export class HandleSyncTimeline {
          * Set time
          */
         this.timeElapsed = time;
-        this.endTime = time;
+        this.currentTime = time;
         this.pauseTime = time;
         this.timeAtReverse = 0;
         this.timeAtReverseBack = 0;
@@ -409,7 +417,7 @@ export class HandleSyncTimeline {
         if (this.isReverse) {
             this.timeAtReverse = this.timeElapsed;
         } else {
-            this.timeAtReverseBack += this.timeElapsed - this.endTime;
+            this.timeAtReverseBack += this.timeElapsed - this.currentTime;
         }
     }
 
@@ -423,7 +431,7 @@ export class HandleSyncTimeline {
         // Fire callbackLoop onStop of each sequencr
         // this.sequencers.forEach((item) => {
         //     item.draw({
-        //         partial: this.endTime,
+        //         partial: this.currentTime,
         //         isLastDraw: true,
         //         useFrame: true,
         //         direction: this.getDirection(),
@@ -468,6 +476,10 @@ export class HandleSyncTimeline {
             : directionConstant.FORWARD;
     }
 
+    getTime() {
+        return this.currentTime;
+    }
+
     onLoopEnd(cb) {
         this.callbackLoop.push({ cb, id: this.callbackId });
         const cbId = this.callbackId;
@@ -487,6 +499,18 @@ export class HandleSyncTimeline {
 
         return () => {
             this.callbackComplete = this.callbackComplete.filter(
+                (item) => item.id !== cbId
+            );
+        };
+    }
+
+    onUpdate(cb) {
+        this.callbackOnUpdate.push({ cb, id: this.callbackId });
+        const cbId = this.callbackId;
+        this.callbackId++;
+
+        return () => {
+            this.callbackOnUpdate = this.callbackOnUpdate.filter(
                 (item) => item.id !== cbId
             );
         };

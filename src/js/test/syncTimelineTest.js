@@ -32,6 +32,7 @@ export function syncTimelineTest() {
     const btnGetDirection = document.querySelector(
         '.syncTimeline .getDirection'
     );
+    const btnGetTime = document.querySelector('.syncTimeline .getTime');
 
     let rotation = 720;
 
@@ -100,6 +101,13 @@ export function syncTimelineTest() {
         .add(seq1)
         .add(seqStagger);
 
+    const updatePropTest = () => {
+        btnActiveStatus.innerHTML = `is running: ${syncTimeline.isActive()}`;
+        btnPauseStatus.innerHTML = `is paused: ${syncTimeline.isPaused()}`;
+        btnGetDirection.innerHTML = `direction: ${syncTimeline.getDirection()}`;
+        btnGetTime.innerHTML = `currentTime: ${syncTimeline.getTime()}`;
+    };
+
     // callback
     syncTimeline.onLoopEnd(({ direction, loop }) => {
         console.log(`direction: ${direction}, loop index: ${loop}`);
@@ -109,40 +117,55 @@ export function syncTimelineTest() {
         console.log(`complete`);
     });
 
+    syncTimeline.onUpdate(() => {
+        updatePropTest();
+    });
+
     btnStart.addEventListener('click', () => {
-        syncTimeline.stop();
-        syncTimeline.play();
+        mobbu.use('frame', () => {
+            syncTimeline.stop();
+            syncTimeline.play();
+            btnGetTime.innerHTML = `currentTime: ${syncTimeline.getTime()}`;
+            updatePropTest();
+        });
     });
 
     btnStop.addEventListener('click', () => {
         syncTimeline.stop();
+        updatePropTest();
     });
 
     btnPause.addEventListener('click', () => {
         syncTimeline.pause();
+        updatePropTest();
     });
 
     btnResume.addEventListener('click', () => {
         syncTimeline.resume();
+        updatePropTest();
     });
 
     btnReverse.addEventListener('click', () => {
         syncTimeline.reverse();
+        updatePropTest();
     });
 
     btnStartReverse.addEventListener('click', () => {
         syncTimeline.stop();
         syncTimeline.playReverse();
+        updatePropTest();
     });
 
     btnPlayFrom.addEventListener('click', () => {
         syncTimeline.stop();
         syncTimeline.playFrom('label1');
+        updatePropTest();
     });
 
     btnPlayFromReverse.addEventListener('click', () => {
         syncTimeline.stop();
         syncTimeline.playFromReverse('label2');
+        updatePropTest();
     });
 
     btnMoreRotation.addEventListener('click', () => {
@@ -161,14 +184,18 @@ export function syncTimelineTest() {
     });
 
     btnActiveStatus.addEventListener('click', () => {
-        btnActiveStatus.innerHTML = `is running: ${syncTimeline.isActive()}`;
+        updatePropTest();
     });
 
     btnPauseStatus.addEventListener('click', () => {
-        btnPauseStatus.innerHTML = `is paused: ${syncTimeline.isPaused()}`;
+        updatePropTest();
     });
 
     btnGetDirection.addEventListener('click', () => {
-        btnGetDirection.innerHTML = `direction: ${syncTimeline.getDirection()}`;
+        updatePropTest();
+    });
+
+    btnGetTime.addEventListener('click', () => {
+        updatePropTest();
     });
 }

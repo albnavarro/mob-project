@@ -43,6 +43,12 @@ import { sequencerRangeValidate } from '../utils/tweenValidation.js';
  * @prop {number} [ duration=10] Defines the time range of the animation, both syncTimeline and scrollTrigger will take care of processing the value as needed. The default value is 10
  **/
 
+/**
+ * @typedef {Object} sequencerSpecialProps
+ * @prop {number} [ start=0 ] Defines the start of the transformation of the timeline in use, from 0 to the maximum surat set. The default is 0
+ * @prop {number} [ end=duration ] Defines the start of the transformation of the timeline in use, from 0 to the maximum surat set. The default value is the set duration
+ **/
+
 export class HandleSequencer {
     /**
      * @param { sequencerTypes & import('../utils/stagger/setStagger.js').staggerTypes & import('../tween/tweenConfig.js').easeTypes} data
@@ -361,14 +367,6 @@ export class HandleSequencer {
         });
     }
 
-    /**
-     * setData - Set initial data structure
-     *
-     * @return {Object}  this
-     *
-     * @example
-     * myTween.setData({ val: 100 });
-     */
     setData(obj) {
         this.values = Object.entries(obj).map((item) => {
             const [prop, value] = item;
@@ -450,20 +448,14 @@ export class HandleSequencer {
     }
 
     /**
-     * @typedef {Object} sequencerGoToSpecialProps
-     * @prop {number} [ start=0 ] Defines the start of the transformation of the timeline in use, from 0 to the maximum surat set. The default is 0
-     * @prop {number} [ end=duration ] Defines the start of the transformation of the timeline in use, from 0 to the maximum surat set. The default value is the set duration
-     **/
-
-    /**
-     * @param {Object.<string, number|function>} obj Destination value of Object propierties
-     * @param {sequencerGoToSpecialProps & import('../tween/tweenConfig.js').easeTypes} props special properties
+     * @param {Object.<string, number|function>} to values
+     * @param {sequencerSpecialProps & import('../tween/tweenConfig.js').easeTypes} props special properties
      *
      * @description
      * <br/>
      * mySequencer.goTo({ string: number|function, ... }, { start: number, end: number, ease: string });
      * <br/>
-     * Transform x optionally properties of the object from the current value to the indicated value, the transformation will start from the value associated with start and will end in the value associated with end.
+     * Transform some properties of your choice from the `current value` to the `entered value`, the transformation will start from the value associated with start and will end in the value associated with end.
      * <br/>
      * The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change in real time as the result of the function changes
      * <br/>
@@ -490,12 +482,19 @@ export class HandleSequencer {
     }
 
     /**
-     * goFrom - go from new goFrom from last toValue
+     * @param {Object.<string, number|function>} from values
+     * @param {sequencerSpecialProps & import('../tween/tweenConfig.js').easeTypes} props special properties
      *
-     * @param  {obj} obj new toValue Object
-     *
-     * @example
-     * myTween.goFrom({ val: 100 }, { start: 2, end: 5, ease: 'easeInBack' });
+     * @description
+     * <br/>
+     * mySequencer.goFrom({ string: number|function, ... }, { start: number, end: number, ease: string });
+     * <br/>
+     * Transform some properties of your choice from the `entered value` to the `current value`, the transformation will start from the value associated with start and will end in the value associated with end.
+     * <br/>
+     * The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change in real time as the result of the function changes
+     * <br/>
+     * It is possible to associate an easing to the transformation, this easing will be applied only in this transformation.
+     * <br/>
      */
     goFrom(obj, props) {
         const propMerged = { ...this.defaultProp, ...props };
@@ -517,13 +516,20 @@ export class HandleSequencer {
     }
 
     /**
-     * goFrom - go from new fromValue to new toValue
+     * @param {Object.<string, number|function>} from values
+     * @param {Object.<string, number|function>} to values
+     * @param {sequencerSpecialProps & import('../tween/tweenConfig.js').easeTypes} props special properties
      *
-     * @param  {obj} fromObj new fromObj Object
-     * @param  {obj} toObj new toValue Object
-     *
-     * @example
-     * myTween.goFrom({ val: 100 }, { start: 2, end: 5, ease: 'easeInBack' });
+     * @description
+     * <br/>
+     * mySequencer.goFromTo({ string: number|function, ... }, { start: number, end: number, ease: string });
+     * <br/>
+     * Transform some properties of your choice from the `first entered value` to the `second entered value`, the transformation will start from the value associated with start and will end in the value associated with end.
+     * <br/>
+     * The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change in real time as the result of the function changes
+     * <br/>
+     * It is possible to associate an easing to the transformation, this easing will be applied only in this transformation.
+     * <br/>
      */
     goFromTo(fromObj, toObj, props) {
         const propMerged = { ...this.defaultProp, ...props };
@@ -549,24 +555,48 @@ export class HandleSequencer {
     }
 
     /**
-     * Set label
+     * @param {string} label name
+     * @param {number} [ time = 0 ] time
+     *
+     * @description
+     * Adds a label associated with a specific step in a range between 0 and duration (default: 10)
+     * Both syncTimeline and scrollTrigger will take care of processing the value as needed
+     * <br/>
      */
-    label(name, time = 0) {
+    label(name = '', time = 0) {
         this.labels.push({ name, time });
         return this;
     }
 
     /**
-     * Get labels array
+     * Return the array of entered labels
+     * @returns {Array<string>} labels array
      */
     getLabels() {
         return this.labels;
     }
 
     /**
-     * add to fire at x time
+     * @typedef {Object} sequencerAddProps
+     * @prop {number} value
+     * @prop {number} isForced
+     **/
+
+    /**
+     * @param {function(import('../utils/constant.js').directionTypes & sequencerAddProps):void } fn Callback fired every time the FPS is computed
+     * @param {number} time
+     *
+     * @description
+     * <br/>
+     * mySequencer.add(({direction: string, value: number, isForced: boolean}) => {
+     *      //code
+     * }, time:number)
+     * <br/>
+     * Fire a function at a step in a range between 0 and duration (default: 10)
+     * Both syncTimeline and scrollTrigger will take care of processing the value as needed
+     * <br/>
      */
-    add(fn, time = 0) {
+    add(fn = () => {}, time = 0) {
         const fnIsValid = storeType.isFunction(fn);
         const timeIsValid = storeType.isNumber(time);
         const addIsValid = fnIsValid && timeIsValid;
