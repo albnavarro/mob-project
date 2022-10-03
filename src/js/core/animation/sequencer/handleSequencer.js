@@ -39,7 +39,7 @@ import { sequencerRangeValidate } from '../utils/tweenValidation.js';
 
 /**
  * @typedef {Object} sequencerTypes
- * @prop {Object.<string, number>} data Initial data Object Example: { x: 0, rotate: 0 }
+ * @prop {Object.<string, number>} data Initial data Object
  * @prop {number} [ duration=10] Defines the time range of the animation, both syncTimeline and scrollTrigger will take care of processing the value as needed. The default value is 10
  **/
 
@@ -53,8 +53,9 @@ export class HandleSequencer {
     /**
      * @param { sequencerTypes & import('../utils/stagger/setStagger.js').staggerTypes & import('../tween/tweenConfig.js').easeTypes} data
      *
-     * @description
-     * {
+     * @example
+     * ```js
+     * const mySequencer = new HandleSequencer({
      *   data: Object.<string, number>,
      *   duration: [ Number ],
      *   ease: [ String ],
@@ -67,7 +68,8 @@ export class HandleSequencer {
      *          direction: [ String ]
      *      },
      *   },
-     * }
+     * })
+     * ```
      */
     constructor(data = {}) {
         // Basic array with all the propierties, is creted in setData methods
@@ -415,6 +417,7 @@ export class HandleSequencer {
     }
 
     /**
+     * @description
      * setPropFromAncestor
      * - Example when we come from goTo methods:
      *
@@ -451,13 +454,16 @@ export class HandleSequencer {
      * @param {Object.<string, number|function>} to values
      * @param {sequencerSpecialProps & import('../tween/tweenConfig.js').easeTypes} props special properties
      *
-     * @description
-     * <br/>
+     * @example
+     * ```js
      * mySequencer.goTo(
      *     { string: number|function, ... },
      *     { start: number, end: number, ease: string }
      * );
-     * <br/>
+     *
+     *
+     * ```
+     * @description
      * Transform some properties of your choice from the `current value` to the `entered value`, the transformation will start from the value associated with start and will end in the value associated with end.
      * <br/>
      * The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change in real time as the result of the function changes
@@ -488,13 +494,16 @@ export class HandleSequencer {
      * @param {Object.<string, number|function>} from values
      * @param {sequencerSpecialProps & import('../tween/tweenConfig.js').easeTypes} props special properties
      *
-     * @description
-     * <br/>
+     * @example
+     * ```js
      * mySequencer.goFrom(
      *     { string: number|function, ... },
      *     { start: number, end: number, ease: string }
      * );
-     * <br/>
+     *
+     *
+     * ```
+     * @description
      * Transform some properties of your choice from the `entered value` to the `current value`, the transformation will start from the value associated with start and will end in the value associated with end.
      * <br/>
      * The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change in real time as the result of the function changes
@@ -526,14 +535,18 @@ export class HandleSequencer {
      * @param {Object.<string, number|function>} to values
      * @param {sequencerSpecialProps & import('../tween/tweenConfig.js').easeTypes} props special properties
      *
-     * @description
-     * <br/>
+     * @example
+     * ```js
      * mySequencer.goFromTo(
      *     { string: number|function, ... },
      *     { string: number|function, ... },
      *     { start: number, end: number, ease: string }
      * );
-     * <br/>
+     *
+     *
+     * ```
+     *
+     * @description
      * Transform some properties of your choice from the `first entered value` to the `second entered value`, the transformation will start from the value associated with start and will end in the value associated with end.
      * <br/>
      * The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change in real time as the result of the function changes
@@ -568,11 +581,14 @@ export class HandleSequencer {
      * @param {string} label name
      * @param {number} [ time = 0 ] time
      *
-     * @description
-     * <br/>
+     * @example
+     * ```js
      * mySequencer.label('mylabel',5);
-     * <br/>
-     * Adds a label associated with a specific step in a range between 0 and duration (default: 10)
+     *
+     *
+     * ```
+     * @description
+     * Adds a label associated with a specific step in a range between 0 and duration (default: 10).
      * Both syncTimeline and scrollTrigger will take care of processing the value as needed
      * <br/>
      */
@@ -599,12 +615,15 @@ export class HandleSequencer {
      * @param {function(import('../utils/constant.js').directionTypes & sequencerAddProps):void } fn - callback function
      * @param {number} time - value between 0 and duration (default 0)
      *
-     * @description
-     * <br/>
+     * @example
+     * ```js
      * mySequencer.add(({direction: string, value: number, isForced: boolean}) => {
      *      //code
-     * }, time:number)
-     * <br/>
+     * }, time:number);
+     *
+     *
+     * ```
+     * @description
      * Fire a function at a step in a range between 0 and duration (default: 10)
      * Both syncTimeline and scrollTrigger will take care of processing the value as needed
      * <br/>
@@ -626,30 +645,75 @@ export class HandleSequencer {
      * @param {import('../utils/callbacks/setCallback.js').subscribeCallbackType} cb - callback function.
      * @return {Function} unsubscribe callback.
      *
-     * @description
-     * <br/>
-     * `Single DOM element`
-     * const unsubscribe = mySequencer.`subscribe`(({ x,y... }) => {
+     * @example
+     * ```js
+     * //Single DOM element
+     * const unsubscribe = mySequencer.subscribe(({ x,y... }) => {
      *      domEl.style.prop = `...`
      * })
-     *
      * unsubscribe()
-     * <br/>
-     * `Multiple DOM element ( stagger )`
+     *
+     *
+     * //Multiple DOM element ( stagger )
      * const unsubscribeStagger = [...elements].map((item) => {
-     *   return mySequencer.`subscribe`(({ x, y... }) => {
+     *   return mySequencer.subscribe(({ x, y... }) => {
      *       item.style.prop = ...
      *   });
      * });
      * unsubscribeStagger.forEach((item) => item());
+     *
+     *
+     * ```
+     * @description
+     * Callback that returns updated values ready to be usable, it is advisable to use it for single elements, although it works well on a not too large number of elements (approximately 100-200 elements) for large staggers it is advisable to use the subscribeCache method .
      * <br/>
-     * `Callback` that returns updated values ready to be usable, it is advisable to use it for single elements, although it works well on a not too large number of elements (approximately 200-300 elements) for large staggers it is advisable to use the `subscribeCache` method .
      */
     subscribe(cb = () => {}) {
         const unsubscribeCb = setCallBack(cb, this.callback);
         return () => (this.callback = unsubscribeCb(this.callback));
     }
 
+    /**
+     * @param {import('../utils/callbacks/setCallback.js').subscribeCallbackType} cb - callback function.
+     * @return {Function} unsubscribe callback.
+     *
+     * @example
+     * ```js
+     * //Single DOM element
+     * const unsubscribe = mySequencer.onStop(({ x,y... }) => {
+     *      domEl.style.prop = `...`
+     * })
+     * unsubscribe()
+     *
+     *
+     * //Multiple DOM element ( stagger )
+     * const unsubscribeStagger = [...elements].map((item) => {
+     *   return mySequencer.onStop(({ x, y... }) => {
+     *       item.style.prop = ...
+     *   });
+     * });
+     * unsubscribeStagger.forEach((item) => item());
+     *
+     *
+     * ```
+     * @description
+     * Similar to subscribe this callBack is launched when the data calculation stops (when the timeline ends or the scroll trigger is inactive).
+     * Useful for applying a different style to an inactive element.
+     * A typical example is to remove the teansform3D property:
+     * <br/>
+     * @example
+     * ```js
+     * // Use transform3D while item is active
+     * mySequencer.subscribe(({x}) => {
+     *      domEl.style.transform = ` transform3D(0,0,0) translateX(${x}px)`
+     * })
+     *
+     * // Remove transform3D when item is inactive
+     * mySequencer.onStop(({x}) => {
+     *      domEl.style.transform = `translateX(${x}px)`
+     * })
+     * ```
+     */
     onStop(cb) {
         const unsubscribeCb = setCallBack(cb, this.callbackOnStop);
         return () => (this.callbackOnStop = unsubscribeCb(this.callbackOnStop));
@@ -660,17 +724,21 @@ export class HandleSequencer {
      * @param {import('../utils/callbacks/setCallback.js').subscribeCallbackType} fn - callback function.
      * @return {Function} unsubscribe callback
      *
-     * @description
-     * <br/>
-     * `Multiple DOM element ( stagger )`
+     * @example
+     *```js
+     * //Multiple DOM element ( stagger )
      * const unsubscribeStagger = [...elements].map((item) => {
-     *   return mySequencer.`subscribeCache`(`item`, ({ x, y... }) => {
+     *   return mySequencer.subscribeCache(item, ({ x, y... }) => {
      *       item.style.prop = ...
      *   });
      * });
      * unsubscribeStagger.forEach((item) => item());
+     *
+     *
+     * ```
+     * @description
+     * Callback that returns updated values ready to be usable, specific to manage large staggers.
      * <br/>
-     * `Callback` that returns updated values ready to be usable, specific to manage large staggers.
      */
     subscribeCache(item, fn = () => {}) {
         const { unsubscribeCb, unsubscribeCache } = setCallBackCache(
@@ -684,32 +752,53 @@ export class HandleSequencer {
         return () => (this.callbackCache = unsubscribeCb(this.callbackCache));
     }
 
+    /**
+     * @description
+     * Get duration
+     * @return {Number}
+     */
     getDuration() {
         return this.duration;
     }
 
-    setDuration(val) {
+    /**
+     * @description
+     * Set duration
+     * @param {Number} val
+     */
+    setDuration(val = 0) {
         this.duration = val;
     }
 
+    /**
+     * @description
+     * Get tween type - 'sequencer'
+     * @param {Number} [ val = sequencer]
+     */
     getType() {
         return this.type;
     }
 
+    /**
+     * @description
+     * Removes all references of staggers not yet started by the handleCache function, method used by HandleSyncTimeline when it is stopped
+     */
     cleanCachedId() {
         this.callbackCache.forEach(({ cb }) => handleCache.clean(cb));
     }
 
     /**
+     * @description
      * Disable stagger for one run
-     * To place object immediatly without "delay"
      **/
     disableStagger() {
         this.useStagger = false;
     }
 
     /**
-     * Remove all reference from tween
+     * @description
+     * Destroy sequencer
+     * <br/>
      */
     destroy() {
         this.values = [];

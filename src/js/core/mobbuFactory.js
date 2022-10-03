@@ -97,8 +97,9 @@ export const mobbu = {
     /**
      * @param {import('./animation/sequencer/handleSequencer.js').sequencerTypes & import('./animation/utils/stagger/setStagger.js').staggerTypes & import('../core/animation/tween/tweenConfig.js').easeTypes} data
      *
-     * @description
-     * {
+     * @example
+     * ```js
+     * const mySequencer  = mobbu.createSequencer({
      *   data: Object.<string, number>,
      *   duration: [ Number ],
      *   ease: [ String ],
@@ -111,7 +112,8 @@ export const mobbu = {
      *          direction: [ String ]
      *      },
      *   },
-     * }
+     * })
+     * ```
      */
     createSequencer(data = {}) {
         return new HandleSequencer(data);
