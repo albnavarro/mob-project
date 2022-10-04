@@ -110,6 +110,10 @@ export class HandleSequencer {
         if (props) this.setData(props);
     }
 
+    /**
+     * @description
+     * Inzialize stagger array
+     */
     inzializeStagger() {
         if (this.staggerIsReady) return;
 
@@ -143,7 +147,35 @@ export class HandleSequencer {
         this.staggerIsReady = true;
     }
 
-    draw({ partial, isLastDraw, useFrame, direction }) {
+    /**
+     * @typedef {Object} sequencerDrawTypes
+     * @prop {Number} [ partial = 0] render at specific partial between 0 and duration
+     * @prop {Boolean} [ isLastDraw = false] use the callback defined by the onStop method
+     * @prop {Boolean} [ useFrame = false ] when the method is used inside a requestAnimatioFrame the useFrame property must be set to true, otherwise it will be executed inside a nextTick
+     **/
+
+    /**
+     * @param {sequencerDrawTypes & import('../utils/constant.js').directionTypes} props
+     *
+     * @example
+     * ```js
+     * mySequencer.draw(
+     *      partial: 200,
+     *      isLastDraw: true,
+     *      useFrame: false,
+     *      direction: ('backward'|'forward'|'none')
+     * );
+     *
+     *
+     * ```
+     * @description
+     */
+    draw({
+        partial = 0,
+        isLastDraw = false,
+        useFrame = false,
+        direction = directionConstant.NONE,
+    }) {
         const mainFn = () => {
             /*
              * First time run or atfer reset lasValue
@@ -161,14 +193,21 @@ export class HandleSequencer {
              *
              * On first run check is jumped
              */
-            if (!this.firstRun && !direction) {
+            if (
+                !this.firstRun &&
+                (!direction || direction === directionConstant.NONE)
+            ) {
                 this.direction =
                     partial >= this.lastPartial
                         ? directionConstant.FORWARD
                         : directionConstant.BACKWARD;
             }
 
-            if (!this.firstRun && direction) {
+            if (
+                !this.firstRun &&
+                (direction === directionConstant.BACKWARD ||
+                    direction === directionConstant.FORWARD)
+            ) {
                 this.direction = direction;
             }
 
@@ -269,7 +308,8 @@ export class HandleSequencer {
     }
 
     /**
-     * Methods call by timeline, everty time user use play, playFrom etcc.. or loop end.
+     * @description
+     * Methods call by syncTimeline, everty time user use play, playFrom etcc.. or loop end.
      * Reset the data that control add callback to have a new clean state
      */
     resetLastValue() {
@@ -279,12 +319,17 @@ export class HandleSequencer {
     }
 
     /**
+     * @private
+     *
+     * @property {number} [ time=0 ]
+     *
+     * @description
      * Fire addCallback first time without check the previous position.
      * becouse first time we can start from any position and we doasn't a have previous position
-     * So we fir the callback once
+     * So we fire the callback once
      * To skip this callback, check isForce prop in callback
      */
-    actionAtFirstRender(time) {
+    actionAtFirstRender(time = 0) {
         if (!this.forceAddFnAtFirstRun) return;
 
         this.callbackAdd.forEach(({ fn, time: fnTime }) => {
@@ -313,7 +358,16 @@ export class HandleSequencer {
         this.forceAddFnAtFirstRun = false;
     }
 
-    fireAddCallBack(time) {
+    /**
+     * @private
+     *
+     * @property {number} [ time=0 ]
+     *
+     * @description
+     * Fire callBack at specific time
+     *
+     */
+    fireAddCallBack(time = 0) {
         this.callbackAdd.forEach(({ fn, time: fnTime }) => {
             /*
              * In forward mode current time must be greater or equel than fn time
@@ -348,11 +402,12 @@ export class HandleSequencer {
     }
 
     /**
+     * @description
      * Set factor between timeline duration and sequencer getDuration
      * So start and end propierties will be proportionate to the duration of the timeline
      * This methods is called by SyncTimeline
      */
-    setStretchFactor(duration) {
+    setStretchFactor(duration = 0) {
         const stretchFactor = duration / this.duration;
 
         this.timeline.forEach(({ start, end }, i) => {
@@ -369,7 +424,12 @@ export class HandleSequencer {
         });
     }
 
-    setData(obj) {
+    /**
+     *
+     * @prop {Object.<string, number>} obj Initial data Object
+     * @returns {M} The instance on which this method was called.
+     */
+    setData(obj = {}) {
         this.values = Object.entries(obj).map((item) => {
             const [prop, value] = item;
             return {
@@ -388,6 +448,8 @@ export class HandleSequencer {
 
     /**
      * Return the new array maeged with main array created in setData
+     *
+     * @private
      *
      * @param  {Array} data new datato merge
      * @return {Array} main store Array merged with new data
@@ -410,6 +472,14 @@ export class HandleSequencer {
         });
     }
 
+    /**
+     * @private
+     *
+     * @property {Array} arr
+     *
+     * @description
+     * Sorts the array by the lowest start value
+     */
     orderByStart(arr) {
         return arr.sort((a, b) => {
             return a.start - b.start;
@@ -453,6 +523,7 @@ export class HandleSequencer {
     /**
      * @param {Object.<string, number|function>} to values
      * @param {sequencerSpecialProps & import('../tween/tweenConfig.js').easeTypes} props special properties
+     * @returns {M} The instance on which this method was called.
      *
      * @example
      * ```js
@@ -493,6 +564,7 @@ export class HandleSequencer {
     /**
      * @param {Object.<string, number|function>} from values
      * @param {sequencerSpecialProps & import('../tween/tweenConfig.js').easeTypes} props special properties
+     * @returns {M} The instance on which this method was called.
      *
      * @example
      * ```js
@@ -580,6 +652,7 @@ export class HandleSequencer {
     /**
      * @param {string} label name
      * @param {number} [ time = 0 ] time
+     * @returns {M} The instance on which this method was called.
      *
      * @example
      * ```js
@@ -607,13 +680,14 @@ export class HandleSequencer {
 
     /**
      * @typedef {Object} sequencerAddProps
-     * @prop {number} value
-     * @prop {number} isForced
+     * @prop {number} value  the time value where the caalback is launched
+     * @prop {boolean} isForced Indicates that the callback was launched the first time without having exceeded the temporal value, e.g .: combined with a scrollTrigger it is launched the first time the page is loaded if it exceeds the set value even if this value has not been exceeded (as it is missing still the previous value)
      **/
 
     /**
      * @param {function(import('../utils/constant.js').directionTypes & sequencerAddProps):void } fn - callback function
      * @param {number} time - value between 0 and duration (default 0)
+     * @returns {M} The instance on which this method was called.
      *
      * @example
      * ```js

@@ -29,12 +29,8 @@ let g:ale_linters = {
     \}
 let g:ale_fix_on_save = 1
 
-let g:user_emmet_install_global = 0
-autocmd FileType html,css EmmetInstall
-let g:user_emmet_leader_key='<C-Z>'
 
 call plug#begin()
-Plug 'mattn/emmet-vim'
 Plug 'vim-airline/vim-airline'
 Plug 'joshdick/onedark.vim'
 Plug 'dense-analysis/ale'
