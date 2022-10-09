@@ -32,7 +32,7 @@ export const gridStaggerSequencer = () => {
     });
 
     const timeline = mobbu
-        .create('syncTimeline', {
+        .createSyncTimeline({
             repeat: -1,
             yoyo: false,
             duration,

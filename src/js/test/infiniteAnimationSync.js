@@ -43,7 +43,7 @@ export const infiniteAnimationSync = () => {
     });
 
     const syncTimeline = mobbu
-        .create('syncTimeline', {
+        .createSyncTimeline({
             repeat: -1,
             yoyo: false,
             duration: 3000,

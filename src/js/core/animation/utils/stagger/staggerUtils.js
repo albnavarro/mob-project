@@ -1,5 +1,16 @@
 import { frameStore } from '../../../events/rafutils/frameStore.js';
-import { DIRECTION_COL } from './staggerCostant.js';
+import {
+    validateStaggerColRow,
+    validateStaggerDirection,
+    validateStaggerEach,
+    validateStaggerFrom,
+    validateStaggerWaitComplete,
+} from '../tweenValidation.js';
+import {
+    DIRECTION_COL,
+    STAGGER_DEFAULT_OBJ,
+    STAGGER_TYPE_START,
+} from './staggerCostant.js';
 
 export const getEachByFps = (each) => {
     const { instantFps } = frameStore.get();
@@ -13,14 +24,31 @@ export const getEachByFps = (each) => {
 
 export const getStaggerFromProps = (props) => {
     return {
-        each: props?.stagger?.each || 0,
-        from: props?.stagger?.from || 'start',
+        each: validateStaggerEach(props?.stagger?.each)
+            ? props.stagger.each
+            : STAGGER_DEFAULT_OBJ.each,
+        //
+        from: validateStaggerFrom(props?.stagger?.from)
+            ? props?.stagger?.from
+            : STAGGER_TYPE_START,
+        //
         grid: {
-            col: props?.stagger?.grid?.col || -1,
-            row: props?.stagger?.grid?.row || -1,
-            direction: props?.stagger?.grid?.direction || DIRECTION_COL,
+            col: validateStaggerColRow(props?.stagger?.grid?.col)
+                ? props.stagger.grid.col
+                : STAGGER_DEFAULT_OBJ.grid.col,
+            //
+            row: validateStaggerColRow(props?.stagger?.grid?.row)
+                ? props.stagger.grid.row
+                : STAGGER_DEFAULT_OBJ.grid.row,
+            //
+            direction: validateStaggerDirection(props?.stagger?.grid?.direction)
+                ? props.stagger.grid.direction
+                : DIRECTION_COL,
         },
-        waitComplete: props?.stagger?.waitComplete || false,
+        //
+        waitComplete: validateStaggerWaitComplete(props?.stagger?.waitComplete)
+            ? props.stagger.waitComplete
+            : STAGGER_DEFAULT_OBJ.waitComplete,
     };
 };
 

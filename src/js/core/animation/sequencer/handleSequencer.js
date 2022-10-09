@@ -10,7 +10,6 @@ import {
     getStaggerFromProps,
     getStaggerArray,
 } from '../utils/stagger/staggerUtils.js';
-import { handleSetUp } from '../../setup.js';
 import {
     setCallBack,
     setCallBackCache,
@@ -35,7 +34,13 @@ import {
 } from './reduceFunction.js';
 import { handleCache } from '../../events/rafutils/handleCache.js';
 import { directionConstant } from '../utils/constant.js';
-import { sequencerRangeValidate } from '../utils/tweenValidation.js';
+import {
+    durationIsValid,
+    easeIsValid,
+    initialDataPropValidate,
+    sequencerRangeValidate,
+} from '../utils/tweenValidation.js';
+import { handleSetUp } from '../../setup.js';
 
 /**
  * @typedef {Object} sequencerTypes
@@ -51,7 +56,7 @@ import { sequencerRangeValidate } from '../utils/tweenValidation.js';
 
 export class HandleSequencer {
     /**
-     * @param { sequencerTypes & import('../utils/stagger/setStagger.js').staggerTypes & import('../tween/tweenConfig.js').easeTypes} data
+     * @param { sequencerTypes & import('../utils/stagger/staggerCostant.js').staggerTypes & import('../tween/tweenConfig.js').easeTypes} data
      *
      * @example
      * ```js
@@ -69,6 +74,22 @@ export class HandleSequencer {
      *      },
      *   },
      * })
+     *
+     *
+     * ```
+     *
+     * @description
+     * Available methods:
+     * ```js
+     * mySequencer.goTo()
+     * mySequencer.goFrom()
+     * mySequencer.goFromTo()
+     * mySequencer.add()
+     * mySequencer.label()
+     * mySequencer.subscribe()
+     * mySequencer.subscribeCache()
+     * mySequencer.onStop()
+     *
      * ```
      */
     constructor(data = {}) {
@@ -84,12 +105,12 @@ export class HandleSequencer {
         this.callbackOnStop = [];
         this.callbackAdd = [];
         this.unsubscribeCache = [];
-        this.duration = data?.duration || handleSetUp.get('sequencer').duration;
+        this.duration = durationIsValid(data?.duration);
         this.type = 'sequencer';
         this.defaultProp = {
             start: 0,
             end: this.duration,
-            ease: data?.ease || handleSetUp.get('sequencer').ease,
+            ease: easeIsValid(data?.ease),
         };
         this.firstRun = true;
         this.forceAddFnAtFirstRun = true;
@@ -427,19 +448,22 @@ export class HandleSequencer {
     /**
      *
      * @prop {Object.<string, number>} obj Initial data Object
-     * @returns {M} The instance on which this method was called.
+     * @returns {this} The instance on which this method was called.
      */
     setData(obj = {}) {
         this.values = Object.entries(obj).map((item) => {
             const [prop, value] = item;
+            const isValid = initialDataPropValidate(prop, value);
+            const valueSanitized = isValid ? value : 0;
+
             return {
-                prop: prop,
-                toValue: value,
-                fromValue: value,
-                currentValue: value,
+                prop: isValid ? prop : 'invalidProp',
+                toValue: valueSanitized,
+                fromValue: valueSanitized,
+                currentValue: valueSanitized,
                 active: false,
                 settled: false,
-                ease: getTweenFn('easeLinear'),
+                ease: getTweenFn(handleSetUp.get('sequencer').ease),
             };
         });
 
@@ -523,7 +547,7 @@ export class HandleSequencer {
     /**
      * @param {Object.<string, number|function>} to values
      * @param {sequencerSpecialProps & import('../tween/tweenConfig.js').easeTypes} props special properties
-     * @returns {M} The instance on which this method was called.
+     * @returns {this} The instance on which this method was called.
      *
      * @example
      * ```js
@@ -564,7 +588,7 @@ export class HandleSequencer {
     /**
      * @param {Object.<string, number|function>} from values
      * @param {sequencerSpecialProps & import('../tween/tweenConfig.js').easeTypes} props special properties
-     * @returns {M} The instance on which this method was called.
+     * @returns {this} The instance on which this method was called.
      *
      * @example
      * ```js
@@ -652,7 +676,7 @@ export class HandleSequencer {
     /**
      * @param {string} label name
      * @param {number} [ time = 0 ] time
-     * @returns {M} The instance on which this method was called.
+     * @returns {this} The instance on which this method was called.
      *
      * @example
      * ```js
@@ -687,7 +711,7 @@ export class HandleSequencer {
     /**
      * @param {function(import('../utils/constant.js').directionTypes & sequencerAddProps):void } fn - callback function
      * @param {number} time - value between 0 and duration (default 0)
-     * @returns {M} The instance on which this method was called.
+     * @returns {this} The instance on which this method was called.
      *
      * @example
      * ```js

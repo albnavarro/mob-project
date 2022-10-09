@@ -93,7 +93,7 @@ export function syncTimelineTest() {
     });
 
     const syncTimeline = mobbu
-        .create('syncTimeline', {
+        .createSyncTimeline({
             repeat: 2,
             yoyo: false,
             duration: 10000,

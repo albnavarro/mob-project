@@ -9,7 +9,49 @@ import { storeType } from '../../store/storeType.js';
 import { directionConstant } from '../utils/constant.js';
 import { syncTimelineLabelWarning } from '../utils/warning.js';
 
+/**
+ * @typedef {Object} syncTimelineTypes
+ * @prop {Number} duration duration in millisecond of timeline,
+ * @prop {Boolean} [yoyo=0] Reverse the direction each time the animation ends
+ * @prop {Number} [repeat=0] how many times the animation should be repeated, -1 means that the animation will run in an infinite loop
+ */
 export class HandleSyncTimeline {
+    /**
+     * @param { syncTimelineTypes } data
+     *
+     * @example
+     * ```js
+     * const myTimeline = new HandleSyncTimeline({
+     *   duration: [ Number ],
+     *   yoyo: [ Boolean ],
+     *   repeat: [ Number ]
+     * })
+     *
+     *
+     * ```
+     *
+     * @description
+     * Available methods:
+     * ```js
+     * myTimeline.add()
+     * myTimeline.onLoopEnd()
+     * myTimeline.onComplete()
+     * myTimeline.onUpdate()
+     * myTimeline.stop()
+     * myTimeline.play()
+     * myTimeline.playReverse()
+     * myTimeline.playFrom()
+     * myTimeline.playFromReverse()
+     * myTimeline.reverse()
+     * myTimeline.pause()
+     * myTimeline.resume()
+     * myTimeline.isActive()
+     * myTimeline.isPaused()
+     * myTimeline.getDirection()
+     * myTimeline.getTime()
+     * myTimeline.destroy()
+     * ```
+     */
     constructor(data = {}) {
         this.duration = data?.duration || handleSetUp.get('sequencer').duration;
         this.yoyo = data?.yoyo || false;
@@ -107,7 +149,10 @@ export class HandleSyncTimeline {
                  * Fire callbackOnUpdate
                  */
                 this.callbackOnUpdate.forEach(({ cb }) => {
-                    cb();
+                    cb({
+                        time: this.currentTime,
+                        direction: this.getDirection(),
+                    });
                 });
             }
         }
@@ -240,6 +285,9 @@ export class HandleSyncTimeline {
         this.goToNextFrame();
     }
 
+    /**
+     * @private
+     */
     goToNextFrame() {
         handleFrame.add(() => {
             handleNextTick.add(({ time, fps, shouldRender }) => {
@@ -250,6 +298,9 @@ export class HandleSyncTimeline {
         });
     }
 
+    /**
+     * @private
+     */
     resetTime() {
         this.timeElapsed = 0;
         this.pauseTime = 0;
@@ -259,7 +310,7 @@ export class HandleSyncTimeline {
     }
 
     /**
-     * Find label tha match the occurrency and return the time
+     * @private
      */
     getTimeFromLabel(label) {
         const labelObj = this.sequencers.reduce((p, c) => {
@@ -276,7 +327,17 @@ export class HandleSyncTimeline {
     }
 
     /**
-     * Control play on forward direction
+     * @returns {this} The instance on which this method was called.
+     *
+     * @example
+     * ```js
+     * myTimeline.play();
+     *
+     *
+     * ```
+     *
+     * @description
+     * Plays the timeline starting from the initial value
      */
     play() {
         if (this.fpsIsInLoading) return;
@@ -285,7 +346,22 @@ export class HandleSyncTimeline {
         return this;
     }
 
-    playFrom(value) {
+    /**
+     * @param {Number|String} value
+     * @returns {this} The instance on which this method was called.
+     *
+     * @example
+     * ```js
+     * myTimeline.playFrom(1000);
+     * myTimeline.playFrom('myLabel');
+     *
+     *
+     * ```
+     *
+     * @description
+     * Plays the timeline forward starting from the specific time or from a label defined in a Handle Sequencer | HandleMasterSequencer instance
+     */
+    playFrom(value = 0) {
         if (this.fpsIsInLoading) return;
 
         const isNumber = storeType.isNumber(value);
@@ -294,6 +370,9 @@ export class HandleSyncTimeline {
         return this;
     }
 
+    /**
+     * @private
+     */
     playFromTime(time = 0) {
         // Reset sequancer callback add function state
         this.resetSequencerLastValue();
@@ -318,7 +397,19 @@ export class HandleSyncTimeline {
     }
 
     /**
-     * Control play on backward direction
+     * @param {Number|String} value
+     * @returns {this} The instance on which this method was called.
+     *
+     * @example
+     * ```js
+     * myTimeline.playFromReverse(1000);
+     * myTimeline.playFromReverse('myLabel');
+     *
+     *
+     * ```
+     *
+     * @description
+     * Plays the timeline backward starting from the specific time or from a label defined in a Handle Sequencer | HandleMasterSequencer instance
      */
     playFromReverse(value) {
         if (this.fpsIsInLoading) return;
@@ -329,6 +420,19 @@ export class HandleSyncTimeline {
         return this;
     }
 
+    /**
+     * @returns {this} The instance on which this method was called.
+     *
+     * @example
+     * ```js
+     * myTimeline.playReverse();
+     *
+     *
+     * ```
+     *
+     * @description
+     * Plays the timeline starting from the end value
+     */
     playReverse() {
         if (this.fpsIsInLoading) return;
 
@@ -336,6 +440,9 @@ export class HandleSyncTimeline {
         return this;
     }
 
+    /**
+     * @private
+     */
     playFromTimeReverse(time = 0) {
         // Reset sequancer callback add function state
         this.resetSequencerLastValue();
@@ -363,6 +470,9 @@ export class HandleSyncTimeline {
         this.startAnimation(time);
     }
 
+    /**
+     * Find label tha match the occurrency and return the time
+     */
     startAnimation(partial) {
         if (this.repeat === 0) return;
 
@@ -394,6 +504,18 @@ export class HandleSyncTimeline {
         });
     }
 
+    /**
+     *
+     * @example
+     * ```js
+     * myTimeline.pause();
+     *
+     *
+     * ```
+     *
+     * @description
+     * Pause timeline
+     */
     pause() {
         if (this.isStopped || this.isInPause || this.fpsIsInLoading) return;
 
@@ -401,6 +523,18 @@ export class HandleSyncTimeline {
         this.isInPause = true;
     }
 
+    /**
+     *
+     * @example
+     * ```js
+     * myTimeline.resume();
+     *
+     *
+     * ```
+     *
+     * @description
+     * Resume timeline from pause
+     */
     resume() {
         if (this.isStopped || !this.isInPause || this.fpsIsInLoading) return;
 
@@ -408,6 +542,18 @@ export class HandleSyncTimeline {
         this.isInPause = false;
     }
 
+    /**
+     *
+     * @example
+     * ```js
+     * myTimeline.reverse();
+     *
+     *
+     * ```
+     *
+     * @description
+     * Reverse the direction while the timeline is running
+     */
     reverse() {
         if (this.isStopped || this.isInPause || this.fpsIsInLoading) return;
 
@@ -421,6 +567,19 @@ export class HandleSyncTimeline {
         }
     }
 
+    /**
+     * @returns {this} The instance on which this method was called.
+     *
+     * @example
+     * ```js
+     * myTimeline.stop();
+     *
+     *
+     * ```
+     *
+     * @description
+     * Stop timeline
+     */
     stop() {
         this.isStopped = true;
         this.isInPause = false;
@@ -443,7 +602,22 @@ export class HandleSyncTimeline {
         });
     }
 
-    add(sequencer) {
+    /**
+     * @property {(HandleSequencer|HandleMasterSequencer)} sequencer
+     * @returns {this} The instance on which this method was called.
+     *
+     * @example
+     * ```js
+     * myTimeline.add(mySequencer);
+     * myTimeline.add(myMasterSequencer);
+     *
+     *
+     * ```
+     *
+     * @description
+     * Add the instance of a sequencer | masterSequencer to the timeline
+     */
+    add(sequencer = {}) {
         sequencer.setStretchFactor(this.duration);
         this.sequencers.push(sequencer);
 
@@ -460,14 +634,53 @@ export class HandleSyncTimeline {
         this.sequencers.forEach((item) => item.resetLastValue());
     }
 
+    /**
+     * @return {Boolean} Active status
+     *
+     * @example
+     * ```js
+     * const isActive = myTimeline.isActive();
+     *
+     *
+     * ```
+     *
+     * @description
+     * Return active status
+     */
     isActive() {
         return !this.isStopped;
     }
 
+    /**
+     * @return {Boolean} Pause status
+     *
+     * @example
+     * ```js
+     * const isPaused = myTimeline.isPaused();
+     *
+     *
+     * ```
+     *
+     * @description
+     * Return pause status
+     */
     isPaused() {
         return this.isInPause;
     }
 
+    /**
+     * @returns {import('../utils/constant.js').directionStringTypes}
+     *
+     * @example
+     * ```js
+     * myTimeline.getDirection();
+     *
+     *
+     * ```
+     *
+     * @description
+     * Return direction forward|backward|none
+     */
     getDirection() {
         if (this.isStopped) return directionConstant.NONE;
 
@@ -476,11 +689,46 @@ export class HandleSyncTimeline {
             : directionConstant.FORWARD;
     }
 
+    /**
+     * @returns {Number} Current time
+     *
+     * @example
+     * ```js
+     * myTimeline.getTime();
+     *
+     *
+     * ```
+     *
+     * @description
+     * Get current time
+     */
     getTime() {
         return this.currentTime;
     }
 
-    onLoopEnd(cb) {
+    /**
+     * @typedef {Object} syncTimelineLoopType
+     * @prop {number} loop
+     **/
+
+    /**
+     * @param {function(import('../utils/constant.js').directionTypes & syncTimelineLoopType):void } cb - callback function
+     * @return {Function} unsubscribe callback
+     *
+     * @example
+     *```js
+     * const unsubscribeOnLoopEnd = myTimeline.onLoopEnd(({direction, loop})=>{
+     *      /// code
+     * })
+     * unsubscribeOnLoopEnd();
+     *
+     *
+     * ```
+     * @description
+     * Callback thrown at the end of each cycle
+     * <br/>
+     */
+    onLoopEnd(cb = () => {}) {
         this.callbackLoop.push({ cb, id: this.callbackId });
         const cbId = this.callbackId;
         this.callbackId++;
@@ -492,7 +740,24 @@ export class HandleSyncTimeline {
         };
     }
 
-    onComplete(cb) {
+    /**
+     * @param {function():void } cb - callback function
+     * @return {Function} unsubscribe callback
+     *
+     * @example
+     *```js
+     * const unsubscribeOnComplete = myTimeline.onComplete(() => {
+     *      /// code
+     * })
+     * unsubscribeOnComplete();
+     *
+     *
+     * ```
+     * @description
+     * Callback thrown at the end of timeline
+     * <br/>
+     */
+    onComplete(cb = () => {}) {
         this.callbackComplete.push({ cb, id: this.callbackId });
         const cbId = this.callbackId;
         this.callbackId++;
@@ -504,7 +769,29 @@ export class HandleSyncTimeline {
         };
     }
 
-    onUpdate(cb) {
+    /**
+     * @typedef {Object} syncTimelineTimeType
+     * @prop {Number} time
+     **/
+
+    /**
+     * @param {function(import('../utils/constant.js').directionTypes & syncTimelineTimeType):void } cb - callback function
+     * @return {Function} unsubscribe callback
+     *
+     * @example
+     *```js
+     * const unsubscribeOnUpdate = myTimeline.onUpdate(({direction, time}) => {
+     *      /// code
+     * })
+     * unsubscribeOnUpdate();
+     *
+     *
+     * ```
+     * @description
+     * Callback thrown at the end of timeline
+     * <br/>
+     */
+    onUpdate(cb = () => {}) {
         this.callbackOnUpdate.push({ cb, id: this.callbackId });
         const cbId = this.callbackId;
         this.callbackId++;
@@ -517,10 +804,14 @@ export class HandleSyncTimeline {
     }
 
     /**
-     * Remove all reference from tween
+     * @description
+     * Destroy timeline and all the sequencer
+     * <br/>
      */
     destroy() {
+        this.sequencers.forEach((item) => item.destroy());
         this.sequencers = [];
+        this.callbackOnUpdate = [];
         this.callbackLoop = [];
         this.callbackComplete = [];
     }

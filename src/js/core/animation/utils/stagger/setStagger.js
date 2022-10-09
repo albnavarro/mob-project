@@ -30,18 +30,6 @@ const setStaggerErrorFallback = () => {
     };
 };
 
-/**
- * @typedef {Object} staggerTypes
- * @prop {Object} [ stagger ] Stagger object
- * @prop {('equal'|'start'|'end'|'center')} [ stagger.type ] Stagger type for createStagger
- * @prop {number} [ stagger.each ] Interval between each stagger, the unit of measure is based on the single frame
- * @prop {boolean} [ stagger.waitComplete ] Determines if the promise will be resolved by the fastest or slowest stagger, if the value is true the promise will be resolved by the slowest stagger
- * @prop {('start'|'end'|'center'|'edges'|'random'|{x:number,y:number}|number)} [ stagger.from ] Determines the starting position of the stagger sequence, it can be an element of your choice (index: number), a string or an array {x, y} in case a grid is used
- * @prop {object} [ stagger.grid ] Grid object
- * @prop {Number} [ stagger.grid.col ] If a grid is used, it determines the number of columns of the grid used
- * @prop {Number} [ stagger.grid.row ] If a grid is used, it determines the number of columns of the grid used
- * @prop {('row'|'col'|'radial')} [ stagger.grid.direction ] If a grid is used, it determines the flow of the sequence, by columns, rows or radial
- **/
 export const setStagger = ({
     arr,
     endArr,

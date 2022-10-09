@@ -60,7 +60,7 @@ export const sequencerStaggerTime = () => {
      *  Animation
      **/
     const timeline = mobbu
-        .create('syncTimeline', {
+        .createSyncTimeline({
             repeat: 3,
             yoyo: true,
             duration: 2000,

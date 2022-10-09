@@ -90,12 +90,18 @@ export const staggerEachWarning = () => {
     console.warn(`stagger each must be a Number `);
 };
 
+export const staggerRowColGenericWarining = (val) => {
+    console.warn(
+        `stagger, row/col: ${val} value is not valid, must be a Number`
+    );
+};
+
 export const staggerWaitCompleteWarning = () => {
     console.warn('Stagger error: waitComplete propierties must be a Boolean');
 };
 
 export const staggerGridDirectionWarning = () => {
-    console.warn(`Stagger error: direction must be a string radial,col,row`);
+    console.warn(`Stagger error: direction must be a string radial/col/row`);
 };
 
 export const staggerRadialDirectionWarning = () => {
@@ -113,5 +119,33 @@ export const staggerRadialColRowWarning = () => {
 export const staggerColRowWarning = () => {
     console.warn(
         `Stagger error: in col/row direction 'from' propierties must be a string start/end/center/edges or a number`
+    );
+};
+
+export const staggerFromGenericWarning = (from) => {
+    console.warn(
+        `Stagger error: from: ${from} is not a valid value, must be a string start/end/center/edges or a number or a Object {x:Number,y:Number}`
+    );
+};
+
+export const durationWarining = (value) => {
+    console.warn(
+        `duration error: ${value} is not valid duration must be a number`
+    );
+};
+
+export const easeWarning = (ease) => {
+    console.warn(`ease definition error: ${ease} is not a valid  definition`);
+};
+
+export const initialDataPropWarining = (prop) => {
+    console.warn(
+        `data inizializiation error; ${prop} is not a valid value, must be a string`
+    );
+};
+
+export const initialDataValueWarining = (value) => {
+    console.warn(
+        `data inizializiation error; ${value} is not a valid value, must be a number`
     );
 };

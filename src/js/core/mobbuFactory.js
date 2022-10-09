@@ -95,7 +95,7 @@ export const mobbu = {
     },
 
     /**
-     * @param {import('./animation/sequencer/handleSequencer.js').sequencerTypes & import('./animation/utils/stagger/setStagger.js').staggerTypes & import('../core/animation/tween/tweenConfig.js').easeTypes} data
+     * @param {import('./animation/sequencer/handleSequencer.js').sequencerTypes & import('./animation/utils/stagger/staggerCostant.js').staggerTypes & import('../core/animation/tween/tweenConfig.js').easeTypes} data
      *
      * @example
      * ```js
@@ -113,10 +113,66 @@ export const mobbu = {
      *      },
      *   },
      * })
+     *
+     *
+     * ```
+     *
+     * @description
+     * Available methods:
+     * ```js
+     * mySequencer.goTo()
+     * mySequencer.goFrom()
+     * mySequencer.goFromTo()
+     * mySequencer.add()
+     * mySequencer.label()
+     * mySequencer.subscribe()
+     * mySequencer.subscribeCache()
+     * mySequencer.onStop()
+     *
      * ```
      */
     createSequencer(data = {}) {
         return new HandleSequencer(data);
+    },
+
+    /**
+     * @param {import('./animation/syncTimeline/handleSyncTimeline.js').syncTimelineTypes } data
+     *
+     * @example
+     * ```js
+     * const myTimeline = mobbu.createSyncTimeline({
+     *   duration: [ Number ],
+     *   yoyo: [ Boolean ],
+     *   repeat: [ Number ]
+     * })
+     *
+     *
+     * ```
+     *
+     * @description
+     * Available methods:
+     * ```js
+     * myTimeline.add()
+     * myTimeline.onLoopEnd()
+     * myTimeline.onComplete()
+     * myTimeline.onUpdate()
+     * myTimeline.stop()
+     * myTimeline.play()
+     * myTimeline.playReverse()
+     * myTimeline.playFrom()
+     * myTimeline.playFromReverse()
+     * myTimeline.reverse()
+     * myTimeline.pause()
+     * myTimeline.resume()
+     * myTimeline.isActive()
+     * myTimeline.isPaused()
+     * myTimeline.getDirection()
+     * myTimeline.getTime()
+     * myTimeline.destroy()
+     * ```
+     */
+    createSyncTimeline(data = {}) {
+        return new HandleSyncTimeline(data);
     },
 
     create(type = '', obj = {}) {
@@ -132,9 +188,6 @@ export const mobbu = {
 
             case 'asyncTimeline':
                 return new HandleAsyncTimeline(obj);
-
-            case 'syncTimeline':
-                return new HandleSyncTimeline(obj);
 
             case 'masterSequencer':
                 return new HandleMasterSequencer(obj);
