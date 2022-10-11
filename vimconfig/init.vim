@@ -16,13 +16,26 @@ set nohlsearch
 set belloff=all
 syntax on
 
+let g:ale_fixers = {
+    \   '*': ['remove_trailing_lines', 'trim_whitespace'],
+    \   'javascript': ['prettier'],
+    \   'scss': ['prettier', 'stylelint'],
+    \   'sass': ['prettier'],
+    \}
+let g:ale_linters = {
+    \   'javascript': ['eslint'],
+    \   'scss': ['stylelint'],
+    \}
+let g:ale_fix_on_save = 1
+let g:ale_disable_lsp = 1
+
+" Set this. Airline will handle the rest.
+let g:airline#extensions#ale#enabled = 1
+
 let g:vim_json_conceal=0
 let g:coc_global_extensions = [
     \'coc-css',
     \'coc-tsserver',
-    \'coc-eslint',
-    \'coc-prettier',
-    \'coc-stylelintplus',
     \'coc-json'
   \]
 
@@ -36,14 +49,13 @@ Plug 'junegunn/fzf.vim'
 Plug 'Yggdroot/indentLine'
 Plug 'pangloss/vim-javascript'
 Plug 'tpope/vim-surround'
+Plug 'dense-analysis/ale'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 call plug#end()
 
 
 packloadall
 colorscheme onedark
-
-command! -nargs=0 Prettier :CocCommand prettier.forceFormatDocument
 
 
 

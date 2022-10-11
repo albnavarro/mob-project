@@ -1,7 +1,3 @@
 {
-    "coc.preferences.formatOnSaveFiletypes": ["scss", "javascript"],
-    "css.validate": false,
-    "less.validate": false,
-    "scss.validate": false,
-    "wxss.validate": false
+  "diagnostic.displayByAle": true
 }
