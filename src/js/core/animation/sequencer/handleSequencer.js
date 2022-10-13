@@ -93,34 +93,109 @@ export class HandleSequencer {
      * ```
      */
     constructor(data = {}) {
-        // Basic array with all the propierties, is creted in setData methods
-        // in draw methods currentValue and settled will be updated for each prop
-        // it is used as a mock to create the array to add to the timeline
+        /**
+         * Basic array with all the propierties, is creted in setData methods
+         * in draw methods currentValue and settled will be updated for each prop
+         *
+         * it is used as a mock to create the array to add to the timeline
+         * @private
+         */
         this.values = [];
-        // Timeline array
+
+        /**
+         * Timeline array
+         *
+         * @private
+         */
         this.timeline = [];
+
+        /**
+         * @private
+         */
         this.labels = [];
+
+        /**
+         * @private
+         */
         this.callback = [];
+
+        /**
+         * @private
+         */
         this.callbackCache = [];
+
+        /**
+         * @private
+         */
         this.callbackOnStop = [];
+
+        /**
+         * @private
+         */
         this.callbackAdd = [];
+
+        /**
+         * @private
+         */
         this.unsubscribeCache = [];
+
+        /**
+         * @private
+         */
         this.duration = durationIsValid(data?.duration);
+
+        /**
+         * @private
+         */
         this.type = 'sequencer';
+
+        /**
+         * @private
+         */
         this.defaultProp = {
             start: 0,
             end: this.duration,
             ease: easeIsValid(data?.ease),
         };
+
+        /**
+         * @private
+         */
         this.firstRun = true;
+
+        /**
+         * @private
+         */
         this.forceAddFnAtFirstRun = true;
+
+        /**
+         * @private
+         */
         this.direction = null;
+
+        /**
+         * @private
+         */
         this.lastPartial = null;
+
+        /**
+         * @private
+         */
         this.lastDirection = null;
 
-        // Stagger
+        /**
+         * @private
+         */
         this.stagger = getStaggerFromProps(data);
+
+        /**
+         * @private
+         */
         this.useStagger = true;
+
+        /**
+         * @private
+         */
         this.staggerIsReady = false;
 
         /**
@@ -511,6 +586,8 @@ export class HandleSequencer {
     }
 
     /**
+     * @private
+     *
      * @description
      * setPropFromAncestor
      * - Example when we come from goTo methods:

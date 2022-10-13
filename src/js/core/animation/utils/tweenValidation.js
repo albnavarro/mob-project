@@ -15,6 +15,7 @@ import {
     durationWarining,
     initialDataPropWarining,
     initialDataValueWarining,
+    repeatWarining,
     sequencerRangeEndWarning,
     sequencerRangeStartWarning,
     staggerEachWarning,
@@ -23,6 +24,7 @@ import {
     staggerRowColGenericWarining,
     staggerWaitCompleteWarning,
     tweenEaseWarning,
+    yoyoWarining,
 } from './warning';
 
 /**
@@ -60,7 +62,7 @@ export const sequencerRangeValidate = ({ start, end }) => {
 /**
  *
  * @param {Number} duration
- * @returns {Boolean}
+ * @returns {Number}
  *
  * @description
  * Check if new duration value is Valid
@@ -75,8 +77,39 @@ export const durationIsValid = (duration) => {
 
 /**
  *
- * @param {String} ease
+ * @param {Boolean} yoyo
  * @returns {Boolean}
+ *
+ * @description
+ * Check if yoyo definition is valid
+ **/
+export const yoyIsValid = (yoyo) => {
+    const isValid = checkType(Boolean, yoyo);
+    if (!isValid && yoyo !== undefined && yoyo !== null) yoyoWarining(yoyo);
+
+    return isValid ? yoyo : false;
+};
+
+/**
+ *
+ * @param {Number} repeat
+ * @returns {Number}
+ *
+ * @description
+ * Check if repeat definition is valid
+ **/
+export const repeatIsValid = (repeat) => {
+    const isValid = checkType(Number, repeat);
+    if (!isValid && repeat !== undefined && repeat !== null)
+        repeatWarining(repeat);
+
+    return isValid ? repeat : 1;
+};
+
+/**
+ *
+ * @param {String} ease
+ * @returns {String}
  *
  * @description
  * Check if ease definition is valid

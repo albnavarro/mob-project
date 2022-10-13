@@ -3,17 +3,21 @@ import { handleFrame } from '../../events/rafutils/handleFrame.js';
 import { handleNextFrame } from '../../events/rafutils/handleNextFrame.js';
 import { handleNextTick } from '../../events/rafutils/handleNextTick.js';
 import { clamp } from '../utils/animationUtils.js';
-import { handleSetUp } from '../../setup.js';
 import { fpsLoadedLog } from '../utils/log.js';
 import { storeType } from '../../store/storeType.js';
 import { directionConstant } from '../utils/constant.js';
 import { syncTimelineLabelWarning } from '../utils/warning.js';
+import {
+    durationIsValid,
+    repeatIsValid,
+    yoyIsValid,
+} from '../utils/tweenValidation.js';
 
 /**
  * @typedef {Object} syncTimelineTypes
  * @prop {Number} duration duration in millisecond of timeline,
  * @prop {Boolean} [yoyo=0] Reverse the direction each time the animation ends
- * @prop {Number} [repeat=0] how many times the animation should be repeated, -1 means that the animation will run in an infinite loop
+ * @prop {Number} [repeat=1] how many times the animation should be repeated, -1 means that the animation will run in an infinite loop
  */
 export class HandleSyncTimeline {
     /**
@@ -53,56 +57,140 @@ export class HandleSyncTimeline {
      * ```
      */
     constructor(data = {}) {
-        this.duration = data?.duration || handleSetUp.get('sequencer').duration;
-        this.yoyo = data?.yoyo || false;
-        this.repeat = data?.repeat || 0;
+        /**
+         * @private
+         */
+        this.duration = durationIsValid(data?.duration);
 
         /**
-         * Child
+         * @private
+         */
+        this.yoyo = yoyIsValid(data?.yoyo);
+
+        /**
+         * @private
+         */
+        this.repeat = repeatIsValid(data?.repeat);
+
+        /**
+         * @private
          */
         this.sequencers = [];
 
         /**
-         * Time prop
+         * @private
          */
         this.startTime = null;
+
+        /**
+         * @private
+         */
         this.timeElapsed = 0;
+
+        /**
+         * @private
+         */
         this.currentTime = 0;
+
+        /**
+         * @private
+         */
         this.pauseTime = 0;
+
+        /**
+         * @private
+         */
         this.timeAtReverse = 0;
+
+        /**
+         * @private
+         */
         this.timeAtReverseBack = 0;
 
-        /*
-         * Reverse prop
+        /**
+         * @private
          */
         this.isReverse = false;
+
+        /**
+         * @private
+         */
         this.startReverse = false;
+
+        /**
+         * @private
+         */
         this.isPlayngReverse = false;
 
         /**
-         * Loop prop
+         * @private
          */
         this.loopCounter = 0;
+
+        /**
+         * @private
+         */
         this.loopIteration = 0;
+
+        /**
+         * @private
+         */
         this.minLoopIteration = 10;
 
-        /*
-         * Generic prop
+        /**
+         * @private
          */
         this.sequencers = [];
+
+        /**
+         * @private
+         */
         this.isStopped = true;
+
+        /**
+         * @private
+         */
         this.skipFirstRender = false;
+
+        /**
+         * @private
+         */
         this.completed = false;
+
+        /**
+         * @private
+         */
         this.fpsIsInLoading = false;
+
+        /**
+         * @private
+         */
         this.isInPause = false;
 
-        // callbackLoop on complete
+        /**
+         * @private
+         */
         this.callbackId = 0;
+
+        /**
+         * @private
+         */
         this.callbackLoop = [];
+
+        /**
+         * @private
+         */
         this.callbackComplete = [];
+
+        /**
+         * @private
+         */
         this.callbackOnUpdate = [];
     }
 
+    /**
+     * @private
+     */
     updateTime(time, fps, shouldRender) {
         if (this.isStopped || this.fpsIsInLoading) return;
 
@@ -788,7 +876,7 @@ export class HandleSyncTimeline {
      *
      * ```
      * @description
-     * Callback thrown at the end of timeline
+     * Callback thrown at each frame during the animation
      * <br/>
      */
     onUpdate(cb = () => {}) {

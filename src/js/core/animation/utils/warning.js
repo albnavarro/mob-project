@@ -134,6 +134,18 @@ export const durationWarining = (value) => {
     );
 };
 
+export const yoyoWarining = (value) => {
+    console.warn(
+        `yoyo error: ${value} is not valid yoyo value must be a Boolean`
+    );
+};
+
+export const repeatWarining = (value) => {
+    console.warn(
+        `repeat error: ${value} is not valid repeat value must be a Number`
+    );
+};
+
 export const easeWarning = (ease) => {
     console.warn(`ease definition error: ${ease} is not a valid  definition`);
 };
