@@ -17,6 +17,7 @@ import { checkType } from '../../store/storeType';
 import { tweenConfig } from '../tween/tweenConfig';
 import {
     createStaggerItemsWarning,
+    createStaggerTypeWarning,
     durationWarining,
     initialDataPropWarining,
     initialDataValueWarining,
@@ -177,14 +178,7 @@ export const validateStaggerFrom = (from) => {
 
     const fromIsAValidString = fromList.includes(from);
     const fromIsANumber = checkType(Number, from);
-    const fromIsAValidObject = (() => {
-        if (!checkType(Object, from)) return false;
-        const propIsValid = 'x' in from && 'y' in from;
-        const valIsValid = Object.values(from).every((val) =>
-            checkType(Number, val)
-        );
-        return propIsValid && valIsValid;
-    })();
+    const fromIsAValidObject = checkType(Object, from);
     const fromIsValid =
         fromIsAValidString || fromIsANumber || fromIsAValidObject;
     if (!fromIsValid) staggerFromGenericWarning(from);
@@ -242,12 +236,25 @@ export const validateStaggerWaitComplete = (waitComplete) => {
  * @returns {boolean}
  *
  * @description
+ * Return only the boolean value
  **/
-export const createStaggerItemsIsValid = (arr = []) => {
+export const validateStaggerItems = (arr = []) => {
     const isValid = checkType(Array, [...arr]) && arr.length > 0;
     if (!isValid) createStaggerItemsWarning();
 
     return isValid;
+};
+
+/**
+ * @param {array} arr
+ * @returns {boolean}
+ *
+ * @description
+ * Return the array fallback
+ **/
+export const staggerItemsIsValid = (arr = []) => {
+    const isValid = checkType(Array, [...arr]) && arr.length > 0;
+    return isValid ? arr : [];
 };
 
 /**
@@ -256,7 +263,9 @@ export const createStaggerItemsIsValid = (arr = []) => {
  *
  * @description
  **/
-export const createStaggerTypeIsValid = (type) => {
+export const validateStaggerType = (type) => {
+    if (!type) return null;
+
     const stagerTypeList = [
         STAGGER_TYPE_EQUAL,
         STAGGER_TYPE_START,
@@ -264,5 +273,8 @@ export const createStaggerTypeIsValid = (type) => {
         STAGGER_TYPE_CENTER,
     ];
 
-    return stagerTypeList.includes(type);
+    const isValid = stagerTypeList.includes(type);
+    if (!isValid) return createStaggerTypeWarning();
+
+    return isValid;
 };

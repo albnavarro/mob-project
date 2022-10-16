@@ -177,7 +177,7 @@ export const mobbu = {
 
     /**
      * @param { import('./animation/sequencer/sequencerUtils.js').createSequencerTypes & import('./animation/utils/stagger/staggerCostant.js').staggerTypes } data
-     * @returns {Array<{ start: Number, end: Number,index: Number, item: (HTMLElement|Object) }>} labels array
+     * @returns {Array<{ start: Number, end: Number,index: Number, item: (HTMLElement|Object) }>} Stagger array
      *
      * @example
      * ```js

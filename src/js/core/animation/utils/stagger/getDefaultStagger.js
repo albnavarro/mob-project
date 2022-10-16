@@ -186,15 +186,19 @@ export const getDefaultStagger = ({
     slowlestStagger,
     fastestStagger,
 }) => {
-    // get chunk size by col if there is a size ( > 1 )
-    const chunckSizeCol = stagger.grid.col < 1 ? arr.length : stagger.grid.col;
-    if (stagger.grid.col < 1) stagger.grid.col = 1;
+    /**
+     * If col/row is 1 use lenght of array, is used for default stagger without grid.
+     * With a value greater than 1 row/col logic is active
+     */
+    const chunckSizeCol =
+        stagger?.grid?.col <= 1 ? arr.length : stagger.grid.col;
+    const chunckSizeRow =
+        stagger?.grid?.row <= 1 ? arr.length : stagger.grid.row;
 
-    // get chunk size by row if there is a size ( > 1 )
-    const chunckSizeRow = stagger.grid.row < 1 ? arr.length : stagger.grid.row;
-    if (stagger.grid.row < 1) stagger.grid.row = 1;
-
-    // Function that convert row matrix to col matrix
+    /**
+     * Default grid direction is COL
+     * In case of ROW grid covert col to row, something like rotate the matrix
+     */
     const getItemsByRow = (arr) => {
         // Reorder main array if direction === row
         if (stagger.grid.direction === DIRECTION_ROW) {

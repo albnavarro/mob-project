@@ -39,8 +39,8 @@ export const STAGGER_DEFAULT_OBJ = {
     waitComplete: false,
     from: STAGGER_START,
     grid: {
-        col: -1,
-        row: -1,
+        col: 1,
+        row: 1,
         direction: DIRECTION_COL,
     },
 };

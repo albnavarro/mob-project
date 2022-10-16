@@ -2,8 +2,6 @@ import { getDefaultStagger } from './getDefaultStagger.js';
 import { getRadialArray } from './getRadialStagger.js';
 import {
     DIRECTION_RADIAL,
-    DIRECTION_COL,
-    DIRECTION_ROW,
     STAGGER_START,
     STAGGER_END,
     STAGGER_CENTER,
@@ -12,23 +10,7 @@ import {
 } from './staggerCostant.js';
 import { getEachByFps } from './staggerUtils.js';
 import { checkType } from '../../../store/storeType.js';
-import {
-    staggerColRowWarning,
-    staggerEachWarning,
-    staggerGridDirectionWarning,
-    staggerRadialColRowWarning,
-    staggerRadialDirectionWarning,
-    staggerWaitCompleteWarning,
-} from '../warning.js';
-
-const setStaggerErrorFallback = () => {
-    return {
-        staggerArray: [{ item: {}, frame: 1, index: 1 }],
-        staggerArrayOnComplete: [{ item: {}, frame: 1, index: 1 }],
-        fastestStagger: {},
-        slowlestStagger: {},
-    };
-};
+import { staggerColRowWarning } from '../warning.js';
 
 export const setStagger = ({
     arr,
@@ -37,65 +19,29 @@ export const setStagger = ({
     slowlestStagger,
     fastestStagger,
 }) => {
-    /**
-     * Each must be a number
-     */
-    if (!checkType(Number, stagger?.each)) {
-        staggerEachWarning();
-        return setStaggerErrorFallback();
-    }
-
-    /*
-     * Wait complete check type
-     */
-    if (!checkType(Boolean, stagger?.waitComplete)) {
-        staggerWaitCompleteWarning();
-        return setStaggerErrorFallback();
-    }
-
-    /*
-     * Direction check type
-     * If grid is settled validate direction
-     * in simple mode grid can be omitted and this check jumped
-     */
-    const directionList = [DIRECTION_RADIAL, DIRECTION_ROW, DIRECTION_COL];
-    if (stagger?.grid && !directionList.includes(stagger?.grid?.direction)) {
-        staggerGridDirectionWarning();
-        return setStaggerErrorFallback();
-    }
-
     const result = (() => {
-        // Check if direction is an object like {x: n, y: n}
         if (stagger?.grid?.direction === DIRECTION_RADIAL) {
             /**
-             * Check if from is a valid parameters
-             * Option chaing doasn't work beacouse we have a valid 0 value
-             * **/
-            if (
-                !checkType(Number, stagger?.from?.x) ||
-                !checkType(Number, stagger?.from?.y)
-            ) {
-                staggerRadialDirectionWarning();
-                return setStaggerErrorFallback();
+             * Check if from is an Object
+             **/
+            if (!checkType(Object, stagger?.from)) {
+                stagger.from = {};
             }
 
             /**
-             * Check if col and row is a valid parameters
-             * **/
-            if (stagger?.grid?.col <= 1 || stagger?.grid?.row <= 1) {
-                staggerRadialColRowWarning();
-                return setStaggerErrorFallback();
+             * Check x value if is not setted use 0 as default
+             */
+            if (!checkType(Number, stagger?.from?.x)) {
+                stagger.from = { ...stagger.from, ...{ x: 0 } };
             }
 
             /**
-             * GRID STAGGER
-             * stagger: {
-             *    each: 15,
-             *    from: { x: 6, y: 2 },
-             *    grid: { col: 9, row: 9, direction: 'radial' },
-             *    waitComplete: false,
-             *  },
-             * **/
+             * Check y value if is not setted use 0 as default
+             */
+            if (!checkType(Number, stagger?.from?.y)) {
+                stagger.from = { ...stagger.from, ...{ y: 0 } };
+            }
+
             const { cleanArray: cleanCb } = getRadialArray(arr, stagger);
 
             // Get stagger index the minumn and the fastest and the slowest
@@ -157,6 +103,7 @@ export const setStagger = ({
         } else {
             /**
              * Check if from is a valid parameters
+             * If not set default start value
              * **/
             const fromList = [
                 STAGGER_START,
@@ -173,12 +120,12 @@ export const setStagger = ({
                     !fromList.includes(stagger?.from))
             ) {
                 staggerColRowWarning();
-                return setStaggerErrorFallback();
+                stagger.from = STAGGER_START;
             }
+
             /**
              * DEFAULT STAGGER
-             * grid: { col: n, row: n, direction: 'row' },
-             * **/
+             **/
             return getDefaultStagger({
                 arr,
                 endArr,

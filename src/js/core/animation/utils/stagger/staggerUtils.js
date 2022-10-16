@@ -4,6 +4,7 @@ import {
     validateStaggerDirection,
     validateStaggerEach,
     validateStaggerFrom,
+    validateStaggerType,
     validateStaggerWaitComplete,
 } from '../tweenValidation.js';
 import {
@@ -24,6 +25,10 @@ export const getEachByFps = (each) => {
 
 export const getStaggerFromProps = (props) => {
     return {
+        type: validateStaggerType(props?.stagger?.type)
+            ? props.stagger.type
+            : STAGGER_DEFAULT_OBJ.type,
+
         each: validateStaggerEach(props?.stagger?.each)
             ? props.stagger.each
             : STAGGER_DEFAULT_OBJ.each,

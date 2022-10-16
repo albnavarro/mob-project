@@ -119,9 +119,9 @@ export const staggerRadialDirectionWarning = () => {
     );
 };
 
-export const staggerRadialColRowWarning = () => {
+export const staggerGridColRowWarning = () => {
     console.warn(
-        `Stagger error: in radial direction 'col' or 'row' is not setted, or is minor than 1, must be a number grater than 1`
+        `Stagger error: in grid configuration col/row is minor than 1, it should be greater or equal 1`
     );
 };
 
