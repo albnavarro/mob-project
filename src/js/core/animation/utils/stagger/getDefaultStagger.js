@@ -15,7 +15,7 @@ export const getRandomChoice = (arr, each, index) => {
     const previousFrame = arr.slice(0, index).map((item) => item.frame);
 
     // Get possibile result
-    const posibileFrame = arr.map((item, i) => i * each);
+    const posibileFrame = arr.map((_item, i) => i * each);
 
     // Get array of possibile result without previous
     const randomChoice = posibileFrame.filter(
@@ -186,22 +186,22 @@ export const getDefaultStagger = ({
     slowlestStagger,
     fastestStagger,
 }) => {
-    // get chunk size by col if there is a size ( > -1 )
-    const chunckSizeCol =
-        stagger.grid.col === -1 ? arr.length : stagger.grid.col;
+    // get chunk size by col if there is a size ( > 1 )
+    const chunckSizeCol = stagger.grid.col < 1 ? arr.length : stagger.grid.col;
+    if (stagger.grid.col < 1) stagger.grid.col = 1;
 
-    // get chunk size by row if there is a size ( > -1 )
-    const chunckSizeRow =
-        stagger.grid.row === -1 ? arr.length : stagger.grid.row;
+    // get chunk size by row if there is a size ( > 1 )
+    const chunckSizeRow = stagger.grid.row < 1 ? arr.length : stagger.grid.row;
+    if (stagger.grid.row < 1) stagger.grid.row = 1;
 
     // Function that convert row matrix to col matrix
-    const getCbByRow = (arr) => {
+    const getItemsByRow = (arr) => {
         // Reorder main array if direction === row
         if (stagger.grid.direction === DIRECTION_ROW) {
             const chunkByCol = sliceIntoChunks(arr, chunckSizeCol);
 
             const colToRowArray = [...Array(stagger.grid.col).keys()].reduce(
-                (p, c, i) => {
+                (p, _c, i) => {
                     return [...p, ...arrayColumn(chunkByCol, i)];
                 },
                 []
@@ -214,15 +214,15 @@ export const getDefaultStagger = ({
     };
 
     // main callBack
-    const cbByRow = getCbByRow(arr);
-    const staggerArray = cbByRow.map((item) => {
-        return item != undefined ? item : { arr: () => {} };
+    const itemByRow = getItemsByRow(arr);
+    const staggerArray = itemByRow.map((item) => {
+        return item && item !== undefined ? item : { arr: () => {} };
     });
 
     // onComplete callBack
-    const cbCompleteByRow = getCbByRow(endArr);
-    const staggerArrayOnComplete = cbCompleteByRow.map((item) => {
-        return item != undefined ? item : { arr: () => {} };
+    const itemCompleteByRow = getItemsByRow(endArr);
+    const staggerArrayOnComplete = itemCompleteByRow.map((item) => {
+        return item && item !== undefined ? item : { arr: () => {} };
     });
 
     // get chunkes array
@@ -273,10 +273,10 @@ export const getDefaultStagger = ({
     });
 
     // Flat the chunked array
-    const flat = chuncked.flat();
+    const flatArray = chuncked.flat();
 
     // set data to original (this.callback) array
-    flat.forEach((item, i) => {
+    flatArray.forEach((item, i) => {
         staggerArray[i].index = item.index;
         staggerArray[i].frame = item.frame;
 

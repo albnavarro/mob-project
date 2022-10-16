@@ -175,6 +175,47 @@ export const mobbu = {
         return new HandleSyncTimeline(data);
     },
 
+    /**
+     * @param { import('./animation/sequencer/sequencerUtils.js').createSequencerTypes & import('./animation/utils/stagger/staggerCostant.js').staggerTypes } data
+     * @returns {Array<{ start: Number, end: Number,index: Number, item: (HTMLElement|Object) }>} labels array
+     *
+     * @example
+     * ```js
+     *
+     *
+     * const staggers = mobbu.createStaggers({
+     *     items: [ Array ],
+     *     stagger: {
+     *         type: [ String ],
+     *         from: [ Number|String|{x:number,y:number} ],
+     *         grid: {
+     *             col: [ Number ],
+     *             row: [ Number ],
+     *             direction: [ String ]
+     *         },
+     *     },
+     *     duration: [ Number ],
+     * });
+     *
+     *
+     * staggers.forEach(({ item, start, end, index }) => {
+     *     const sequencer = mobbu
+     *         .createSequencer({ ... })
+     *         .goTo({ ... }, { start, end ...});
+     *     sequencer.subscribe(({ ... }) => { ... });
+     *     masterSequencer.add(sequencer);
+     * });
+     *
+     * ```
+     *
+     * @description
+     *
+     * ```
+     */
+    createStaggers(data = {}) {
+        return createStaggers(data);
+    },
+
     create(type = '', obj = {}) {
         switch (type) {
             case 'lerp':
@@ -191,9 +232,6 @@ export const mobbu = {
 
             case 'masterSequencer':
                 return new HandleMasterSequencer(obj);
-
-            case 'stagger':
-                return createStaggers(obj);
 
             case 'parallax':
                 return new ParallaxItemClass({

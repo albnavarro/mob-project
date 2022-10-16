@@ -1,15 +1,13 @@
 import { mobbu, outerHeight } from '../core';
-import { HandleSequencer } from '../core/animation/sequencer/handleSequencer';
 
 export const createStagger = () => {
     const items = document.querySelectorAll('.create-stagger__item');
     const trigger = document.querySelector('.scrollStagger');
 
     let masterSequencer = mobbu.create('masterSequencer');
-    let sequencers = [];
     const duration = 2000;
 
-    const staggers = mobbu.create('stagger', {
+    const staggers = mobbu.createStaggers({
         items,
         stagger: {
             type: 'equal',
@@ -22,7 +20,7 @@ export const createStagger = () => {
 
     // Create sequencer
     const createSequencer = () => {
-        sequencers = staggers.map(({ item, start, end }) => {
+        return staggers.map(({ item, start, end }) => {
             const sequencer = mobbu
                 .createSequencer({
                     duration,
@@ -51,7 +49,8 @@ export const createStagger = () => {
         });
     };
 
-    createSequencer();
+    const sequencers = createSequencer();
+    console.log(sequencers);
 
     const parallaxIn = mobbu.create('scrolltrigger', {
         item: trigger,

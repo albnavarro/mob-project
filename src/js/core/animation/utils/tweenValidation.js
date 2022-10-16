@@ -7,11 +7,16 @@ import {
     DIRECTION_RADIAL,
     DIRECTION_ROW,
     DIRECTION_COL,
+    STAGGER_TYPE_EQUAL,
+    STAGGER_TYPE_START,
+    STAGGER_TYPE_END,
+    STAGGER_TYPE_CENTER,
 } from './stagger/staggerCostant.js';
 import { handleSetUp } from '../../setup';
 import { checkType } from '../../store/storeType';
 import { tweenConfig } from '../tween/tweenConfig';
 import {
+    createStaggerItemsWarning,
     durationWarining,
     initialDataPropWarining,
     initialDataValueWarining,
@@ -230,4 +235,34 @@ export const validateStaggerWaitComplete = (waitComplete) => {
     if (!valIsValid) staggerWaitCompleteWarning(waitComplete);
 
     return valIsValid;
+};
+
+/**
+ * @param {array} arr
+ * @returns {boolean}
+ *
+ * @description
+ **/
+export const createStaggerItemsIsValid = (arr = []) => {
+    const isValid = checkType(Array, [...arr]) && arr.length > 0;
+    if (!isValid) createStaggerItemsWarning();
+
+    return isValid;
+};
+
+/**
+ * @param {string} arr
+ * @returns {boolean}
+ *
+ * @description
+ **/
+export const createStaggerTypeIsValid = (type) => {
+    const stagerTypeList = [
+        STAGGER_TYPE_EQUAL,
+        STAGGER_TYPE_START,
+        STAGGER_TYPE_END,
+        STAGGER_TYPE_CENTER,
+    ];
+
+    return stagerTypeList.includes(type);
 };

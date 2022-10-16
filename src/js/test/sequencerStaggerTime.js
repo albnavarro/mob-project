@@ -18,11 +18,9 @@ export const sequencerStaggerTime = () => {
     // Example , not necessary
     const duration = 3000;
 
-    const staggers = mobbu.create('stagger', {
+    const staggers = mobbu.createStaggers({
         items,
         stagger: {
-            // type: 'classicInverse',
-            // each: 3,
             type: 'equal',
             each: 5,
         },

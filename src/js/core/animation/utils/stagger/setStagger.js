@@ -23,8 +23,8 @@ import {
 
 const setStaggerErrorFallback = () => {
     return {
-        staggerArray: [],
-        staggerArrayOnComplete: [],
+        staggerArray: [{ item: {}, frame: 1, index: 1 }],
+        staggerArrayOnComplete: [{ item: {}, frame: 1, index: 1 }],
         fastestStagger: {},
         slowlestStagger: {},
     };
@@ -82,7 +82,7 @@ export const setStagger = ({
             /**
              * Check if col and row is a valid parameters
              * **/
-            if (stagger?.grid?.col <= 0 || stagger?.grid?.row <= 0) {
+            if (stagger?.grid?.col <= 1 || stagger?.grid?.row <= 1) {
                 staggerRadialColRowWarning();
                 return setStaggerErrorFallback();
             }

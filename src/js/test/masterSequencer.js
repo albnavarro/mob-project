@@ -7,7 +7,7 @@ export const masterSequencer = () => {
     let masterSequencer = mobbu.create('masterSequencer');
     let sequencers = [];
 
-    const staggers = mobbu.create('stagger', {
+    const staggers = mobbu.createStaggers({
         items,
         stagger: {
             type: 'equal',

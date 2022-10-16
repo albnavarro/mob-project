@@ -1,3 +1,10 @@
+import {
+    STAGGER_START,
+    STAGGER_TYPE_CENTER,
+    STAGGER_TYPE_END,
+    STAGGER_TYPE_EQUAL,
+} from './stagger/staggerCostant';
+
 export const compareKeysWarning = (label, fromObj, toObj) => {
     console.warn(
         `${label}: ${JSON.stringify(fromObj)} and to ${JSON.stringify(
@@ -101,7 +108,9 @@ export const staggerWaitCompleteWarning = () => {
 };
 
 export const staggerGridDirectionWarning = () => {
-    console.warn(`Stagger error: direction must be a string radial/col/row`);
+    console.warn(
+        `Stagger error: in grid option direction should be a string radial/col/row`
+    );
 };
 
 export const staggerRadialDirectionWarning = () => {
@@ -112,7 +121,7 @@ export const staggerRadialDirectionWarning = () => {
 
 export const staggerRadialColRowWarning = () => {
     console.warn(
-        `Stagger error: in radial direction 'col' or 'row' is not setted, or is minor than 1, must be a number grater than 0`
+        `Stagger error: in radial direction 'col' or 'row' is not setted, or is minor than 1, must be a number grater than 1`
     );
 };
 
@@ -159,5 +168,27 @@ export const initialDataPropWarining = (prop) => {
 export const initialDataValueWarining = (value) => {
     console.warn(
         `data inizializiation error; ${value} is not a valid value, must be a number`
+    );
+};
+
+export const createStaggerItemsWarning = () => {
+    console.warn(`createStaggers error: items array can not be empty`);
+};
+
+export const createStaggerItemsTypeWarning = () => {
+    console.warn(
+        `createStaggers error: each element of the array must be an Element or an Object`
+    );
+};
+
+export const createStaggerTypeWarning = () => {
+    console.warn(
+        `screateStaggers error: type should be: ${STAGGER_TYPE_EQUAL} || ${STAGGER_START} || ${STAGGER_TYPE_END} || ${STAGGER_TYPE_CENTER}`
+    );
+};
+
+export const createStaggerEachWarning = (eachProportion) => {
+    console.warn(
+        `createStagger:  each must be between 1 and ${eachProportion}`
     );
 };

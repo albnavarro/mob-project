@@ -9,13 +9,72 @@ import {
 } from '../utils/stagger/staggerCostant.js';
 import { handleSetUp } from '../../setup.js';
 import { checkType } from '../../store/storeType.js';
+import {
+    createStaggerEachWarning,
+    createStaggerItemsTypeWarning,
+    createStaggerTypeWarning,
+    staggerIsOutOfRangeWarning,
+} from '../utils/warning.js';
+import {
+    createStaggerItemsIsValid,
+    createStaggerTypeIsValid,
+} from '../utils/tweenValidation.js';
 
-export const createStaggers = ({ items, stagger, duration }) => {
+/**
+ * @typedef {Object} createSequencerTypes
+ * @prop {[Element,Object]} items Generally an array of HTMLelements but it is possible to use an array of objects as well @prop {number} [ duration=10] Defines the time range of the animation, both syncTimeline and scrollTrigger will take care of processing the value as needed. The default value is 10
+ **/
+
+/**
+ * @param { createSequencerTypes & import('../utils/stagger/staggerCostant.js').staggerTypes } data
+ * @returns {Array<{ start: Number, end: Number,index: Number, item: (HTMLElement|Object) }>} labels array
+ *
+ * @example
+ * ```js
+ *
+ *
+ * const staggers = createStagger({
+ *     items: [ Array ],
+ *     stagger: {
+ *         type: [ String ],
+ *         from: [ Number|String|{x:number,y:number} ],
+ *         grid: {
+ *             col: [ Number ],
+ *             row: [ Number ],
+ *             direction: [ String ]
+ *         },
+ *     },
+ *     duration: [ Number ],
+ * });
+ *
+ *
+ * staggers.forEach(({ item, start, end, index }) => {
+ *     const sequencer = mobbu
+ *         .createSequencer({ ... })
+ *         .goTo({ ... }, { start, end ...});
+ *     sequencer.subscribe(({ ... }) => { ... });
+ *     masterSequencer.add(sequencer);
+ * });
+ *
+ * ```
+ *
+ * @description
+ *
+ * ```
+ */
+export const createStaggers = ({
+    items = [],
+    stagger = {},
+    duration = handleSetUp.get('sequencer').duration,
+}) => {
     const eachProportion = 10;
-    const durationNow = duration || handleSetUp.get('sequencer').duration;
     const staggerNow = { ...STAGGER_DEFAULT_OBJ, ...stagger };
     const type = staggerNow.type;
-    let each = staggerNow.each;
+
+    /**
+     * In createStagger each must be > 0
+     */
+    let each = staggerNow?.each || 1;
 
     /*
      * Fallback is something goes wron
@@ -29,34 +88,23 @@ export const createStaggers = ({ items, stagger, duration }) => {
         };
     });
 
-    const stagerTypeList = [
-        STAGGER_TYPE_EQUAL,
-        STAGGER_TYPE_START,
-        STAGGER_TYPE_END,
-        STAGGER_TYPE_CENTER,
-    ];
+    if (!createStaggerItemsIsValid(items)) {
+        return fallBack;
+    }
 
     /**
      * Secure check
      **/
     if (staggerNow.grid?.col > items.length) {
-        console.warn(
-            'stagger col of grid is out of range, it must be less than the number of staggers '
-        );
-        each = 0;
+        staggerIsOutOfRangeWarning(items.length);
+        each = 1;
     }
 
     /**
      * Check type prop
      */
-    if (!stagerTypeList.includes(type)) {
-        console.warn(
-            `stager.type should be: 
-            ${STAGGER_TYPE_EQUAL} ||
-            ${STAGGER_TYPE_START} || 
-            ${STAGGER_TYPE_END} || 
-            ${STAGGER_TYPE_CENTER}`
-        );
+    if (!createStaggerTypeIsValid(type)) {
+        createStaggerTypeWarning();
         return fallBack;
     }
 
@@ -64,9 +112,7 @@ export const createStaggers = ({ items, stagger, duration }) => {
      * In classic mode each must be between 1 and eachProportion
      */
     if (checkType(Number, each) && (each > eachProportion || each < 1)) {
-        console.warn(
-            `createStagger: in classic mode each must be between 1 and ${eachProportion}`
-        );
+        createStaggerEachWarning(eachProportion);
         each = 1;
     }
 
@@ -90,6 +136,11 @@ export const createStaggers = ({ items, stagger, duration }) => {
         ({ item }) => checkType(Element, item) || checkType(Object, item)
     );
 
+    if (staggerArrayFiltered.length === 0) {
+        createStaggerItemsTypeWarning();
+        return fallBack;
+    }
+
     /*
      * Get the 'Chunk' number
      * 1 - Create an arry with all the frame es: [1,1,2,2,2,3,3,3]
@@ -110,16 +161,20 @@ export const createStaggers = ({ items, stagger, duration }) => {
         const { start, end } = (() => {
             if (type === STAGGER_TYPE_EQUAL) {
                 if (each === 1) {
-                    const stepDuration = durationNow / numItem;
+                    const stepDuration = duration / numItem;
                     const start = getRoundedValue(index * stepDuration);
                     const end = getRoundedValue(start + stepDuration);
                     return { start, end };
                 } else {
-                    const unit = durationNow / numItem;
+                    const unit = duration / numItem;
                     const staggerDuration = unit * eachByNumItem;
-                    const remainSpace = durationNow - staggerDuration;
-                    const remainSpaceUnit = remainSpace / (numItem - 1);
+                    const remainSpace = duration - staggerDuration;
+
+                    // Avoid division with 0
+                    const validNumItem = numItem - 1 > 0 ? numItem - 1 : 1;
+                    const remainSpaceUnit = remainSpace / validNumItem;
                     const staggerStart = remainSpaceUnit * index;
+
                     return {
                         start: getRoundedValue(staggerStart),
                         end: getRoundedValue(staggerDuration + staggerStart),
@@ -132,15 +187,15 @@ export const createStaggers = ({ items, stagger, duration }) => {
                 type === STAGGER_TYPE_END ||
                 type === STAGGER_TYPE_CENTER
             ) {
-                const unit = durationNow / numItem;
+                const unit = duration / numItem;
                 const cleanStart = unit * index;
-                const noopSpace = durationNow - (durationNow - cleanStart);
+                const noopSpace = duration - (duration - cleanStart);
                 const gap = (noopSpace / numItem) * eachByNumItem;
 
                 if (type === STAGGER_TYPE_START) {
                     return {
                         start: 0,
-                        end: getRoundedValue(durationNow - (cleanStart - gap)),
+                        end: getRoundedValue(duration - (cleanStart - gap)),
                     };
                 }
 
@@ -148,14 +203,14 @@ export const createStaggers = ({ items, stagger, duration }) => {
                     const space = (cleanStart - gap) / 2;
                     return {
                         start: getRoundedValue(space),
-                        end: getRoundedValue(durationNow - space),
+                        end: getRoundedValue(duration - space),
                     };
                 }
 
                 if (type === STAGGER_TYPE_END) {
                     return {
                         start: getRoundedValue(cleanStart - gap),
-                        end: getRoundedValue(durationNow),
+                        end: getRoundedValue(duration),
                     };
                 }
             }
