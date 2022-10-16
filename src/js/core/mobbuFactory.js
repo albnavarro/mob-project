@@ -184,7 +184,7 @@ export const mobbu = {
      *
      *
      * const staggers = mobbu.createStaggers({
-     *     items: [ Array ],
+     *     items: Array.<Element|Object>,
      *     stagger: {
      *         type: [ String ],
      *         from: [ Number|String|{x:number,y:number} ],

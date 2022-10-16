@@ -34,7 +34,7 @@ import { getStaggerFromProps } from '../utils/stagger/staggerUtils.js';
  *
  *
  * const staggers = createStagger({
- *     items: [ Array ],
+ *     items: Array.<Element|Object>,
  *     stagger: {
  *         stagger.type: [ String ],
  *         from: [ Number|String|{x:number,y:number} ],
