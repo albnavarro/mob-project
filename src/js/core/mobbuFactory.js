@@ -216,6 +216,45 @@ export const mobbu = {
         return createStaggers(data);
     },
 
+    /**
+     * @param { import('./animation/parallax/parallaxTween.js').parallaxTweenTypes & import('./animation/utils/stagger/staggerCostant.js').staggerTypes & import('./animation/tween/tweenConfig.js').easeTypes} data
+     *
+     * @example
+     * ```js
+     * const myParallaxTween = mobbu.createParallaxTween({
+     *   data: Object.<string, number>,
+     *   duration: [ Number ],
+     *   ease: [ String ],
+     *   stagger:{
+     *      each: [ Number ],
+     *      from: [ Number|String|{x:number,y:number} ],
+     *      grid: {
+     *          col: [ Number ],
+     *          row: [ Number ],
+     *          direction: [ String ]
+     *      },
+     *   },
+     * })
+     *
+     *
+     * ```
+     *
+     * @description
+     * Available methods:
+     * ```js
+     * myParallaxTween.goTo()
+     * myParallaxTween.goFrom()
+     * myParallaxTween.goFromTo()
+     * myParallaxTween.subscribe()
+     * myParallaxTween.subscribeCache()
+     * myParallaxTween.onStop()
+     *
+     * ```
+     */
+    createParallaxTween(data = {}) {
+        return new ParallaxTween(data);
+    },
+
     create(type = '', obj = {}) {
         switch (type) {
             case 'lerp':
@@ -244,9 +283,6 @@ export const mobbu = {
                     ...obj,
                     ...{ type: parallaxConstant.TYPE_SCROLLTRIGGER },
                 });
-
-            case 'parallaxTween':
-                return new ParallaxTween(obj);
 
             case 'mouseParallax':
                 return new MouseParallaxItemClass(obj);

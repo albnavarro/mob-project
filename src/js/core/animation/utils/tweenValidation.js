@@ -14,7 +14,7 @@ import {
 } from './stagger/staggerCostant.js';
 import { handleSetUp } from '../../setup';
 import { checkType } from '../../store/storeType';
-import { tweenConfig } from '../tween/tweenConfig';
+import { getTweenFn, tweenConfig } from '../tween/tweenConfig';
 import {
     createStaggerItemsWarning,
     createStaggerTypeWarning,
@@ -125,6 +125,23 @@ export const easeIsValid = (ease) => {
     if (!isValid && ease !== undefined && ease !== null) tweenEaseWarning(ease);
 
     return isValid ? ease : handleSetUp.get('sequencer').ease;
+};
+
+/**
+ *
+ * @param {String} ease
+ * @returns {String}
+ *
+ * @description
+ * Check if ease definition is valid
+ **/
+export const easeParallaxTweenIsValid = (ease) => {
+    const isValid = ease in tweenConfig;
+    if (!isValid && ease !== undefined && ease !== null) tweenEaseWarning(ease);
+
+    return isValid
+        ? getTweenFn(ease)
+        : getTweenFn(handleSetUp.get('parallaxTween').ease);
 };
 
 /**

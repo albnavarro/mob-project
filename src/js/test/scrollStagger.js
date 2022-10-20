@@ -1,4 +1,4 @@
-import { mobbu, offset, outerHeight } from '../core';
+import { mobbu, outerHeight } from '../core';
 
 export const scrollStagger = () => {
     const items = document.querySelectorAll('rect');
@@ -18,7 +18,7 @@ export const scrollStagger = () => {
     });
 
     const myParallaxTween = mobbu
-        .create('parallaxTween', {
+        .createParallaxTween({
             stagger: { each: 3, from: 'center' },
             ease: 'easeLinear',
             data: { rotate: 0 },

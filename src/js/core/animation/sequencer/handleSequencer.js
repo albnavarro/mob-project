@@ -948,7 +948,6 @@ export class HandleSequencer {
     /**
      * @description
      * Get tween type - 'sequencer'
-     * @param {Number} [ val = sequencer]
      */
     getType() {
         return this.type;

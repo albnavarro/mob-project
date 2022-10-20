@@ -106,7 +106,7 @@ export const hScroller = () => {
 
     const target2 = document.querySelector('.parallax-via-js-out');
     const myParallaxTween = mobbu
-        .create('parallaxTween', {
+        .createParallaxTween({
             data: { x: 0, y: 0 },
         })
         .goTo({ x: -pluto.offsetWidth, y: pluto.offsetHeight });
