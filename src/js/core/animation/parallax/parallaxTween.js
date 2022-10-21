@@ -1,6 +1,5 @@
 import {
     getValueObj,
-    compareKeys,
     getRoundedValue,
 } from '../../animation/utils/animationUtils.js';
 import { handleNextTick } from '../../events/rafutils/handleNextTick.js';
@@ -14,11 +13,8 @@ import {
     setCallBackCache,
 } from '../utils/callbacks/setCallback.js';
 import { syncCallback } from '../utils/callbacks/syncCallback.js';
-import { goToUtils, goFromUtils, goFromToUtils } from '../utils/actions.js';
-import {
-    compareKeysWarning,
-    staggerIsOutOfRangeWarning,
-} from '../utils/warning.js';
+import { goToUtils } from '../utils/actions.js';
+import { staggerIsOutOfRangeWarning } from '../utils/warning.js';
 import {
     durationIsValid,
     easeParallaxTweenIsValid,
@@ -26,7 +22,8 @@ import {
 
 /**
  * @typedef {Object} parallaxTweenTypes
- * @prop {Object.<string, number>} data Initial data Object
+ * @prop {Object.<string, number>} from initial values of the animation.
+ * @prop {Object.<string, number>} to final values of the animation.
  * @prop {number} [ duration=10] Defines the time range of the animation, ScrollTrigger will take care of processing the value as needed. The default value is 10
  **/
 
@@ -37,7 +34,8 @@ export class ParallaxTween {
      * @example
      * ```js
      * const myParallaxTween = new ParallaxTween({
-     *   data: Object.<string, number>,
+     *   from: Object.<string, number>,
+     *   to: Object.<string, number>,
      *   duration: [ Number ],
      *   ease: [ String ],
      *   stagger:{
@@ -55,11 +53,11 @@ export class ParallaxTween {
      * ```
      *
      * @description
+     * Simplified tween specific to be used with scrollTrigger as an alternative to the more complex sequencer, ParallaxTween requires only one mutation step (from / to).
+     * <br/>
+     *
      * Available methods:
      * ```js
-     * myParallaxTween.goTo()
-     * myParallaxTween.goFrom()
-     * myParallaxTween.goFromTo()
      * myParallaxTween.subscribe()
      * myParallaxTween.subscribeCache()
      * myParallaxTween.onStop()
@@ -116,8 +114,12 @@ export class ParallaxTween {
          * Set initial store data if defined in constructor props
          * If not use setData methods
          */
-        const props = data?.data || null;
+        const props = data?.from || null;
         if (props) this.setData(props);
+
+        if (data?.to) {
+            this.goTo(data.to);
+        }
     }
 
     /**
@@ -252,6 +254,8 @@ export class ParallaxTween {
     }
 
     /**
+     * @private
+     *
      * @param {Object.<string, number|function>} obj to values
      * @returns {this} The instance on which this method was called.
      *
@@ -271,62 +275,6 @@ export class ParallaxTween {
      */
     goTo(obj) {
         const data = goToUtils(obj);
-        this.mergeData(data);
-        return this;
-    }
-
-    /**
-     * @param {Object.<string, number|function>} obj from values
-     * @returns {this} The instance on which this method was called.
-     *
-     * @example
-     * ```js
-     * myParallaxTween.goFrom(
-     *     { string: number|function, ... }
-     * );
-     *
-     *
-     * ```
-     * @description
-     * Transform some properties of your choice from the `entered value` to the `current value`.
-     * <br/>
-     * The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change in real time as the result of the function changes
-     * <br/>
-     */
-    goFrom(obj) {
-        const data = goFromUtils(obj);
-        this.mergeData(data);
-        return this;
-    }
-
-    /**
-     * @param {Object.<string, number|function>} fromObj from values
-     * @param {Object.<string, number|function>} toObj to values
-     *
-     * @example
-     * ```js
-     * myParallaxTween.goFromTo(
-     *     { string: number|function, ... },
-     *     { string: number|function, ... }
-     * );
-     *
-     *
-     * ```
-     *
-     * @description
-     * Transform some properties of your choice from the `first entered value` to the `second entered value`
-     * <br/>
-     * The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change in real time as the result of the function changes
-     * <br/>
-     */
-    goFromTo(fromObj, toObj) {
-        // Check if fromObj has the same keys of toObj
-        if (!compareKeys(fromObj, toObj)) {
-            compareKeysWarning('spring goFromTo:', fromObj, toObj);
-            return;
-        }
-
-        const data = goFromToUtils(fromObj, toObj);
         this.mergeData(data);
         return this;
     }

@@ -105,11 +105,10 @@ export const hScroller = () => {
     parallaxIn.init();
 
     const target2 = document.querySelector('.parallax-via-js-out');
-    const myParallaxTween = mobbu
-        .createParallaxTween({
-            data: { x: 0, y: 0 },
-        })
-        .goTo({ x: -pluto.offsetWidth, y: pluto.offsetHeight });
+    const myParallaxTween = mobbu.createParallaxTween({
+        from: { x: 0, y: 0 },
+        to: { x: -pluto.offsetWidth, y: pluto.offsetHeight },
+    });
 
     myParallaxTween.subscribe(({ x, y }) => {
         target2.style.transform = `translate3D(0,0,0) translate(${x}px, ${y}px)`;

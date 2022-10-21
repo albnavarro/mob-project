@@ -17,13 +17,12 @@ export const scrollStagger = () => {
         valEl.innerHTML = val;
     });
 
-    const myParallaxTween = mobbu
-        .createParallaxTween({
-            stagger: { each: 3, from: 'center' },
-            ease: 'easeLinear',
-            data: { rotate: 0 },
-        })
-        .goTo({ rotate: () => val });
+    const myParallaxTween = mobbu.createParallaxTween({
+        stagger: { each: 3, from: 'center' },
+        ease: 'easeLinear',
+        from: { rotate: 0 },
+        to: { rotate: () => val },
+    });
 
     const unit = 1.4;
 

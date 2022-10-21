@@ -222,7 +222,8 @@ export const mobbu = {
      * @example
      * ```js
      * const myParallaxTween = mobbu.createParallaxTween({
-     *   data: Object.<string, number>,
+     *   from: Object.<string, number>,
+     *   to: Object.<string, number>,
      *   duration: [ Number ],
      *   ease: [ String ],
      *   stagger:{
@@ -240,11 +241,11 @@ export const mobbu = {
      * ```
      *
      * @description
+     * Simplified tween specific to be used with scrollTrigger as an alternative to the more complex sequencer, ParallaxTween requires only one mutation step (from / to).
+     * <br/>
+     *
      * Available methods:
      * ```js
-     * myParallaxTween.goTo()
-     * myParallaxTween.goFrom()
-     * myParallaxTween.goFromTo()
      * myParallaxTween.subscribe()
      * myParallaxTween.subscribeCache()
      * myParallaxTween.onStop()
