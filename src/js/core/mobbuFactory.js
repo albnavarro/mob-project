@@ -256,6 +256,35 @@ export const mobbu = {
         return new ParallaxTween(data);
     },
 
+    /**
+     * @description
+     *
+     * Support class for grouping multiple sequencers.
+     * Very useful when generating sequencers dynamically, such as through the use of a createStagger.
+     * <br/>
+     * The following example uses a timeline but the same can be done using a scrollTrigger
+     * <br/>
+     *
+     *
+     * @example
+     *
+     * ```js
+     * cont masterSequencer = mobbu.createMasterSequencer();
+     * const staggers = mobbu.createStaggers({})
+     * staggers.forEach(({ item, start, end, index }) => {
+     *     const sequencer = mobbu
+     *         .createSequencer({ ... })
+     *         .goTo({ ... }, { start, end ...});
+     *     sequencer.subscribe(({ ... }) => { ... });
+     *     masterSequencer.add(sequencer);
+     * });
+     * const timeline = mobbu.createSyncTimeline({}).add(masterSequencer)
+     * ```
+     */
+    createMasterSequencer() {
+        return new HandleMasterSequencer();
+    },
+
     create(type = '', obj = {}) {
         switch (type) {
             case 'lerp':
@@ -269,9 +298,6 @@ export const mobbu = {
 
             case 'asyncTimeline':
                 return new HandleAsyncTimeline(obj);
-
-            case 'masterSequencer':
-                return new HandleMasterSequencer(obj);
 
             case 'parallax':
                 return new ParallaxItemClass({

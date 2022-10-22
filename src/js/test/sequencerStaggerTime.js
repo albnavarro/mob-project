@@ -13,7 +13,7 @@ export const sequencerStaggerTime = () => {
         '.animation-playFromReverse'
     );
 
-    let masterSequencer = mobbu.create('masterSequencer');
+    let masterSequencer = mobbu.createMasterSequencer();
 
     // Example , not necessary
     const duration = 3000;

@@ -4,37 +4,38 @@ export const gridStaggerSequencer = () => {
     const items = document.querySelectorAll(
         '.grid-stagger-sequencer .grid-stagger__item'
     );
-    const duration = 5000;
+    const duration = 4000;
 
     const tween = mobbu
         .createSequencer({
+            ease: 'easeInOutBack',
             stagger: {
                 each: 15,
-                from: 'start',
-                grid: { col: 7, row: 7, direction: 'row' },
+                grid: { col: 7, row: 7, direction: 'radial' },
             },
-            data: { scale: 1 },
+            data: { scale: 1, x: 0 },
             duration,
         })
-        .goTo({ scale: 0.5 }, { start: 0, end: 4000, ease: 'easeInOutBack' })
-        .goTo({ scale: 1 }, { start: 4000, end: 5000, ease: 'easeInOutBack' });
+        .goTo({ scale: 3 }, { end: duration / 2 })
+        .goTo({ scale: 0.5 }, { start: duration / 2 })
+        .goTo({ x: 100 });
 
-    // items.forEach((item, i) => {
-    //     tween.subscribe(({ scale }) => {
-    //         item.style.transform = `scale(${scale})`;
-    //     });
-    // });
+    items.forEach((item) => {
+        tween.subscribeCache(item, ({ scale, x }) => {
+            item.style.transform = `translate3D(0,0,0) scale(${scale}) translateX(${x}%)`;
+        });
+    });
 
-    items.forEach((item, i) => {
-        tween.subscribeCache(item, ({ scale }) => {
-            item.style.transform = `scale(${scale})`;
+    items.forEach((item) => {
+        tween.onStop(({ scale, x }) => {
+            item.style.transform = `scale(${scale}) translateX(${x}%)`;
         });
     });
 
     const timeline = mobbu
         .createSyncTimeline({
             repeat: -1,
-            yoyo: false,
+            yoyo: true,
             duration,
         })
         .add(tween)

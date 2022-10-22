@@ -1,3 +1,28 @@
+/**
+ * @description
+ *
+ * Support class for grouping multiple sequencers.
+ * Very useful when generating sequencers dynamically, such as through the use of a createStagger.
+ * <br/>
+ * The following example uses a timeline but the same can be done using a scrollTrigger
+ * <br/>
+ *
+ *
+ * @example
+ *
+ * ```js
+ * cont masterSequencer = new HandleMasterSequencer();
+ * const staggers = mobbu.createStaggers({})
+ * staggers.forEach(({ item, start, end, index }) => {
+ *     const sequencer = mobbu
+ *         .createSequencer({ ... })
+ *         .goTo({ ... }, { start, end ...});
+ *     sequencer.subscribe(({ ... }) => { ... });
+ *     masterSequencer.add(sequencer);
+ * });
+ * const timeline = mobbu.createSyncTimeline({}).add(masterSequencer)
+ * ```
+ */
 export class HandleMasterSequencer {
     constructor() {
         this.type = 'sequencer';

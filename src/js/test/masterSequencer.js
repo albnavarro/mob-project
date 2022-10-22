@@ -4,7 +4,7 @@ export const masterSequencer = () => {
     const items = document.querySelectorAll('.master-stagger__item');
     const trigger = document.querySelector('.scrollStagger');
 
-    let masterSequencer = mobbu.create('masterSequencer');
+    let masterSequencer = mobbu.createMasterSequencer();
     let sequencers = [];
 
     const staggers = mobbu.createStaggers({
