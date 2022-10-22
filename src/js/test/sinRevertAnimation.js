@@ -5,7 +5,7 @@ export const sinRevertAnimation = () => {
     const play = document.querySelector('.sin-revert .anim-play');
     const stop = document.querySelector('.sin-revert .anim-stop');
 
-    const tween = mobbu.create('tween', {
+    const tween = mobbu.createTween({
         ease: 'easeLinear',
         stagger: { each: 3 },
         data: { x: 0 },

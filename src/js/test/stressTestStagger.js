@@ -6,7 +6,7 @@ export const stressTestStagger = () => {
         '.radial-stress-stagger .radial-stress-stagger__item'
     );
 
-    const tween = mobbu.create('tween', {
+    const tween = mobbu.createTween({
         ease: 'easeInOutQuad',
         stagger: {
             each: 15,

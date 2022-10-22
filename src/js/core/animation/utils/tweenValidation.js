@@ -16,11 +16,14 @@ import { handleSetUp } from '../../setup';
 import { checkType } from '../../store/storeType';
 import { getTweenFn, tweenConfig } from '../tween/tweenConfig';
 import {
+    booleanWarning,
     createStaggerItemsWarning,
     createStaggerTypeWarning,
+    durationNumberOrFunctionWarining,
     durationWarining,
     initialDataPropWarining,
     initialDataValueWarining,
+    relativeWarining,
     repeatWarining,
     sequencerRangeEndWarning,
     sequencerRangeStartWarning,
@@ -294,4 +297,101 @@ export const validateStaggerType = (type) => {
     if (!isValid) return createStaggerTypeWarning();
 
     return isValid;
+};
+
+/**
+ *
+ * @param {Number} tween duration
+ * @returns {Number}
+ *
+ * @description
+ * Check if new tween duration value is Valid
+ **/
+export const durationTweenIsValid = (duration) => {
+    const isValid = checkType(Number, duration);
+    if (!isValid && duration !== undefined && duration !== null)
+        durationWarining(duration);
+
+    return isValid ? duration : handleSetUp.get('tween').duration;
+};
+
+/**
+ *
+ * @param {Boolean} relative prop
+ * @returns {Boolean}
+ *
+ * @description
+ * Check if new relative value is Valid
+ **/
+export const relativeIsValid = (val) => {
+    const isValid = checkType(Boolean, val);
+    if (!isValid && val !== undefined && val !== null) relativeWarining(val);
+
+    return isValid ? val : handleSetUp.get('tween').relative;
+};
+
+/**
+ *
+ * @param {String} ease
+ * @returns {String}
+ *
+ * @description
+ * Check if ease definition is valid
+ **/
+export const easeTweenIsValidGetFunction = (ease) => {
+    const isValid = ease in tweenConfig;
+    if (!isValid && ease !== undefined && ease !== null) tweenEaseWarning(ease);
+
+    return isValid
+        ? getTweenFn(ease)
+        : getTweenFn(handleSetUp.get('tween').ease);
+};
+
+/**
+ *
+ * @param {String} ease
+ * @returns {String}
+ *
+ * @description
+ * Check if ease definition is valid
+ **/
+export const easeTweenIsValid = (ease) => {
+    const isValid = ease in tweenConfig;
+    if (!isValid && ease !== undefined && ease !== null) tweenEaseWarning(ease);
+
+    return isValid ? ease : handleSetUp.get('tween').ease;
+};
+
+/**
+ *
+ * @param {(Number|Function)} duration
+ * @returns {Number}
+ *
+ * @description
+ * Check if duration definition is valid
+ **/
+export const durationIsNumberOrFunctionIsValid = (duration) => {
+    const durationIsFn = checkType(Function, duration);
+    const durationResult = durationIsFn ? duration() : duration;
+    const isValid = checkType(Number, durationResult);
+    if (!isValid && duration !== undefined && duration !== null)
+        durationNumberOrFunctionWarining(duration);
+
+    return isValid ? durationResult : handleSetUp.get('tween').duration;
+};
+
+/**
+ *
+ * @param {Boolean} duration
+ * @returns {Boolean}
+ *
+ * @description
+ * Check if value is Boolan and true
+ **/
+export const valueIsBooleanAndTrue = (value, label) => {
+    const isValid = checkType(Boolean, value);
+    if (!isValid && value !== undefined && value !== null)
+        booleanWarning(value, label);
+
+    return isValid && value === true;
 };

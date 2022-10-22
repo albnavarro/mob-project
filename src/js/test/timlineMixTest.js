@@ -43,7 +43,7 @@ export function timlineMixTest() {
     });
 
     // DEFINE TWEEN
-    const tweenBox1 = mobbu.create('tween', {
+    const tweenBox1 = mobbu.createTween({
         data: { x: 0, y: 0, rotate: 0 },
     });
 
@@ -52,7 +52,7 @@ export function timlineMixTest() {
     });
 
     // DEFINE TWEEN 2
-    const tweenBox2 = mobbu.create('tween', { data: { rotate: 0 } });
+    const tweenBox2 = mobbu.createTween({ data: { rotate: 0 } });
     tweenBox2.subscribe(({ rotate }) => {
         target2.style.transform = `rotate(${rotate}deg)`;
     });

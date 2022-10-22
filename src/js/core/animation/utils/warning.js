@@ -21,7 +21,7 @@ export const staggerIsOutOfRangeWarning = (max) => {
 
 export const dataTweenValueIsNotValidWarning = (label) => {
     console.warn(
-        `tween | sequencer: ${label} is not valid value, must be a number or a function`
+        `tween | sequencer: ${label} is not valid value, must be a number or a Function that return a number`
     );
 };
 
@@ -143,6 +143,12 @@ export const durationWarining = (value) => {
     );
 };
 
+export const durationNumberOrFunctionWarining = (value) => {
+    console.warn(
+        `duration error: ${value} is not valid duration must be a number or a Function that return a number`
+    );
+};
+
 export const yoyoWarining = (value) => {
     console.warn(
         `yoyo error: ${value} is not valid yoyo value must be a Boolean`
@@ -191,4 +197,14 @@ export const createStaggerEachWarning = (eachProportion) => {
     console.warn(
         `createStagger:  each must be between 1 and ${eachProportion}`
     );
+};
+
+export const relativeWarining = (val) => {
+    console.warn(
+        `relative prop: ${val} is not a valid parameter, must be a boolean `
+    );
+};
+
+export const booleanWarning = (val, label) => {
+    console.warn(`${label}: ${val} is not Boolean`);
 };

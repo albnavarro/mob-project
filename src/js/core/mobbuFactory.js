@@ -285,6 +285,54 @@ export const mobbu = {
         return new HandleMasterSequencer();
     },
 
+    /**
+     * @param { import('./animation/tween/handleTween.js').tweenTypes & import('./animation/utils/stagger/staggerCostant.js').staggerTypes & import('./animation/tween/tweenConfig.js').easeTypes} data
+     *
+     * @example
+     * ```js
+     * const myTween = mobbu.createTween({
+     *   data: Object.<string, number>,
+     *   duration: [ Number ],
+     *   ease: [ String ],
+     *   relative: [ Boolean ]
+     *   stagger:{
+     *      each: [ Number ],
+     *      from: [ Number|String|{x:number,y:number} ],
+     *      grid: {
+     *          col: [ Number ],
+     *          row: [ Number ],
+     *          direction: [ String ]
+     *      },
+     *   },
+     * })
+     *
+     *
+     * ```
+     *
+     * @description
+     * Available methods:
+     * ```js
+     * myTween.set()
+     * myTween.goTo()
+     * myTween.goFrom()
+     * myTween.goFromTo()
+     * myTween.subscribe()
+     * myTween.subscribeCache()
+     * myTween.onComplete()
+     * myTween.updatePreset()
+     * myTween.getId()
+     * myTween.get()
+     * myTween.getTo()
+     * myTween.getFrom()
+     * myTween.getToNativeType()
+     * myTween.getFromNativeType()
+     *
+     * ```
+     */
+    createTween(data = {}) {
+        return new HandleTween(data);
+    },
+
     create(type = '', obj = {}) {
         switch (type) {
             case 'lerp':
@@ -292,9 +340,6 @@ export const mobbu = {
 
             case 'spring':
                 return new HandleSpring(obj);
-
-            case 'tween':
-                return new HandleTween(obj);
 
             case 'asyncTimeline':
                 return new HandleAsyncTimeline(obj);

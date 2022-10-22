@@ -7,7 +7,7 @@ export const sinAnimation = () => {
     const pause = document.querySelector('.sin .anim-pause');
     const resume = document.querySelector('.sin .anim-resume');
 
-    const tween = mobbu.create('tween', {
+    const tween = mobbu.createTween({
         ease: 'easeInOutQuad',
         stagger: { each: 3 },
         data: { x: 0 },

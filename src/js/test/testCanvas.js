@@ -39,7 +39,7 @@ export const testCanvas = () => {
         draw();
     });
 
-    const tween = mobbu.create('tween', {
+    const tween = mobbu.createTween({
         ease: 'easeInOutQuad',
         stagger: {
             each: 15,

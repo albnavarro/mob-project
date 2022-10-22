@@ -6,7 +6,7 @@ export const tweenRealtive = () => {
     const resetTween = document.querySelector('.tween-reset');
     const boxTween = document.querySelector('.tween-relative-item--tween');
 
-    const tween = mobbu.create('tween', {
+    const tween = mobbu.createTween({
         ease: 'easeInOutQuad',
         data: { x: 0, rotate: 0 },
         duration: 500,

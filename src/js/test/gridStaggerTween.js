@@ -5,7 +5,7 @@ export const gridStaggerTween = () => {
         '.grid-stagger-tween .grid-stagger__item'
     );
 
-    const tween = mobbu.create('tween', {
+    const tween = mobbu.createTween({
         ease: 'easeInOutQuad',
         stagger: {
             each: 15,

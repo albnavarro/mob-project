@@ -13,10 +13,10 @@ export const freeMode = () => {
     /*
      * Tween
      */
-    const tween1 = mobbu.create('tween', { data: { y: 0 } });
-    const tween2 = mobbu.create('tween', { data: { y: 0 } });
-    const tween3 = mobbu.create('tween', { data: { y: 0 } });
-    const tweenStagger = mobbu.create('tween', {
+    const tween1 = mobbu.createTween({ data: { y: 0 } });
+    const tween2 = mobbu.createTween({ data: { y: 0 } });
+    const tween3 = mobbu.createTween({ data: { y: 0 } });
+    const tweenStagger = mobbu.createTween({
         data: { rotate: 0 },
         stagger: { each: 10 },
     });

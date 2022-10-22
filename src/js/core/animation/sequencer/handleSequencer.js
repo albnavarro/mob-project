@@ -622,7 +622,7 @@ export class HandleSequencer {
     }
 
     /**
-     * @param {Object.<string, number|function>} to values
+     * @param {Object.<string, number|function>} obj  to values
      * @param {sequencerSpecialProps & import('../tween/tweenConfig.js').easeTypes} props special properties
      * @returns {this} The instance on which this method was called.
      *
@@ -663,7 +663,7 @@ export class HandleSequencer {
     }
 
     /**
-     * @param {Object.<string, number|function>} from values
+     * @param {Object.<string, number|function>} obj from values
      * @param {sequencerSpecialProps & import('../tween/tweenConfig.js').easeTypes} props special properties
      * @returns {this} The instance on which this method was called.
      *
@@ -704,8 +704,8 @@ export class HandleSequencer {
     }
 
     /**
-     * @param {Object.<string, number|function>} from values
-     * @param {Object.<string, number|function>} to values
+     * @param {Object.<string, number|function>} fromObj from values
+     * @param {Object.<string, number|function>} toObj to values
      * @param {sequencerSpecialProps & import('../tween/tweenConfig.js').easeTypes} props special properties
      *
      * @example

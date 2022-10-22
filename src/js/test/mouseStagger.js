@@ -33,7 +33,7 @@ export const mouseStagger = () => {
 
     // 2
     const stagger = document.querySelectorAll('.stagger__item');
-    const tween = mobbu.create('tween', {
+    const tween = mobbu.createTween({
         ease: 'easeInOutQuad',
         duration: 1000,
         stagger: { each: 10, from: 'start' },
