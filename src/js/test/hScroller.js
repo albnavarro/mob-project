@@ -35,16 +35,16 @@ export const hScroller = () => {
      */
     const parallaxItemTween = document.querySelector('.parallax-js-1');
     const parallaxTween = mobbu.createParallaxTween({
-        from: { x: 0, rotate: 0, opacity: 0 },
-        to: { x: 50, rotate: 50, opacity: 0.2 },
+        from: { x: 0, rotate: 0, opacity: 1 },
+        to: { x: 50, rotate: 50, opacity: 1.2 },
     });
     parallaxTween.subscribe(({ x, rotate, opacity }) => {
         parallaxItemTween.style.transform = `translate3D(0,0,0) translateX(${x}px) rotate(${rotate}deg)`;
-        parallaxItemTween.style.opacity = opacity + 1;
+        parallaxItemTween.style.opacity = opacity;
     });
     parallaxTween.onStop(({ x, rotate, opacity }) => {
         parallaxItemTween.style.transform = `translateX(${x}px) rotate(${rotate}deg)`;
-        parallaxItemTween.style.opacity = opacity + 1;
+        parallaxItemTween.style.opacity = opacity;
     });
     const parallax1 = mobbu.create('parallax', {
         item: document.querySelector('.parallax-js-1'),
