@@ -17,6 +17,7 @@ import { HandleLerp } from '../lerp/handleLerp.js';
 import { getRoundedValue } from '../utils/animationUtils.js';
 import { getTranslateValues } from '../../utils/vanillaFunction.js';
 import { clamp } from '../utils/animationUtils.js';
+import { handleFrameIndex } from '../../events/rafutils/handleFrameIndex.js';
 
 export class ParallaxItemClass {
     constructor(data) {
@@ -117,7 +118,7 @@ export class ParallaxItemClass {
         this.breackpoint = data.breackpoint || 'desktop';
         this.queryType = data.queryType || 'min';
         this.limiterOff = data.limiterOff || false;
-        this.reverse = data.reverse || false;
+        this.reverse = data.reverse || false; // only parallax no scrollTrigger
         this.ease = data.ease || false;
         this.propierties = data.propierties
             ? data.propierties
@@ -209,12 +210,13 @@ export class ParallaxItemClass {
         this.getScreenHeight();
         this.setPerspective();
 
+        if (this.propierties === parallaxConstant.PROP_TWEEN) {
+            this.range = this.tween.getDuration();
+            if (this.tween?.inzializeStagger) this.tween.inzializeStagger();
+        }
+
         if (this.type == parallaxConstant.TYPE_SCROLLTRIGGER) {
             this.limiterOff = true;
-            if (this.propierties === parallaxConstant.PROP_TWEEN) {
-                this.range = this.tween.getDuration();
-                if (this.tween?.inzializeStagger) this.tween.inzializeStagger();
-            }
             this.calcRangeAndUnitMiusure();
             this.calcFixedLimit();
         }
@@ -646,13 +648,15 @@ export class ParallaxItemClass {
 
             // Reset Style
             // For tween is necessary reset inside tween callback
-            handleFrame.add(() => {
+            handleFrameIndex.add(() => {
                 if (this.applyTo) {
+                    this.resetTweenStyle(this.applyTo);
                     Object.assign(this.applyTo.style, this.getResetStyle());
                 } else {
+                    this.resetTweenStyle(this.item);
                     Object.assign(this.item.style, this.getResetStyle());
                 }
-            });
+            }, 3);
         } else {
             this.move();
         }
@@ -760,6 +764,25 @@ export class ParallaxItemClass {
                         break;
                 }
         }
+
+        /**
+         * Get reverse value
+         */
+        this.GC.reverseVal =
+            this.reverse && this.type !== parallaxConstant.TYPE_SCROLLTRIGGER
+                ? parallaxUtils.getRetReverseValue(
+                      this.propierties,
+                      this.endValue
+                  )
+                : this.endValue;
+
+        /**
+         * Get switch after 0 value for non scrolTrigger
+         */
+        this.endValue =
+            this.type !== parallaxConstant.TYPE_SCROLLTRIGGER
+                ? this.getSwitchAfterZeroValue(this.GC.reverseVal)
+                : this.GC.reverseVal;
     }
 
     noEasingRender() {
@@ -770,21 +793,28 @@ export class ParallaxItemClass {
         });
     }
 
+    checkIfLastDraw() {
+        return this.endValue === this.lastValue;
+    }
+
     cleanRender() {
-        if (this.endValue === this.lastValue) return;
+        // if (this.endValue === this.lastValue) return;
 
         if (this.propierties === parallaxConstant.PROP_TWEEN) {
             this.tween.draw({
                 partial: this.endValue,
-                isLastDraw: true,
+                isLastDraw: this.checkIfLastDraw(),
+                // isLastDraw: true,
                 useFrame: false,
             });
             this.lastValue = this.endValue;
             this.firstTime = false;
         } else {
+            if (this.checkIfLastDraw()) return;
             this.updateStyle(this.endValue);
         }
 
+        if (this.checkIfLastDraw()) return;
         handleNextTick.add(() => {
             if (this.onTickCallback) this.onTickCallback(this.endValue);
         });
@@ -988,67 +1018,70 @@ export class ParallaxItemClass {
     }
 
     getStyle(val) {
-        this.GC.reverseVal = this.reverse
-            ? parallaxUtils.getRetReverseValue(this.propierties, val)
-            : val;
-
-        this.GC.typeVal =
-            this.type !== parallaxConstant.TYPE_SCROLLTRIGGER
-                ? this.getSwitchAfterZeroValue(this.GC.reverseVal)
-                : this.GC.reverseVal;
-
         this.GC.force3DStyle = this.force3D ? 'translate3D(0px, 0px, 0px)' : '';
 
         switch (this.propierties) {
             case parallaxConstant.PROP_VERTICAL:
                 return {
-                    transform: `${this.GC.force3DStyle} translateY(${this.GC.typeVal}px)`,
+                    // translate: `0 ${val}px`,
+                    // transform: `${this.GC.force3DStyle}`,
+                    transform: `${this.GC.force3DStyle} translateY(${val}px)`,
                 };
 
             case parallaxConstant.PROP_HORIZONTAL:
                 return {
-                    transform: `${this.GC.force3DStyle} translateX(${this.GC.typeVal}px)`,
+                    transform: `${this.GC.force3DStyle} translateX(${val}px)`,
                 };
 
             case parallaxConstant.PROP_ROTATE:
                 return {
-                    transform: `${this.GC.force3DStyle} rotate(${this.GC.typeVal}deg)`,
+                    transform: `${this.GC.force3DStyle} rotate(${val}deg)`,
                 };
 
             case parallaxConstant.PROP_ROTATEY:
                 return {
-                    transform: `${this.GC.force3DStyle} rotateY(${this.GC.typeVal}deg)`,
+                    transform: `${this.GC.force3DStyle} rotateY(${val}deg)`,
                 };
 
             case parallaxConstant.PROP_ROTATEX:
                 return {
-                    transform: `${this.GC.force3DStyle} rotateX(${this.GC.typeVal}deg)`,
+                    transform: `${this.GC.force3DStyle} rotateX(${val}deg)`,
                 };
 
             case parallaxConstant.PROP_ROTATEZ:
                 return {
-                    transform: `${this.GC.force3DStyle} rotateZ(${this.GC.typeVal}deg)`,
+                    transform: `${this.GC.force3DStyle} rotateZ(${val}deg)`,
                 };
 
             case parallaxConstant.PROP_OPACITY:
-                return { opacity: `${this.GC.typeVal}` };
+                return { opacity: `${val}` };
 
             case parallaxConstant.PROP_SCALE:
                 this.GC.scaleVal =
                     this.type !== parallaxConstant.TYPE_SCROLLTRIGGER
-                        ? 1 + this.GC.typeVal / 1000
-                        : this.GC.typeVal;
+                        ? 1 + val / 1000
+                        : val;
                 return {
                     transform: `${this.GC.force3DStyle} scale(${this.GC.scaleVal})`,
                 };
 
             default:
                 return {
-                    [this.propierties.toLowerCase()]: `${this.GC.typeVal}px`,
+                    [this.propierties.toLowerCase()]: `${val}px`,
                 };
         }
     }
 
+    /**
+     * Reset sequencer/parallaxTween style
+     */
+    resetTweenStyle(item) {
+        if (this.tween) item.style = '';
+    }
+
+    /**
+     * Reset default style
+     */
     getResetStyle() {
         switch (this.propierties) {
             case parallaxConstant.PROP_VERTICAL:

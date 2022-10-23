@@ -1,6 +1,9 @@
 import { mobbu } from '../core';
 
 export function indexParallax() {
+    /**
+     * Sequencer
+     */
     const item = document.querySelector('.index-parallax-1');
     const trigger = document.querySelector('.index-timeline');
 
@@ -41,6 +44,7 @@ export function indexParallax() {
         trigger: trigger,
         propierties: 'tween',
         tween: myParallaxTimeline,
+        breackpoint: 'medium',
         start: 'bottom',
         end: 'top -height',
         ease: true,
@@ -49,4 +53,29 @@ export function indexParallax() {
         marker: 'parallax-timeline',
     });
     parallaxIn.init();
+
+    /**
+     * Parallax
+     */
+    const parallaxItem = document.querySelector('.js-parallax-scale');
+    const tweenScale = mobbu.createParallaxTween({
+        from: { x: 0, scale: 1 },
+        to: { x: -50, scale: 1.2 },
+    });
+    tweenScale.subscribe(({ scale, x }) => {
+        parallaxItem.style.transform = `translate3D(0,0,0) translateX(${x}px) scale(${scale})`;
+    });
+    tweenScale.onStop(({ scale, x }) => {
+        parallaxItem.style.transform = `translateX(${x}px) scale(${scale})`;
+    });
+
+    const parallaxScale = mobbu.create('parallax', {
+        item: parallaxItem,
+        ease: true,
+        // easeType: 'lerp',
+        propierties: 'tween',
+        tween: tweenScale,
+        onSwitch: 'in-stop',
+    });
+    parallaxScale.init();
 }

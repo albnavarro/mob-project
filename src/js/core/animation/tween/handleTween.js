@@ -814,8 +814,14 @@ export class HandleTween {
     /**
      * @private
      *
+     * @param {Object.<string, number|function>} data Updated data
+     * @param {tweenSpecialProps & tweenCommonSpecialProps & import('../tween/tweenConfig.js').easeTypes} props special props
+     * @param {Object.<string, number|function>} obj new data obj come from set/goTo/goFrom/goFromTo
+     * @returns {Promise} Return a promise which is resolved when tween is over
+     *
      * @description
      * Common oparation for set/goTo/goFrom/goFromTo methods.
+     * It is the method that updates the internal store
      */
     doAction(data, props, obj) {
         this.values = mergeArrayTween(data, this.values);
@@ -851,72 +857,102 @@ export class HandleTween {
     }
 
     /**
-     * get - get current value
+     * @description
+     * Get current values, If the single value is a function it returns the result of the function.
      *
-     * @return {Object} current value obj { prop: value, prop2: value2 }
+     * @return {Object} current value obj.
      *
      * @example
-     * const { prop } = mySpring.get();
+     * ```js
+     *
+     *
+     * const { prop } = myTween.get();
+     * ```
      */
     get() {
         return getValueObj(this.values, 'currentValue');
     }
 
     /**
-     * get - get initial value
+     * @description
+     * Get initial values, If the single value is a function it returns the result of the function.
      *
-     * @return {Object} current value obj { prop: value, prop2: value2 }
+     * @return {Object} initial value obj.
      *
      * @example
-     * const { prop } = mySpring.getIntialData();
+     * ```js
+     *
+     *
+     * const { prop } = myTween.getIntialData();
+     * ```
      */
     getInitialData() {
         return getValueObj(this.initialData, 'currentValue');
     }
 
     /**
-     * getFrom - get fromValue value
+     * @description
+     * Get from values, If the single value is a function it returns the result of the function.
      *
-     * @return {Object} fromValue value obj { prop: value, prop2: value2 }
+     * @return {Object} from value obj.
      *
      * @example
-     * const { prop } = mySpring.get();
+     * ```js
+     *
+     *
+     * const { prop } = myTween.getFrom();
+     * ```
      */
     getFrom() {
         return getValueObj(this.values, 'fromValue');
     }
 
     /**
-     * getFrom - get toValue value
+     * @description
+     * Get to values, If the single value is a function it returns the result of the function.
      *
-     * @return {Object} toValue value obj { prop: value, prop2: value2 }
+     * @return {Object} to value obj.
      *
      * @example
-     * const { prop } = mySpring.get();
+     * ```js
+     *
+     *
+     * const { prop } = myTween.getTo();
+     * ```
      */
     getTo() {
         return getValueObj(this.values, 'toValue');
     }
 
     /**
-     * getFrom - get fromValue value
+     * @description
+     * Get From values, if the single value is a function it returns the same function.
      *
-     * @return {Object} fromValue value obj { prop: value, prop2: value2 }
+     * @return {Object} from value obj.
      *
      * @example
-     * const { prop } = mySpring.get();
+     * ```js
+     *
+     *
+     * const { prop } = myTween.getFromNativeType();
+     * ```
      */
     getFromNativeType() {
         return getValueObjFromNative(this.values);
     }
 
     /**
-     * getFrom - get toValue value
+     * @description
+     * Get To values, if the single value is a function it returns the same function.
      *
-     * @return {Object} toValue value obj { prop: value, prop2: value2 }
+     * @return {Object} to value obj.
      *
      * @example
-     * const { prop } = mySpring.get();
+     * ```js
+     *
+     *
+     * const { prop } = myTween.getToNativeType();
+     * ```
      */
     getToNativeType() {
         return getValueObjToNative(this.values);
@@ -924,19 +960,33 @@ export class HandleTween {
 
     /**
      * @description
-     * getType - get tween type
+     * Get tween type
      *
      * @return {string} tween type
      *
      * @example
+     * ```js
+     *
+     *
      * const type = myTween.getType();
+     * ```
      */
     getType() {
         return 'TWEEN';
     }
 
     /**
-     * Get uniqueId
+     * @description
+     * Get univoque Id
+     *
+     * @return {string} Univoque Id
+     *
+     * @example
+     * ```js
+     *
+     *
+     * const type = myTween.getId();
+     * ```
      */
     getId() {
         return this.uniqueId;
@@ -945,15 +995,11 @@ export class HandleTween {
     /**
      * updatePreset - Update config object with new preset
      *
-     * @param  {String} preset new preset
-     * @return {void}
+     * @param { import('../tween/tweenConfig.js').easeStringTypes } preset
      *
      */
     updatePreset(preset) {
-        if (preset in tweenConfig) {
-            this.ease = tweenConfig[preset];
-        }
-
+        this.ease = easeTweenIsValidGetFunction(preset);
         this.defaultProps = mergeDeep(this.defaultProps, {
             ease: preset,
         });
@@ -992,7 +1038,9 @@ export class HandleTween {
     }
 
     /**
-     * subscribe - add callback to start in pause to stack
+     * Support callback to asyncTimeline.
+     * Callback to manage the departure of tweens in a timeline. If a delay is applied to the tween and before the delay ends the timeline pauses the tween at the end of the delay will automatically pause.
+     * Add callback to start in pause to stack
      *
      * @param  {function} cb cal function
      * @return {function} unsubscribe callback

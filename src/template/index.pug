@@ -71,7 +71,7 @@ block content
                         .accrdion-item__content.js-accordion-content(style="height:0;")
                             span
                                 |content
-                                
+
                 //- ACCORDION
                 h3
                     |accordion via js
@@ -97,11 +97,11 @@ block content
                                 |content
 
                 include ../component/lightbox/pug/button.pug
-                
+
                 //- div(data-conponent='m-comp--pageScroller')
                 //-     .pageScroller__content
                 include ../component/tooltip/pug/tooltip.pug
-                
+
 
                 .parallax__item-test.js-parallax(
                     data-range='1.5',
@@ -118,20 +118,20 @@ block content
 
         include ../component/threeBlocks/pug/tBlocks.pug
         include ../component/threeBlocks/pug/tBlocks.pug
-        
+
         section.overflow-hidden
             .interceptTrigger.parallax__item-test.js-animate(
                 data-triggerEl=".interceptObserver-1")
             .interceptObserver.interceptObserver-1.js-animate
             .interceptObserver.interceptObserver-2.js-animate
-        
+
             .index-timeline(style="border:1px #ccc solid;position: relative;height:140px;")
                 //- div(style='position:absolute;left:50%;transform:translateX(-50%)')
                 div
                   .index-parallax-1.inlineBLock
                     .parallax__item-test
-              
-            .grid-parallax             
+
+            .grid-parallax
               .grid-parallax__item.js-parallax(
                   data-type="scrollTrigger"
                   data-propierties="rotate"
@@ -144,8 +144,8 @@ block content
                   .grid-parallax__cell
                     |1
                   .grid-parallax__cell
-                    |2  
-                    
+                    |2
+
             .flex.justify-center
                 .js-parallax(
                     data-perspective="400"
@@ -166,14 +166,10 @@ block content
                 data-propierties="opacity"
                 data-opacityStart="100"
                 data-opacityEnd="45")
-                
+
 
             .clearfix
-                .inlineBLock.js-parallax(
-                    data-range='.7',
-                    data-ease
-                    data-onSwitch="in-back",
-                    data-propierties="scale")
+                .inlineBLock.js-parallax-scale
                     .parallax__item-test.parallax__item-test--float
 
             .parallax__item-test.js-parallax(
@@ -182,12 +178,12 @@ block content
                 data-onSwitch="in-back",
                 data-reverse,
                 data-propierties="x")
-                
+
 
             .clipath-start.js-toggle-class(
                 data-startClass="clipath-start",
                 data-endClass="clipath-end")
-                    .trasition-item-test 
+                    .trasition-item-test
 
             .flex
                 div.js-parallax(
@@ -207,7 +203,7 @@ block content
                 data-startClass="transformY-start",
                 data-endClass="transformY-end",
                 data-onlyOnce)
-                    .trasition-item-test 
+                    .trasition-item-test
 
             .flex
                 .parallax__item-test.inlineBLock.js-parallax(
@@ -216,18 +212,18 @@ block content
                     data-ease,
                     data-disableForce3D,
                     data-propierties="rotate")
-                    
+
 
             .opacity-start.js-toggle-class(
                 data-startClass="opacity-start",
                 data-endClass="opacity-end")
-                    .trasition-item-test 
+                    .trasition-item-test
 
             .parallax__item-test.js-parallax(
                 data-range='2',
                 data-align='end',
                 data-propierties="x")
-                
+
 
             div(style="height:200px;")
 

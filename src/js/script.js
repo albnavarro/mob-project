@@ -103,9 +103,115 @@ mobbu.use('load', () => {
 
     const body = document.querySelector('body');
 
+    mobbu.run('parallax');
+    mobbu.run('mouseParallax');
+    pageScroll.init();
+    tBlocks.init();
+    showElement.init();
+    toolTip.init();
+    totop.init();
+    vh.init();
+    move3D.init();
+    dragger.init();
+    accordion.init();
+    animate.init();
+    loadImageFromManifest.init();
+
+    // SVG
+    glitch.init();
+    wave.init();
+    predictiveTurbolence.init();
+
+    // CUSTOM ACCORDION VIA JS
+    const accordionCustom = new AccordionItemClass({
+        container: document.querySelector('.accordion-custom'),
+        item: '.accrdion-item',
+        toggle: '.accrdion-item__btn',
+        content: '.accrdion-item__content',
+        multiple: true,
+    });
+    accordionCustom.init();
+
+    // TBlock custom event
+    // L'evento su tBlocks è legato all'elemento container ( .tBlocks) che lo dispaccia
+    // Sul cambio di item possiamo fare cose, arriva:
+    // Direzione: up/down
+    // Active Index
+    const tBlockContaner1 = document.querySelector(
+        '.container-block-1 .tBlocks'
+    );
+    if (typeof tBlockContaner1 != 'undefined' && tBlockContaner1 != null) {
+        tBlockContaner1.addEventListener(
+            'itemChange',
+            (e) => {
+                console.log(e.detail);
+            },
+            false
+        );
+    }
+
+    // FIND ELEMENT
+    findElement('.offset-slider')
+        .then(() => {
+            console.log('founded');
+        })
+        .catch(() => {
+            console.log('not found');
+        });
+
+    // LIGHTBOX
+    const lightSimply = new LightBoxClass({
+        openBtn: '.btn-Lightbox1',
+        closeBtn: '.lightbox__closeBtn',
+        lightbox: '.lightbox--static',
+        type: 'normal',
+    });
+    //
+    const lightImage = new LightBoxClass({
+        openBtn: '.btn-LightboxImage',
+        closeBtn: '.lightbox__closeBtn',
+        lightbox: '.lightbox--image',
+        type: 'image',
+    });
+    //
+    const lightSlide = new LightBoxClass({
+        openBtn: '.btn-LightboxImageSlide',
+        closeBtn: '.lightbox__closeBtn',
+        lightbox: '.lightbox--image',
+        type: 'image-slide',
+    });
+    //
+    const lightVideo = new LightBoxClass({
+        openBtn: '.btn-LightboxVideo',
+        closeBtn: '.lightbox__closeBtn',
+        lightbox: '.lightbox--video',
+        type: 'video',
+    });
+
+    // MENU
+    const menu = new menuClass({
+        componentWrapper: '.menu-container--top',
+    });
+
+    const sidebarMenu = new menuClass({
+        componentWrapper: '.menu-container--sidebar',
+        direction: 'vertical',
+        sideDirection: 'left',
+        offCanvas: false,
+    });
+
     if (body.classList.contains('page-index')) {
         indexParallax();
     }
+
+    if (
+        body.classList.contains('page-gsap') ||
+        body.classList.contains('page-gsapHorizontal')
+    ) {
+        gsapTest.init();
+    }
+
+    if (body.classList.contains('page-store')) storeTest.init();
 
     if (body.classList.contains('page-asyncTimeline')) {
         springTest();
@@ -206,111 +312,6 @@ mobbu.use('load', () => {
     if (body.classList.contains('page-freemode')) {
         freeMode();
     }
-
-    mobbu.run('parallax');
-    mobbu.run('mouseParallax');
-    pageScroll.init();
-    tBlocks.init();
-    showElement.init();
-    toolTip.init();
-    totop.init();
-    vh.init();
-    move3D.init();
-    dragger.init();
-
-    accordion.init();
-    if (
-        body.classList.contains('page-gsap') ||
-        body.classList.contains('page-gsapHorizontal')
-    )
-        gsapTest.init();
-
-    if (body.classList.contains('page-store')) storeTest.init();
-    animate.init();
-    loadImageFromManifest.init();
-
-    // SVG
-    glitch.init();
-    wave.init();
-    predictiveTurbolence.init();
-
-    // CUSTOM ACCORDION VIA JS
-    const accordionCustom = new AccordionItemClass({
-        container: document.querySelector('.accordion-custom'),
-        item: '.accrdion-item',
-        toggle: '.accrdion-item__btn',
-        content: '.accrdion-item__content',
-        multiple: true,
-    });
-    accordionCustom.init();
-
-    // TBlock custom event
-    // L'evento su tBlocks è legato all'elemento container ( .tBlocks) che lo dispaccia
-    // Sul cambio di item possiamo fare cose, arriva:
-    // Direzione: up/down
-    // Active Index
-    const tBlockContaner1 = document.querySelector(
-        '.container-block-1 .tBlocks'
-    );
-    if (typeof tBlockContaner1 != 'undefined' && tBlockContaner1 != null) {
-        tBlockContaner1.addEventListener(
-            'itemChange',
-            (e) => {
-                console.log(e.detail);
-            },
-            false
-        );
-    }
-
-    // FIND ELEMENT
-    findElement('.offset-slider')
-        .then(() => {
-            console.log('founded');
-        })
-        .catch(() => {
-            console.log('not found');
-        });
-
-    // LIGHTBOX
-    const lightSimply = new LightBoxClass({
-        openBtn: '.btn-Lightbox1',
-        closeBtn: '.lightbox__closeBtn',
-        lightbox: '.lightbox--static',
-        type: 'normal',
-    });
-    //
-    const lightImage = new LightBoxClass({
-        openBtn: '.btn-LightboxImage',
-        closeBtn: '.lightbox__closeBtn',
-        lightbox: '.lightbox--image',
-        type: 'image',
-    });
-    //
-    const lightSlide = new LightBoxClass({
-        openBtn: '.btn-LightboxImageSlide',
-        closeBtn: '.lightbox__closeBtn',
-        lightbox: '.lightbox--image',
-        type: 'image-slide',
-    });
-    //
-    const lightVideo = new LightBoxClass({
-        openBtn: '.btn-LightboxVideo',
-        closeBtn: '.lightbox__closeBtn',
-        lightbox: '.lightbox--video',
-        type: 'video',
-    });
-
-    // MENU
-    const menu = new menuClass({
-        componentWrapper: '.menu-container--top',
-    });
-
-    const sidebarMenu = new menuClass({
-        componentWrapper: '.menu-container--sidebar',
-        direction: 'vertical',
-        sideDirection: 'left',
-        offCanvas: false,
-    });
 
     // Provvisorio
     // const forceResize = () => {
