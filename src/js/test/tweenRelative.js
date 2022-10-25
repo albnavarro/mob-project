@@ -32,7 +32,7 @@ export const tweenRealtive = () => {
     const resetSpring = document.querySelector('.spring-reset');
     const boxSpring = document.querySelector('.tween-relative-item--spring');
 
-    const spring = mobbu.create('spring', {
+    const spring = mobbu.createSpring({
         data: { x: 0, rotate: 0 },
         relative: true,
     });

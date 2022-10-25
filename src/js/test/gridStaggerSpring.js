@@ -5,7 +5,7 @@ export const gridStaggerSpring = () => {
         '.grid-stagger-spring .grid-stagger__item'
     );
 
-    const tween = mobbu.create('spring', {
+    const tween = mobbu.createSpring({
         config: 'bounce',
         stagger: {
             each: 15,
@@ -29,13 +29,7 @@ export const gridStaggerSpring = () => {
     });
 
     const timeline = mobbu.create('asyncTimeline', { repeat: -1, yoyo: true });
-    timeline.goTo(
-        tween,
-        { scale: 0.5 },
-        {
-            precision: 1,
-        }
-    );
+    timeline.goTo(tween, { scale: 0.5 });
 
     tween.set({ scale: 1 }).then((value) => {
         timeline.play();

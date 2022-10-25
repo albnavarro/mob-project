@@ -27,6 +27,8 @@ import {
     repeatWarining,
     sequencerRangeEndWarning,
     sequencerRangeStartWarning,
+    springConfigPropWarning,
+    springPresetWarning,
     staggerEachWarning,
     staggerFromGenericWarning,
     staggerGridDirectionWarning,
@@ -317,17 +319,19 @@ export const durationTweenIsValid = (duration) => {
 
 /**
  *
- * @param {Boolean} relative prop
+ * @param {Boolean} val  relative prop
+ * @param {('tween'|'spring'|'lerp')} tweenType relative prop
  * @returns {Boolean}
  *
  * @description
  * Check if new relative value is Valid
  **/
-export const relativeIsValid = (val) => {
+export const relativeIsValid = (val, tweenType) => {
     const isValid = checkType(Boolean, val);
-    if (!isValid && val !== undefined && val !== null) relativeWarining(val);
+    if (!isValid && val !== undefined && val !== null)
+        relativeWarining(val, tweenType);
 
-    return isValid ? val : handleSetUp.get('tween').relative;
+    return isValid ? val : handleSetUp.get(tweenType).relative;
 };
 
 /**
@@ -360,6 +364,61 @@ export const easeTweenIsValid = (ease) => {
     if (!isValid && ease !== undefined && ease !== null) tweenEaseWarning(ease);
 
     return isValid ? ease : handleSetUp.get('tween').ease;
+};
+
+/**
+ *
+ * @param {String} spring config
+ * @returns {String}
+ *
+ * @description
+ * Check if spring config is valid and return new config
+ **/
+export const springConfigIsValidAndGetNew = (config) => {
+    const isValid = config in handleSetUp.get('spring');
+    if (!isValid && config !== undefined && config !== null)
+        springPresetWarning(config);
+
+    return isValid
+        ? handleSetUp.get('spring')[config]
+        : handleSetUp.get('spring').default;
+};
+
+/**
+ *
+ * @param {String} spring config
+ * @returns {String}
+ *
+ * @description
+ * Check if spring config is valid
+ **/
+export const springConfigIsValid = (config) => {
+    const isValid = config in handleSetUp.get('spring');
+    if (!isValid && config !== undefined && config !== null)
+        springPresetWarning(config);
+
+    return isValid;
+};
+
+/**
+ *
+ * @param {String} spring config
+ * @returns {String}
+ *
+ * @description
+ * Check if every spring config prop is valid
+ **/
+export const springConfigPropIsValid = (obj) => {
+    const isValid =
+        checkType(Object, obj) &&
+        Object.values(obj).every((prop) => {
+            return checkType(Number, prop) && prop >= 0;
+        });
+
+    if (!isValid && obj !== undefined && obj !== null)
+        springConfigPropWarning();
+
+    return isValid ? obj : {};
 };
 
 /**

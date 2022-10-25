@@ -29,7 +29,7 @@ export class move3DContainerClass {
         this.pageY = false;
         this.childrenInstances = [];
 
-        this.spring = mobbu.create('spring');
+        this.spring = mobbu.createSpring();
         this.unsubscribeSpring = () => {};
 
         // MOUSE COORD

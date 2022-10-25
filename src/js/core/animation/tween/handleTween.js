@@ -136,7 +136,7 @@ export class HandleTween {
         /**
          * @private
          */
-        this.relative = relativeIsValid(data?.relative);
+        this.relative = relativeIsValid(data?.relative, 'tween');
 
         /**
          *  end

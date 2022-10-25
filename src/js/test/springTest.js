@@ -13,7 +13,7 @@ export function springTest() {
     const target = document.querySelector('.spring-target');
 
     // DEFINE SPRING
-    const mySpring = mobbu.create('spring', {
+    const mySpring = mobbu.createSpring({
         data: { x: 0, y: 0, rotate: 0 },
     });
 
@@ -25,38 +25,39 @@ export function springTest() {
     function springBack() {
         timeline.stop();
         mySpring.updatePreset('gentle');
-        return mySpring.goTo(
-            { x: 0, y: 0, rotate: 180 },
-            { ease: 'easeOutBack' }
-        );
+        return mySpring.goTo({ x: 0, y: 0, rotate: 180 });
     }
 
     // DEFINE TIMELINE
     const timeline = mobbu
         .create('asyncTimeline', { repeat: 2, yoyo: true, freeMode: true })
-        .add(() => mySpring.updatePreset('wobbly'))
-        .set(
+        .set(mySpring, { x: 0, y: 0, rotate: 0 })
+        .goTo(
             mySpring,
-            { x: 0, y: 0, rotate: 0 },
-            { config: { precision: 0.5 } }
+            { x: -200 },
+            { config: 'wobbly', configProp: { precision: 0.5 } }
         )
-        .goTo(mySpring, { x: -200 }, { config: { precision: 0.5 } })
         .goFromTo(
             mySpring,
             { x: -200 },
             { x: 400 },
-            { config: { precision: 0.5 } }
+            { configProp: { precision: 0.5 } }
         )
-        .add(() => mySpring.updatePreset('default'))
-        .goTo(mySpring, { y: 400 }, { config: { mass: 2, precision: 0.5 } })
-        .add(() => mySpring.updatePreset('bounce'))
+        .goTo(
+            mySpring,
+            { y: 400 },
+            { config: 'bounce', configProp: { mass: 2, precision: 0.5 } }
+        )
         .label({ name: 'label1' })
-        .goTo(mySpring, { x: -100, rotate: 90 }, { config: { precision: 0.5 } })
-        .add(() => mySpring.updatePreset('gentle'))
+        .goTo(
+            mySpring,
+            { x: -100, rotate: 90 },
+            { configProp: { precision: 0.5 } }
+        )
         .goTo(
             mySpring,
             { x: 0, y: 0, rotate: 0 },
-            { config: { precision: 0.5 } }
+            { config: 'gentle', configProp: { precision: 0.5 } }
         );
 
     // LISTNER

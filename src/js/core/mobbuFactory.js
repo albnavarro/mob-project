@@ -333,13 +333,14 @@ export const mobbu = {
         return new HandleTween(data);
     },
 
+    createSpring(data = {}) {
+        return new HandleSpring(data);
+    },
+
     create(type = '', obj = {}) {
         switch (type) {
             case 'lerp':
                 return new HandleLerp(obj);
-
-            case 'spring':
-                return new HandleSpring(obj);
 
             case 'asyncTimeline':
                 return new HandleAsyncTimeline(obj);

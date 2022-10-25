@@ -18,7 +18,6 @@ import { loadFps } from '../../events/rafutils/loadFps.js';
 import { handleFrame } from '../../events/rafutils/handleFrame.js';
 import { handleNextTick } from '../../events/rafutils/handleNextTick.js';
 import { mergeDeep } from '../../utils/mergeDeep.js';
-import { handleSetUp } from '../../setup.js';
 import { setStagger } from '../utils/stagger/setStagger.js';
 import { STAGGER_DEFAULT_INDEX_OBJ } from '../utils/stagger/staggerCostant.js';
 import {
@@ -43,48 +42,122 @@ import { initRaf } from '../utils/initRaf.js';
 import { resume } from '../utils/resume.js';
 import {
     compareKeysWarning,
-    springPresetWarning,
     staggerIsOutOfRangeWarning,
 } from '../utils/warning.js';
 import { fpsLoadedLog } from '../utils/log.js';
 import { shouldInizializzeStagger } from '../utils/condition.js';
 import { handleCache } from '../../events/rafutils/handleCache.js';
+import {
+    relativeIsValid,
+    springConfigIsValid,
+    springConfigIsValidAndGetNew,
+    springConfigPropIsValid,
+} from '../utils/tweenValidation.js';
+import { handleSetUp } from '../../setup.js';
 
 export class HandleSpring {
     constructor(data = {}) {
+        /**
+         * @private
+         */
+        this.stagger = getStaggerFromProps(data);
+
+        /**
+         * @private
+         */
+        this.relative = relativeIsValid(data?.relative, 'spring');
+
+        /**
+         * @private
+         *
+         * This value lives from user call ( goTo etc..) until next call
+         **/
+        this.config = springConfigIsValidAndGetNew(data?.config);
+
+        /**
+         * @private
+         */
         this.uniqueId = getUnivoqueId();
+
+        /**
+         * @private
+         */
         this.isActive = false;
+
+        /**
+         * @private
+         */
         this.currentResolve = null;
+
+        /**
+         * @private
+         */
         this.currentReject = null;
+
+        /**
+         * @private
+         */
         this.promise = null;
+
+        /**
+         * @private
+         */
         this.values = [];
+
+        /**
+         * @private
+         */
         this.initialData = [];
+
+        /**
+         * @private
+         */
         this.callback = [];
+
+        /**
+         * @private
+         */
         this.callbackCache = [];
+
+        /**
+         * @private
+         */
         this.callbackOnComplete = [];
+
+        /**
+         * @private
+         */
         this.callbackStartInPause = [];
+
+        /**
+         * @private
+         */
         this.unsubscribeCache = [];
+
+        /**
+         * @private
+         */
         this.pauseStatus = false;
+
+        /**
+         * @privatg
+         */
         this.firstRun = true;
+
+        /**
+         * @private
+         */
         this.useStagger = true;
+
+        /**
+         * @private
+         */
         this.fpsInLoading = false;
 
         /**
-        This value lives from user call ( goTo etc..) until next call
-         **/
-        this.config =
-            'config' in data
-                ? this.springValidator(data.config)
-                : handleSetUp.get('spring').default;
-
-        this.relative =
-            'relative' in data
-                ? data.relative
-                : handleSetUp.get('spring').relative;
-
-        /**
-        This value is the base value merged with new value in custom prop
-        passed form user in goTo etc..
+         * @private
+         * This value is the base value merged with new value in custom prop
+         * passed form user in goTo etc..
          **/
         this.defaultProps = {
             reverse: false,
@@ -95,27 +168,22 @@ export class HandleSpring {
         };
 
         /**
+         * @private
+         */
+        this.slowlestStagger = STAGGER_DEFAULT_INDEX_OBJ;
+
+        /**
         Stagger value
          **/
-        this.stagger = getStaggerFromProps(data);
-        this.slowlestStagger = STAGGER_DEFAULT_INDEX_OBJ;
         this.fastestStagger = STAGGER_DEFAULT_INDEX_OBJ;
 
         /**
+         * @private
          * Set initial store data if defined in constructor props
          * If not use setData methods
          */
         const props = data?.data || null;
         if (props) this.setData(props);
-    }
-
-    springValidator(config) {
-        if (config in handleSetUp.get('spring')) {
-            return handleSetUp.get('spring')[config];
-        } else {
-            springPresetWarning(config);
-            return handleSetUp.get('spring').default;
-        }
     }
 
     onReuqestAnim(time, fps, res) {
@@ -135,7 +203,7 @@ export class HandleSpring {
         o.mass = parseFloat(this.config.mass);
         o.precision = parseFloat(this.config.precision);
 
-        const draw = (time, fps) => {
+        const draw = (_time, fps) => {
             this.isActive = true;
 
             this.values.forEach((item) => {
@@ -412,16 +480,23 @@ export class HandleSpring {
     /**
      * mergeProps - Mege special props with default props
      *
-     * @param  {Object} props { reverse: <>, config: <> , immediate <> }
+     * @param  {Object} props { reverse: <>, config: <> ,configProp: <>, immediate <> }
      * @return {Object} props merged
      *
      */
     mergeProps(props) {
-        /*
-         * Merge config Obj
+        /**
+         * Get new config preset
          */
-        const configToMerge = props?.config || {};
-        const newConfig = { ...this.defaultProps.config, ...configToMerge };
+        const newConfigPreset = springConfigIsValid(props?.config)
+            ? handleSetUp.get('spring')[props.config]
+            : this.defaultProps.config;
+
+        /*
+         * Modify single propierties of newConfigPreset
+         */
+        const configToMerge = springConfigPropIsValid(props?.configProp);
+        const newConfig = { ...newConfigPreset, ...configToMerge };
 
         /*
          * Merge all
@@ -657,12 +732,7 @@ export class HandleSpring {
      *
      */
     updatePreset(preset) {
-        if (preset in handleSetUp.get('spring')) {
-            this.config = handleSetUp.get('spring')[preset];
-        } else {
-            springPresetWarning(preset);
-        }
-
+        this.config = springConfigIsValidAndGetNew(preset);
         this.defaultProps = mergeDeep(this.defaultProps, {
             config: this.config,
         });

@@ -5,7 +5,7 @@ export const infiniteAnimation = () => {
     const play = document.querySelector('.infinite-tween .anim-play');
     const stop = document.querySelector('.infinite-tween .anim-stop');
 
-    const tween = mobbu.create('spring', {
+    const tween = mobbu.createSpring({
         stagger: { each: 3 },
         data: { x: 0 },
     });

@@ -7,7 +7,7 @@ export const mouseStagger = () => {
     const smallerBtn = document.querySelector('.down');
     console.log(biggerBtn, smallerBtn);
 
-    const spring = mobbu.create('spring', {
+    const spring = mobbu.createSpring({
         config: 'gentle',
         stagger: { each: 4 },
         data: { x: 0, y: 0 },

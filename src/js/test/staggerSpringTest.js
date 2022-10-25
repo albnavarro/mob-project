@@ -11,13 +11,13 @@ export function staggerSpringTest() {
     const stagger = document.querySelectorAll('.spring .target-stagger');
 
     // DEFINE SPRING
-    const myTween = mobbu.create('spring', { data: { x: 0, y: 0 } });
+    const myTween = mobbu.createSpring({ data: { x: 0, y: 0 } });
 
     myTween.subscribe(({ x, y }) => {
         target.style.transform = `translate3D(0px,0px,0px) translate(${x}px, ${y}px)`;
     });
 
-    const myStagger = mobbu.create('spring', {
+    const myStagger = mobbu.createSpring({
         stagger: { each: 4, from: 'center' },
         data: { x: 0 },
     });
@@ -38,13 +38,13 @@ export function staggerSpringTest() {
     // DEFINE TIMELINE
     const timeline = mobbu
         .create('asyncTimeline', { repeat: -1, yoyo: true, autoSet: false })
-        .goTo(myTween, { x: 500 }, { config: { precision: 1 } })
-        .goTo(myTween, { y: 500 }, { config: { precision: 1 } })
+        .goTo(myTween, { x: 500 }, { configProp: { precision: 1 } })
+        .goTo(myTween, { y: 500 }, { configProp: { precision: 1 } })
         .createGroup({ waitComplete: false })
-        .goTo(myTween, { x: 0 }, { config: { precision: 1 } })
+        .goTo(myTween, { x: 0 }, { configProp: { precision: 1 } })
         .goTo(myStagger, { x: 500 })
         .closeGroup()
-        .goTo(myTween, { y: 0 }, { config: { precision: 1 } });
+        .goTo(myTween, { y: 0 }, { configProp: { precision: 1 } });
 
     // LISTNER
     btnStart.addEventListener('click', () => {

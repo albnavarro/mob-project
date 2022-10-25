@@ -89,6 +89,10 @@ export const springPresetWarning = (preset) => {
     console.warn(`${preset} doasn't exist in spring configuration list`);
 };
 
+export const springConfigPropWarning = () => {
+    console.warn(`Spring configProp: all prop must be a positive Number`);
+};
+
 export const tweenEaseWarning = (preset) => {
     console.warn(`${preset} doasn't exixst in tweens ease function`);
 };
@@ -199,9 +203,9 @@ export const createStaggerEachWarning = (eachProportion) => {
     );
 };
 
-export const relativeWarining = (val) => {
+export const relativeWarining = (val, tweenType) => {
     console.warn(
-        `relative prop: ${val} is not a valid parameter, must be a boolean `
+        `${tweenType}: relative prop: ${val} is not a valid parameter, must be a boolean `
     );
 };
 

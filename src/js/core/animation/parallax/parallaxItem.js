@@ -131,7 +131,7 @@ export class ParallaxItemClass {
         // Add more precision to motion spring/lerp to trigger better force3D
         this.motionParameters =
             data.easeType === parallaxConstant.EASE_SPRING
-                ? { config: { precision: parallaxConstant.EASE_PRECISION } }
+                ? { configProp: { precision: parallaxConstant.EASE_PRECISION } }
                 : { precision: parallaxConstant.EASE_PRECISION };
 
         //

@@ -5,7 +5,7 @@ export const circleAnimation = () => {
     const play = document.querySelector('.circle-tween .anim-play');
     const stop = document.querySelector('.circle-tween .anim-stop');
 
-    const tween = mobbu.create('spring', {
+    const tween = mobbu.createSpring({
         stagger: { each: 3, from: 'start' },
         data: { x: 0 },
     });
