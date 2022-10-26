@@ -1,3 +1,11 @@
+/**
+ * @typedef {Object} springConfigTypes
+ * @prop {('default'|'gentle'|'wobbly'|'bounce'|'scroller')} config spring configuration list
+ **/
+
+/**
+ * @typedef {('default'|'gentle'|'wobbly'|'bounce'|'scroller')} springConfigStringTypes
+ **/
 export const springPresetConfig = {
     default: {
         tension: 20,

@@ -55,7 +55,56 @@ import {
 } from '../utils/tweenValidation.js';
 import { handleSetUp } from '../../setup.js';
 
+/**
+ * @typedef {Object} springTypes
+ * @prop {Object.<string, number>} data Initial data Object.
+ * @prop {Boolean} [ relative=false ] It defines the initial value of the relative properties, the value can be momentarily changed whenever the goTo, goFrom, goFromTo methods are invoked, the default value is false. If set to true each value will be calculated starting from the last used value, by default each value is calculated starting from the value defined in the constructor.
+ **/
 export class HandleSpring {
+    /**
+     * @param { springTypes & import('../utils/stagger/staggerCostant.js').staggerTypes & import('../spring/springConfig.js').springConfigTypes} data
+     *
+     * @example
+     * ```js
+     * const mySpring = new HandleSpring({
+     *   data: Object.<string, number>,
+     *   config: [ String ]
+     *   relative: [ Boolean ]
+     *   stagger:{
+     *      each: [ Number ],
+     *      from: [ Number|String|{x:number,y:number} ],
+     *      grid: {
+     *          col: [ Number ],
+     *          row: [ Number ],
+     *          direction: [ String ]
+     *      },
+     *   },
+     * })
+     *
+     *
+     * ```
+     *
+     * @description
+     * Available methods:
+     * ```js
+     * mySpring.set()
+     * mySpring.goTo()
+     * mySpring.goFrom()
+     * mySpring.goFromTo()
+     * mySpring.subscribe()
+     * mySpring.subscribeCache()
+     * mySpring.onComplete()
+     * mySpring.updateConfig()
+     * mySpring.updatePreset()
+     * mySpring.getId()
+     * mySpring.get()
+     * mySpring.getTo()
+     * mySpring.getFrom()
+     * mySpring.getToNativeType()
+     * mySpring.getFromNativeType()
+     *
+     * ```
+     */
     constructor(data = {}) {
         /**
          * @private
@@ -488,8 +537,9 @@ export class HandleSpring {
         /**
          * Get new config preset
          */
+        const { config: allConfig } = handleSetUp.get('spring');
         const newConfigPreset = springConfigIsValid(props?.config)
-            ? handleSetUp.get('spring')[props.config]
+            ? allConfig[props.config]
             : this.defaultProps.config;
 
         /*

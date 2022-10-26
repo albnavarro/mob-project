@@ -375,13 +375,12 @@ export const easeTweenIsValid = (ease) => {
  * Check if spring config is valid and return new config
  **/
 export const springConfigIsValidAndGetNew = (config) => {
-    const isValid = config in handleSetUp.get('spring');
+    const { config: allConfig } = handleSetUp.get('spring');
+    const isValid = config in allConfig;
     if (!isValid && config !== undefined && config !== null)
         springPresetWarning(config);
 
-    return isValid
-        ? handleSetUp.get('spring')[config]
-        : handleSetUp.get('spring').default;
+    return isValid ? allConfig[config] : allConfig.default;
 };
 
 /**
@@ -393,7 +392,8 @@ export const springConfigIsValidAndGetNew = (config) => {
  * Check if spring config is valid
  **/
 export const springConfigIsValid = (config) => {
-    const isValid = config in handleSetUp.get('spring');
+    const { config: allConfig } = handleSetUp.get('spring');
+    const isValid = config in allConfig;
     if (!isValid && config !== undefined && config !== null)
         springPresetWarning(config);
 

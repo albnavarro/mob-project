@@ -32,6 +32,7 @@ export const handleSetUp = (() => {
         },
         spring: {
             relative: false,
+            config: springPresetConfig,
         },
         lerp: {
             relative: false,
@@ -39,8 +40,6 @@ export const handleSetUp = (() => {
             velocity: 0.06,
         },
     };
-
-    data.spring = { ...data.spring, ...springPresetConfig };
 
     const set = (obj) => {
         data = mergeDeep(data, obj);

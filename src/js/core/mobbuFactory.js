@@ -333,6 +333,50 @@ export const mobbu = {
         return new HandleTween(data);
     },
 
+    /**
+     * @param { import('./animation/spring/handleSpring.js').springTypes & import('./animation/utils/stagger/staggerCostant.js').staggerTypes & import('./animation/spring/springConfig.js').springConfigTypes} data
+     *
+     * @example
+     * ```js
+     * const mySpring = new createSpring({
+     *   data: Object.<string, number>,
+     *   config: [ String ]
+     *   relative: [ Boolean ]
+     *   stagger:{
+     *      each: [ Number ],
+     *      from: [ Number|String|{x:number,y:number} ],
+     *      grid: {
+     *          col: [ Number ],
+     *          row: [ Number ],
+     *          direction: [ String ]
+     *      },
+     *   },
+     * })
+     *
+     *
+     * ```
+     *
+     * @description
+     * Available methods:
+     * ```js
+     * mySpring.set()
+     * mySpring.goTo()
+     * mySpring.goFrom()
+     * mySpring.goFromTo()
+     * mySpring.subscribe()
+     * mySpring.subscribeCache()
+     * mySpring.onComplete()
+     * mySpring.updateConfig()
+     * mySpring.updatePreset()
+     * mySpring.getId()
+     * mySpring.get()
+     * mySpring.getTo()
+     * mySpring.getFrom()
+     * mySpring.getToNativeType()
+     * mySpring.getFromNativeType()
+     *
+     * ```
+     */
     createSpring(data = {}) {
         return new HandleSpring(data);
     },

@@ -1,4 +1,3 @@
-import { tweenConfig } from './tweenConfig.js';
 import {
     getUnivoqueId,
     getValueObj,
