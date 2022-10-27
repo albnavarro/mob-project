@@ -28,6 +28,7 @@ import {
     sequencerRangeEndWarning,
     sequencerRangeStartWarning,
     springConfigPropWarning,
+    springConfigSpecificPropWarning,
     springPresetWarning,
     staggerEachWarning,
     staggerFromGenericWarning,
@@ -376,11 +377,43 @@ export const easeTweenIsValid = (ease) => {
  **/
 export const springConfigIsValidAndGetNew = (config) => {
     const { config: allConfig } = handleSetUp.get('spring');
-    const isValid = config in allConfig;
-    if (!isValid && config !== undefined && config !== null)
+
+    //Get config from store
+    const isInConfig = config in allConfig;
+
+    // Get obj config
+    const obj = isInConfig ? allConfig[config] : {};
+
+    // Check if there is all key
+    const isValidPropsKey = isInConfig
+        ? (() => {
+              return (
+                  checkType(Object, obj) &&
+                  'tension' in obj &&
+                  'mass' in obj &&
+                  'friction' in obj &&
+                  'velocity' in obj &&
+                  'precision' in obj
+              );
+          })()
+        : false;
+
+    // Check if all key is a positive number
+    const isValidPropsValue = isValidPropsKey
+        ? Object.values(obj).every((prop) => {
+              return checkType(Number, prop) && prop >= 0;
+          })
+        : null;
+
+    // warning gif config don't exist
+    if (!isInConfig && config !== undefined && config !== null)
         springPresetWarning(config);
 
-    return isValid ? allConfig[config] : allConfig.default;
+    // warning if config props is not valid
+    if (!isValidPropsValue && isInConfig)
+        springConfigSpecificPropWarning(config);
+
+    return isValidPropsValue ? allConfig[config] : allConfig.default;
 };
 
 /**

@@ -93,6 +93,12 @@ export const springConfigPropWarning = () => {
     console.warn(`Spring configProp: all prop must be a positive Number`);
 };
 
+export const springConfigSpecificPropWarning = (config) => {
+    console.warn(
+        `Spring config: ${config}: config must have friction/mass/precision/tesnion props and must be a number`
+    );
+};
+
 export const tweenEaseWarning = (preset) => {
     console.warn(`${preset} doasn't exixst in tweens ease function`);
 };

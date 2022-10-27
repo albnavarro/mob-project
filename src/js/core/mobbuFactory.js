@@ -334,13 +334,21 @@ export const mobbu = {
     },
 
     /**
-     * @param { import('./animation/spring/handleSpring.js').springTypes & import('./animation/utils/stagger/staggerCostant.js').staggerTypes & import('./animation/spring/springConfig.js').springConfigTypes} data
+     * @param { import('./animation/spring/handleSpring.js').springTypes & import('./animation/utils/stagger/staggerCostant.js').staggerTypes & import('./animation/spring/springConfig.js').springConfigTypes & import('./animation/spring/springConfig.js').springConfigPropsTypes} data
+     *
      *
      * @example
      * ```js
      * const mySpring = new createSpring({
      *   data: Object.<string, number>,
-     *   config: [ String ]
+     *   config: [ String ],
+     *   configProp: {
+     *      tension: [ Number ],
+     *      mass: [ Number ],
+     *      friction: [ Number ],
+     *      velocity: [ Number ],
+     *      precision: [ Number ],
+     *   },
      *   relative: [ Boolean ]
      *   stagger:{
      *      each: [ Number ],
@@ -348,7 +356,7 @@ export const mobbu = {
      *      grid: {
      *          col: [ Number ],
      *          row: [ Number ],
-     *          direction: [ String ]
+     *          direction: [ String ],
      *      },
      *   },
      * })

@@ -15,6 +15,8 @@ export function springTest() {
     // DEFINE SPRING
     const mySpring = mobbu.createSpring({
         data: { x: 0, y: 0, rotate: 0 },
+        configProp: { mass: 0.2 },
+        config: 'wobbly',
     });
 
     mySpring.subscribe(({ x, y, rotate }) => {
@@ -32,16 +34,12 @@ export function springTest() {
     const timeline = mobbu
         .create('asyncTimeline', { repeat: 2, yoyo: true, freeMode: true })
         .set(mySpring, { x: 0, y: 0, rotate: 0 })
-        .goTo(
-            mySpring,
-            { x: -200 },
-            { config: 'wobbly', configProp: { precision: 0.5 } }
-        )
+        .goTo(mySpring, { x: -200 }, { configProp: { precision: 0.5 } })
         .goFromTo(
             mySpring,
             { x: -200 },
             { x: 400 },
-            { configProp: { precision: 0.5 } }
+            { configProp: { mass: 1, precision: 0.5 } }
         )
         .goTo(
             mySpring,

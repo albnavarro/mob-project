@@ -4,6 +4,16 @@
  **/
 
 /**
+ * @typedef {Object} springConfigPropsTypes
+ * @prop {Object} configProp single spring config propierties
+ * @prop {Number} [ configProp.tension ] tension - A positive number
+ * @prop {Number} [ configProp.mass ] mass - A positive number
+ * @prop {Number} [ configProp.friction ] friction - A positive number
+ * @prop {Number} [ configProp.velocity ] velocity - A positive number
+ * @prop {Number} [ configProp.precision ] precision - A positive number
+ **/
+
+/**
  * @typedef {('default'|'gentle'|'wobbly'|'bounce'|'scroller')} springConfigStringTypes
  **/
 export const springPresetConfig = {

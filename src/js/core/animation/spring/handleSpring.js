@@ -62,13 +62,20 @@ import { handleSetUp } from '../../setup.js';
  **/
 export class HandleSpring {
     /**
-     * @param { springTypes & import('../utils/stagger/staggerCostant.js').staggerTypes & import('../spring/springConfig.js').springConfigTypes} data
+     * @param { springTypes & import('../utils/stagger/staggerCostant.js').staggerTypes & import('../spring/springConfig.js').springConfigTypes & import('../spring/springConfig.js').springConfigPropsTypes} data
      *
      * @example
      * ```js
      * const mySpring = new HandleSpring({
      *   data: Object.<string, number>,
-     *   config: [ String ]
+     *   config: [ String ],
+     *   configProp: {
+     *      tension: [ Number ],
+     *      mass: [ Number ],
+     *      friction: [ Number ],
+     *      velocity: [ Number ],
+     *      precision: [ Number ],
+     *   },
      *   relative: [ Boolean ]
      *   stagger:{
      *      each: [ Number ],
@@ -76,7 +83,7 @@ export class HandleSpring {
      *      grid: {
      *          col: [ Number ],
      *          row: [ Number ],
-     *          direction: [ String ]
+     *          direction: [ String ],
      *      },
      *   },
      * })
@@ -122,6 +129,11 @@ export class HandleSpring {
          * This value lives from user call ( goTo etc..) until next call
          **/
         this.config = springConfigIsValidAndGetNew(data?.config);
+
+        /**
+         * Update config with single props
+         */
+        this.updateConfig(data?.configProp);
 
         /**
          * @private
@@ -768,9 +780,11 @@ export class HandleSpring {
      *
      */
     updateConfig(config) {
-        this.config = { ...this.config, ...config };
+        const configToMerge = springConfigPropIsValid(config);
+        this.config = { ...this.config, ...configToMerge };
+
         this.defaultProps = mergeDeep(this.defaultProps, {
-            config,
+            config: configToMerge,
         });
     }
 
