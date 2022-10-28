@@ -288,7 +288,7 @@ export class HandleSyncTimeline {
              * Prevent multiple fire of complete event
              * Send direction BACKWARD || FORWARD as argument
              * If loop is too fast consider end of loop invalid
-             * Prevent error from cycle that start fromm end
+             * Prevent error from cycle that start from end
              * in reverse mode
              **/
             if (
@@ -415,20 +415,36 @@ export class HandleSyncTimeline {
     }
 
     /**
+     * @param {Object} props
+     * @param {Boolean} [ props.useCurrent ]
      * @returns {this} The instance on which this method was called.
      *
      * @example
      * ```js
-     * myTimeline.play();
+     * myTimeline.play({
+     *      useCurrent: true
+     * });
      *
      *
      * ```
      *
      * @description
      * Plays the timeline starting from the initial value
+     * With useCurrent set to true and with the timeline active, it will reverse the direction from the current value if it is scrolling in reverse, otherwise it will continue in the current direction.
+     * With useCurrent set to false (default) the animation will always start from frame 0 towards the final value.
      */
-    play() {
+    play(props = {}) {
+        const useCurrent = props?.useCurrent;
         if (this.fpsIsInLoading) return;
+
+        /**
+         * If is running and useCurrent is true move from current time value
+         */
+        if (!this.isStopped && !this.isReverse && useCurrent) return;
+        if (!this.isStopped && this.isReverse && useCurrent) {
+            this.reverse();
+            return;
+        }
 
         this.playFromTime();
         return this;
@@ -476,6 +492,7 @@ export class HandleSyncTimeline {
          * Generic prop
          */
         this.isPlayngReverse = false;
+        this.loopIteration = 0;
 
         /*
          * Prevent multile firing
@@ -509,20 +526,36 @@ export class HandleSyncTimeline {
     }
 
     /**
+     * @param {Object} props
+     * @param {Boolean} [ props.useCurrent ]
      * @returns {this} The instance on which this method was called.
      *
      * @example
      * ```js
-     * myTimeline.playReverse();
+     * myTimeline.playReverse({
+     *      useCurrent: true
+     * });
      *
      *
      * ```
      *
      * @description
      * Plays the timeline starting from the end value
+     * With useCurrent set to true and with the timeline active, it will reverse the direction from the current value if it is scrolling in reverse, otherwise it will continue in the current direction.
+     * With useCurrent set to false (default) the animation will always start from the final value towards the initial value.
      */
-    playReverse() {
+    playReverse(props = {}) {
+        const useCurrent = props?.useCurrent;
         if (this.fpsIsInLoading) return;
+
+        /**
+         * If is running and useCurrent is true move from current time value
+         */
+        if (!this.isStopped && this.isReverse && useCurrent) return;
+        if (!this.isStopped && !this.isReverse && useCurrent) {
+            this.reverse();
+            return;
+        }
 
         this.playFromTimeReverse(this.duration, true);
         return this;
@@ -550,6 +583,7 @@ export class HandleSyncTimeline {
         this.startReverse = true;
         this.isPlayngReverse = true;
         this.skipFirstRender = true;
+        this.loopIteration = 0;
 
         /*
          * Prevent multile firing

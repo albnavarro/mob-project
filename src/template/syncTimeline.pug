@@ -7,12 +7,20 @@ block content
         .container.menu-container.menu-container--top
             include ../includes/navigation.pug
     main
-        .container.clearfix  
+        .container.clearfix
           .syncTimeline
                 h1
                     |Sync timeline animation
                 button.start(type="button")
-                    |start
+                    |play - useCurrent: false
+                button.startReverse(type="button")
+                    |playReverse - useCurrent: false
+                button.startCurrent(type="button")
+                    |play - useCurrent: true
+                button.startReverseCurrent(type="button")
+                    |playReverse - useCurrent: true
+                hr
+
                 button.stop(type="button")
                     |stop
                 button.pause(type="button")
@@ -21,13 +29,12 @@ block content
                     |resume
                 button.reverse(type="button")
                     |reverse
-                button.startReverse(type="button")
-                    |startReverse
                 button.playFrom(type="button")
                     |play from
                 button.playFromReverse(type="button")
                     |play from reverse
                 hr
+
                 button.unsubscribeStagger(type="button")
                     |unsubscribe stagger 2
                 button.moreRotation(type="button")
@@ -35,6 +42,7 @@ block content
                 button.lessRotation(type="button")
                     |less rotaation
                 hr
+
                 span.label.activeStatus
                     |is running: false
                 span.label.pauseStatus

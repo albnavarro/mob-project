@@ -4,7 +4,18 @@ import { isIOS } from '../utility/isIOS.js';
 export function syncTimelineTest() {
     const target = document.querySelector('.sync-target');
     const starger = document.querySelectorAll('.sync-stagger');
+
     const btnStart = document.querySelector('.syncTimeline .start');
+    const btnStartReverse = document.querySelector(
+        '.syncTimeline .startReverse'
+    );
+    const btnStartCurrent = document.querySelector(
+        '.syncTimeline .startCurrent'
+    );
+    const btnStartReverseCurrent = document.querySelector(
+        '.syncTimeline .startReverseCurrent'
+    );
+
     const btnStop = document.querySelector('.syncTimeline .stop');
     const btnPause = document.querySelector('.syncTimeline .pause');
     const btnResume = document.querySelector('.syncTimeline .resume');
@@ -18,9 +29,6 @@ export function syncTimelineTest() {
     );
     const btnLessRotation = document.querySelector(
         '.syncTimeline .lessRotation'
-    );
-    const btnStartReverse = document.querySelector(
-        '.syncTimeline .startReverse'
     );
     const btnUnsubscribe = document.querySelector(
         '.syncTimeline .unsubscribeStagger'
@@ -94,7 +102,7 @@ export function syncTimelineTest() {
 
     const syncTimeline = mobbu
         .createSyncTimeline({
-            repeat: 2,
+            repeat: 1,
             yoyo: false,
             duration: 10000,
         })
@@ -115,20 +123,30 @@ export function syncTimelineTest() {
 
     syncTimeline.onComplete(() => {
         console.log(`complete`);
+        updatePropTest();
     });
 
     syncTimeline.onUpdate(() => {
         updatePropTest();
     });
 
+    //
     btnStart.addEventListener('click', () => {
-        mobbu.use('frame', () => {
-            syncTimeline.stop();
-            syncTimeline.play();
-            btnGetTime.innerHTML = `currentTime: ${syncTimeline.getTime()}`;
-            updatePropTest();
-        });
+        syncTimeline.play();
     });
+
+    btnStartReverse.addEventListener('click', () => {
+        syncTimeline.playReverse();
+    });
+
+    btnStartCurrent.addEventListener('click', () => {
+        syncTimeline.play({ useCurrent: true });
+    });
+
+    btnStartReverseCurrent.addEventListener('click', () => {
+        syncTimeline.playReverse({ useCurrent: true });
+    });
+    //
 
     btnStop.addEventListener('click', () => {
         syncTimeline.stop();
@@ -142,30 +160,20 @@ export function syncTimelineTest() {
 
     btnResume.addEventListener('click', () => {
         syncTimeline.resume();
-        updatePropTest();
     });
 
     btnReverse.addEventListener('click', () => {
         syncTimeline.reverse();
-        updatePropTest();
-    });
-
-    btnStartReverse.addEventListener('click', () => {
-        syncTimeline.stop();
-        syncTimeline.playReverse();
-        updatePropTest();
     });
 
     btnPlayFrom.addEventListener('click', () => {
         syncTimeline.stop();
         syncTimeline.playFrom('label1');
-        updatePropTest();
     });
 
     btnPlayFromReverse.addEventListener('click', () => {
         syncTimeline.stop();
         syncTimeline.playFromReverse('label2');
-        updatePropTest();
     });
 
     btnMoreRotation.addEventListener('click', () => {
