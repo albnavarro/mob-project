@@ -26,7 +26,7 @@ export function springTest() {
     // BACK TWEEN
     function springBack() {
         timeline.stop();
-        mySpring.updatePreset('gentle');
+        mySpring.updateConfig('gentle');
         return mySpring.goTo({ x: 0, y: 0, rotate: 180 });
     }
 

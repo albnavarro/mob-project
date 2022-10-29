@@ -350,9 +350,8 @@ export class ParallaxItemClass {
                 }
                 break;
             case parallaxConstant.EASE_SPRING:
-            default:
                 if (this.springConfig) {
-                    this.motion.updatePreset(this.springConfig);
+                    this.motion.updateConfig(this.springConfig);
                 }
                 break;
         }

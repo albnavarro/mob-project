@@ -107,7 +107,7 @@ export class HandleTween {
      * myTween.subscribe()
      * myTween.subscribeCache()
      * myTween.onComplete()
-     * myTween.updatePreset()
+     * myTween.updateEase()
      * myTween.getId()
      * myTween.get()
      * myTween.getTo()
@@ -295,6 +295,7 @@ export class HandleTween {
     }
 
     /**
+     * @private
      * @param {Number} time current global time
      * @param {Boolean} fps current FPS
      * @param {Boolean} res current promise resolve
@@ -774,7 +775,7 @@ export class HandleTween {
 
     /**
      * @param {Object.<string, number|function>} obj to Values
-     * @param {tweenSpecialProps & tweenCommonSpecialProps & import('../tween/tweenConfig.js').easeTypes} props special props
+     * @param {tweenCommonSpecialProps } props special props
      * @returns {Promise} Return a promise which is resolved when tween is over
      *
      * @example
@@ -992,15 +993,15 @@ export class HandleTween {
     }
 
     /**
-     * updatePreset - Update config object with new preset
+     * Update ease with new preset
      *
-     * @param { import('../tween/tweenConfig.js').easeStringTypes } preset
+     * @param { import('../tween/tweenConfig.js').easeStringTypes } ease
      *
      */
-    updatePreset(preset) {
-        this.ease = easeTweenIsValidGetFunction(preset);
+    updateEase(ease) {
+        this.ease = easeTweenIsValidGetFunction(ease);
         this.defaultProps = mergeDeep(this.defaultProps, {
-            ease: preset,
+            ease,
         });
     }
 
@@ -1065,7 +1066,7 @@ export class HandleTween {
      *
      * //Multiple DOM element ( stagger )
      * const unsubscribeStagger = [...elements].map((item) => {
-     *   return myTween.onStop(({ x, y... }) => {
+     *   return myTween.onComplete(({ x, y... }) => {
      *       item.style.prop = ...
      *   });
      * });
@@ -1081,12 +1082,12 @@ export class HandleTween {
      * @example
      * ```js
      * // Use transform3D while item is active
-     * mySequencer.subscribe(({x}) => {
+     * myTween.subscribe(({x}) => {
      *      domEl.style.transform = ` transform3D(0,0,0) translateX(${x}px)`
      * })
      *
      * // Remove transform3D when item is inactive
-     * mySequencer.onStop(({x}) => {
+     * myTween.onComplete(({x}) => {
      *      domEl.style.transform = `translateX(${x}px)`
      * })
      * ```

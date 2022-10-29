@@ -54,14 +54,14 @@ export const bodyScroll = (() => {
             const scrollNow = window.pageYOffset;
 
             if (prevent) document.body.style.overflow = 'hidden';
-            if (ease) tween.updatePreset(ease);
+            if (ease) tween.updateEase(ease);
 
             return new Promise((res, reject) => {
                 tween
                     .goFromTo({ val: scrollNow }, { val: target }, { duration })
                     .then(() => {
                         if (prevent) document.body.style.overflow = '';
-                        if (ease) tween.updatePreset(defaultPreset);
+                        if (ease) tween.updateEase(defaultPreset);
                         res();
                     })
                     .catch(() => {
