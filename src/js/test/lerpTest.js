@@ -13,7 +13,9 @@ export function lerpTest() {
     const target = document.querySelector('.lerp-target');
 
     // DEFINE SPRING
-    const mylerp = mobbu.create('lerp', { data: { x: 0, y: 0, rotate: 0 } });
+    const mylerp = mobbu.createLerp({
+        data: { x: 0, y: 0, rotate: 0 },
+    });
     mylerp.subscribe(({ x, y, rotate }) => {
         target.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg)`;
     });

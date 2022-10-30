@@ -389,11 +389,57 @@ export const mobbu = {
         return new HandleSpring(data);
     },
 
+    /**
+     * @param { import('./animation/lerp/handleLerp.js').lerpTypes & import('./animation/lerp/handleLerp.js').lerpPropTypes & import('./animation/utils/stagger/staggerCostant.js').staggerTypes } data
+     *
+     * @example
+     * ```js
+     * const myLerp = new mobbu.createLerp({
+     *   data: Object.<string, number>,
+     *   precision: [ Number ],
+     *   velocity: [ Number ],
+     *   relative: [ Boolean ]
+     *   stagger:{
+     *      each: [ Number ],
+     *      from: [ Number|String|{x:number,y:number} ],
+     *      grid: {
+     *          col: [ Number ],
+     *          row: [ Number ],
+     *          direction: [ String ],
+     *      },
+     *   },
+     * })
+     *
+     *
+     * ```
+     *
+     * @description
+     * Available methods:
+     * ```js
+     * myLerp.set()
+     * myLerp.goTo()
+     * myLerp.goFrom()
+     * myLerp.goFromTo()
+     * myLerp.subscribe()
+     * myLerp.subscribeCache()
+     * myLerp.onComplete()
+     * myLerp.updateVelocity()
+     * myLerp.updatePrecision()
+     * myLerp.getId()
+     * myLerp.get()
+     * myLerp.getTo()
+     * myLerp.getFrom()
+     * myLerp.getToNativeType()
+     * myLerp.getFromNativeType()
+     *
+     * ```
+     */
+    createLerp(data = {}) {
+        return new HandleLerp(data);
+    },
+
     create(type = '', obj = {}) {
         switch (type) {
-            case 'lerp':
-                return new HandleLerp(obj);
-
             case 'asyncTimeline':
                 return new HandleAsyncTimeline(obj);
 

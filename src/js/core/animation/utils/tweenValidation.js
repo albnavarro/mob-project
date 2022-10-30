@@ -23,6 +23,8 @@ import {
     durationWarining,
     initialDataPropWarining,
     initialDataValueWarining,
+    lerpPrecisionWarining,
+    lerpVelocityWarining,
     relativeWarining,
     repeatWarining,
     sequencerRangeEndWarning,
@@ -486,4 +488,36 @@ export const valueIsBooleanAndTrue = (value, label) => {
         booleanWarning(value, label);
 
     return isValid && value === true;
+};
+
+/**
+ *
+ * @param {Number} velocity
+ * @returns {Number}
+ *
+ * @description
+ * Check if velocity is valid
+ **/
+export const lerpVelocityIsValid = (value) => {
+    const isValid = checkType(Number, value) && value > 0 && value <= 1;
+    if (!isValid && value !== undefined && value !== null)
+        lerpVelocityWarining();
+
+    return isValid ? value : handleSetUp.get('lerp').velocity;
+};
+
+/**
+ *
+ * @param {Number} velocity
+ * @returns {Number}
+ *
+ * @description
+ * Check if precision is valid
+ **/
+export const lerpPrecisionIsValid = (value) => {
+    const isValid = checkType(Number, value);
+    if (!isValid && value !== undefined && value !== null)
+        lerpPrecisionWarining();
+
+    return isValid ? value : handleSetUp.get('lerp').precision;
 };

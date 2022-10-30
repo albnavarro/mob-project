@@ -5,7 +5,7 @@ export const gridStaggerLerp = () => {
         '.grid-stagger-lerp .grid-stagger__item'
     );
 
-    const tween = mobbu.create('lerp', {
+    const tween = mobbu.createLerp({
         stagger: {
             each: 15,
             from: 'center',

@@ -19,7 +19,6 @@ import { loadFps } from '../../events/rafutils/loadFps.js';
 import { handleFrame } from '../../events/rafutils/handleFrame.js';
 import { handleNextTick } from '../../events/rafutils/handleNextTick.js';
 import { mergeDeep } from '../../utils/mergeDeep.js';
-import { handleSetUp } from '../../setup.js';
 import { setStagger } from '../utils/stagger/setStagger.js';
 import { STAGGER_DEFAULT_INDEX_OBJ } from '../utils/stagger/staggerCostant.js';
 import {
@@ -49,48 +48,184 @@ import {
 import { fpsLoadedLog } from '../utils/log.js';
 import { shouldInizializzeStagger } from '../utils/condition.js';
 import { handleCache } from '../../events/rafutils/handleCache.js';
+import {
+    lerpPrecisionIsValid,
+    lerpVelocityIsValid,
+    relativeIsValid,
+} from '../utils/tweenValidation.js';
+
+/**
+ * @typedef {Object} lerpTypes
+ * @prop {Object.<string, number>} data Initial data Object.
+ * @prop {Boolean} [ relative=false ] It defines the initial value of the relative properties, the value can be momentarily changed whenever the goTo, goFrom, goFromTo methods are invoked, the default value is false. If set to true each value will be calculated starting from the last used value, by default each value is calculated starting from the value defined in the constructor.
+ **/
+
+/**
+ * @typedef {Object} lerpPropTypes
+ * @prop {Number} [ velocity ] It defines the initial value of the velocity properties, the value can be momentarily changed whenever the goTo, goFrom, goFromTo methods are invoked, `default value is 0.06`,the closer the value is to 1, the faster the transition will be.
+ * @prop {Number} [ precision ] It defines the initial value of the precision properties, the value can be momentarily changed whenever the goTo, goFrom, goFromTo methods are invoked, when the calculated value is less than this number, the transition will be considered completed, the smaller the value, the greater the precision of the calculation, the `default value is 0.01`.
+ **/
 
 export class HandleLerp {
+    /**
+     * @param { lerpTypes & lerpPropTypes & import('../utils/stagger/staggerCostant.js').staggerTypes } data
+     *
+     * @example
+     * ```js
+     * const myLerp = new HandleSpring({
+     *   data: Object.<string, number>,
+     *   precision: [ Number ],
+     *   velocity: [ Number ],
+     *   relative: [ Boolean ]
+     *   stagger:{
+     *      each: [ Number ],
+     *      from: [ Number|String|{x:number,y:number} ],
+     *      grid: {
+     *          col: [ Number ],
+     *          row: [ Number ],
+     *          direction: [ String ],
+     *      },
+     *   },
+     * })
+     *
+     *
+     * ```
+     *
+     * @description
+     * Available methods:
+     * ```js
+     * myLerp.set()
+     * myLerp.goTo()
+     * myLerp.goFrom()
+     * myLerp.goFromTo()
+     * myLerp.subscribe()
+     * myLerp.subscribeCache()
+     * myLerp.onComplete()
+     * myLerp.updateVelocity()
+     * myLerp.updatePrecision()
+     * myLerp.getId()
+     * myLerp.get()
+     * myLerp.getTo()
+     * myLerp.getFrom()
+     * myLerp.getToNativeType()
+     * myLerp.getFromNativeType()
+     *
+     * ```
+     */
     constructor(data = {}) {
+        /**
+         * @private
+         */
+        this.stagger = getStaggerFromProps(data);
+
+        /**
+         * This value lives from user call ( goTo etc..) until next call
+         **/
+
+        /**
+         * @private
+         */
+        this.relative = relativeIsValid(data?.relative, 'lerp');
+
+        /**
+         * @private
+         */
+        this.velocity = lerpVelocityIsValid(data?.velocity);
+
+        /**
+         * @private
+         */
+        this.precision = lerpPrecisionIsValid(data?.precision);
+
+        /**
+         * End
+         **/
+
+        /**
+         * @private
+         */
         this.uniqueId = getUnivoqueId();
-        this.config = {};
+
+        /**
+         * @private
+         */
         this.isActive = false;
+
+        /**
+         * @private
+         */
         this.currentResolve = null;
+
+        /**
+         * @private
+         */
         this.currentReject = null;
+
+        /**
+         * @private
+         */
         this.promise = null;
+
+        /**
+         * @private
+         */
         this.values = [];
+
+        /**
+         * @private
+         */
         this.initialData = [];
+
+        /**
+         * @private
+         */
         this.callback = [];
+
+        /**
+         * @private
+         */
         this.callbackCache = [];
+
+        /**
+         * @private
+         */
         this.callbackOnComplete = [];
+
+        /**
+         * @private
+         */
         this.callbackStartInPause = [];
+
+        /**
+         * @private
+         */
         this.unsubscribeCache = [];
+
+        /**
+         * @private
+         */
         this.pauseStatus = false;
+
+        /**
+         * @private
+         */
         this.firstRun = true;
+
+        /**
+         * @private
+         */
         this.useStagger = true;
+
+        /**
+         * @private
+         */
         this.fpsInLoading = false;
 
         /**
-        This value lives from user call ( goTo etc..) until next call
-         **/
-        this.velocity =
-            'velocity' in data
-                ? data.velocity
-                : handleSetUp.get('lerp').velocity;
-
-        this.precision =
-            'precision' in data
-                ? data.precision
-                : handleSetUp.get('lerp').precision;
-
-        this.relative =
-            'relative' in data
-                ? data.relative
-                : handleSetUp.get('lerp').relative;
-
-        /**
-        This value is the base value merged with new value in custom prop
-        passed form user in goTo etc..
+         * @private
+         *
+         * This value is the base value merged with new value in custom prop
+         * passed form user in goTo etc..
          **/
         this.defaultProps = {
             reverse: false,
@@ -102,10 +237,14 @@ export class HandleLerp {
         };
 
         /**
-        Stagger value
+         * @private
+         * Stagger value
          **/
-        this.stagger = getStaggerFromProps(data);
         this.slowlestStagger = STAGGER_DEFAULT_INDEX_OBJ;
+
+        /**
+         * @private
+         **/
         this.fastestStagger = STAGGER_DEFAULT_INDEX_OBJ;
 
         /**
@@ -400,9 +539,9 @@ export class HandleLerp {
     mergeProps(props) {
         const newProps = { ...this.defaultProps, ...props };
         const { velocity, precision, relative } = newProps;
-        this.velocity = velocity;
-        this.precision = precision;
-        this.relative = relative;
+        this.relative = relativeIsValid(relative, 'lerp');
+        this.velocity = lerpVelocityIsValid(velocity);
+        this.precision = lerpPrecisionIsValid(precision);
 
         return newProps;
     }
@@ -613,9 +752,16 @@ export class HandleLerp {
      *
      */
     updateVelocity(velocity) {
-        this.velocity = velocity;
+        this.velocity = lerpVelocityIsValid(velocity);
         this.defaultProps = mergeDeep(this.defaultProps, {
-            velocity: velocity,
+            velocity: this.velocity,
+        });
+    }
+
+    updatePrecision(precision) {
+        this.velocity = lerpPrecisionIsValid(precision);
+        this.defaultProps = mergeDeep(this.defaultProps, {
+            precision: this.precision,
         });
     }
 

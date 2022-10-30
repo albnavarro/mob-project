@@ -13,7 +13,7 @@ export class PageScrollItemClass {
         this.endValue = 0;
         this.prevValue = 0;
         this.firstTime = true;
-        this.lerp = mobbu.create('lerp');
+        this.lerp = mobbu.createLerp();
         this.unsubscribeResize = () => {};
         this.unsubscribeScroll = () => {};
         this.unsubscribeLerp = () => {};

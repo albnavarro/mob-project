@@ -10,7 +10,7 @@ export class move3DitemClass {
         this.range = data.range;
         this.initialRotate = data.initialRotate;
         this.animate = data.animate;
-        this.lerp = mobbu.create('lerp');
+        this.lerp = mobbu.createLerp();
         this.unsubscribelerp = () => {};
         this.unsubscribeOnComplete = () => {};
     }

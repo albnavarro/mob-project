@@ -218,3 +218,15 @@ export const relativeWarining = (val, tweenType) => {
 export const booleanWarning = (val, label) => {
     console.warn(`${label}: ${val} is not Boolean`);
 };
+
+export const lerpVelocityWarining = () => {
+    console.warn(
+        'Lerp error: velocity is not valid, must be a Number greater than 0 and less than 1'
+    );
+};
+
+export const lerpPrecisionWarining = () => {
+    console.warn(
+        'Lerp error: precision is not valid, must be a number greater than 0'
+    );
+};

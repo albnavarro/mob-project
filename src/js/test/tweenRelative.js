@@ -54,7 +54,7 @@ export const tweenRealtive = () => {
     const resetLerp = document.querySelector('.lerp-reset');
     const boxLerp = document.querySelector('.tween-relative-item--lerp');
 
-    const lerp = mobbu.create('lerp', {
+    const lerp = mobbu.createLerp({
         data: { x: 0, rotate: 0 },
         relative: true,
     });

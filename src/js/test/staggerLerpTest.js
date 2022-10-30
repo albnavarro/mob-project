@@ -12,13 +12,13 @@ export function staggerLerpTest() {
     const stagger = document.querySelectorAll('.lerp .target-stagger');
 
     // DEFINE SPRING
-    const myTween = mobbu.create('lerp', { data: { x: 0, y: 0 } });
+    const myTween = mobbu.createLerp({ data: { x: 0, y: 0 } });
 
     myTween.subscribe(({ x, y }) => {
         target.style.transform = `translate3D(0px,0px,0px) translate(${x}px, ${y}px)`;
     });
 
-    const myStagger = mobbu.create('lerp', {
+    const myStagger = mobbu.createLerp({
         stagger: { each: 4, from: 'edges' },
         data: { x: 0 },
     });
