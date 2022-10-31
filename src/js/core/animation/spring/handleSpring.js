@@ -792,7 +792,7 @@ export class HandleSpring {
      * @private
      *
      * @param {Object.<string, number|function>} data Updated data
-     * @param { import('../tween/handleTween.js').tweenCommonSpecialProps & import('../utils/stagger/staggerCostant.js').staggerTypes & import('../spring/springConfig.js').springConfigTypes & import('../spring/springConfig.js').springConfigPropsTypes} props special props
+     * @param { import('../tween/handleTween.js').tweenCommonSpecialProps & import('../spring/springConfig.js').springConfigTypes & import('../spring/springConfig.js').springConfigPropsTypes} props special props
      * @param {Object.<string, number|function>} obj new data obj come from set/goTo/goFrom/goFromTo
      * @returns {Promise} Return a promise which is resolved when tween is over
      *
