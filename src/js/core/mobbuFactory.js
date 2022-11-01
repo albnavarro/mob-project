@@ -456,6 +456,8 @@ export const mobbu = {
      * @description
      * Available methods:
      * ```js
+     *
+     * `Methods to create timeline`
      * myTimeline.set()
      * myTimeline.goTo()
      * myTimeline.goFrom()
@@ -467,7 +469,9 @@ export const mobbu = {
      * myTimeline.closeGroup()
      * myTimeline.suspend()
      * myTimeline.label()
-     * myTimeline.setTween()
+     *
+     *
+     * `Methods to control timeline`
      * myTimeline.play()
      * myTimeline.playFromLabel()
      * myTimeline.playFrom()
@@ -477,11 +481,12 @@ export const mobbu = {
      * myTimeline.stop()
      * myTimeline.pause()
      * myTimeline.resume()
-     * myTimeline.get()
      * myTimeline.isActive()
      * myTimeline.isPaused()
      * myTimeline.isSuspended()
      * myTimeline.getDirection()
+     * myTimeline.setTween()
+     * myTimeline.get()
      * myTimeline.onLoopEnd()
      * myTimeline.onComplete()
      * myTimeline.destroy()

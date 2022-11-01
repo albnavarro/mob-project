@@ -69,6 +69,8 @@ export class HandleAsyncTimeline {
      * @description
      * Available methods:
      * ```js
+     *
+     * `Methods to create timeline`
      * myTimeline.set()
      * myTimeline.goTo()
      * myTimeline.goFrom()
@@ -80,7 +82,9 @@ export class HandleAsyncTimeline {
      * myTimeline.closeGroup()
      * myTimeline.suspend()
      * myTimeline.label()
-     * myTimeline.setTween()
+     *
+     *
+     * `Methods to control timeline`
      * myTimeline.play()
      * myTimeline.playFromLabel()
      * myTimeline.playFrom()
@@ -90,11 +94,12 @@ export class HandleAsyncTimeline {
      * myTimeline.stop()
      * myTimeline.pause()
      * myTimeline.resume()
-     * myTimeline.get()
      * myTimeline.isActive()
      * myTimeline.isPaused()
      * myTimeline.isSuspended()
      * myTimeline.getDirection()
+     * myTimeline.setTween()
+     * myTimeline.get()
      * myTimeline.onLoopEnd()
      * myTimeline.onComplete()
      * myTimeline.destroy()
@@ -948,7 +953,6 @@ export class HandleAsyncTimeline {
      *
      * @example
      * ```js
-     * `Tween`
      * myTimeline.goTo(
      *      myTweenInstance,
      *      { Object.<string, (Number|Function)> },
@@ -1028,7 +1032,6 @@ export class HandleAsyncTimeline {
      *
      * @example
      * ```js
-     * `Tween`
      * myTimeline.goFrom(
      *      myTweenInstance,
      *      { Object.<string, (Number|Function)> },
@@ -1109,7 +1112,6 @@ export class HandleAsyncTimeline {
      *
      * @example
      * ```js
-     * `Tween`
      * myTimeline.goFromTo(
      *      myTweenInstance,
      *      { Object.<string, (Number|Function)> },
