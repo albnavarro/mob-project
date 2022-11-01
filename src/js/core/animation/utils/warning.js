@@ -53,10 +53,6 @@ export const timelineReverseGoFromWarning = () => {
     );
 };
 
-export const timelineSyncWarning = (val) => {
-    console.warn(`timeline.sync(): ${val} is not a tween`);
-};
-
 export const timelineSetTweenArrayWarining = (items) => {
     console.warn(`timeline setTween: ${items} is not an array of tween`);
 };
@@ -159,12 +155,6 @@ export const durationNumberOrFunctionWarining = (value) => {
     );
 };
 
-export const yoyoWarining = (value) => {
-    console.warn(
-        `yoyo error: ${value} is not valid yoyo value must be a Boolean`
-    );
-};
-
 export const repeatWarining = (value) => {
     console.warn(
         `repeat error: ${value} is not valid repeat value must be a Number`
@@ -229,4 +219,24 @@ export const lerpPrecisionWarining = () => {
     console.warn(
         'Lerp error: precision is not valid, must be a number greater than 0'
     );
+};
+
+export const asyncTimelineMetodsInsideGroupWarining = (methodName) => {
+    console.warn(
+        `asyncTimeline error: ${methodName} cannot be used inside group`
+    );
+};
+
+export const valueStringWarning = (label) => {
+    console.warn(`${label} value must be a string`);
+};
+
+export const asyncTimelineTweenWaring = () => {
+    console.warn(
+        'tween added to asyncTimeline or used inside sync() method must be instance of HandleLerp | HandleTween | HandleSpring'
+    );
+};
+
+export const asyncTimelineDelayWarning = () => {
+    console.warn('asyncTimeline arror: delay must be a Number');
 };

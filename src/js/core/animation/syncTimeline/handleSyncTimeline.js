@@ -10,7 +10,7 @@ import { syncTimelineLabelWarning } from '../utils/warning.js';
 import {
     durationIsValid,
     repeatIsValid,
-    yoyIsValid,
+    valueIsBooleanAndReturnDefault,
 } from '../utils/tweenValidation.js';
 
 /**
@@ -65,7 +65,11 @@ export class HandleSyncTimeline {
         /**
          * @private
          */
-        this.yoyo = yoyIsValid(data?.yoyo);
+        this.yoyo = valueIsBooleanAndReturnDefault(
+            data?.yoyo,
+            'syncTimeline: yoyo',
+            false
+        );
 
         /**
          * @private

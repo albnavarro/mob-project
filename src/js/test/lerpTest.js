@@ -28,7 +28,7 @@ export function lerpTest() {
 
     // DEFINE TIMELINE
     const timeline = mobbu
-        .create('asyncTimeline', { repeat: 2, yoyo: true, freeMode: true })
+        .createAsyncTimeline({ repeat: 2, yoyo: true, freeMode: true })
         .set(mylerp, { x: 0, y: 0, rotate: 0 })
         .goTo(mylerp, { x: -200 }, { velocity: 0.02, precision: 1 })
         .goFromTo(mylerp, { x: -200 }, { x: 400 })
@@ -80,7 +80,7 @@ export function lerpTest() {
     });
 
     btnReverse.addEventListener('click', () => {
-        timeline.reverse();
+        timeline.playReverse();
     });
 
     btnFrom.addEventListener('click', () => {

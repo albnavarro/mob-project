@@ -51,7 +51,7 @@ export const mouseStagger = () => {
     smallerBtn.addEventListener('click', () => (val -= 0.5));
 
     const timeline = mobbu
-        .create('asyncTimeline', { repeat: -1, yoyo: true })
+        .createAsyncTimeline({ repeat: -1, yoyo: true })
         .goTo(tween, { scale: () => val * 2 })
         // .goTo(tween, { scale: () => val * 3 })
         .play()

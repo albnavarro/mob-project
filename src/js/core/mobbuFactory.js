@@ -438,11 +438,61 @@ export const mobbu = {
         return new HandleLerp(data);
     },
 
+    /**
+     * @param { import('./animation/asyncTimeline/handleAsyncTimeline.js').asyncTimelineTypes } data
+     *
+     * @example
+     * ```js
+     * const myTimeline = mobbu.createAsyncTimeline({
+     *   yoyo: [ Boolean ],
+     *   repeat: [ Number ],
+     *   freeMode: [ Number ],
+     *   autoSet: [ Number ],
+     * })
+     *
+     *
+     * ```
+     *
+     * @description
+     * Available methods:
+     * ```js
+     * myTimeline.set()
+     * myTimeline.goTo()
+     * myTimeline.goFrom()
+     * myTimeline.goFromTo()
+     * myTimeline.add()
+     * myTimeline.addAsync()
+     * myTimeline.sync()
+     * myTimeline.createGroup()
+     * myTimeline.closeGroup()
+     * myTimeline.suspend()
+     * myTimeline.label()
+     * myTimeline.setTween()
+     * myTimeline.play()
+     * myTimeline.playFromLabel()
+     * myTimeline.playFrom()
+     * myTimeline.playFromReverse()
+     * myTimeline.playReverse()
+     * myTimeline.reverseNext()
+     * myTimeline.stop()
+     * myTimeline.pause()
+     * myTimeline.resume()
+     * myTimeline.get()
+     * myTimeline.isActive()
+     * myTimeline.isPaused()
+     * myTimeline.isSuspended()
+     * myTimeline.getDirection()
+     * myTimeline.onLoopEnd()
+     * myTimeline.onComplete()
+     * myTimeline.destroy()
+     * ```
+     */
+    createAsyncTimeline(data = {}) {
+        return new HandleAsyncTimeline(data);
+    },
+
     create(type = '', obj = {}) {
         switch (type) {
-            case 'asyncTimeline':
-                return new HandleAsyncTimeline(obj);
-
             case 'parallax':
                 return new ParallaxItemClass({
                     ...obj,

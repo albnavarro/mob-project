@@ -32,7 +32,7 @@ export function springTest() {
 
     // DEFINE TIMELINE
     const timeline = mobbu
-        .create('asyncTimeline', { repeat: 2, yoyo: true, freeMode: true })
+        .createAsyncTimeline({ repeat: 2, yoyo: true, freeMode: true })
         .set(mySpring, { x: 0, y: 0, rotate: 0 })
         .goTo(mySpring, { x: -200 }, { configProp: { precision: 0.5 } })
         .goFromTo(
@@ -80,7 +80,7 @@ export function springTest() {
     });
 
     btnReverse.addEventListener('click', () => {
-        timeline.reverse();
+        timeline.playReverse();
     });
 
     btnFrom.addEventListener('click', () => {

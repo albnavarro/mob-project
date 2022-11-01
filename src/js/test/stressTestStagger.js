@@ -49,7 +49,7 @@ export const stressTestStagger = () => {
     // tween.destroy();
 
     const timeline = mobbu
-        .create('asyncTimeline', { repeat: -1, yoyo: true })
+        .createAsyncTimeline({ repeat: -1, yoyo: true })
         .goTo(tween, { scale: 1.5 }, { duration: 1000 })
         .goTo(tween, { scale: 0.5 }, { duration: 500 })
         .goTo(tween, { rotate: 180, scale: 1.2 }, { duration: 500 })

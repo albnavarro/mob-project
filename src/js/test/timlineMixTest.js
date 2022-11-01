@@ -58,7 +58,7 @@ export function timlineMixTest() {
     });
 
     // DEFINE TIMELINE
-    const timeline = mobbu.create('asyncTimeline', {
+    const timeline = mobbu.createAsyncTimeline({
         repeat: 4,
         yoyo: false,
         autoSet: true,
@@ -120,7 +120,7 @@ export function timlineMixTest() {
     });
 
     btnReverse.addEventListener('click', () => {
-        timeline.reverse();
+        timeline.playReverse();
     });
 
     btnStop.addEventListener('click', () => {

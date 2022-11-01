@@ -28,7 +28,7 @@ export function tweenTest() {
 
     // DEFINE TIMELINE
     const timeline = mobbu
-        .create('asyncTimeline', { repeat: -1, yoyo: false, freeMode: true })
+        .createAsyncTimeline({ repeat: -1, yoyo: false, freeMode: true })
         .set(myTween, { x: 0, y: 0, rotate: 0 })
         .goTo(myTween, { x: -200 })
         .goFromTo(myTween, { x: -200 }, { x: 400 }, { duration: 800 })
@@ -88,6 +88,6 @@ export function tweenTest() {
     });
 
     btnReverse.addEventListener('click', () => {
-        timeline.reverse();
+        timeline.playReverse();
     });
 }

@@ -16,6 +16,8 @@ import { handleSetUp } from '../../setup';
 import { checkType } from '../../store/storeType';
 import { getTweenFn, tweenConfig } from '../tween/tweenConfig';
 import {
+    asyncTimelineDelayWarning,
+    asyncTimelineTweenWaring,
     booleanWarning,
     createStaggerItemsWarning,
     createStaggerTypeWarning,
@@ -38,7 +40,7 @@ import {
     staggerRowColGenericWarining,
     staggerWaitCompleteWarning,
     tweenEaseWarning,
-    yoyoWarining,
+    valueStringWarning,
 } from './warning';
 
 /**
@@ -87,21 +89,6 @@ export const durationIsValid = (duration) => {
         durationWarining(duration);
 
     return isValid ? duration : handleSetUp.get('sequencer').duration;
-};
-
-/**
- *
- * @param {Boolean} yoyo
- * @returns {Boolean}
- *
- * @description
- * Check if yoyo definition is valid
- **/
-export const yoyIsValid = (yoyo) => {
-    const isValid = checkType(Boolean, yoyo);
-    if (!isValid && yoyo !== undefined && yoyo !== null) yoyoWarining(yoyo);
-
-    return isValid ? yoyo : false;
 };
 
 /**
@@ -492,6 +479,22 @@ export const valueIsBooleanAndTrue = (value, label) => {
 
 /**
  *
+ * @param {Boolean} duration
+ * @returns {Boolean}
+ *
+ * @description
+ * Check if value is Boolan and false
+ **/
+export const valueIsBooleanAndReturnDefault = (value, label, defaultValue) => {
+    const isValid = checkType(Boolean, value);
+    if (!isValid && value !== undefined && value !== null)
+        booleanWarning(value, label);
+
+    return isValid ? value : defaultValue;
+};
+
+/**
+ *
  * @param {Number} velocity
  * @returns {Number}
  *
@@ -520,4 +523,58 @@ export const lerpPrecisionIsValid = (value) => {
         lerpPrecisionWarining();
 
     return isValid ? value : handleSetUp.get('lerp').precision;
+};
+
+/**
+ *
+ * @param {String} value
+ * @param {String} label
+ * @returns {Boolean}
+ *
+ * @description
+ * Check if value is a string.
+ **/
+export const valueStringIsValid = (value, label) => {
+    const isValid = checkType(String, value);
+    if (!isValid && value !== undefined && value !== null)
+        valueStringWarning(label);
+
+    return isValid;
+};
+
+/**
+ *
+ * @param {Number} value
+ * @returns {NUmber|null}
+ *
+ * @description
+ * Check if Delay is a Number and return Number || null.
+ **/
+export const asyncTimelineDelayIsValid = (value) => {
+    const isValid = checkType(Number, value);
+    if (!isValid && value !== undefined && value !== null)
+        asyncTimelineDelayWarning();
+
+    return isValid ? value : null;
+};
+
+/**
+ *
+ * @param {Object} value
+ * @returns {Boolean}
+ *
+ * @description
+ * Check if tween is lerp|spring|tween
+ **/
+export const asyncTimelineTweenIsValid = (instance) => {
+    const isValid =
+        instance?.getType?.() &&
+        (instance.getType() === 'LERP' ||
+            instance.getType() === 'SPRING' ||
+            instance.getType() === 'TWEEN');
+
+    if (!isValid && instance !== undefined && instance !== null)
+        asyncTimelineTweenWaring();
+
+    return isValid;
 };

@@ -28,7 +28,7 @@ export const gridStaggerTween = () => {
         });
     });
 
-    const timeline = mobbu.create('asyncTimeline', { repeat: -1, yoyo: true });
+    const timeline = mobbu.createAsyncTimeline({ repeat: -1, yoyo: true });
     timeline.goTo(
         tween,
         { scale: 0.5 },

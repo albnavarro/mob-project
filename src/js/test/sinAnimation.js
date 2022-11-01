@@ -27,7 +27,7 @@ export const sinAnimation = () => {
         });
     });
 
-    const timeline = mobbu.create('asyncTimeline', { repeat: -1, yoyo: true });
+    const timeline = mobbu.createAsyncTimeline({ repeat: -1, yoyo: true });
     timeline.goFromTo(
         tween,
         { x: 0 },

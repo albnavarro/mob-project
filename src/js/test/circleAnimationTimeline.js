@@ -38,7 +38,7 @@ export const circleAnimationTimeline = () => {
         });
     });
 
-    const timeline = mobbu.create('asyncTimeline', { repeat: -1 });
+    const timeline = mobbu.createAsyncTimeline({ repeat: -1 });
     timeline.goFromTo(
         tween,
         { x: 0 },

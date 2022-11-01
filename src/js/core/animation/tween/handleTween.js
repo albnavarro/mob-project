@@ -748,6 +748,7 @@ export class HandleTween {
      *
      *
      * ```
+     * @description
      * Transform some properties of your choice from the `first entered value` to the `second entered value`.
      * <br/>
      * The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change every time this transformation is called.

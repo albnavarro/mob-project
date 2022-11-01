@@ -42,8 +42,8 @@ export const freeMode = () => {
     /*
      * Timeline
      */
-    const goTimeline = mobbu.create('asyncTimeline', { freeMode: true });
-    const backTimeline = mobbu.create('asyncTimeline', { freeMode: true });
+    const goTimeline = mobbu.createAsyncTimeline({ freeMode: true });
+    const backTimeline = mobbu.createAsyncTimeline({ freeMode: true });
 
     goTimeline
         .createGroup()
