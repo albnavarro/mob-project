@@ -60,7 +60,7 @@ export function tweenTest() {
     });
 
     btnBack.addEventListener('click', () => {
-        tweenback().catch(() => {});
+        tweenback();
     });
 
     btnStop.addEventListener('click', () => {

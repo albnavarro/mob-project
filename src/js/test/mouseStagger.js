@@ -28,7 +28,7 @@ export const mouseStagger = () => {
     // In real time (like mousemove) use waitComplete: false, to avoid moviemnt when promise in sot resolved
     mobbu.use('mouseMove', ({ client }) => {
         const { x, y } = client;
-        spring.goTo({ x, y }).catch(() => {});
+        spring.goTo({ x, y });
     });
 
     // 2
@@ -52,10 +52,10 @@ export const mouseStagger = () => {
 
     const timeline = mobbu
         .createAsyncTimeline({ repeat: -1, yoyo: true })
-        .goTo(tween, { scale: () => val * 2 })
-        // .goTo(tween, { scale: () => val * 3 })
-        .play()
-        .onLoopEnd(({ loop, direction }) => {
-            // console.log('onLoopEnd', loop, direction);
-        });
+        .goTo(tween, { scale: () => val * 2 });
+    // .goTo(tween, { scale: () => val * 3 })
+    timeline.play();
+    timeline.onLoopEnd(({ loop, direction }) => {
+        // console.log('onLoopEnd', loop, direction);
+    });
 };

@@ -303,6 +303,7 @@ export const mobbu = {
      *          row: [ Number ],
      *          direction: [ String ]
      *      },
+     *      waitComplete: [ Boolean ],
      *   },
      * })
      *
@@ -358,6 +359,7 @@ export const mobbu = {
      *          row: [ Number ],
      *          direction: [ String ],
      *      },
+     *      waitComplete: [ Boolean ],
      *   },
      * })
      *
@@ -407,6 +409,7 @@ export const mobbu = {
      *          row: [ Number ],
      *          direction: [ String ],
      *      },
+     *      waitComplete: [ Boolean ],
      *   },
      * })
      *

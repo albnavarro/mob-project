@@ -52,6 +52,7 @@ import {
     relativeIsValid,
     valueIsBooleanAndTrue,
 } from '../utils/tweenValidation.js';
+import { ANIMATION_STOP_REJECT } from '../../events/errorHandler/catchAnimationReject.js';
 
 /**
  * @typedef {Object} tweenCommonSpecialProps
@@ -91,6 +92,7 @@ export class HandleTween {
      *          row: [ Number ],
      *          direction: [ String ]
      *      },
+     *      waitComplete: [ Boolean ],
      *   },
      * })
      *
@@ -506,7 +508,7 @@ export class HandleTween {
 
         // Abort promise
         if (this.currentReject) {
-            this.currentReject();
+            this.currentReject(ANIMATION_STOP_REJECT);
             this.promise = null;
             this.currentReject = null;
             this.currentResolve = null;
@@ -605,7 +607,7 @@ export class HandleTween {
 
         // Reject promise
         if (this.currentReject) {
-            this.currentReject();
+            this.currentReject(ANIMATION_STOP_REJECT);
             this.promise = null;
         }
 

@@ -240,3 +240,15 @@ export const asyncTimelineTweenWaring = () => {
 export const asyncTimelineDelayWarning = () => {
     console.warn('asyncTimeline arror: delay must be a Number');
 };
+
+export const playLabelWarining = (label) => {
+    console.warn(`${label} not found`);
+};
+
+export const addFunctionWarining = (value) => {
+    console.warn(`timeline add function, ${value} is not a function `);
+};
+
+export const addAsyncFunctionWarining = (value) => {
+    console.warn(`timeline add async function, ${value} is not a function `);
+};

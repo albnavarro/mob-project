@@ -30,7 +30,7 @@ export const infiniteAnimation = () => {
     let isRunning = false;
     const loop = () => {
         counter++;
-        tween.goTo({ x: counter }).catch((err) => {});
+        tween.goTo({ x: counter });
         if (isRunning) mobbu.use('nextFrame', () => loop());
     };
 

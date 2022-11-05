@@ -53,6 +53,7 @@ import {
     lerpVelocityIsValid,
     relativeIsValid,
 } from '../utils/tweenValidation.js';
+import { ANIMATION_STOP_REJECT } from '../../events/errorHandler/catchAnimationReject.js';
 
 /**
  * @typedef {Object} lerpTypes
@@ -85,6 +86,7 @@ export class HandleLerp {
      *          row: [ Number ],
      *          direction: [ String ],
      *      },
+     *      waitComplete: [ Boolean ],
      *   },
      * })
      *
@@ -464,7 +466,7 @@ export class HandleLerp {
 
         // Reject promise
         if (this.currentReject) {
-            this.currentReject();
+            this.currentReject(ANIMATION_STOP_REJECT);
             this.promise = null;
             this.currentReject = null;
             this.currentResolve = null;

@@ -54,6 +54,7 @@ import {
     springConfigPropIsValid,
 } from '../utils/tweenValidation.js';
 import { handleSetUp } from '../../setup.js';
+import { ANIMATION_STOP_REJECT } from '../../events/errorHandler/catchAnimationReject.js';
 
 /**
  * @typedef {Object} springTypes
@@ -85,6 +86,7 @@ export class HandleSpring {
      *          row: [ Number ],
      *          direction: [ String ],
      *      },
+     *      waitComplete: [ Boolean ],
      *   },
      * })
      *
@@ -470,7 +472,7 @@ export class HandleSpring {
 
         // Abort promise
         if (this.currentReject) {
-            this.currentReject();
+            this.currentReject(ANIMATION_STOP_REJECT);
             this.promise = null;
             this.currentReject = null;
             this.currentResolve = null;

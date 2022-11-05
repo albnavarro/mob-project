@@ -16,6 +16,8 @@ import { handleSetUp } from '../../setup';
 import { checkType } from '../../store/storeType';
 import { getTweenFn, tweenConfig } from '../tween/tweenConfig';
 import {
+    addAsyncFunctionWarining,
+    addFunctionWarining,
     asyncTimelineDelayWarning,
     asyncTimelineTweenWaring,
     booleanWarning,
@@ -27,6 +29,7 @@ import {
     initialDataValueWarining,
     lerpPrecisionWarining,
     lerpVelocityWarining,
+    playLabelWarining,
     relativeWarining,
     repeatWarining,
     sequencerRangeEndWarning,
@@ -577,4 +580,49 @@ export const asyncTimelineTweenIsValid = (instance) => {
         asyncTimelineTweenWaring();
 
     return isValid;
+};
+
+/**
+ *
+ * @param {Number} index
+ * @param {String} label
+ *
+ * @description
+ * Check if label is found
+ **/
+export const playLabelIsValid = (index, label) => {
+    if (index === -1) playLabelWarining(label);
+};
+
+/**
+ *
+ * @param {Function} fn
+ *
+ * @description
+ * Check if value is A function
+ **/
+export const addFunctionIsValid = (fn) => {
+    const isValid = checkType(Function, fn);
+    if (!isValid && fn !== undefined && fn !== null) addFunctionWarining(fn);
+
+    return isValid ? fn : () => {};
+};
+
+/**
+ *
+ * @param {Function} fn
+ *
+ * @description
+ * Check if value is A function
+ **/
+export const addAsyncFunctionIsValid = (fn) => {
+    const isValid = checkType(Function, fn);
+    if (!isValid && fn !== undefined && fn !== null)
+        addAsyncFunctionWarining(fn);
+
+    return isValid
+        ? fn
+        : ({ resolve }) => {
+              resolve();
+          };
 };

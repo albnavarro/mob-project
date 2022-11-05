@@ -12,6 +12,7 @@ import {
     repeatIsValid,
     valueIsBooleanAndReturnDefault,
 } from '../utils/tweenValidation.js';
+import { ANIMATION_STOP_REJECT } from '../../events/errorHandler/catchAnimationReject.js';
 
 /**
  * @typedef {Object} syncTimelineTypes
@@ -190,6 +191,16 @@ export class HandleSyncTimeline {
          * @private
          */
         this.callbackOnUpdate = [];
+
+        /**
+         * @private
+         */
+        this.currentResolve = null;
+
+        /**
+         * @private
+         */
+        this.currentReject = null;
     }
 
     /**
@@ -342,6 +353,7 @@ export class HandleSyncTimeline {
 
             // Fire last callback on Complete
             this.callbackComplete.forEach(({ cb }) => cb());
+            if (this.currentResolve) this.currentResolve();
             return;
         }
 
@@ -419,15 +431,27 @@ export class HandleSyncTimeline {
     }
 
     /**
+     * Private
+     */
+    rejectPromise() {
+        if (this.currentReject) {
+            this.currentReject(ANIMATION_STOP_REJECT);
+            this.currentReject = null;
+        }
+    }
+
+    /**
      * @param {Object} props
      * @param {Boolean} [ props.useCurrent ]
-     * @returns {this} The instance on which this method was called.
+     * @return {Promise} - The promise launched at the end of the animation
      *
      * @example
      * ```js
      * myTimeline.play({
      *      useCurrent: true
-     * });
+     * }).then(() => {
+     *      // code
+     * })
      *
      *
      * ```
@@ -438,30 +462,41 @@ export class HandleSyncTimeline {
      * With useCurrent set to false (default) the animation will always start from frame 0 towards the final value.
      */
     play(props = {}) {
-        const useCurrent = props?.useCurrent;
-        if (this.fpsIsInLoading) return;
+        return new Promise((resolve, reject) => {
+            const useCurrent = props?.useCurrent;
+            if (this.fpsIsInLoading) return;
 
-        /**
-         * If is running and useCurrent is true move from current time value
-         */
-        if (!this.isStopped && !this.isReverse && useCurrent) return;
-        if (!this.isStopped && this.isReverse && useCurrent) {
-            this.reverse();
-            return;
-        }
+            this.rejectPromise();
+            this.currentResolve = resolve;
+            this.currentReject = reject;
 
-        this.playFromTime();
-        return this;
+            /**
+             * If is running and useCurrent is true move from current time value
+             */
+            if (!this.isStopped && !this.isReverse && useCurrent) return;
+            if (!this.isStopped && this.isReverse && useCurrent) {
+                this.reverse();
+                return;
+            }
+
+            this.playFromTime();
+        });
     }
 
     /**
      * @param {Number|String} value
-     * @returns {this} The instance on which this method was called.
+     * @return {Promise} - The promise launched at the end of the animation
      *
      * @example
      * ```js
-     * myTimeline.playFrom(1000);
-     * myTimeline.playFrom('myLabel');
+     * myTimeline.playFrom(1000).then(() => {
+     *      // code
+     * })
+
+     * myTimeline.playFrom('myLabel').then(() => {
+     *      // code
+     * })
+
      *
      *
      * ```
@@ -470,12 +505,17 @@ export class HandleSyncTimeline {
      * Plays the timeline forward starting from the specific time or from a label defined in a Handle Sequencer | HandleMasterSequencer instance
      */
     playFrom(value = 0) {
-        if (this.fpsIsInLoading) return;
+        return new Promise((resolve, reject) => {
+            if (this.fpsIsInLoading) return;
 
-        const isNumber = storeType.isNumber(value);
-        const labelTime = isNumber ? value : this.getTimeFromLabel(value);
-        this.playFromTime(labelTime);
-        return this;
+            const isNumber = storeType.isNumber(value);
+            const labelTime = isNumber ? value : this.getTimeFromLabel(value);
+
+            this.rejectPromise();
+            this.currentResolve = resolve;
+            this.currentReject = reject;
+            this.playFromTime(labelTime);
+        });
     }
 
     /**
@@ -507,12 +547,18 @@ export class HandleSyncTimeline {
 
     /**
      * @param {Number|String} value
-     * @returns {this} The instance on which this method was called.
+     * @return {Promise} - The promise launched at the end of the animation
      *
      * @example
      * ```js
-     * myTimeline.playFromReverse(1000);
-     * myTimeline.playFromReverse('myLabel');
+     * myTimeline.playFromReverse(1000).then(() => {
+     *      // code
+     * })
+
+     * myTimeline.playFromReverse('myLabel').then(() => {
+     *      // code
+     * })
+
      *
      *
      * ```
@@ -521,24 +567,32 @@ export class HandleSyncTimeline {
      * Plays the timeline backward starting from the specific time or from a label defined in a Handle Sequencer | HandleMasterSequencer instance
      */
     playFromReverse(value) {
-        if (this.fpsIsInLoading) return;
+        return new Promise((resolve, reject) => {
+            if (this.fpsIsInLoading) return;
 
-        const isNumber = storeType.isNumber(value);
-        const labelTime = isNumber ? value : this.getTimeFromLabel(value);
-        this.playFromTimeReverse(labelTime, true);
-        return this;
+            const isNumber = storeType.isNumber(value);
+            const labelTime = isNumber ? value : this.getTimeFromLabel(value);
+
+            this.rejectPromise();
+            this.currentResolve = resolve;
+            this.currentReject = reject;
+            this.playFromTimeReverse(labelTime, true);
+        });
     }
 
     /**
      * @param {Object} props
      * @param {Boolean} [ props.useCurrent ]
-     * @returns {this} The instance on which this method was called.
+     * @return {Promise} - The promise launched at the end of the animation
      *
      * @example
      * ```js
      * myTimeline.playReverse({
      *      useCurrent: true
-     * });
+     * }).then(() => {
+     *      // code
+     * })
+
      *
      *
      * ```
@@ -549,20 +603,25 @@ export class HandleSyncTimeline {
      * With useCurrent set to false (default) the animation will always start from the final value towards the initial value.
      */
     playReverse(props = {}) {
-        const useCurrent = props?.useCurrent;
-        if (this.fpsIsInLoading) return;
+        return new Promise((resolve, reject) => {
+            const useCurrent = props?.useCurrent;
+            if (this.fpsIsInLoading) return;
 
-        /**
-         * If is running and useCurrent is true move from current time value
-         */
-        if (!this.isStopped && this.isReverse && useCurrent) return;
-        if (!this.isStopped && !this.isReverse && useCurrent) {
-            this.reverse();
-            return;
-        }
+            this.rejectPromise();
+            this.currentResolve = resolve;
+            this.currentReject = reject;
 
-        this.playFromTimeReverse(this.duration, true);
-        return this;
+            /**
+             * If is running and useCurrent is true move from current time value
+             */
+            if (!this.isStopped && this.isReverse && useCurrent) return;
+            if (!this.isStopped && !this.isReverse && useCurrent) {
+                this.reverse();
+                return;
+            }
+
+            this.playFromTimeReverse(this.duration, true);
+        });
     }
 
     /**
@@ -709,6 +768,7 @@ export class HandleSyncTimeline {
     stop() {
         this.isStopped = true;
         this.isInPause = false;
+        this.rejectPromise();
 
         // TO DO: con lo stagger il render del last frame ( es senza translate3d)
         // va in conflitto con cleanCachedId

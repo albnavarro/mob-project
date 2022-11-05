@@ -30,8 +30,5 @@ export const gridStaggerSpring = () => {
 
     const timeline = mobbu.createAsyncTimeline({ repeat: -1, yoyo: true });
     timeline.goTo(tween, { scale: 0.5 });
-
-    tween.set({ scale: 1 }).then((value) => {
-        timeline.play();
-    });
+    timeline.play();
 };

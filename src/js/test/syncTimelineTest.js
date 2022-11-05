@@ -132,19 +132,27 @@ export function syncTimelineTest() {
 
     //
     btnStart.addEventListener('click', () => {
-        syncTimeline.play();
+        syncTimeline.play().then(() => {
+            console.log('resolve play current:false');
+        });
     });
 
     btnStartReverse.addEventListener('click', () => {
-        syncTimeline.playReverse();
+        syncTimeline.playReverse().then(() => {
+            console.log('resolve playReverse current:false');
+        });
     });
 
     btnStartCurrent.addEventListener('click', () => {
-        syncTimeline.play({ useCurrent: true });
+        syncTimeline.play({ useCurrent: true }).then(() => {
+            console.log('resolve play current: true');
+        });
     });
 
     btnStartReverseCurrent.addEventListener('click', () => {
-        syncTimeline.playReverse({ useCurrent: true });
+        syncTimeline.playReverse({ useCurrent: true }).then(() => {
+            console.log('resolve playReverse current: true');
+        });
     });
     //
 
@@ -168,12 +176,16 @@ export function syncTimelineTest() {
 
     btnPlayFrom.addEventListener('click', () => {
         syncTimeline.stop();
-        syncTimeline.playFrom('label1');
+        syncTimeline.playFrom('label1').then(() => {
+            console.log('resolve playFrom');
+        });
     });
 
     btnPlayFromReverse.addEventListener('click', () => {
         syncTimeline.stop();
-        syncTimeline.playFromReverse('label2');
+        syncTimeline.playFromReverse('label2').then(() => {
+            console.log('resolve playFromReverse');
+        });
     });
 
     btnMoreRotation.addEventListener('click', () => {

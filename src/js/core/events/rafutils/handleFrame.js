@@ -6,6 +6,7 @@ import { handleNextTick } from './handleNextTick.js';
 import { handleNextFrame } from './handleNextFrame.js';
 import { handleFrameIndex } from './handleFrameIndex';
 import { frameStore } from './frameStore.js';
+import { catchAnimationReject } from '../errorHandler/catchAnimationReject.js';
 
 export const handleFrame = (() => {
     /*
@@ -44,6 +45,8 @@ export const handleFrame = (() => {
     handleVisibilityChange(({ visibilityState }) => {
         isStopped = visibilityState === 'visible';
     });
+
+    catchAnimationReject();
 
     // Call new requestAnimationFrame on event emit
     frameStore.watch('requestFrame', () => {

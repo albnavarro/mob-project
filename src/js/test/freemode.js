@@ -68,11 +68,15 @@ export const freeMode = () => {
      */
     go.addEventListener('click', () => {
         backTimeline.stop();
-        goTimeline.play();
+        goTimeline.play().then(() => {
+            console.log('go');
+        });
     });
 
     back.addEventListener('click', () => {
         goTimeline.stop();
-        backTimeline.play();
+        backTimeline.play().then(() => {
+            console.log('back');
+        });
     });
 };

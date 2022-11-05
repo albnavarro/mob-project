@@ -37,8 +37,5 @@ export const gridStaggerTween = () => {
         }
     );
 
-    // Exmple set and go
-    tween.set({ scale: 1 }).then((value) => {
-        timeline.play();
-    });
+    timeline.play();
 };

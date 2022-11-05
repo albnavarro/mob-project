@@ -18,13 +18,11 @@ export const tweenRealtive = () => {
     });
 
     playTween.addEventListener('click', () => {
-        tween.goTo({ x: 100, rotate: 45 }).catch(() => {});
+        tween.goTo({ x: 100, rotate: 45 });
     });
 
     resetTween.addEventListener('click', () => {
-        tween
-            .goTo({ x: 0, rotate: 0 }, { relative: false, duration: 1000 })
-            .catch(() => {});
+        tween.goTo({ x: 0, rotate: 0 }, { relative: false, duration: 1000 });
     });
 
     // Spring
@@ -42,11 +40,11 @@ export const tweenRealtive = () => {
     });
 
     playSpring.addEventListener('click', () => {
-        spring.goTo({ x: 100, rotate: 45 }).catch(() => {});
+        spring.goTo({ x: 100, rotate: 45 });
     });
 
     resetSpring.addEventListener('click', () => {
-        spring.goTo({ x: 0, rotate: 0 }, { relative: false }).catch(() => {});
+        spring.goTo({ x: 0, rotate: 0 }, { relative: false });
     });
 
     // Lerp
@@ -64,10 +62,10 @@ export const tweenRealtive = () => {
     });
 
     playLerp.addEventListener('click', () => {
-        lerp.goTo({ x: 100, rotate: 45 }).catch(() => {});
+        lerp.goTo({ x: 100, rotate: 45 });
     });
 
     resetLerp.addEventListener('click', () => {
-        lerp.goTo({ x: 0, rotate: 0 }, { relative: false }).catch(() => {});
+        lerp.goTo({ x: 0, rotate: 0 }, { relative: false });
     });
 };

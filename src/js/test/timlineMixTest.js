@@ -59,7 +59,7 @@ export function timlineMixTest() {
 
     // DEFINE TIMELINE
     const timeline = mobbu.createAsyncTimeline({
-        repeat: 4,
+        repeat: 1,
         yoyo: false,
         autoSet: true,
     });
@@ -116,11 +116,15 @@ export function timlineMixTest() {
 
     // LISTNER
     btnStart.addEventListener('click', () => {
-        timeline.play();
+        timeline.play().then(() => {
+            console.log('resolve promise play');
+        });
     });
 
     btnReverse.addEventListener('click', () => {
-        timeline.playReverse();
+        timeline.playReverse().then(() => {
+            console.log('resolve promise reverse');
+        });
     });
 
     btnStop.addEventListener('click', () => {
@@ -140,21 +144,19 @@ export function timlineMixTest() {
     });
 
     btnFrom.addEventListener('click', () => {
-        timeline
-            .setTween('label1', [tweenBox2])
-            .then(() => {
-                timeline.playFrom('label1');
-            })
-            .catch((error) => console.log(error));
+        timeline.setTween('label1', [tweenBox2, springBox1]).then(() => {
+            timeline.playFrom('label1').then(() => {
+                console.log('resolve promise playFrom');
+            });
+        });
     });
 
     btnFromReverse.addEventListener('click', () => {
-        timeline
-            .setTween('label1', [tweenBox2])
-            .then(() => {
-                timeline.playFromReverse('label1');
-            })
-            .catch((error) => console.log(error));
+        timeline.setTween('label1', [tweenBox2, springBox1]).then(() => {
+            timeline.playFromReverse('label1').then(() => {
+                console.log('resolve promise playFromReverse');
+            });
+        });
     });
 
     btnToggleSuspend.addEventListener('click', () => {

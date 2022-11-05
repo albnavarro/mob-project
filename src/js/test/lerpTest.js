@@ -64,7 +64,7 @@ export function lerpTest() {
     });
 
     btnBack.addEventListener('click', () => {
-        lerpBack().catch(() => {});
+        lerpBack();
     });
 
     btnStop.addEventListener('click', () => {
