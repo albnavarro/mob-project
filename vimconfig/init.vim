@@ -227,9 +227,16 @@ nnoremap <silent><nowait> <space>k  :<C-u>CocPrev<CR>
 " Resume latest coc list.
 nnoremap <silent><nowait> <space>p  :<C-u>CocListResume<CR>
 
+
 " Custom remap
 " Open new buffer on right move to new buffer and execute Ex command
 nnoremap <silent><nowait> <F2> <C-w>v<bar><C-w>l<bar>:Ex<CR>
 
 " Open new buffer on bottom move to new buffer and execute Ex command
-nnoremap <silent><nowait> <F3> <C-w>s<bar><C-w>j<bar>:Ex<CR>F
+nnoremap <silent><nowait> <F3> <C-w>s<bar><C-w>j<bar>:Ex<CR>
+
+" Move form split to another
+nnoremap <silent><nowait> <C-right> <C-w>l
+nnoremap <silent><nowait> <C-left> <C-w>h
+nnoremap <silent><nowait> <C-up> <C-w>k
+nnoremap <silent><nowait> <C-down> <C-w>j
