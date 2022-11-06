@@ -238,8 +238,10 @@ nnoremap <silent><nowait> <F2> <C-w>v<bar><C-w>l<bar>:Ex<CR>
 " Open new buffer on bottom move to new buffer and execute Ex command
 nnoremap <silent><nowait> <F3> <C-w>s<bar><C-w>j<bar>:Ex<CR>
 
-" Use tab to move to the buffer right|bottom in normal mode
+" Move to viewport
+nnoremap <silent><nowait> <C-h> <C-w>h
+nnoremap <silent><nowait> <C-j> <C-w>j
+nnoremap <silent><nowait> <C-k> <C-w>k
+nnoremap <silent><nowait> <C-l> <C-w>l
 nnoremap <silent><nowait> <TAB> <C-w>w
-
-" Use tab to move to the buffer left|top in normal mode
 nnoremap <silent><nowait> <S-TAB> <C-w>W
