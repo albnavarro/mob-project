@@ -42,6 +42,7 @@ import {
     staggerGridDirectionWarning,
     staggerRowColGenericWarining,
     staggerWaitCompleteWarning,
+    timelineSetTweenArrayWarining,
     tweenEaseWarning,
     valueStringWarning,
 } from './warning';
@@ -625,4 +626,34 @@ export const addAsyncFunctionIsValid = (fn) => {
         : ({ resolve }) => {
               resolve();
           };
+};
+
+/**
+ *
+ * @param {Array} arr
+ *
+ * @description
+ * Check if value is an Array
+ **/
+export const timelineSetTweenArrayIsValid = (arr) => {
+    const isValid = checkType(Array, arr);
+    if (!isValid && arr !== undefined && arr !== null)
+        timelineSetTweenArrayWarining(arr);
+
+    return isValid;
+};
+
+/**
+ *
+ * @param {String} label
+ *
+ * @description
+ * Check if value is an string
+ **/
+export const timelineSetTweenLabelIsValid = (label) => {
+    const isValid = checkType(String, label);
+    if (!isValid && label !== undefined && label !== null)
+        timelineSetTweenLabelIsValid(label);
+
+    return isValid;
 };

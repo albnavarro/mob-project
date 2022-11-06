@@ -11,6 +11,8 @@ import {
     asyncTimelineTweenIsValid,
     playLabelIsValid,
     repeatIsValid,
+    timelineSetTweenArrayIsValid,
+    timelineSetTweenLabelIsValid,
     valueIsBooleanAndReturnDefault,
     valueStringIsValid,
 } from '../utils/tweenValidation.js';
@@ -18,10 +20,8 @@ import {
     asyncTimelineMetodsInsideGroupWarining,
     relativePropInsideTimelineWarning,
     timelineReverseGoFromWarning,
-    timelineSetTweenArrayWarining,
     timelineSetTweenFailWarining,
     timelineSetTweenLabelNotFoundWarining,
-    timelineSetTweenLabelWarining,
     timelineSuspendWarning,
 } from '../utils/warning.js';
 import { asyncReduceData } from './asyncReduceData.js';
@@ -1573,18 +1573,8 @@ export class HandleAsyncTimeline {
     setTween(label = '', items = []) {
         this.stop();
 
-        /**
-         * Props type check
-         */
-        const itemsIsArray = checkType(Array, items);
-        if (!itemsIsArray) {
-            timelineSetTweenArrayWarining(items);
-        }
-
-        const labelIsString = checkType(String, label);
-        if (!labelIsString) {
-            timelineSetTweenLabelWarining(label);
-        }
+        const itemsIsArray = timelineSetTweenArrayIsValid(items);
+        const labelIsString = timelineSetTweenLabelIsValid(label);
 
         if (!itemsIsArray || !labelIsString)
             return Promise.reject(
