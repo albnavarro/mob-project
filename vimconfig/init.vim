@@ -239,7 +239,7 @@ nnoremap <silent><nowait> <F2> <C-w>v<bar><C-w>l<bar>:Ex<CR>
 nnoremap <silent><nowait> <F3> <C-w>s<bar><C-w>j<bar>:Ex<CR>
 
 " Use tab to move to the buffer right|bottom in normal mode
-nnoremap <silent><nowait> <Tab> <C-w>w
+nnoremap <silent><nowait> <TAB> <C-w>w
 
 " Use tab to move to the buffer left|top in normal mode
-nnoremap <silent><nowait> <S-Tab> <C-w>W
+nnoremap <silent><nowait> <S-TAB> <C-w>W
