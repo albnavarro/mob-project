@@ -61,7 +61,7 @@ export const scrollStagger = () => {
     });
 
     const parallaxIn = mobbu.create('scrolltrigger', {
-        item: trigger,
+        trigger,
         propierties: 'tween',
         tween: myParallaxTween,
         dynamicStart: {

@@ -8,7 +8,7 @@ export const hScroller = () => {
      */
     const parallaxOpacity = mobbu.create('parallax', {
         item: document.querySelector('.parallax-via-js-opacity'),
-        scroller: '.scrollerH-container .scrollerH',
+        scroller: document.querySelector('.scrollerH-container .scrollerH'),
         direction: 'horizontal',
         ease: true,
         propierties: 'opacity',
@@ -171,7 +171,7 @@ export const hScroller = () => {
         item: target2,
         scroller: '.scrollerH-container .scrollerH',
         trigger: '.pluto3',
-        direction: 'tween',
+        direction: 'horizontal',
         ease: true,
         dynamicStart: {
             position: 'left',

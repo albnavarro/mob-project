@@ -18,6 +18,11 @@ import { getRoundedValue } from '../utils/animationUtils.js';
 import { getTranslateValues } from '../../utils/vanillaFunction.js';
 import { clamp } from '../utils/animationUtils.js';
 import { handleFrameIndex } from '../../events/rafutils/handleFrameIndex.js';
+import {
+    domNodeIsValidAndReturnElOrWin,
+    domNodeIsValidAndReturnNull,
+    parallaxDirectionIsValid,
+} from '../utils/tweenValidation.js';
 
 export class ParallaxItemClass {
     constructor(data) {
@@ -47,22 +52,12 @@ export class ParallaxItemClass {
         this.force3D = false;
 
         // Base props
-        this.item = data.item;
-        this.direction = (() => {
-            return data.direction
-                ? data.direction
-                : parallaxConstant.DIRECTION_VERTICAL;
-        })();
-        this.scroller = data.scroller
-            ? (() => {
-                  return typeof data.scroller === 'string'
-                      ? document.querySelector(data.scroller)
-                      : data.scroller;
-              })()
-            : window;
-        this.screen = data.screen
-            ? document.querySelector(data.screen)
-            : window;
+        this.item = domNodeIsValidAndReturnElOrWin(data?.item, false);
+        this.scroller = domNodeIsValidAndReturnElOrWin(data?.scroller, true);
+        this.screen = domNodeIsValidAndReturnElOrWin(data?.screen, true);
+        this.trigger = domNodeIsValidAndReturnNull(data?.trigger);
+        this.applyTo = domNodeIsValidAndReturnNull(data?.applyTo);
+        this.direction = parallaxDirectionIsValid(data?.direction);
 
         /*
         Pin  prop
@@ -105,16 +100,6 @@ export class ParallaxItemClass {
         // Function that return a range value
         this.dynamicRange = data.dynamicRange || null;
         this.perspective = data.perspective || false;
-        this.applyTo = data.applyTo || false;
-        this.trigger = (() => {
-            if (data.trigger) {
-                return typeof data.trigger === 'string'
-                    ? document.querySelector(data.trigger)
-                    : data.trigger;
-            } else {
-                return null;
-            }
-        })();
         this.breackpoint = data.breackpoint || 'desktop';
         this.queryType = data.queryType || 'min';
         this.limiterOff = data.limiterOff || false;

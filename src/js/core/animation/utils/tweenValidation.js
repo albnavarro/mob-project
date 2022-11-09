@@ -29,6 +29,7 @@ import {
     initialDataValueWarining,
     lerpPrecisionWarining,
     lerpVelocityWarining,
+    parallaxDirectionWarining,
     playLabelWarining,
     relativeWarining,
     repeatWarining,
@@ -43,9 +44,11 @@ import {
     staggerRowColGenericWarining,
     staggerWaitCompleteWarning,
     timelineSetTweenArrayWarining,
+    timelineSetTweenLabelWarining,
     tweenEaseWarning,
     valueStringWarning,
 } from './warning';
+import { parallaxConstant } from '../parallax/parallaxConstant.js';
 
 /**
  *
@@ -653,7 +656,70 @@ export const timelineSetTweenArrayIsValid = (arr) => {
 export const timelineSetTweenLabelIsValid = (label) => {
     const isValid = checkType(String, label);
     if (!isValid && label !== undefined && label !== null)
-        timelineSetTweenLabelIsValid(label);
+        timelineSetTweenLabelWarining(label);
 
     return isValid;
+};
+
+/**
+ *
+ * @param {(String|Element)} element
+ * @returns {Element}
+ *
+ * @description
+ * Check if value is a valid Element and return element|window|element
+ **/
+export const domNodeIsValidAndReturnElOrWin = (
+    element,
+    returnWindow = false
+) => {
+    const isNode = checkType(Element, element);
+    const realEl = isNode ? element : document.querySelector(element);
+    const isValid = realEl && realEl !== undefined && realEl !== null;
+
+    if (returnWindow) {
+        return isValid ? realEl : window;
+    } else {
+        return isValid ? realEl : document.createElement('div');
+    }
+};
+
+/**
+ *
+ * @param {(String|Element)} element
+ * @returns {Boolean}
+ *
+ * @description
+ * Check if value is a valid Element
+ **/
+export const domNodeIsValidAndReturnNull = (element) => {
+    const isNode = checkType(Element, element);
+    const realEl = isNode ? element : document.querySelector(element);
+    const isValid = realEl && realEl !== undefined && realEl !== null;
+    return isValid ? realEl : null;
+};
+
+/**
+ * Specific parallax
+ */
+
+/**
+ *
+ * @param {String} label
+ * @returns {Boolean}
+ *
+ * @description
+ * Check if value is a valid direction
+ **/
+export const parallaxDirectionIsValid = (direction) => {
+    const choice = [
+        parallaxConstant.DIRECTION_VERTICAL,
+        parallaxConstant.DIRECTION_HORIZONTAL,
+    ];
+
+    const isValid = choice.includes(direction);
+    if (!isValid && direction !== undefined && direction !== null)
+        parallaxDirectionWarining(direction);
+
+    return isValid ? direction : parallaxConstant.DIRECTION_VERTICAL;
 };

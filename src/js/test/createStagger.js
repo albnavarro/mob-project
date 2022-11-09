@@ -53,7 +53,7 @@ export const createStagger = () => {
     console.log(sequencers);
 
     const parallaxIn = mobbu.create('scrolltrigger', {
-        item: trigger,
+        trigger,
         propierties: 'tween',
         tween: masterSequencer,
         dynamicStart: {

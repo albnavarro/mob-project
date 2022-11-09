@@ -1,3 +1,4 @@
+import { parallaxConstant } from '../parallax/parallaxConstant';
 import {
     STAGGER_START,
     STAGGER_TYPE_CENTER,
@@ -251,4 +252,10 @@ export const addFunctionWarining = (value) => {
 
 export const addAsyncFunctionWarining = (value) => {
     console.warn(`timeline add async function, ${value} is not a function `);
+};
+
+export const parallaxDirectionWarining = (value) => {
+    console.warn(
+        `Parallax direction: ${value} is not valid value: must be ${parallaxConstant.DIRECTION_VERTICAL} | ${parallaxConstant.DIRECTION_HORIZONTAL}`
+    );
 };
