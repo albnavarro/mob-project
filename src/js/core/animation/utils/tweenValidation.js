@@ -30,6 +30,8 @@ import {
     lerpPrecisionWarining,
     lerpVelocityWarining,
     parallaxDirectionWarining,
+    parallaxDynmicValueWarining,
+    parallaxTweenWarning,
     playLabelWarining,
     relativeWarining,
     repeatWarining,
@@ -43,6 +45,7 @@ import {
     staggerGridDirectionWarning,
     staggerRowColGenericWarining,
     staggerWaitCompleteWarning,
+    stringWarning,
     timelineSetTweenArrayWarining,
     timelineSetTweenLabelWarining,
     tweenEaseWarning,
@@ -470,8 +473,8 @@ export const durationIsNumberOrFunctionIsValid = (duration) => {
 
 /**
  *
- * @param {Boolean} duration
- * @returns {Boolean}
+ * @param {Boolean} value
+ * @param {String} label
  *
  * @description
  * Check if value is Boolan and true
@@ -486,16 +489,34 @@ export const valueIsBooleanAndTrue = (value, label) => {
 
 /**
  *
- * @param {Boolean} duration
+ * @param {Boolean} value
+ * @param {String} label
+ * @param {Boolean} defaultValue
  * @returns {Boolean}
  *
  * @description
- * Check if value is Boolan and false
+ * Check if value is Boolan and reteurn Default
  **/
 export const valueIsBooleanAndReturnDefault = (value, label, defaultValue) => {
     const isValid = checkType(Boolean, value);
     if (!isValid && value !== undefined && value !== null)
         booleanWarning(value, label);
+
+    return isValid ? value : defaultValue;
+};
+
+/**
+ *
+ * @param {String} value
+ * @returns {String}
+ *
+ * @description
+ * Check if value is String and return defualt
+ **/
+export const valueIsStringAndReturnDefault = (value, label, defaultValue) => {
+    const isValid = checkType(String, value);
+    if (!isValid && value !== undefined && value !== null)
+        stringWarning(value, label);
 
     return isValid ? value : defaultValue;
 };
@@ -722,4 +743,63 @@ export const parallaxDirectionIsValid = (direction) => {
         parallaxDirectionWarining(direction);
 
     return isValid ? direction : parallaxConstant.DIRECTION_VERTICAL;
+};
+
+/**
+ *
+ * @param {Object} obj
+ * @param {label} string
+ * @returns {Object} dynamicStart|dynamicEnd|null Object
+ *
+ * @description
+ * Check if dynamicStart|dynamicEnd is a valid direction
+ **/
+export const parallaxDynamicValueIsValid = (obj, label) => {
+    const positionChoice = [
+        parallaxConstant.POSITION_TOP,
+        parallaxConstant.POSITION_LEFT,
+        parallaxConstant.POSITION_RIGHT,
+        parallaxConstant.POSITION_BOTTOM,
+    ];
+
+    // obj is an Object
+    const valueIsObject = checkType(Object, obj);
+    //
+    // position is a String and cotains the right value
+    const positionIsValid =
+        valueIsObject &&
+        checkType(String, obj?.position) &&
+        positionChoice.includes(obj.position);
+
+    // Value is a function and return a number
+    const valueIsValid =
+        valueIsObject &&
+        checkType(Function, obj.value) &&
+        checkType(Number, obj.value());
+
+    // Validate all
+    const isValid = valueIsObject && positionIsValid && valueIsValid;
+    if (!isValid) parallaxDynmicValueWarining(label);
+
+    return isValid ? obj : null;
+};
+
+/**
+ *
+ * @param {Object} value
+ * @returns {Object} parallaxTween|HandleSequencer|{}
+ *
+ * @description
+ * Check if tween is parallaxTween|HandleSequencer
+ **/
+export const parallaxTweenIsValid = (instance) => {
+    const isValid =
+        instance?.getType?.() &&
+        (instance.getType() === parallaxConstant.TWEEN_TWEEN ||
+            instance.getType() === parallaxConstant.TWEEN_TIMELINE);
+
+    if (!isValid && instance !== undefined && instance !== null)
+        parallaxTweenWarning();
+
+    return isValid ? instance : {};
 };

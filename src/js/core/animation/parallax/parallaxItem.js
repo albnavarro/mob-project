@@ -22,6 +22,10 @@ import {
     domNodeIsValidAndReturnElOrWin,
     domNodeIsValidAndReturnNull,
     parallaxDirectionIsValid,
+    parallaxDynamicValueIsValid,
+    parallaxTweenIsValid,
+    valueIsBooleanAndReturnDefault,
+    valueIsStringAndReturnDefault,
 } from '../utils/tweenValidation.js';
 
 export class ParallaxItemClass {
@@ -50,6 +54,7 @@ export class ParallaxItemClass {
         this.firstTime = true;
         this.isInViewport = false;
         this.force3D = false;
+        this.pinInstance = null;
 
         // Base props
         this.item = domNodeIsValidAndReturnElOrWin(data?.item, false);
@@ -60,23 +65,73 @@ export class ParallaxItemClass {
         this.direction = parallaxDirectionIsValid(data?.direction);
 
         /*
-        Pin  prop
+        Pin user  prop
         */
-        this.pin = data.pin || false;
-        this.animatePin = data.animatePin || false;
-        this.forceTranspond = data.forceTranspond || false;
-        this.anticipatePinOnLoad = data.anticipatePinOnLoad || false;
-        this.pinInstance = null;
+        this.pin = valueIsBooleanAndReturnDefault(
+            data?.pin,
+            'Parallax|Scrolltrigger pin propierties error:',
+            false
+        );
+        this.animatePin = valueIsBooleanAndReturnDefault(
+            data?.animatePin,
+            'Parallax|Scrolltrigger animatePin propierties error:',
+            false
+        );
 
-        //Fixed prop
-        this.fromTo = data.fromTo || false;
-        this.start = data.start || '0px';
-        this.dynamicStart = data.dynamicStart || null;
-        this.end = data.end || null;
-        this.dynamicEnd = data.dynamicEnd || null;
-        this.invertSide = data.invertSide || false;
-        this.marker = data.marker || null;
-        this.tween = data.tween || null;
+        this.forceTranspond = valueIsBooleanAndReturnDefault(
+            data?.forceTranspond,
+            'Parallax|Scrolltrigger forceTranspond propierties error:',
+            false
+        );
+
+        this.anticipatePinOnLoad = valueIsBooleanAndReturnDefault(
+            data?.anticipatePinOnLoad,
+            'Parallax|Scrolltrigger anticipatePinOnLoad propierties error:',
+            false
+        );
+
+        /**
+         * Fixed prop
+         */
+        this.start = valueIsStringAndReturnDefault(
+            data?.start,
+            'Scrolltrigger start propierties error:',
+            'bottom 0px'
+        );
+
+        this.end = valueIsStringAndReturnDefault(
+            data?.end,
+            'Scrolltrigger end propierties error:',
+            'top'
+        );
+
+        this.fromTo = valueIsBooleanAndReturnDefault(
+            data?.fromTo,
+            'Scrolltrigger fromTo propierties error:',
+            false
+        );
+
+        this.invertSide = valueIsBooleanAndReturnDefault(
+            data?.invertSide,
+            'Scrolltrigger invertSide propierties error:',
+            false
+        );
+
+        this.marker = valueIsStringAndReturnDefault(
+            data?.marker,
+            'Scrolltrigger marker propierties error:',
+            null
+        );
+
+        this.dynamicStart = data?.dynamicStart
+            ? parallaxDynamicValueIsValid(data.dynamicStart, 'dynamicStart')
+            : null;
+
+        this.dynamicEnd = data?.dynamicEnd
+            ? parallaxDynamicValueIsValid(data.dynamicEnd, 'dynamicEnd')
+            : null;
+
+        this.tween = parallaxTweenIsValid(data?.tween);
 
         //Lienar prop
         this.align = data.align ? data.align : parallaxConstant.ALIGN_CENTER;
@@ -124,7 +179,7 @@ export class ParallaxItemClass {
         this.lerpConfig = data.lerpConfig || null;
         this.motion = (() => {
             if (
-                this.tween &&
+                this.tween?.getType &&
                 this.tween.getType() === parallaxConstant.TWEEN_TIMELINE
             ) {
                 this.easeType = parallaxConstant.EASE_LERP;
@@ -196,7 +251,9 @@ export class ParallaxItemClass {
         this.setPerspective();
 
         if (this.propierties === parallaxConstant.PROP_TWEEN) {
-            this.range = this.tween.getDuration();
+            this.range = this?.tween?.getDuration
+                ? this.tween.getDuration()
+                : 0;
             if (this.tween?.inzializeStagger) this.tween.inzializeStagger();
         }
 
@@ -294,7 +351,10 @@ export class ParallaxItemClass {
         this.unsubscribeMotion = this.motion.subscribe(({ val }) => {
             if (val === this.lastValue) return;
 
-            if (this.propierties === parallaxConstant.PROP_TWEEN) {
+            if (
+                this.propierties === parallaxConstant.PROP_TWEEN &&
+                this.tween?.draw
+            ) {
                 this.tween.draw({
                     partial: val,
                     isLastDraw: false,
@@ -314,7 +374,10 @@ export class ParallaxItemClass {
         this.unsubscribeOnComplete = this.motion.onComplete(({ val }) => {
             this.force3D = false;
 
-            if (this.propierties === parallaxConstant.PROP_TWEEN) {
+            if (
+                this.propierties === parallaxConstant.PROP_TWEEN &&
+                this.tween?.draw
+            ) {
                 this.tween.draw({
                     partial: val,
                     isLastDraw: true,

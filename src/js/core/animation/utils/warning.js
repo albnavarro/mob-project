@@ -207,7 +207,11 @@ export const relativeWarining = (val, tweenType) => {
 };
 
 export const booleanWarning = (val, label) => {
-    console.warn(`${label}: ${val} is not Boolean`);
+    console.warn(`${label}: '${val}' is not Boolean`);
+};
+
+export const stringWarning = (val, label) => {
+    console.warn(`${label}: '${val}' is not String`);
 };
 
 export const lerpVelocityWarining = () => {
@@ -257,5 +261,17 @@ export const addAsyncFunctionWarining = (value) => {
 export const parallaxDirectionWarining = (value) => {
     console.warn(
         `Parallax direction: ${value} is not valid value: must be ${parallaxConstant.DIRECTION_VERTICAL} | ${parallaxConstant.DIRECTION_HORIZONTAL}`
+    );
+};
+
+export const parallaxDynmicValueWarining = (label) => {
+    console.warn(
+        `scrollTrigger error; ${label} propierties: value must be a Object like { position: top|bottom|left|right, value: () => { return Number} } `
+    );
+};
+
+export const parallaxTweenWarning = () => {
+    console.warn(
+        'parallax|scrolTrigger error: tween is not valid, must be an instance of HandleSequencer || ParallaxTween'
     );
 };
