@@ -1,32 +1,40 @@
-import { mq } from '../../utils/mediaManager.js';
-import { offset, position } from '../../utils/vanillaFunction.js';
-import { parallaxUtils } from './parallaxUtils.js';
-import { parallaxConstant } from './parallaxConstant.js';
-import { parallaxMarker } from './parallaxMarker.js';
-import { parallaxEmitter } from './parallaxEmitter.js';
-import { ParallaxPin } from './parallaxPin.js';
 import { handleFrame } from '../../events/rafutils/handleFrame.js';
+import { handleFrameIndex } from '../../events/rafutils/handleFrameIndex.js';
 import { handleNextTick } from '../../events/rafutils/handleNextTick.js';
 import { handleResize } from '../../events/resizeUtils/handleResize.js';
 import { handleScroll } from '../../events/scrollUtils/handleScroll.js';
 import { handleScrollImmediate } from '../../events/scrollUtils/handleScrollImmediate.js';
 import { handleScrollThrottle } from '../../events/scrollUtils/handleScrollThrottle.js';
 import { handleScrollStart } from '../../events/scrollUtils/handleScrollUtils.js';
-import { HandleSpring } from '../spring/handleSpring.js';
+import { mq } from '../../utils/mediaManager.js';
+import {
+    getTranslateValues,
+    offset,
+    position,
+} from '../../utils/vanillaFunction.js';
 import { HandleLerp } from '../lerp/handleLerp.js';
-import { getRoundedValue } from '../utils/animationUtils.js';
-import { getTranslateValues } from '../../utils/vanillaFunction.js';
-import { clamp } from '../utils/animationUtils.js';
-import { handleFrameIndex } from '../../events/rafutils/handleFrameIndex.js';
+import { HandleSpring } from '../spring/handleSpring.js';
+import { clamp, getRoundedValue } from '../utils/animationUtils.js';
 import {
     domNodeIsValidAndReturnElOrWin,
     domNodeIsValidAndReturnNull,
+    parallaxAlignIsValid,
     parallaxDirectionIsValid,
+    parallaxDynamicRangeIsValid,
     parallaxDynamicValueIsValid,
+    parallaxOnSwitchIsValid,
+    parallaxOpacityIsValid,
+    parallaxRangeIsValid,
     parallaxTweenIsValid,
+    parallaxTypeIsValid,
     valueIsBooleanAndReturnDefault,
     valueIsStringAndReturnDefault,
 } from '../utils/tweenValidation.js';
+import { parallaxConstant } from './parallaxConstant.js';
+import { parallaxEmitter } from './parallaxEmitter.js';
+import { parallaxMarker } from './parallaxMarker.js';
+import { ParallaxPin } from './parallaxPin.js';
+import { parallaxUtils } from './parallaxUtils.js';
 
 export class ParallaxItemClass {
     constructor(data) {
@@ -131,29 +139,45 @@ export class ParallaxItemClass {
             ? parallaxDynamicValueIsValid(data.dynamicEnd, 'dynamicEnd')
             : null;
 
+        this.dynamicRange = parallaxDynamicRangeIsValid(data?.dynamicRange);
+
         this.tween = parallaxTweenIsValid(data?.tween);
 
-        //Lienar prop
-        this.align = data.align ? data.align : parallaxConstant.ALIGN_CENTER;
-        this.onSwitch = data.onSwitch ? data.onSwitch.toLowerCase() : false;
+        //parallax  prop
+        this.align = parallaxAlignIsValid(data?.align);
+
+        this.onSwitch = parallaxOnSwitchIsValid(data?.onSwitch);
 
         // Opacity Prop
-        this.opacityStart = data.opacityStart || 100;
-        this.opacityEnd = data.opacityEnd || 0;
+        this.opacityStart = parallaxOpacityIsValid(
+            data?.opacityStart,
+            'Parallax opacityStart propierties error:',
+            100
+        );
+
+        this.opacityEnd = parallaxOpacityIsValid(
+            data?.opacityEnd,
+            'Parallax opacityEnd propierties error:',
+            0
+        );
 
         // Common prop
-        this.disableForce3D = data.disableForce3D || false;
-        this.useThrottle = data.useThrottle || false;
-        this.type = data.type
-            ? data.type.toLowerCase()
-            : parallaxConstant.TYPE_DEFAULT;
+        this.disableForce3D = valueIsBooleanAndReturnDefault(
+            data?.disableForce3D,
+            'Parallax|Scrolltrigger disableForce3D propierties error:',
+            false
+        );
 
-        // Base range
-        this.range =
-            data.range ||
-            (() => (this.type === parallaxConstant.TYPE_DEFAULT ? 2 : 0))();
-        // Function that return a range value
-        this.dynamicRange = data.dynamicRange || null;
+        this.useThrottle = valueIsBooleanAndReturnDefault(
+            data?.useThrottle,
+            'Parallax|Scrolltrigger useThrottle propierties error:',
+            false
+        );
+
+        this.type = parallaxTypeIsValid(data?.type);
+
+        this.range = parallaxRangeIsValid(data?.range, this.type);
+
         this.perspective = data.perspective || false;
         this.breackpoint = data.breackpoint || 'desktop';
         this.queryType = data.queryType || 'min';

@@ -6,6 +6,14 @@ import {
     STAGGER_TYPE_EQUAL,
 } from './stagger/staggerCostant';
 
+const possibleChoice = (choice) => {
+    return choice
+        .map((item) => {
+            return `${item} | `;
+        })
+        .join('');
+};
+
 export const compareKeysWarning = (label, fromObj, toObj) => {
     console.warn(
         `${label}: ${JSON.stringify(fromObj)} and to ${JSON.stringify(
@@ -214,6 +222,10 @@ export const stringWarning = (val, label) => {
     console.warn(`${label}: '${val}' is not String`);
 };
 
+export const naumberWarning = (val, label) => {
+    console.warn(`${label}: '${val}' is not Number`);
+};
+
 export const lerpVelocityWarining = () => {
     console.warn(
         'Lerp error: velocity is not valid, must be a Number greater than 0 and less than 1'
@@ -270,8 +282,54 @@ export const parallaxDynmicValueWarining = (label) => {
     );
 };
 
+export const parallaxDynmicRangeValueWarining = () => {
+    console.warn(
+        `scrollTrigger error; dynamicRange propierties: value must be a Funtion that return a Number`
+    );
+};
+
 export const parallaxTweenWarning = () => {
     console.warn(
         'parallax|scrolTrigger error: tween is not valid, must be an instance of HandleSequencer || ParallaxTween'
+    );
+};
+
+export const parallaxAlignWarining = (value, choice) => {
+    console.warn(
+        `parallax error align propierties: ${value} is not valid must be one of ${possibleChoice(
+            choice
+        )} or a Number between 0 and 100`
+    );
+};
+
+export const parallaxOnSwitchWarining = (value, choice) => {
+    console.warn(
+        `parallax error align propierties: ${value} is not valid must be one of ${possibleChoice(
+            choice
+        )}`
+    );
+};
+
+export const parallaxOpacityWarning = (val, label) => {
+    console.warn(
+        `${label}: '${val}' is not Number, must be a number between 0 and 100`
+    );
+};
+
+export const parallaxTypeWarining = (value, choice) => {
+    console.warn(
+        `parallax error type propierties: ${value} is not valid must be one of ${possibleChoice(
+            choice
+        )}`
+    );
+};
+
+export const parallaxRangeNumberWarning = (value) => {
+    console.warn(`parallax error range propierties: ${value} is not a Number`);
+};
+
+export const parallaxRangeStringWarning = (value) => {
+    console.warn(
+        `scrollTrigger error range propierties: ${value} is not a String`
     );
 };

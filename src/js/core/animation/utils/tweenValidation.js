@@ -1,20 +1,21 @@
-import {
-    STAGGER_START,
-    STAGGER_END,
-    STAGGER_CENTER,
-    STAGGER_EDGES,
-    STAGGER_RANDOM,
-    DIRECTION_RADIAL,
-    DIRECTION_ROW,
-    DIRECTION_COL,
-    STAGGER_TYPE_EQUAL,
-    STAGGER_TYPE_START,
-    STAGGER_TYPE_END,
-    STAGGER_TYPE_CENTER,
-} from './stagger/staggerCostant.js';
 import { handleSetUp } from '../../setup';
 import { checkType } from '../../store/storeType';
+import { parallaxConstant } from '../parallax/parallaxConstant.js';
 import { getTweenFn, tweenConfig } from '../tween/tweenConfig';
+import {
+    DIRECTION_COL,
+    DIRECTION_RADIAL,
+    DIRECTION_ROW,
+    STAGGER_CENTER,
+    STAGGER_EDGES,
+    STAGGER_END,
+    STAGGER_RANDOM,
+    STAGGER_START,
+    STAGGER_TYPE_CENTER,
+    STAGGER_TYPE_END,
+    STAGGER_TYPE_EQUAL,
+    STAGGER_TYPE_START,
+} from './stagger/staggerCostant.js';
 import {
     addAsyncFunctionWarining,
     addFunctionWarining,
@@ -29,9 +30,17 @@ import {
     initialDataValueWarining,
     lerpPrecisionWarining,
     lerpVelocityWarining,
+    naumberWarning,
+    parallaxAlignWarining,
     parallaxDirectionWarining,
+    parallaxDynmicRangeValueWarining,
     parallaxDynmicValueWarining,
+    parallaxOnSwitchWarining,
+    parallaxOpacityWarning,
+    parallaxRangeNumberWarning,
+    parallaxRangeStringWarning,
     parallaxTweenWarning,
+    parallaxTypeWarining,
     playLabelWarining,
     relativeWarining,
     repeatWarining,
@@ -51,7 +60,6 @@ import {
     tweenEaseWarning,
     valueStringWarning,
 } from './warning';
-import { parallaxConstant } from '../parallax/parallaxConstant.js';
 
 /**
  *
@@ -523,6 +531,22 @@ export const valueIsStringAndReturnDefault = (value, label, defaultValue) => {
 
 /**
  *
+ * @param {Number} value
+ * @returns {Number}
+ *
+ * @description
+ * Check if value is Number and return defualt
+ **/
+export const valueIsNumberAndReturnDefault = (value, label, defaultValue) => {
+    const isValid = checkType(Number, parseFloat(value));
+    if (!isValid && value !== undefined && value !== null)
+        naumberWarning(value, label);
+
+    return isValid ? value : defaultValue;
+};
+
+/**
+ *
  * @param {Number} velocity
  * @returns {Number}
  *
@@ -786,6 +810,23 @@ export const parallaxDynamicValueIsValid = (obj, label) => {
 
 /**
  *
+ * @param {Function} value
+ * @returns {Function}
+ *
+ * @description
+ * Check if dynamicRange is a functiom that return a Number
+ **/
+export const parallaxDynamicRangeIsValid = (fn) => {
+    const isValid = checkType(Function, fn) && checkType(Number, fn());
+
+    if (!isValid && fn !== undefined && fn !== null)
+        parallaxDynmicRangeValueWarining();
+
+    return isValid ? fn : null;
+};
+
+/**
+ *
  * @param {Object} value
  * @returns {Object} parallaxTween|HandleSequencer|{}
  *
@@ -802,4 +843,116 @@ export const parallaxTweenIsValid = (instance) => {
         parallaxTweenWarning();
 
     return isValid ? instance : {};
+};
+
+/**
+ *
+ * @param {( String|NUmber )} value
+ * @returns {( String|NUmber )} ALign value
+ *
+ * @description
+ * Check if Align value is valid
+ **/
+export const parallaxAlignIsValid = (value) => {
+    const choice = [
+        parallaxConstant.ALIGN_START,
+        parallaxConstant.ALIGN_TOP,
+        parallaxConstant.ALIGN_RIGHT,
+        parallaxConstant.ALIGN_CENTER,
+        parallaxConstant.ALIGN_BOTTOM,
+        parallaxConstant.ALIGN_LEFT,
+        parallaxConstant.ALIGN_END,
+    ];
+
+    const isValid =
+        choice.includes(value) || checkType(Number, parseFloat(value));
+
+    if (!isValid && value !== undefined && value !== null)
+        parallaxAlignWarining(value, choice);
+
+    return isValid ? value : parallaxConstant.ALIGN_CENTER;
+};
+
+/**
+ *
+ * @param {String} value
+ * @returns {String} ALign value
+ *
+ * @description
+ * Check if unSwitch value is valid
+ **/
+export const parallaxOnSwitchIsValid = (value) => {
+    const choice = [
+        parallaxConstant.IN_BACK,
+        parallaxConstant.IN_STOP,
+        parallaxConstant.OUT_BACK,
+        parallaxConstant.OUT_STOP,
+    ];
+
+    const isValid = choice.includes(value);
+
+    if (!isValid && value !== undefined && value !== null)
+        parallaxOnSwitchWarining(value, choice);
+
+    return isValid ? value : false;
+};
+
+/**
+ *
+ * @param {Number} value
+ * @returns {Number}
+ *
+ * @description
+ * Check if value is Number and return defualt
+ **/
+export const parallaxOpacityIsValid = (value, label, defaultValue) => {
+    const isValid = checkType(Number, parseFloat(value));
+    if (!isValid && value !== undefined && value !== null)
+        parallaxOpacityWarning(value, label);
+
+    return isValid ? value : defaultValue;
+};
+
+/**
+ *
+ * @param {String} value
+ * @returns {String}
+ *
+ * @description
+ * Check if type propierties is valid
+ **/
+export const parallaxTypeIsValid = (value) => {
+    const valueParsed = value ? value.toLowerCase() : null;
+
+    const choice = [
+        parallaxConstant.TYPE_PARALLAX,
+        parallaxConstant.TYPE_SCROLLTRIGGER,
+    ];
+
+    const isValid = choice.includes(valueParsed);
+
+    if (!isValid && valueParsed !== undefined && valueParsed !== null)
+        parallaxTypeWarining(valueParsed, choice);
+
+    return isValid ? valueParsed : parallaxConstant.TYPE_PARALLAX;
+};
+
+export const parallaxRangeIsValid = (value, type) => {
+    const parsedValue = () => {
+        if (type === parallaxConstant.TYPE_PARALLAX) {
+            const isValid = checkType(Number, parseFloat(value));
+            if (!isValid && value !== undefined && value !== null)
+                parallaxRangeNumberWarning(value);
+
+            return isValid ? value : 2;
+        } else {
+            const isValid = checkType(String, value);
+            if (!isValid && value !== undefined && value !== null)
+                parallaxRangeStringWarning(value);
+
+            return isValid ? value : '0px';
+        }
+    };
+
+    return parsedValue();
 };

@@ -63,7 +63,7 @@ class ParallaxClass {
         data.item = item;
 
         // String: scrolltrigger || default
-        data.type = item.getAttribute('data-type') || 'default';
+        data.type = item.getAttribute('data-type') || 'parallax';
 
         // String: 'vertical' || 'horizontal'
         data.direction = item.getAttribute('data-direction');

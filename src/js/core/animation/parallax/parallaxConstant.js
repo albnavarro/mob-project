@@ -28,7 +28,7 @@ export const parallaxConstant = {
     DIRECTION_HORIZONTAL: 'horizontal',
 
     // Constant computation type
-    TYPE_DEFAULT: 'default',
+    TYPE_PARALLAX: 'parallax',
     TYPE_SCROLLTRIGGER: 'scrolltrigger',
 
     // Constant propierties

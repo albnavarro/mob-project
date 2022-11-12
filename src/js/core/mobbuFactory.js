@@ -1,60 +1,51 @@
-// Constant
-import { parallaxConstant } from './animation/parallax/parallaxConstant.js';
-
-// Instance
-import { HandleLerp } from './animation/lerp/handleLerp.js';
-import { HandleSpring } from './animation/spring/handleSpring.js';
-import { HandleTween } from './animation/tween/handleTween.js';
-import { HandleSequencer } from './animation/sequencer/handleSequencer.js';
 import { HandleAsyncTimeline } from './animation/asyncTimeline/handleAsyncTimeline.js';
-import { HandleSyncTimeline } from './animation/syncTimeline/handleSyncTimeline.js';
-import { HandleMasterSequencer } from './animation/sequencer/handleMasterSequencer.js';
+import { bodyScroll } from './animation/bodyScroll/bodyScroll.js';
+import { HandleLerp } from './animation/lerp/handleLerp.js';
+import { mouseParallax } from './animation/mouseParallax/mouseParallax.js';
+import { MouseParallaxItemClass } from './animation/mouseParallax/mouseParallaxitem.js';
+import { parallax } from './animation/parallax/parallax.js';
+import { parallaxConstant } from './animation/parallax/parallaxConstant.js';
 import { ParallaxItemClass } from './animation/parallax/parallaxItem.js';
 import { ParallaxTween } from './animation/parallax/parallaxTween.js';
-import { MouseParallaxItemClass } from './animation/mouseParallax/mouseParallaxitem.js';
-import { SmoothScrollClass } from './animation/smoothScroller/smoothScroll.js';
-import { SimpleStore } from './store/simpleStore.js';
+import { HandleMasterSequencer } from './animation/sequencer/handleMasterSequencer.js';
+import { HandleSequencer } from './animation/sequencer/handleSequencer.js';
 import { createStaggers } from './animation/sequencer/sequencerUtils.js';
-
-// Event
-import { handleNextFrame } from './events/rafutils/handleNextFrame.js';
-import { handleNextTick } from './events/rafutils/handleNextTick.js';
-import { handleFrame } from './events/rafutils/handleFrame.js';
-import { handleFrameIndex } from './events/rafutils/handleFrameIndex';
-import { frameStore } from './events/rafutils/frameStore';
-import { loadFps } from './events/rafutils/loadFps.js';
+import { slide } from './animation/slide/slide.js';
+import { SmoothScrollClass } from './animation/smoothScroller/smoothScroll.js';
+import { HandleSpring } from './animation/spring/handleSpring.js';
+import { HandleSyncTimeline } from './animation/syncTimeline/handleSyncTimeline.js';
+import { HandleTween } from './animation/tween/handleTween.js';
+import { printEaseKey } from './animation/tween/tweenConfig.js';
 import { handleLoad } from './events/loadutils/handleLoad.js';
-import { handleResize } from './events/resizeUtils/handleResize.js';
-import { handleVisibilityChange } from './events/visibilityChange/handleVisibilityChange.js';
 import {
     handleMouseClick,
     handleMouseDown,
-    handleTouchStart,
     handleMouseMove,
-    handleTouchMove,
     handleMouseUp,
-    handleTouchEnd,
     handleMouseWheel,
+    handleTouchEnd,
+    handleTouchMove,
+    handleTouchStart,
 } from './events/mouseUtils/handleMouse.js';
+import { frameStore } from './events/rafutils/frameStore';
+import { handleFrame } from './events/rafutils/handleFrame.js';
+import { handleFrameIndex } from './events/rafutils/handleFrameIndex';
+import { handleNextFrame } from './events/rafutils/handleNextFrame.js';
+import { handleNextTick } from './events/rafutils/handleNextTick.js';
+import { loadFps } from './events/rafutils/loadFps.js';
+import { handleResize } from './events/resizeUtils/handleResize.js';
 import { handleScroll } from './events/scrollUtils/handleScroll.js';
 import { handleScrollImmediate } from './events/scrollUtils/handleScrollImmediate.js';
 import { handleScrollThrottle } from './events/scrollUtils/handleScrollThrottle.js';
 import {
-    handleScrollStart,
     handleScrollEnd,
+    handleScrollStart,
 } from './events/scrollUtils/handleScrollUtils.js';
-
-// Body scroll
-import { bodyScroll } from './animation/bodyScroll/bodyScroll.js';
-import { slide } from './animation/slide/slide.js';
+import { handleVisibilityChange } from './events/visibilityChange/handleVisibilityChange.js';
+import { handleSetUp } from './setup.js';
+import { SimpleStore } from './store/simpleStore.js';
 import { LoadImages } from './utils/loadImages.js';
 import { mq } from './utils/mediaManager.js';
-import { handleSetUp } from './setup.js';
-import { parallax } from './animation/parallax/parallax.js';
-import { mouseParallax } from './animation/mouseParallax/mouseParallax.js';
-
-// Easing list
-import { printEaseKey } from './animation/tween/tweenConfig.js';
 
 export const mobbu = {
     /**
@@ -504,7 +495,7 @@ export const mobbu = {
             case 'parallax':
                 return new ParallaxItemClass({
                     ...obj,
-                    ...{ type: parallaxConstant.TYPE_DEFAULT },
+                    ...{ type: parallaxConstant.TYPE_PARALLAX },
                 });
 
             case 'scrolltrigger':
