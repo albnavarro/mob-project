@@ -20,7 +20,7 @@ import { ANIMATION_STOP_REJECT } from '../../events/errorHandler/catchAnimationR
  * @prop {Boolean} [yoyo=0] Reverse the direction each time the animation ends
  * @prop {Number} [repeat=1] how many times the animation should be repeated, -1 means that the animation will run in an infinite loop
  */
-export class HandleSyncTimeline {
+export default class HandleSyncTimeline {
     /**
      * @param { syncTimelineTypes } data
      *

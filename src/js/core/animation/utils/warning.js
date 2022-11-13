@@ -324,12 +324,58 @@ export const parallaxTypeWarining = (value, choice) => {
     );
 };
 
+export const parallaxPropiertiesWarining = (value, choice) => {
+    console.warn(
+        `parallax/scrollTrigger error propierties props: ${value} is not valid must be one of ${possibleChoice(
+            choice
+        )}`
+    );
+};
+
+export const parallaxEaseTypeWarining = (value, choice) => {
+    console.warn(
+        `parallax error easeType props: ${value} is not valid must be one of ${possibleChoice(
+            choice
+        )}`
+    );
+};
+
+export const parallaxEaseTypeSpringWarining = () => {
+    console.warn(
+        'Scrolltrigger warning: spring animation is only available for native properties and ParallaxTween'
+    );
+};
+
+export const parallaxSpringCongifWarining = (value, choice) => {
+    console.warn(
+        `parallax/scrollTrigger error springConfig props: ${value} is not valid must be one of ${possibleChoice(
+            choice
+        )}`
+    );
+};
+
 export const parallaxRangeNumberWarning = (value) => {
-    console.warn(`parallax error range propierties: ${value} is not a Number`);
+    console.warn(
+        `parallax error range propierties, current value: ${value}, the value must be a number between 0 and 9.99`
+    );
 };
 
 export const parallaxRangeStringWarning = (value) => {
     console.warn(
         `scrollTrigger error range propierties: ${value} is not a String`
+    );
+};
+
+export const breakpointWarning = (mq, choice, label) => {
+    console.warn(
+        `parallax/sctrolltrigger error ${label} propierties: ${mq} is not valid must be one of ${possibleChoice(
+            choice
+        )}`
+    );
+};
+
+export const parallaxUseSequencerWarining = () => {
+    console.warn(
+        'Parallax warning: if propierties is a tween the only choice is ParallaxTween, HandleSequencer or empty tween propierites is not allowed'
     );
 };

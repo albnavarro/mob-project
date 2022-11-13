@@ -1,4 +1,4 @@
-import { MouseParallaxItemClass } from './mouseParallaxitem.js';
+import MouseParallaxItemClass from './mouseParallaxitem.js';
 
 class MouseParallaxClass {
     constructor() {

@@ -67,7 +67,7 @@ import { ANIMATION_STOP_REJECT } from '../../events/errorHandler/catchAnimationR
  * @prop {Number} [ precision ] It defines the initial value of the precision properties, the value can be momentarily changed whenever the goTo, goFrom, goFromTo methods are invoked, when the calculated value is less than this number, the transition will be considered completed, the smaller the value, the greater the precision of the calculation, the `default value is 0.01`.
  **/
 
-export class HandleLerp {
+export default class HandleLerp {
     /**
      * @param { lerpTypes & lerpPropTypes & import('../utils/stagger/staggerCostant.js').staggerTypes } data
      *

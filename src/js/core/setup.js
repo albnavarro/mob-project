@@ -1,5 +1,7 @@
 import { springPresetConfig } from './animation/spring/springConfig.js';
 import { mergeDeep } from './utils/mergeDeep.js';
+export const MQ_MIN = 'min';
+export const MQ_MAX = 'max';
 
 export const handleSetUp = (() => {
     let data = {
@@ -17,9 +19,17 @@ export const handleSetUp = (() => {
             large: 1200,
             xLarge: 1400,
         },
+        defaultMq: {
+            value: 'desktop',
+            type: MQ_MIN,
+        },
         sequencer: {
             duration: 10,
             ease: 'easeLinear',
+        },
+        parallax: {
+            defaultRange: 8,
+            defaultSpringConfig: 'default',
         },
         parallaxTween: {
             duration: 10,

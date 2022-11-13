@@ -1,4 +1,4 @@
-import { ParallaxItemClass } from './parallaxItem.js';
+import ParallaxItemClass from './parallaxItem.js';
 
 class ParallaxClass {
     constructor() {

@@ -54,7 +54,7 @@ import { handleSetUp } from '../../setup.js';
  * @prop {number} [ end=duration ] Defines the start of the transformation of the timeline in use, from 0 to the maximum surat set. The default value is the set duration
  **/
 
-export class HandleSequencer {
+export default class HandleSequencer {
     /**
      * @param { sequencerTypes & import('../utils/stagger/staggerCostant.js').staggerTypes & import('../tween/tweenConfig.js').easeTypes} data
      *

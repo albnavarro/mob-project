@@ -1,4 +1,4 @@
-import { HandleTween } from '../tween/handleTween.js';
+import HandleTween from '../tween/handleTween.js';
 import { offset, isNode } from '../../utils/vanillaFunction.js';
 
 /**

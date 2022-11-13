@@ -23,7 +23,7 @@
  * const timeline = mobbu.createSyncTimeline({}).add(masterSequencer)
  * ```
  */
-export class HandleMasterSequencer {
+export default class HandleMasterSequencer {
     constructor() {
         this.type = 'sequencer';
         this.children = [];

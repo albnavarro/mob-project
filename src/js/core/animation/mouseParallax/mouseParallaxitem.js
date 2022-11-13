@@ -4,12 +4,12 @@ import {
     offset,
     getTranslateValues,
 } from '../../utils/vanillaFunction.js';
-import { HandleSpring } from '../spring/handleSpring.js';
+import HandleSpring from '../spring/handleSpring.js';
 import { handleResize } from '../../events/resizeUtils/handleResize.js';
 import { handleScroll } from '../../events/scrollUtils/handleScroll.js';
 import { handleMouseMove } from '../../events/mouseUtils/handleMouse.js';
 
-export class MouseParallaxItemClass {
+export default class MouseParallaxItemClass {
     constructor(data) {
         this.item = data.item;
         this.centerToViewoport = data.centerToViewoport;

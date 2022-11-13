@@ -1,4 +1,4 @@
-import { HandleSpring } from '../../animation/spring/handleSpring.js';
+import HandleSpring from '../../animation/spring/handleSpring.js';
 import { handleFrame } from '../../events/rafutils/handleFrame.js';
 import { parallaxConstant } from './parallaxConstant.js';
 import { position } from '../../utils/vanillaFunction.js';

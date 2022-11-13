@@ -1,5 +1,6 @@
 import { handleSetUp } from '../../setup';
 import { checkType } from '../../store/storeType';
+import { MQ_MAX, MQ_MIN } from '../../setup.js';
 import { parallaxConstant } from '../parallax/parallaxConstant.js';
 import { getTweenFn, tweenConfig } from '../tween/tweenConfig';
 import {
@@ -22,6 +23,7 @@ import {
     asyncTimelineDelayWarning,
     asyncTimelineTweenWaring,
     booleanWarning,
+    breakpointWarning,
     createStaggerItemsWarning,
     createStaggerTypeWarning,
     durationNumberOrFunctionWarining,
@@ -35,12 +37,17 @@ import {
     parallaxDirectionWarining,
     parallaxDynmicRangeValueWarining,
     parallaxDynmicValueWarining,
+    parallaxEaseTypeSpringWarining,
+    parallaxEaseTypeWarining,
     parallaxOnSwitchWarining,
     parallaxOpacityWarning,
+    parallaxPropiertiesWarining,
     parallaxRangeNumberWarning,
     parallaxRangeStringWarning,
+    parallaxSpringCongifWarining,
     parallaxTweenWarning,
     parallaxTypeWarining,
+    parallaxUseSequencerWarining,
     playLabelWarining,
     relativeWarining,
     repeatWarining,
@@ -60,6 +67,7 @@ import {
     tweenEaseWarning,
     valueStringWarning,
 } from './warning';
+import { springPresetConfig } from '../spring/springConfig';
 
 /**
  *
@@ -937,14 +945,30 @@ export const parallaxTypeIsValid = (value) => {
     return isValid ? valueParsed : parallaxConstant.TYPE_PARALLAX;
 };
 
+/**
+ *
+ * @param {String} value
+ * @returns {String}
+ *
+ * @description
+ * Check if range propierties is valid
+ **/
 export const parallaxRangeIsValid = (value, type) => {
     const parsedValue = () => {
         if (type === parallaxConstant.TYPE_PARALLAX) {
-            const isValid = checkType(Number, parseFloat(value));
+            const isOnlyNumber = /^\d+\.\d+$|^\d+$/.test(value);
+            const isValid =
+                checkType(Number, parseFloat(value)) &&
+                isOnlyNumber &&
+                value >= 0 &&
+                value < 10;
+
             if (!isValid && value !== undefined && value !== null)
                 parallaxRangeNumberWarning(value);
 
-            return isValid ? value : 2;
+            return isValid
+                ? 10 - value
+                : 10 - handleSetUp.get('parallax').defaultRange;
         } else {
             const isValid = checkType(String, value);
             if (!isValid && value !== undefined && value !== null)
@@ -955,4 +979,147 @@ export const parallaxRangeIsValid = (value, type) => {
     };
 
     return parsedValue();
+};
+
+/**
+ *
+ * @param {String} value
+ * @returns {String}
+ *
+ * @description
+ * Check if breackpoint prop is valid
+ **/
+export const breakpointIsValid = (mq, label) => {
+    const mqObj = handleSetUp.get('mq');
+    const defaultMq = handleSetUp.get('defaultMq').value;
+    const choice = Object.keys(mqObj);
+
+    const isValid = checkType(String, mq) && choice.includes(mq);
+    if (!isValid && mq !== undefined && mq !== null)
+        breakpointWarning(mq, choice, label);
+
+    return isValid ? mq : defaultMq;
+};
+
+/**
+ *
+ * @param {String} value
+ * @returns {String}
+ *
+ * @description
+ * Check if queryType prop is valid
+ **/
+export const breakpointTypeIsValid = (type, label) => {
+    const defaultType = handleSetUp.get('defaultMq').type;
+    const choice = [MQ_MAX, MQ_MIN];
+
+    const isValid = checkType(String, type) && choice.includes(type);
+    if (!isValid && type !== undefined && type !== null)
+        breakpointWarning(type, choice, label);
+
+    return isValid ? type : defaultType;
+};
+
+/**
+ *
+ * @param {String} value
+ * @returns {String}
+ *
+ * @description
+ * Check if propierties prop is valid
+ **/
+export const parallaxPropiertiesIsValid = (
+    value,
+    type,
+    tweenIsParallaxTween
+) => {
+    const choice = [
+        parallaxConstant.PROP_VERTICAL,
+        parallaxConstant.PROP_HORIZONTAL,
+        parallaxConstant.PROP_ROTATE,
+        parallaxConstant.PROP_ROTATEY,
+        parallaxConstant.PROP_ROTATEX,
+        parallaxConstant.PROP_ROTATEZ,
+        parallaxConstant.PROP_OPACITY,
+        parallaxConstant.PROP_SCALE,
+        parallaxConstant.PROP_TWEEN,
+    ];
+
+    const isValid = choice.includes(value);
+    if (!isValid && value !== undefined && value !== null)
+        parallaxPropiertiesWarining(value, choice);
+
+    /**
+     * Inside Parallax sequencer is not allowed
+     * So return verticasl props
+     */
+    const shouldBeDefault =
+        type === parallaxConstant.TYPE_PARALLAX &&
+        value === parallaxConstant.PROP_TWEEN &&
+        !tweenIsParallaxTween;
+
+    if (shouldBeDefault) parallaxUseSequencerWarining();
+    const valueParsed = shouldBeDefault
+        ? parallaxConstant.PROP_VERTICAL
+        : value;
+
+    return isValid ? valueParsed : parallaxConstant.PROP_VERTICAL;
+};
+
+/**
+ *
+ * @param {String} value
+ * @returns {String}
+ *
+ * @description
+ * Check if easeType is valid
+ **/
+export const parallaxEaseTypeIsValid = (
+    value,
+    isSequencer,
+    isScrollTtrigger
+) => {
+    const choice = [parallaxConstant.EASE_SPRING, parallaxConstant.EASE_LERP];
+    const sequencerUseSpringInsideScrolltrigger =
+        isSequencer &&
+        isScrollTtrigger &&
+        value === parallaxConstant.EASE_SPRING;
+
+    const isValid = choice.includes(value);
+    if (!isValid && value !== undefined && value !== null)
+        parallaxEaseTypeWarining(value, choice);
+
+    /**
+     * Sequencer can not use spring
+     */
+    if (sequencerUseSpringInsideScrolltrigger) parallaxEaseTypeSpringWarining();
+    const fallback = sequencerUseSpringInsideScrolltrigger
+        ? parallaxConstant.EASE_LERP
+        : value;
+
+    return isValid ? value : fallback;
+};
+
+/**
+ *
+ * @param {String} value
+ * @returns {String}
+ *
+ * @description
+ * Check if springConfig is valid
+ **/
+export const parallaxSpringConfigIsValid = (config, type) => {
+    const springDefaultConfig = handleSetUp.get('spring').config;
+    const choice = Object.keys(springDefaultConfig);
+
+    const defaultConfig =
+        type === parallaxConstant.TYPE_PARALLAX
+            ? handleSetUp.get('parallax').defaultSpringConfig
+            : null;
+
+    const isValid = choice.includes(config);
+    if (!isValid && config !== undefined && config !== null)
+        parallaxSpringCongifWarining(config, choice);
+
+    return isValid ? config : defaultConfig;
 };

@@ -27,7 +27,7 @@ import {
  * @prop {number} [ duration=10] Defines the time range of the animation, ScrollTrigger will take care of processing the value as needed. The default value is 10
  **/
 
-export class ParallaxTween {
+export default class ParallaxTween {
     /**
      * @param { parallaxTweenTypes & import('../utils/stagger/staggerCostant.js').staggerTypes & import('../tween/tweenConfig.js').easeTypes} data
      *

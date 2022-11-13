@@ -1,5 +1,8 @@
 import { frameStore } from './frameStore.js';
 
+/**
+ * @private
+ */
 export const handleCache = (() => {
     let id = 0;
 

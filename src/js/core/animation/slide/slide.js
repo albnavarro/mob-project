@@ -1,4 +1,4 @@
-import { HandleTween } from '../tween/handleTween.js';
+import HandleTween from '../tween/handleTween.js';
 import { outerHeight } from '../../utils/vanillaFunction.js';
 
 /**  slide.subscribe(el);

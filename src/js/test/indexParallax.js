@@ -48,6 +48,7 @@ export function indexParallax() {
         start: 'bottom',
         end: 'top -height',
         ease: true,
+        // easeType: 'spring',
         // pin: true,
         // animatePin: true,
         marker: 'parallax-timeline',
@@ -72,7 +73,7 @@ export function indexParallax() {
     const parallaxScale = mobbu.create('parallax', {
         item: parallaxItem,
         ease: true,
-        // easeType: 'lerp',
+        easeType: 'spring',
         propierties: 'tween',
         tween: tweenScale,
         onSwitch: 'in-stop',

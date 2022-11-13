@@ -17,11 +17,11 @@ import {
     isDescendant,
     getTranslateValues,
 } from '../../utils/vanillaFunction.js';
-import { HandleLerp } from '../../animation/lerp/handleLerp.js';
-import { HandleSpring } from '../../animation/spring/handleSpring.js';
+import HandleLerp from '../../animation/lerp/handleLerp.js';
+import HandleSpring from '../../animation/spring/handleSpring.js';
 import { clamp } from '../../animation/utils/animationUtils.js';
 
-export class SmoothScrollClass {
+export default class SmoothScrollClass {
     constructor(data = {}) {
         this.VERTICAL = 'VERTICAL';
         this.HORIZONTAL = 'HORIZONTAL';

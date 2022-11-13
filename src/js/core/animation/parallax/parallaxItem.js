@@ -12,22 +12,28 @@ import {
     offset,
     position,
 } from '../../utils/vanillaFunction.js';
-import { HandleLerp } from '../lerp/handleLerp.js';
-import { HandleSpring } from '../spring/handleSpring.js';
+import HandleLerp from '../lerp/handleLerp.js';
+import HandleSpring from '../spring/handleSpring.js';
 import { clamp, getRoundedValue } from '../utils/animationUtils.js';
 import {
+    breakpointIsValid,
+    breakpointTypeIsValid,
     domNodeIsValidAndReturnElOrWin,
     domNodeIsValidAndReturnNull,
     parallaxAlignIsValid,
     parallaxDirectionIsValid,
     parallaxDynamicRangeIsValid,
     parallaxDynamicValueIsValid,
+    parallaxEaseTypeIsValid,
     parallaxOnSwitchIsValid,
     parallaxOpacityIsValid,
+    parallaxPropiertiesIsValid,
     parallaxRangeIsValid,
+    parallaxSpringConfigIsValid,
     parallaxTweenIsValid,
     parallaxTypeIsValid,
     valueIsBooleanAndReturnDefault,
+    valueIsNumberAndReturnDefault,
     valueIsStringAndReturnDefault,
 } from '../utils/tweenValidation.js';
 import { parallaxConstant } from './parallaxConstant.js';
@@ -36,7 +42,7 @@ import { parallaxMarker } from './parallaxMarker.js';
 import { ParallaxPin } from './parallaxPin.js';
 import { parallaxUtils } from './parallaxUtils.js';
 
-export class ParallaxItemClass {
+export default class ParallaxItemClass {
     constructor(data) {
         this.offset = 0;
         this.screenPosition = 0;
@@ -64,17 +70,13 @@ export class ParallaxItemClass {
         this.force3D = false;
         this.pinInstance = null;
 
-        // Base props
-        this.item = domNodeIsValidAndReturnElOrWin(data?.item, false);
-        this.scroller = domNodeIsValidAndReturnElOrWin(data?.scroller, true);
-        this.screen = domNodeIsValidAndReturnElOrWin(data?.screen, true);
-        this.trigger = domNodeIsValidAndReturnNull(data?.trigger);
-        this.applyTo = domNodeIsValidAndReturnNull(data?.applyTo);
-        this.direction = parallaxDirectionIsValid(data?.direction);
+        /**
+         * Fixed prop
+         */
 
         /*
-        Pin user  prop
-        */
+         * Pin prop
+         */
         this.pin = valueIsBooleanAndReturnDefault(
             data?.pin,
             'Parallax|Scrolltrigger pin propierties error:',
@@ -98,9 +100,6 @@ export class ParallaxItemClass {
             false
         );
 
-        /**
-         * Fixed prop
-         */
         this.start = valueIsStringAndReturnDefault(
             data?.start,
             'Scrolltrigger start propierties error:',
@@ -143,12 +142,33 @@ export class ParallaxItemClass {
 
         this.tween = parallaxTweenIsValid(data?.tween);
 
-        //parallax  prop
+        /**
+         * Check if tween is a sequencer or a paralalx
+         */
+        const tweenIsSequencer =
+            this.tween?.getType &&
+            this.tween.getType() === parallaxConstant.TWEEN_TIMELINE;
+
+        const tweenIsParallaxTween =
+            this.tween?.getType &&
+            this.tween.getType() === parallaxConstant.TWEEN_TWEEN;
+        /**
+         *
+         */
+
+        /**
+         * Parallax  prop
+         * */
         this.align = parallaxAlignIsValid(data?.align);
 
         this.onSwitch = parallaxOnSwitchIsValid(data?.onSwitch);
 
-        // Opacity Prop
+        this.reverse = valueIsBooleanAndReturnDefault(
+            data?.reverse,
+            'Parallax reverse propierties error:',
+            false
+        );
+
         this.opacityStart = parallaxOpacityIsValid(
             data?.opacityStart,
             'Parallax opacityStart propierties error:',
@@ -161,7 +181,27 @@ export class ParallaxItemClass {
             0
         );
 
-        // Common prop
+        this.limiterOff = valueIsBooleanAndReturnDefault(
+            data?.limiterOff,
+            'Parallax|Scrolltrigger limiterOff propierties error:',
+            false
+        );
+
+        /**
+         * Common prop
+         */
+        this.item = domNodeIsValidAndReturnElOrWin(data?.item, false);
+
+        this.scroller = domNodeIsValidAndReturnElOrWin(data?.scroller, true);
+
+        this.screen = domNodeIsValidAndReturnElOrWin(data?.screen, true);
+
+        this.trigger = domNodeIsValidAndReturnNull(data?.trigger);
+
+        this.applyTo = domNodeIsValidAndReturnNull(data?.applyTo);
+
+        this.direction = parallaxDirectionIsValid(data?.direction);
+
         this.disableForce3D = valueIsBooleanAndReturnDefault(
             data?.disableForce3D,
             'Parallax|Scrolltrigger disableForce3D propierties error:',
@@ -178,34 +218,49 @@ export class ParallaxItemClass {
 
         this.range = parallaxRangeIsValid(data?.range, this.type);
 
-        this.perspective = data.perspective || false;
-        this.breackpoint = data.breackpoint || 'desktop';
-        this.queryType = data.queryType || 'min';
-        this.limiterOff = data.limiterOff || false;
-        this.reverse = data.reverse || false; // only parallax no scrollTrigger
-        this.ease = data.ease || false;
-        this.propierties = data.propierties
-            ? data.propierties
-            : parallaxConstant.PROP_VERTICAL;
+        this.perspective = valueIsNumberAndReturnDefault(
+            data?.perspective,
+            'Parallax|Scrolltrigger perspective propierties error:',
+            false
+        );
 
-        this.easeType = data.easeType
-            ? data.easeType
-            : parallaxConstant.EASE_SPRING;
+        this.breackpoint = breakpointIsValid(data?.breackpoint, 'breakpoint');
+
+        this.queryType = breakpointTypeIsValid(data?.queryType, 'queryType');
+
+        this.ease = valueIsBooleanAndReturnDefault(
+            data?.ease,
+            'Parallax|Scrolltrigger ease propierties error:',
+            false
+        );
+
+        this.propierties = parallaxPropiertiesIsValid(
+            data?.propierties,
+            this.type,
+            tweenIsParallaxTween
+        );
+
+        this.easeType = parallaxEaseTypeIsValid(
+            data?.easeType,
+            tweenIsSequencer,
+            this.type === parallaxConstant.TYPE_SCROLLTRIGGER
+        );
+
+        this.springConfig = parallaxSpringConfigIsValid(
+            data?.springConfig,
+            this.type
+        );
+
+        this.lerpConfig = data.lerpConfig || null;
 
         // Add more precision to motion spring/lerp to trigger better force3D
         this.motionParameters =
-            data.easeType === parallaxConstant.EASE_SPRING
+            this.easeType === parallaxConstant.EASE_SPRING
                 ? { configProp: { precision: parallaxConstant.EASE_PRECISION } }
                 : { precision: parallaxConstant.EASE_PRECISION };
 
-        //
-        this.springConfig = data.springConfig || null;
-        this.lerpConfig = data.lerpConfig || null;
         this.motion = (() => {
-            if (
-                this.tween?.getType &&
-                this.tween.getType() === parallaxConstant.TWEEN_TIMELINE
-            ) {
+            if (tweenIsSequencer) {
                 this.easeType = parallaxConstant.EASE_LERP;
                 // Force lerp motion parameters if tween is a sequencer
                 this.motionParameters = {
@@ -213,10 +268,11 @@ export class ParallaxItemClass {
                 };
             }
 
-            return this.easeType === parallaxConstant.EASE_LERP
-                ? new HandleLerp()
-                : new HandleSpring();
+            return this.easeType === parallaxConstant.EASE_SPRING
+                ? new HandleSpring()
+                : new HandleLerp();
         })();
+
         this.unsubscribeMotion = () => {};
         this.unsubscribeOnComplete = () => {};
         this.animateAtStart = data.animateAtStart || false;

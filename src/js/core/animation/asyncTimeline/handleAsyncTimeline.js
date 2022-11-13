@@ -54,7 +54,7 @@ import { asyncReduceTween } from './asyncReduceTween.js';
  * @typedef {Object} asyncTimelineSpecialPropTypes
  * @prop {Number} [delay = 0] delay - dealy value in millisecond.
  */
-export class HandleAsyncTimeline {
+export default class HandleAsyncTimeline {
     /**
      * @param { asyncTimelineTypes } data
      *
