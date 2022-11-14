@@ -25,6 +25,7 @@ import {
     parallaxDynamicRangeIsValid,
     parallaxDynamicValueIsValid,
     parallaxEaseTypeIsValid,
+    parallaxLerpConfigIsValid,
     parallaxOnSwitchIsValid,
     parallaxOpacityIsValid,
     parallaxPropiertiesIsValid,
@@ -140,18 +141,6 @@ export default class ParallaxItemClass {
 
         this.dynamicRange = parallaxDynamicRangeIsValid(data?.dynamicRange);
 
-        this.tween = parallaxTweenIsValid(data?.tween);
-
-        /**
-         * Check if tween is a sequencer or a paralalx
-         */
-        const tweenIsSequencer =
-            this.tween?.getType &&
-            this.tween.getType() === parallaxConstant.TWEEN_TIMELINE;
-
-        const tweenIsParallaxTween =
-            this.tween?.getType &&
-            this.tween.getType() === parallaxConstant.TWEEN_TWEEN;
         /**
          *
          */
@@ -190,6 +179,19 @@ export default class ParallaxItemClass {
         /**
          * Common prop
          */
+        this.tween = parallaxTweenIsValid(data?.tween);
+
+        const tweenIsSequencer =
+            this.tween?.getType &&
+            this.tween.getType() === parallaxConstant.TWEEN_TIMELINE;
+
+        const tweenIsParallaxTween =
+            this.tween?.getType &&
+            this.tween.getType() === parallaxConstant.TWEEN_TWEEN;
+        /**
+         *
+         */
+
         this.item = domNodeIsValidAndReturnElOrWin(data?.item, false);
 
         this.scroller = domNodeIsValidAndReturnElOrWin(data?.scroller, true);
@@ -208,6 +210,7 @@ export default class ParallaxItemClass {
             false
         );
 
+        // With pin active no throttle is usable, pin need precision
         this.useThrottle = valueIsBooleanAndReturnDefault(
             data?.useThrottle,
             'Parallax|Scrolltrigger useThrottle propierties error:',
@@ -234,12 +237,22 @@ export default class ParallaxItemClass {
             false
         );
 
+        /**
+         * Get properties, check if there is sequencer inside a Parallax,
+         * In case return y propierties
+         */
         this.propierties = parallaxPropiertiesIsValid(
             data?.propierties,
             this.type,
-            tweenIsParallaxTween
+            tweenIsParallaxTween,
+            tweenIsSequencer
         );
 
+        /**
+         * Get easeType properties, Check if a sequencer is used inside a scrollTrigger
+         * In case retutn a lerp
+         *
+         */
         this.easeType = parallaxEaseTypeIsValid(
             data?.easeType,
             tweenIsSequencer,
@@ -251,7 +264,10 @@ export default class ParallaxItemClass {
             this.type
         );
 
-        this.lerpConfig = data.lerpConfig || null;
+        this.lerpConfig = parallaxLerpConfigIsValid(
+            data?.lerpConfig,
+            this.type
+        );
 
         // Add more precision to motion spring/lerp to trigger better force3D
         this.motionParameters =

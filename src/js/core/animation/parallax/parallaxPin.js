@@ -5,6 +5,7 @@ import { position } from '../../utils/vanillaFunction.js';
 import { handleScroll } from '../../events/scrollUtils/handleScroll.js';
 import { handleScrollStart } from '../../events/scrollUtils/handleScrollUtils.js';
 import { clamp } from '../../animation/utils/animationUtils.js';
+import { handleSetUp } from '../../setup.js';
 
 export class ParallaxPin {
     constructor() {
@@ -230,22 +231,19 @@ export class ParallaxPin {
         const wrapperStyle = (() => {
             if (!this.marker) return {};
 
+            const borderColor =
+                handleSetUp.get('scrollTrigger')?.markerColor?.item ||
+                '#14df3b';
+            const borderStyle = `3px ${borderColor} solid`;
+
             if (this.orientation === parallaxConstant.DIRECTION_VERTICAL) {
                 return this.invertSide
-                    ? {
-                          borderBottom: '1px green solid',
-                      }
-                    : {
-                          borderTop: '1px green solid',
-                      };
+                    ? { borderBottom: borderStyle }
+                    : { borderTop: borderStyle };
             } else {
                 return this.invertSide
-                    ? {
-                          borderRight: '1px green solid',
-                      }
-                    : {
-                          borderLeft: '1px green solid',
-                      };
+                    ? { borderRight: borderStyle }
+                    : { borderLeft: borderStyle };
             }
         })();
 

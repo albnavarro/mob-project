@@ -40,7 +40,6 @@ export function indexParallax() {
     });
 
     const parallaxIn = mobbu.create('scrolltrigger', {
-        item: item,
         trigger: trigger,
         propierties: 'tween',
         tween: myParallaxTimeline,
@@ -48,9 +47,6 @@ export function indexParallax() {
         start: 'bottom',
         end: 'top -height',
         ease: true,
-        // easeType: 'spring',
-        // pin: true,
-        // animatePin: true,
         marker: 'parallax-timeline',
     });
     parallaxIn.init();
@@ -71,7 +67,7 @@ export function indexParallax() {
     });
 
     const parallaxScale = mobbu.create('parallax', {
-        item: parallaxItem,
+        trigger: parallaxItem,
         ease: true,
         easeType: 'spring',
         propierties: 'tween',

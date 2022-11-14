@@ -39,6 +39,8 @@ import {
     parallaxDynmicValueWarining,
     parallaxEaseTypeSpringWarining,
     parallaxEaseTypeWarining,
+    parallaxLerpConfigWarning,
+    parallaxNoTweenDefinedWarning,
     parallaxOnSwitchWarining,
     parallaxOpacityWarning,
     parallaxPropiertiesWarining,
@@ -48,6 +50,7 @@ import {
     parallaxTweenWarning,
     parallaxTypeWarining,
     parallaxUseSequencerWarining,
+    parallaxUseTweenButNotProsDefinedWarning,
     playLabelWarining,
     relativeWarining,
     repeatWarining,
@@ -67,7 +70,6 @@ import {
     tweenEaseWarning,
     valueStringWarning,
 } from './warning';
-import { springPresetConfig } from '../spring/springConfig';
 
 /**
  *
@@ -1031,7 +1033,8 @@ export const breakpointTypeIsValid = (type, label) => {
 export const parallaxPropiertiesIsValid = (
     value,
     type,
-    tweenIsParallaxTween
+    tweenIsParallaxTween,
+    tweenIsSequencer
 ) => {
     const choice = [
         parallaxConstant.PROP_VERTICAL,
@@ -1053,13 +1056,32 @@ export const parallaxPropiertiesIsValid = (
      * Inside Parallax sequencer is not allowed
      * So return verticasl props
      */
-    const shouldBeDefault =
+    const notParallaxTweenInsideParallax =
         type === parallaxConstant.TYPE_PARALLAX &&
         value === parallaxConstant.PROP_TWEEN &&
         !tweenIsParallaxTween;
 
-    if (shouldBeDefault) parallaxUseSequencerWarining();
-    const valueParsed = shouldBeDefault
+    /**
+     * Check if with tween propierties there is a tween associated
+     */
+    if (
+        !tweenIsParallaxTween &&
+        !tweenIsSequencer &&
+        value === parallaxConstant.PROP_TWEEN
+    )
+        parallaxNoTweenDefinedWarning();
+
+    /**
+     * Check if there a tween but propierties is not settled to tween
+     */
+    if (
+        (tweenIsParallaxTween || tweenIsSequencer) &&
+        value !== parallaxConstant.PROP_TWEEN
+    )
+        parallaxUseTweenButNotProsDefinedWarning();
+
+    if (notParallaxTweenInsideParallax) parallaxUseSequencerWarining();
+    const valueParsed = notParallaxTweenInsideParallax
         ? parallaxConstant.PROP_VERTICAL
         : value;
 
@@ -1093,9 +1115,10 @@ export const parallaxEaseTypeIsValid = (
      * Sequencer can not use spring
      */
     if (sequencerUseSpringInsideScrolltrigger) parallaxEaseTypeSpringWarining();
+    const fallbackIfIsValid = isValid ? value : parallaxConstant.EASE_LERP;
     const fallback = sequencerUseSpringInsideScrolltrigger
         ? parallaxConstant.EASE_LERP
-        : value;
+        : fallbackIfIsValid;
 
     return isValid ? value : fallback;
 };
@@ -1115,11 +1138,32 @@ export const parallaxSpringConfigIsValid = (config, type) => {
     const defaultConfig =
         type === parallaxConstant.TYPE_PARALLAX
             ? handleSetUp.get('parallax').defaultSpringConfig
-            : null;
+            : handleSetUp.get('scrollTrigger').defaultSpringConfig;
 
     const isValid = choice.includes(config);
     if (!isValid && config !== undefined && config !== null)
         parallaxSpringCongifWarining(config, choice);
 
     return isValid ? config : defaultConfig;
+};
+
+/**
+ *
+ * @param {Number} value
+ * @returns {Number}
+ *
+ * @description
+ * Check if lerpConfig is valid
+ **/
+export const parallaxLerpConfigIsValid = (value, type) => {
+    const isValid = checkType(Number, value) && value > 0 && value <= 1;
+    if (!isValid && value !== undefined && value !== null)
+        parallaxLerpConfigWarning();
+
+    const defaultConfig =
+        type === parallaxConstant.TYPE_PARALLAX
+            ? handleSetUp.get('parallax').defaultLerpConfig
+            : handleSetUp.get('scrollTrigger').defaultLerpConfig;
+
+    return isValid ? value : defaultConfig;
 };

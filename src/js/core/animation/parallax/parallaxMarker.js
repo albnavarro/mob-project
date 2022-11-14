@@ -1,5 +1,6 @@
 import { parallaxConstant } from './parallaxConstant.js';
 import { handleFrame } from '../../events/rafutils/handleFrame.js';
+import { handleSetUp } from '../../setup.js';
 
 export const parallaxMarker = ({
     startMarker,
@@ -48,10 +49,13 @@ export const parallaxMarker = ({
 
     const style = {
         position: 'fixed',
-        'z-index': '99999',
-        background: 'red',
-        'font-size': '14px',
-        'white-space': 'nowrap',
+        zIndex: '99999',
+        background:
+            handleSetUp.get('scrollTrigger')?.markerColor?.startEnd ||
+            '#ff0000',
+        fontSize: '14px',
+        whiteSpace: 'nowrap',
+        textTransform: 'uppercase',
     };
 
     const { top, right, bottom, left } = (() => {
@@ -82,7 +86,7 @@ export const parallaxMarker = ({
                 ? {
                       right: 0,
                       width: '100vw',
-                      height: '2px',
+                      height: '3px',
                       top: `${startPoint + top}px`,
                       padding: '0 30px',
                       pointerEvents: 'none',
@@ -90,7 +94,7 @@ export const parallaxMarker = ({
                 : {
                       right: 0,
                       width: '100vw',
-                      height: '2px',
+                      height: '3px',
                       bottom: `${startPoint + bottom}px`,
                       padding: '0 30px',
                       pointerEvents: 'none',
@@ -100,7 +104,7 @@ export const parallaxMarker = ({
                 ? {
                       top: 0,
                       height: '100vw',
-                      width: '2px',
+                      width: '3px',
                       left: `${startPoint + left}px`,
                       padding: '30px 0',
                       pointerEvents: 'none',
@@ -108,7 +112,7 @@ export const parallaxMarker = ({
                 : {
                       top: 0,
                       height: '100vw',
-                      width: '2px',
+                      width: '3px',
                       right: `${startPoint + right}px`,
                       padding: '30px 0',
                       pointerEvents: 'none',
@@ -122,7 +126,7 @@ export const parallaxMarker = ({
                 ? {
                       right: 0,
                       width: '100vw',
-                      height: '2px',
+                      height: '3px',
                       top: `${startPoint + endPoint + top}px`,
                       padding: '0 30px',
                       pointerEvents: 'none',
@@ -130,7 +134,7 @@ export const parallaxMarker = ({
                 : {
                       right: 0,
                       width: '100vw',
-                      height: '2px',
+                      height: '3px',
                       bottom: `${startPoint + endPoint + bottom}px`,
                       padding: '0 30px',
                       pointerEvents: 'none',
@@ -140,7 +144,7 @@ export const parallaxMarker = ({
                 ? {
                       top: 0,
                       height: '100vw',
-                      width: '2px',
+                      width: '3px',
                       left: `${startPoint + endPoint + left}px`,
                       padding: '30px 0',
                       pointerEvents: 'none',
@@ -148,7 +152,7 @@ export const parallaxMarker = ({
                 : {
                       top: 0,
                       height: '100vw',
-                      width: '2px',
+                      width: '3px',
                       right: `${startPoint + endPoint + right}px`,
                       padding: '30px 0',
                       pointerEvents: 'none',

@@ -27,9 +27,18 @@ export const handleSetUp = (() => {
             duration: 10,
             ease: 'easeLinear',
         },
+        scrollTrigger: {
+            defaultSpringConfig: 'default',
+            defaultLerpConfig: 0.06,
+            markerColor: {
+                startEnd: '#ff0000',
+                item: '#14df3b',
+            },
+        },
         parallax: {
             defaultRange: 8,
             defaultSpringConfig: 'default',
+            defaultLerpConfig: 0.06,
         },
         parallaxTween: {
             duration: 10,

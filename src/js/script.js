@@ -75,6 +75,9 @@ mobbu.use('load', () => {
         fpsScalePercent: { 0: 1, 15: 2, 30: 3, 45: 4 },
         useScaleFps: true,
         throttle: 120,
+        mq: {
+            desktop: 1024,
+        },
         spring: {
             config: {
                 customSpring: {

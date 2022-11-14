@@ -342,7 +342,7 @@ export const parallaxEaseTypeWarining = (value, choice) => {
 
 export const parallaxEaseTypeSpringWarining = () => {
     console.warn(
-        'Scrolltrigger warning: spring animation is only available for native properties and ParallaxTween'
+        'Scrolltrigger warning: spring animation is only available for native properties and ParallaxTween, Check that with the "propierties" property set to "tween" no HandleSequencer is associated with the "tween" property'
     );
 };
 
@@ -376,6 +376,24 @@ export const breakpointWarning = (mq, choice, label) => {
 
 export const parallaxUseSequencerWarining = () => {
     console.warn(
-        'Parallax warning: if propierties is a tween the only choice is ParallaxTween, HandleSequencer or empty tween propierites is not allowed'
+        'Parallax warning: if propierties is a tween the only choice is ParallaxTween, HandleSequencer or empty tween propierites is not allowed inside a parallax'
+    );
+};
+
+export const parallaxLerpConfigWarning = () => {
+    console.warn(
+        'parallax/ScrollTrrigger error: velocity is not valid, must be a Number greater than 0 and less than 1'
+    );
+};
+
+export const parallaxNoTweenDefinedWarning = () => {
+    console.warn(
+        'parallax/ScrollTrrigger warning:  The property is "tween" but no tween has been associated, associate a tween with the "tween" property'
+    );
+};
+
+export const parallaxUseTweenButNotProsDefinedWarning = () => {
+    console.warn(
+        'parallax/ScrollTrrigger: there is tween associated but pros "propierties" is not setted to "tween"'
     );
 };
