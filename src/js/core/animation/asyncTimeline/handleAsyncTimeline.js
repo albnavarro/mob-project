@@ -6,9 +6,9 @@ import { getTime } from '../../utils/time.js';
 import { directionConstant } from '../utils/constant.js';
 import {
     addAsyncFunctionIsValid,
-    addFunctionIsValid,
     asyncTimelineDelayIsValid,
     asyncTimelineTweenIsValid,
+    functionIsValidAndReturnDefault,
     playLabelIsValid,
     repeatIsValid,
     timelineSetTweenArrayIsValid,
@@ -1217,7 +1217,11 @@ export default class HandleAsyncTimeline {
      * Adds a `custom function` to the timeline, the function will be executed after the previous promise and before the next one, `the function will not overlap the tweens`. `This property cannot be used within a group`
      */
     add(fn = this.NOOP) {
-        const cb = addFunctionIsValid(fn);
+        const cb = functionIsValidAndReturnDefault(
+            fn,
+            () => {},
+            'timeline add function'
+        );
         /**
          * Can't add this interpolation inside a group.
          * groupId props is not null when active.

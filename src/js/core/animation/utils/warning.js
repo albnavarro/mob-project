@@ -262,10 +262,6 @@ export const playLabelWarining = (label) => {
     console.warn(`${label} not found`);
 };
 
-export const addFunctionWarining = (value) => {
-    console.warn(`timeline add function, ${value} is not a function `);
-};
-
 export const addAsyncFunctionWarining = (value) => {
     console.warn(`timeline add async function, ${value} is not a function `);
 };
@@ -396,4 +392,8 @@ export const parallaxUseTweenButNotProsDefinedWarning = () => {
     console.warn(
         'parallax/ScrollTrrigger: there is tween associated but pros "propierties" is not setted to "tween"'
     );
+};
+
+export const functionIsValidAndReturnDefaultWarining = (label, value) => {
+    console.warn(`${label}: ${value} is not a function`);
 };

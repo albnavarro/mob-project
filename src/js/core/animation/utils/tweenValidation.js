@@ -19,7 +19,6 @@ import {
 } from './stagger/staggerCostant.js';
 import {
     addAsyncFunctionWarining,
-    addFunctionWarining,
     asyncTimelineDelayWarning,
     asyncTimelineTweenWaring,
     booleanWarning,
@@ -28,6 +27,7 @@ import {
     createStaggerTypeWarning,
     durationNumberOrFunctionWarining,
     durationWarining,
+    functionIsValidAndReturnDefaultWarining,
     initialDataPropWarining,
     initialDataValueWarining,
     lerpPrecisionWarining,
@@ -70,6 +70,26 @@ import {
     tweenEaseWarning,
     valueStringWarning,
 } from './warning';
+
+/**
+ * Compare two string exact match case insensitive
+ */
+export const exactMatchInsensitive = (string, pattern) => {
+    const regex = new RegExp(`^${pattern}$`, 'i');
+    const result = string.match(regex) || [];
+    return result.length;
+};
+
+/**
+ * Compare an array of String with a pattern exact match case insensitive
+ */
+export const exactMatchInsensitiveInArray = (arr, string) => {
+    return arr.some((unitMisure) => {
+        const regex = new RegExp(`[0-9]${unitMisure}$`, 'i');
+        const result = string.match(regex) || [];
+        return result.length;
+    });
+};
 
 /**
  *
@@ -658,13 +678,14 @@ export const playLabelIsValid = (index, label) => {
  * @param {Function} fn
  *
  * @description
- * Check if value is A function
+ * Check if value is A function and return defualt
  **/
-export const addFunctionIsValid = (fn) => {
+export const functionIsValidAndReturnDefault = (fn, defualt, label) => {
     const isValid = checkType(Function, fn);
-    if (!isValid && fn !== undefined && fn !== null) addFunctionWarining(fn);
+    if (!isValid && fn !== undefined && fn !== null)
+        functionIsValidAndReturnDefaultWarining(label, fn);
 
-    return isValid ? fn : () => {};
+    return isValid ? fn : defualt;
 };
 
 /**
@@ -1166,4 +1187,45 @@ export const parallaxLerpConfigIsValid = (value, type) => {
             : handleSetUp.get('scrollTrigger').defaultLerpConfig;
 
     return isValid ? value : defaultConfig;
+};
+
+export const checkStringRangeOnPropierties = (string, properties) => {
+    const parallalxXYRangeChoice = [
+        parallaxConstant.PX,
+        parallaxConstant.VW,
+        parallaxConstant.VH,
+        parallaxConstant.WPERCENT,
+        parallaxConstant.HPERCENT,
+    ];
+    /**
+     * Check X,Y prop
+     */
+    if (
+        properties === parallaxConstant.PROP_VERTICAL ||
+        properties === parallaxConstant.PROP_HORIZONTAL
+    ) {
+        const isValid = exactMatchInsensitiveInArray(
+            parallalxXYRangeChoice,
+            string
+        );
+        if (!isValid) console.log(`${string} X|Y range not valid`);
+        return isValid ? string : '0';
+    }
+
+    /**
+     * Check ROTATE PROP
+     */
+    if (
+        properties === parallaxConstant.PROP_ROTATE ||
+        properties === parallaxConstant.PROP_ROTATEX ||
+        properties === parallaxConstant.PROP_ROTATEY ||
+        properties === parallaxConstant.PROP_ROTATEZ
+    ) {
+        const isValid = exactMatchInsensitiveInArray(
+            [parallaxConstant.DEGREE],
+            string
+        );
+        if (!isValid) console.log(`${string} Rotate reange not valid`);
+        return isValid ? string : '0';
+    }
 };

@@ -18,8 +18,10 @@ import { clamp, getRoundedValue } from '../utils/animationUtils.js';
 import {
     breakpointIsValid,
     breakpointTypeIsValid,
+    checkStringRangeOnPropierties,
     domNodeIsValidAndReturnElOrWin,
     domNodeIsValidAndReturnNull,
+    functionIsValidAndReturnDefault,
     parallaxAlignIsValid,
     parallaxDirectionIsValid,
     parallaxDynamicRangeIsValid,
@@ -70,6 +72,11 @@ export default class ParallaxItemClass {
         this.isInViewport = false;
         this.force3D = false;
         this.pinInstance = null;
+        this.unitMisure = '';
+        this.startPoint = 0;
+        this.endPoint = 0;
+        this.unsubscribeMotion = () => {};
+        this.unsubscribeOnComplete = () => {};
 
         /**
          * Fixed prop
@@ -289,21 +296,42 @@ export default class ParallaxItemClass {
                 : new HandleLerp();
         })();
 
-        this.unsubscribeMotion = () => {};
-        this.unsubscribeOnComplete = () => {};
-        this.animateAtStart = data.animateAtStart || false;
-
-        //
-        this.unitMisure = '';
-        this.startPoint = 0;
-        this.endPoint = 0;
+        this.animateAtStart = valueIsBooleanAndReturnDefault(
+            data?.animateAtStart,
+            'Parallax|Scrolltrigger animateAtStart propierties error:',
+            false
+        );
 
         // Event
-        this.onEnter = data.onEnter || null;
-        this.onEnterBack = data.onEnterBack || null;
-        this.onLeave = data.onLeave || null;
-        this.onLeaveBack = data.onLeaveBack || null;
-        this.onTickCallback = data.onTick || null;
+        this.onEnter = functionIsValidAndReturnDefault(
+            data?.onEnter,
+            false,
+            'parallax/Scrolltrigger onEnter propierties error'
+        );
+
+        this.onEnterBack = functionIsValidAndReturnDefault(
+            data?.onEnterBack,
+            false,
+            'parallax/Scrolltrigger onEnterBack propierties error'
+        );
+
+        this.onLeave = functionIsValidAndReturnDefault(
+            data?.onLeave,
+            false,
+            'parallax/Scrolltrigger onLeave propierties error'
+        );
+
+        this.onLeaveBack = functionIsValidAndReturnDefault(
+            data?.onLeaveBack,
+            false,
+            'parallax/Scrolltrigger onLeaveBack propierties error'
+        );
+
+        this.onTickCallback = functionIsValidAndReturnDefault(
+            data?.onTick,
+            false,
+            'parallax/Scrolltrigger onTickCallback propierties error'
+        );
 
         /*
         Obj utils to avoid new GC allocation during animation
@@ -512,6 +540,17 @@ export default class ParallaxItemClass {
             const isNegative = firstChar === '-' ? -1 : 1;
             this.numericRange =
                 parseFloat(str.replace(/^\D+/g, '')) * isNegative;
+
+            /**
+             * Check if px|vw|deg or other is associated with the right props
+             * Ex: rotate have a value like '45deg'
+             */
+            checkStringRangeOnPropierties(str, this.propierties);
+
+            /**
+             * Get px|vw|etc...
+             * TODO: la funziona deve fareil controllo case sensitive
+             */
             this.unitMisure = parallaxUtils.getRangeUnitMisure(str);
         }
     }
