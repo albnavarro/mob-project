@@ -538,20 +538,26 @@ export default class ParallaxItemClass {
             const str = String(this.range);
             const firstChar = str.charAt(0);
             const isNegative = firstChar === '-' ? -1 : 1;
-            this.numericRange =
-                parseFloat(str.replace(/^\D+/g, '')) * isNegative;
 
             /**
              * Check if px|vw|deg or other is associated with the right props
              * Ex: rotate have a value like '45deg'
              */
-            checkStringRangeOnPropierties(str, this.propierties);
+            const strParsed = checkStringRangeOnPropierties(
+                str,
+                this.propierties
+            );
+
+            /**
+             * Extract number froms tring
+             */
+            this.numericRange =
+                parseFloat(strParsed.replace(/^\D+/g, '')) * isNegative;
 
             /**
              * Get px|vw|etc...
-             * TODO: la funziona deve fareil controllo case sensitive
              */
-            this.unitMisure = parallaxUtils.getRangeUnitMisure(str);
+            this.unitMisure = parallaxUtils.getRangeUnitMisure(strParsed);
         }
     }
 

@@ -1,3 +1,10 @@
+import {
+    exactMatchInsensitive,
+    exactMatchInsesitiveNumberProp,
+    exactMatchInsesitivePropArray,
+    gentStartEndUnitMisure,
+    getParallaxPositionFromContanst,
+} from '../utils/tweenValidation.js';
 import { parallaxConstant } from './parallaxConstant.js';
 
 export const parallaxUtils = {
@@ -9,16 +16,17 @@ export const parallaxUtils = {
     },
 
     getRangeUnitMisure(string) {
-        if (string.includes(parallaxConstant.PX)) return parallaxConstant.PX;
-        else if (string.includes(parallaxConstant.VH))
+        if (exactMatchInsesitiveNumberProp(string, parallaxConstant.PX))
+            return parallaxConstant.PX;
+        if (exactMatchInsesitiveNumberProp(string, parallaxConstant.VH))
             return parallaxConstant.VH;
-        else if (string.includes(parallaxConstant.VW))
+        if (exactMatchInsesitiveNumberProp(string, parallaxConstant.VW))
             return parallaxConstant.VW;
-        else if (string.includes(parallaxConstant.WPERCENT))
+        if (exactMatchInsesitiveNumberProp(string, parallaxConstant.WPERCENT))
             return parallaxConstant.WPERCENT;
-        else if (string.includes(parallaxConstant.HPERCENT))
+        if (exactMatchInsesitiveNumberProp(string, parallaxConstant.HPERCENT))
             return parallaxConstant.HPERCENT;
-        else if (string.includes(parallaxConstant.DEGREE))
+        if (exactMatchInsesitiveNumberProp(string, parallaxConstant.DEGREE))
             return parallaxConstant.DEGREE;
 
         return parallaxConstant.PX;
@@ -36,21 +44,12 @@ export const parallaxUtils = {
      */
     getStartEndValue(values, direction) {
         // Get number value if exist, check values array to find a item wih almost 1 number ad get it
-        const getNumberVal = values.find((item) => {
+        const numberInString = values.find((item) => {
             return [...item].some((c) => !Number.isNaN(parseFloat(c)));
         });
 
-        // Get unit misure from nunmber
-        const unitMisure = (() => {
-            if (getNumberVal) {
-                if (getNumberVal.includes(parallaxConstant.PX))
-                    return parallaxConstant.PX;
-                if (getNumberVal.includes(parallaxConstant.VH))
-                    return parallaxConstant.VH;
-                if (getNumberVal.includes(parallaxConstant.VW))
-                    return parallaxConstant.VW;
-            }
-        })();
+        // Get unit misure from nunmber case insensitive
+        const unitMisure = gentStartEndUnitMisure(numberInString);
 
         // fail return with bad data
         const returnWhenFail = () => {
@@ -63,7 +62,7 @@ export const parallaxUtils = {
         };
 
         // Number without unit misure is not allowed
-        if (getNumberVal && !unitMisure) {
+        if (numberInString && !unitMisure) {
             console.warn(
                 `parallax prop checker: value in start or end prop with no unit misure is not allowed,
                  failed operation, use vh in vertical mode or vw in horzontal, or px animation failed`
@@ -73,7 +72,7 @@ export const parallaxUtils = {
 
         // Number in vh is not allowed in horizontal mode
         if (
-            getNumberVal &&
+            numberInString &&
             unitMisure === parallaxConstant.VH &&
             direction === parallaxConstant.DIRECTION_HORIZONTAL
         ) {
@@ -85,7 +84,7 @@ export const parallaxUtils = {
 
         // Number in vw is not allowed in vertical mode
         if (
-            getNumberVal &&
+            numberInString &&
             unitMisure === parallaxConstant.VW &&
             direction === parallaxConstant.DIRECTION_VERTICAL
         ) {
@@ -107,7 +106,7 @@ export const parallaxUtils = {
             parallaxConstant.MINUS_WIDTH_HALF,
         ];
         const getAdditionalVal = values.find((item) => {
-            return additionaChoice.includes(item);
+            return exactMatchInsesitivePropArray(additionaChoice, item);
         });
 
         // Get position top || bottom || left || right
@@ -118,11 +117,11 @@ export const parallaxUtils = {
             parallaxConstant.POSITION_RIGHT,
         ];
         const getPosition = values.find((item) => {
-            return positionMap.includes(item);
+            return exactMatchInsesitivePropArray(positionMap, item);
         });
 
         return {
-            numberVal: getNumberVal ? getNumberVal : 0,
+            numberVal: numberInString || 0,
             unitMisure,
             additionalVal: getAdditionalVal ? getAdditionalVal : '',
             position: getPosition
@@ -131,35 +130,48 @@ export const parallaxUtils = {
         };
     },
 
-    // Get start point withuot addition value
+    /**
+     * Get start point withuot addition value
+     */
     getStartPoint(screenUnit, data, direction) {
-        // SPLIT INTO CHUNK DATA
+        /**
+         * Split into chunk data
+         */
         const str = String(data);
         const values = str.split(' ');
 
+        /**
+         * Process splitted array
+         */
         const { numberVal, unitMisure, additionalVal, position } =
             parallaxUtils.getStartEndValue(values, direction);
 
-        // CHECK IF NUMBER IS NEGATIVE
+        /**
+         * Check if number is negative
+         */
         const firstChar = String(numberVal).charAt(0);
         const isNegative = firstChar === '-' ? -1 : 1;
 
-        // GET NUMBER WITHOT PX OR VW etc..
+        /**
+         * Get number withot px or vw etc..
+         */
         const number = parseFloat(String(numberVal).replace(/^\D+/g, ''));
         const startValInNumber = number ? number : 0;
 
-        // GET FINAL VLAUE
+        /**
+         * Get final value without height/halfHeight etc..
+         */
         if (unitMisure === parallaxConstant.PX) {
             return {
                 value: startValInNumber * isNegative,
                 additionalVal,
-                position,
+                position: getParallaxPositionFromContanst(position),
             };
         } else {
             return {
                 value: screenUnit * startValInNumber * isNegative,
                 additionalVal,
-                position,
+                position: getParallaxPositionFromContanst(position),
             };
         }
     },
@@ -173,68 +185,91 @@ export const parallaxUtils = {
         invertSide,
         direction
     ) {
-        // SPLIT INTO CHUNK DATA
+        /**
+         * Split into chunk data
+         */
         const str = String(data);
         const values = str.split(' ');
+
+        /**
+         * Process splitted array
+         */
         const { numberVal, unitMisure, additionalVal, position } =
             parallaxUtils.getStartEndValue(values, direction);
 
-        // CHECK IF NUMBER IS NEGATIVE
+        /**
+         * Check if number is negative
+         */
         const firstChar = String(numberVal).charAt(0);
         const isNegative = firstChar === '-' ? -1 : 1;
 
-        // GET NUMBER WITHOT PX OR VW etc..
+        /**
+         * Get number withot px or vw etc..
+         */
         const number = parseFloat(String(numberVal).replace(/^\D+/g, ''));
         const endValInNumber = number ? number : 0;
 
-        // GET FINAL VLAUE
-        if (unitMisure === parallaxConstant.PX) {
+        /**
+         * Get position constant from prallax constant
+         */
+        const positionFromConstant = getParallaxPositionFromContanst(position);
+
+        /**
+         * Check direction
+         */
+        const isFromTopLeft =
+            positionFromConstant === parallaxConstant.POSITION_TOP ||
+            positionFromConstant === parallaxConstant.POSITION_LEFT;
+
+        /**
+         * Get px value to add (es: top +100px)
+         */
+        const getValueInPx = (invert = false) => {
             const valueFromTop = endValInNumber * isNegative - startPoint;
             const valueFromBottom =
                 scrollerHeight - endValInNumber * isNegative - startPoint;
 
+            if (invert) {
+                return isFromTopLeft ? valueFromTop : valueFromBottom;
+            } else {
+                return isFromTopLeft ? valueFromBottom : valueFromTop;
+            }
+        };
+
+        /**
+         * Get vw/vh value to add (es: top +50vh)
+         */
+        const getValueInVwVh = (invert = false) => {
+            if (invert) {
+                return isFromTopLeft
+                    ? scrollerHeight -
+                          screenUnit * (100 - endValInNumber * isNegative) -
+                          startPoint
+                    : screenUnit * (100 - endValInNumber * isNegative) -
+                          startPoint;
+            } else {
+                return isFromTopLeft
+                    ? scrollerHeight -
+                          screenUnit * endValInNumber * isNegative -
+                          startPoint
+                    : screenUnit * endValInNumber * isNegative - startPoint;
+            }
+        };
+
+        /**
+         * Get final value without height/halfHeight etc..
+         */
+        if (unitMisure === parallaxConstant.PX) {
             return {
-                value: invertSide
-                    ? (() => {
-                          return position === parallaxConstant.POSITION_TOP ||
-                              position === parallaxConstant.POSITION_LEFT
-                              ? valueFromTop
-                              : valueFromBottom;
-                      })()
-                    : (() => {
-                          return position === parallaxConstant.POSITION_TOP ||
-                              position === parallaxConstant.POSITION_LEFT
-                              ? valueFromBottom
-                              : valueFromTop;
-                      })(),
+                value: invertSide ? getValueInPx(true) : getValueInPx(),
                 additionalVal,
-                position,
+                position: positionFromConstant,
             };
         } else {
             return {
-                value: invertSide
-                    ? (() => {
-                          return position === parallaxConstant.POSITION_TOP ||
-                              position === parallaxConstant.POSITION_LEFT
-                              ? scrollerHeight -
-                                    screenUnit *
-                                        (100 - endValInNumber * isNegative) -
-                                    startPoint
-                              : screenUnit *
-                                    (100 - endValInNumber * isNegative) -
-                                    startPoint;
-                      })()
-                    : (() => {
-                          return position === parallaxConstant.POSITION_TOP ||
-                              position === parallaxConstant.POSITION_LEFT
-                              ? scrollerHeight -
-                                    screenUnit * endValInNumber * isNegative -
-                                    startPoint
-                              : screenUnit * endValInNumber * isNegative -
-                                    startPoint;
-                      })(),
+                value: invertSide ? getValueInVwVh(true) : getValueInVwVh(),
                 additionalVal,
-                position,
+                position: positionFromConstant,
             };
         }
     },
@@ -243,36 +278,36 @@ export const parallaxUtils = {
         const str = String(stringValue);
 
         // plus
-        if (str.includes(parallaxConstant.PLUS_HEIGHT_HALF)) {
+        if (exactMatchInsensitive(str, parallaxConstant.PLUS_HEIGHT_HALF)) {
             return value + height / 2;
         }
 
-        if (str.includes(parallaxConstant.PLUS_HEIGHT)) {
+        if (exactMatchInsensitive(str, parallaxConstant.PLUS_HEIGHT)) {
             return value + height;
         }
 
-        if (str.includes(parallaxConstant.PLUS_WIDTH_HALF)) {
+        if (exactMatchInsensitive(str, parallaxConstant.PLUS_WIDTH_HALF)) {
             return value + width / 2;
         }
 
-        if (str.includes(parallaxConstant.PLUS_WIDTH)) {
+        if (exactMatchInsensitive(str, parallaxConstant.PLUS_WIDTH)) {
             return value + width;
         }
 
         // minus
-        if (str.includes(parallaxConstant.MINUS_HEIGHT_HALF)) {
+        if (exactMatchInsensitive(str, parallaxConstant.MINUS_HEIGHT_HALF)) {
             return value - height / 2;
         }
 
-        if (str.includes(parallaxConstant.MINUS_HEIGHT)) {
+        if (exactMatchInsensitive(str, parallaxConstant.MINUS_HEIGHT)) {
             return value - height;
         }
 
-        if (str.includes(parallaxConstant.MINUS_WIDTH_HALF)) {
+        if (exactMatchInsensitive(str, parallaxConstant.MINUS_WIDTH_HALF)) {
             return value - width / 2;
         }
 
-        if (str.includes(parallaxConstant.MINUS_WIDTH)) {
+        if (exactMatchInsensitive(str, parallaxConstant.MINUS_WIDTH)) {
             return value - width;
         }
 

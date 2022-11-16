@@ -324,7 +324,7 @@ export const parallaxPropiertiesWarining = (value, choice) => {
     console.warn(
         `parallax/scrollTrigger error propierties props: ${value} is not valid must be one of ${possibleChoice(
             choice
-        )}`
+        )} or a custom css propierites like margin|line-height|...`
     );
 };
 
@@ -396,4 +396,24 @@ export const parallaxUseTweenButNotProsDefinedWarning = () => {
 
 export const functionIsValidAndReturnDefaultWarining = (label, value) => {
     console.warn(`${label}: ${value} is not a function`);
+};
+
+export const scrollTriggerRangeWarning = (string, properties, choice) => {
+    console.warn(
+        `scrollTrigger error range : with '${properties}' propierties ${string} is not valid, add one of the following unit misure: ${possibleChoice(
+            choice
+        )}, es: 45deg|100px|50vw etc..`
+    );
+};
+
+export const scrollTriggerCustomRangeWarning = (properties) => {
+    console.warn(
+        `scrollTrigger error range : with custom css propierties '${properties}' no unit misure is necessary, the default unit misure will be used (px). Only '-' for negative value is allowed`
+    );
+};
+
+export const scrollTriggerRangeScaleWarning = (string, properties) => {
+    console.warn(
+        `scrollTrigger error range : with '${properties}' propierties ${string} is not valid no unit misure is necessary. Only '-' for negative value is allowed`
+    );
 };
