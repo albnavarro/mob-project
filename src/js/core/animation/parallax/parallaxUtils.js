@@ -1,10 +1,11 @@
 import {
-    exactMatchInsensitive,
-    exactMatchInsesitiveNumberProp,
-    exactMatchInsesitivePropArray,
-    gentStartEndUnitMisure,
     getParallaxPositionFromContanst,
-} from '../utils/tweenValidation.js';
+    getStartEndUnitMisure,
+} from '../utils/getConstantFromRegex.js';
+import {
+    exactMatchInsensitive,
+    exactMatchInsesitivePropArray,
+} from '../utils/regexValidation.js';
 import { parallaxConstant } from './parallaxConstant.js';
 
 export const parallaxUtils = {
@@ -13,23 +14,6 @@ export const parallaxUtils = {
             offset + height > wScrollTop - gap &&
             offset < wScrollTop + (wHeight + gap)
         );
-    },
-
-    getRangeUnitMisure(string) {
-        if (exactMatchInsesitiveNumberProp(string, parallaxConstant.PX))
-            return parallaxConstant.PX;
-        if (exactMatchInsesitiveNumberProp(string, parallaxConstant.VH))
-            return parallaxConstant.VH;
-        if (exactMatchInsesitiveNumberProp(string, parallaxConstant.VW))
-            return parallaxConstant.VW;
-        if (exactMatchInsesitiveNumberProp(string, parallaxConstant.WPERCENT))
-            return parallaxConstant.WPERCENT;
-        if (exactMatchInsesitiveNumberProp(string, parallaxConstant.HPERCENT))
-            return parallaxConstant.HPERCENT;
-        if (exactMatchInsesitiveNumberProp(string, parallaxConstant.DEGREE))
-            return parallaxConstant.DEGREE;
-
-        return parallaxConstant.PX;
     },
 
     /**
@@ -49,7 +33,7 @@ export const parallaxUtils = {
         });
 
         // Get unit misure from nunmber case insensitive
-        const unitMisure = gentStartEndUnitMisure(numberInString);
+        const unitMisure = getStartEndUnitMisure(numberInString);
 
         // fail return with bad data
         const returnWhenFail = () => {
@@ -64,8 +48,7 @@ export const parallaxUtils = {
         // Number without unit misure is not allowed
         if (numberInString && !unitMisure) {
             console.warn(
-                `parallax prop checker: value in start or end prop with no unit misure is not allowed,
-                 failed operation, use vh in vertical mode or vw in horzontal, or px animation failed`
+                'parallax prop checker: value in start or end prop with no unit misure is not allowed, failed operation, use vh in vertical mode or vw in horzontal or px'
             );
             return returnWhenFail();
         }
@@ -77,7 +60,7 @@ export const parallaxUtils = {
             direction === parallaxConstant.DIRECTION_HORIZONTAL
         ) {
             console.warn(
-                `parallax prop checker: value in start or end in vh is not allowed in horizontal mode, animation failed`
+                'parallax prop checker: value in start or end in vh is not allowed in horizontal mode, use vw or px'
             );
             return returnWhenFail();
         }
@@ -89,7 +72,7 @@ export const parallaxUtils = {
             direction === parallaxConstant.DIRECTION_VERTICAL
         ) {
             console.warn(
-                `parallax prop checker: value in start or end in vw is not allowed in vertical mode, animation failed`
+                'parallax prop checker: value in start or end in vw is not allowed in vertical mode, use vh or px'
             );
             return returnWhenFail();
         }

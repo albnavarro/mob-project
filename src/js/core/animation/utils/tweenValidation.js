@@ -73,54 +73,12 @@ import {
     tweenEaseWarning,
     valueStringWarning,
 } from './warning';
-
-const escapeRegExp = (text) => {
-    return text ? text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&') : '';
-};
-
-const checkIfIsOnlyNumberPositiveNegative = (pattern) => {
-    return /^[-+]?[0-9]\d*(\.\d+)?$/.test(pattern);
-};
-
-const checkIfIsOnlyNumber = (pattern) => {
-    return /^\d+\.\d+$|^\d+$/.test(pattern);
-};
-/**
- * Compare two string exact match case insensitive
- */
-export const exactMatchInsensitive = (string, pattern) => {
-    const regex = new RegExp(`^${escapeRegExp(pattern)}$`, 'i');
-    const result = string.match(regex) || [];
-    return result.length;
-};
-
-/**
- *
- */
-export const exactMatchInsesitiveNumberProp = (string, pattern) => {
-    const regex = new RegExp(`[0-9]${pattern}$`, 'i');
-    const result = string.match(regex) || [];
-    return result.length;
-};
-
-/**
- * Compare an array of String with a pattern exact match case insensitive
- */
-export const exactMatchInsesitiveNumberPropArray = (arr, string) => {
-    return arr.some((unitMisure) => {
-        const regex = new RegExp(`[0-9]${unitMisure}$`, 'i');
-        const result = string.match(regex) || [];
-        return result.length;
-    });
-};
-
-export const exactMatchInsesitivePropArray = (arr, string) => {
-    return arr.some((unitMisure) => {
-        const regex = new RegExp(`^${escapeRegExp(unitMisure)}$`, 'i');
-        const result = string.match(regex) || [];
-        return result.length;
-    });
-};
+import {
+    checkIfIsOnlyNumber,
+    checkIfIsOnlyNumberPositiveNegative,
+    exactMatchInsesitiveNumberPropArray,
+} from './regexValidation';
+import { getPropiertiesValueFromConstant } from './getConstantFromRegex';
 
 /**
  *
@@ -1075,43 +1033,6 @@ export const breakpointTypeIsValid = (type, label) => {
 };
 
 /**
- * Support function for parallaxPropiertiesIsValid
- * Get exact prop name from constant ( resolve sensitive typing )
- */
-const getPropiertiesValueFromConstant = (value) => {
-    /**
-     * If null provent regex error
-     */
-    if (!value) return value;
-
-    if (exactMatchInsensitive(value, parallaxConstant.PROP_VERTICAL))
-        return parallaxConstant.PROP_VERTICAL;
-
-    if (exactMatchInsensitive(value, parallaxConstant.PROP_HORIZONTAL))
-        return parallaxConstant.PROP_HORIZONTAL;
-
-    if (exactMatchInsensitive(value, parallaxConstant.PROP_ROTATE))
-        return parallaxConstant.PROP_ROTATE;
-
-    if (exactMatchInsensitive(value, parallaxConstant.PROP_ROTATEY))
-        return parallaxConstant.PROP_ROTATEY;
-
-    if (exactMatchInsensitive(value, parallaxConstant.PROP_ROTATEX))
-        return parallaxConstant.PROP_ROTATEX;
-
-    if (exactMatchInsensitive(value, parallaxConstant.PROP_OPACITY))
-        return parallaxConstant.PROP_OPACITY;
-
-    if (exactMatchInsensitive(value, parallaxConstant.PROP_SCALE))
-        return parallaxConstant.PROP_SCALE;
-
-    if (exactMatchInsensitive(value, parallaxConstant.PROP_TWEEN))
-        return parallaxConstant.PROP_TWEEN;
-
-    return value;
-};
-
-/**
  *
  * @param {String} value
  * @returns {String}
@@ -1256,7 +1177,8 @@ export const parallaxSpringConfigIsValid = (config, type) => {
  * Check if lerpConfig is valid
  **/
 export const parallaxLerpConfigIsValid = (value, type) => {
-    const isValid = checkType(Number, value) && value > 0 && value <= 1;
+    const isValid =
+        checkType(Number, parseFloat(value)) && value > 0 && value <= 1;
     if (!isValid && value !== undefined && value !== null)
         parallaxLerpConfigWarning();
 
@@ -1265,7 +1187,7 @@ export const parallaxLerpConfigIsValid = (value, type) => {
             ? handleSetUp.get('parallax').defaultLerpConfig
             : handleSetUp.get('scrollTrigger').defaultLerpConfig;
 
-    return isValid ? value : defaultConfig;
+    return isValid ? parseFloat(value) : defaultConfig;
 };
 
 export const checkStringRangeOnPropierties = (string, properties) => {
@@ -1334,31 +1256,4 @@ export const checkStringRangeOnPropierties = (string, properties) => {
     if (!isValid) scrollTriggerCustomRangeWarning(properties);
 
     return isValid ? string : '0';
-};
-
-export const gentStartEndUnitMisure = (pattern) => {
-    if (pattern) {
-        if (exactMatchInsesitiveNumberProp(pattern, parallaxConstant.PX))
-            return parallaxConstant.PX;
-
-        if (exactMatchInsesitiveNumberProp(pattern, parallaxConstant.VH))
-            return parallaxConstant.VH;
-
-        if (exactMatchInsesitiveNumberProp(pattern, parallaxConstant.VW))
-            return parallaxConstant.VW;
-    }
-};
-
-export const getParallaxPositionFromContanst = (position) => {
-    if (exactMatchInsensitive(position, parallaxConstant.POSITION_TOP))
-        return parallaxConstant.POSITION_TOP;
-
-    if (exactMatchInsensitive(position, parallaxConstant.POSITION_BOTTOM))
-        return parallaxConstant.POSITION_BOTTOM;
-
-    if (exactMatchInsensitive(position, parallaxConstant.POSITION_LEFT))
-        return parallaxConstant.POSITION_LEFT;
-
-    if (exactMatchInsensitive(position, parallaxConstant.POSITION_RIGHT))
-        return parallaxConstant.POSITION_RIGHT;
 };
