@@ -15,7 +15,7 @@ export const noGsap = () => {
     });
 
     // Create child parallax
-    const parallaxTest = mobbu.create('scrolltrigger', {
+    const parallaxTest = mobbu.createScrollTrigger({
         item: title,
         scroller: scroller,
         direction: 'horizontal',

@@ -490,20 +490,28 @@ export const mobbu = {
         return new HandleAsyncTimeline(data);
     },
 
+    /**
+     * @param { import('./animation/parallax/parallaxItem.js').parallaxDefaultTypes & import('./animation/parallax/parallaxItem.js').parallaxSpecificTypes } data
+     */
+    createParallax(data = {}) {
+        return new ParallaxItemClass({
+            ...data,
+            ...{ type: parallaxConstant.TYPE_PARALLAX },
+        });
+    },
+
+    /**
+     * @param { import('./animation/parallax/parallaxItem.js').parallaxDefaultTypes & import('./animation/parallax/parallaxItem.js').scrolltriggerSpecificTypes  } data
+     */
+    createScrollTrigger(data = {}) {
+        return new ParallaxItemClass({
+            ...data,
+            ...{ type: parallaxConstant.TYPE_SCROLLTRIGGER },
+        });
+    },
+
     create(type = '', obj = {}) {
         switch (type) {
-            case 'parallax':
-                return new ParallaxItemClass({
-                    ...obj,
-                    ...{ type: parallaxConstant.TYPE_PARALLAX },
-                });
-
-            case 'scrolltrigger':
-                return new ParallaxItemClass({
-                    ...obj,
-                    ...{ type: parallaxConstant.TYPE_SCROLLTRIGGER },
-                });
-
             case 'mouseParallax':
                 return new MouseParallaxItemClass(obj);
 

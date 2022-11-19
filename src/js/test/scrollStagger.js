@@ -60,7 +60,7 @@ export const scrollStagger = () => {
         });
     });
 
-    const parallaxIn = mobbu.create('scrolltrigger', {
+    const parallaxIn = mobbu.createScrollTrigger({
         trigger,
         propierties: 'tween',
         tween: myParallaxTween,

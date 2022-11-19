@@ -6,7 +6,7 @@ export const hScroller = () => {
     /**
      *
      */
-    const parallaxOpacity = mobbu.create('parallax', {
+    const parallaxOpacity = mobbu.createParallax({
         item: document.querySelector('.parallax-via-js-opacity'),
         scroller: document.querySelector('.scrollerH-container .scrollerH'),
         direction: 'horizontal',
@@ -20,7 +20,7 @@ export const hScroller = () => {
     /**
      *
      */
-    const parallax0 = mobbu.create('parallax', {
+    const parallax0 = mobbu.createParallax({
         item: document.querySelector('.parallax-js-0'),
         scroller: '.scrollerH-container .scrollerH',
         direction: 'horizontal',
@@ -46,7 +46,7 @@ export const hScroller = () => {
         parallaxItemTween.style.transform = `translateX(${x}px) rotate(${rotate}deg)`;
         parallaxItemTween.style.opacity = opacity;
     });
-    const parallax1 = mobbu.create('parallax', {
+    const parallax1 = mobbu.createParallax({
         item: document.querySelector('.parallax-js-1'),
         scroller: '.scrollerH-container .scrollerH',
         direction: 'horizontal',
@@ -63,7 +63,7 @@ export const hScroller = () => {
      *
      */
 
-    const parallax2 = mobbu.create('parallax', {
+    const parallax2 = mobbu.createParallax({
         item: document.querySelector('.parallax-js-2'),
         scroller: '.scrollerH-container .scrollerH',
         direction: 'horizontal',
@@ -77,7 +77,7 @@ export const hScroller = () => {
     /**
      *
      */
-    const parallaxPin = mobbu.create('scrolltrigger', {
+    const parallaxPin = mobbu.createScrollTrigger({
         item: document.querySelector('.parallax-js-pin'),
         scroller: '.scrollerH-container .scrollerH',
         direction: 'horizontal',
@@ -111,7 +111,7 @@ export const hScroller = () => {
         target.style.transform = `translate3D(0,0,0) translate(${x}px, ${y}px)`;
     });
 
-    const parallaxIn = mobbu.create('scrolltrigger', {
+    const parallaxIn = mobbu.createScrollTrigger({
         item: target,
         scroller: '.scrollerH-container .scrollerH',
         trigger: '.pluto3',
@@ -167,7 +167,7 @@ export const hScroller = () => {
         target2.style.transform = `translate(${x}px, ${y}px)`;
     });
 
-    let parallaxOut = mobbu.create('scrolltrigger', {
+    let parallaxOut = mobbu.createScrollTrigger({
         item: target2,
         scroller: '.scrollerH-container .scrollerH',
         trigger: '.pluto3',
@@ -230,7 +230,7 @@ export const hScroller = () => {
     /**
      *
      */
-    const parallaxb1 = mobbu.create('parallax', {
+    const parallaxb1 = mobbu.createParallax({
         item: document.querySelector('.parallax-js-b1'),
         direction: 'horizontal',
         scroller: '.scrollerH-container2 .scrollerH2',
@@ -244,7 +244,7 @@ export const hScroller = () => {
     /**
      *
      */
-    const parallaxb2 = mobbu.create('scrolltrigger', {
+    const parallaxb2 = mobbu.createScrollTrigger({
         item: document.querySelector('.parallax-js-b2'),
         direction: 'horizontal',
         scroller: '.scrollerH-container2 .scrollerH2',
@@ -283,7 +283,7 @@ export const hScroller = () => {
     /**
      *
      */
-    const parallaxC1 = mobbu.create('scrolltrigger', {
+    const parallaxC1 = mobbu.createScrollTrigger({
         item: document.querySelector('.parallax-js-c1'),
         scroller: '.scrollerH-container3 .scrollerH3',
         screen: '.scrollerH-container3',
@@ -298,7 +298,7 @@ export const hScroller = () => {
     /**
      *
      */
-    const parallaxC2 = mobbu.create('scrolltrigger', {
+    const parallaxC2 = mobbu.createScrollTrigger({
         item: document.querySelector('.parallax-js-c2'),
         scroller: '.scrollerH-container3 .scrollerH3',
         screen: '.scrollerH-container3',
@@ -314,7 +314,7 @@ export const hScroller = () => {
     /**
      *
      */
-    const parallaxC3 = mobbu.create('scrolltrigger', {
+    const parallaxC3 = mobbu.createScrollTrigger({
         item: document.querySelector('.parallax-js-c3'),
         scroller: '.scrollerH-container3 .scrollerH3',
         screen: '.scrollerH-container3',
@@ -331,7 +331,7 @@ export const hScroller = () => {
     /**
      *
      */
-    const parallaxC4 = mobbu.create('parallax', {
+    const parallaxC4 = mobbu.createParallax({
         item: document.querySelector('.parallax-js-c4'),
         conponent: 'm-comp--parallax',
         scroller: '.scrollerH-container3 .scrollerH3',

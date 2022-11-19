@@ -14,9 +14,8 @@ export class horizontalCustomClass {
         this.forceTranspond = data.forceTranspond || false;
         this.addCss = data.addCss || false;
         this.mainContainer = document.querySelector(data.rootEl);
-        this.triggerContainer = this.mainContainer.querySelector(
-            '.scroller__trigger'
-        );
+        this.triggerContainer =
+            this.mainContainer.querySelector('.scroller__trigger');
         this.row = this.mainContainer.querySelector('.scroller__row');
         this.cards = this.mainContainer.querySelectorAll('.scroller__section');
         this.shadow = this.mainContainer.querySelectorAll('[data-shadow]');
@@ -264,7 +263,7 @@ export class horizontalCustomClass {
         )
             return;
 
-        const scroller = mobbu.create('scrolltrigger', {
+        const scroller = mobbu.createScrollTrigger({
             item: this.row,
             trigger: this.triggerContainer,
             propierties: 'x',
