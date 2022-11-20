@@ -90,6 +90,9 @@ export const mobbu = {
      *
      * @example
      * ```js
+     * Property schema:
+     *
+     *
      * const mySequencer  = mobbu.createSequencer({
      *   data: Object.<string, number>,
      *   duration: [ Number ],
@@ -131,6 +134,9 @@ export const mobbu = {
      *
      * @example
      * ```js
+     * Property schema:
+     *
+     *
      * const myTimeline = mobbu.createSyncTimeline({
      *   duration: [ Number ],
      *   yoyo: [ Boolean ],
@@ -172,6 +178,7 @@ export const mobbu = {
      *
      * @example
      * ```js
+     * Property schema:
      *
      *
      * const staggers = mobbu.createStaggers({
@@ -212,6 +219,9 @@ export const mobbu = {
      *
      * @example
      * ```js
+     * Property schema:
+     *
+     *
      * const myParallaxTween = mobbu.createParallaxTween({
      *   from: Object.<string, number>,
      *   to: Object.<string, number>,
@@ -281,6 +291,9 @@ export const mobbu = {
      *
      * @example
      * ```js
+     * Property schema:
+     *
+     *
      * const myTween = mobbu.createTween({
      *   data: Object.<string, number>,
      *   duration: [ Number ],
@@ -331,6 +344,9 @@ export const mobbu = {
      *
      * @example
      * ```js
+     * Property schema:
+     *
+     *
      * const mySpring = new createSpring({
      *   data: Object.<string, number>,
      *   config: [ String ],
@@ -387,6 +403,9 @@ export const mobbu = {
      *
      * @example
      * ```js
+     * Property schema:
+     *
+     *
      * const myLerp = new mobbu.createLerp({
      *   data: Object.<string, number>,
      *   precision: [ Number ],
@@ -437,6 +456,9 @@ export const mobbu = {
      *
      * @example
      * ```js
+     * Property schema:
+     *
+     *
      * const myTimeline = mobbu.createAsyncTimeline({
      *   yoyo: [ Boolean ],
      *   repeat: [ Number ],
@@ -450,6 +472,7 @@ export const mobbu = {
      * @description
      * Available methods:
      * ```js
+     *
      *
      * `Methods to create timeline`
      * myTimeline.set()
@@ -492,6 +515,55 @@ export const mobbu = {
 
     /**
      * @param { import('./animation/parallax/parallaxItem.js').parallaxDefaultTypes & import('./animation/parallax/parallaxItem.js').parallaxSpecificTypes } data
+     *
+     * @example
+     * ```js
+     *  Property schema:
+     *
+     *
+     *  const myParallax = mobbu.createParallax({
+     *      item: String | Element,
+     *      applyTo: [ String | Element ],
+     *      trigger: [ String | Element ],
+     *      screen: [ String | Element ],
+     *      scroller: [ String | Element ],
+     *      breackpoint: [ String ],
+     *      queryType: [ String ],
+     *      direction: [ String ],
+     *      propierties: [ String ],
+     *      tween: [ HandleSequencer | ParallaxTween ],
+     *      range: [ String | Number ],
+     *      align: [ String ],
+     *      onSwitch: [ String ],
+     *      reverse: [ Boolean ],
+     *      ease: [ Boolean ],
+     *      easeType: [ String ],
+     *      lerpConfig: [ Number ],
+     *      springConfig: [ String ],
+     *      opacityEnd: [ Number ],
+     *      opacityStart: [ Number ],
+     *      limiterOff: [ Boolean ],
+     *      perspective: [ Number ],
+     *      disableForce3D: [ Boolean ],
+     *      useThrottle: [ Boolean ],
+     *  });
+     *
+     *
+     * ```
+     *
+     * @description
+     * Available methods:
+     *
+     * ```js
+     *
+     *
+     * myParallax.init()
+     * myParallax.destroy()
+     * myParallax.refresh()
+     * myParallax.move()
+     *
+     * ```
+     *
      */
     createParallax(data = {}) {
         return new ParallaxItemClass({
@@ -502,6 +574,73 @@ export const mobbu = {
 
     /**
      * @param { import('./animation/parallax/parallaxItem.js').parallaxDefaultTypes & import('./animation/parallax/parallaxItem.js').scrolltriggerSpecificTypes  } data
+     *
+     * @example
+     *
+     * ```js
+     *   Property schema:
+     *
+     *
+     *   const myScrollTrigger = mobbu.createScrollTrigger({
+     *       item: String | Element,
+     *       applyTo: [ String | Element ],
+     *       trigger: [ String | Element ],
+     *       screen: [ String | Element ],
+     *       scroller: [ String | Element ],
+     *       breackpoint: [ String ],
+     *       queryType: [ String ],
+     *       direction: [ String ],
+     *       propierties: [ String ],
+     *       tween: [ HandleSequencer | ParallaxTween ],
+     *       range: [ String ],
+     *       dynamicRange: [ Function ],
+     *       fromTo: [ Boolean ],
+     *       start: [ String ],
+     *       dynamicStart: {
+     *          postion: [ String ],
+     *          value: [ Function ]
+     *       },
+     *       end: [ String ],
+     *       dynamicEnd: {
+     *          postion: [ String ],
+     *          value: [ Function ]
+     *       },
+     *       ease: [ Boolean ],
+     *       easeType: [ String ],
+     *       lerpConfig: [ Number ],
+     *       springConfig: [ String ],
+     *       pin: [ Boolean ],
+     *       animatePin: [ Boolean ],
+     *       anticipatePinOnLoad: [ Boolean ],
+     *       marker: [ String ],
+     *       forceTranspond: [ Boolean ],
+     *       animateAtStart: [ Boolean ],
+     *       disableForce3D: [ Boolean ],
+     *       onEnter: [ Function ],
+     *       onEnterBack: [ Function ],
+     *       onLeave: [ Function ],
+     *       onLeaveBack: [ Function ],
+     *       onTick: [ Function ],
+     *       perspective: [ Number ],
+     *       useThrottle: [ Boolean ],
+     *   });
+     *
+     *
+     *
+     * ```
+     *
+     * @description
+     * Available methods:
+     *
+     * ```js
+     *
+     *
+     * myScrollTrigger.init()
+     * myScrollTrigger.destroy()
+     * myScrollTrigger.refresh()
+     * myScrollTrigger.move()
+     *
+     * ```
      */
     createScrollTrigger(data = {}) {
         return new ParallaxItemClass({
@@ -655,6 +794,13 @@ export const mobbu = {
                 console.warn(`${action} in mobbu.slide not exist`);
         }
     },
+
+    /**
+     * TODO:
+     * mqMin('desktop')
+     * mqMax('desktop')
+     * mqGet('desktop')
+     */
 
     /**
      * @typedef {('min'|'max'|'get')} mqType - string

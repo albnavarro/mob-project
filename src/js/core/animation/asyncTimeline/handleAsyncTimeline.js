@@ -963,7 +963,7 @@ export default class HandleAsyncTimeline {
     /**
      * @param {asyncTimelineTweenTypes} tween instance of HandleTween | HandleLerp | HandleSpring
      * @param {Object.<string, number>} valuesTo - to values Object
-     * @param {asyncTimelineSpecialPropTypes & import('../tween/handleTween.js').tweenCommonSpecialProps & import('../tween/tweenConfig.js').easeTypes & import('../spring/springConfig.js').springConfigTypes & import('../spring/springConfig.js').springConfigPropsTypes & import('../lerp/handleLerp.js').lerpPropTypes} tweenProps - special props
+     * @param {asyncTimelineSpecialPropTypes & import('../tween/handleTween.js').tweenCommonSpecialProps & import('../tween/handleTween.js').tweenSpecialProps & import('../tween/tweenConfig.js').easeTypes & import('../spring/springConfig.js').springConfigTypes & import('../spring/springConfig.js').springConfigPropsTypes & import('../lerp/handleLerp.js').lerpPropTypes} tweenProps - special props
      * @returns {this} The instance on which this method was called.
      *
      * @example
@@ -1042,7 +1042,7 @@ export default class HandleAsyncTimeline {
     /**
      * @param {asyncTimelineTweenTypes} tween instance of HandleTween | HandleLerp | HandleSpring
      * @param {Object.<string, number>} valuesFrom - from values Object
-     * @param {asyncTimelineSpecialPropTypes & import('../tween/handleTween.js').tweenCommonSpecialProps & import('../tween/tweenConfig.js').easeTypes & import('../spring/springConfig.js').springConfigTypes & import('../spring/springConfig.js').springConfigPropsTypes & import('../lerp/handleLerp.js').lerpPropTypes} tweenProps - special props
+     * @param {asyncTimelineSpecialPropTypes & import('../tween/handleTween.js').tweenCommonSpecialProps & import('../tween/handleTween.js').tweenSpecialProps & import('../tween/tweenConfig.js').easeTypes & import('../spring/springConfig.js').springConfigTypes & import('../spring/springConfig.js').springConfigPropsTypes & import('../lerp/handleLerp.js').lerpPropTypes} tweenProps - special props
      * @returns {this} The instance on which this method was called.
      *
      * @example
@@ -1122,7 +1122,7 @@ export default class HandleAsyncTimeline {
      * @param {asyncTimelineTweenTypes} tween instance of HandleTween | HandleLerp | HandleSpring
      * @param {Object.<string, number>} valuesFrom - from values Object
      * @param {Object.<string, number>} valuesTo - to values Object
-     * @param {asyncTimelineSpecialPropTypes & import('../tween/handleTween.js').tweenCommonSpecialProps & import('../tween/tweenConfig.js').easeTypes & import('../spring/springConfig.js').springConfigTypes & import('../spring/springConfig.js').springConfigPropsTypes & import('../lerp/handleLerp.js').lerpPropTypes} tweenProps - special props
+     * @param {asyncTimelineSpecialPropTypes & import('../tween/handleTween.js').tweenCommonSpecialProps & import('../tween/handleTween.js').tweenSpecialProps & import('../tween/tweenConfig.js').easeTypes & import('../spring/springConfig.js').springConfigTypes & import('../spring/springConfig.js').springConfigPropsTypes & import('../lerp/handleLerp.js').lerpPropTypes} tweenProps - special props
      * @returns {this} The instance on which this method was called.
      *
      * @example

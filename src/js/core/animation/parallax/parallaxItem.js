@@ -572,6 +572,11 @@ export default class ParallaxItemClass {
         };
     }
 
+    /**
+     * @description
+     * Initialize instance
+     * <br/>
+     */
     init() {
         this.setMotion();
         this.calcScreenPosition();
@@ -661,6 +666,9 @@ export default class ParallaxItemClass {
         }
     }
 
+    /**
+     * @private
+     */
     setPerspective() {
         if (this.perspective && this.item && this.item.parentNode) {
             const style = {
@@ -672,6 +680,9 @@ export default class ParallaxItemClass {
         }
     }
 
+    /**
+     * @private
+     */
     setMotion() {
         const initialValue =
             parallaxConstant.PROP_SCALE || parallaxConstant.PROP_OPACITY
@@ -736,6 +747,9 @@ export default class ParallaxItemClass {
         }
     }
 
+    /**
+     * @private
+     */
     calcRangeAndUnitMiusure() {
         if (this.dynamicRange) {
             const range = this.dynamicRange();
@@ -768,6 +782,9 @@ export default class ParallaxItemClass {
         }
     }
 
+    /**
+     * @private
+     */
     calcFixedLimit() {
         const screenUnit = this.scrollerHeight / 100;
 
@@ -873,6 +890,9 @@ export default class ParallaxItemClass {
         if (this.invertSide) this.startPoint -= this.height;
     }
 
+    /**
+     * @private
+     */
     setMarker() {
         if (this.marker) {
             // Add Marker
@@ -892,6 +912,9 @@ export default class ParallaxItemClass {
         }
     }
 
+    /**
+     * @private
+     */
     calcOffset() {
         const el = this.trigger === null ? this.item : this.trigger;
 
@@ -931,6 +954,9 @@ export default class ParallaxItemClass {
         }
     }
 
+    /**
+     * @private
+     */
     calcScreenPosition() {
         if (this.screen === window) return;
 
@@ -940,6 +966,9 @@ export default class ParallaxItemClass {
                 : parseInt(position(this.screen).left);
     }
 
+    /**
+     * @private
+     */
     calcHeight() {
         const el = this.trigger === null ? this.item : this.trigger;
         this.height =
@@ -948,6 +977,9 @@ export default class ParallaxItemClass {
                 : parseInt(el.offsetWidth);
     }
 
+    /**
+     * @private
+     */
     calcWidth() {
         const el = this.trigger === null ? this.item : this.trigger;
         this.width =
@@ -956,6 +988,9 @@ export default class ParallaxItemClass {
                 : parseInt(el.offsetHeight);
     }
 
+    /**
+     * @private
+     */
     getScrollerOffset() {
         if (this.scroller === window) {
             this.scrollerScroll =
@@ -970,6 +1005,9 @@ export default class ParallaxItemClass {
         }
     }
 
+    /**
+     * @private
+     */
     getScreenHeight() {
         this.windowInnerWidth = window.innerWidth;
         this.windowInnerHeight = window.innerHeight;
@@ -987,6 +1025,11 @@ export default class ParallaxItemClass {
         }
     }
 
+    /**
+     * @description
+     * Destroy instance
+     * <br/>
+     */
     destroy() {
         if ('stop' in this.motion) {
             this.motion.stop();
@@ -1014,6 +1057,10 @@ export default class ParallaxItemClass {
         this.endValue = 0;
     }
 
+    /**
+     * @description
+     * Recalculate positions and align all values
+     */
     refresh() {
         if (this.pin && this.pinInstance) this.pinInstance.destroy();
 
@@ -1057,6 +1104,29 @@ export default class ParallaxItemClass {
         }
     }
 
+    /**
+     * @param {Number} [ scrollVal = null ] - parent scroll position value
+     *
+     *
+     * @description
+     * Method used to control the instance from the outside, the scrollVal parameter if passed to the method will prevent the instance itself from having to recalculate the scroll flight and therefore ask the DOM for a value that could force the browser to redraw the layout.
+     *
+     *
+     * @example
+     * ```js
+     *
+     *
+     * Control the instance from another scrollTrigger:
+     *
+     * const myScroller = mobbu.createScrollTrigger({
+     *     ...
+     *     onTick: (scrollVal) => {
+     *         myInstance.move(scrollVal);
+     *     },
+     *     ...
+     * });
+     * ```
+     */
     move(scrollVal = null) {
         if (!mq[this.queryType](this.breackpoint)) return;
 
@@ -1076,6 +1146,9 @@ export default class ParallaxItemClass {
         }
     }
 
+    /**
+     * @private
+     */
     smoothParallaxJs(scrollVal = null) {
         if (!mq[this.queryType](this.breackpoint)) return;
 
@@ -1106,6 +1179,9 @@ export default class ParallaxItemClass {
         ).catch(() => {});
     }
 
+    /**
+     * @private
+     */
     computeValue(scrollVal = null) {
         if (!mq[this.queryType](this.breackpoint)) return;
 
@@ -1180,6 +1256,9 @@ export default class ParallaxItemClass {
                 : this.GC.reverseVal;
     }
 
+    /**
+     * @private
+     */
     noEasingRender() {
         if (!mq[this.queryType](this.breackpoint)) return;
 
@@ -1188,10 +1267,16 @@ export default class ParallaxItemClass {
         });
     }
 
+    /**
+     * @private
+     */
     checkIfLastDraw() {
         return this.endValue === this.lastValue;
     }
 
+    /**
+     * @private
+     */
     cleanRender() {
         // if (this.endValue === this.lastValue) return;
 
@@ -1215,6 +1300,9 @@ export default class ParallaxItemClass {
         });
     }
 
+    /**
+     * @private
+     */
     updateStyle(val) {
         if (this.applyTo) {
             Object.assign(this.applyTo.style, this.getStyle(val));
@@ -1226,6 +1314,9 @@ export default class ParallaxItemClass {
         this.firstTime = false;
     }
 
+    /**
+     * @private
+     */
     getFixedValue() {
         this.GC.partials = !this.invertSide
             ? -(
@@ -1302,6 +1393,9 @@ export default class ParallaxItemClass {
         }
     }
 
+    /**
+     * @private
+     */
     getHVval() {
         switch (this.unitMisure) {
             case parallaxConstant.VW:
@@ -1328,6 +1422,9 @@ export default class ParallaxItemClass {
         }
     }
 
+    /**
+     * @private
+     */
     getOpacityValue() {
         this.GC.vhLimit = (this.scrollerHeight / 100) * this.opacityEnd;
         this.GC.vhStart =
@@ -1349,6 +1446,9 @@ export default class ParallaxItemClass {
         return clamp(this.GC.valClamped, 0, 1);
     }
 
+    /**
+     * @private
+     */
     getIsNaNValue() {
         this.GC.documentHeight =
             this.direction === parallaxConstant.DIRECTION_VERTICAL
@@ -1391,6 +1491,9 @@ export default class ParallaxItemClass {
         }
     }
 
+    /**
+     * @private
+     */
     getIsANumberValue() {
         this.GC.align = parseFloat(this.align);
         this.GC.offset = this.offset;
@@ -1404,6 +1507,9 @@ export default class ParallaxItemClass {
         );
     }
 
+    /**
+     * @private
+     */
     getSwitchAfterZeroValue(value) {
         return parallaxUtils.getValueOnSwitch({
             switchPropierties: this.onSwitch,
@@ -1412,6 +1518,9 @@ export default class ParallaxItemClass {
         });
     }
 
+    /**
+     * @private
+     */
     getStyle(val) {
         this.GC.force3DStyle = this.force3D ? 'translate3D(0px, 0px, 0px)' : '';
 
@@ -1468,6 +1577,7 @@ export default class ParallaxItemClass {
     }
 
     /**
+     * @private
      * Reset sequencer/parallaxTween style
      */
     resetTweenStyle(item) {
@@ -1475,6 +1585,7 @@ export default class ParallaxItemClass {
     }
 
     /**
+     * @private
      * Reset default style
      */
     getResetStyle() {
