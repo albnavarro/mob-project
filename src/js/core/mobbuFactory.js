@@ -514,7 +514,7 @@ export const mobbu = {
     },
 
     /**
-     * @param { import('./animation/parallax/parallaxItem.js').parallaxDefaultTypes & import('./animation/parallax/parallaxItem.js').parallaxSpecificTypes } data
+     * @param { import('./animation/parallax/parallaxItem.js').parallaxDefaultTypes & import('./utils/mediaManager.js').breackPointTypeObj & import('./animation/spring/springConfig.js').springConfigParallaxTypes & import('./utils/mediaManager.js').mqTypeObject & import('./animation/parallax/parallaxItem.js').parallaxSpecificTypes } data
      *
      * @example
      * ```js
@@ -573,7 +573,7 @@ export const mobbu = {
     },
 
     /**
-     * @param { import('./animation/parallax/parallaxItem.js').parallaxDefaultTypes & import('./animation/parallax/parallaxItem.js').scrolltriggerSpecificTypes  } data
+     * @param { import('./animation/parallax/parallaxItem.js').parallaxDefaultTypes & import('./utils/mediaManager.js').breackPointTypeObj & import('./animation/spring/springConfig.js').springConfigParallaxTypes & import('./utils/mediaManager.js').mqTypeObject & import('./animation/parallax/parallaxItem.js').scrolltriggerSpecificTypes  } data
      *
      * @example
      *
@@ -796,18 +796,26 @@ export const mobbu = {
     },
 
     /**
-     * TODO:
-     * mqMin('desktop')
-     * mqMax('desktop')
-     * mqGet('desktop')
-     */
-
-    /**
-     * @typedef {('min'|'max'|'get')} mqType - string
-     **/
-
-    /**
-     * @param action {mqType} string
+     * @param { import('./utils/mediaManager.js').mqType } action
+     * @param { import('./utils/mediaManager.js').breackPointType } breackpoint
+     *
+     * @return {(Boolean|Number)} Returns a boolean value if the action value is equal to 'min' or 'max', returns a numeric value if it is equal to 'get'
+     *
+     * @description
+     *
+     * @example
+     *
+     * ```js
+     *   Property schema:
+     *   mobbu.mq([String], [string])
+     *
+     *   const isDesktop = mobbu.mq('min', 'desktop'); // true/false
+     *   const isMobile = mobbu.mq('max', 'desktop'); // true/false
+     *   const desktopBreackPoint = mobbu.mq('get', 'desktop'); // 992
+     *
+     *
+     *
+     * ```
      **/
     mq(action = '', breackpoint) {
         switch (action) {

@@ -4,6 +4,11 @@
  **/
 
 /**
+ * @typedef {Object} springConfigParallaxTypes
+ * @prop {('default'|'gentle'|'wobbly'|'bounce'|'scroller')} [ springConfig = 'default' ] spring configuration list
+ **/
+
+/**
  * @typedef {Object} springConfigPropsTypes
  * @prop {Object} configProp single spring config propierties
  * @prop {Number} [ configProp.tension ] tension - A positive number
