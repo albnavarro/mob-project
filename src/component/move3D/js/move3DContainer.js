@@ -75,17 +75,17 @@ export class move3DContainerClass {
         this.setDepth();
         this.getDimension();
 
-        this.unsubscribeMouseMove = mobbu.use('mouseMove', ({ page }) => {
+        this.unsubscribeMouseMove = mobbu.useMouseMove(({ page }) => {
             this.setGlobalCoord({ page });
             this.onMove();
         });
 
-        this.unsubscribeResize = mobbu.use('resize', () => {
+        this.unsubscribeResize = mobbu.useResize(() => {
             this.getDimension();
         });
 
         if (this.pageY) {
-            this.unsubscribeScroll = mobbu.use('scroll', ({ scrollY }) => {
+            this.unsubscribeScroll = mobbu.useScroll(({ scrollY }) => {
                 this.onScroll(scrollY);
             });
         }
@@ -95,23 +95,23 @@ export class move3DContainerClass {
             this.dragY = window.innerHeight / 2;
             this.item.classList.add('move3D--drag');
 
-            this.unsubscribeTouchMove = mobbu.use('touchStart', ({ page }) => {
+            this.unsubscribeTouchMove = mobbu.useTouchStart(({ page }) => {
                 this.onMouseDown({ page });
             });
 
-            this.unsubscribeTouchMove = mobbu.use('touchEnd', () => {
+            this.unsubscribeTouchMove = mobbu.useTouchEnd(() => {
                 this.onMouseUp();
             });
 
-            this.unsubscribeTouchMove = mobbu.use('mouseDown', ({ page }) => {
+            this.unsubscribeTouchMove = mobbu.useMouseDown(({ page }) => {
                 this.onMouseDown({ page });
             });
 
-            this.unsubscribeTouchMove = mobbu.use('mouseUp', () => {
+            this.unsubscribeTouchMove = mobbu.useMouseUp(() => {
                 this.onMouseUp();
             });
 
-            this.unsubscribeTouchMove = mobbu.use('touchMove', ({ page }) => {
+            this.unsubscribeTouchMove = mobbu.useTouchMove(({ page }) => {
                 this.setGlobalCoord({ page });
                 this.onMove();
             });

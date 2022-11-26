@@ -51,41 +51,39 @@ class LightPichZoomClass {
         zoom.appendChild(zoomOut);
         this.setZoomBtnhandler();
 
-        this.unsubscribeWheel = mobbu.use('mouseWheel', ({ spinY, target }) => {
+        this.unsubscribeWheel = mobbu.useMouseWheel(({ spinY, target }) => {
             this.onWeel({ spinY, target });
         });
 
-        this.unsubscribeTouchStart = mobbu.use(
-            'touchStart',
+        this.unsubscribeTouchStart = mobbu.useTouchStart(
             ({ target, preventDefault }) => {
                 this.onMouseDown({ target, preventDefault });
             }
         );
 
-        this.unsubscribeMouseDown = mobbu.use(
-            'mouseDown',
+        this.unsubscribeMouseDown = mobbu.useMouseDown(
             ({ target, preventDefault }) => {
                 this.onMouseDown({ target, preventDefault });
             }
         );
 
-        this.unsubscribeTouchEnd = mobbu.use('touchEnd', () => {
+        this.unsubscribeTouchEnd = mobbu.useTouchEnd(() => {
             this.onMouseUp();
         });
 
-        this.unsubscribeMouseUp = mobbu.use('mouseUp', () => {
+        this.unsubscribeMouseUp = mobbu.useMouseUp(() => {
             this.onMouseUp();
         });
 
-        this.unsubscribeMouseMove = mobbu.use('mouseMove', ({ page }) => {
+        this.unsubscribeMouseMove = mobbu.useMouseMove(({ page }) => {
             this.onMove(false, page.x, page.y);
         });
 
-        this.unsubscribeTouchMove = mobbu.use('touchMove', ({ page }) => {
+        this.unsubscribeTouchMove = mobbu.useTouchMove(({ page }) => {
             this.onMove(false, page.x, page.y);
         });
 
-        this.unsubscribeResize = mobbu.use('resize', () => {
+        this.unsubscribeResize = mobbu.useResize(() => {
             this.resetZoom();
         });
     }
@@ -269,7 +267,7 @@ class LightPichZoomClass {
 
         if (this.onDrag || force) {
             // this.image.style.transform = `translateX(${xValue}px) translateY(${yValue}px) scale(${this.scale})`;
-            mobbu.use('frame', () => {
+            mobbu.useFrame(() => {
                 this.image.style.transform = `translateX(${xValue}px) translateY(${yValue}px) scale(${this.scale})`;
             });
         }

@@ -44,7 +44,7 @@ class LightBoxImageClass {
 
                 this.removeLoder(wrapper);
 
-                this.unsubscribeResize = mobbu.use('resize', () => {
+                this.unsubscribeResize = mobbu.useResize(() => {
                     this.onResizeLightboxImage(wrapper, hGap, wGap, zoom);
                 });
 

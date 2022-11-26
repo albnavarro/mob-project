@@ -107,7 +107,7 @@ export class tBlocksItemClass {
         this.setActiveitemTransformOrigin();
         this.setActiveitemStyle();
 
-        const unsubscribeResize = mobbu.use('resize', () => {
+        const unsubscribeResize = mobbu.useResize(() => {
             this.setWidth();
             this.calcCenter();
             this.store.set('clone', { action: this.REMOVE });

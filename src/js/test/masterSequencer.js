@@ -36,7 +36,7 @@ export const masterSequencer = () => {
     createSequencer();
 
     // Test destroy and create sequencer on resize
-    mobbu.use('resize', () => {
+    mobbu.useResize(() => {
         sequencers.forEach(({ unsubscribe }, i) => unsubscribe());
         masterSequencer.destroy();
         createSequencer();

@@ -31,7 +31,7 @@ export const infiniteAnimation = () => {
     const loop = () => {
         counter++;
         tween.goTo({ x: counter });
-        if (isRunning) mobbu.use('nextFrame', () => loop());
+        if (isRunning) mobbu.useNextFrame(() => loop());
     };
 
     play.addEventListener('click', () => {

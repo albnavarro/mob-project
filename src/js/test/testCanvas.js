@@ -33,7 +33,7 @@ export const testCanvas = () => {
         };
     });
 
-    mobbu.use('resize', () => {
+    mobbu.useResize(() => {
         canvas.width = canvas.clientWidth;
         canvas.height = canvas.clientHeight;
         draw();
@@ -102,8 +102,8 @@ export const testCanvas = () => {
 
     const loop = () => {
         draw();
-        mobbu.use('nextFrame', () => loop());
+        mobbu.useNextFrame(() => loop());
     };
 
-    mobbu.use('frame', () => loop());
+    mobbu.useFrame(() => loop());
 };

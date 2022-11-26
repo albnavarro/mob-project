@@ -9,7 +9,7 @@ class totopClass {
     init() {
         this.addHandler();
         this.showArrow();
-        mobbu.use('scroll', ({ scrollY }) => this.showArrow(scrollY));
+        mobbu.useScroll(({ scrollY }) => this.showArrow(scrollY));
     }
 
     addHandler() {
@@ -22,15 +22,15 @@ class totopClass {
     }
 
     showArrow(scrollY) {
-        mobbu.use('frame', () => {
-            mobbu.use('nextTick', () => {
+        mobbu.useFrame(() => {
+            mobbu.useNextTick(() => {
                 if (scrollY >= window.innerWidth && this.hide) {
-                    mobbu.use('frame', () => {
+                    mobbu.useFrame(() => {
                         this.totop.classList.add('visible');
                         this.hide = false;
                     });
                 } else if (scrollY < window.innerWidth && !this.hide) {
-                    mobbu.use('frame', () => {
+                    mobbu.useFrame(() => {
                         this.totop.classList.remove('visible');
                         this.hide = true;
                     });

@@ -649,109 +649,102 @@ export const mobbu = {
         });
     },
 
-    create(type = '', obj = {}) {
-        switch (type) {
-            case 'mouseParallax':
-                return new MouseParallaxItemClass(obj);
-
-            case 'smoothScroll':
-                return new SmoothScrollClass(obj);
-
-            case 'store':
-                return new SimpleStore(obj);
-
-            case 'loadImages':
-                if (obj && 'images' in obj) {
-                    return new LoadImages(obj.images);
-                } else {
-                    console.warn(
-                        `loadImages need a Object with an array of images: {images: [...]}`
-                    );
-                }
-                break;
-
-            default:
-                console.warn(`${type} in mobbu.create not exist`);
-        }
+    /**
+     * @description
+     * Execute a callBack within the first available request animation frame
+     *
+     * @param {function(import('./events/rafutils/handleFrame.js').handleFrameTypes):void } callback - callback function
+     *
+     * @example
+     * ```js
+     * mobbu.useframe(({ fps, shouldrender, time }) => {
+     *     // code ...
+     * });
+     *
+     * ```
+     */
+    useFrame(callback = () => {}) {
+        return handleFrame.add(callback);
     },
 
-    /**
-     * @typedef {('frame'|'nextTick'|'nextFrame'|'frameIndex'|'loadFps'|'load'|'resize'|'visibilityChange'|'mouseClick'|'mouseDown'|'touchStart'|'mouseMove'|'touchMove'|'mouseUp'|'touchEnd'|'mouseWheel'|'scoll'|'scrollImmediate'|'scrollThrottle'|'scrollStart'|'scrollEnd')} useType - string
-     **/
+    useNextTick(callback = () => {}) {
+        return handleNextTick.add(callback);
+    },
 
-    /**
-     * @param type {useType} string
-     * @param {function} callback
-     * @param {Number} [ frame=0 ]
-     **/
-    use(type = '', callback = () => {}, frame = 0) {
-        switch (type) {
-            case 'frame':
-                return handleFrame.add(callback);
+    useNextFrame(callback = () => {}) {
+        return handleNextFrame.add(callback);
+    },
 
-            case 'nextTick':
-                return handleNextTick.add(callback);
+    useFrameIndex(callback = () => {}, frame = 0) {
+        return handleFrameIndex.add(callback, frame);
+    },
 
-            case 'nextFrame':
-                return handleNextFrame.add(callback);
+    useFps(callback = () => {}) {
+        return loadFps().then((obj) => callback(obj));
+    },
 
-            case 'frameIndex':
-                return handleFrameIndex.add(callback, frame);
+    useLoad(callback = () => {}) {
+        return handleLoad(callback);
+    },
 
-            case 'loadFps':
-                return loadFps().then((obj) => callback(obj));
+    useResize(callback = () => {}) {
+        return handleResize(callback);
+    },
 
-            case 'load':
-                return handleLoad(callback);
+    useVisibilityChange(callback = () => {}) {
+        return handleVisibilityChange(callback);
+    },
 
-            case 'resize':
-                return handleResize(callback);
+    useMouseClick(callback = () => {}) {
+        return handleMouseClick(callback);
+    },
 
-            case 'visibilityChange':
-                return handleVisibilityChange(callback);
+    useMouseDown(callback = () => {}) {
+        return handleMouseDown(callback);
+    },
 
-            case 'mouseClick':
-                return handleMouseClick(callback);
+    useTouchStart(callback = () => {}) {
+        return handleTouchStart(callback);
+    },
 
-            case 'mouseDown':
-                return handleMouseDown(callback);
+    useMouseMove(callback = () => {}) {
+        return handleMouseMove(callback);
+    },
 
-            case 'touchStart':
-                return handleTouchStart(callback);
+    useTouchMove(callback = () => {}) {
+        return handleTouchMove(callback);
+    },
 
-            case 'mouseMove':
-                return handleMouseMove(callback);
+    useMouseUp(callback = () => {}) {
+        return handleMouseUp(callback);
+    },
 
-            case 'touchMove':
-                return handleTouchMove(callback);
+    useTouchEnd(callback = () => {}) {
+        return handleTouchEnd(callback);
+    },
 
-            case 'mouseUp':
-                return handleMouseUp(callback);
+    useMouseWheel(callback = () => {}) {
+        return handleMouseWheel(callback);
+    },
 
-            case 'touchEnd':
-                return handleTouchEnd(callback);
+    useScroll(callback = () => {}) {
+        return handleScroll(callback);
+    },
 
-            case 'mouseWheel':
-                return handleMouseWheel(callback);
+    useScrollImmediate(callback = () => {}) {
+        return handleScrollImmediate(callback);
+    },
 
-            case 'scroll':
-                return handleScroll(callback);
+    useScrollThrottle(callback = () => {}) {
+        return handleScrollThrottle(callback);
+    },
 
-            case 'scrollImmediate':
-                return handleScrollImmediate(callback);
+    useScrollStart(callback = () => {}) {
+        return handleScrollStart(callback);
+    },
 
-            case 'scrollThrottle':
-                return handleScrollThrottle(callback);
-
-            case 'scrollStart':
-                return handleScrollStart(callback);
-
-            case 'scrollEnd':
-                return handleScrollEnd(callback);
-
-            default:
-                console.warn(`${type} in mobbu.use not exist`);
-        }
+    useScrollEnd(callback = () => {}) {
+        return handleScrollEnd(callback);
     },
 
     /**
@@ -761,39 +754,6 @@ export const mobbu = {
      * @prop {('easeLinear'|'easeInQuad'|'easeOutQuad'|'easeInOutQuad'|'easeInCubic'|'easeOutCubic'|'easeInOutCubic'|'easeInQuart'|'easeOutQuart'|'easeInOutQuart'|'easeInQuint'|'easeOutQuint'|'easeInOutQuint'|'easeInSine'|'easeOutSine'|'easeInOutSine'|'easeInExpo'|'easeOutExpo'|'easeInOutExpo'|'easeInCirc'|'easeOutCirc'|'easeInOutCirc'|'easeInElastic'|'easeOutElastic'|'easeInOutElastic'|'easeInBack'|'easeOutBack'|'easeInOutBack'|'easeInBounce'|'easeOutBounce'|'easeInOutBounce')}  ease
      * @prop {boolean}  prevent
      **/
-
-    /**
-     * @param {scrollToObj} obj
-     * @description
-     * {
-     *     target: Number|HTMLElement,
-     *     duration: number,
-     *     ease: string,
-     *     prevent: boolean
-     * }
-     */
-    scrollTo(obj = {}) {
-        return bodyScroll.to(obj);
-    },
-
-    slide(action, el) {
-        switch (action) {
-            case 'subscribe':
-                return slide.subscribe(el);
-
-            case 'reset':
-                return slide.reset(el);
-
-            case 'up':
-                return slide.up(el);
-
-            case 'down':
-                return slide.down(el);
-
-            default:
-                console.warn(`${action} in mobbu.slide not exist`);
-        }
-    },
 
     /**
      * @param { import('./utils/mediaManager.js').mqType } action
@@ -830,6 +790,65 @@ export const mobbu = {
 
             default:
                 console.warn(`${action} in mobbu.mq not exist`);
+        }
+    },
+
+    /**
+     * @param {scrollToObj} obj
+     * @description
+     * {
+     *     target: Number|HTMLElement,
+     *     duration: number,
+     *     ease: string,
+     *     prevent: boolean
+     * }
+     */
+    scrollTo(obj = {}) {
+        return bodyScroll.to(obj);
+    },
+
+    slide(action, el) {
+        switch (action) {
+            case 'subscribe':
+                return slide.subscribe(el);
+
+            case 'reset':
+                return slide.reset(el);
+
+            case 'up':
+                return slide.up(el);
+
+            case 'down':
+                return slide.down(el);
+
+            default:
+                console.warn(`${action} in mobbu.slide not exist`);
+        }
+    },
+
+    create(type = '', obj = {}) {
+        switch (type) {
+            case 'mouseParallax':
+                return new MouseParallaxItemClass(obj);
+
+            case 'smoothScroll':
+                return new SmoothScrollClass(obj);
+
+            case 'store':
+                return new SimpleStore(obj);
+
+            case 'loadImages':
+                if (obj && 'images' in obj) {
+                    return new LoadImages(obj.images);
+                } else {
+                    console.warn(
+                        `loadImages need a Object with an array of images: {images: [...]}`
+                    );
+                }
+                break;
+
+            default:
+                console.warn(`${type} in mobbu.create not exist`);
         }
     },
 

@@ -39,7 +39,7 @@ export class horizontalCustomClass {
                 this.createShadow().then(() =>
                     this.updateShadow().then(() => {
                         this.initScroller();
-                        mobbu.use('resize', ({ horizontalResize }) =>
+                        mobbu.useResize(({ horizontalResize }) =>
                             this.onResize(horizontalResize)
                         );
                     })
@@ -58,7 +58,7 @@ export class horizontalCustomClass {
 
     setDimension() {
         return new Promise((resolve, reject) => {
-            mobbu.use('frame', () => {
+            mobbu.useFrame(() => {
                 const width = this.horizontalWidth;
                 this.percentRange = (100 * (width - window.innerWidth)) / width;
                 this.triggerContainer.style.height = `${width}px`;
@@ -72,7 +72,7 @@ export class horizontalCustomClass {
 
     getWidth() {
         return new Promise((resolve, reject) => {
-            mobbu.use('frame', () => {
+            mobbu.useFrame(() => {
                 if (!mobbu.mq(this.queryType, this.breackpoint)) {
                     resolve();
                     return;
@@ -91,7 +91,7 @@ export class horizontalCustomClass {
 
     createShadow() {
         return new Promise((resolve, reject) => {
-            mobbu.use('frame', () => {
+            mobbu.useFrame(() => {
                 if (!mobbu.mq(this.queryType, this.breackpoint)) {
                     resolve();
                     return;
@@ -154,7 +154,7 @@ export class horizontalCustomClass {
                 return;
             }
 
-            mobbu.use('frame', () => {
+            mobbu.useFrame(() => {
                 const shadowEl = this.mainContainer.querySelectorAll(
                     `.${this.shadowMainClass}`
                 );
@@ -317,8 +317,8 @@ export class horizontalCustomClass {
         if (this.moduleisActive) {
             this.scroller.refresh();
 
-            mobbu.use('frame', () => {
-                mobbu.use('nextTick', () => {
+            mobbu.useFrame(() => {
+                mobbu.useNextTick(() => {
                     this.onRefreshCallBack.forEach((item, i) => item());
                 });
             });
@@ -344,8 +344,8 @@ export class horizontalCustomClass {
         this.removeShadow();
 
         if (this.moduleisActive) {
-            mobbu.use('frame', () => {
-                mobbu.use('nextTick', () => {
+            mobbu.useFrame(() => {
+                mobbu.useNextTick(() => {
                     this.scroller.destroy();
                     this.scroller = null;
                     this.moduleisActive = false;

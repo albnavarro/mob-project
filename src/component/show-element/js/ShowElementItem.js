@@ -21,11 +21,11 @@ export class showElementItemClass {
         this.calcOffset();
         this.checkPosition();
 
-        this.unsubscribeScroll = mobbu.use('scroll', () => {
+        this.unsubscribeScroll = mobbu.useScroll(() => {
             this.checkPosition();
         });
 
-        this.unsubscribeResize = mobbu.use('resize', () => {
+        this.unsubscribeResize = mobbu.useResize(() => {
             this.refresh();
         });
     }
@@ -55,14 +55,14 @@ export class showElementItemClass {
         const isAble = this.onlyOnce && this.firstActive ? false : true;
 
         if (postion < window.pageYOffset && this.hide && isAble) {
-            mobbu.use('frame', () => {
+            mobbu.useFrame(() => {
                 this.item.classList.remove(this.startClass);
                 this.item.classList.add(this.endClass);
                 this.hide = false;
                 this.firstActive = true;
             });
         } else if (postion >= window.pageYOffset && !this.hide && isAble) {
-            mobbu.use('frame', () => {
+            mobbu.useFrame(() => {
                 this.item.classList.remove(this.endClass);
                 this.item.classList.add(this.startClass);
                 this.hide = true;

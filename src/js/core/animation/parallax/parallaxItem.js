@@ -133,7 +133,102 @@ export default class ParallaxItemClass {
      *
      * @example
      *
+     * ```js
+     *  Parallax property schema:
+     *
+     *
+     *  const myParallax = new ParallaxItemClass({
+     *      type: 'parallax',
+     *      item: String | Element,
+     *      applyTo: [ String | Element ],
+     *      trigger: [ String | Element ],
+     *      screen: [ String | Element ],
+     *      scroller: [ String | Element ],
+     *      breackpoint: [ String ],
+     *      queryType: [ String ],
+     *      direction: [ String ],
+     *      propierties: [ String ],
+     *      tween: [ HandleSequencer | ParallaxTween ],
+     *      range: [ String | Number ],
+     *      align: [ String ],
+     *      onSwitch: [ String ],
+     *      reverse: [ Boolean ],
+     *      ease: [ Boolean ],
+     *      easeType: [ String ],
+     *      lerpConfig: [ Number ],
+     *      springConfig: [ String ],
+     *      opacityEnd: [ Number ],
+     *      opacityStart: [ Number ],
+     *      limiterOff: [ Boolean ],
+     *      perspective: [ Number ],
+     *      disableForce3D: [ Boolean ],
+     *      useThrottle: [ Boolean ],
+     *  });
+     *
+     *
+     *
+     *  Scrolltrigger property schema:
+     *
+     *
+     *  const myScrollTrigger = new ParallaxItemClass({
+     *      item: String | Element,
+     *      applyTo: [ String | Element ],
+     *      trigger: [ String | Element ],
+     *      screen: [ String | Element ],
+     *      scroller: [ String | Element ],
+     *      breackpoint: [ String ],
+     *      queryType: [ String ],
+     *      direction: [ String ],
+     *      propierties: [ String ],
+     *      tween: [ HandleSequencer | ParallaxTween ],
+     *      range: [ String ],
+     *      dynamicRange: [ Function ],
+     *      fromTo: [ Boolean ],
+     *      start: [ String ],
+     *      dynamicStart: {
+     *         postion: [ String ],
+     *         value: [ Function ]
+     *      },
+     *      end: [ String ],
+     *      dynamicEnd: {
+     *         postion: [ String ],
+     *         value: [ Function ]
+     *      },
+     *      ease: [ Boolean ],
+     *      easeType: [ String ],
+     *      lerpConfig: [ Number ],
+     *      springConfig: [ String ],
+     *      pin: [ Boolean ],
+     *      animatePin: [ Boolean ],
+     *      anticipatePinOnLoad: [ Boolean ],
+     *      marker: [ String ],
+     *      forceTranspond: [ Boolean ],
+     *      animateAtStart: [ Boolean ],
+     *      disableForce3D: [ Boolean ],
+     *      onEnter: [ Function ],
+     *      onEnterBack: [ Function ],
+     *      onLeave: [ Function ],
+     *      onLeaveBack: [ Function ],
+     *      onTick: [ Function ],
+     *      perspective: [ Number ],
+     *      useThrottle: [ Boolean ],
+     *  });
+     *
+     *
+     * ```
+     *
      * @description
+     * Available methods:
+     *
+     * ```js
+     *
+     *
+     * myInstance.init()
+     * myInstance.destroy()
+     * myInstance.refresh()
+     * myInstance.move()
+     *
+     * ```
      */
 
     constructor(data = {}) {

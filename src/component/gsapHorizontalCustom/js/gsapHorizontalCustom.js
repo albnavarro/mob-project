@@ -44,7 +44,7 @@ export class GsapHorizontalCustomClass {
         this.getWidth();
         this.createShadow();
         this.initGsap();
-        mobbu.use('resize', () => this.onResize());
+        mobbu.useResize(() => this.onResize());
     }
 
     onTick(fn) {

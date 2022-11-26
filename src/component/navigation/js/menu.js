@@ -126,7 +126,7 @@ export class menuClass {
         this.addHandler();
         this.resetSubmenuHeight();
 
-        mobbu.use('resize', () => {
+        mobbu.useResize(() => {
             this.getSubmenuWidth();
             this.getToggleWrapHeight();
             this.resizeMenu();
@@ -136,7 +136,7 @@ export class menuClass {
         if (this.direction == 'horizontal') {
             this.SetPosition();
 
-            mobbu.use('resize', () => {
+            mobbu.useResize(() => {
                 this.SetPosition();
             });
         }

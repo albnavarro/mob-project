@@ -28,13 +28,13 @@ export class PageScrollItemClass {
         this.setShadow();
         this.setOffset();
         this.setContent();
-        this.unsubscribeResize = mobbu.use('resize', () => {
+        this.unsubscribeResize = mobbu.useResize(() => {
             this.firstTime = true;
             this.setShadow();
             this.setOffset();
             this.setContent();
         });
-        this.unsubscribeScroll = mobbu.use('scroll', () => this.onScroll());
+        this.unsubscribeScroll = mobbu.useScroll(() => this.onScroll());
     }
 
     destroy() {

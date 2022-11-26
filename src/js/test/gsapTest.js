@@ -216,7 +216,7 @@ class gsapTestClass {
             },
         });
 
-        mobbu.use('resize', () => {
+        mobbu.useResize(() => {
             width = this.cardWidth(card);
             this.applyStyle(width, container, itemToScroll);
             percentRange = this.getPercentMaxScroll();
@@ -257,7 +257,7 @@ class gsapTestClass {
             },
         });
 
-        mobbu.use('reize', () => {
+        mobbu.useResize(() => {
             width = this.cardWidth(card);
             this.applyStyle(width, container, itemToScroll);
             tl.scrollTrigger.refresh();

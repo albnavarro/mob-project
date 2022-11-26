@@ -53,37 +53,31 @@ export class DraggerItemClass {
     }
 
     init() {
-        this.unsubscribeTouchStart = mobbu.use(
-            'touchStart',
-            ({ page, target }) => {
-                this.onMouseDown({ page, target });
-            }
-        );
+        this.unsubscribeTouchStart = mobbu.useTouchStart(({ page, target }) => {
+            this.onMouseDown({ page, target });
+        });
 
-        this.unsubscribeMouseDown = mobbu.use(
-            'mouseDown',
-            ({ page, target }) => {
-                this.onMouseDown({ page, target });
-            }
-        );
+        this.unsubscribeMouseDown = mobbu.useMouseDown(({ page, target }) => {
+            this.onMouseDown({ page, target });
+        });
 
-        this.unsubscribeTouchEnd = mobbu.use('touchEnd', () => {
+        this.unsubscribeTouchEnd = mobbu.useTouchEnd(() => {
             this.onMouseUp();
         });
 
-        this.unsubscribeMouseUp = mobbu.use('mouseUp', () => {
+        this.unsubscribeMouseUp = mobbu.useMouseUp(() => {
             this.onMouseUp();
         });
 
-        this.unsubscribeMouseMove = mobbu.use('mouseMove', ({ page }) => {
+        this.unsubscribeMouseMove = mobbu.useMouseMove(({ page }) => {
             this.onMove({ page });
         });
 
-        this.unsubscribeTouchMove = mobbu.use('touchMove', ({ page }) => {
+        this.unsubscribeTouchMove = mobbu.useTouchMove(({ page }) => {
             this.onMove({ page });
         });
 
-        this.unsubscribeResize = mobbu.use('resize', () => {
+        this.unsubscribeResize = mobbu.useResize(() => {
             this.onResize();
         });
 

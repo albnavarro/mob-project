@@ -55,14 +55,14 @@ export class PredictiveTurbolenceItemClass {
         this.inzializeSvg();
         this.onResize();
 
-        this.unsubscribeMouseMove = mobbu.use('mouseMove', ({ page }) => {
+        this.unsubscribeMouseMove = mobbu.useMouseMove(({ page }) => {
             this.setGlobalCoord({ page });
             this.onMove();
         });
-        this.unsubscribeScroll = mobbu.use('scroll', ({ scrollY }) => {
+        this.unsubscribeScroll = mobbu.useScroll(({ scrollY }) => {
             this.onScroll({ scrollY });
         });
-        this.unsubscribeResize = mobbu.use('resize', () => {
+        this.unsubscribeResize = mobbu.useResize(() => {
             this.onResize();
         });
 

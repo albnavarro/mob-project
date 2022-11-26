@@ -8,6 +8,17 @@ import { handleFrameIndex } from './handleFrameIndex';
 import { frameStore } from './frameStore.js';
 import { catchAnimationReject } from '../errorHandler/catchAnimationReject.js';
 
+/**
+ * @typedef {Object} handleFrameTypes
+ * @prop {number} time - The total activity time of the request animation frame
+ * @prop {number} fps - Current fps
+ * @prop {boolean} shouldRender - If the useScaleFps global property is on, the property indicates whether there is a drop in frame rate compared to the optimal frame rate calculated at application startup.
+ */
+
+/**
+ * @description
+ * Execute a callBack within the first available request animation frame
+ */
 export const handleFrame = (() => {
     /*
     10000 is maximum stagger frame delay
@@ -234,10 +245,27 @@ export const handleFrame = (() => {
         frameIsRuning = true;
     };
 
+    /**
+     * @description
+     * Get current fps
+     *
+     * @param {number}
+     */
     const getFps = () => fps;
 
     /**
-     *  Add callback
+     * @description
+     * Add callback
+     *
+     * @param {function(handleFrameTypes):void } cb - callback function
+     *
+     * @example
+     * ```js
+     * handleFrame.add(({ fps, shouldRender, time }) => {
+     *     // code ...
+     * });
+     *
+     * ```
      */
     const add = (cb) => {
         callback.push(cb);
@@ -245,9 +273,12 @@ export const handleFrame = (() => {
     };
 
     /**
-     *  Add multiple callback
+     * @description
+     * Add an array of callback
+     *
+     * @param {Array.<function>} arr - array of callback
      */
-    const addMultiple = (arr) => {
+    const addMultiple = (arr = []) => {
         callback = [...callback, ...arr];
         initFrame();
     };

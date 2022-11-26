@@ -205,7 +205,7 @@ export const hScroller = () => {
     smoothScrollFull.init();
     smoothScrollFull.onTick(({ scrollValue, percent }) => {
         // console.log(percent);
-        mobbu.use('nextTick', () => {
+        mobbu.useNextTick(() => {
             parallax0.move(scrollValue);
             parallax1.move(scrollValue);
             parallax2.move(scrollValue);
@@ -273,7 +273,7 @@ export const hScroller = () => {
     });
     smoothScrollContiner.init();
     smoothScrollContiner.onTick(({ scrollValue }) => {
-        mobbu.use('nextTick', () => {
+        mobbu.useNextTick(() => {
             parallaxb1.move(scrollValue);
             parallaxb2.move(scrollValue);
         });
@@ -354,7 +354,7 @@ export const hScroller = () => {
     });
     smoothScrollContiner2.init();
     smoothScrollContiner2.onTick(({ scrollValue }) => {
-        mobbu.use('nextTick', () => {
+        mobbu.useNextTick(() => {
             parallaxC1.move(scrollValue);
             parallaxC2.move(scrollValue);
             parallaxC3.move(scrollValue);

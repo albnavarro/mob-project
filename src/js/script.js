@@ -69,7 +69,7 @@ import { tweenRealtive } from './test/tweenRelative.js';
 import { testCanvas } from './test/testCanvas.js';
 import { freeMode } from './test/freemode.js';
 
-mobbu.use('load', () => {
+mobbu.useLoad(() => {
     mobbu.default('set', {
         deferredNextTick: false,
         fpsScalePercent: { 0: 1, 15: 2, 30: 3, 45: 4 },
@@ -93,18 +93,14 @@ mobbu.use('load', () => {
 
     mobbu.default('print');
 
-    // mobbu.use('loadFps', () => {
-    //     console.log('fps ready at:', mobbu.getInstantFps());
+    // mobbu.useFps(({ averageFPS }) => {
+    //     console.log('fps ready at:', averageFPS);
     // });
 
-    // mobbu.use(
-    //     'frameIndex',
-    //     () => {
-    //         console.log('test');
-    //         console.log('fps: ', mobbu.getFps());
-    //     },
-    //     500
-    // );
+    // mobbu.useFrameIndex(() => {
+    //     console.log('test');
+    //     console.log('fps: ', mobbu.getFps());
+    // }, 500);
 
     const body = document.querySelector('body');
 

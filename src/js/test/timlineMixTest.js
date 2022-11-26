@@ -169,7 +169,7 @@ export function timlineMixTest() {
         btnSuspensionStatus.innerHTML = `is in suspension: ${timeline.isSuspended()}`;
         btnPauseStatus.innerHTML = `is paused: ${timeline.isPaused()}`;
         btnActiveStatus.innerHTML = `is running: ${timeline.isActive()}`;
-        mobbu.use('nextFrame', () => loop());
+        mobbu.useNextFrame(() => loop());
     };
 
     loop();

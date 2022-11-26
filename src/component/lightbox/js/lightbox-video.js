@@ -57,7 +57,7 @@ class LightBoxVideoClass {
             videoWrapper.classList.add('visible');
         }, 200);
 
-        this.unsubscribeResize = mobbu.use('resize', () => {
+        this.unsubscribeResize = mobbu.useResize(() => {
             this.setVideoSize(wrapper, hGap, wGap, ratioW, ratioH);
         });
 
