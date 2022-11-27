@@ -1,14 +1,28 @@
 import { frameStore } from './frameStore.js';
 
-/**
- * https://itecnote.com/tecnote/javascript-recording-fps-in-webgl/
- *  Intial loop fo reach the right fps
- *  loadFps().then(() => ... );
- *  To get the right FPS immediatly use a different calcultation respect handleFrame
- *  More Havier but run in a very limited time
- */
 let loadFpsIsReady = false;
 
+/**
+ * @typedef {object} loadFpsType
+ * @prop {number} averageFPS - detected fps value
+ */
+
+/**
+ * @description
+ * Runs a request animation frame loop to detect the frame rate of the monitor. After the method will be resolved the first time, subsequent calls will be resolved immediately returning the previously calculated value. The method is launched the first time automatically at the first loading.
+ *
+ * @param {number} [ duration = 30 ] - loop duration in frame, the default value is 30.
+ * @return {Promise.<loadFpsType>} The promise launched after the loop
+ *
+ * @example
+ * ```js
+ *
+ * loadFps(60).then(({ averageFPS }) => {
+ *     // code
+ * });
+ *
+ * ```
+ */
 export const loadFps = (duration = 30) => {
     if (loadFpsIsReady) {
         const { instantFps } = frameStore.get();
@@ -62,22 +76,3 @@ export const loadFps = (duration = 30) => {
         requestAnimationFrame(render);
     });
 };
-
-/**
- * Utils to centralize all action form all components in one Request Animation Frame,
- * All subsciber use the same frame
- * handleFrame run once then delete all subscriber
- * Use inside a loop or inside eventListener like scroll or mousemove
- *
- * @example:
- *
- * handleFrame.add(() => {
- *     myFunction()
- * });
- *
- */
-
-/**
- *  Load fos to set initial stabel fps
- */
-loadFps();

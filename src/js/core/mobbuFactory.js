@@ -651,7 +651,7 @@ export const mobbu = {
 
     /**
      * @description
-     * Execute a callBack within the first available request animation frame
+     * Execute a callBack within the first available request animation frame. Use this method to modify elements of the DOM
      *
      * @param {function(import('./events/rafutils/handleFrame.js').handleFrameTypes):void } callback - callback function
      *
@@ -667,18 +667,79 @@ export const mobbu = {
         return handleFrame.add(callback);
     },
 
+    /**
+     * @description
+     * Execute callbacks after scheduling the request animation frame. Use this method to read data from the DOM. To execute callbacks exactly after the request animation frame, set the global property deferredNextTick to true.
+     *
+     * @param {function(import('./events/rafutils/handleFrame.js').handleFrameTypes):void } callback - callback function
+     *
+     * @example
+     * ```js
+     * mobbu.useFrame(() => {
+     *     mobbu.useNextTick(({ fps, shouldRender, time }) => {
+     *         // code
+     *     });
+     * });
+     *
+     * To tick exactly after the request animation frame:
+     * mobbu.default('set', { deferredNextTick: true });
+     *
+     * ```
+     */
     useNextTick(callback = () => {}) {
         return handleNextTick.add(callback);
     },
 
+    /**
+     * @description
+     * Execute a callback to the next available frame allowing the creation of a request animation frame loop
+     *
+     * @param {function(import('./events/rafutils/handleFrame.js').handleFrameTypes):void } callback - callback function
+     *
+     * @example
+     * ```js
+     * const loop = () => {
+     *     mobbu.useNextFrame(({ fps, shouldRender, time }) => {
+     *         // code
+     *         loop();
+     *     });
+     * };
+     *
+     * mobbu.useFrame(() => loop());
+     *
+     * ```
+     */
     useNextFrame(callback = () => {}) {
         return handleNextFrame.add(callback);
     },
 
+    /**
+     * @description
+     * Add callback to a specific frame.
+     *
+     * @param {function(import('./events/rafutils/handleFrame.js').handleFrameTypes):void } callback - callback function
+     * @pram {number} index
+     *
+     * @example
+     * ```js
+     * mobbu.useFrameIndex(({ fps, shouldRender, time }) => {
+     *     // code ...
+     * }, 5);
+     *
+     * ```
+     */
     useFrameIndex(callback = () => {}, frame = 0) {
         return handleFrameIndex.add(callback, frame);
     },
 
+    /**
+     * @description
+     * Runs a request animation frame loop to detect the frame rate of the monitor. After the method will be resolved the first time, subsequent calls will be resolved immediately returning the previously calculated value. The method is launched the first time automatically at the first loading.
+     *
+     * @param {function(import('./events/rafutils/loadFps.js').loadFpsType):void } callback - callback function
+     * @return {Promise}
+     *
+     */
     useFps(callback = () => {}) {
         return loadFps().then((obj) => callback(obj));
     },
