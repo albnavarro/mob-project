@@ -19,6 +19,20 @@ export const handleNextTick = (() => {
      *     });
      * });
      *
+     * Loop request animation frame using handleNextTick:
+     * const loop = () => {
+     *     handleNextTick.add(() => {
+     *         // read from DOM
+     *
+     *         handleFrame.add(() => {
+     *             // write to the DOM
+     *             loop();
+     *         });
+     *     });
+     * };
+     *
+     * handleFrame.add(() => loop());
+     *
      * To tick exactly after the request animation frame:
      * mobbu.default('set', { deferredNextTick: true });
      * ```

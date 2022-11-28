@@ -1,19 +1,13 @@
 /**
- * Utils to centralize scroll listener, all subscriber use the same listener
- * First subscriber create a listener, when there are no more listeners the listern is removed
- *
- * NOTE:
- * Use it inside onMount function to be sure callback is added after first rendering in case of server side rendering
- * https://svelte.dev/tutorial/onmount
- *
- * @example:
- * onMount(() => {
- *   const unsubscribe = handleScroll(({scrollY, direction}) => console.log(scrollY,direction));
- *   return(() => unsubscribe())
- * }
- *
+ * @typedef {Object} handleScrollType
+ * @prop {number} scrollY - Scroll position
+ * @prop {('UP'|'DOWN')} direction
  */
 
+/**
+ * @description
+ * Execute a callback immediately on scroll
+ */
 export const handleScrollImmediate = (() => {
     let inizialized = false;
     let callback = [];
@@ -28,12 +22,6 @@ export const handleScrollImmediate = (() => {
         direction,
     };
 
-    /**
-     * handler - handler for mouse move
-     *
-     * @param  {event} e mouse move event
-     * @return {void}   description
-     */
     function handler() {
         /**
          * if - if there is no subscritor remove handler
@@ -75,9 +63,21 @@ export const handleScrollImmediate = (() => {
     }
 
     /**
-     * init - add call back to stack
+     * @description
+     * Execute a callback immediately on scroll
      *
-     * @return {function} unsubscribe function
+     * @param {function(handleScrollType):void } cb - callback function
+     * @return {Function} unsubscribe callback
+     *
+     * @example
+     * ```js
+     * const unsubscribe = handleScrollImmediate(({ direction, scrollY }) => {
+     *     // code
+     * });
+     *
+     * unsubscribe();
+     *
+     * ```
      */
     const addCb = (cb) => {
         callback.push({ cb, id: id });

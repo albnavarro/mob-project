@@ -1,5 +1,15 @@
 import { debounceFuncion } from '../debounce.js';
 
+/**
+ * @typedef {Object} handleResizeTypes
+ * @prop {number} scrollY - Scroll postion
+ * @prop {number} windowsHeight - Height of the window
+ * @prop {number} windowsWidth - Width of the window
+ * @prop {number} documentHeight - Height of the document
+ * @prop {boolean} verticalResize - Boolean value indicating whether the height of the viewport changed during the resize.
+ * @prop {boolean} horizontalResize - Boolean value indicating whether the width of the viewport changed during the resize.
+ */
+
 export const handleResize = (() => {
     let inizialized = false;
     let callback = [];
@@ -9,10 +19,7 @@ export const handleResize = (() => {
     let previousWindowWidth = window.innerWidth;
 
     /**
-     * handler - handler for scroll debounce
      *
-     * @param  {event} e mouse move event
-     * @return {void}   description
      */
     function handler() {
         /**
@@ -66,9 +73,27 @@ export const handleResize = (() => {
     }
 
     /**
-     * init - add call back to stack
+     * @description
+     * Add callback on resize using a debounce function.
      *
-     * @return {function} unsubscribe function
+     * @param {function(handleResizeTypes):void } cb - callback function fired on resize.
+     *
+     * @example
+     * ```js
+     * handleResize(
+     *     ({
+     *         documentHeight,
+     *         horizontalResize,
+     *         scrollY,
+     *         verticalResize,
+     *         windowsHeight,
+     *         windowsWidth,
+     *     }) => {
+     *         // code
+     *     }
+     * );
+     *
+     * ```
      */
     const addCb = (cb) => {
         callback.push({ cb, id: id });

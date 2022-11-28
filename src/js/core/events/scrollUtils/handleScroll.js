@@ -1,35 +1,17 @@
-/**
- * Utils to centralize scroll listener, all subscriber use the same listener
- * First subscriber create a listener, when there are no more listeners the listern is removed
- *
- * NOTE:
- * Use it inside onMount function to be sure callback is added after first rendering in case of server side rendering
- * https://svelte.dev/tutorial/onmount
- *
- * @example:
- * onMount(() => {
- *   const unsubscribe = handleScroll(({scrollY, direction}) => console.log(scrollY,direction));
- *   return(() => unsubscribe())
- * }
- *
- */
-
 import { handleFrame } from '../rafutils/handleFrame.js';
 import { handleNextTick } from '../rafutils/handleNextTick.js';
 import { handleScrollImmediate } from './handleScrollImmediate.js';
 
+/**
+ * @description
+ * Perform a callback to the first nextTick available after scrolling
+ */
 export const handleScroll = (() => {
     let inizialized = false;
     let callback = [];
     let id = 0;
     let unsubscribe = () => {};
 
-    /**
-     * handler - handler for mouse move
-     *
-     * @param  {event} e mouse move event
-     * @return {void}   description
-     */
     function handler(scrollData) {
         /**
          * if - if there is no subscritor remove handler
@@ -63,9 +45,21 @@ export const handleScroll = (() => {
     }
 
     /**
-     * init - add call back to stack
+     * @description
+     * Perform a callback to the first nextTick available after scrolling
      *
-     * @return {function} unsubscribe function
+     * @param {function(import('./handleScrollImmediate.js').handleScrollType):void } cb - callback function
+     * @return {Function} unsubscribe callback
+     *
+     * @example
+     * ```js
+     * const unsubscribe = handleScroll(({ direction, scrollY }) => {
+     *     // code
+     * });
+     *
+     * unsubscribe();
+     *
+     * ```
      */
     const addCb = (cb) => {
         callback.push({ cb, id: id });

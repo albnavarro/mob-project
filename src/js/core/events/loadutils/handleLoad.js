@@ -1,12 +1,12 @@
+/**
+ * @description Function to execute a callback on page load
+ */
 export const handleLoad = (() => {
     let inizialized = false;
     let callback = [];
     let id = 0;
 
     /**
-     * handler - handler for scroll debounce
-     *
-     * @param  {event} e mouse move event
      * @return {void}   description
      */
     function handler() {
@@ -44,9 +44,19 @@ export const handleLoad = (() => {
     }
 
     /**
-     * init - add call back to stack
+     * @description
+     * Add callback on page load
      *
-     * @return {function} unsubscribe function
+     * @param {function():void } cb - Callback function executed on page load
+     *
+     * @example
+     * ```js
+     *
+     * handleLoad(() => {
+     *     // code
+     * });
+     *
+     * ```
      */
     const addCb = (cb) => {
         callback.push({ cb, id: id });

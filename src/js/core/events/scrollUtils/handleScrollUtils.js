@@ -4,8 +4,8 @@ import { handleFrame } from '../rafutils/handleFrame.js';
 import { handleNextTick } from '../rafutils/handleNextTick.js';
 
 /**
- * Same of handleScroll but trigger scrollEnd and scrollStart event
- *
+ * @typedef {Object} handleScrollUtilsType
+ * @prop {number} scrollY - Scroll position
  */
 
 function handleScrollUtils(type) {
@@ -17,12 +17,6 @@ function handleScrollUtils(type) {
     let unsubscribeScrollEnd = () => {};
     let debouceFunctionReference = () => {};
 
-    /**
-     * handler - handler for scroll debounce
-     *
-     * @param  {event} e mouse move event
-     * @return {void}   description
-     */
     function handler() {
         isScrolling = false;
 
@@ -93,9 +87,8 @@ function handleScrollUtils(type) {
     }
 
     /**
-     * init - add call back to stack
-     *
-     * @return {function} unsubscribe function
+     * @param {function(handleScrollUtilsType):void } cb - callback function
+     * @return {Function} unsubscribe callback
      */
     const addCb = (cb) => {
         callback.push({ cb, id: id });
@@ -114,5 +107,34 @@ function handleScrollUtils(type) {
     return addCb;
 }
 
+/**
+ * @description
+ * Execute a callback at the beginning of the scroll
+ *
+ * @example
+ * ```js
+ * const unsubscribe = handleScrollStart(({ scrollY }) => {
+ *     // code
+ * });
+ *
+ * unsubscribe()
+ *
+ * ```
+ */
 export const handleScrollStart = new handleScrollUtils('START');
+
+/**
+ * @description
+ * Execute a callback at the end of the scroll
+ *
+ * @example
+ * ```js
+ * const unsubscribe = handleScrollEnd(({ scrollY }) => {
+ *     // code
+ * });
+ *
+ * unsubscribe()
+ *
+ * ```
+ */
 export const handleScrollEnd = new handleScrollUtils('END');

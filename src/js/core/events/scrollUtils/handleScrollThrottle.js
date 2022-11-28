@@ -1,25 +1,13 @@
-/**
- * Utils to centralize scroll listener, all subscriber use the same listener
- * First subscriber create a listener, when there are no more listeners the listern is removed
- *
- * NOTE:
- * Use it inside onMount function to be sure callback is added after first rendering in case of server side rendering
- * https://svelte.dev/tutorial/onmount
- *
- * @example:
- * onMount(() => {
- *   const unsubscribe = handleScroll(({scrollY, direction}) => console.log(scrollY,direction));
- *   return(() => unsubscribe())
- * }
- *
- */
-
 import { handleFrame } from '../rafutils/handleFrame.js';
 import { handleNextTick } from '../rafutils/handleNextTick.js';
 import { throttle } from '../throttle.js';
 import { handleScrollImmediate } from './handleScrollImmediate.js';
 import { handleSetUp } from '../../setup.js';
 
+/**
+ * @description
+ * Performs a scroll callback using a throttle function
+ */
 export const handleScrollThrottle = (() => {
     let inizialized = false;
     let callback = [];
@@ -27,12 +15,6 @@ export const handleScrollThrottle = (() => {
     let throttleFunctionReference = () => {};
     let unsubscribe = () => {};
 
-    /**
-     * handler - handler for mouse move
-     *
-     * @param  {event} e mouse move event
-     * @return {void}   description
-     */
     function handler(scrollData) {
         /**
          * if - if there is no subscritor remove handler
@@ -70,9 +52,24 @@ export const handleScrollThrottle = (() => {
     }
 
     /**
-     * init - add call back to stack
+     * @description
+     * Performs a scroll callback using a throttle function
      *
-     * @return {function} unsubscribe function
+     * @param {function(import('./handleScrollImmediate.js').handleScrollType):void } cb - callback function
+     * @return {Function} unsubscribe callback
+     *
+     * @example
+     * ```js
+     * const unsubscribe = handleScrollThrottle(({ direction, scrollY }) => {
+     *     // code
+     * });
+     *
+     * unsubscribe()
+     *
+     * Define throttle value from default:
+     * handleSetUp.set({ throttle: 100 });
+     *
+     * ```
      */
     const addCb = (cb) => {
         callback.push({ cb, id: id });

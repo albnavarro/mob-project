@@ -681,6 +681,21 @@ export const mobbu = {
      *     });
      * });
      *
+     * Loop request animation frame using handleNextTick:
+     *
+     * const loop = () => {
+     *     mobbu.useNextTick(() => {
+     *         // read from DOM
+     *
+     *         mobbu.useFrame(() => {
+     *             // write to the DOM
+     *             loop();
+     *         });
+     *     });
+     * };
+     *
+     * mobbu.useFrame(() => loop());
+     *
      * To tick exactly after the request animation frame:
      * mobbu.default('set', { deferredNextTick: true });
      *
@@ -744,10 +759,48 @@ export const mobbu = {
         return loadFps().then((obj) => callback(obj));
     },
 
+    /**
+     * @description
+     * Add callback on page load
+     *
+     * @param {function():void } callback - Callback function executed on page load
+     *
+     * @example
+     * ```js
+     *
+     * mobbu.useLoad(() => {
+     *     // code
+     * });
+     *
+     * ```
+     */
     useLoad(callback = () => {}) {
         return handleLoad(callback);
     },
 
+    /**
+     * @description
+     * Add callback on resize using a debounce function.
+     *
+     * @param {function(import('./events/resizeUtils/handleResize.js').handleResizeTypes):void } callback - callback function fired on resize.
+     *
+     * @example
+     * ```js
+     * mobbu.useResize(
+     *     ({
+     *         documentHeight,
+     *         horizontalResize,
+     *         scrollY,
+     *         verticalResize,
+     *         windowsHeight,
+     *         windowsWidth,
+     *     }) => {
+     *         // code
+     *     }
+     * );
+     *
+     * ```
+     */
     useResize(callback = () => {}) {
         return handleResize(callback);
     },
@@ -788,22 +841,108 @@ export const mobbu = {
         return handleMouseWheel(callback);
     },
 
+    /**
+     * @description
+     * Perform a callback to the first nextTick available after scrolling
+     *
+     * @param {function(import('./events/scrollUtils/handleScrollImmediate.js').handleScrollType):void } callback - callback function
+     * @return {Function} unsubscribe callback
+     *
+     * @example
+     * ```js
+     * const unsubscribe = mobbu.useScroll(({ direction, scrollY }) => {
+     *     // code
+     * });
+     *
+     * unsubscribe();
+     *
+     * ```
+     */
     useScroll(callback = () => {}) {
         return handleScroll(callback);
     },
 
+    /**
+     * @description
+     * Execute a callback immediately on scroll
+     *
+     * @param {function(import('./events/scrollUtils/handleScrollImmediate.js').handleScrollType):void } callback - callback function
+     * @return {Function} unsubscribe callback
+     *
+     * @example
+     * ```js
+     * const unsubscribe = mobbu.useScrollImmediate(({ direction, scrollY }) => {
+     *     // code
+     * });
+     *
+     * unsubscribe();
+     *
+     * ```
+     */
     useScrollImmediate(callback = () => {}) {
         return handleScrollImmediate(callback);
     },
 
+    /**
+     * @description
+     * Performs a scroll callback using a throttle function
+     * TODO aggiungere refernza al defualt di throttle
+     *
+     * @param {function(import('./events/scrollUtils/handleScrollImmediate.js').handleScrollType):void } callback - callback function
+     * @return {Function} unsubscribe callback
+     *
+     * @example
+     * ```js
+     * const unsubscribe = mobbu.useScrollThrottle(({ direction, scrollY }) => {
+     *    // code
+     * });
+     *
+     * unsubscribe();
+     *
+     * ```
+     */
     useScrollThrottle(callback = () => {}) {
         return handleScrollThrottle(callback);
     },
 
+    /**
+     * @description
+     * Execute a callback at the beginning of the scroll
+     *
+     * @param {function(import('./events/scrollUtils/handleScrollUtils').handleScrollUtilsType):void } callback - callback function
+     * @return {Function} unsubscribe callback
+     *
+     * @example
+     * ```js
+     * const unsubscribe = mobbu.useScrollStart(({ scrollY }) => {
+     *     // code
+     * });
+     *
+     * unsubscribe();
+     *
+     * ```
+     */
     useScrollStart(callback = () => {}) {
         return handleScrollStart(callback);
     },
 
+    /**
+     * @description
+     * Execute a callback at the end of the scroll
+     *
+     * @param {function(import('./events/scrollUtils/handleScrollUtils').handleScrollUtilsType):void } callback - callback function
+     * @return {Function} unsubscribe callback
+     *
+     * @example
+     * ```js
+     * const unsubscribe = mobbu.useScrollEnd(({ scrollY }) => {
+     *     // code
+     * });
+     *
+     * unsubscribe()
+     *
+     * ```
+     */
     useScrollEnd(callback = () => {}) {
         return handleScrollEnd(callback);
     },
