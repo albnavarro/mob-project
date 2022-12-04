@@ -1170,7 +1170,6 @@ export const mobbu = {
     /**
      * @description
      * Performs a scroll callback using a throttle function
-     * TODO aggiungere refernza al defualt di throttle
      *
      * @param {function(import('./events/scrollUtils/handleScrollImmediate.js').handleScrollType):void } callback - callback function
      * @return {Function} unsubscribe callback
@@ -1182,6 +1181,11 @@ export const mobbu = {
      * });
      *
      * unsubscribe();
+     *
+     * To change the duration of the throttle, change the value of the throttle property to the defaults:
+     *
+     *
+     * mobbu.setDefault({throttle: 500});
      *
      * ```
      */
