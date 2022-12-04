@@ -70,7 +70,7 @@ import { testCanvas } from './test/testCanvas.js';
 import { freeMode } from './test/freemode.js';
 
 mobbu.useLoad(() => {
-    mobbu.default('set', {
+    mobbu.setDefault({
         deferredNextTick: false,
         fpsScalePercent: { 0: 1, 15: 2, 30: 3, 45: 4 },
         useScaleFps: true,
@@ -91,7 +91,7 @@ mobbu.useLoad(() => {
         },
     });
 
-    mobbu.default('print');
+    mobbu.printDefault();
 
     // mobbu.useFps(({ averageFPS }) => {
     //     console.log('fps ready at:', averageFPS);

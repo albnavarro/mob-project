@@ -1,17 +1,6 @@
 /**
- * Utils to centralize scroll listener, all subscriber use the same listener
- * First subscriber create a listener, when there are no more listeners the listern is removed
- *
- * NOTE:
- * Use it inside onMount function to be sure callback is added after first rendering in case of server side rendering
- * https://svelte.dev/tutorial/onmount
- *
- * @example:
- * onMount(() => {
- *   const unsubscribe = handleScroll(({scrollY, direction}) => console.log(scrollY,direction));
- *   return(() => unsubscribe())
- * }
- *
+ * @typedef {Object} visibilityChangeTYpe
+ * @prop {('hidden'|'visible')} visibilityState - Boolean value indicating the visibility status of the current tab-
  */
 
 export const handleVisibilityChange = (() => {
@@ -20,10 +9,7 @@ export const handleVisibilityChange = (() => {
     let id = 0;
 
     /**
-     * handler - handler for mouse move
      *
-     * @param  {event} e mouse move event
-     * @return {void}   description
      */
     function handler() {
         /**
@@ -61,9 +47,20 @@ export const handleVisibilityChange = (() => {
     }
 
     /**
-     * init - add call back to stack
+     * @description
+     * Add callback on tab change
      *
-     * @return {function} unsubscribe function
+     * @param {function(visibilityChangeTYpe):void } cb - callback function fired on tab change.
+     *
+     * @example
+     * ```js
+     *  const unsubscribe = handleVisibilityChange(({ visibilityState }) => {
+     *      // code
+     *  });
+     *
+     *  unsubscribe()
+     *
+     * ```
      */
     const addCb = (cb) => {
         callback.push({ cb, id: id });

@@ -1158,8 +1158,8 @@ export const parallaxSpringConfigIsValid = (config, type) => {
 
     const defaultConfig =
         type === parallaxConstant.TYPE_PARALLAX
-            ? handleSetUp.get('parallax').defaultSpringConfig
-            : handleSetUp.get('scrollTrigger').defaultSpringConfig;
+            ? handleSetUp.get('parallax').springConfig
+            : handleSetUp.get('scrollTrigger').springConfig;
 
     const isValid = choice.includes(config);
     if (!isValid && config !== undefined && config !== null)
@@ -1184,8 +1184,8 @@ export const parallaxLerpConfigIsValid = (value, type) => {
 
     const defaultConfig =
         type === parallaxConstant.TYPE_PARALLAX
-            ? handleSetUp.get('parallax').defaultLerpConfig
-            : handleSetUp.get('scrollTrigger').defaultLerpConfig;
+            ? handleSetUp.get('parallax').lerpConfig
+            : handleSetUp.get('scrollTrigger').lerpConfig;
 
     return isValid ? parseFloat(value) : defaultConfig;
 };

@@ -1,31 +1,37 @@
 import { normalizeWheel } from './normalizeWhell.js';
 
 /**
- * Utils to centralize mouse listener, all subscriber use the same listener
- * First subscriber create a listener, when there are no more listeners the listern is removed
- *
- * NOTE:
- * Use it inside onMount function to be sure callback is added after first rendering in case of server side rendering
- * https://svelte.dev/tutorial/onmount
- *
- * @example:
- * onMount(() => {
- *   const unsubscribe = handleMouseMove(({client}) => console.log(client.x));
- *   return(() => unsubscribe())
- * }
+ * @typedef {Object} mouseType
+ * @prop {Object} page
+ * @prop {Number} page.x
+ * @prop {Number} page.y
+ * @prop {Object} client
+ * @prop {Number} client.x
+ * @prop {Number} client.y
+ * @prop {Element} target
+ * @prop {('click'|'mousedown'|'mousemove'|'mouseup'|'touchstart'|'touchmove'|'touchend'|'wheel')} type
+ * @prop {function} preventDefault
+ */
+
+/**
+ * @typedef {Object} mouseWheelType
+ * @prop {Number} spinX
+ * @prop {Number} spinY
+ * @prop {Number} pixelX
+ * @prop {Number} pixelY
  *
  */
 
+/**
+ * @constructor
+ */
 function handleMouse(event) {
     let inizialized = false;
     let callback = [];
     let id = 0;
 
     /**
-     * handler - handler for mouse move
      *
-     * @param  {event} e mouse move event
-     * @return {void}   description
      */
     function handler(e) {
         /**
@@ -105,9 +111,15 @@ function handleMouse(event) {
     }
 
     /**
-     * init - add call back to stack
+     * @description
+     * add callback on mouse action
      *
-     * @return {function} unsubscribe function
+     * @param {function(mouseType):void } cb - callback function fired on mouse action.
+     *
+     * @example
+     * ```js
+     *
+     * ```
      */
     const addCb = (cb) => {
         callback.push({ cb, id: id });
@@ -126,11 +138,156 @@ function handleMouse(event) {
     return addCb;
 }
 
+/**
+ * @description
+ * Add callback on mouse click
+ *
+ * @example
+ * ```js
+ * const unsubscribe = handleMouseClick(
+ *     ({ client, page, preventDefault, target, type }) => {
+ *         // code
+ *     }
+ * );
+ *
+ * unsubscribe();
+ *
+ * ```
+ */
 export const handleMouseClick = new handleMouse(['click']);
+
+/**
+ * @description
+ * Add callback on mouse down
+ *
+ * @example
+ * ```js
+ * const unsubscribe = handleMouseDown(
+ *     ({ client, page, preventDefault, target, type }) => {
+ *         // code
+ *     }
+ * );
+ *
+ * unsubscribe();
+ *
+ * ```
+ */
 export const handleMouseDown = new handleMouse(['mousedown']);
+
+/**
+ * @description
+ * Add callback on touch start
+ *
+ * @example
+ * ```js
+ * const unsubscribe = handleTouchStart(
+ *     ({ client, page, preventDefault, target, type }) => {
+ *         // code
+ *     }
+ * );
+ *
+ * unsubscribe();
+ *
+ * ```
+ */
 export const handleTouchStart = new handleMouse(['touchstart']);
+
+/**
+ * @description
+ * Add callback on handleMouseMove
+ *
+ * @example
+ * ```js
+ * const unsubscribe = handleMouseMove(
+ *     ({ client, page, preventDefault, target, type }) => {
+ *         // code
+ *     }
+ * );
+ *
+ * unsubscribe();
+ *
+ * ```
+ */
 export const handleMouseMove = new handleMouse(['mousemove']);
+
+/**
+ * @description
+ * Add callback on touch move
+ *
+ * @example
+ * ```js
+ * const unsubscribe = handleTouchMove(
+ *     ({ client, page, preventDefault, target, type }) => {
+ *         // code
+ *     }
+ * );
+ *
+ * unsubscribe();
+ *
+ * ```
+ */
 export const handleTouchMove = new handleMouse(['touchmove']);
+
+/**
+ * @description
+ * Add callback on mouse up
+ *
+ * @example
+ * ```js
+ * const unsubscribe = handleMouseUp(
+ *     ({ client, page, preventDefault, target, type }) => {
+ *         // code
+ *     }
+ * );
+ *
+ * unsubscribe();
+ *
+ * ```
+ */
 export const handleMouseUp = new handleMouse(['mouseup']);
+
+/**
+ * @description
+ * Add callback on touc end
+ *
+ * @example
+ * ```js
+ * const unsubscribe = handleTouchEnd(
+ *     ({ client, page, preventDefault, target, type }) => {
+ *         // code
+ *     }
+ * );
+ *
+ * unsubscribe();
+ *
+ * ```
+ */
 export const handleTouchEnd = new handleMouse(['touchend']);
+
+/**
+ * @description
+ * Add callback on mouse wheel
+ *
+ * @example
+ * ```js
+ * const unsubscribe = handleMouseWheel(
+ *     ({
+ *         client,
+ *         page,
+ *         preventDefault,
+ *         target,
+ *         type,
+ *         pixelX,
+ *         pixelY,
+ *         spinX,
+ *         spinY,
+ *     }) => {
+ *         // code
+ *     }
+ * );
+ *
+ * unsubscribe();
+ *
+ * ```
+ */
 export const handleMouseWheel = new handleMouse(['wheel']);

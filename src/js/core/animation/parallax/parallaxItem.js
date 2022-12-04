@@ -57,7 +57,7 @@ import { parallaxUtils } from './parallaxUtils.js';
  * @prop {boolean} [ disableForce3D = false ] - Disable 3D transform added to enable GPU, only valid for native properties ( x, y , scale, etc...). The default value is false.
  * @prop {boolean} [ useThrottle = false ] - Enable a Throttle function on the scroll, the option will not be enabled with the presence of an active pin to maintain accuracy. The default value is false.
  * @prop {('parallax'|'scrolltrigger')} [ type = 'parallax' ]  Main property that defines whether the instance will behave as a parallax or as a scrolltrigger. the default is 'parallax'.
- * @prop {(string|number)} [ range = 0 ] Property that defines the calculation of the final value.
+ * @prop {(string|number)} [ range = 0 ] Property that defines the calculation of the distance value.
  * - Parallax: A number between `0.1` and `9.99`. The default value is `0`.
  * -
  * - Scrolltrigger: String of the following type:

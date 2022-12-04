@@ -8,6 +8,9 @@ import { handleNextTick } from '../rafutils/handleNextTick.js';
  * @prop {number} scrollY - Scroll position
  */
 
+/**
+ * @constructor
+ */
 function handleScrollUtils(type) {
     let inizialized = false;
     let callback = [];

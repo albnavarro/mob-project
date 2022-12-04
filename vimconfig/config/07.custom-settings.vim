@@ -20,3 +20,6 @@ nnoremap <silent> <leader>z zszH
 
 " Retab to 4 spaces
 :command RetabToFour :set ts=2 sts=2 noet <bar> :retab! <bar> :set ts=4 sts=4 et <bar> :retab
+
+" Exclude trailing whitespace from $
+vnoremap $ g_

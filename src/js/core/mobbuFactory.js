@@ -15,7 +15,6 @@ import SmoothScrollClass from './animation/smoothScroller/smoothScroll.js';
 import HandleSpring from './animation/spring/handleSpring.js';
 import HandleSyncTimeline from './animation/syncTimeline/handleSyncTimeline.js';
 import HandleTween from './animation/tween/handleTween.js';
-import { printEaseKey } from './animation/tween/tweenConfig.js';
 import { handleLoad } from './events/loadutils/handleLoad.js';
 import {
     handleMouseClick,
@@ -49,38 +48,153 @@ import { mq } from './utils/mediaManager.js';
 
 export const mobbu = {
     /**
-     * @typedef {('get'|'set'|'print')} defaultType - string
-     **/
+     * @description
+     * - Here it is possible to modify the default values of the various modules of the library
+     *
+     * @param {import('./setup.js').handleSetUpSetType} props
+     *
+     *
+     * @example
+     * ```js
+     * Default value schema:
+     *
+     * mobbu.setDefault.set({
+     *     startFps: 60,
+     *     fpsScalePercent: {
+     *         0: 1,
+     *         15: 2,
+     *         30: 3,
+     *         45: 4,
+     *     },
+     *     useScaleFps: true,
+     *     deferredNextTick: false,
+     *     throttle: 100,
+     *     mq: {
+     *         xSmall: 320,
+     *         small: 360,
+     *         medium: 600,
+     *         tablet: 768,
+     *         desktop: 992,
+     *         large: 1200,
+     *         xLarge: 1400,
+     *     },
+     *     defaultMq: {
+     *         value: 'desktop',
+     *         type: 'min',
+     *     },
+     *     sequencer: {
+     *         duration: 10,
+     *         ease: 'easeLinear',
+     *     },
+     *     scrollTrigger: {
+     *         springConfig: 'default',
+     *         lerpConfig: 0.06,
+     *         markerColor: {
+     *             startEnd: '#ff0000',
+     *             item: '#14df3b',
+     *         },
+     *     },
+     *     parallax: {
+     *         defaultRange: 8,
+     *         springConfig: 'default',
+     *         lerpConfig: 0.06,
+     *     },
+     *     parallaxTween: {
+     *         duration: 10,
+     *         ease: 'easeLinear',
+     *     },
+     *     tween: {
+     *         duration: 1000,
+     *         ease: 'easeLinear',
+     *         relative: false,
+     *     },
+     *     spring: {
+     *         relative: false,
+     *         config: {
+     *             default: {
+     *                 tension: 20,
+     *                 mass: 1,
+     *                 friction: 5,
+     *                 velocity: 0,
+     *                 precision: 0.01,
+     *             },
+     *             gentle: {
+     *                 tension: 120,
+     *                 mass: 1,
+     *                 friction: 14,
+     *                 velocity: 0,
+     *                 precision: 0.01,
+     *             },
+     *             wobbly: {
+     *                 tension: 180,
+     *                 mass: 1,
+     *                 friction: 12,
+     *                 velocity: 0,
+     *                 precision: 0.01,
+     *             },
+     *             bounce: {
+     *                 tension: 200,
+     *                 mass: 3,
+     *                 friction: 5,
+     *                 velocity: 0,
+     *                 precision: 0.01,
+     *             },
+     *             scroller: {
+     *                 tension: 10,
+     *                 mass: 1,
+     *                 friction: 5,
+     *                 velocity: 0,
+     *                 precision: 0.5,
+     *             },
+     *         },
+     *     },
+     *     lerp: {
+     *         relative: false,
+     *         precision: 0.01,
+     *         velocity: 0.06,
+     *     },
+     * });
+     *
+     *
+     * ```
+     */
+    setDefault(props = {}) {
+        handleSetUp.set(props);
+    },
 
     /**
-     * @param action {defaultType} string
-     **/
-    default(action = '', props) {
-        switch (action) {
-            case 'get':
-                handleSetUp.get(props);
-                break;
-
-            case 'set':
-                handleSetUp.set(props);
-                break;
-
-            case 'print':
-                // Writable props
-                handleSetUp.print();
-
-                // Readable props
-                console.log('Readable props:');
-                printEaseKey();
-                break;
-
-            default:
-                console.warn(`${action} in mobbu.default not exist`);
-        }
+     * @description
+     * Returns the value of a specific property
+     *
+     * @param {import('./setup.js').handleSetUpGetType} prop
+     * @returns {Object}
+     *
+     * @example
+     * ```js
+     * mobbu.getDefault('parallax');
+     * ```
+     */
+    getDefault(prop = '') {
+        return handleSetUp.get(prop);
     },
+
+    /**
+     * @description
+     * Perform a console.log() of the default values
+     *
+     * @example
+     * ```js
+     * mobbu.printDefault();
+     * ```
+     */
+    printDefault() {
+        handleSetUp.print();
+    },
+
     getFps() {
         return handleFrame.getFps();
     },
+
     getInstantFps() {
         return frameStore.getProp('instantFps');
     },
@@ -805,38 +919,208 @@ export const mobbu = {
         return handleResize(callback);
     },
 
+    /**
+     * @description
+     * Add callback on resize using a debounce function.
+     *
+     * @param {function(import('./events/visibilityChange/handleVisibilityChange.js').visibilityChangeTYpe):void } callback - callback function fired on tab change.
+     *
+     * @example
+     * ```js
+     *  const unsubscribe = mobbu.useVisibilityChange(({ visibilityState }) => {
+     *      // code
+     *  });
+     *
+     *  unsubscribe();
+     *
+     * ```
+     */
     useVisibilityChange(callback = () => {}) {
         return handleVisibilityChange(callback);
     },
 
+    /**
+     * @description
+     * Add callback on mouse click
+     *
+     * @param {function(import('./events/mouseUtils/handleMouse.js').mouseType):void } callback - callback function fired on mouse click.
+     *
+     * @example
+     * ```js
+     * const unsubscribe = mobbu.useMouseClick(
+     *     ({ client, page, preventDefault, target, type }) => {
+     *         // code
+     *     }
+     * );
+     *
+     * unsubscribe();
+     *
+     * ```
+     */
     useMouseClick(callback = () => {}) {
         return handleMouseClick(callback);
     },
 
+    /**
+     * @description
+     * Add callback on mouse down
+     *
+     * @param {function(import('./events/mouseUtils/handleMouse.js').mouseType):void } callback - callback function fired on mouse down.
+     *
+     * @example
+     * ```js
+     * const unsubscribe = mobbu.useMouseDown(
+     *     ({ client, page, preventDefault, target, type }) => {
+     *         // code
+     *     }
+     * );
+     *
+     * unsubscribe();
+     *
+     * ```
+     */
     useMouseDown(callback = () => {}) {
         return handleMouseDown(callback);
     },
 
+    /**
+     * @description
+     * Add callback on touch start
+     *
+     * @param {function(import('./events/mouseUtils/handleMouse.js').mouseType):void } callback - callback function fired on mouse touch start.
+     *
+     * @example
+     * ```js
+     * const unsubscribe = mobbu.useTouchStart(
+     *     ({ client, page, preventDefault, target, type }) => {
+     *         // code
+     *     }
+     * );
+     *
+     * unsubscribe();
+     *
+     * ```
+     */
     useTouchStart(callback = () => {}) {
         return handleTouchStart(callback);
     },
 
+    /**
+     * @description
+     * Add callback on mouse move
+     *
+     * @param {function(import('./events/mouseUtils/handleMouse.js').mouseType):void } callback - callback function fired on mouse move.
+     *
+     * @example
+     * ```js
+     * const unsubscribe = mobbu.useMouseMove(
+     *     ({ client, page, preventDefault, target, type }) => {
+     *         // code
+     *     }
+     * );
+     *
+     * unsubscribe();
+     *
+     * ```
+     */
     useMouseMove(callback = () => {}) {
         return handleMouseMove(callback);
     },
 
+    /**
+     * @description
+     * Add callback on touch move
+     *
+     * @param {function(import('./events/mouseUtils/handleMouse.js').mouseType):void } callback - callback function fired on touch move.
+     *
+     * @example
+     * ```js
+     * const unsubscribe = mobbu.useTouchMove(
+     *     ({ client, page, preventDefault, target, type }) => {
+     *         // code
+     *     }
+     * );
+     *
+     * unsubscribe();
+     *
+     * ```
+     */
     useTouchMove(callback = () => {}) {
         return handleTouchMove(callback);
     },
 
+    /**
+     * @description
+     * Add callback on mouse up
+     *
+     * @param {function(import('./events/mouseUtils/handleMouse.js').mouseType):void } callback - callback function fired on mouse up.
+     *
+     * @example
+     * ```js
+     * const unsubscribe = mobbu.useMouseUp(
+     *     ({ client, page, preventDefault, target, type }) => {
+     *         // code
+     *     }
+     * );
+     *
+     * unsubscribe();
+     *
+     * ```
+     */
     useMouseUp(callback = () => {}) {
         return handleMouseUp(callback);
     },
 
+    /**
+     * @description
+     * Add callback on touch end.
+     *
+     * @param {function(import('./events/mouseUtils/handleMouse.js').mouseType):void } callback - callback function fired on touch end.
+     *
+     * @example
+     * ```js
+     * const unsubscribe = mobbu.useTouchEnd(
+     *     ({ client, page, preventDefault, target, type }) => {
+     *         // code
+     *     }
+     * );
+     *
+     * unsubscribe();
+     *
+     * ```
+     */
     useTouchEnd(callback = () => {}) {
         return handleTouchEnd(callback);
     },
 
+    /**
+     * @description
+     * Add callback on mouse wheel.
+     *
+     * @param {function(import('./events/mouseUtils/handleMouse.js').mouseType & import('./events/mouseUtils/handleMouse.js').mouseWheelType):void } callback - callback function fired on mouse wheel.
+     *
+     * @example
+     * ```js
+     * const unsubscribe = mobbu.useMouseWheel(
+     *     ({
+     *         client,
+     *         page,
+     *         preventDefault,
+     *         target,
+     *         type,
+     *         pixelX,
+     *         pixelY,
+     *         spinX,
+     *         spinY,
+     *     }) => {
+     *         // code
+     *     }
+     * );
+     *
+     * unsubscribe();
+     *
+     * ```
+     */
     useMouseWheel(callback = () => {}) {
         return handleMouseWheel(callback);
     },
