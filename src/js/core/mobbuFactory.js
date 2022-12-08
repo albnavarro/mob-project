@@ -51,7 +51,7 @@ export const mobbu = {
      * @description
      * - Here it is possible to modify the default values of the various modules of the library
      *
-     * @param {import('./setup.js').handleSetUpSetType} props
+     * @param {import('./animation/utils/setUpValidation.js').handleSetUpSetType} props
      *
      *
      * @example
