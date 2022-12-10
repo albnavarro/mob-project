@@ -7,100 +7,306 @@ import {
     getTypeRecursive,
 } from './storeUtils.js';
 
-export function SimpleStore(data) {
+export class SimpleStore {
     /**
-     * Log Style
+     * @description
+     * SimpleStore inizialization.
+       If objects are used, it is not possible to graft more than two levels. 
+     * It is possible to have a type and a validation function for each property of the store, the supported types are:
+     * `String | Number | Object | Function | Array | Boolean | Element | NodeList`.
+     *
+     * If the type is used the property will not be updated if it doesn't match, you will have a waring.
+       The validation function is non-blocking. the validation status of each property will be displayed in the watchers and will be retrievable using the getValidation() method.
+     *
+     *
+     * @param {Object} data - local data of the store.
+     *
+     * @example
+     * ```js
+     *
+     * Use propierties with type checking:
+     * const myStore = new SimpleStore({
+     *     myProp: () => ({
+     *         value: 10,
+     *         type: Number,
+     *         validate: (val) => val < 10,
+     *     }),
+     *     myObject: {
+     *         prop1: () => ({
+     *             value: 0,
+     *             type: Number,
+     *             validate: (val) => val < 10,
+     *         }),
+     *         prop2: () => ({
+     *             value: document.createElement('div'),
+     *             type: Element,
+     *         }),
+     *     }
+     * });
+     *
+     *
+     *
+     * Use simlple propierties.
+     * const myStore = new SimpleStore({
+     *     prop1: 0,
+     *     prop2: 0
+     * });
+     *
+     *
+     * Available methods:
+     * myStore.set();
+     * myStore.setProp();
+     * myStore.setProp();
+     * myStore.setObj();
+     * myStore.computed();
+     * myStore.get();
+     * myStore.getProp();
+     * myStore.getValidation();
+     * myStore.watch();
+     * myStore.emit();
+     * myStore.debugStore();
+     * myStore.debugValidate();
+     * myStore.setStyle();
+     * myStore.destroy();
+     * ```
      */
-    let logStyle = 'padding: 10px;';
+    constructor(data = {}) {
+        this.logStyle = 'padding: 10px;';
+
+        /**
+         * @private
+         *
+         * @description
+         * Subscriber id counter
+         */
+        this.counterId = 0;
+
+        /**
+         * @private
+         *
+         * @description
+         * Callback store
+         */
+        this.callBackWatcher = [];
+
+        /**
+         * @private
+         *
+         * @description
+         * Callback store
+         */
+        this.callBackComputed = [];
+
+        /**
+         * @private
+         *
+         * @description
+         * Object that store calidation status for each props
+         */
+        this.validationStatusObject = {};
+
+        /**
+         * @private
+         * @description
+         * Depth of initial data object
+         */
+        this.dataDepth = maxDepth(data);
+
+        /**
+         * @private
+         *
+         * @description
+         * Main Object that store the value of each props/Object.
+         * Max depth allowed is 2.
+         */
+        this.store = (() => {
+            if (this.dataDepth > 2) {
+                console.warn(
+                    `%c data depth on store creation allowed is maximun 2 this data is ${this.dataDepth}`,
+                    this.logStyle
+                );
+                return {};
+            } else {
+                return getDataRecursive(data);
+            }
+        })();
+
+        /**
+         * @private
+         *
+         * @description
+         * Main Object that store the type of each props.
+         * Max depth allowed is 2.
+         */
+        this.type = (() => {
+            if (this.dataDepth > 2) {
+                console.warn(
+                    `%c data depth on store creation allowed is maximun 2 this data is ${this.dataDepth}`,
+                    this.logStyle
+                );
+                return {};
+            } else {
+                return getTypeRecursive(data);
+            }
+        })();
+
+        /**
+         * @private
+         *
+         * @description
+         * Main Object that store the validate function for every prop.
+         * Max depth allowed is 2.
+         */
+        this.fnValidate = (() => {
+            if (this.dataDepth > 2) {
+                console.warn(
+                    `%c data depth on store creation allowed is maximun 2 this data is ${this.dataDepth}`,
+                    this.logStyle
+                );
+                return {};
+            } else {
+                return getValidateRecursive(data);
+            }
+        })();
+
+        this.inizializeValidation();
+    }
 
     /**
-     * Fire computed if some prop associated change
+     * @private
      *
-     * @param  {string} propChanged keys of prop changed
+     * @description
+     * Inizialize validation status for each prop.
      */
-    function fireComputed(propChanged) {
-        fnComputed.forEach((item) => {
+    inizializeValidation() {
+        /**
+         * Inizialize empty Object if prop is an object.
+         */
+        for (const key in this.store) {
+            if (storeType.isObject(this.store[key]))
+                this.validationStatusObject[key] = {};
+        }
+
+        /**
+         * First run execute each propierites to check validation without fire event
+         */
+        Object.entries(this.store).forEach((item) => {
+            const [key, value] = item;
+            this.set(key, value, false);
+        });
+    }
+
+    /**
+     * @private
+     * @description
+     * Update prop target of computed.
+     */
+    fireComputed(propChanged) {
+        this.callBackComputed.forEach((item) => {
             const {
                 prop: propToUpdate,
                 keys: propsShouldChange,
                 fn: computedFn,
             } = item;
 
-            // Prendo la lista di tutte le chiavi dello store
-            const storeKeys = Object.keys(store);
+            /**
+             * I'm getting the list of all the store keys
+             */
+            const storeKeys = Object.keys(this.store);
 
-            // Controllo che tutte le chiavi da monitorare nella computed esistano nello store
+            /**
+             * I check that all keys to monitor in computed exist in the store*
+             */
             const propsShouldChangeIsInStore = propsShouldChange.every((item) =>
                 storeKeys.includes(item)
             );
 
-            // Se una delle delle chiavi da monitoriare non esiste nello store skippo
+            /**
+             * If one of the keys to monitor does not exist in the store, I interrupt.
+             */
             if (!propsShouldChangeIsInStore) {
                 console.warn(
                     `%c one of this key ${propsShouldChange} defined in computed method of prop to monitor '${propToUpdate}' prop not exist`,
-                    logStyle
+                    this.logStyle
                 );
 
                 return;
             }
 
-            // Controllo che la prop in entrata sia una dipendenza del computed
-            // E' il controlo chiave che scatena il computed
+            /**
+             * I check that the incoming prop is a computed dependency
+             * It is the key control that triggers the computed
+             */
             const propChangedIsDependency =
                 propsShouldChange.includes(propChanged);
 
             if (!propChangedIsDependency) return;
 
-            // Prendo il valore di ogni propietá data la chiave
+            /**
+             * I take the value of each property given the key
+             */
             const propValues = propsShouldChange.map((item) => {
-                return store[item];
+                return this.store[item];
             });
 
-            // Genero il valore dalla funzione di callback da passare ai setter per aggiornare la prop
+            /**
+             * I generate the value from the callback function to pass to the
+             * setters to update the prop
+             */
             const computedValue = computedFn(...propValues);
-            set(propToUpdate, computedValue);
+            this.set(propToUpdate, computedValue);
         });
     }
 
     /**
-     * Update propierities of store item by prop keys
-     * Fire all the callback associate to the prop
-     * Usage:
-     * myStore.set("prop", {prop: val});
-     * myStore.setProp("prop", val);
+     * @param {String} prop - propierties to update
+     * @param {any} value - new value
+     * @param {Boolean} fireCallback - fire watcher callback on update,  default value is `true`
      *
-     * @param  {string} prop keys of obj in store to update
-     * @param  {object} val object or value to merge with the corresponding in store
+     * @description
+     * Update object and non-objects propierties
+     *
+     * @example
+     * ```js
+     * myStore.set('myProp', newValue, true);
+     * myStore.set('myPropObject', { myProp: newValue, ... });
+     *
+     * ```
      */
-    const set = (prop, val, fireCallback = true) => {
+    set(prop, value, fireCallback = true) {
         /**
          * Check if prop exist in store
          */
-        if (!(prop in store)) {
+        if (!(prop in this.store)) {
             console.warn(
                 `%c trying to execute set method: store.${prop} not exist`,
-                logStyle
+                this.logStyle
             );
             return;
         }
 
-        if (storeType.isObject(store[prop])) {
-            setObj(prop, val, fireCallback);
+        if (storeType.isObject(this.store[prop])) {
+            this.setObj(prop, value, fireCallback);
         } else {
-            setProp(prop, val, fireCallback);
+            this.setProp(prop, value, fireCallback);
         }
-    };
-
-    // Private function
+    }
 
     /**
-     * Set propierities value of store item
-     * Fire all the callback associate to the prop
+     * @param {String} prop - propierties to update
+     * @param {any} value - new value
+     * @param {Boolean} fireCallback - fire watcher callback on update,  default value is `true`
      *
-     * @param  {string} prop keys of obj in store to update
-     * @param  {any} val object to merge with the corresponding in store
+     * @description
+     * Update non-object propierties
+     *
+     * @example
+     * ```js
+     * myStore.setProp('myProp', newValue, true);
+     *
+     * ```
      */
-    const setProp = (prop, val, fireCallback = true) => {
+    setProp(prop, val, fireCallback = true) {
         /**
          * Check if val is an Object
          */
@@ -109,7 +315,7 @@ export function SimpleStore(data) {
                 `%c trying to execute setProp method on '${prop}' propierties: setProp methods doasn't allow objects as value, ${JSON.stringify(
                     val
                 )} is an Object`,
-                logStyle
+                this.logStyle
             );
             return;
         }
@@ -117,63 +323,72 @@ export function SimpleStore(data) {
         /**
          * Check if prop is an Object
          */
-        if (storeType.isObject(store[prop])) {
+        if (storeType.isObject(this.store[prop])) {
             console.warn(
                 `%c trying to execute setProp method on '${prop}' propierties: '${JSON.stringify(
                     prop
                 )}' is an objects`,
-                logStyle
+                this.logStyle
             );
             return;
         }
 
-        const isValidType = checkType(type[prop], val);
+        const isValidType = checkType(this.type[prop], val);
         if (!isValidType) {
             console.warn(
                 `%c trying to execute setProp method on '${prop}' propierties: ${val} is not ${getTypeName(
-                    type[prop]
+                    this.type[prop]
                 )}`,
-                logStyle
+                this.logStyle
             );
             return;
         }
 
         /**
-         * Check if there is a validate function and update validateResult arr
+         * Check if there is a validate function and update validationStatusObject arr
          */
-        validateResult[prop] = fnValidate[prop](val);
+        this.validationStatusObject[prop] = this.fnValidate[prop](val);
 
         /**
          * Update value and fire callback associated
          */
-        const oldVal = store[prop];
-        store[prop] = val;
+        const oldVal = this.store[prop];
+        this.store[prop] = val;
 
         if (fireCallback) {
-            const fnByProp = fnStore.filter((item) => item.prop === prop);
+            const fnByProp = this.callBackWatcher.filter(
+                (item) => item.prop === prop
+            );
             fnByProp.forEach((item) => {
-                item.fn(val, oldVal, validateResult[prop]);
+                item.fn(val, oldVal, this.validationStatusObject[prop]);
             });
         }
 
-        fireComputed(prop);
-    };
+        this.fireComputed(prop);
+    }
 
     /**
-     * Update propierities of store item by prop keys, only if store item is an object
-     * Fire all the callback associate to the prop
+     * @param {String} prop - propierties to update
+     * @param {any} value - new value
+     * @param {Boolean} fireCallback - fire watcher callback on update,  default value is `true`
      *
-     * @param  {string} prop keys of obj in store to update
-     * @param  {object} val object to merge with the corresponding in store
+     * @description
+     * Update object propierties
+     *
+     * @example
+     * ```js
+     * myStore.set('myPropObject', { myProp: newValue, ... }, true);
+     *
+     * ```
      */
-    const setObj = (prop, val, fireCallback = true) => {
+    setObj(prop, val, fireCallback = true) {
         /**
          * Check if val is not an Object
          */
         if (!storeType.isObject(val)) {
             console.warn(
                 `%c trying to execute setObj method on '${prop}' propierties: setObj methods allow only objects as value, ${val} is not an Object`,
-                logStyle
+                this.logStyle
             );
             return;
         }
@@ -181,10 +396,10 @@ export function SimpleStore(data) {
         /**
          * Check if prop is not an Object
          */
-        if (!storeType.isObject(store[prop])) {
+        if (!storeType.isObject(this.store[prop])) {
             console.warn(
                 `%c trying to execute setObj data method on '${prop}' propierties: store propierties '${prop}' is not an object`,
-                logStyle
+                this.logStyle
             );
             return;
         }
@@ -193,12 +408,12 @@ export function SimpleStore(data) {
          * Check if prop has val keys
          */
         const valKeys = Object.keys(val);
-        const propKeys = Object.keys(store[prop]);
+        const propKeys = Object.keys(this.store[prop]);
         const hasKeys = valKeys.every((item) => propKeys.includes(item));
         if (!hasKeys) {
             console.warn(
                 `%c trying to execute setObj data method: one of these keys '${valKeys}' not exist in store.${prop}`,
-                logStyle
+                this.logStyle
             );
             return;
         }
@@ -212,7 +427,7 @@ export function SimpleStore(data) {
                 `%c trying to execute setObj data method on '${prop}' propierties: '${JSON.stringify(
                     val
                 )}' have a depth > 1, nested obj is not allowed`,
-                logStyle
+                this.logStyle
             );
             return;
         }
@@ -221,14 +436,17 @@ export function SimpleStore(data) {
         const isValidType = Object.entries(val)
             .map((item) => {
                 const [subProp, subVal] = item;
-                const typeResponse = checkType(type[prop][subProp], subVal);
+                const typeResponse = checkType(
+                    this.type[prop][subProp],
+                    subVal
+                );
 
                 if (!typeResponse) {
                     console.warn(
                         `%c trying to execute setObj data method on ${prop}.${subProp} propierties: ${subVal} is not a ${getTypeName(
-                            type[prop][subProp]
+                            this.type[prop][subProp]
                         )}`,
-                        logStyle
+                        this.logStyle
                     );
                 }
 
@@ -241,163 +459,231 @@ export function SimpleStore(data) {
         }
 
         /**
-         * Validate value (value passed to setObj is a Object to merge with original) and store the result in validateResult arr
+         * Validate value (value passed to setObj is a Object to merge with original) and store the result in validationStatusObject arr
          * id there is no validation return true, otherwse get boolean value from fnValidate obj
          */
 
         Object.entries(val).forEach((item) => {
             const [subProp, subVal] = item;
-            validateResult[prop][subProp] = fnValidate[prop][subProp](subVal);
+            this.validationStatusObject[prop][subProp] =
+                this.fnValidate[prop][subProp](subVal);
         });
 
         /**
          * Update value and fire callback associated
          */
-        const oldVal = store[prop];
-        store[prop] = { ...store[prop], ...val };
+        const oldVal = this.store[prop];
+        this.store[prop] = { ...this.store[prop], ...val };
 
         if (fireCallback) {
-            const fnByProp = fnStore.filter((item) => item.prop === prop);
+            const fnByProp = this.callBackWatcher.filter(
+                (item) => item.prop === prop
+            );
             fnByProp.forEach((item) => {
-                item.fn(store[prop], oldVal, validateResult[prop]);
+                item.fn(
+                    this.store[prop],
+                    oldVal,
+                    this.validationStatusObject[prop]
+                );
             });
         }
 
-        fireComputed(prop);
-    };
+        this.fireComputed(prop);
+    }
 
     /**
-     * Get all store object, use decostructing to get specific prop valu
-     * Usage:
-     * const { prop } = myStore.get();
+     * @description
+     * Get store object
      *
-     * @return { Object } return store object
+     * @example
+     * ```js
+     * const storeObject = myStore.get();
+     * const { myProp } = myStore.get();
+     *
+     * ```
+     *
      */
-    const get = () => {
-        return store;
-    };
+    get() {
+        return this.store;
+    }
 
     /**
-     * Get value of propierties in store
-     * Useful if prop is array ( es2)
-     * Usage:
-     * es1: const prop = myStore.getProp("prop");
-     * es2: const [prop] = myStore.getProp("prop");
+     * @param {string} prop - propierites froms store.
+     * @returns {any} property value
      *
-     * @param  {string} prop keys of obj in store
-     * @return {any} return prop value
+     * @description
+     * Get specific prop from store.
+     *
+     * @example
+     * ```js
+     * const myProp= myStore.get('myProp');
+     *
+     * ```
      */
-    const getProp = (prop) => {
-        if (prop in store) {
-            return store[prop];
+    getProp(prop) {
+        if (prop in this.store) {
+            return this.store[prop];
         } else {
             console.warn(
                 `%c trying to execute get data method: store.${prop} not exist`,
-                logStyle
+                this.logStyle
             );
         }
-    };
+    }
 
     /**
-     * Get validation store object, use decostructing to get specific prop value
-     * Usage:
-     * const { prop } = myStore.getValidation();
+     * @returns {Object} Object validation.
      *
-     * @return {Object} return validation store object
+     * @description
+     * Get validation object status
+     *
+     * @example
+     * ```js
+     * const storeValidationObject = myStore.getValidation();
+     * const { myProp } = myStore.getValidation();
+     *
+     * ```
+     *
      */
-    const getValidation = () => {
-        return validateResult;
-    };
+    getValidation() {
+        return this.validationStatusObject;
+    }
 
     /**
-     * Add callback for specific propierties in store
-     * Usage:
-     * const id2 =  myStore.watch('prop', (newVal, oldVal, validate) => {})
+     * @param {String} prop - property to watch.
+     * @param {function(any,any,(boolean|object))} callback - callback Function, fired on prop value change
+     * @returns {function} unsubscribe function
      *
-     * @param  {string} prop keys of obj in store
-     * @param  {function} fn callback Function, fired on prop value change
-     * @return {function} unsubscribe function
+     * @description
+     * Watch property mutation
+     *
+     * @example
+     * ```js
+     *
+     * const unsubscribe =  myStore.watch('myProp', (newVal, oldVal, validate) => {
+     *      // code
+     * })
+     * unsubscribe();
+     *
+     *
+     * ```
      */
-    const watch = (prop, fn) => {
-        fnStore.push({
+    watch(prop, callback = () => {}) {
+        this.callBackWatcher.push({
             prop,
-            fn,
-            id: counterId,
+            fn: callback,
+            id: this.counterId,
         });
 
-        const cbId = counterId;
-        counterId++;
+        const cbId = this.counterId;
+        this.counterId++;
 
         return () => {
-            fnStore = fnStore.filter((item) => item.id !== cbId);
+            this.callBackWatcher = this.callBackWatcher.filter(
+                (item) => item.id !== cbId
+            );
         };
-    };
+    }
 
     /**
-     * Forse fire callback for specific key
-     * Usage:
-     * store.emit('prop');
+     * @description
+     * Fire callback related to specific property.
      *
-     * @param  {string} prop keys of obj in store
+     * @param {string} prop
+     *
+     * @example
+     * ```js
+     * myStore.emit('myProp');
+     * ```
      */
-    const emit = (prop) => {
-        if (prop in store) {
-            const fnByProp = fnStore.filter((item) => item.prop === prop);
+    emit(prop) {
+        if (prop in this.store) {
+            const fnByProp = this.callBackWatcher.filter(
+                (item) => item.prop === prop
+            );
             fnByProp.forEach((item) => {
                 // Val , OldVal, Validate
-                item.fn(store[prop], store[prop], validateResult[prop]);
+                item.fn(
+                    this.store[prop],
+                    this.store[prop],
+                    this.validationStatusObject[prop]
+                );
             });
         } else {
             console.warn(
                 `trying to execute set data method: store.${prop} not exist`
             );
         }
-    };
-
-    const debugStore = () => {
-        console.log(store);
-    };
-
-    const debugValidate = () => {
-        console.log(validateResult);
-    };
-
-    const setStyle = (string) => {
-        logStyle = string;
-    };
+    }
 
     /**
-     * Set propierities value of store item
-     * Fire all the callback associate to the prop
-     * @example:
-     *
-     *  Prop target not Object, and not Object keys:
-     *  store.computed('prop', ['key', 'key'], (val1, val2) => {
-     *      return val1 + val2;
-     *  });
-     *
-     *  Prop target not Object and Object keys (obj.val1 , obj.val2)
-     *  store.computed('prop', ['obj'], (obj) => {
-     *       return obj.val1 + obj.val2;
-     *  })
-     *
-     *  Prop target Object ( obj.sum ), and not Object keys:
-     *  store.computed('obj', ['key', 'key'], (val1, val2) => {
-     *      return { sum: val1 + val2 };
-     *  });
-     *
-     *  Prop target Object ( obj.sum ), and Object keys (obj.val1 , obj.val2):
-     *  store.computed('obj', ['obj'], (obj) => {
-     *      return { sum: obj.val1 + obj.val2 };
-     *  });
-     *
-     * @param  {string} prop keys of obj in store to update
-     * @param  {keys} Array of keys to watch
-     * @param  {fn} Function Callback
+     * @description
+     * Run a console.log() of store object.
      */
-    const computed = (prop, keys, fn) => {
+    debugStore() {
+        console.log(this.store);
+    }
+
+    /**
+     * @description
+     * Run a console.log() of validation object
+     */
+    debugValidate() {
+        console.log(this.validationStatusObject);
+    }
+
+    /**
+     * @description
+     * Modify style of warining.
+     * Utils to have a different style for each store.
+     *
+     * @example
+     * Store.setStyle('color:#ccc;');
+     */
+    setStyle(string) {
+        this.logStyle = string;
+    }
+
+    /**
+     * @param  {string} prop - Property in store to update
+     * @param  {Array.<String>} keys - Array of property to watch.
+     * @param {function(any,any):any} fn - Callback function launched when one of the properties of the array changes, the result of the function will be the new value of the property. The parameters of the function are the current values of the properties specified in the array.
+     *
+     * @description
+     * Update propierties value if some dependency change.
+     *
+     *
+     * @example
+     * ```js
+     * Prop target is not an object, and dependency is not an object:
+     * myStore.computed('prop', ['prop1', 'prop2'], (val1, val2) => {
+     *     return val1 + val2;
+     * });
+     *
+     * Prop target is not an object and dependency is an object.
+     * myStore.computed('prop', ['objectProp'], (obj) => {
+     *      return obj.val1 + obj.val2;
+     * })
+     *
+     * Prop target is an object and dependency is not an object.
+       When target is on object the result will be mergerd with original object.
+     * myStore.computed('objectProp', ['prop1', 'prop2'], (val1, val2) => {
+     *     return { sum: val1 + val2 };
+     * });
+     *
+     * Prop target is an object, and dependency is an object.
+       When target is on object the result will be mergerd with original object.
+     * myStore.computed('objectProp', ['objectProp1'], (obj) => {
+     *     return { sum: obj.val1 + obj.val2 };
+     * });
+     * ```
+     */
+    computed(prop, keys, fn) {
         // Create a temp array with the fuiture computeda added to check
-        const tempComputedArray = [...fnComputed, ...[{ prop, keys, fn }]];
+        const tempComputedArray = [
+            ...this.callBackComputed,
+            ...[{ prop, keys, fn }],
+        ];
 
         // Get all prop stored in tempComputedArray
         const propList = tempComputedArray.map((item) => item.prop).flat();
@@ -419,7 +705,7 @@ export function SimpleStore(data) {
         if (keysIsusedInSomeComputed) {
             console.warn(
                 `%c una delel chiavi [${keys}] é gia usata come target di una computed`,
-                logStyle
+                this.logStyle
             );
             return;
         }
@@ -433,86 +719,29 @@ export function SimpleStore(data) {
         if (keysIsNotProp) {
             console.warn(
                 `%c una delel chiavi [${keys}] coincide con la prop '${prop}' da mutare`,
-                logStyle
+                this.logStyle
             );
             return;
         }
 
-        fnComputed.push({
+        this.callBackComputed.push({
             prop,
             keys,
             fn,
         });
-    };
-
-    /**
-     * Inizialize store
-     */
-    let counterId = 0;
-    let fnStore = [];
-    let fnComputed = [];
-    const validateResult = {};
-    const dataDepth = maxDepth(data);
-
-    // Create store obj
-    const store = (() => {
-        if (dataDepth > 2) {
-            console.warn(
-                `%c data depth on store creation allowed is maximun 2 this data is ${dataDepth}`,
-                logStyle
-            );
-            return {};
-        } else {
-            return getDataRecursive(data);
-        }
-    })();
-
-    const type = (() => {
-        if (dataDepth > 2) {
-            console.warn(
-                `%c data depth on store creation allowed is maximun 2 this data is ${dataDepth}`,
-                logStyle
-            );
-            return {};
-        } else {
-            return getTypeRecursive(data);
-        }
-    })();
-
-    // Create array with alidate function
-    const fnValidate = (() => {
-        if (dataDepth > 2) {
-            console.warn(
-                `%c data depth on store creation allowed is maximun 2 this data is ${dataDepth}`,
-                logStyle
-            );
-            return {};
-        } else {
-            return getValidateRecursive(data);
-        }
-    })();
-
-    // Inzializa Empty obj in second level if nedeed
-    for (const key in store) {
-        if (storeType.isObject(store[key])) validateResult[key] = {};
     }
 
-    // First run execute each propierites to check validation without fire event
-    Object.entries(store).forEach((item) => {
-        const [key, value] = item;
-        set(key, value, false);
-    });
-
-    return {
-        set,
-        get,
-        getProp,
-        getValidation,
-        watch,
-        emit,
-        computed,
-        debugStore,
-        debugValidate,
-        setStyle,
-    };
+    /**
+     * @descrition
+     * Delete all data inside store.
+     */
+    destroy() {
+        this.counterId = 0;
+        this.callBackWatcher = [];
+        this.callBackComputed = [];
+        this.validationStatusObject = {};
+        this.store = {};
+        this.type = {};
+        this.fnValidate = {};
+    }
 }

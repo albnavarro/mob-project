@@ -28,7 +28,7 @@ export class GsapHorizontalCustomClass {
         this.callback = [];
 
         // GSAP store
-        this.store = mobbu.create('store', {
+        this.store = mobbu.createStore({
             gsapisActive: false,
             horizontalWidth: 0,
             tl: [],

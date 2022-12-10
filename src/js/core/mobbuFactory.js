@@ -765,6 +765,72 @@ export const mobbu = {
 
     /**
      * @description
+     * SimpleStore inizialization.
+       If objects are used, it is not possible to graft more than two levels. 
+     * It is possible to have a type and a validation function for each property of the store, the supported types are:
+     * `String | Number | Object | Function | Array | Boolean | Element | NodeList`.
+     *
+     * If the type is used the property will not be updated if it doesn't match, you will have a waring.
+       The validation function is non-blocking. the validation status of each property will be displayed in the watchers and will be retrievable using the getValidation() method.
+     *
+     *
+     * @param {Object} data - local data of the store.
+     *
+     * @example
+     * ```js
+     *
+     * Use propierties with type checking:
+     * const myStore = mobbu.createStore({
+     *     myProp: () => ({
+     *         value: 10,
+     *         type: Number,
+     *         validate: (val) => val < 10,
+     *     }),
+     *     myObject: {
+     *         prop1: () => ({
+     *             value: 0,
+     *             type: Number,
+     *             validate: (val) => val < 10,
+     *         }),
+     *         prop2: () => ({
+     *             value: document.createElement('div'),
+     *             type: Element,
+     *         }),
+     *     }
+     * });
+     *
+     *
+     *
+     * Use simlple propierties.
+     * const myStore = mobbu.createStore({
+     *     prop1: 0,
+     *     prop2: 0
+     * });
+     *
+     *
+     * Available methods:
+     * myStore.set();
+     * myStore.setProp();
+     * myStore.setProp();
+     * myStore.setObj();
+     * myStore.computed();
+     * myStore.get();
+     * myStore.getProp();
+     * myStore.getValidation();
+     * myStore.watch();
+     * myStore.emit();
+     * myStore.debugStore();
+     * myStore.debugValidate();
+     * myStore.setStyle();
+     * myStore.destroy();
+     * ```
+     */
+    createStore(data = {}) {
+        return new SimpleStore(data);
+    },
+
+    /**
+     * @description
      * Execute a callBack within the first available request animation frame. Use this method to modify elements of the DOM
      *
      * @param {function(import('./events/rafutils/handleFrame.js').handleFrameTypes):void } callback - callback function
@@ -1321,9 +1387,6 @@ export const mobbu = {
 
             case 'smoothScroll':
                 return new SmoothScrollClass(obj);
-
-            case 'store':
-                return new SimpleStore(obj);
 
             case 'loadImages':
                 if (obj && 'images' in obj) {

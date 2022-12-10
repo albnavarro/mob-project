@@ -1,4 +1,3 @@
-import { modernzier } from '../../../js/utility/modernizr.js';
 import {
     position,
     outerWidth,
@@ -23,7 +22,7 @@ export class tBlocksItemClass {
             '.tBlocks__item:not(.tBlocks__item--active)'
         );
 
-        this.store = mobbu.create('store', {
+        this.store = mobbu.createStore({
             itemsNotActive: () => ({
                 value: this.container.querySelectorAll(
                     '.tBlocks__item:not(.tBlocks__item--active)'

@@ -14,7 +14,7 @@ class StoreTestClass {
 
         const getValidate = document.querySelector('.getValidate');
 
-        const store = mobbu.create('store', {
+        const store = mobbu.createStore({
             input: () => ({
                 value: 10,
                 type: Number,
