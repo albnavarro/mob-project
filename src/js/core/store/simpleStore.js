@@ -23,7 +23,7 @@ export class SimpleStore {
     /**
      * @description
      * SimpleStore inizialization.
-       If objects are used, it is not possible to graft more than two levels. 
+       If objects are used, it is not possible to gcomputedRunningt more than two levels. 
      * It is possible to have a type and a validation function for each property of the store, the supported types are:
      * `String | Number | Object | Function | Array | Boolean | Element | NodeList`.
      *
@@ -126,6 +126,25 @@ export class SimpleStore {
 
         /**
          * @private
+         * Computed propierties update in tick.
+         */
+        this.computedPropFired = [];
+
+        /**
+         * @private
+         * Queque of props changed.
+         * Compued use this queque for checking mutation
+         */
+        this.computedWaitList = [];
+
+        /**
+         * @private
+         * Next tick ( settimeout 0 ) is fired.
+         */
+        this.computedRunning = false;
+
+        /**
+         * @private
          *
          * @description
          * Main Object that store the value of each props/Object.
@@ -204,61 +223,94 @@ export class SimpleStore {
      * @description
      * Update prop target of computed.
      */
-    fireComputed(propChanged) {
-        this.callBackComputed.forEach((item) => {
-            const {
-                prop: propToUpdate,
-                keys: propsShouldChange,
-                fn: computedFn,
-            } = item;
+    fireComputed() {
+        this.computedWaitList.forEach((propChanged) => {
+            this.callBackComputed.forEach((item) => {
+                const {
+                    prop: propToUpdate,
+                    keys: propsShouldChange,
+                    fn: computedFn,
+                } = item;
 
-            /**
-             * I'm getting the list of all the store keys
-             */
-            const storeKeys = Object.keys(this.store);
+                /**
+                 * I'm getting the list of all the store keys
+                 */
+                const storeKeys = Object.keys(this.store);
 
-            /**
-             * I check that all keys to monitor in computed exist in the store*
-             */
-            const propsShouldChangeIsInStore = propsShouldChange.every((item) =>
-                storeKeys.includes(item)
-            );
-
-            /**
-             * If one of the keys to monitor does not exist in the store, I interrupt.
-             */
-            if (!propsShouldChangeIsInStore) {
-                storeComputedWarning(
-                    propsShouldChange,
-                    propToUpdate,
-                    this.logStyle
+                /**
+                 * I check that all keys to monitor in computed exist in the store*
+                 */
+                const propsShouldChangeIsInStore = propsShouldChange.every(
+                    (item) => storeKeys.includes(item)
                 );
-                return;
-            }
 
-            /**
-             * I check that the incoming prop is a computed dependency
-             * It is the key control that triggers the computed
-             */
-            const propChangedIsDependency =
-                propsShouldChange.includes(propChanged);
+                /**
+                 * If one of the keys to monitor does not exist in the store, I interrupt.
+                 */
+                if (!propsShouldChangeIsInStore) {
+                    storeComputedWarning(
+                        propsShouldChange,
+                        propToUpdate,
+                        this.logStyle
+                    );
+                    return;
+                }
 
-            if (!propChangedIsDependency) return;
+                /**
+                 * I check that the incoming prop is a computed dependency
+                 * It is the key control that triggers the computed
+                 */
+                const propChangedIsDependency =
+                    propsShouldChange.includes(propChanged);
 
-            /**
-             * I take the value of each property given the key
-             */
-            const propValues = propsShouldChange.map((item) => {
-                return this.store[item];
+                if (!propChangedIsDependency) return;
+
+                /**
+                 * I take the value of each property given the key
+                 */
+                const propValues = propsShouldChange.map((item) => {
+                    return this.store[item];
+                });
+
+                /**
+                 * I generate the value from the callback function to pass to the
+                 * setters to update the prop
+                 */
+
+                const shouldFire =
+                    !this.computedPropFired.includes(propToUpdate);
+
+                if (shouldFire) {
+                    const computedValue = computedFn(...propValues);
+                    this.set(propToUpdate, computedValue);
+                    this.computedPropFired.push(propToUpdate);
+                }
             });
-
-            /**
-             * I generate the value from the callback function to pass to the
-             * setters to update the prop
-             */
-            const computedValue = computedFn(...propValues);
-            this.set(propToUpdate, computedValue);
         });
+
+        this.computedPropFired = [];
+        this.computedWaitList = [];
+        this.computedRunning = false;
+    }
+
+    /**
+     * @private
+     * @param {string} prop - prop chenages by set() method.
+     *
+     * @description
+     * Store all prop changes and wait next tick.
+     * If several properties related to the same computed change at the same time
+     * the callback related to the computed will be fired only once.
+     */
+    addToComputedWaitLsit(prop) {
+        if (!this.callBackComputed.length) return;
+
+        this.computedWaitList.push(prop);
+
+        if (!this.computedRunning) {
+            this.computedRunning = true;
+            setTimeout(() => this.fireComputed());
+        }
     }
 
     /**
@@ -351,7 +403,7 @@ export class SimpleStore {
             });
         }
 
-        this.fireComputed(prop);
+        this.addToComputedWaitLsit(prop);
     }
 
     /**
@@ -464,7 +516,7 @@ export class SimpleStore {
             });
         }
 
-        this.fireComputed(prop);
+        this.addToComputedWaitLsit(prop);
     }
 
     /**
@@ -627,6 +679,8 @@ export class SimpleStore {
      *
      * @description
      * Update propierties value if some dependency change.
+     * Computed functions are resolved on the nextTick. 
+     * If multiple dependencies change at the same time, the computed will be resolved only once.
      *
      *
      * @example
@@ -695,6 +749,8 @@ export class SimpleStore {
         this.counterId = 0;
         this.callBackWatcher = [];
         this.callBackComputed = [];
+        this.computedPropFired = [];
+        this.computedWaitList = [];
         this.validationStatusObject = {};
         this.store = {};
         this.type = {};

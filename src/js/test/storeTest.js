@@ -35,6 +35,7 @@ class StoreTestClass {
                     type: NodeList,
                 }),
             },
+            pippo: 0,
             sum: () => ({
                 value: 0,
                 type: Number,
@@ -65,22 +66,33 @@ class StoreTestClass {
         });
         //
         const unsubscribeSum = store.watch('sum', (val, oldVal, validate) => {
+            console.log('sum watched fired');
             result3.innerHTML = `sum of input field: ${val} ,oldval: ${oldVal} , is equal 3:${validate}`;
         });
 
         // COMPUTED
-        store.computed('sum', ['input', 'obj'], (input, obj) => {
-            const { input: inputValidation } = store.getValidation();
-            const { obj: inputObjectValidation } = store.getValidation();
+        store.computed(
+            'sum',
+            ['input', 'obj', 'pippo'],
+            (input, obj, pippo) => {
+                console.log(input, obj, pippo);
+                const { input: inputValidation } = store.getValidation();
+                const { obj: inputObjectValidation } = store.getValidation();
 
-            return inputValidation && inputObjectValidation.input
-                ? input + obj.input
-                : 0;
-        });
+                return inputValidation && inputObjectValidation.input
+                    ? input + obj.input
+                    : 0;
+            }
+        );
 
         // HANDLER
         inputField1.addEventListener('input', (e) => {
+            // test multiple state change on the samle computed
+            // computed fire once
             store.set('input', parseInt(inputField1.value));
+            const { pippo } = store.get();
+            store.set('pippo', pippo + 1);
+            store.set('pippo', pippo + 1);
         });
 
         inputField2.addEventListener('input', (e) => {
