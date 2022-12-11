@@ -1,11 +1,23 @@
-import { checkType, getTypeName, storeType } from './storeType.js';
+import { checkType, storeType } from './storeType.js';
 
+import { maxDepth, getDataRecursive, getPropRecursive } from './storeUtils.js';
 import {
-    maxDepth,
-    getDataRecursive,
-    getValidateRecursive,
-    getTypeRecursive,
-} from './storeUtils.js';
+    storeComputedKeyUsedWarning,
+    storeComputedWarning,
+    storeDepthWarning,
+    storeEmitWarning,
+    storeGetPropWarning,
+    storeSetObjDepthWarning,
+    storeSetObjectPropWarning,
+    storeSetObjectValWarning,
+    storeSetObjKeysWarning,
+    storeSetObjTypeWarning,
+    storeSetPropPropWarning,
+    storeSetPropTypeWarning,
+    storeSetPropValWarning,
+    storeSetWarning,
+    storeWatchWarning,
+} from './storeWarining.js';
 
 export class SimpleStore {
     /**
@@ -121,10 +133,7 @@ export class SimpleStore {
          */
         this.store = (() => {
             if (this.dataDepth > 2) {
-                console.warn(
-                    `%c data depth on store creation allowed is maximun 2 this data is ${this.dataDepth}`,
-                    this.logStyle
-                );
+                storeDepthWarning(this.dataDepth, this.logStyle);
                 return {};
             } else {
                 return getDataRecursive(data);
@@ -140,13 +149,10 @@ export class SimpleStore {
          */
         this.type = (() => {
             if (this.dataDepth > 2) {
-                console.warn(
-                    `%c data depth on store creation allowed is maximun 2 this data is ${this.dataDepth}`,
-                    this.logStyle
-                );
+                storeDepthWarning(this.dataDepth, this.logStyle);
                 return {};
             } else {
-                return getTypeRecursive(data);
+                return getPropRecursive(data, 'type', 'any');
             }
         })();
 
@@ -159,13 +165,10 @@ export class SimpleStore {
          */
         this.fnValidate = (() => {
             if (this.dataDepth > 2) {
-                console.warn(
-                    `%c data depth on store creation allowed is maximun 2 this data is ${this.dataDepth}`,
-                    this.logStyle
-                );
+                storeDepthWarning(this.dataDepth, this.logStyle);
                 return {};
             } else {
-                return getValidateRecursive(data);
+                return getPropRecursive(data, 'validate', () => true);
             }
         })();
 
@@ -225,11 +228,11 @@ export class SimpleStore {
              * If one of the keys to monitor does not exist in the store, I interrupt.
              */
             if (!propsShouldChangeIsInStore) {
-                console.warn(
-                    `%c one of this key ${propsShouldChange} defined in computed method of prop to monitor '${propToUpdate}' prop not exist`,
+                storeComputedWarning(
+                    propsShouldChange,
+                    propToUpdate,
                     this.logStyle
                 );
-
                 return;
             }
 
@@ -278,10 +281,7 @@ export class SimpleStore {
          * Check if prop exist in store
          */
         if (!(prop in this.store)) {
-            console.warn(
-                `%c trying to execute set method: store.${prop} not exist`,
-                this.logStyle
-            );
+            storeSetWarning(prop, this.logStyle);
             return;
         }
 
@@ -293,6 +293,8 @@ export class SimpleStore {
     }
 
     /**
+     * @private
+     *
      * @param {String} prop - propierties to update
      * @param {any} value - new value
      * @param {Boolean} fireCallback - fire watcher callback on update,  default value is `true`
@@ -311,12 +313,7 @@ export class SimpleStore {
          * Check if val is an Object
          */
         if (storeType.isObject(val)) {
-            console.warn(
-                `%c trying to execute setProp method on '${prop}' propierties: setProp methods doasn't allow objects as value, ${JSON.stringify(
-                    val
-                )} is an Object`,
-                this.logStyle
-            );
+            storeSetPropValWarning(prop, val, this.logStyle);
             return;
         }
 
@@ -324,23 +321,13 @@ export class SimpleStore {
          * Check if prop is an Object
          */
         if (storeType.isObject(this.store[prop])) {
-            console.warn(
-                `%c trying to execute setProp method on '${prop}' propierties: '${JSON.stringify(
-                    prop
-                )}' is an objects`,
-                this.logStyle
-            );
+            storeSetPropPropWarning(prop, this.logStyle);
             return;
         }
 
         const isValidType = checkType(this.type[prop], val);
         if (!isValidType) {
-            console.warn(
-                `%c trying to execute setProp method on '${prop}' propierties: ${val} is not ${getTypeName(
-                    this.type[prop]
-                )}`,
-                this.logStyle
-            );
+            storeSetPropTypeWarning(prop, val, this.type[prop], this.logStyle);
             return;
         }
 
@@ -368,6 +355,8 @@ export class SimpleStore {
     }
 
     /**
+     * @private
+     *
      * @param {String} prop - propierties to update
      * @param {any} value - new value
      * @param {Boolean} fireCallback - fire watcher callback on update,  default value is `true`
@@ -386,10 +375,7 @@ export class SimpleStore {
          * Check if val is not an Object
          */
         if (!storeType.isObject(val)) {
-            console.warn(
-                `%c trying to execute setObj method on '${prop}' propierties: setObj methods allow only objects as value, ${val} is not an Object`,
-                this.logStyle
-            );
+            storeSetObjectValWarning(prop, val, this.logStyle);
             return;
         }
 
@@ -397,10 +383,7 @@ export class SimpleStore {
          * Check if prop is not an Object
          */
         if (!storeType.isObject(this.store[prop])) {
-            console.warn(
-                `%c trying to execute setObj data method on '${prop}' propierties: store propierties '${prop}' is not an object`,
-                this.logStyle
-            );
+            storeSetObjectPropWarning(prop, this.logStyle);
             return;
         }
 
@@ -411,10 +394,7 @@ export class SimpleStore {
         const propKeys = Object.keys(this.store[prop]);
         const hasKeys = valKeys.every((item) => propKeys.includes(item));
         if (!hasKeys) {
-            console.warn(
-                `%c trying to execute setObj data method: one of these keys '${valKeys}' not exist in store.${prop}`,
-                this.logStyle
-            );
+            storeSetObjKeysWarning(valKeys, prop, this.logStyle);
             return;
         }
 
@@ -423,12 +403,7 @@ export class SimpleStore {
          */
         const dataDepth = maxDepth(val);
         if (dataDepth > 1) {
-            console.warn(
-                `%c trying to execute setObj data method on '${prop}' propierties: '${JSON.stringify(
-                    val
-                )}' have a depth > 1, nested obj is not allowed`,
-                this.logStyle
-            );
+            storeSetObjDepthWarning(prop, val, this.logStyle);
             return;
         }
 
@@ -442,10 +417,11 @@ export class SimpleStore {
                 );
 
                 if (!typeResponse) {
-                    console.warn(
-                        `%c trying to execute setObj data method on ${prop}.${subProp} propierties: ${subVal} is not a ${getTypeName(
-                            this.type[prop][subProp]
-                        )}`,
+                    storeSetObjTypeWarning(
+                        prop,
+                        subProp,
+                        subVal,
+                        this.type[prop][subProp],
                         this.logStyle
                     );
                 }
@@ -524,10 +500,7 @@ export class SimpleStore {
         if (prop in this.store) {
             return this.store[prop];
         } else {
-            console.warn(
-                `%c trying to execute get data method: store.${prop} not exist`,
-                this.logStyle
-            );
+            storeGetPropWarning(prop, this.logStyle);
         }
     }
 
@@ -569,6 +542,11 @@ export class SimpleStore {
      * ```
      */
     watch(prop, callback = () => {}) {
+        if (!(prop in this.store)) {
+            storeWatchWarning(prop, this.logStyle);
+            return;
+        }
+
         this.callBackWatcher.push({
             prop,
             fn: callback,
@@ -610,9 +588,7 @@ export class SimpleStore {
                 );
             });
         } else {
-            console.warn(
-                `trying to execute set data method: store.${prop} not exist`
-            );
+            storeEmitWarning(prop, this.logStyle);
         }
     }
 
@@ -679,7 +655,7 @@ export class SimpleStore {
      * ```
      */
     computed(prop, keys, fn) {
-        // Create a temp array with the fuiture computeda added to check
+        // Create a temp array with the future computed added to check
         const tempComputedArray = [
             ...this.callBackComputed,
             ...[{ prop, keys, fn }],
@@ -693,9 +669,6 @@ export class SimpleStore {
             keys.includes(item)
         );
 
-        // Key is not a prop
-        const keysIsNotProp = keys.includes(prop);
-
         /**
          * if - Key to watch can't be a prop used in some computed to avoid infinite loop
          *
@@ -703,24 +676,7 @@ export class SimpleStore {
          * @return {void}
          */
         if (keysIsusedInSomeComputed) {
-            console.warn(
-                `%c una delel chiavi [${keys}] é gia usata come target di una computed`,
-                this.logStyle
-            );
-            return;
-        }
-
-        /**
-         * if - Key to watch can't be a prop to mutate to avoid infinite loop
-         *
-         * @param  {Bollean} keysIsNotProp
-         * @return {void}
-         */
-        if (keysIsNotProp) {
-            console.warn(
-                `%c una delel chiavi [${keys}] coincide con la prop '${prop}' da mutare`,
-                this.logStyle
-            );
+            storeComputedKeyUsedWarning(keys, this.logStyle);
             return;
         }
 

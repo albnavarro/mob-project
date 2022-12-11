@@ -40,53 +40,26 @@ export const getDataRecursive = (data) => {
     }, {});
 };
 
-/**
- * Get Validation function Object
- * If use a function with validation check if there is a function that return an object like;
- * key: () => ({
- *   value: 0,
- *   validate: (val) => ....,
- * }),
- * If there isn't a validate function add (val) => true ( always true )
- */
-export const getValidateRecursive = (data) => {
+export const getPropRecursive = (data, prop, fallback) => {
     return Object.entries(data).reduce((p, c) => {
         const [key, value] = c;
         const functionResult = storeType.isFunction(value) ? value() : {};
 
         if (storeType.isObject(value)) {
             // Recursive function if find an Object
-            return { ...p, ...{ [key]: getValidateRecursive(value) } };
+            return {
+                ...p,
+                ...{ [key]: getPropRecursive(value, prop, fallback) },
+            };
         } else if (
             storeType.isFunction(value) &&
             storeType.isObject(functionResult) &&
             'value' in functionResult &&
-            'validate' in functionResult
+            prop in functionResult
         ) {
-            return { ...p, ...{ [key]: functionResult.validate } };
+            return { ...p, ...{ [key]: functionResult[prop] } };
         } else {
-            return { ...p, ...{ [key]: () => true } };
-        }
-    }, {});
-};
-
-export const getTypeRecursive = (data) => {
-    return Object.entries(data).reduce((p, c) => {
-        const [key, value] = c;
-        const functionResult = storeType.isFunction(value) ? value() : {};
-
-        if (storeType.isObject(value)) {
-            // Recursive function if find an Object
-            return { ...p, ...{ [key]: getTypeRecursive(value) } };
-        } else if (
-            storeType.isFunction(value) &&
-            storeType.isObject(functionResult) &&
-            'value' in functionResult &&
-            'type' in functionResult
-        ) {
-            return { ...p, ...{ [key]: functionResult.type } };
-        } else {
-            return { ...p, ...{ [key]: 'any' } };
+            return { ...p, ...{ [key]: fallback } };
         }
     }, {});
 };
