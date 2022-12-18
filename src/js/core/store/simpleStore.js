@@ -23,12 +23,28 @@ export class SimpleStore {
     /**
      * @description
      * SimpleStore inizialization.
-       If objects are used, it is not possible to gcomputedRunningt more than two levels. 
-     * It is possible to have a type and a validation function for each property of the store, the supported types are:
-     * `String | Number | Object | Function | Array | Boolean | Element | NodeList`.
+       If objects are used, it is not possible to nest more than two levels. 
      *
-     * If the type is used the property will not be updated if it doesn't match, you will have a waring.
-       The validation function is non-blocking. the validation status of each property will be displayed in the watchers and will be retrievable using the getValidation() method.
+      `value`:
+       Initial value.
+
+      `type`:
+       Supported types:
+      `String | Number | Object | Function | Array | Boolean | Element | NodeList`.
+       The property will not be updated if it doesn't match, you will have a waring.
+
+       `validation`:
+       Validation function to parse value.
+       This function will have the current value as input parameter and will return a boolean value.
+       The validation status of each property will be displayed in the watchers and will be retrievable using the getValidation() method.
+       
+       `strict`:
+       If set to true, the validation function will become blocking and the property will be updated only if the validation function is successful.
+       THe default value is false.
+
+       `skipEqual`:
+       If the value is equal to the previous one, the property will not be updated. The watches will not be executed and the property will have no effect on the computed related to it.
+       The default value is true.
      *
      *
      * @param {Object} data - local data of the store.
@@ -36,18 +52,22 @@ export class SimpleStore {
      * @example
      * ```js
      *
-     * Use propierties with type checking:
+     * Complex propierties setup:
      * const myStore = new SimpleStore({
      *     myProp: () => ({
      *         value: 10,
      *         type: Number,
      *         validate: (val) => val < 10,
+     *         strict: true,
+     *         skipEqual: false,
      *     }),
      *     myObject: {
      *         prop1: () => ({
      *             value: 0,
      *             type: Number,
      *             validate: (val) => val < 10,
+     *             strict: true,
+     *             skipEqual: true,
      *         }),
      *         prop2: () => ({
      *             value: document.createElement('div'),
@@ -58,7 +78,7 @@ export class SimpleStore {
      *
      *
      *
-     * Use simlple propierties.
+     * Simlple propierties setup;
      * const myStore = new SimpleStore({
      *     prop1: 0,
      *     prop2: 0
@@ -188,6 +208,38 @@ export class SimpleStore {
                 return {};
             } else {
                 return getPropRecursive(data, 'validate', () => true);
+            }
+        })();
+
+        /**
+         * @private
+         *
+         * @description
+         * Main Object that store the strict state of each prop.
+         * Max depth allowed is 2.
+         */
+        this.strict = (() => {
+            if (this.dataDepth > 2) {
+                storeDepthWarning(this.dataDepth, this.logStyle);
+                return {};
+            } else {
+                return getPropRecursive(data, 'strict', false);
+            }
+        })();
+
+        /**
+         * @private
+         *
+         * @description
+         * Main Object that store the skipEqual state.
+         * Max depth allowed is 2.
+         */
+        this.skipEqual = (() => {
+            if (this.dataDepth > 2) {
+                storeDepthWarning(this.dataDepth, this.logStyle);
+                return {};
+            } else {
+                return getPropRecursive(data, 'skipEqual', true);
             }
         })();
 
@@ -384,14 +436,34 @@ export class SimpleStore {
         }
 
         /**
-         * Check if there is a validate function and update validationStatusObject arr
+         * Get validate status
          */
-        this.validationStatusObject[prop] = this.fnValidate[prop](val);
+        const isValidated = this.fnValidate[prop](val);
+
+        /**
+         * In strict mode return is prop is not valid
+         */
+        if (this.strict[prop] && !isValidated) return;
+
+        /**
+         * Update validation array.
+         */
+        this.validationStatusObject[prop] = isValidated;
 
         /**
          * Update value and fire callback associated
          */
         const oldVal = this.store[prop];
+
+        /**
+         * Check if last value is equal new value.
+         * if true and skipEqual is true for this prop return.
+         */
+        if (oldVal === val && this.skipEqual[prop]) return;
+
+        /**
+         * Finally set new value
+         */
         this.store[prop] = val;
 
         if (fireCallback) {
@@ -487,11 +559,40 @@ export class SimpleStore {
         }
 
         /**
+         * Filter all props that pass the strict check.
+         */
+        const strictObjectResult = Object.entries(val)
+            .map((item) => {
+                const [subProp, subVal] = item;
+                return this.strict[prop][subProp]
+                    ? {
+                          strictCheck: this.fnValidate[prop][subProp](subVal),
+                          item,
+                      }
+                    : { strictCheck: true, item };
+            })
+            .filter(({ strictCheck }) => strictCheck === true);
+
+        /**
+         * If all Object prop fail strict check return
+         */
+        const allStrictFail = strictObjectResult.every(
+            (item) => item === false
+        );
+        if (allStrictFail) return;
+
+        /**
+         * Get new Object with only validate and strick passed
+         */
+        const newValParsedByStrict = strictObjectResult
+            .map(({ item }) => item)
+            .reduce((acc, [key, val]) => ({ ...acc, ...{ [key]: val } }), {});
+
+        /**
          * Validate value (value passed to setObj is a Object to merge with original) and store the result in validationStatusObject arr
          * id there is no validation return true, otherwse get boolean value from fnValidate obj
          */
-
-        Object.entries(val).forEach((item) => {
+        Object.entries(newValParsedByStrict).forEach((item) => {
             const [subProp, subVal] = item;
             this.validationStatusObject[prop][subProp] =
                 this.fnValidate[prop][subProp](subVal);
@@ -501,7 +602,40 @@ export class SimpleStore {
          * Update value and fire callback associated
          */
         const oldVal = this.store[prop];
-        this.store[prop] = { ...this.store[prop], ...val };
+        const newObjectValues = {
+            ...this.store[prop],
+            ...newValParsedByStrict,
+        };
+
+        /**
+         * Check if all modified prop have skipEqual = true;
+         */
+        const shouldSkipEqual = Object.keys(newValParsedByStrict).some(
+            (subProp) => {
+                return this.skipEqual[prop][subProp] === true;
+            }
+        );
+
+        /**
+         * Check if all old props value is equal new props value.
+         */
+        const prevValueIsEqualNew = Object.entries(oldVal).reduce(
+            (acc, curr) => {
+                const [key, value] = curr;
+                return value === newObjectValues[key] ? acc : false;
+            },
+            true
+        );
+
+        /**
+         * If shouldSkipEqual = true and previous object is quel new object return.
+         */
+        if (shouldSkipEqual && prevValueIsEqualNew) return;
+
+        /**
+         * Finally update Object.
+         */
+        this.store[prop] = newObjectValues;
 
         if (fireCallback) {
             const fnByProp = this.callBackWatcher.filter(
@@ -755,5 +889,7 @@ export class SimpleStore {
         this.store = {};
         this.type = {};
         this.fnValidate = {};
+        this.strict = {};
+        this.skipEqual = {};
     }
 }

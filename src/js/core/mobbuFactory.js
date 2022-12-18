@@ -766,12 +766,28 @@ export const mobbu = {
     /**
      * @description
      * SimpleStore inizialization.
-       If objects are used, it is not possible to graft more than two levels. 
-     * It is possible to have a type and a validation function for each property of the store, the supported types are:
-     * `String | Number | Object | Function | Array | Boolean | Element | NodeList`.
+       If objects are used, it is not possible to nest more than two levels. 
      *
-     * If the type is used the property will not be updated if it doesn't match, you will have a waring.
-       The validation function is non-blocking. the validation status of each property will be displayed in the watchers and will be retrievable using the getValidation() method.
+      `value`:
+       Initial value.
+
+      `type`:
+       Supported types:
+      `String | Number | Object | Function | Array | Boolean | Element | NodeList`.
+       The property will not be updated if it doesn't match, you will have a waring.
+
+       `validation`:
+       Validation function to parse value.
+       This function will have the current value as input parameter and will return a boolean value.
+       The validation status of each property will be displayed in the watchers and will be retrievable using the getValidation() method.
+       
+       `strict`:
+       If set to true, the validation function will become blocking and the property will be updated only if the validation function is successful.
+       THe default value is false.
+
+       `skipEqual`:
+       If the value is equal to the previous one, the property will not be updated. The watches will not be executed and the property will have no effect on the computed related to it.
+       The default value is true.
      *
      *
      * @param {Object} data - local data of the store.
@@ -779,18 +795,22 @@ export const mobbu = {
      * @example
      * ```js
      *
-     * Use propierties with type checking:
+     * Complex propierties setup:
      * const myStore = mobbu.createStore({
      *     myProp: () => ({
      *         value: 10,
      *         type: Number,
      *         validate: (val) => val < 10,
+     *         strict: true,
+     *         skipEqual: false,
      *     }),
      *     myObject: {
      *         prop1: () => ({
      *             value: 0,
      *             type: Number,
      *             validate: (val) => val < 10,
+     *             strict: true,
+     *             skipEqual: true,
      *         }),
      *         prop2: () => ({
      *             value: document.createElement('div'),
@@ -801,8 +821,8 @@ export const mobbu = {
      *
      *
      *
-     * Use simlple propierties.
-     * const myStore = mobbu.createStore({
+     * Simlple propierties setup;
+     * const myStore = new SimpleStore({
      *     prop1: 0,
      *     prop2: 0
      * });

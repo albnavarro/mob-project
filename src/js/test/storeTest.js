@@ -16,15 +16,25 @@ class StoreTestClass {
 
         const store = mobbu.createStore({
             input: () => ({
-                value: 10,
+                value: 0,
                 type: Number,
                 validate: (val) => val < 10,
+                strict: true,
+                skipEqual: true,
             }),
             obj: {
                 input: () => ({
                     value: 0,
                     type: Number,
                     validate: (val) => val < 10,
+                    strict: true,
+                    skipEqual: true,
+                }),
+                test: () => ({
+                    value: 0,
+                    type: Number,
+                    validate: (val) => val < 10,
+                    strict: true,
                 }),
                 testElement: () => ({
                     value: document.createElement('div'),
@@ -35,11 +45,15 @@ class StoreTestClass {
                     type: NodeList,
                 }),
             },
-            pippo: 0,
+            batchTest: () => ({
+                value: 0,
+                skipEqual: false,
+            }),
             sum: () => ({
                 value: 0,
                 type: Number,
                 validate: (val) => val === 3,
+                skipEqual: true,
             }),
         });
 
@@ -53,11 +67,13 @@ class StoreTestClass {
         const unsubscribeInput = store.watch(
             'input',
             (val, oldVal, validate) => {
+                console.log('Input watched fired');
                 result1.innerHTML = `input1: ${val} ,oldval: ${oldVal} , val is < 10: ${validate}`;
             }
         );
         //
         const unsubscribeObj = store.watch('obj', (val, oldVal, validate) => {
+            console.log('Object watched fired');
             const { input: value } = val;
             const { input: prevValue } = oldVal;
             const { input: error } = validate;
@@ -65,17 +81,25 @@ class StoreTestClass {
             result2.innerHTML = `input2: ${value},oldval: ${prevValue} , val is < 10:${error}`;
         });
         //
+        const unsubscribeBatch = store.watch(
+            'batchTest',
+            (val, oldVal, validate) => {
+                console.log('Batch watched fired');
+            }
+        );
+        //
         const unsubscribeSum = store.watch('sum', (val, oldVal, validate) => {
             console.log('sum watched fired');
+            store.debugStore();
+            console.log('-----------');
             result3.innerHTML = `sum of input field: ${val} ,oldval: ${oldVal} , is equal 3:${validate}`;
         });
 
         // COMPUTED
         store.computed(
             'sum',
-            ['input', 'obj', 'pippo'],
-            (input, obj, pippo) => {
-                console.log(input, obj, pippo);
+            ['input', 'obj', 'batchTest'],
+            (input, obj, batchTest) => {
                 const { input: inputValidation } = store.getValidation();
                 const { obj: inputObjectValidation } = store.getValidation();
 
@@ -87,16 +111,20 @@ class StoreTestClass {
 
         // HANDLER
         inputField1.addEventListener('input', (e) => {
-            // test multiple state change on the samle computed
-            // computed fire once
             store.set('input', parseInt(inputField1.value));
-            const { pippo } = store.get();
-            store.set('pippo', pippo + 1);
-            store.set('pippo', pippo + 1);
         });
 
         inputField2.addEventListener('input', (e) => {
-            store.set('obj', { input: parseInt(inputField2.value) });
+            store.set('obj', {
+                input: parseInt(inputField2.value),
+                test: 22,
+            });
+
+            // test multiple state change on the samle computed
+            // computed fire once
+            const { batchTest } = store.get();
+            store.set('batchTest', batchTest + 1);
+            store.set('batchTest', batchTest + 1);
         });
 
         inputField3.addEventListener('click', (e) => {

@@ -31,7 +31,9 @@ export const getDataRecursive = (data) => {
             storeType.isFunction(value) &&
             storeType.isObject(functionResult) &&
             'value' in functionResult &&
-            ('validate' in functionResult || 'type' in functionResult)
+            ('validate' in functionResult ||
+                'type' in functionResult ||
+                'skipEqual' in functionResult)
         ) {
             return { ...p, ...{ [key]: functionResult.value } };
         } else {
