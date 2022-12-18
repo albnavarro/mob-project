@@ -601,7 +601,7 @@ export class SimpleStore {
         /**
          * Update value and fire callback associated
          */
-        const oldVal = this.store[prop];
+        const oldObjectValues = this.store[prop];
         const newObjectValues = {
             ...this.store[prop],
             ...newValParsedByStrict,
@@ -610,25 +610,21 @@ export class SimpleStore {
         /**
          * Check if all modified prop have skipEqual = true;
          */
-        const shouldSkipEqual = Object.keys(newValParsedByStrict).some(
-            (subProp) => {
-                return this.skipEqual[prop][subProp] === true;
-            }
+        const shouldSkipEqual = Object.keys(newValParsedByStrict).every(
+            (subProp) => this.skipEqual[prop][subProp] === true
         );
 
         /**
          * Check if all old props value is equal new props value.
          */
-        const prevValueIsEqualNew = Object.entries(oldVal).reduce(
-            (acc, curr) => {
-                const [key, value] = curr;
-                return value === newObjectValues[key] ? acc : false;
-            },
-            true
+        const prevValueIsEqualNew = Object.entries(newObjectValues).every(
+            ([key, value]) => value === oldObjectValues[key]
         );
 
         /**
-         * If shouldSkipEqual = true and previous object is quel new object return.
+         * If shouldSkipEqual = true and previous object is equal new object return.
+         * If at least one modified property of the object has skipEqual set to false
+         * then the entire object is considered mutated even if all values are equal
          */
         if (shouldSkipEqual && prevValueIsEqualNew) return;
 
@@ -644,7 +640,7 @@ export class SimpleStore {
             fnByProp.forEach((item) => {
                 item.fn(
                     this.store[prop],
-                    oldVal,
+                    oldObjectValues,
                     this.validationStatusObject[prop]
                 );
             });
