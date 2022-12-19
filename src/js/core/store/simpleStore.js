@@ -23,7 +23,11 @@ export class SimpleStore {
     /**
      * @description
      * SimpleStore inizialization.
+     * The store accepts single properties or objects
        If objects are used, it is not possible to nest more than two levels. 
+       Each individual property can be initialized with a simple value or via a more complex setup.
+       A complex set-up is created through a function that must return an object with the property `value` and at least one of the following properties:
+       `type` || `validation` || `skipEqual`
      *
       `value`:
        Initial value.
@@ -40,17 +44,24 @@ export class SimpleStore {
        
        `strict`:
        If set to true, the validation function will become blocking and the property will be updated only if the validation function is successful.
-       THe default value is false.
+       THe default value is `false`.
 
        `skipEqual`:
        If the value is equal to the previous one, the property will not be updated. The watches will not be executed and the property will have no effect on the computed related to it.
-       The default value is true.
+       The default value is `true`.
      *
      *
      * @param {Object} data - local data of the store.
      *
      * @example
      * ```js
+     *
+     * Simlple propierties setup;
+     * const myStore = new SimpleStore({
+     *     prop1: 0,
+     *     prop2: 0
+     * });
+     *
      *
      * Complex propierties setup:
      * const myStore = new SimpleStore({
@@ -74,14 +85,6 @@ export class SimpleStore {
      *             type: Element,
      *         }),
      *     }
-     * });
-     *
-     *
-     *
-     * Simlple propierties setup;
-     * const myStore = new SimpleStore({
-     *     prop1: 0,
-     *     prop2: 0
      * });
      *
      *
@@ -366,21 +369,27 @@ export class SimpleStore {
     }
 
     /**
-     * @param {String} prop - propierties to update
-     * @param {any} value - new value
-     * @param {Boolean} fireCallback - fire watcher callback on update,  default value is `true`
+     * @param {String} prop - propierties or object to update
+     * @param {(any|function(any):any)} newValue - It is possible to pass the direct value or a function which takes as parameter the current value and which returns the new value
+       If the type of value used is a function, only the new function can be passed
+     * @param {Boolean} [ fireCallback ] - fire watcher callback on update,  default value is `true`
      *
      * @description
-     * Update object and non-objects propierties
+     * Update object and non-objects propierties.
      *
      * @example
      * ```js
+     * Direct value:
      * myStore.set('myProp', newValue, true);
      * myStore.set('myPropObject', { myProp: newValue, ... });
      *
+     * Function that return a value:
+     * myStore.set('myProp', (currentValue) => currentValue + 1);
+     * myStore.set('myPropObject', (obj) => ({ prop: obj.prop + 1, ...}))
+     *
      * ```
      */
-    set(prop, value, fireCallback = true) {
+    set(prop, newValue, fireCallback = true) {
         /**
          * Check if prop exist in store
          */
@@ -388,6 +397,15 @@ export class SimpleStore {
             storeSetWarning(prop, this.logStyle);
             return;
         }
+
+        /**
+         * Check if newValue is a param or function.
+         * Id prop type is a function skip.
+         */
+        const value =
+            checkType(Function, newValue) && this.type[prop] !== Function
+                ? newValue(this.store[prop])
+                : newValue;
 
         if (storeType.isObject(this.store[prop])) {
             this.setObj(prop, value, fireCallback);

@@ -766,7 +766,11 @@ export const mobbu = {
     /**
      * @description
      * SimpleStore inizialization.
+     * The store accepts single properties or objects
        If objects are used, it is not possible to nest more than two levels. 
+       Each individual property can be initialized with a simple value or via a more complex setup.
+       A complex set-up is created through a function that must return an object with the property `value` and at least one of the following properties:
+       `type` || `validation` || `skipEqual`
      *
       `value`:
        Initial value.
@@ -783,17 +787,23 @@ export const mobbu = {
        
        `strict`:
        If set to true, the validation function will become blocking and the property will be updated only if the validation function is successful.
-       THe default value is false.
+       THe default value is `false`.
 
        `skipEqual`:
        If the value is equal to the previous one, the property will not be updated. The watches will not be executed and the property will have no effect on the computed related to it.
-       The default value is true.
+       The default value is `true`.
      *
      *
      * @param {Object} data - local data of the store.
      *
      * @example
      * ```js
+     *
+     * Simlple propierties setup;
+     * const myStore = new SimpleStore({
+     *     prop1: 0,
+     *     prop2: 0
+     * });
      *
      * Complex propierties setup:
      * const myStore = mobbu.createStore({
@@ -819,13 +829,6 @@ export const mobbu = {
      *     }
      * });
      *
-     *
-     *
-     * Simlple propierties setup;
-     * const myStore = new SimpleStore({
-     *     prop1: 0,
-     *     prop2: 0
-     * });
      *
      *
      * Available methods:

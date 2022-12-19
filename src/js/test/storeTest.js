@@ -36,6 +36,13 @@ class StoreTestClass {
                     validate: (val) => val < 10,
                     strict: true,
                 }),
+                test2: () => ({
+                    value: 0,
+                    type: Number,
+                    validate: (val) => val < 5,
+                    strict: true,
+                    skipEqual: false,
+                }),
                 testElement: () => ({
                     value: document.createElement('div'),
                     type: Element,
@@ -96,18 +103,14 @@ class StoreTestClass {
         });
 
         // COMPUTED
-        store.computed(
-            'sum',
-            ['input', 'obj', 'batchTest'],
-            (input, obj, batchTest) => {
-                const { input: inputValidation } = store.getValidation();
-                const { obj: inputObjectValidation } = store.getValidation();
+        store.computed('sum', ['input', 'obj', 'batchTest'], (input, obj) => {
+            const { input: inputValidation } = store.getValidation();
+            const { obj: inputObjectValidation } = store.getValidation();
 
-                return inputValidation && inputObjectValidation.input
-                    ? input + obj.input
-                    : 0;
-            }
-        );
+            return inputValidation && inputObjectValidation.input
+                ? input + obj.input
+                : 0;
+        });
 
         // HANDLER
         inputField1.addEventListener('input', (e) => {
@@ -115,16 +118,15 @@ class StoreTestClass {
         });
 
         inputField2.addEventListener('input', (e) => {
-            store.set('obj', {
+            store.set('obj', (value) => ({
                 input: parseInt(inputField2.value),
                 test: 22,
-            });
+                test2: value.test2 + 1,
+            }));
 
             // test multiple state change on the samle computed
             // computed fire once
-            const { batchTest } = store.get();
-            store.set('batchTest', batchTest + 1);
-            store.set('batchTest', batchTest + 1);
+            store.set('batchTest', (val) => val + 1);
         });
 
         inputField3.addEventListener('click', (e) => {
