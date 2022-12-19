@@ -400,10 +400,12 @@ export class SimpleStore {
 
         /**
          * Check if newValue is a param or function.
-         * Id prop type is a function skip.
+         * Id prop type is a function or last value is a function skip.
          */
         const value =
-            checkType(Function, newValue) && this.type[prop] !== Function
+            checkType(Function, newValue) &&
+            !checkType(Function, this.store[prop]) &&
+            this.type[prop] !== Function
                 ? newValue(this.store[prop])
                 : newValue;
 
