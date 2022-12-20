@@ -105,7 +105,7 @@ export const handleFrame = (() => {
          */
         if (currentFrame === currentFrameLimit) {
             currentFrame = 0;
-            frameStore.set('currentFrame', currentFrame);
+            frameStore.quickSetProp('currentFrame', currentFrame);
             handleFrameIndex.updateKeys(currentFrameLimit);
             handleCache.updateFrameId(currentFrameLimit);
         }
@@ -139,7 +139,7 @@ export const handleFrame = (() => {
         } else {
             isStopped = true;
             currentFrame = 0;
-            frameStore.set('currentFrame', currentFrame);
+            frameStore.quickSetProp('currentFrame', currentFrame);
         }
     };
 
@@ -219,7 +219,7 @@ export const handleFrame = (() => {
         Update currentFrame
         */
         currentFrame++;
-        frameStore.set('currentFrame', currentFrame);
+        frameStore.quickSetProp('currentFrame', currentFrame);
 
         /*
         Reset props

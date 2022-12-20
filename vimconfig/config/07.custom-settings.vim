@@ -28,3 +28,7 @@ nnoremap <C-u> <C-u>zz
 " center screen on next occurence of search
 nnoremap n nzzzv
 nnoremap N Nzzzv
+
+" yank and paste on register a
+vnoremap <leader>y "ay
+vnoremap <leader>p "ap

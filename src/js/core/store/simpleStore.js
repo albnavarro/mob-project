@@ -670,6 +670,35 @@ export class SimpleStore {
     }
 
     /**
+     * @private
+     *
+     * @param {String} prop - propierties to update
+     * @param {any} value - new value
+     *
+     * @description
+     * Update a parameter omitting any type of control, method for internal use for maximum responsiveness.et prop without
+     */
+    quickSetProp(prop, val) {
+        /**
+         * Update value and fire callback associated
+         */
+        const oldVal = this.store[prop];
+
+        /**
+         * Finally set new value
+         */
+        this.store[prop] = val;
+
+        const fnByProp = this.callBackWatcher.filter(
+            (item) => item.prop === prop
+        );
+
+        fnByProp.forEach((item) => {
+            item.fn(val, oldVal, null);
+        });
+    }
+
+    /**
      * @description
      * Get store object
      *
