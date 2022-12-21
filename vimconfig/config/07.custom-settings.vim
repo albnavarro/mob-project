@@ -29,6 +29,10 @@ nnoremap <C-u> <C-u>zz
 nnoremap n nzzzv
 nnoremap N Nzzzv
 
-" yank and paste on register a
-vnoremap <leader>y "ay
-vnoremap <leader>p "ap
+" Paste on register 0
+noremap <Leader>p "0p
+noremap <Leader>P "0P
+vnoremap <Leader>p "0p
+
+" fast replace word from current line to end of file.
+noremap <Leader>s :.,$s/\<<C-r><C-w>\>/<C-r><C-w>/gc<Left><Left><Left>
