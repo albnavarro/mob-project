@@ -11,12 +11,15 @@ nnoremap <silent><nowait> <F4> gg=G
 " Move to viewport
 nnoremap <silent><nowait> <TAB> <C-w>w
 nnoremap <silent><nowait> <S-TAB> <C-w>W
+
+" Resize viewport
 nnoremap <silent> <C-right> :exe "vertical resize " . (winwidth(0) * 3/2)<CR>
 nnoremap <silent> <C-left> :exe "vertical resize " . (winwidth(0) * 2/3)<CR>
 nnoremap <silent> <C-down> :exe "resize " . (winheight(0) * 3/2)<CR>
 nnoremap <silent> <C-up> :exe "resize " . (winheight(0) * 2/3)<CR>
+
+" Open fuzzy finder history
 nnoremap <silent> <C-h> :History<CR>
-nnoremap <silent> <leader>z zszH
 
 " Retab to 4 spaces
 :command RetabToFour :set ts=2 sts=2 noet <bar> :retab! <bar> :set ts=4 sts=4 et <bar> :retab
@@ -36,3 +39,21 @@ vnoremap <Leader>p "0p
 
 " fast replace word from current line to end of file.
 noremap <Leader>s :.,$s/\<<C-r><C-w>\>/<C-r><C-w>/gc<Left><Left><Left>
+
+" Move 1 more lines up or down in normal and visual selection modes.
+nnoremap <C-k> :m .-2<CR>==
+nnoremap <C-j> :m .+1<CR>==
+vnoremap <C-k> :m '<-2<CR>gv=gv
+vnoremap <C-j> :m '>+1<CR>gv=gv
+
+"Shortcut :normal froms election
+vnoremap <Leader>n :normal<Space>
+
+":Ex
+nnoremap <Leader>e :Ex<CR>
+
+":w
+nnoremap <Leader>w :w<CR>
+
+" Center horizontally
+nnoremap <silent> <leader>z zszH
