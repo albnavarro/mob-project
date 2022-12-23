@@ -14,6 +14,8 @@ set incsearch
 set scrolloff=8
 set nohlsearch
 set belloff=all
+" set cursorcolumn
+set cursorline
 syntax on
 
 let g:netrw_banner=0

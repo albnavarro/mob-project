@@ -48,7 +48,7 @@ vnoremap <Leader>p "0p
 noremap <Leader>s :.,$s/\<<C-r><C-w>\>//gc<Left><Left><Left>
 
 " fast replace on whole file.
-noremap <Leader>S :%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>
+noremap <Leader>S :%s/\<<C-r><C-w>\>//gI<Left><Left><Left>
 
 " Move 1 more lines up or down in normal and visual selection modes.
 nnoremap <C-k> :m .-2<CR>==
