@@ -22,12 +22,20 @@ return require('packer').startup(function(use)
     }
 
     use({
-        'joshdick/onedark.vim',
-        as = 'onedark',
+        'folke/tokyonight.nvim',
+        as = 'tokyonight',
         config = function()
-            vim.cmd('colorscheme onedark')
+            vim.cmd('colorscheme tokyonight-storm')
         end
     })
+
+    use {
+        'nvim-tree/nvim-tree.lua',
+        requires = {
+            'nvim-tree/nvim-web-devicons', -- optional, for file icons
+        },
+        tag = 'nightly' -- optional, updated every week. (see issue #1193)
+    }
 
     use({'nvim-treesitter/nvim-treesitter', run = ':TSUpdate'})
 
@@ -85,4 +93,3 @@ return require('packer').startup(function(use)
     end
 
 end)
-

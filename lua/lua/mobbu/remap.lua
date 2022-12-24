@@ -1,16 +1,16 @@
 local function map(mode, lhs, rhs, opts)
-  local options = { noremap=true, silent=true }
-  if opts then
-    options = vim.tbl_extend('force', options, opts)
-  end
-  vim.api.nvim_set_keymap(mode, lhs, rhs, options)
+    local options = { noremap=true, silent=true }
+    if opts then
+        options = vim.tbl_extend('force', options, opts)
+    end
+    vim.api.nvim_set_keymap(mode, lhs, rhs, options)
 end
 
 -- Open new buffer on right move to new buffer and execute Ex command
-map("n", "<A-l>", "<C-w>v<bar><C-w>l<bar>:Ex<CR>", { silent = true })
+-- map("n", "<A-l>", "<C-w>v<bar><C-w>l<bar>:Ex<CR>", { silent = true })
 
 -- Open new buffer on bottom move to new buffer and execute Ex command
-map("n", "<A-k>", "<C-w>s<bar><C-w>j<bar>:Ex<CR>", { silent = true })
+-- map("n", "<A-k>", "<C-w>s<bar><C-w>j<bar>:Ex<CR>", { silent = true })
 
 -- Move 1 more lines up or down in normal and visual selection modes.
 map("v", "<C-J>", ":m '>+1<CR>gv=gv")
@@ -56,8 +56,8 @@ map("n", "<leader>S", [[:%s/\<<C-r><C-w>\>//gI<Left><Left><Left>]], { silent = f
 -- Shortcut :normal froms election
 map("v", "<Leader>n", ":normal<Space>", { silent = false })
 
--- :Ex
-map("n", "<Leader>e", ":Ex<CR>")
+-- :q
+map("n", "<Leader>e", ":q<CR>")
 
 -- :w
 map("n", "<Leader>w", ":w<CR>")
