@@ -86,7 +86,15 @@ return require('packer').startup(function(use)
         }
     }
 
-    use { 'mhartington/formatter.nvim' }
+    -- use { 'mhartington/formatter.nvim' }
+
+    use({
+        "jose-elias-alvarez/null-ls.nvim",
+        config = function()
+            require("null-ls").setup()
+        end,
+        requires = { "nvim-lua/plenary.nvim" },
+    })
 
     if packer_bootstrap then
         require('packer').sync()

@@ -1,4 +1,5 @@
 local lsp = require("lsp-zero")
+local null_ls = require('null-ls')
 
 lsp.preset("recommended")
 
@@ -26,27 +27,31 @@ lsp.configure('stylelint_lsp', {
     filetypes = { "css", "less", "scss", "sugarss", "vue", "wxss" }
 })
 
-lsp.on_attach(function(client, bufnr)
-    local opts = {buffer = bufnr, remap = false}
-
-    if client.name == "eslint" then
-        vim.cmd.LspStop('eslint')
-        return
-    end
-
-    vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-    vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-    vim.keymap.set("n", "<leader>vws", vim.lsp.buf.workspace_symbol, opts)
-    vim.keymap.set("n", "<leader>vd", vim.diagnostic.open_float, opts)
-    vim.keymap.set("n", "[d", vim.diagnostic.goto_next, opts)
-    vim.keymap.set("n", "]d", vim.diagnostic.goto_prev, opts)
-    vim.keymap.set("n", "<leader>vca", vim.lsp.buf.code_action, opts)
-    vim.keymap.set("n", "<leader>vrr", vim.lsp.buf.references, opts)
-    vim.keymap.set("n", "<leader>vrn", vim.lsp.buf.rename, opts)
-    vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help, opts)
-end)
 
 lsp.setup()
+
+local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
+local null_opts = lsp.build_options('null-ls', {})
+
+null_ls.setup({
+    on_attach = function(client, bufnr)
+        if client.supports_method("textDocument/formatting") then
+            vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
+            vim.api.nvim_create_autocmd("BufWritePre", {
+                group = augroup,
+                buffer = bufnr,
+                callback = function()
+                    -- on 0.8, you should use vim.lsp.buf.format({ bufnr = bufnr }) instead
+                    vim.lsp.buf.format({ bufnr = bufnr })
+                end,
+            })
+        end
+    end,
+    sources = {
+        null_ls.builtins.formatting.prettier,
+        null_ls.builtins.formatting.stylelint
+    }
+})
 
 vim.diagnostic.config({
     virtual_text = true,
