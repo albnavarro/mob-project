@@ -22,6 +22,10 @@ lsp.set_preferences({
     }
 })
 
+lsp.configure('stylelint_lsp', {
+    filetypes = { "css", "less", "scss", "sugarss", "vue", "wxss" }
+})
+
 lsp.on_attach(function(client, bufnr)
     local opts = {buffer = bufnr, remap = false}
 
