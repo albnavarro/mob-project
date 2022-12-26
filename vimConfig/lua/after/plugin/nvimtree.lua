@@ -11,6 +11,9 @@ vim.opt.termguicolors = true
 
 -- OR setup with some options
 nvim_tree.setup({
+    git = {
+        ignore = false,
+    },
     sort_by = "case_sensitive",
     view = {
         adaptive_size = true,
