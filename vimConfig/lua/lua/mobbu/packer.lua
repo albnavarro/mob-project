@@ -56,7 +56,7 @@ return require('packer').startup(function(use)
         end
     }
 
-    use('Yggdroot/indentLine')
+    use("lukas-reineke/indent-blankline.nvim")
 
     use {
         'nvim-lualine/lualine.nvim',
@@ -87,14 +87,6 @@ return require('packer').startup(function(use)
     }
 
     use { 'mhartington/formatter.nvim' }
-
-    -- use({
-    --     "jose-elias-alvarez/null-ls.nvim",
-    --     config = function()
-    --         require("null-ls").setup()
-    --     end,
-    --     requires = { "nvim-lua/plenary.nvim" },
-    -- })
 
     if packer_bootstrap then
         require('packer').sync()

@@ -53,8 +53,11 @@ map("n", "<leader>s", [[:.,$s/\<<C-r><C-w>\>//gc<Left><Left><Left>]], { silent =
 -- fast replace on whole file.
 map("n", "<leader>S", [[:%s/\<<C-r><C-w>\>//gI<Left><Left><Left>]], { silent = false })
 
--- Shortcut :normal froms election
-map("v", "<Leader>n", ":normal<Space>", { silent = false })
+-- Shortcut :s/ from election
+map("v", "s", ":s/", { silent = false })
+--
+-- Shortcut :normal from election
+map("v", "n", ":normal<Space>", { silent = false })
 
 -- :q
 map("n", "<Leader>e", ":q<CR>")
