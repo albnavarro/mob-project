@@ -12,6 +12,7 @@ vim.opt.termguicolors = true
 -- OR setup with some options
 nvim_tree.setup({
     git = {
+        enable = false,
         ignore = false,
     },
     sort_by = "case_sensitive",
@@ -32,4 +33,5 @@ nvim_tree.setup({
     },
 })
 
-vim.keymap.set('n', '<Leader>t', ":NvimTreeToggle<CR>")
+vim.keymap.set('n', '<Leader>tt', ":NvimTreeToggle<CR>")
+vim.keymap.set('n', '<Leader>tf', ":NvimTreeFindFile<CR>")
