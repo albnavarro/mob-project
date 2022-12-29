@@ -78,7 +78,7 @@ export function isDescendant(parent, child) {
     return false;
 }
 
-export const simulateClick = function(elem) {
+export const simulateClick = function (elem) {
     // Create our event (with options)
     const evt = new MouseEvent('click', {
         bubbles: true,
@@ -94,7 +94,6 @@ export const simulateClick = function(elem) {
  * @param {HTMLElement} element
  * @returns {Object}
  */
-
 export function getTranslateValues(element) {
     const style = window.getComputedStyle(element);
     const matrix =

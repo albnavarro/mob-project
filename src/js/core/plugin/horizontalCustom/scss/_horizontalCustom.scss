@@ -1,0 +1,101 @@
+$mediaQ: desktop;
+
+.scroller {
+    position: relative;
+
+    &__trigger {
+        @include mq($from: $mediaQ) {
+            left: 0;
+            overflow: hidden;
+            pointer-events: none;
+            position: absolute;
+            right: 0;
+            top: 0;
+            z-index: 10;
+        }
+    }
+
+    &__row {
+        --sectionheight: 100vh;
+
+        @include mq($from: $mediaQ) {
+            display: flex;
+            height: var(--sectionheight);
+        }
+    }
+
+    &__section {
+        height: var(--sectionheight);
+
+        @include mq($from: $mediaQ) {
+            flex: 0 0 auto;
+        }
+    }
+
+    &__shadowEl {
+        display: none;
+
+        @include mq($from: $mediaQ) {
+            display: block;
+            pointer-events: none;
+            width: 100%;
+        }
+    }
+
+    &__shadow {
+        display: none;
+
+        @include mq($from: $mediaQ) {
+            display: block;
+            left: 0;
+            pointer-events: none;
+            position: absolute;
+            right: 0;
+
+            &__in-center,
+            &__out-center,
+            &__left,
+            &__end {
+                border: 1px red dashed;
+                opacity: 0;
+                width: 25%;
+
+                &.debug {
+                    opacity: 1;
+                }
+            }
+
+            &__in-center {
+                padding: 0 40px;
+                position: absolute;
+                right: 0;
+                text-align: center;
+                top: 0;
+            }
+
+            &__out-center {
+                padding: 0 40px;
+                position: absolute;
+                right: 0;
+                text-align: center;
+                top: 0;
+            }
+
+            &__left {
+                left: 50%;
+                padding: 0 40px;
+                position: absolute;
+                text-align: center;
+                top: 0;
+                transform: translateX(-50%);
+            }
+
+            &__end {
+                left: 0;
+                padding-left: 40px;
+                position: absolute;
+                top: 0;
+            }
+        }
+    }
+}

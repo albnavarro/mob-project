@@ -1,5 +1,5 @@
-import { horizontalCustomClass } from '../../component/horizontalCustom/js/horizontalCustom.js';
 import { mobbu } from '../core';
+import { HorizontalCustomClass } from '../core/plugin';
 
 export const noGsap = () => {
     const title = document.querySelector('.js-scroll-item');
@@ -7,8 +7,7 @@ export const noGsap = () => {
         '.test-custom-scroller .scroller__row'
     );
 
-    // Create first scroll to have css for parallax test
-    const horizontalCustom = new horizontalCustomClass({
+    const horizontalCustom = new HorizontalCustomClass({
         rootEl: '.test-custom-scroller',
         forceTranspond: true, // Tryying to massimize performance, move scroll to body on pin
         addCss: true,
@@ -46,7 +45,7 @@ export const noGsap = () => {
     });
 
     // Rtefresh parallax child
-    horizontalCustom.onRefresh((scrollVal) => {
+    horizontalCustom.onRefresh(() => {
         parallaxTest.refresh();
     });
 
@@ -54,10 +53,11 @@ export const noGsap = () => {
     horizontalCustom.init();
     parallaxTest.init();
 
-    const horizontalCustom2 = new horizontalCustomClass({
+    const horizontalCustom2 = new HorizontalCustomClass({
         rootEl: '.test-custom-scroller2',
         forceTranspond: true, // Tryying to massimize performance, move scroll to body on pin
         addCss: true,
     });
+
     horizontalCustom2.init();
 };
