@@ -7,7 +7,7 @@ vim.keymap.set('n', '<leader>fs', builtin.grep_string, {})
 vim.keymap.set('n', '<leader>fb', builtin.buffers, {})
 vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
 vim.keymap.set('n', '<leader>fj', builtin.jumplist, {})
-vim.keymap.set('n', '<leader>fo', builtin.oldfiles, {})
+vim.keymap.set('n', '<C-h>', builtin.oldfiles, {})
 
 require('telescope').setup{
     defaults = {
