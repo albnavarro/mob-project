@@ -1,4 +1,5 @@
 import { mobbu } from '../../../js/core';
+import { bodyScroll } from '../../../js/core/plugin';
 
 class totopClass {
     constructor() {
@@ -18,7 +19,7 @@ class totopClass {
 
     onClick(event) {
         event.preventDefault();
-        mobbu.scrollTo({ target: 0, duration: 1000 });
+        bodyScroll.to({ target: 0, duration: 1000 });
     }
 
     showArrow(scrollY) {

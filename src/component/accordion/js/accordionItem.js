@@ -1,4 +1,5 @@
 import { mobbu } from '../../../js/core';
+import { slide } from '../../../js/core/plugin';
 
 export class AccordionItemClass {
     constructor(data) {
@@ -27,8 +28,8 @@ export class AccordionItemClass {
 
         const targetArray = Array.from(this.target);
         for (const el of targetArray) {
-            mobbu.slide('subscribe', el);
-            mobbu.slide('reset', el);
+            slide.subscribe(el);
+            slide.reset(el);
         }
     }
 
@@ -48,8 +49,8 @@ export class AccordionItemClass {
             const targetArray = Array.from(this.target);
             for (const el of targetArray) {
                 if (el !== target) {
-                    mobbu
-                        .slide('up', el)
+                    slide
+                        .up(el)
                         .then(() => {
                             window.dispatchEvent(new Event('resize'));
                         })
@@ -62,8 +63,8 @@ export class AccordionItemClass {
 
         if (!btn.classList.contains('active')) {
             btn.classList.add('active');
-            mobbu
-                .slide('down', target)
+            slide
+                .down(target)
                 .then(() => {
                     window.dispatchEvent(new Event('resize'));
                     this.dispatch();
@@ -73,8 +74,8 @@ export class AccordionItemClass {
                 });
         } else if (!this.notAllClose && btn.classList.contains('active')) {
             btn.classList.remove('active');
-            mobbu
-                .slide('up', target)
+            slide
+                .up(target)
                 .then(() => {
                     window.dispatchEvent(new Event('resize'));
                     this.dispatch();

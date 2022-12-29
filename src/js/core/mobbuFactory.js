@@ -1,17 +1,11 @@
 import HandleAsyncTimeline from './animation/asyncTimeline/handleAsyncTimeline.js';
-import { bodyScroll } from './animation/bodyScroll/bodyScroll.js';
 import HandleLerp from './animation/lerp/handleLerp.js';
-import { mouseParallax } from './animation/mouseParallax/mouseParallax.js';
-import MouseParallaxItemClass from './animation/mouseParallax/mouseParallaxitem.js';
-import { parallax } from './animation/parallax/parallax.js';
 import { parallaxConstant } from './animation/parallax/parallaxConstant.js';
-import ParallaxItemClass from './animation/parallax/parallaxItem.js';
+import ParallaxClass from './animation/parallax/parallax.js';
 import ParallaxTween from './animation/parallax/parallaxTween.js';
 import HandleMasterSequencer from './animation/sequencer/handleMasterSequencer.js';
 import HandleSequencer from './animation/sequencer/handleSequencer.js';
 import { createStaggers } from './animation/sequencer/sequencerUtils.js';
-import { slide } from './animation/slide/slide.js';
-import SmoothScrollClass from './animation/smoothScroller/smoothScroll.js';
 import HandleSpring from './animation/spring/handleSpring.js';
 import HandleSyncTimeline from './animation/syncTimeline/handleSyncTimeline.js';
 import HandleTween from './animation/tween/handleTween.js';
@@ -43,7 +37,6 @@ import {
 import { handleVisibilityChange } from './events/visibilityChange/handleVisibilityChange.js';
 import { handleSetUp } from './setup.js';
 import { SimpleStore } from './store/simpleStore.js';
-import { LoadImages } from './utils/loadImages.js';
 import { mq } from './utils/mediaManager.js';
 
 export const mobbu = {
@@ -680,7 +673,7 @@ export const mobbu = {
      *
      */
     createParallax(data = {}) {
-        return new ParallaxItemClass({
+        return new ParallaxClass({
             ...data,
             ...{ type: parallaxConstant.TYPE_PARALLAX },
         });
@@ -757,7 +750,7 @@ export const mobbu = {
      * ```
      */
     createScrollTrigger(data = {}) {
-        return new ParallaxItemClass({
+        return new ParallaxClass({
             ...data,
             ...{ type: parallaxConstant.TYPE_SCROLLTRIGGER },
         });
@@ -767,7 +760,7 @@ export const mobbu = {
      * @description
      * SimpleStore inizialization.
      * The store accepts single properties or objects
-       If objects are used, it is not possible to nest more than two levels. 
+       If objects are used, it is not possible to nest more than two levels.
        Each individual property can be initialized with a simple value or via a more complex setup.
        A complex set-up is created through a function that must return an object with the property `value` and at least one of the following properties:
        `type` || `validation` || `skipEqual`
@@ -784,7 +777,7 @@ export const mobbu = {
        Validation function to parse value.
        This function will have the current value as input parameter and will return a boolean value.
        The validation status of each property will be displayed in the watchers and will be retrievable using the getValidation() method.
-       
+
        `strict`:
        If set to true, the validation function will become blocking and the property will be updated only if the validation function is successful.
        THe default value is `false`.
@@ -1325,14 +1318,6 @@ export const mobbu = {
     },
 
     /**
-     * @typedef {Object} scrollToObj
-     * @prop {number|HTMLElement} target
-     * @prop {number}  duration
-     * @prop {('easeLinear'|'easeInQuad'|'easeOutQuad'|'easeInOutQuad'|'easeInCubic'|'easeOutCubic'|'easeInOutCubic'|'easeInQuart'|'easeOutQuart'|'easeInOutQuart'|'easeInQuint'|'easeOutQuint'|'easeInOutQuint'|'easeInSine'|'easeOutSine'|'easeInOutSine'|'easeInExpo'|'easeOutExpo'|'easeInOutExpo'|'easeInCirc'|'easeOutCirc'|'easeInOutCirc'|'easeInElastic'|'easeOutElastic'|'easeInOutElastic'|'easeInBack'|'easeOutBack'|'easeInOutBack'|'easeInBounce'|'easeOutBounce'|'easeInOutBounce')}  ease
-     * @prop {boolean}  prevent
-     **/
-
-    /**
      * @param { import('./utils/mediaManager.js').mqType } action
      * @param { import('./utils/mediaManager.js').breackPointType } breackpoint
      *
@@ -1367,84 +1352,6 @@ export const mobbu = {
 
             default:
                 console.warn(`${action} in mobbu.mq not exist`);
-        }
-    },
-
-    /**
-     * @param {scrollToObj} obj
-     * @description
-     * {
-     *     target: Number|HTMLElement,
-     *     duration: number,
-     *     ease: string,
-     *     prevent: boolean
-     * }
-     */
-    scrollTo(obj = {}) {
-        return bodyScroll.to(obj);
-    },
-
-    slide(action, el) {
-        switch (action) {
-            case 'subscribe':
-                return slide.subscribe(el);
-
-            case 'reset':
-                return slide.reset(el);
-
-            case 'up':
-                return slide.up(el);
-
-            case 'down':
-                return slide.down(el);
-
-            default:
-                console.warn(`${action} in mobbu.slide not exist`);
-        }
-    },
-
-    create(type = '', obj = {}) {
-        switch (type) {
-            case 'mouseParallax':
-                return new MouseParallaxItemClass(obj);
-
-            case 'smoothScroll':
-                return new SmoothScrollClass(obj);
-
-            case 'loadImages':
-                if (obj && 'images' in obj) {
-                    return new LoadImages(obj.images);
-                } else {
-                    console.warn(
-                        `loadImages need a Object with an array of images: {images: [...]}`
-                    );
-                }
-                break;
-
-            default:
-                console.warn(`${type} in mobbu.create not exist`);
-        }
-    },
-
-    /**
-     * @typedef {('parallax'|'mouseParallax')} runType - string
-     **/
-
-    /**
-     * @param prop {runType} string
-     **/
-    run(prop = '') {
-        switch (prop) {
-            case 'parallax':
-                parallax.init();
-                return parallax;
-
-            case 'mouseParallax':
-                mouseParallax.init();
-                return mouseParallax;
-
-            default:
-                console.warn(`${prop} in mobbu.run not exist`);
         }
     },
 };

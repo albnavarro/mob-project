@@ -1,4 +1,4 @@
-import HandleTween from '../tween/handleTween.js';
+import HandleTween from '../../animation/tween/handleTween.js';
 import { outerHeight } from '../../utils/vanillaFunction.js';
 
 /**  slide.subscribe(el);
@@ -69,8 +69,7 @@ export const slide = (() => {
                 .goFromTo({ val: currentHeight }, { val: 0 }, { duration: 500 })
                 .then(() => {
                     res();
-                })
-                .catch(() => {});
+                });
         });
     }
 
@@ -87,13 +86,10 @@ export const slide = (() => {
             const height = outerHeight(item);
             item.style.height = `${currentHeight}px`;
 
-            tween
-                .goTo({ val: height }, { duration: 500 })
-                .then(() => {
-                    item.style.height = `auto`;
-                    res();
-                })
-                .catch(() => {});
+            tween.goTo({ val: height }, { duration: 500 }).then(() => {
+                item.style.height = `auto`;
+                res();
+            });
         });
     }
 

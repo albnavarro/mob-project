@@ -2,6 +2,7 @@ import { lightDescription } from './lightbox-description.js';
 import { lightboxUtils } from './lightbox-utils.js';
 import { lightPichZoom } from './lightbox-zoom-pinch.js';
 import { mobbu } from '.../../../js/core';
+import { LoadImages } from '../../../js/core/plugin/index.js';
 
 class LightBoxImageClass {
     constructor() {
@@ -28,7 +29,7 @@ class LightBoxImageClass {
 
         this.isLoading = true;
 
-        this.loadimage = mobbu.create('loadImages', { images: [url] });
+        this.loadimage = new LoadImages([url]);
         this.loadimage
             .load()
             .then(() => {
@@ -81,15 +82,13 @@ class LightBoxImageClass {
         const maxHeight = window.innerHeight - newHGap;
         const maxWidth = window.innerWidth - newWGap;
 
-        const {
-            ratioWidth,
-            ratioHeight,
-        } = lightboxUtils.calculateAspectRatioFit(
-            width,
-            height,
-            maxWidth,
-            maxHeight
-        );
+        const { ratioWidth, ratioHeight } =
+            lightboxUtils.calculateAspectRatioFit(
+                width,
+                height,
+                maxWidth,
+                maxHeight
+            );
 
         const style = {
             width: `${ratioWidth}px`,

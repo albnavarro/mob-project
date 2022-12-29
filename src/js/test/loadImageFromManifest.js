@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { mobbu } from '../core';
+import { LoadImages } from '../core/plugin';
 
 class loadImageFromManifestClass {
     constructor() {
@@ -17,9 +17,7 @@ class loadImageFromManifestClass {
                 `${this.distPath}${data['pic3.jpg']}`,
             ];
 
-            const imageLoader = mobbu.create('loadImages', {
-                images: imagelist,
-            });
+            const imageLoader = new LoadImages(imagelist);
 
             imageLoader
                 .load()

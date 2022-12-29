@@ -75,4 +75,127 @@ export function indexParallax() {
         onSwitch: 'in-stop',
     });
     parallaxScale.init();
+
+    /**
+     * Various parallax
+     */
+
+    const parallax1 = mobbu.createParallax({
+        item: '.js-index-parallax-1',
+        align: 'start',
+        propierties: 'opacity',
+    });
+    parallax1.init();
+
+    const parallax2 = mobbu.createParallax({
+        item: '.js-index-parallax-2',
+        range: 8.5,
+        align: 'center',
+        ease: true,
+    });
+    parallax2.init();
+
+    const parallax3 = mobbu.createParallax({
+        item: '.js-index-parallax-3',
+        propierties: 'opacity',
+        opacityStart: 110,
+        opacityEnd: 50,
+        ease: true,
+    });
+    parallax3.init();
+
+    const scrollTrigger1 = mobbu.createScrollTrigger({
+        item: '.js-index-scrolltrigger-1',
+        propierties: 'rotate',
+        range: '45deg',
+        start: 'bottom 50vh -halfHeight',
+        end: 'top +20vh',
+        pin: true,
+        marker: 'side-tween-from-top',
+    });
+    scrollTrigger1.init();
+
+    const parallax4 = mobbu.createParallax({
+        item: '.js-index-parallax-4',
+        perspective: 400,
+        propierties: 'rotateX',
+        reverse: true,
+        range: 6,
+    });
+    parallax4.init();
+
+    const parallax5 = mobbu.createParallax({
+        item: '.js-index-parallax-5',
+        reverse: true,
+        ease: true,
+        range: 6,
+    });
+    parallax5.init();
+
+    const parallax6 = mobbu.createParallax({
+        item: '.js-index-parallax-6',
+        ease: true,
+        easeType: 'spring',
+        propierties: 'opacity',
+        opacityStart: 100,
+        opacityEnd: 45,
+    });
+    parallax6.init();
+
+    // const parallax6 = mobbu.createScrollTrigger({
+    //     item: '.js-index-parallax-6',
+    //     ease: true,
+    //     easeType: 'spring',
+    //     start: 'bottom +height',
+    //     end: 'bottom +45vh',
+    //     propierties: 'opacity',
+    //     range: '-1',
+    // });
+    // parallax6.init();
+
+    const parallax7 = mobbu.createParallax({
+        item: '.js-index-parallax-7',
+        range: 9,
+        align: 90,
+        onSwitch: 'in-back',
+        reverse: true,
+        propierties: 'x',
+    });
+    parallax7.init();
+
+    const parallax8 = mobbu.createParallax({
+        item: '.js-index-parallax-8',
+        range: 6,
+        onSwitch: 'in-stop',
+        ease: true,
+    });
+    parallax8.init();
+
+    const parallax9 = mobbu.createParallax({
+        item: '.js-index-parallax-9',
+        range: 4.5,
+        onSwitch: 'out-stop',
+        easeType: 'spring',
+        ease: true,
+    });
+    parallax9.init();
+
+    const parallax10 = mobbu.createParallax({
+        item: '.js-index-parallax-10',
+        range: 9,
+        align: 'bottom',
+        ease: true,
+        disableForce3D: true,
+        easeType: 'spring',
+        propierties: 'rotate',
+    });
+    parallax10.init();
+
+    const parallax11 = mobbu.createParallax({
+        item: '.js-index-parallax-11',
+        range: 2,
+        align: 'end',
+        propierties: 'x',
+    });
+    parallax11.init();
 }

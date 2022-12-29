@@ -1,4 +1,5 @@
-import HandleTween from '../tween/handleTween.js';
+import HandleTween from '../../animation/tween/handleTween.js';
+import { ANIMATION_STOP_REJECT } from '../../events/errorHandler/catchAnimationReject.js';
 import { offset, isNode } from '../../utils/vanillaFunction.js';
 
 /**
@@ -65,7 +66,7 @@ export const bodyScroll = (() => {
                         res();
                     })
                     .catch(() => {
-                        reject();
+                        reject(ANIMATION_STOP_REJECT);
                     });
             });
         }

@@ -5,6 +5,7 @@ import {
     offset,
     mobbu,
 } from '../../../js/core';
+import { bodyScroll } from '../../../js/core/plugin';
 
 export class tBlocksItemClass {
     constructor(container) {
@@ -337,7 +338,7 @@ export class tBlocksItemClass {
         );
 
         setTimeout(() => {
-            mobbu.scrollTo({ target: this.container }).catch((err) => {});
+            bodyScroll.to({ target: this.container });
         }, 500);
     }
 }

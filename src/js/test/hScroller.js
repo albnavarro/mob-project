@@ -1,4 +1,5 @@
 import { mobbu } from '../core';
+import { SmoothScrollClass } from '../core/plugin';
 
 export const hScroller = () => {
     // FIRST
@@ -195,7 +196,7 @@ export const hScroller = () => {
      *
      */
     const inputRange = document.querySelector('.scrollerInput');
-    const smoothScrollFull = mobbu.create('smoothScroll', {
+    const smoothScrollFull = new SmoothScrollClass({
         target: '.scrollerH',
         direction: 'HORIZONTAL',
         speed: 40,
@@ -263,7 +264,7 @@ export const hScroller = () => {
     /**
      *
      */
-    const smoothScrollContiner = mobbu.create('smoothScroll', {
+    const smoothScrollContiner = new SmoothScrollClass({
         target: '.scrollerH2',
         container: '.scrollerH-container2',
         direction: 'HORIZONTAL',
@@ -344,7 +345,7 @@ export const hScroller = () => {
     /**
      *
      */
-    const smoothScrollContiner2 = mobbu.create('smoothScroll', {
+    const smoothScrollContiner2 = new SmoothScrollClass({
         target: '.scrollerH3',
         container: '.scrollerH-container3',
         direction: 'VERTICAL',

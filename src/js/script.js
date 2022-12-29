@@ -68,6 +68,7 @@ import { createStagger } from './test/createStagger.js';
 import { tweenRealtive } from './test/tweenRelative.js';
 import { testCanvas } from './test/testCanvas.js';
 import { freeMode } from './test/freemode.js';
+import { mouseParallaxTest } from './test/mouseParallaxTest.js';
 
 mobbu.useLoad(() => {
     mobbu.setDefault({
@@ -104,8 +105,6 @@ mobbu.useLoad(() => {
 
     const body = document.querySelector('body');
 
-    mobbu.run('parallax');
-    mobbu.run('mouseParallax');
     pageScroll.init();
     tBlocks.init();
     showElement.init();
@@ -214,6 +213,10 @@ mobbu.useLoad(() => {
 
     if (body.classList.contains('page-store')) storeTest.init();
 
+    if (body.classList.contains('template-mouseParallax')) {
+        mouseParallaxTest();
+    }
+
     if (body.classList.contains('page-asyncTimeline')) {
         springTest();
         tweenTest();
@@ -245,11 +248,6 @@ mobbu.useLoad(() => {
 
     if (body.classList.contains('page-mouseStagger')) {
         mouseStagger();
-    }
-
-    if (body.classList.contains('template-fixed')) {
-        const smoothScroll = mobbu.create('smoothScroll');
-        smoothScroll.init();
     }
 
     if (body.classList.contains('template-scrollerH')) {

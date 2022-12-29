@@ -16,9 +16,7 @@ block content
                 h2
                     |#{hello()}
 
-                .js-parallax(
-                    data-align='start',
-                    data-propierties="opacity")
+                .js-index-parallax-1
                     .parallax__item-test
 
                 //- ACCORDION
@@ -103,18 +101,8 @@ block content
                 include ../component/tooltip/pug/tooltip.pug
 
 
-                .parallax__item-test.js-parallax(
-                    data-range='8.5',
-                    data-align='center',
-                    data-ease
-                    data-easeType="lerp")
-
-                .parallax__item-test.js-parallax(
-                    data-opacityStart='110'
-                    data-opacityEnd='50'
-                    data-ease
-                    data-easeType="lerp"
-                    data-propierties="opacity")
+                .js-index-parallax-2.parallax__item-test
+                .js-index-parallax-3.parallax__item-test
 
         include ../component/threeBlocks/pug/tBlocks.pug
         include ../component/threeBlocks/pug/tBlocks.pug
@@ -132,52 +120,26 @@ block content
                     .parallax__item-test
 
             .grid-parallax
-              .grid-parallax__item.js-parallax(
-                  data-type="scrollTrigger"
-                  data-propierties="rotate"
-                  data-range="45deg"
-                  data-start="bottom 50vh -halfHeight"
-                  data-end="top +20vh"
-                  data-pin
-                  data-marker='side-tween-from-top'
-                  )
+              .js-index-scrolltrigger-1.grid-parallax__item
                   .grid-parallax__cell
                     |1
                   .grid-parallax__cell
                     |2
 
             .flex.justify-center
-                .js-parallax(
-                    data-perspective="400"
-                    data-propierties="rotateX"
-                    data-reverse
-                    data-ease
-                    data-range="6")
-                    .js-parallax(
-                        data-reverse
-                        data-ease
-                        data-range="6")
+                .js-index-parallax-4
+                    .js-index-parallax-5
                         .parallax__item-test
 
 
-            .parallax__item-test.js-parallax(
-                data-ease
-                data-easeType='spring'
-                data-propierties="opacity"
-                data-opacityStart="100"
-                data-opacityEnd="45")
+            .parallax__item-test.js-index-parallax-6
 
 
             .clearfix
                 .inlineBLock.js-parallax-scale
                     .parallax__item-test.parallax__item-test--float
 
-            .parallax__item-test.js-parallax(
-                data-range='9',
-                data-align='90',
-                data-onSwitch="in-back",
-                data-reverse,
-                data-propierties="x")
+            .parallax__item-test.js-index-parallax-7
 
 
             .clipath-start.js-toggle-class(
@@ -186,17 +148,10 @@ block content
                     .trasition-item-test
 
             .flex
-                div.js-parallax(
-                    2ata-range='6',
-                    data-onSwitch="in-stop"
-                    data-ease)
+                .js-index-parallax-8
                     .parallax__item-test.parallax__item-test--float
 
-                div.js-parallax(
-                    data-range='4.5',
-                    data-onSwitch="out-stop"
-                    data-easeType='spring'
-                    data-ease)
+                div.js-index-parallax-9
                     .parallax__item-test.parallax__item-test--float
 
             .transformY-start.js-toggle-class(
@@ -206,13 +161,7 @@ block content
                     .trasition-item-test
 
             .flex
-                .parallax__item-test.inlineBLock.js-parallax(
-                    data-range='9',
-                    data-align='bottom',
-                    data-ease,
-                    data-disableForce3D,
-                    data-easeType='spring'
-                    data-propierties="rotate")
+                .parallax__item-test.inlineBLock.js-index-parallax-10
 
 
             .opacity-start.js-toggle-class(
@@ -220,11 +169,7 @@ block content
                 data-endClass="opacity-end")
                     .trasition-item-test
 
-            .parallax__item-test.js-parallax(
-                data-range='2',
-                data-align='end',
-                data-propierties="x")
-
+            .parallax__item-test.js-index-parallax-11
 
             div(style="height:200px;")
 
