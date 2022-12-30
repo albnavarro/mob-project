@@ -72,7 +72,7 @@ end
 
 null_ls.setup({
 	sources = {
-		formatting.stylelint,
+		-- formatting.stylelint,
 		formatting.eslint_d,
 		formatting.prettierd,
 		formatting.stylua,
