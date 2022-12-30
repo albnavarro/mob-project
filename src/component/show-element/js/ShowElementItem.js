@@ -1,4 +1,5 @@
-import { offset, mobbu } from '../../../js/core';
+import { offset } from '../../../js/core/utils';
+import { mobbu } from '../../../js/core';
 
 export class showElementItemClass {
     constructor(data) {

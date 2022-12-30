@@ -48,90 +48,196 @@ import { parallaxUtils } from './parallaxUtils.js';
 
 /**
  * @typedef {object} parallaxDefaultTypes
- * @prop {object} [ tween = null ] - instance of ParallaxTween | HandleSequencer
- * @prop {(string|Element)} item - target element. The default value is a empty Element.
- * @prop {(string|Element)} [ scroller = window ] - The scrollable node in which the target is contained. The default is window.
- * @prop {(string|Element)} [ screen = window ] - A node that contains the scrollable element. The default is window.
- * @prop {(string|Element)} [ trigger = null ] - A reference node from which to take the measurements (position, width, height) instead of the target. The default value is null.
- * @prop {(string|Element)} [ applyTo  = null ] - A node to apply the transformations to instead of the target, applicable only with using native transformations ( x, y, scale, etcc... ). The default value is null.
- * @prop {boolean} [ disableForce3D = false ] - Disable 3D transform added to enable GPU, only valid for native properties ( x, y , scale, etc...). The default value is false.
- * @prop {boolean} [ useThrottle = false ] - Enable a Throttle function on the scroll, the option will not be enabled with the presence of an active pin to maintain accuracy. The default value is false.
- * @prop {('parallax'|'scrolltrigger')} [ type = 'parallax' ]  Main property that defines whether the instance will behave as a parallax or as a scrolltrigger. the default is 'parallax'.
- * @prop {(string|number)} [ range = 0 ] Property that defines the calculation of the distance value.
+ * @prop {object} [ tween = null ] 
+    Instance of ParallaxTween | HandleSequencer
+ * @prop {(string|Element)} item 
+    Target element.
+    The default value is a empty Element.
+ * @prop {(string|Element)} [ scroller = window ] 
+    The scrollable node in which the target is contained.
+    The default is window.
+ * @prop {(string|Element)} [ screen = window ] 
+    A node that contains the scrollable element.
+    The default is window.
+ * @prop {(string|Element)} [ trigger = null ] 
+    A reference node from which to take the measurements (position, width, height) instead of the target.
+    The default value is null.
+ * @prop {(string|Element)} [ applyTo  = null ] 
+    A node to apply the transformations to instead of the target.
+    Applicable only with using native transformations ( x, y, scale, etcc... ). 
+    The default value is null.
+ * @prop {boolean} [ disableForce3D = false ] 
+    Disable 3D transform added to enable GPU.
+    Only valid for native properties ( x, y , scale, etc...).
+    The default value is false.
+ * @prop {boolean} [ useThrottle = false ] 
+    Enable a Throttle function on the scroll.
+    The option will not be enabled with the presence of an active pin to maintain accuracy.
+    The default value is false.
+ * @prop {('parallax'|'scrolltrigger')} [ type = 'parallax' ]  
+    Main property that defines whether the instance will behave as a parallax or as a scrolltrigger.
+    The default is 'parallax'.
+ * @prop {(string|number)} [ range = 0 ] 
+    Property that defines the calculation of the distance value.
 
- * Parallax: A number between `0.1` and `9.99`. The default value is `0`.
+    Parallax: 
+    A number between `0.1` and `9.99`. The default value is `0`.
 
- * Scrolltrigger: String of the following type:
- * - x|y: `+/-100px | +/-100vw | +/-100vh | +/-100w | +/-100h `. the default value is `0px`.
- * - rotate|rotateY|rotateX|rotateZ: `45deg` |  `-45deg`, The default value is 0.
- * - scale: `+/-0.5`, The scale property is increased by 0.5, th default value is 0.
- * - opacity: `+/-` number between 0 and 1.
- * - customCssPropierites: ('margin', 'padding-left', etc ...) Each value will be converted to px, no unit misure is needed.
- * - tween: There are no options the value will be controlled by the tween itself.
- * @prop {number} [ perspective = 0 ] - Apply the css styles perspective: <value>; transform-style: preserve-3d; to the closest parent node. The default value is false
- * @prop {boolean} [ ease = false ] - Defines whether the animation will have ease. The default value is false.
- * @prop {('spring'|'lerp')} [ easeType = 'lerp'] - Defines the type of easing. The default is 'lerp'.
- * @prop {number} [ lerpConfig = 0.06 ] - It defines the initial value of the lerp velocity. The default value is 0.06.
- * @prop {('y'|'x'|'rotate'|'rotateY'|'rotateX'|'rotateZ'|'opacity'|'scale'|'tween')} [ propierties = 'x'] - Defines the applied property, you can apply a custom css property ( ex: 'margin-left' ), if you choose 'tween' you will need to specify a HandleSequencer or ParallaxTween instance in the tween property. The default value is 'x'.
+    Scrolltrigger: String of the following type:
+    - x|y: `+/-100px | +/-100vw | +/-100vh | +/-100w | +/-100h `. the default value is `0px`.
+    - rotate|rotateY|rotateX|rotateZ: `45deg` |  `-45deg`, The default value is 0.
+    - scale: `+/-0.5`, The scale property is increased by 0.5, th default value is 0.
+    - opacity: `+/-` number between 0 and 1.
+    - customCssPropierites: ('margin', 'padding-left', etc ...) Each value will be converted to px, no unit misure is needed.
+    - tween: There are no options the value will be controlled by the tween itself.
+ * @prop {number} [ perspective = 0 ] 
+    Apply the css styles perspective: <value>; transform-style: preserve-3d; to the closest parent node.
+    The default value is false
+ * @prop {boolean} [ ease = false ] 
+    Defines whether the animation will have ease.
+    The default value is false.
+ * @prop {('spring'|'lerp')} [ easeType = 'lerp'] 
+    Defines the type of easing. The default is 'lerp'.
+ * @prop {number} [ lerpConfig = 0.06 ] 
+    It defines the initial value of the lerp velocity.
+    The default value is 0.06.
+ * @prop {('y'|'x'|'rotate'|'rotateY'|'rotateX'|'rotateZ'|'opacity'|'scale'|'tween')} [ propierties = 'x'] 
+    Defines the applied property, you can apply a custom css property ( ex: 'margin-left' ).
+    if you choose 'tween' you will need to specify a HandleSequencer or ParallaxTween instance in the tween property.
+    The default value is 'x'.
  * @prop {('vertical'|'horizontal')} [ direction = 'vertical' ] - Defines the scroll direction
  */
 
 /**
  * @typedef {object} parallaxSpecificTypes
  * @prop {('start'|'top'|'right'|'center'|'bottom'|'left'|'end'|Number)} [ align = 'center' ]
- Defines when the calculation reaches the value 0 ( neutral position ).
- It is possible to use a preset value or a number from 0 to 100 which corresponds to a value calculated with respect to the viewport.
- The default is 'center'.
- * - `start`: top of document.
- * - `end`: end of document.
- * - `center`: center of viewport.
- * - `top/left`: top/left of viewport.
- * - `bottom/right`: bottom/right of viewport.
- * @prop {('in-stop'|'in-back'|'out-stop'|'out-back')} [ onSwitch = false ] - Defines the behavior of the parallax once it reaches point 0. It can continue, stop or go back. The default value is false, in this case the calculation from positive will become negative.
- * @prop {boolean} [ reverse = false ] - Reverse the animation
- * @prop {number} [ opacityStart = 100] - Defines the start value of the opacity animation with respect to the viewport, 100 corresponds to 100vh. The default value is 100.
- * @prop {number} [ opacityEnd = 0 ] - Defines the end value of the opacity animation with respect to the viewport, 100 corresponds to 100vh. The default value is 0
+     Defines when the calculation reaches the value 0 ( neutral position ).
+     It is possible to use a preset value or a number from 0 to 100 which corresponds to a value calculated with respect to the viewport.
+     The default is 'center'.
+    - `start`: top of document.
+    - `end`: end of document.
+    - `center`: center of viewport.
+    - `top/left`: top/left of viewport.
+    - `bottom/right`: bottom/right of viewport.
+ * @prop {('in-stop'|'in-back'|'out-stop'|'out-back')} [ onSwitch = false ] 
+    Defines the behavior of the parallax once it reaches point 0 ( neutral position )
+    It can continue, stop or go back.
+    The default value is null, in this case the calculation from positive will become negative.
+ * @prop {boolean} [ reverse = false ] 
+    Reverse the animation.
+    The default value is false.
+ * @prop {number} [ opacityStart = 100] 
+    Defines the start value of the opacity animation with respect to the viewport.
+    100 corresponds to 100vh.
+    The default value is 100.
+ * @prop {number} [ opacityEnd = 0 ] 
+    Defines the end value of the opacity animation with respect to the viewport.
+    100 corresponds to 100vh.
+    The default value is 0
  * @prop {boolean} [ limiterOff = false ] - Parallax remains active as long as the element remains behind the viewport (with a safety margin of 150px), using this option bypasses this check. The default value is false.
  */
 
 /**
  * @typedef {object} scrolltriggerSpecificTypes
- * @prop {boolean} [ pin = false ] - Activate the pin, the pin will be applied to the defined element of the item property. The default value is false.
- * @prop {boolean} [ animatePin = false ] - A spring animation will be applied to the pinned element which will animate the moment in which the element will move into position: fixed.
- * @prop {boolean} [ forceTranspond = false ] - The element at the time of being pinned will be removed from the original position hanging from the document body even if not necessary. The default value is false.
- * @prop {boolean} [ anticipatePinOnLoad = false ] - The pin is always activated a little earlier based on the last scroll made. With this property, when loading the page and without having performed any scrolling, the element can be pinned even if slightly earlier than the preset position. The default value is false.
+ * @prop {boolean} [ pin = false ] 
+    Activate the pin.
+    The pin will be applied to the defined element of the item property.
+    The default value is false.
+ * @prop {boolean} [ animatePin = false ] 
+    A spring animation will be applied to the pinned element on state change.
+ * @prop {boolean} [ forceTranspond = false ] 
+    The element will always be appended to the document body.
+    The default value is false.
+ * @prop {boolean} [ anticipatePinOnLoad = false ] 
+    The pin is always activated a little earlier based on the last scroll made.
+    With this property, when loading the page and without having performed any scrolling,
+    the element can be pinned even if slightly earlier than the preset position.
+    The default value is false.
  * @prop {string} [ start = '0px']
- * - Defines the start position of the animation, the value is a string made up of 3 optional values:
- * - 1 => `bottom|top|left|right`: Indicates the side of the viewport that will be referenced. If the value is 'bottom|right' the animation will be understood as if the element enters the scene from the bottom|right and its reference will be its top|left side.
- * - 2 => `+/-<value>vh|vw|px`: add a value in vh|vw|px, vh in vertical direction, vw in horizontal direction,
- * - 3 => `+/-height|halfHeight|width|halfWidth`: You can add the height/width value or half of one of them to the final value, which is useful for centering the element.
- * - The values 2 & 3 will always be added from the chosen position towards the center of the screen, whether the position corresponds to top|bottom etc... Expamples: `bottom +50vh -halfHeight` the value corresponding to the element position centered in the viewport. All the values is case insensitive
+    Defines the start position of the animation, the value is a string made up of 3 optional values:
+
+    1: `bottom|top|left|right`:
+    Indicates the side of the viewport that will be referenced.
+
+    2: `+/-<value>vh|vw|px`: 
+    add a value in vh|vw|px, vh in vertical direction, vw in horizontal direction,
+
+    3: `+/-height|halfHeight|width|halfWidth`:
+    You can add the height/width value or half of one of them to the final value.
+    Useful for centering the element.
+
+    The values 2 & 3 will always be added from the chosen position towards the center of the screen,
+    whether the position corresponds to top|bottom left|right
+
+    Expamples: `bottom +50vh -halfHeight` the value corresponding to the element position centered in the viewport.
+    All the values is case insensitive
+
  * @prop {string} [ end = '0px']
- * - Defines the end position of the animation, the value is a string made up of 3 optional values:
- * - 1 => `bottom|top|left|right`: Indicates the side of the viewport that will be referenced. If the value is 'bottom|right' the animation will be understood as if the element enters the scene from the bottom|right and its reference will be its top|left side.
- * - 2 => `+/-<value>vh|vw|px`: add a value in vh|vw|px, vh in vertical direction, vw in horizontal direction,
- * - 3 => `+/-height|halfHeight|width|halfWidth`: You can add the height/width value or half of one of them to the final value, which is useful for centering the element.
- * - The values 2 & 3 will always be added from the chosen position towards the center of the screen, whether the position corresponds to top|bottom etc... Expamples: `top +50vh -halfHeight` the value corresponding to the element position centered in the viewport if element start from bottom. All the values is case insensitive
- * @prop {boolean} [ fromTo = false ] - Reverse the animation. The default is false.
- * @prop {string} [ marker = false ] - Display start|end values with a solid line, in case you activate the pin property the top|bottom|right|left border of the pin warapper will have a highlight border applied. The value is a text string that will be added to the fixed line. The default value is false.
- * @prop {object} [ dynamicStart = null ] - The start position calculated with the help of a function, the resulting value of the function will be calculated starting from the specified position towards the center of the viewport, if the property is used it will take precedence over start.
- * @prop {('bottom'|'top'|'left'|'right')} dynamicStart.postion - Start position
- * @prop {function():number} dynamicStart.value - Function that return a Number
- * @prop {object} [ dynamicEnd = null ] - The end position calculated with the help of a function, the resulting value of the function will be calculated starting from the specified position towards the center of the viewport, if the property is used it will take precedence over end.
- * @prop {('bottom'|'top'|'left'|'right')} dynamicEnd.postion - End position
- * @prop {function():number} dynamicEnd.value - Function that return a Number
- * @prop {function():number} [ dynamicRange  = null] - The transformation value calculated through the use of a function, the result of the function will be used in px. If used, it will take priority over the range method.
- * @prop {boolean} [ animateAtStart = false ] - The element will animate with easing (if used) on loading the page or animation. The default value is false.
+ - Defines the end position of the animation, the value is a string made up of 3 optional values:
+
+    1: `bottom|top|left|right`:
+    Indicates the side of the viewport that will be referenced.
+
+    2: `+/-<value>vh|vw|px`: 
+    add a value in vh|vw|px, vh in vertical direction, vw in horizontal direction,
+
+    3: `+/-height|halfHeight|width|halfWidth`:
+    You can add the height/width value or half of one of them to the final value.
+    Useful for centering the element.
+
+    The values 2 & 3 will always be added from the chosen position towards the center of the screen,
+    whether the position corresponds to top|bottom left|right
+
+    Expamples: `bottom +50vh -halfHeight` the value corresponding to the element position centered in the viewport.
+    All the values is case insensitive
+ * @prop {boolean} [ fromTo = false ] 
+    Reverse the animation.
+    The default is false.
+ * @prop {string} [ marker = false ] 
+    Display start|end values with a solid line.
+    In case you activate the pin property the top|bottom|right|left border of the pin warapper
+    will have a highlight border applied.
+    The value is a text string that will be added to the fixed line.
+    The default value is false.
+ * @prop {object} [ dynamicStart = null ] 
+    The start position calculated with the help of a function.
+    the resulting value of the function will be calculated starting from the specified position towards the center of the viewport.
+    if the property is used it will take precedence over start.
+ * @prop {('bottom'|'top'|'left'|'right')} dynamicStart.postion 
+    Start position
+ * @prop {function():number} dynamicStart.value 
+    Function that return a Number
+ * @prop {object} [ dynamicEnd = null ] 
+    The end position calculated with the help of a function.
+    The resulting value of the function will be calculated starting from the specified position towards the center of the viewport.
+    If the property is used it will take precedence over end.
+ * @prop {('bottom'|'top'|'left'|'right')} dynamicEnd.postion 
+    End position
+ * @prop {function():number} dynamicEnd.value 
+    Function that return a Number
+ * @prop {function():number} [ dynamicRange  = null] 
+    The transformation value calculated through the use of a function.
+    The result of the function will be used in px.
+    If used, it will take priority over the range method.
+ * @prop {boolean} [ animateAtStart = false ] 
+    The element will animate with easing (if used) on loading the page or animation.
+    The default value is false.
  * @prop {function():void} [ onEnter = null ] -
  * @prop {function():void} [ onEnterBack = null ] -
  * @prop {function():void} [ onLeave = null ] -
  * @prop {function():void} [ onLeaveBack = null ]-
- * @prop {function(Number):void} [ onTick = null ] - Function that is launched at each tick, the function will have the current value as input parameter.
+ * @prop {function(Number):void} [ onTick = null ] 
+    Function that is launched at each tick.
+    The function will have the current value as input parameter.
+ */
+
+/**
+ * @typedef  { parallaxDefaultTypes & import('../../utils/mediaManager.js').breackPointTypeObj & import('../../utils/mediaManager.js').mqTypeObject & import('../spring/springConfig.js').springConfigParallaxTypes & parallaxSpecificTypes & scrolltriggerSpecificTypes } parallaxConstructor
  */
 
 export default class ParallaxClass {
     /**
-     * @param { parallaxDefaultTypes & import('../../utils/mediaManager.js').breackPointTypeObj & import('../../utils/mediaManager.js').mqTypeObject & import('../spring/springConfig.js').springConfigParallaxTypes & parallaxSpecificTypes & scrolltriggerSpecificTypes }  data
+     * @param  { parallaxConstructor } data
      *
      * @example
      *

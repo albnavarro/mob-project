@@ -1,6 +1,6 @@
 import { gsap } from 'gsap';
 import { ScrollToPlugin } from 'gsap/all';
-import { outerHeight } from '../core/utils/vanillaFunction.js';
+import { outerHeight } from '../core/utils';
 
 export function slideUpDownReset(target) {
     target.style.height = 0;

@@ -621,7 +621,11 @@ export const mobbu = {
     },
 
     /**
-     * @param { import('./animation/parallax/parallax.js').parallaxDefaultTypes & import('./utils/mediaManager.js').breackPointTypeObj & import('./animation/spring/springConfig.js').springConfigParallaxTypes & import('./utils/mediaManager.js').mqTypeObject & import('./animation/parallax/parallax.js').parallaxSpecificTypes } data
+     * @typedef { import('./animation/parallax/parallax.js').parallaxDefaultTypes & import('./utils/mediaManager.js').breackPointTypeObj & import('./animation/spring/springConfig.js').springConfigParallaxTypes & import('./utils/mediaManager.js').mqTypeObject & import('./animation/parallax/parallax.js').parallaxSpecificTypes } createParallaxType
+     */
+
+    /**
+     * @param { createParallaxType } data
      *
      * @example
      * ```js
@@ -680,7 +684,11 @@ export const mobbu = {
     },
 
     /**
-     * @param { import('./animation/parallax/parallax.js').parallaxDefaultTypes & import('./utils/mediaManager.js').breackPointTypeObj & import('./animation/spring/springConfig.js').springConfigParallaxTypes & import('./utils/mediaManager.js').mqTypeObject & import('./animation/parallax/parallax.js').scrolltriggerSpecificTypes  } data
+     * @typedef { import('./animation/parallax/parallax.js').parallaxDefaultTypes & import('./utils/mediaManager.js').breackPointTypeObj & import('./animation/spring/springConfig.js').springConfigParallaxTypes & import('./utils/mediaManager.js').mqTypeObject & import('./animation/parallax/parallax.js').scrolltriggerSpecificTypes  } createScrollTriggerType
+     */
+
+    /**
+     * @param { createScrollTriggerType } data
      *
      * @example
      *

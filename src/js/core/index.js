@@ -40,19 +40,5 @@ export { handleSetUp } from './setup.js';
 export { SimpleStore } from './store/simpleStore.js';
 export { mq } from './utils/mediaManager.js';
 
-export {
-    outerHeight,
-    outerWidth,
-    offset,
-    position,
-    getSiblings,
-    getParents,
-    isDescendant,
-    simulateClick,
-    getTranslateValues,
-    isNode,
-    isElement,
-} from './utils/vanillaFunction.js';
-
 // Factory class
 export { mobbu } from './mobbuFactory.js';

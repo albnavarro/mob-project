@@ -15,6 +15,14 @@ return require('packer').startup(function(use)
     -- Packer can manage itself
     use 'wbthomason/packer.nvim'
 
+    use { 'dense-analysis/ale', as = 'ale' }
+
+    use {
+        'neoclide/coc.nvim',
+        as = 'coc',
+        branch = 'release'
+    }
+
     use {
         'nvim-telescope/telescope.nvim', tag = '0.1.0',
         -- or                            , branch = '0.1.x',
@@ -33,8 +41,7 @@ return require('packer').startup(function(use)
         'nvim-tree/nvim-tree.lua',
         requires = {
             'nvim-tree/nvim-web-devicons', -- optional, for file icons
-        },
-        tag = 'nightly' -- optional, updated every week. (see issue #1193)
+        }
     }
 
     use({'nvim-treesitter/nvim-treesitter', run = ':TSUpdate'})
@@ -56,7 +63,7 @@ return require('packer').startup(function(use)
         end
     }
 
-    use('Yggdroot/indentLine')
+    use("lukas-reineke/indent-blankline.nvim")
 
     use {
         'nvim-lualine/lualine.nvim',
@@ -65,10 +72,6 @@ return require('packer').startup(function(use)
     }
 
     use { 'digitaltoad/vim-pug' }
-
-    use { 'dense-analysis/ale' }
-
-    use {'neoclide/coc.nvim', branch = 'release'}
 
     if packer_bootstrap then
         require('packer').sync()

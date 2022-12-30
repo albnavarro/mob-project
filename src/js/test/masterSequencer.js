@@ -1,4 +1,5 @@
-import { mobbu, outerHeight } from '../core';
+import { outerHeight } from '../core/utils';
+import { mobbu } from '../core';
 
 export const masterSequencer = () => {
     const items = document.querySelectorAll('.master-stagger__item');

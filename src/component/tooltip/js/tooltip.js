@@ -1,5 +1,10 @@
 import { modernzier } from '../../../js/utility/modernizr.js';
-import { outerWidth, offset, getParents, getSiblings } from '../../../js/core';
+import {
+    outerWidth,
+    offset,
+    getParents,
+    getSiblings,
+} from '../../../js/core/utils';
 
 class toolTipClass {
     constructor() {

@@ -2,12 +2,12 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 import {
-    offset,
     outerHeight,
     outerWidth,
     getTranslateValues,
-    mobbu,
-} from '../../../js/core';
+} from '../../../js/core/utils';
+
+import { mobbu } from '../../../js/core';
 
 export class GsapHorizontalCustomClass {
     constructor(data = {}) {

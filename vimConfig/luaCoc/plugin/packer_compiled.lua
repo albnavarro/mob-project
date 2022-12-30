@@ -85,15 +85,15 @@ _G.packer_plugins = {
     path = "/home/albertonavarro/.local/share/nvim/site/pack/packer/start/ale",
     url = "https://github.com/dense-analysis/ale"
   },
-  ["coc.nvim"] = {
+  coc = {
     loaded = true,
-    path = "/home/albertonavarro/.local/share/nvim/site/pack/packer/start/coc.nvim",
+    path = "/home/albertonavarro/.local/share/nvim/site/pack/packer/start/coc",
     url = "https://github.com/neoclide/coc.nvim"
   },
-  indentLine = {
+  ["indent-blankline.nvim"] = {
     loaded = true,
-    path = "/home/albertonavarro/.local/share/nvim/site/pack/packer/start/indentLine",
-    url = "https://github.com/Yggdroot/indentLine"
+    path = "/home/albertonavarro/.local/share/nvim/site/pack/packer/start/indent-blankline.nvim",
+    url = "https://github.com/lukas-reineke/indent-blankline.nvim"
   },
   lualine = {
     loaded = true,

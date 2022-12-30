@@ -1,4 +1,5 @@
-import { mobbu, outerHeight } from '../core';
+import { outerHeight } from '../core/utils';
+import { mobbu } from '../core';
 
 export const scrollStagger = () => {
     const items = document.querySelectorAll('rect');

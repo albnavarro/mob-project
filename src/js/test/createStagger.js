@@ -1,4 +1,5 @@
-import { mobbu, outerHeight } from '../core';
+import { outerHeight } from '../core/utils';
+import { mobbu } from '../core';
 
 export const createStagger = () => {
     const items = document.querySelectorAll('.create-stagger__item');

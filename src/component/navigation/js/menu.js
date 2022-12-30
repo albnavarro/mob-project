@@ -1,8 +1,4 @@
-import {
-    disableBodyScroll,
-    enableBodyScroll,
-    clearAllBodyScrollLocks,
-} from 'body-scroll-lock';
+import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
 
 import {
     slideUpDownReset,
@@ -18,8 +14,9 @@ import {
     offset,
     getParents,
     getSiblings,
-    mobbu,
-} from '../../../js/core';
+} from '../../../js/core/utils';
+
+import { mobbu } from '../../../js/core';
 
 export class menuClass {
     constructor(data) {
@@ -181,8 +178,10 @@ export class menuClass {
             this.parentItemPos = 0;
             this.parentItemWidth = 0;
             this.maxLevel = [...this.submenu].reduce((p, c) => {
-                const numSubmenuParents = getParents(c, context.SUB_MENU)
-                    .length;
+                const numSubmenuParents = getParents(
+                    c,
+                    context.SUB_MENU
+                ).length;
                 return numSubmenuParents > p ? numSubmenuParents : p;
             }, 1);
             this.totalWidth = 0;

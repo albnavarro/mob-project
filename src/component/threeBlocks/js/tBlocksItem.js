@@ -3,8 +3,8 @@ import {
     outerWidth,
     outerHeight,
     offset,
-    mobbu,
-} from '../../../js/core';
+} from '../../../js/core/utils';
+import { mobbu } from '../../../js/core';
 import { bodyScroll } from '../../../js/core/plugin';
 
 export class tBlocksItemClass {

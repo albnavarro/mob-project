@@ -1,6 +1,7 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { offset, outerHeight, outerWidth, mobbu } from '../core';
+import { outerWidth } from '../core/utils';
+import { mobbu } from '../core';
 
 class gsapTestClass {
     constructor() {}

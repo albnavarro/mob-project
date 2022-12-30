@@ -21,4 +21,3 @@ vim.opt.signcolumn = "yes"
 vim.opt.colorcolumn = "80"
 vim.opt.cursorline = true
 vim.g.netrw_banner = 0
-vim.g.vim_json_conceal=0

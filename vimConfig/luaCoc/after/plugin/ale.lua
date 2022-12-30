@@ -11,7 +11,7 @@ let g:ale_linters = {
     \   'javascript': ['eslint'],
     \   'scss': ['stylelint'],
     \}
-    
+
 let g:ale_fix_on_save = 1
 let g:ale_disable_lsp = 1
 

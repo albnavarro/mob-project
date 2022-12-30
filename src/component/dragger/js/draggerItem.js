@@ -1,4 +1,5 @@
-import { isDescendant, mobbu } from '.../../../js/core';
+import { isDescendant } from '.../../../js/core/utils';
+import { mobbu } from '.../../../js/core';
 
 export class DraggerItemClass {
     constructor(data) {

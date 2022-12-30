@@ -1,4 +1,5 @@
-import { outerHeight, outerWidth, offset, mobbu } from '.../../../js/core';
+import { outerHeight, outerWidth } from '.../../../js/core/utils';
+import { mobbu } from '.../../../js/core';
 
 class LightPichZoomClass {
     constructor() {

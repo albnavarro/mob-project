@@ -1,9 +1,9 @@
 local function map(mode, lhs, rhs, opts)
-    local options = { noremap=true, silent=true }
-    if opts then
-        options = vim.tbl_extend('force', options, opts)
-    end
-    vim.api.nvim_set_keymap(mode, lhs, rhs, options)
+	local options = { noremap = true, silent = true }
+	if opts then
+		options = vim.tbl_extend("force", options, opts)
+	end
+	vim.api.nvim_set_keymap(mode, lhs, rhs, options)
 end
 
 -- Open new buffer on right move to new buffer and execute Ex command
@@ -43,9 +43,9 @@ map("n", "n", "nzzzv")
 map("n", "N", "Nzzzv")
 
 --  Paste from register 0
-map("n", "<Leader>p", "\"0p")
-map("n", "<Leader>P", "\"0P")
-map("v", "<Leader>p", "\"0p")
+map("n", "<Leader>p", '"0p')
+map("n", "<Leader>P", '"0P')
+map("v", "<Leader>p", '"0p')
 
 -- fast replace word from current line to end of file with confirm.
 map("n", "<leader>s", [[:.,$s/\<<C-r><C-w>\>//gc<Left><Left><Left>]], { silent = false })
@@ -54,7 +54,7 @@ map("n", "<leader>s", [[:.,$s/\<<C-r><C-w>\>//gc<Left><Left><Left>]], { silent =
 map("n", "<leader>S", [[:%s/\<<C-r><C-w>\>//gI<Left><Left><Left>]], { silent = false })
 
 -- Shortcut :s/ from election
-map("v", "s", ":s/", { silent = false })
+map("v", "<leader>s", ":s/", { silent = false })
 --
 -- Shortcut :normal from election
 map("v", "n", ":normal<Space>", { silent = false })

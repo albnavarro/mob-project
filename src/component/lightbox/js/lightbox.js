@@ -1,8 +1,4 @@
-import {
-    disableBodyScroll,
-    enableBodyScroll,
-    clearAllBodyScrollLocks,
-} from 'body-scroll-lock';
+import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
 import { lightDescription } from './lightbox-description.js';
 import { lightboxUtils } from './lightbox-utils.js';
 import { lightBoxImage } from './lightbox-image.js';
