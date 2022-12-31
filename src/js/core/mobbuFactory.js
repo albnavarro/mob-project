@@ -855,7 +855,8 @@ export const mobbu = {
 
     /**
      * @description
-     * Execute a callBack within the first available request animation frame. Use this method to modify elements of the DOM
+    Execute a callBack within the first available request animation frame.
+    Use this method to modify elements of the DOM
      *
      * @param {function(import('./events/rafutils/handleFrame.js').handleFrameTypes):void } callback - callback function
      *
@@ -953,7 +954,9 @@ export const mobbu = {
 
     /**
      * @description
-     * Runs a request animation frame loop to detect the frame rate of the monitor. After the method will be resolved the first time, subsequent calls will be resolved immediately returning the previously calculated value. The method is launched the first time automatically at the first loading.
+        Runs a request animation frame loop to detect the frame rate of the monitor.
+        After the method will be resolved the first time, subsequent calls will be resolved immediately returning the previously calculated value.
+        The method is launched the first time automatically at the first loading.
      *
      * @param {function(import('./events/rafutils/loadFps.js').loadFpsType):void } callback - callback function
      * @return {Promise}

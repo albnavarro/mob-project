@@ -5,6 +5,7 @@
     "additionalData": ["nav.json"],
     "registerComponent": [
         "to-top/pug/toTop.pug",
-        "horizontalCustom/pug/horizontalCustom.pug"
+        "horizontalCustom/pug/horizontalCustom.pug",
+        "horizontalCustom/pug/horizontalCustom2.pug"
     ]
 }

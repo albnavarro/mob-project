@@ -1,12 +1,13 @@
 $mediaQ: desktop;
 
-.scroller__section {
+.scroller__section,
+.scroller__section2 {
     @include mq($from: $mediaQ) {
-        width: 80vw;
+        align-items: center;
         border: 1px #000 solid;
         display: flex;
         justify-content: center;
-        align-items: center;
+        width: 80vw;
 
         &:nth-of-type(2) {
             width: 400px;
@@ -20,9 +21,9 @@ $mediaQ: desktop;
             width: 400px;
 
             h1 {
+                flex: 0 0 auto;
                 font-size: 300px;
                 white-space: nowrap;
-                flex: 0 0 auto;
             }
         }
 

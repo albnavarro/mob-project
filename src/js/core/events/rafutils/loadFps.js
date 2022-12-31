@@ -4,12 +4,15 @@ let loadFpsIsReady = false;
 
 /**
  * @typedef {object} loadFpsType
- * @prop {number} averageFPS - detected fps value
+ * @prop {number} averageFPS
+    Detected fps value
  */
 
 /**
  * @description
- * Runs a request animation frame loop to detect the frame rate of the monitor. After the method will be resolved the first time, subsequent calls will be resolved immediately returning the previously calculated value. The method is launched the first time automatically at the first loading.
+Runs a request animation frame loop to detect the frame rate of the monitor.
+After the method will be resolved the first time, subsequent calls will be resolved immediately returning the previously calculated value.
+The method is launched the first time automatically at the first loading.
  *
  * @param {number} [ duration = 30 ] - loop duration in frame, the default value is 30.
  * @return {Promise.<loadFpsType>} The promise launched after the loop

@@ -8,8 +8,16 @@ export const noGsap = () => {
     );
 
     const horizontalCustom = new HorizontalCustomClass({
-        rootEl: '.test-custom-scroller',
+        root: '.test-custom-scroller',
+        container: '.scroller',
+        row: '.scroller__row',
+        column: '.scroller__section',
+        trigger: '.scroller__triggerT',
+        shadow: '.shadowClass1',
         forceTranspond: true, // Tryying to massimize performance, move scroll to body on pin
+        animateAtStart: false,
+        ease: true,
+        // easeType: 'spring',
         addCss: true,
     });
 
@@ -54,10 +62,22 @@ export const noGsap = () => {
     parallaxTest.init();
 
     const horizontalCustom2 = new HorizontalCustomClass({
-        rootEl: '.test-custom-scroller2',
+        root: '.test-custom-scroller2',
+        container: '.scroller',
+        row: '.scroller__row2',
+        column: '.scroller__section2',
+        trigger: '.scroller__triggerT2',
+        shadow: '.shadowClass2',
         forceTranspond: true, // Tryying to massimize performance, move scroll to body on pin
+        ease: true,
         addCss: true,
     });
 
     horizontalCustom2.init();
+
+    // document.body.addEventListener('click', () => {
+    //     horizontalCustom.destrory();
+    //     parallaxTest.destroy();
+    //     horizontalCustom2.refresh();
+    // });
 };

@@ -11,14 +11,22 @@ import { loadFps } from './loadFps.js';
 
 /**
  * @typedef {Object} handleFrameTypes
- * @prop {number} time - The total activity time of the request animation frame
- * @prop {number} fps - Current fps value, the starting fps value is 60, the effective value of the fps property will occur 30 frames after the initialization of handleFrame, 30 frames the minimum interval to have a correct result.
- * @prop {boolean} shouldRender - If the useScaleFps global property is on, the property indicates whether there is a drop in frame rate compared to the optimal frame rate calculated at application startup.
+ * @prop {number} time 
+    The total activity time of the request animation frame
+ * @prop {number} fps 
+    Current fps value, the starting fps value is 60.
+    The effective value of the fps property will occur 30 frames after the initialization of handleFrame,
+    30 frames the minimum interval to have a correct result.
+ * @prop {boolean} shouldRender 
+    If the useScaleFps global property is on,
+    the property indicates whether there is a drop in frame rate compared 
+    to the optimal frame rate calculated at application startup.
  */
 
 /**
  * @description
- * Execute a callBack within the first available request animation frame. Use this method to modify elements of the DOM
+    Execute a callBack within the first available request animation frame.
+    Use this method to modify elements of the DOM
  */
 export const handleFrame = (() => {
     /**

@@ -5,6 +5,7 @@ import { handleResize } from '../../../events/resizeUtils/handleResize';
 import { getTranslateValues, outerWidth } from '../../../utils/vanillaFunction';
 import { horizontalCustomCss } from './horizontalCustomCss.js';
 import { mq } from '../../../utils/mediaManager.js';
+import { handleFrameIndex } from '../../../events/rafutils/handleFrameIndex';
 
 export class HorizontalCustomClass {
     constructor(data = {}) {
@@ -12,24 +13,62 @@ export class HorizontalCustomClass {
         this.queryType = data.queryType || 'min';
         this.forceTranspond = data.forceTranspond || false;
         this.addCss = data.addCss || false;
-        this.mainContainer = document.querySelector(data.rootEl);
-        this.triggerContainer =
-            this.mainContainer.querySelector('.scroller__trigger');
-        this.row = this.mainContainer.querySelector('.scroller__row');
-        this.cards = this.mainContainer.querySelectorAll('.scroller__section');
+        this.animateAtStart = data?.animateAtStart;
+        this.ease = data?.ease;
+        this.easeType = data?.easeType;
+
+        // Main container
+        this.mainContainer = document.querySelector(data.root);
+        if (!this.mainContainer) {
+            console.warn('horizontal custom: root node not found');
+            return;
+        }
+
+        this.container = data.container;
+
+        // Scroller trigger
+        this.triggerContainer = this.mainContainer.querySelector(data.trigger);
+        if (!this.triggerContainer) {
+            console.warn('horizontal custom: trigger node not found');
+            return;
+        }
+
+        this.row = this.mainContainer.querySelector(data.row);
+        if (!this.triggerContainer) {
+            console.warn('horizontal custom: row node not found');
+            return;
+        }
+
+        this.cards = this.mainContainer.querySelectorAll(data.column);
+        if (!this.triggerContainer) {
+            console.warn('horizontal custom: column nodeList not found');
+            return;
+        }
+
         this.shadow = this.mainContainer.querySelectorAll('[data-shadow]');
-        this.shadowMainClass = 'scroller__shadowEl';
-        this.shadowMainClassTransition = 'scroller__shadow';
+
+        const originalShadowClass = data?.shadow || 'shadow';
+        this.shadowMainClassTransition = originalShadowClass.replace('.', '');
+
         //
         this.onTickCallBack = [];
         this.onRefreshCallBack = [];
         //
         this.moduleisActive = false;
         this.horizontalWidth = 0;
-        this.scroller = [];
+        this.scroller = {};
         this.percentRange = 0;
 
-        if (this.addCss) horizontalCustomCss(this.queryType, this.breackpoint);
+        if (this.addCss)
+            horizontalCustomCss({
+                queryType: this.queryType,
+                breackpoint: this.breackpoint,
+                container: this.container,
+                trigger: data.trigger,
+                row: data.row,
+                column: data.column,
+                shadow: this.shadowMainClassTransition,
+            });
     }
 
     init() {
@@ -56,13 +95,22 @@ export class HorizontalCustomClass {
     }
 
     setDimension() {
+        if (!this.triggerContainer || !this.mainContainer || !this.row) {
+            return new Promise((resolve) => {
+                resolve();
+            });
+        }
+
         return new Promise((resolve) => {
             handleFrame.add(() => {
                 const width = this.horizontalWidth;
                 this.percentRange = (100 * (width - window.innerWidth)) / width;
-                this.triggerContainer.style.height = `${width}px`;
-                this.mainContainer.style.height = `${width}px`;
-                this.row.style.width = `${width}px`;
+
+                if (width > 0) {
+                    this.triggerContainer.style.height = `${width}px`;
+                    this.mainContainer.style.height = `${width}px`;
+                    this.row.style.width = `${width}px`;
+                }
 
                 resolve();
             });
@@ -89,6 +137,12 @@ export class HorizontalCustomClass {
     }
 
     createShadow() {
+        if (!this.triggerContainer) {
+            return new Promise((resolve) => {
+                resolve();
+            });
+        }
+
         return new Promise((resolve) => {
             handleFrame.add(() => {
                 if (!mq[this.queryType](this.breackpoint)) {
@@ -115,16 +169,16 @@ export class HorizontalCustomClass {
 
                         return `
                             <div class='${this.shadowMainClassTransition} ${this.shadowMainClassTransition}--${shadowClass}' data-shadow='${shadowClass}'>
-                                <span class="${this.shadowMainClassTransition}__in-center ${debug}">
+                                <span class="${this.shadowMainClassTransition}--in-center ${debug}">
                                     ${inCenter}
                                 </span>
-                                <span class="${this.shadowMainClassTransition}__out-center ${debug}">
+                                <span class="${this.shadowMainClassTransition}--out-center ${debug}">
                                     ${outCenter}
                                 </span>
-                                <span class="${this.shadowMainClassTransition}__left ${debug}">
+                                <span class="${this.shadowMainClassTransition}--left ${debug}">
                                     ${left}
                                 </span>
-                                <span class="${this.shadowMainClassTransition}__end ${debug}">
+                                <span class="${this.shadowMainClassTransition}--end ${debug}">
                                     ${end}
                                 </span>
                             </div>`;
@@ -162,19 +216,20 @@ export class HorizontalCustomClass {
                     const widthAmount = offset / screenRatio;
                     const diffAmount = offset - offset / screenRatio;
                     const shadowTransitionEl = this.mainContainer.querySelector(
-                        `.scroller__shadow[data-shadow="${shadowData}"]`
+                        `.${this.shadowMainClassTransition}[data-shadow="${shadowData}"]`
                     );
+
                     const inCenterMarker = shadowTransitionEl.querySelector(
-                        '.scroller__shadow__in-center'
+                        `.${this.shadowMainClassTransition}--in-center`
                     );
                     const outCenterMarker = shadowTransitionEl.querySelector(
-                        '.scroller__shadow__out-center'
+                        `.${this.shadowMainClassTransition}--out-center`
                     );
                     const leftMarker = shadowTransitionEl.querySelector(
-                        '.scroller__shadow__left'
+                        `.${this.shadowMainClassTransition}--left`
                     );
                     const endMarker = shadowTransitionEl.querySelector(
-                        '.scroller__shadow__end'
+                        `.${this.shadowMainClassTransition}--end`
                     );
 
                     // Strengh shadow end item to bottom of page
@@ -256,6 +311,11 @@ export class HorizontalCustomClass {
             propierties: 'x',
             breackpoint: 'xSmall',
             pin: true,
+            ease: this.ease,
+            forceTranspond: this.forceTranspond, //Bring element to body to have better performance
+            easeType: this.easeType,
+            springConfig: 'scroller',
+            animateAtStart: this.animateAtStart,
             dynamicRange: () => {
                 return -(this.horizontalWidth - window.innerWidth);
             },
@@ -276,10 +336,6 @@ export class HorizontalCustomClass {
                     item(scrollVal);
                 });
             },
-            ease: true,
-            forceTranspond: this.forceTranspond, //Bring element to body to have better performance
-            easeType: 'lerp',
-            animateAtStart: false,
         });
         scroller.init();
 
@@ -312,12 +368,12 @@ export class HorizontalCustomClass {
         }
     }
 
-    update() {
+    refresh() {
         this.getWidth().then(() =>
             this.setDimension().then(() =>
                 this.updateShadow().then(() => {
                     this.updateModule();
-                    this.scroller.motion.stop();
+                    this.scroller.motion?.stop();
                 })
             )
         );
@@ -343,7 +399,7 @@ export class HorizontalCustomClass {
 
     onResize(horizontalResize) {
         if (this.moduleisActive && mq[this.queryType](this.breackpoint)) {
-            if (horizontalResize) this.update();
+            if (horizontalResize) this.refresh();
         } else if (
             !this.moduleisActive &&
             mq[this.queryType](this.breackpoint)
@@ -355,5 +411,25 @@ export class HorizontalCustomClass {
         ) {
             this.killScroller();
         }
+    }
+
+    destrory() {
+        this.killScroller();
+
+        handleFrameIndex.add(() => {
+            this.row.style.transform = '';
+            this.row.style.width = '';
+            this.triggerContainer.style.height = '';
+            this.mainContainer.style.height = '';
+            this.mainContainer = null;
+            this.triggerContainer = null;
+            this.row = [];
+            this.cards = [];
+            this.shadow = [];
+            this.onTickCallBack = [];
+            this.onRefreshCallBack = [];
+            this.moduleisActive = false;
+            this.scroller = null;
+        }, 2);
     }
 }
