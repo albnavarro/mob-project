@@ -1512,7 +1512,7 @@ export default class ParallaxClass {
             this.updateStyle(this.endValue);
         }
 
-        if (this.checkIfLastDraw()) return;
+        // if (this.checkIfLastDraw()) return;
         handleNextTick.add(() => {
             if (this.onTickCallback) this.onTickCallback(this.endValue);
         });

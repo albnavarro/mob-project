@@ -10,9 +10,11 @@ import {
 import { horizontalScrollerCss } from './horizontalScrollerCss.js';
 import { mq } from '../../../utils/mediaManager.js';
 import { handleFrameIndex } from '../../../events/rafutils/handleFrameIndex';
+import { horizontalScrollerContstant } from './horizontalScrollerConstant';
 
 export class HorizontalScroller {
     constructor(data = {}) {
+        this.NOOP = () => {};
         this.breackpoint = data.breackpoint || 'desktop';
         this.queryType = data.queryType || 'min';
         this.forceTranspond = data.forceTranspond || false;
@@ -21,6 +23,19 @@ export class HorizontalScroller {
         this.ease = data?.ease;
         this.easeType = data?.easeType;
         this.useSticky = data?.useSticky;
+        this.columnHeight = data?.columnHeight || 100;
+        this.columnWidth = data?.columnWidth || null;
+        this.columnAlign = data?.columnAlign
+            ? data.columnAlign.toUpperCase()
+            : horizontalScrollerContstant.START;
+        this.onEnter = data?.onEnter || null;
+        this.onEnterBack = data?.onEnterBack || null;
+        this.onLeave = data?.onLeave || null;
+        this.onLeaveBack = data?.onLeaveBack || null;
+        this.afterInit = data?.afterInit || null;
+        this.afterRefresh = data?.afterRefresh || null;
+        this.afterDestroy = data?.afterDestroy || null;
+        this.onTick = data?.onTick || null;
 
         // Main container
         this.mainContainer = document.querySelector(data.root);
@@ -56,10 +71,6 @@ export class HorizontalScroller {
         this.shadowMainClassTransition = originalShadowClass.replace('.', '');
 
         //
-        this.onTickCallBack = [];
-        this.onRefreshCallBack = [];
-        this.onDestroyCallback = [];
-        //
         this.moduleisActive = false;
         this.horizontalWidth = 0;
         this.scroller = {};
@@ -67,6 +78,7 @@ export class HorizontalScroller {
 
         if (this.addCss)
             horizontalScrollerCss({
+                mainContainer: this.mainContainer,
                 queryType: this.queryType,
                 breackpoint: this.breackpoint,
                 container: this.container,
@@ -75,6 +87,9 @@ export class HorizontalScroller {
                 column: data.column,
                 shadow: this.shadowMainClassTransition,
                 useSticky: this.useSticky,
+                columnHeight: this.columnHeight,
+                columnWidth: this.columnWidth,
+                columnAlign: this.columnAlign,
             });
     }
 
@@ -87,22 +102,16 @@ export class HorizontalScroller {
                         handleResize(({ horizontalResize }) =>
                             this.onResize(horizontalResize)
                         );
+
+                        handleFrameIndex.add(() => {
+                            handleNextTick.add(() => {
+                                this.afterInit?.();
+                            });
+                        }, 3);
                     })
                 )
             )
         );
-    }
-
-    onTick(fn) {
-        this.onTickCallBack.push(fn);
-    }
-
-    onRefresh(fn) {
-        this.onRefreshCallBack.push(fn);
-    }
-
-    onDestroy(fn) {
-        this.onDestroyCallback.push(fn);
     }
 
     setDimension() {
@@ -203,7 +212,7 @@ export class HorizontalScroller {
     }
 
     removeShadow() {
-        this.triggerContainer.innerHTML = '';
+        if (this.triggerContainer) this.triggerContainer.innerHTML = '';
     }
 
     updateShadow() {
@@ -348,10 +357,12 @@ export class HorizontalScroller {
                 },
             },
             onTick: (scrollVal) => {
-                this.onTickCallBack.forEach((item) => {
-                    item(scrollVal);
-                });
+                this.onTick?.(scrollVal);
             },
+            onEnter: this.onEnter,
+            onEnterBack: this.onEnterBack,
+            onLeave: this.onLeave,
+            onLeaveBack: this.onLeaveBack,
         });
         scroller.init();
 
@@ -365,24 +376,19 @@ export class HorizontalScroller {
                 this.createShadow().then(() =>
                     this.updateShadow().then(() => {
                         this.initScroller();
-                        this.onRefreshCallBack.forEach((item) => item());
+                        this.refreshChildren();
                     })
                 )
             )
         );
     }
 
-    updateModule() {
-        if (this.moduleisActive) {
-            this.scroller?.refresh?.();
-
-            // Refresh children after component itself.
-            handleFrame.add(() => {
-                handleNextTick.add(() => {
-                    this.onRefreshCallBack.forEach((item) => item());
-                });
+    refreshChildren() {
+        handleFrameIndex.add(() => {
+            handleNextTick.add(() => {
+                this.afterRefresh?.();
             });
-        }
+        }, 3);
     }
 
     refresh() {
@@ -393,19 +399,24 @@ export class HorizontalScroller {
             this.setDimension().then(() =>
                 this.updateShadow().then(() => {
                     this.scroller?.stopMotion?.();
-                    this.updateModule();
+
+                    if (this.moduleisActive) {
+                        this.scroller?.refresh?.();
+                        this.refreshChildren();
+                    }
                 })
             )
         );
     }
 
     killScroller({ destroyAll = false }) {
-        if (this.moduleisActive) {
-            this.scroller.destroy();
+        if (this.moduleisActive || destroyAll) {
+            this.scroller?.destroy?.();
             this.scroller = null;
-            this.triggerContainer.style.height = '';
-            this.mainContainer.style.height = '';
-            this.triggerContainer.style.marginTop = '';
+            if (this.triggerContainer) this.triggerContainer.style.height = '';
+            if (this.mainContainer) this.mainContainer.style.height = '';
+            if (this.triggerContainer)
+                this.triggerContainer.style.marginTop = '';
             this.removeShadow();
             this.moduleisActive = false;
 
@@ -413,19 +424,29 @@ export class HorizontalScroller {
             handleFrameIndex.add(() => {
                 this.row.style = '';
 
-                if (destroyAll) {
+                if (destroyAll && this.mainContainer) {
+                    const styleDiv =
+                        this.mainContainer.querySelector('.scroller-style');
+                    if (styleDiv) styleDiv.remove();
+
                     this.mainContainer = null;
                     this.triggerContainer = null;
                     this.row = [];
                     this.cards = [];
                     this.shadow = [];
-                    this.onTickCallBack = [];
-                    this.onRefreshCallBack = [];
+                    this.afterInit = null;
+                    this.afterRefresh = null;
+                    this.onTick = null;
+                    this.onEnter = null;
+                    this.onEnterBack = null;
+                    this.onLeave = null;
+                    this.onLeaveBack = null;
                     this.scroller = null;
                     this.moduleisActive = false;
 
                     handleNextTick.add(() => {
-                        this.onDestroyCallback.forEach((item) => item());
+                        this.afterDestroy?.();
+                        this.afterDestroy = null;
                     });
                 }
             }, 3);

@@ -9,8 +9,11 @@ block content
             include ../includes/navigation.pug
 
     main
-        button.destroy-scroller(type='button')
-            |detroy scroller 1
+        .scroller-nav
+            button.destroy-scroller(type='button')
+                |destroy scroller 1
+            button.create-scroller(type='button')
+                |create scroller 1
 
         .test-custom-scroller
             include ../component/horizontalCustom/pug/horizontalCustom.pug

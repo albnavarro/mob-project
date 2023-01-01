@@ -1,36 +1,20 @@
 import { mobbu } from '../core';
 import { HorizontalScroller } from '../core/plugin/horizontalScroller/js/horizontalScroller';
 
-export const noGsap = () => {
+const createScroller = ({ bottomScroller }) => {
     const title = document.querySelector('.js-scroll-item');
     const scroller = document.querySelector(
         '.test-custom-scroller .scroller__row'
     );
-    const destroyButton = document.querySelector('.destroy-scroller');
-
-    const horizontalCustom = new HorizontalScroller({
-        root: '.test-custom-scroller',
-        container: '.scroller',
-        row: '.scroller__row',
-        column: '.scroller__section',
-        trigger: '.scroller__triggerT',
-        shadowClass: '.shadowClass1',
-        forceTranspond: true, // Tryying to massimize performance, move scroll to body on pin
-        animateAtStart: false,
-        ease: true,
-        // easeType: 'spring',
-        addCss: true,
-        useSticky: true,
-    });
 
     // Create child parallax
-    const parallaxTest = mobbu.createScrollTrigger({
+    let parallaxTest = mobbu.createScrollTrigger({
         item: title,
         scroller: scroller,
         direction: 'horizontal',
         propierties: 'y',
         pin: true,
-        forceTranspond: true,
+        // forceTranspond: true,
         marker: 'pin',
         dynamicStart: {
             position: 'right',
@@ -50,29 +34,59 @@ export const noGsap = () => {
         // ease: true,
     });
 
-    // Move parallax child
-    horizontalCustom.onTick((scrollVal) => {
-        parallaxTest.move(scrollVal);
-    });
-
-    // Rtefresh parallax child
-    horizontalCustom.onRefresh(() => {
-        parallaxTest.refresh();
-    });
-
-    horizontalCustom.onDestroy(() => {
-        parallaxTest.destroy();
-        horizontalCustom2.refresh();
-    });
-
-    destroyButton.addEventListener('click', () => {
-        horizontalCustom.destroy();
+    const horizontalCustom = new HorizontalScroller({
+        root: '.test-custom-scroller',
+        container: '.scroller',
+        row: '.scroller__row',
+        column: '.scroller__section',
+        trigger: '.scroller__triggerT',
+        shadowClass: '.shadowClass1',
+        // forceTranspond: true, // Tryying to massimize performance, move scroll to body on pin
+        useSticky: true,
+        animateAtStart: false,
+        ease: true,
+        // easeType: 'spring',
+        addCss: true,
+        columnHeight: 80,
+        columnWidth: 50,
+        columnAlign: 'center',
+        onEnter: () => {
+            console.log('horizontalScroller onEnter');
+        },
+        onEnterBack: () => {
+            console.log('horizontalScroller onEnterBack');
+        },
+        onLeave: () => {
+            console.log('horizontalScroller onLeave');
+        },
+        onLeaveBack: () => {
+            console.log('horizontalScroller onLeaveBack');
+        },
+        afterInit: () => {
+            parallaxTest.refresh();
+            bottomScroller.refresh();
+        },
+        onTick: (scrollVal) => {
+            parallaxTest.move(scrollVal);
+        },
+        afterRefresh: () => {
+            parallaxTest.refresh();
+        },
+        afterDestroy: () => {
+            parallaxTest.destroy();
+            parallaxTest = null;
+            bottomScroller.refresh();
+        },
     });
 
     // Init all
     horizontalCustom.init();
     parallaxTest.init();
 
+    return horizontalCustom;
+};
+
+export const noGsap = () => {
     const horizontalCustom2 = new HorizontalScroller({
         root: '.test-custom-scroller2',
         container: '.scroller',
@@ -86,4 +100,24 @@ export const noGsap = () => {
     });
 
     horizontalCustom2.init();
+
+    const destroyButton = document.querySelector('.destroy-scroller');
+    const createButton = document.querySelector('.create-scroller');
+    let horizontalCustom = createScroller({
+        bottomScroller: horizontalCustom2,
+    });
+
+    destroyButton.addEventListener('click', () => {
+        if (horizontalCustom) {
+            horizontalCustom.destroy();
+            horizontalCustom = null;
+        }
+    });
+
+    createButton.addEventListener('click', () => {
+        if (!horizontalCustom)
+            horizontalCustom = createScroller({
+                bottomScroller: horizontalCustom2,
+            });
+    });
 };
