@@ -2,12 +2,16 @@ import ParallaxClass from '../../../animation/parallax/parallax';
 import { handleFrame } from '../../../events/rafutils/handleFrame';
 import { handleNextTick } from '../../../events/rafutils/handleNextTick';
 import { handleResize } from '../../../events/resizeUtils/handleResize';
-import { getTranslateValues, outerWidth } from '../../../utils/vanillaFunction';
-import { horizontalCustomCss } from './horizontalCustomCss.js';
+import {
+    getTranslateValues,
+    outerHeight,
+    outerWidth,
+} from '../../../utils/vanillaFunction';
+import { horizontalScrollerCss } from './horizontalScrollerCss.js';
 import { mq } from '../../../utils/mediaManager.js';
 import { handleFrameIndex } from '../../../events/rafutils/handleFrameIndex';
 
-export class HorizontalCustomClass {
+export class HorizontalScroller {
     constructor(data = {}) {
         this.breackpoint = data.breackpoint || 'desktop';
         this.queryType = data.queryType || 'min';
@@ -16,6 +20,7 @@ export class HorizontalCustomClass {
         this.animateAtStart = data?.animateAtStart;
         this.ease = data?.ease;
         this.easeType = data?.easeType;
+        this.useSticky = data?.useSticky;
 
         // Main container
         this.mainContainer = document.querySelector(data.root);
@@ -47,12 +52,13 @@ export class HorizontalCustomClass {
 
         this.shadow = this.mainContainer.querySelectorAll('[data-shadow]');
 
-        const originalShadowClass = data?.shadow || 'shadow';
+        const originalShadowClass = data?.shadowClass || 'shadow';
         this.shadowMainClassTransition = originalShadowClass.replace('.', '');
 
         //
         this.onTickCallBack = [];
         this.onRefreshCallBack = [];
+        this.onDestroyCallback = [];
         //
         this.moduleisActive = false;
         this.horizontalWidth = 0;
@@ -60,7 +66,7 @@ export class HorizontalCustomClass {
         this.percentRange = 0;
 
         if (this.addCss)
-            horizontalCustomCss({
+            horizontalScrollerCss({
                 queryType: this.queryType,
                 breackpoint: this.breackpoint,
                 container: this.container,
@@ -68,6 +74,7 @@ export class HorizontalCustomClass {
                 row: data.row,
                 column: data.column,
                 shadow: this.shadowMainClassTransition,
+                useSticky: this.useSticky,
             });
     }
 
@@ -92,6 +99,10 @@ export class HorizontalCustomClass {
 
     onRefresh(fn) {
         this.onRefreshCallBack.push(fn);
+    }
+
+    onDestroy(fn) {
+        this.onDestroyCallback.push(fn);
     }
 
     setDimension() {
@@ -207,7 +218,7 @@ export class HorizontalCustomClass {
                     const percentrange = this.percentRange / 100;
                     const shadowData = item.dataset.shadow;
                     const width = outerWidth(item);
-                    // const height = outerHeight(this.row);
+                    const height = outerHeight(this.row);
                     const { x } = getTranslateValues(this.row);
                     const offset = item.getBoundingClientRect().left - x;
                     const screenRatio = window.innerWidth / window.innerHeight;
@@ -285,7 +296,12 @@ export class HorizontalCustomClass {
                         return end / 2 + plusHalf;
                     })();
 
-                    // this.triggerContainer.style['margin-top'] = `-${height}px`;
+                    if (this.useSticky) {
+                        this.triggerContainer.style[
+                            'margin-top'
+                        ] = `-${height}px`;
+                    }
+
                     shadowTransitionEl.style.top = `${start}px`;
                     inCenterMarker.style.height = `${inCenter}px`;
                     outCenterMarker.style.height = `${inCenter}px`;
@@ -310,7 +326,7 @@ export class HorizontalCustomClass {
             trigger: this.triggerContainer,
             propierties: 'x',
             breackpoint: 'xSmall',
-            pin: true,
+            pin: !this.useSticky,
             ease: this.ease,
             forceTranspond: this.forceTranspond, //Bring element to body to have better performance
             easeType: this.easeType,
@@ -358,8 +374,9 @@ export class HorizontalCustomClass {
 
     updateModule() {
         if (this.moduleisActive) {
-            this.scroller.refresh();
+            this.scroller?.refresh?.();
 
+            // Refresh children after component itself.
             handleFrame.add(() => {
                 handleNextTick.add(() => {
                     this.onRefreshCallBack.forEach((item) => item());
@@ -369,31 +386,49 @@ export class HorizontalCustomClass {
     }
 
     refresh() {
+        if (!this.moduleisActive || !mq[this.queryType](this.breackpoint))
+            return;
+
         this.getWidth().then(() =>
             this.setDimension().then(() =>
                 this.updateShadow().then(() => {
+                    this.scroller?.stopMotion?.();
                     this.updateModule();
-                    this.scroller.motion?.stop();
                 })
             )
         );
     }
 
-    killScroller() {
-        this.row.style.transform = '';
-        this.row.style.width = '';
-        this.triggerContainer.style.height = '';
-        this.mainContainer.style.height = '';
-        this.removeShadow();
-
+    killScroller({ destroyAll = false }) {
         if (this.moduleisActive) {
-            handleFrame.add(() => {
-                handleNextTick.add(() => {
-                    this.scroller.destroy();
+            this.scroller.destroy();
+            this.scroller = null;
+            this.triggerContainer.style.height = '';
+            this.mainContainer.style.height = '';
+            this.triggerContainer.style.marginTop = '';
+            this.removeShadow();
+            this.moduleisActive = false;
+
+            // Make sure that if component is running with ease the style is removed.
+            handleFrameIndex.add(() => {
+                this.row.style = '';
+
+                if (destroyAll) {
+                    this.mainContainer = null;
+                    this.triggerContainer = null;
+                    this.row = [];
+                    this.cards = [];
+                    this.shadow = [];
+                    this.onTickCallBack = [];
+                    this.onRefreshCallBack = [];
                     this.scroller = null;
                     this.moduleisActive = false;
-                });
-            });
+
+                    handleNextTick.add(() => {
+                        this.onDestroyCallback.forEach((item) => item());
+                    });
+                }
+            }, 3);
         }
     }
 
@@ -409,27 +444,11 @@ export class HorizontalCustomClass {
             this.moduleisActive &&
             !mq[this.queryType](this.breackpoint)
         ) {
-            this.killScroller();
+            this.killScroller({ destroyAll: false });
         }
     }
 
-    destrory() {
-        this.killScroller();
-
-        handleFrameIndex.add(() => {
-            this.row.style.transform = '';
-            this.row.style.width = '';
-            this.triggerContainer.style.height = '';
-            this.mainContainer.style.height = '';
-            this.mainContainer = null;
-            this.triggerContainer = null;
-            this.row = [];
-            this.cards = [];
-            this.shadow = [];
-            this.onTickCallBack = [];
-            this.onRefreshCallBack = [];
-            this.moduleisActive = false;
-            this.scroller = null;
-        }, 2);
+    destroy() {
+        this.killScroller({ destroyAll: true });
     }
 }

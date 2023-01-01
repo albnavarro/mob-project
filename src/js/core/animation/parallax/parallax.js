@@ -818,6 +818,11 @@ export default class ParallaxClass {
             }
         };
 
+        /**
+         * If scroller is !== window we have to component
+         * that calcown offset simultaneously, so laggy.
+         * Use move() methods to control children
+         */
         if (this.ease) {
             // Force transform3D onscroll start
             this.unsubscribeScrollStart = handleScrollStart(() => {
@@ -1231,30 +1236,32 @@ export default class ParallaxClass {
      * <br/>
      */
     destroy() {
-        if ('stop' in this.motion) {
-            this.motion.stop();
-        }
+        this.motion?.stop?.();
         this.unsubscribeScroll();
         this.unsubscribeScrollStart();
         this.unsubscribeResize();
         this.unsubscribeMotion();
         this.unsubscribeOnComplete();
         this.unsubscribeMarker();
-        this.motion.destroy();
+        this.motion?.destroy?.();
         this.dynamicRange = null;
         this.onEnter = () => {};
         this.onEnterBack = () => {};
         this.onLeave = () => {};
         this.onLeaveBack = () => {};
         this.onTickCallback = () => {};
-        if (this.pin && this.pinInstance) this.pinInstance.destroy();
-        if (this.startMarker) this.startMarker.remove();
-        if (this.endMarker) this.endMarker.remove();
+        if (this.pin && this.pinInstance) this.pinInstance?.destroy?.();
+        if (this.startMarker) this.startMarker?.remove?.();
+        if (this.endMarker) this.endMarker?.remove?.();
         this.motion = null;
         this.startMarker = null;
         this.endMarker = null;
         this.pinInstance = null;
         this.endValue = 0;
+
+        // Remove style from element, if style prop exist.
+        const el = this.applyTo ? this.applyTo : this.item;
+        if ('style' in el) el.style = '';
     }
 
     /**
@@ -1286,7 +1293,7 @@ export default class ParallaxClass {
         this.firstTime = true;
 
         if (!mq[this.queryType](this.breackpoint)) {
-            if (this.ease) this.motion.stop();
+            if (this.ease) this.motion?.stop?.();
 
             // Reset Style
             // For tween is necessary reset inside tween callback
@@ -1347,6 +1354,14 @@ export default class ParallaxClass {
     }
 
     /**
+     * @description
+     * Stop lerp|spring tween.
+     */
+    stopMotion() {
+        this.motion?.stop?.();
+    }
+
+    /**
      * @private
      */
     smoothParallaxJs(scrollVal = null) {
@@ -1372,6 +1387,9 @@ export default class ParallaxClass {
 
         // First time render with no easing
         const action = this.firstTime & !this.animateAtStart ? 'set' : 'goTo';
+
+        // Maybe a destroy method is callad during animation, so check if exist.
+        if (!this.motion) return;
 
         this.motion[action](
             { val: this.endValue },

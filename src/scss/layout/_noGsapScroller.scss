@@ -1,5 +1,12 @@
 $mediaQ: desktop;
 
+.destroy-scroller {
+    bottom: 20px;
+    left: 20px;
+    position: fixed;
+    z-index: 10;
+}
+
 .scroller__section,
 .scroller__section2 {
     @include mq($from: $mediaQ) {
