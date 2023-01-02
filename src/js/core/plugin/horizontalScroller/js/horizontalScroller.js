@@ -23,6 +23,7 @@ export class HorizontalScroller {
         this.ease = data?.ease;
         this.easeType = data?.easeType;
         this.useSticky = data?.useSticky;
+        this.useThrottle = data?.useThrottle;
         this.columnHeight = data?.columnHeight || 100;
         this.columnWidth = data?.columnWidth || null;
         this.columnAlign = data?.columnAlign
@@ -338,6 +339,7 @@ export class HorizontalScroller {
             pin: !this.useSticky,
             ease: this.ease,
             forceTranspond: this.forceTranspond, //Bring element to body to have better performance
+            useThrottle: this.useThrottle,
             easeType: this.easeType,
             springConfig: 'scroller',
             animateAtStart: this.animateAtStart,

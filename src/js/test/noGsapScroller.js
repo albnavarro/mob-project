@@ -44,6 +44,7 @@ const createScroller = ({ bottomScroller }) => {
         shadowClass: '.shadowClass1',
         // forceTranspond: true, // Tryying to massimize performance, move scroll to body on pin
         useSticky: true,
+        useThrottle: true,
         animateAtStart: false,
         ease: true,
         // easeType: 'spring',
@@ -96,6 +97,8 @@ export const noGsap = () => {
         trigger: '.scroller__triggerT2',
         shadowClass: '.shadowClass2',
         forceTranspond: true, // Tryying to massimize performance, move scroll to body on pin
+        // useSticky: true,
+        // useThrottle: true,
         ease: true,
         addCss: true,
     });

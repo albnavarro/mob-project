@@ -136,7 +136,7 @@ export const startFpsDefault = 60;
 export const fpsScalePercentDefault = { 0: 1, 15: 2, 30: 3, 45: 4 };
 export const useScaleFpsDefault = true;
 export const deferredNextTickDefault = false;
-export const throttleDefault = 100;
+export const throttleDefault = 60;
 export const mqDefault = {
     xSmall: 320,
     small: 360,
@@ -189,6 +189,13 @@ export const setupValidation = (obj) => {
         value: obj?.deferredNextTick,
         defaultValue: deferredNextTickDefault,
         type: Boolean,
+    });
+
+    const throttle = checkSetUpType({
+        prop: 'throttle',
+        value: obj?.throttle,
+        defaultValue: throttleDefault,
+        type: Number,
     });
 
     const mq = checkSetUpMq(obj?.mq);
@@ -330,6 +337,7 @@ export const setupValidation = (obj) => {
         fpsScalePercent,
         useScaleFps,
         deferredNextTick,
+        throttle,
         mq,
         defaultMq: {
             value: defaultMqValue,

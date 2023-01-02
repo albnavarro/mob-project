@@ -837,8 +837,7 @@ export default class ParallaxClass {
         };
 
         /**
-         * If scroller is !== window we have to component
-         * that calcown offset simultaneously, so laggy.
+         * If scroller is !== window the istance is controlled by another component
          * Use move() methods to control children
          */
         if (this.ease) {

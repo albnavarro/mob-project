@@ -75,7 +75,7 @@ mobbu.useLoad(() => {
         deferredNextTick: false,
         fpsScalePercent: { 0: 1, 15: 2, 30: 3, 45: 4 },
         useScaleFps: true,
-        throttle: 120,
+        // throttle: 60,
         mq: {
             desktop: 1024,
         },
