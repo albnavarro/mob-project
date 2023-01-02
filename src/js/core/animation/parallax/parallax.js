@@ -222,6 +222,7 @@ import { parallaxUtils } from './parallaxUtils.js';
     The transformation value calculated through the use of a function.
     The result of the function will be used in px.
     If used, it will take priority over the range method.
+    if the property is a tween it will have no effect.
  * @prop {boolean} [ animateAtStart = false ] 
     The element will animate with easing (if used) on loading the page or animation.
     The default value is false.
@@ -343,6 +344,11 @@ export default class ParallaxClass {
      */
 
     constructor(data = {}) {
+        /**
+         * @private
+         */
+        this.isInzialized = false;
+
         /**
          * @private
          */
@@ -796,6 +802,9 @@ export default class ParallaxClass {
      * <br/>
      */
     init() {
+        if (this.isInzialized) return;
+
+        this.isInzialized = true;
         this.setMotion();
         this.calcScreenPosition();
         this.calcOffset();
@@ -808,7 +817,8 @@ export default class ParallaxClass {
             this.range = this?.tween?.getDuration
                 ? this.tween.getDuration()
                 : 0;
-            if (this.tween?.inzializeStagger) this.tween.inzializeStagger();
+            this.dynamicRange = () => this.range;
+            this.tween?.inzializeStagger?.();
         }
 
         if (this.type == parallaxConstant.TYPE_SCROLLTRIGGER) {
@@ -919,6 +929,20 @@ export default class ParallaxClass {
                 });
             }
         }
+    }
+
+    /**
+     *
+     */
+    setScroller(scroller) {
+        this.scroller = domNodeIsValidAndReturnElOrWin(scroller, true);
+    }
+
+    /**
+     *
+     */
+    setDirection(direction) {
+        this.direction = parallaxDirectionIsValid(direction);
     }
 
     /**
@@ -1344,11 +1368,11 @@ export default class ParallaxClass {
                 }
             }
         }
-
+        //
         // reset value to update animation after resize
         this.lastValue = null;
         this.firstTime = true;
-
+        //
         if (!mq[this.queryType](this.breackpoint)) {
             if (this.ease) this.motion?.stop?.();
 
@@ -1364,7 +1388,14 @@ export default class ParallaxClass {
                 }
             }, 3);
         } else {
-            this.move();
+            if (this.ease) {
+                this.smoothParallaxJs();
+            } else {
+                this.computeValue();
+
+                // Disable 3d transfrom at first render after refresh.
+                this.noEasingRender({ forceRender: true });
+            }
         }
     }
 

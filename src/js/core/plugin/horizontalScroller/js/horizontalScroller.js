@@ -15,6 +15,8 @@ import { horizontalScrollerContstant } from './horizontalScrollerConstant';
 export class HorizontalScroller {
     constructor(data = {}) {
         this.NOOP = () => {};
+
+        // Props
         this.breackpoint = data.breackpoint || 'desktop';
         this.queryType = data.queryType || 'min';
         this.forceTranspond = data.forceTranspond || false;
@@ -29,16 +31,20 @@ export class HorizontalScroller {
         this.columnAlign = data?.columnAlign
             ? data.columnAlign.toUpperCase()
             : horizontalScrollerContstant.START;
-        this.onEnter = data?.onEnter || null;
-        this.onEnterBack = data?.onEnterBack || null;
-        this.onLeave = data?.onLeave || null;
-        this.onLeaveBack = data?.onLeaveBack || null;
-        this.afterInit = data?.afterInit || null;
-        this.afterRefresh = data?.afterRefresh || null;
-        this.afterDestroy = data?.afterDestroy || null;
-        this.onTick = data?.onTick || null;
 
-        // Main container
+        // Methods
+        this.onEnter = data?.onEnter || this.NOOP;
+        this.onEnterBack = data?.onEnterBack || this.NOOP;
+        this.onLeave = data?.onLeave || this.NOOP;
+        this.onLeaveBack = data?.onLeaveBack || this.NOOP;
+        this.afterInit = data?.afterInit || this.NOOP;
+        this.afterRefresh = data?.afterRefresh || this.NOOP;
+        this.afterDestroy = data?.afterDestroy || this.NOOP;
+        this.onTick = data?.onTick || this.NOOP;
+
+        /**
+         * Dom element
+         */
         this.mainContainer = document.querySelector(data.root);
         if (!this.mainContainer) {
             console.warn('horizontal custom: root node not found');
@@ -77,6 +83,14 @@ export class HorizontalScroller {
         this.scroller = {};
         this.percentRange = 0;
 
+        // Inizialize children.
+        this.children = data?.children || [];
+        this.children.forEach((element) => {
+            element.setScroller(this.row);
+            element.setDirection('horizontal');
+            element.init();
+        });
+
         if (this.addCss)
             horizontalScrollerCss({
                 mainContainer: this.mainContainer,
@@ -100,6 +114,7 @@ export class HorizontalScroller {
                 this.createShadow().then(() =>
                     this.updateShadow().then(() => {
                         this.initScroller();
+
                         handleResize(({ horizontalResize }) =>
                             this.onResize(horizontalResize)
                         );
@@ -107,6 +122,12 @@ export class HorizontalScroller {
                         handleFrameIndex.add(() => {
                             handleNextTick.add(() => {
                                 this.afterInit?.();
+
+                                // Builtin children control
+                                // Refresh after component inizialization
+                                this.children.forEach((element) => {
+                                    element.refresh();
+                                });
                             });
                         }, 3);
                     })
@@ -338,7 +359,7 @@ export class HorizontalScroller {
             breackpoint: 'xSmall',
             pin: !this.useSticky,
             ease: this.ease,
-            forceTranspond: this.forceTranspond, //Bring element to body to have better performance
+            forceTranspond: this.forceTranspond,
             useThrottle: this.useThrottle,
             easeType: this.easeType,
             springConfig: 'scroller',
@@ -358,8 +379,21 @@ export class HorizontalScroller {
                     return this.horizontalWidth;
                 },
             },
-            onTick: (props) => {
-                this.onTick?.(props);
+            onTick: ({ value, parentIsMoving }) => {
+                // onTick standalone methods.
+                this.onTick({
+                    value,
+                    parentIsMoving,
+                    percent: -parseInt(
+                        (value * 100) /
+                            (this.horizontalWidth - window.innerWidth)
+                    ),
+                });
+
+                // Builtin children onTick;
+                this.children.forEach((element) => {
+                    element.move({ value, parentIsMoving });
+                });
             },
             onEnter: this.onEnter,
             onEnterBack: this.onEnterBack,
@@ -388,7 +422,13 @@ export class HorizontalScroller {
     refreshChildren() {
         handleFrameIndex.add(() => {
             handleNextTick.add(() => {
+                // After Refresh standalone methods.
                 this.afterRefresh?.();
+
+                // Builtin children control;
+                this.children.forEach((element) => {
+                    element?.refresh?.();
+                });
             });
         }, 3);
     }
@@ -447,8 +487,16 @@ export class HorizontalScroller {
                     this.moduleisActive = false;
 
                     handleNextTick.add(() => {
+                        // afterDestroy standalone methods
                         this.afterDestroy?.();
                         this.afterDestroy = null;
+
+                        // Destroy children
+                        this.children.forEach((element) => {
+                            element?.destroy?.();
+                            element = null;
+                        });
+                        this.children = [];
                     });
                 }
             }, 3);

@@ -7,15 +7,33 @@ const createScroller = ({ bottomScroller }) => {
         '.test-custom-scroller .scroller__row'
     );
 
-    // Create child parallax
+    // const tweetTest = mobbu.createParallaxTween({
+    //     from: { y: 0, scale: 1 },
+    //     to: { y: -300, scale: 1.2 },
+    // });
+    //
+    // tweetTest.subscribe(({ scale, y }) => {
+    //     title.style.transform = `translate3D(0,0,0) translateY(${y}px) scale(${scale})`;
+    // });
+    //
+    // tweetTest.onStop(({ scale, y }) => {
+    //     title.style.transform = `translateY(${y}px) scale(${scale})`;
+    // });
+
     let parallaxTest = mobbu.createScrollTrigger({
         item: title,
-        scroller: scroller,
-        direction: 'horizontal',
-        propierties: 'y',
         pin: true,
-        // forceTranspond: true,
         marker: 'pin',
+        propierties: 'y',
+        // disableForce3D: true,
+        // ease: true,
+        // scroller: scroller,
+        // direction: 'horizontal',
+        // tween: tweetTest,
+        // forceTranspond: true,
+        dynamicRange: () => {
+            return -300;
+        },
         dynamicStart: {
             position: 'right',
             value: () => {
@@ -28,11 +46,6 @@ const createScroller = ({ bottomScroller }) => {
                 return 0;
             },
         },
-        dynamicRange: () => {
-            return -300;
-        },
-        // ease: true,
-        // disableForce3D: true,
     });
 
     const horizontalCustom = new HorizontalScroller({
@@ -52,6 +65,7 @@ const createScroller = ({ bottomScroller }) => {
         columnHeight: 80,
         columnWidth: 50,
         columnAlign: 'center',
+        children: [parallaxTest],
         onEnter: () => {
             console.log('horizontalScroller onEnter');
         },
@@ -65,25 +79,29 @@ const createScroller = ({ bottomScroller }) => {
             console.log('horizontalScroller onLeaveBack');
         },
         afterInit: () => {
-            parallaxTest.refresh();
+            console.log('after init');
+            // parallaxTest.refresh();
             bottomScroller.refresh();
         },
-        onTick: (props) => {
-            parallaxTest.move(props);
+        onTick: ({ value, parentIsMoving, percent }) => {
+            scroller.style.setProperty('--percent', `${percent}%`);
+            // parallaxTest.move({ value, parentIsMoving });
         },
         afterRefresh: () => {
-            parallaxTest.refresh();
+            console.log('after refresh');
+            // parallaxTest.refresh();
         },
         afterDestroy: () => {
-            parallaxTest.destroy();
-            parallaxTest = null;
+            console.log('after destroy');
+            // parallaxTest.destroy();
+            // parallaxTest = null;
             bottomScroller.refresh();
         },
     });
 
     // Init all
     horizontalCustom.init();
-    parallaxTest.init();
+    // parallaxTest.init();
 
     return horizontalCustom;
 };
