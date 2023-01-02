@@ -5,7 +5,10 @@ import { handleResize } from '../../events/resizeUtils/handleResize.js';
 import { handleScroll } from '../../events/scrollUtils/handleScroll.js';
 import { handleScrollImmediate } from '../../events/scrollUtils/handleScrollImmediate.js';
 import { handleScrollThrottle } from '../../events/scrollUtils/handleScrollThrottle.js';
-import { handleScrollStart } from '../../events/scrollUtils/handleScrollUtils.js';
+import {
+    handleScrollEnd,
+    handleScrollStart,
+} from '../../events/scrollUtils/handleScrollUtils.js';
 import { mq } from '../../utils/mediaManager.js';
 import {
     getTranslateValues,
@@ -413,6 +416,11 @@ export default class ParallaxClass {
         /**
          * @private
          */
+        this.unsubscribeScrollEnd = () => {};
+
+        /**
+         * @private
+         */
         this.unsubscribeMarker = () => {};
 
         /**
@@ -454,6 +462,16 @@ export default class ParallaxClass {
          * @private
          */
         this.isInViewport = false;
+
+        /**
+         * @private
+         */
+        this.lastIsInViewPortOnScrollEnd = false;
+
+        /**
+         * @private
+         */
+        this.iSControlledFromOutside = false;
 
         /**
          * @private
@@ -845,6 +863,18 @@ export default class ParallaxClass {
             }
             this.computeValue();
             this.noEasingRender();
+
+            this.unsubscribeScrollEnd = handleScrollEnd(() => {
+                /**
+                 * Force draw no 3d on scroll end with no ease.
+                 * Only first time thant item is outside window
+                 */
+                if (!this.lastIsInViewPortOnScrollEnd && !this.isInViewport)
+                    return;
+
+                this.noEasingRender(true);
+                this.lastIsInViewPortOnScrollEnd = this.isInViewport;
+            });
         }
 
         if (this.scroller !== window) {
@@ -1239,6 +1269,7 @@ export default class ParallaxClass {
         this.motion?.stop?.();
         this.unsubscribeScroll();
         this.unsubscribeScrollStart();
+        this.unsubscribeScrollEnd();
         this.unsubscribeResize();
         this.unsubscribeMotion();
         this.unsubscribeOnComplete();
@@ -1336,9 +1367,7 @@ export default class ParallaxClass {
      */
     move(scrollVal = null) {
         if (!mq[this.queryType](this.breackpoint)) return;
-
-        // Bypass translate3D() if there is no easing
-        if (!this.ease) this.force3D = false;
+        this.iSControlledFromOutside = true;
 
         scrollVal =
             scrollVal !== null && this.screen !== window
@@ -1346,9 +1375,13 @@ export default class ParallaxClass {
                 : null;
 
         if (this.ease) {
+            // 3d is enable
+            // With lerpConfig ~=  0.2 is similar no-ease but with 3d enabled.
             this.smoothParallaxJs(scrollVal);
         } else {
             this.computeValue(scrollVal);
+
+            // Disable 3D when there is no ease
             this.noEasingRender();
         }
     }
@@ -1477,42 +1510,43 @@ export default class ParallaxClass {
     /**
      * @private
      */
-    noEasingRender() {
+    noEasingRender(forceRender = false) {
         if (!mq[this.queryType](this.breackpoint)) return;
 
         handleFrame.add(() => {
-            this.cleanRender();
+            this.cleanRender(forceRender);
         });
     }
 
     /**
      * @private
      */
-    checkIfLastDraw() {
-        return this.endValue === this.lastValue;
-    }
+    cleanRender(forceRender = false) {
+        if (
+            (this.endValue === this.lastValue && !forceRender) ||
+            (!this.isInViewport && !forceRender)
+        )
+            return;
 
-    /**
-     * @private
-     */
-    cleanRender() {
-        // if (this.endValue === this.lastValue) return;
+        /**
+         * Force is setted true on scrollEnd with no ease;
+         * If is  controlleds from another parallax no 3D.
+         */
+        if (!this.disableForce3D && !this.iSControlledFromOutside)
+            this.force3D = !forceRender;
 
         if (this.propierties === parallaxConstant.PROP_TWEEN) {
             this.tween.draw({
                 partial: this.endValue,
-                isLastDraw: this.checkIfLastDraw(),
-                // isLastDraw: true,
+                isLastDraw: !this.force3D,
                 useFrame: false,
             });
             this.lastValue = this.endValue;
             this.firstTime = false;
         } else {
-            if (this.checkIfLastDraw()) return;
             this.updateStyle(this.endValue);
         }
 
-        // if (this.checkIfLastDraw()) return;
         handleNextTick.add(() => {
             if (this.onTickCallback) this.onTickCallback(this.endValue);
         });

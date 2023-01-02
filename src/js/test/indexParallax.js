@@ -68,11 +68,12 @@ export function indexParallax() {
 
     const parallaxScale = mobbu.createParallax({
         trigger: parallaxItem,
-        ease: true,
         easeType: 'spring',
         propierties: 'tween',
         tween: tweenScale,
         onSwitch: 'in-stop',
+        ease: true,
+        // disableForce3D: true,
     });
     parallaxScale.init();
 

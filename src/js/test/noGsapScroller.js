@@ -32,6 +32,7 @@ const createScroller = ({ bottomScroller }) => {
             return -300;
         },
         // ease: true,
+        // disableForce3D: true,
     });
 
     const horizontalCustom = new HorizontalScroller({
