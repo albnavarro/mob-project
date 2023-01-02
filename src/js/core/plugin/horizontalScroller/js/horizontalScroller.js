@@ -356,8 +356,8 @@ export class HorizontalScroller {
                     return this.horizontalWidth;
                 },
             },
-            onTick: (scrollVal) => {
-                this.onTick?.(scrollVal);
+            onTick: (props) => {
+                this.onTick?.(props);
             },
             onEnter: this.onEnter,
             onEnterBack: this.onEnterBack,

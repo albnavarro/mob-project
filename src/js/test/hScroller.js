@@ -207,13 +207,13 @@ export const hScroller = () => {
     smoothScrollFull.onTick(({ scrollValue, percent }) => {
         // console.log(percent);
         mobbu.useNextTick(() => {
-            parallax0.move(scrollValue);
-            parallax1.move(scrollValue);
-            parallax2.move(scrollValue);
-            parallaxOpacity.move(scrollValue);
-            parallaxPin.move(scrollValue);
-            parallaxIn.move(scrollValue);
-            parallaxOut.move(scrollValue);
+            parallax0.move({ value: scrollValue });
+            parallax1.move({ value: scrollValue });
+            parallax2.move({ value: scrollValue });
+            parallaxOpacity.move({ value: scrollValue });
+            parallaxPin.move({ value: scrollValue });
+            parallaxIn.move({ value: scrollValue });
+            parallaxOut.move({ value: scrollValue });
         });
     });
 
@@ -275,8 +275,8 @@ export const hScroller = () => {
     smoothScrollContiner.init();
     smoothScrollContiner.onTick(({ scrollValue }) => {
         mobbu.useNextTick(() => {
-            parallaxb1.move(scrollValue);
-            parallaxb2.move(scrollValue);
+            parallaxb1.move({ value: scrollValue });
+            parallaxb2.move({ value: scrollValue });
         });
     });
 
@@ -356,10 +356,10 @@ export const hScroller = () => {
     smoothScrollContiner2.init();
     smoothScrollContiner2.onTick(({ scrollValue }) => {
         mobbu.useNextTick(() => {
-            parallaxC1.move(scrollValue);
-            parallaxC2.move(scrollValue);
-            parallaxC3.move(scrollValue);
-            parallaxC4.move(scrollValue);
+            parallaxC1.move({ value: scrollValue });
+            parallaxC2.move({ value: scrollValue });
+            parallaxC3.move({ value: scrollValue });
+            parallaxC4.move({ value: scrollValue });
         });
     });
 };

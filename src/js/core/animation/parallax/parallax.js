@@ -842,7 +842,9 @@ export default class ParallaxClass {
          * Use move() methods to control children
          */
         if (this.ease) {
-            // Force transform3D onscroll start
+            /**
+             *  Force transform3D onscroll start
+             */
             this.unsubscribeScrollStart = handleScrollStart(() => {
                 if (!this.disableForce3D) this.force3D = true;
             });
@@ -853,6 +855,9 @@ export default class ParallaxClass {
                 });
             }
 
+            /**
+             * First render
+             */
             this.smoothParallaxJs();
         } else {
             if (this.scroller === window) {
@@ -861,9 +866,16 @@ export default class ParallaxClass {
                     this.noEasingRender();
                 });
             }
+
+            /**
+             * First render
+             */
             this.computeValue();
             this.noEasingRender();
 
+            /**
+             * Execture render on scrollEnd to remove 3Dtransform
+             */
             this.unsubscribeScrollEnd = handleScrollEnd(() => {
                 /**
                  * Force draw no 3d on scroll end with no ease.
@@ -872,11 +884,14 @@ export default class ParallaxClass {
                 if (!this.lastIsInViewPortOnScrollEnd && !this.isInViewport)
                     return;
 
-                this.noEasingRender(true);
+                this.noEasingRender({ forceRender: true });
                 this.lastIsInViewPortOnScrollEnd = this.isInViewport;
             });
         }
 
+        /**
+         * Inizialize marker
+         */
         if (this.scroller !== window) {
             this.unsubscribeMarker = handleScroll(() => {
                 // Refresh marker
@@ -884,10 +899,16 @@ export default class ParallaxClass {
             });
         }
 
+        /**
+         * Inizialize refresh
+         */
         this.unsubscribeResize = handleResize(({ horizontalResize }) => {
             if (horizontalResize) this.refresh();
         });
 
+        /**
+         * Inizialize pin
+         */
         if (this.pin) {
             this.pinInstance = new ParallaxPin();
 
@@ -944,7 +965,8 @@ export default class ParallaxClass {
             }
 
             handleNextTick.add(() => {
-                if (this.onTickCallback) this.onTickCallback(val);
+                if (this.onTickCallback)
+                    this.onTickCallback({ value: val, parentIsMoving: true });
             });
         });
 
@@ -963,6 +985,11 @@ export default class ParallaxClass {
             } else {
                 this.updateStyle(val);
             }
+
+            handleNextTick.add(() => {
+                if (this.onTickCallback)
+                    this.onTickCallback({ value: val, parentIsMoving: false });
+            });
         });
 
         switch (this.easeType) {
@@ -1343,11 +1370,25 @@ export default class ParallaxClass {
     }
 
     /**
-     * @param {Number} [ scrollVal = null ] - parent scroll position value
+     * @typedef {Object} parallaxMoveType
+     * @prop {Number} value
+     * @prop {Boolean} parentIsMoving
+     */
+
+    /**
+     * @param {parallaxMoveType}
      *
      *
      * @description
-     * Method used to control the instance from the outside, the scrollVal parameter if passed to the method will prevent the instance itself from having to recalculate the scroll flight and therefore ask the DOM for a value that could force the browser to redraw the layout.
+     * Method used to control the instance from the outside.
+    The methods acceps two parameters:
+
+    `value`: The scroll position of the parent.
+    If no value is provided, the instance will calculate it autonomously.
+
+    `parentIsMoving`: Value that indicates if the component using the method is moving.
+    The value is used to manage the addition of the translate3D property.
+    The default value is false 
      *
      *
      * @example
@@ -1358,32 +1399,37 @@ export default class ParallaxClass {
      *
      * const myScroller = mobbu.createScrollTrigger({
      *     ...
-     *     onTick: (scrollVal) => {
-     *         myInstance.move(scrollVal);
+     *     onTick: ({ value, parentIsMoving }) => {
+     *         myInstance.move({ value, parentIsMoving });
      *     },
      *     ...
      * });
      * ```
      */
-    move(scrollVal = null) {
+    move({ value = null, parentIsMoving = false } = {}) {
         if (!mq[this.queryType](this.breackpoint)) return;
         this.iSControlledFromOutside = true;
 
-        scrollVal =
-            scrollVal !== null && this.screen !== window
-                ? scrollVal + this.screenPosition
-                : null;
+        const scrollVal = this.getScrollValueOnMove(value);
 
         if (this.ease) {
-            // 3d is enable
-            // With lerpConfig ~=  0.2 is similar no-ease but with 3d enabled.
-            this.smoothParallaxJs(scrollVal);
+            this.smoothParallaxJs({ scrollVal });
         } else {
-            this.computeValue(scrollVal);
-
-            // Disable 3D when there is no ease
-            this.noEasingRender();
+            this.computeValue({ scrollVal });
+            const forceRender = this.isInViewport || this.firstTime || null;
+            this.noEasingRender({ forceRender, parentIsMoving });
         }
+    }
+
+    /**
+     * @private
+     */
+    getScrollValueOnMove(value) {
+        if (!value) return null;
+
+        if (this.screen !== window) return value + this.screenPosition;
+
+        return value;
     }
 
     /**
@@ -1397,10 +1443,10 @@ export default class ParallaxClass {
     /**
      * @private
      */
-    smoothParallaxJs(scrollVal = null) {
+    smoothParallaxJs({ scrollVal = null } = {}) {
         if (!mq[this.queryType](this.breackpoint)) return;
 
-        this.computeValue(scrollVal);
+        this.computeValue({ scrollVal });
 
         // Skip motion fixed type
         if (
@@ -1433,7 +1479,7 @@ export default class ParallaxClass {
     /**
      * @private
      */
-    computeValue(scrollVal = null) {
+    computeValue({ scrollVal = null } = {}) {
         if (!mq[this.queryType](this.breackpoint)) return;
 
         if (scrollVal === null) {
@@ -1510,18 +1556,21 @@ export default class ParallaxClass {
     /**
      * @private
      */
-    noEasingRender(forceRender = false) {
+    noEasingRender({ forceRender = false, parentIsMoving = false } = {}) {
         if (!mq[this.queryType](this.breackpoint)) return;
 
         handleFrame.add(() => {
-            this.cleanRender(forceRender);
+            this.cleanRender({ forceRender, parentIsMoving });
         });
     }
 
     /**
      * @private
      */
-    cleanRender(forceRender = false) {
+    cleanRender({ forceRender = false, parentIsMoving = false } = {}) {
+        /**
+         * Skip unnecessary rendering ( no control from outside )
+         */
         if (
             (this.endValue === this.lastValue && !forceRender) ||
             (!this.isInViewport && !forceRender)
@@ -1529,12 +1578,20 @@ export default class ParallaxClass {
             return;
 
         /**
-         * Force is setted true on scrollEnd with no ease;
-         * If is  controlleds from another parallax no 3D.
+         * Set force3D if is not control from outside.
          */
         if (!this.disableForce3D && !this.iSControlledFromOutside)
             this.force3D = !forceRender;
 
+        /**
+         * Set force3D if is control from outside.
+         */
+        if (!this.disableForce3D && this.iSControlledFromOutside)
+            this.force3D = parentIsMoving && this.isInViewport;
+
+        /**
+         * Draw
+         */
         if (this.propierties === parallaxConstant.PROP_TWEEN) {
             this.tween.draw({
                 partial: this.endValue,
@@ -1547,8 +1604,15 @@ export default class ParallaxClass {
             this.updateStyle(this.endValue);
         }
 
+        /**
+         * Children
+         */
         handleNextTick.add(() => {
-            if (this.onTickCallback) this.onTickCallback(this.endValue);
+            if (this.onTickCallback)
+                this.onTickCallback({
+                    value: this.endValue,
+                    parentIsMoving: this.force3D,
+                });
         });
     }
 
@@ -1604,8 +1668,7 @@ export default class ParallaxClass {
                 ? -clamp(this.GC.valPerDirection, 0, this.GC.maxVal)
                 : -clamp(this.GC.valPerDirection, this.GC.maxVal, 0);
 
-        this.fixedShouldRender =
-            this.prevFixedClamp === this.GC.clamp ? false : true;
+        this.fixedShouldRender = this.prevFixedClamp !== this.GC.clamp;
         this.prevFixedClamp = this.GC.clamp;
         if (!this.fixedShouldRender && !this.firstTime) return this.endValue;
 

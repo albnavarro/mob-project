@@ -67,8 +67,8 @@ const createScroller = ({ bottomScroller }) => {
             parallaxTest.refresh();
             bottomScroller.refresh();
         },
-        onTick: (scrollVal) => {
-            parallaxTest.move(scrollVal);
+        onTick: (props) => {
+            parallaxTest.move(props);
         },
         afterRefresh: () => {
             parallaxTest.refresh();
