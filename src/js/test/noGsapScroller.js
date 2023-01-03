@@ -115,8 +115,10 @@ export const noGsap = () => {
         trigger: '.scroller__triggerT2',
         shadowClass: '.shadowClass2',
         forceTranspond: true, // Tryying to massimize performance, move scroll to body on pin
+        reverse: true,
+        // reverse: true,
         // useSticky: true,
-        // useThrottle: true,
+        useThrottle: true,
         ease: true,
         addCss: true,
     });

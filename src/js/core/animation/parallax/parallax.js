@@ -946,6 +946,13 @@ export default class ParallaxClass {
     }
 
     /**
+     *
+     */
+    setBreakPoint(breackpoint) {
+        this.breackpoint = breakpointIsValid(breackpoint, 'breakpoint');
+    }
+
+    /**
      * @private
      */
     setPerspective() {

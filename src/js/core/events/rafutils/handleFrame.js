@@ -269,6 +269,13 @@ export const handleFrame = (() => {
 
     /**
      * @description
+     * Get drop frame status.
+     *
+     */
+    const getShouldRender = () => shouldRender;
+
+    /**
+     * @description
      * Add callback
      *
      * @param {function(handleFrameTypes):void } cb - callback function
@@ -301,5 +308,6 @@ export const handleFrame = (() => {
         add,
         addMultiple,
         getFps,
+        getShouldRender,
     };
 })();

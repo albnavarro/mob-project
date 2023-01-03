@@ -11,6 +11,7 @@ import { horizontalScrollerCss } from './horizontalScrollerCss.js';
 import { mq } from '../../../utils/mediaManager.js';
 import { handleFrameIndex } from '../../../events/rafutils/handleFrameIndex';
 import { horizontalScrollerContstant } from './horizontalScrollerConstant';
+import { pipe } from '../../../utils/functionsUtils';
 
 export class HorizontalScroller {
     constructor(data = {}) {
@@ -25,6 +26,7 @@ export class HorizontalScroller {
         this.ease = data?.ease;
         this.easeType = data?.easeType;
         this.useSticky = data?.useSticky;
+        this.reverse = data?.reverse;
         this.useThrottle = data?.useThrottle;
         this.columnHeight = data?.columnHeight || 100;
         this.columnWidth = data?.columnWidth || null;
@@ -88,6 +90,7 @@ export class HorizontalScroller {
         this.children.forEach((element) => {
             element.setScroller(this.row);
             element.setDirection('horizontal');
+            element.setBreakPoint(this.breackpoint);
             element.init();
         });
 
@@ -109,31 +112,30 @@ export class HorizontalScroller {
     }
 
     init() {
-        this.getWidth().then(() =>
-            this.setDimension().then(() =>
-                this.createShadow().then(() =>
-                    this.updateShadow().then(() => {
-                        this.initScroller();
+        pipe(
+            this.getWidth.bind(this),
+            this.setDimension.bind(this),
+            this.createShadow.bind(this),
+            this.updateShadow.bind(this)
+        )().then(() => {
+            this.initScroller();
 
-                        handleResize(({ horizontalResize }) =>
-                            this.onResize(horizontalResize)
-                        );
+            handleResize(({ horizontalResize }) =>
+                this.onResize(horizontalResize)
+            );
 
-                        handleFrameIndex.add(() => {
-                            handleNextTick.add(() => {
-                                this.afterInit?.();
+            handleFrameIndex.add(() => {
+                handleNextTick.add(() => {
+                    this.afterInit?.();
 
-                                // Builtin children control
-                                // Refresh after component inizialization
-                                this.children.forEach((element) => {
-                                    element.refresh();
-                                });
-                            });
-                        }, 3);
-                    })
-                )
-            )
-        );
+                    // Builtin children control
+                    // Refresh after component inizialization
+                    this.children.forEach((element) => {
+                        element.refresh();
+                    });
+                });
+            }, 3);
+        });
     }
 
     setDimension() {
@@ -251,7 +253,10 @@ export class HorizontalScroller {
                     const width = outerWidth(item);
                     const height = outerHeight(this.row);
                     const { x } = getTranslateValues(this.row);
-                    const offset = item.getBoundingClientRect().left - x;
+                    const offset = this.reverse
+                        ? this.horizontalWidth -
+                          (item.getBoundingClientRect().right - x)
+                        : item.getBoundingClientRect().left - x;
                     const screenRatio = window.innerWidth / window.innerHeight;
                     const windowDifference =
                         window.innerWidth - window.innerHeight;
@@ -364,6 +369,7 @@ export class HorizontalScroller {
             easeType: this.easeType,
             springConfig: 'scroller',
             animateAtStart: this.animateAtStart,
+            fromTo: this.reverse,
             dynamicRange: () => {
                 return -(this.horizontalWidth - window.innerWidth);
             },
@@ -407,16 +413,15 @@ export class HorizontalScroller {
     }
 
     createScroller() {
-        this.getWidth().then(() =>
-            this.setDimension().then(() =>
-                this.createShadow().then(() =>
-                    this.updateShadow().then(() => {
-                        this.initScroller();
-                        this.refreshChildren();
-                    })
-                )
-            )
-        );
+        pipe(
+            this.getWidth.bind(this),
+            this.setDimension.bind(this),
+            this.createShadow.bind(this),
+            this.updateShadow.bind(this)
+        )().then(() => {
+            this.initScroller();
+            this.refreshChildren();
+        });
     }
 
     refreshChildren() {
@@ -437,18 +442,18 @@ export class HorizontalScroller {
         if (!this.moduleisActive || !mq[this.queryType](this.breackpoint))
             return;
 
-        this.getWidth().then(() =>
-            this.setDimension().then(() =>
-                this.updateShadow().then(() => {
-                    this.scroller?.stopMotion?.();
+        pipe(
+            this.getWidth.bind(this),
+            this.setDimension.bind(this),
+            this.updateShadow.bind(this)
+        )().then(() => {
+            this.scroller?.stopMotion?.();
 
-                    if (this.moduleisActive) {
-                        this.scroller?.refresh?.();
-                        this.refreshChildren();
-                    }
-                })
-            )
-        );
+            if (this.moduleisActive) {
+                this.scroller?.refresh?.();
+                this.refreshChildren();
+            }
+        });
     }
 
     killScroller({ destroyAll = false }) {
