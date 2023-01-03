@@ -47,8 +47,8 @@ map("n", "<Leader>p", '"0p')
 map("n", "<Leader>P", '"0P')
 map("v", "<Leader>p", '"0p')
 
---  Delete without ovverdie register
-map("v", "<Leader>d", '"_d')
+--  Cut to register 0
+map("v", "<Leader>x", '"0x')
 
 -- fast replace word from current line to end of file with confirm.
 map("n", "<leader>s", [[:.,$s/\<<C-r><C-w>\>//gc<Left><Left><Left>]], { silent = false })
