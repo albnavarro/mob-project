@@ -109,6 +109,8 @@ import { parallaxUtils } from './parallaxUtils.js';
     if you choose 'tween' you will need to specify a HandleSequencer or ParallaxTween instance in the tween property.
     The default value is 'x'.
  * @prop {('vertical'|'horizontal')} [ direction = 'vertical' ] - Defines the scroll direction
+ * @prop {Boolean} [useWillChange]
+    description
  */
 
 /**
@@ -344,6 +346,11 @@ export default class ParallaxClass {
      */
 
     constructor(data = {}) {
+        /**
+         * @private
+         */
+        this.willChangeIsActive = false;
+
         /**
          * @private
          */
@@ -654,6 +661,9 @@ export default class ParallaxClass {
         /**
          * Common prop
          */
+
+        this.useWillChange = data?.useWillChange;
+
         this.tween = parallaxTweenIsValid(data?.tween);
 
         const tweenIsSequencer =
@@ -950,6 +960,13 @@ export default class ParallaxClass {
      */
     setBreakPoint(breackpoint) {
         this.breackpoint = breakpointIsValid(breackpoint, 'breakpoint');
+    }
+
+    /**
+     *
+     */
+    setQueryType(queryType) {
+        this.queryType = breakpointTypeIsValid(queryType, 'queryType');
     }
 
     /**
@@ -1871,10 +1888,29 @@ export default class ParallaxClass {
     }
 
     /**
+     *@private
+     */
+    extremeRatioStart() {
+        if (!handleFrame.dropFps() || this.willChangeIsActive) return;
+
+        this.willChangeIsActive = true;
+        handleFrameIndex.add(() => {
+            this.willChangeIsActive = false;
+        }, 1000);
+    }
+
+    /**
      * @private
      */
     getStyle(val) {
         this.GC.force3DStyle = this.force3D ? 'translate3D(0px, 0px, 0px)' : '';
+
+        /**
+         * If frame drop activate 'will-change: transform;'
+         */
+        if (this.useWillChange) this.extremeRatioStart();
+        const shouldWill =
+            this.willChangeIsActive && this.force3D ? 'transform' : '';
 
         switch (this.propierties) {
             case parallaxConstant.PROP_VERTICAL:
@@ -1882,31 +1918,37 @@ export default class ParallaxClass {
                     // translate: `0 ${val}px`,
                     // transform: `${this.GC.force3DStyle}`,
                     transform: `${this.GC.force3DStyle} translateY(${val}px)`,
+                    willChange: shouldWill,
                 };
 
             case parallaxConstant.PROP_HORIZONTAL:
                 return {
                     transform: `${this.GC.force3DStyle} translateX(${val}px)`,
+                    willChange: shouldWill,
                 };
 
             case parallaxConstant.PROP_ROTATE:
                 return {
                     transform: `${this.GC.force3DStyle} rotate(${val}deg)`,
+                    willChange: shouldWill,
                 };
 
             case parallaxConstant.PROP_ROTATEY:
                 return {
                     transform: `${this.GC.force3DStyle} rotateY(${val}deg)`,
+                    willChange: shouldWill,
                 };
 
             case parallaxConstant.PROP_ROTATEX:
                 return {
                     transform: `${this.GC.force3DStyle} rotateX(${val}deg)`,
+                    willChange: shouldWill,
                 };
 
             case parallaxConstant.PROP_ROTATEZ:
                 return {
                     transform: `${this.GC.force3DStyle} rotateZ(${val}deg)`,
+                    willChange: shouldWill,
                 };
 
             case parallaxConstant.PROP_OPACITY:
@@ -1919,6 +1961,7 @@ export default class ParallaxClass {
                         : val;
                 return {
                     transform: `${this.GC.force3DStyle} scale(${this.GC.scaleVal})`,
+                    willChange: shouldWill,
                 };
 
             default:

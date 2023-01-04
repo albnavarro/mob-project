@@ -4,8 +4,6 @@
  * @prop {('UP'|'DOWN')} direction
  */
 
-import { handleFrame } from '../rafutils/handleFrame';
-
 /**
  * @description
  * Execute a callback immediately on scroll
@@ -49,9 +47,6 @@ export const handleScrollImmediate = (() => {
          * Check if browser lost frame.
          * If true skip.
          */
-        // const shouldRender = handleFrame.getShouldRender();
-        // if (!shouldRender) return;
-
         callback.forEach(({ cb }) => {
             cb(scrollData);
         });

@@ -13,39 +13,296 @@ import { handleFrameIndex } from '../../../events/rafutils/handleFrameIndex';
 import { horizontalScrollerContstant } from './horizontalScrollerConstant';
 import { pipe } from '../../../utils/functionsUtils';
 
+/**
+ * @typedef {Object} horizontalScrollerType
+
+ * @prop {boolean} [ ease = false ] 
+    Defines whether the animation will have ease.
+    The default value is `false`.
+ * @prop {boolean} [ animateAtStart = false ] 
+    The element will animate with easing (if used) on loading the page or animation.
+    The default value is `false`.
+ * @prop {('spring'|'lerp')} [ easeType = 'lerp'] 
+    Defines the type of easing. The default is `lerp`.
+ * @prop {boolean} [ useThrottle = false ] 
+    Enable a Throttle function on the scroll.
+    The option will not be enabled with the presence of an active pin to maintain accuracy.
+    The default value is `false`.
+ * @prop {boolean} [ forceTranspond = false ] 
+    Property valid only with `useSticky = false`.
+    The element will always be appended to the document body.
+    The default value is false.
+ * @prop {function():void} [ onEnterBack = null ] -
+ * @prop {function():void} [ onLeave = null ] -
+ * @prop {function():void} [ onLeaveBack = null ]-
+ * @prop {function(Number):void} [ onTick = null ] 
+    Function that is launched at each tick.
+    The function will have the current value as input parameter.
+ * @prop {Boolean} [useWillChange]
+    description
+
+ * @prop {Object} [ useSticky ]
+    Use native `postion: sticky` to pin the scroller or use scrolleTrigger pin.
+    Default value is `false`.
+ * @prop {Boolean} [ addCss ]
+    Generate scoped css.
+    Default value is `true`.
+ * @prop {Number} [columnHeight]
+    If the addCss property is active, it is possible to define a default height for the columns.
+    The value must be a number between 0 and 100. 
+    The unit of measure used in vh
+    The default value is `100`.
+ * @prop {Number} [columnWidth]
+    If the addCss property is active, it is possible to define a default width for the columns.
+    The value must be a number between 0 and 100. 
+    The unit of measure used in `vh`
+    The default value is null ( no value will be applied ).
+* @prop {('start'|'center'|'end')} columnAlign
+    If the addCss property is active, it is possible to define the vertical alignment of the columns.
+    The default value is `start`.
+* @prop {string} root 
+    Root element.
+    Accept only a unique class in the form of a string (dot included)
+    It is necessary to provide a string in order to create the necessary css.
+* @prop {string} container 
+    Container element.
+    Accept only a unique class in the form of a string (dot included)
+    It is necessary to provide a string in order to create the necessary css.
+* @prop {string} row 
+    Row element.
+    Accept only a unique class in the form of a string (dot included)
+    It is necessary to provide a string in order to create the necessary css.
+* @prop {string} column 
+    Column element.
+    Accept only a unique class in the form of a string (dot included)
+    It is necessary to provide a string in order to create the necessary css.
+* @prop {string} trigger 
+    Trigger element.
+    Accept only a unique class in the form of a string (dot included)
+    It is necessary to provide a string in order to create the necessary css.
+* @prop {string} shadowClass 
+    The name of the class that will be used to create vertical shadow elements.
+    In this case the dot is optional.
+* @prop {Array.<ParallaxClass>} children
+    An array of instances of the ParallaxClass class used within the scroller.
+    Es:
+    const parallax = mobbu.createParallax({ ... })
+    const scrolltrigger = mobbu.createScrollTrigger({ ... })
+    ...
+    children: [parallax, scrolltrigger],
+    ...
+
+    The instances contained in the array will be:
+    Drive.
+    Updated.
+    Destroyed.
+
+    The `scroller`,`direction`,`branckPoint`,`queryType` properties
+    will be automatically aligned.
+  */
+
+/**
+ * @typedef  { horizontalScrollerType & import('../../../utils/mediaManager.js').breackPointTypeObj & import('../../../utils/mediaManager.js').mqTypeObject } horizontalScrollerConstructorType
+ */
+
 export class HorizontalScroller {
+    /**
+     * @param  { horizontalScrollerConstructorType } data
+     *
+     * @description
+     *
+     * @example
+     *
+     * HTML:
+        <div class="root">
+            <div class="container">
+                <div class="row">
+                    <section class="column" data-shadow="section1">
+                        <h1>title</h1>
+                    </section>
+                    <section class="column">
+                        <h1 data-shadow="title" data-debug>title</h1>
+                    </section>
+                    ...
+                </div>
+                <div class="trigger"></div>
+            </div>
+        </div>
+
+    * JS:
+        const myHorizontalScroller = new HorizontalScroller({
+            root: '.root',
+            container: '.container',
+            row: '.row',
+            column: '.column',
+            trigger: '.trigger',
+            shadowClass: '.myShadowClass,
+            forceTranspond: [ Boolean ],
+            useSticky: [ Boolean ],
+            useThrottle: [ Boolean ],
+            animateAtStart: [ Boolean ],
+            queryType: [ String ],
+            breackpoint: [ String ],
+            ease: [ Boolean ],
+            easeType: [ String ],
+            addCss: [ Boolean ],
+            columnHeight: [ Number ],
+            columnWidth: [ Number ],
+            columnAlign: [ String ],
+            children: [child1,child2, ...],
+            onEnter: () => {
+                ...
+            },
+            onEnterBack: () => {
+                ...
+            },
+            onLeave: () => {
+                ...
+            },
+            onLeaveBack: () => {
+                ...
+            },
+            afterInit: () => {
+                ...
+            },
+            onTick: ({ value, parentIsMoving, percent }) => {
+                ...
+            },
+            afterRefresh: () => {
+                ...
+            },
+            afterDestroy: () => {
+                ...
+            },
+        });
+    *
+     */
     constructor(data = {}) {
+        /**
+         * @private
+         */
         this.NOOP = () => {};
 
-        // Props
-        this.breackpoint = data.breackpoint || 'desktop';
-        this.queryType = data.queryType || 'min';
-        this.forceTranspond = data.forceTranspond || false;
-        this.addCss = data.addCss || false;
+        /**
+         * @private
+         */
+        this.useWillChange = data?.useWillChange ?? true;
+
+        /**
+         * @private
+         */
+        this.breackpoint = data?.breackpoint || 'desktop';
+
+        /**
+         * @private
+         */
+        this.queryType = data?.queryType || 'min';
+
+        /**
+         * @private
+         */
+        this.forceTranspond = data?.forceTranspond || false;
+
+        /**
+         * @private
+         */
+        this.addCss = data.addCss || true;
+
+        /**
+         * @private
+         */
         this.animateAtStart = data?.animateAtStart;
+
+        /**
+         * @private
+         */
         this.ease = data?.ease;
+
+        /**
+         * @private
+         */
         this.easeType = data?.easeType;
-        this.useSticky = data?.useSticky;
+
+        /**
+         * @private
+         */
+        this.useSticky = data?.useSticky ?? false;
+
+        /**
+         * @private
+         */
         this.reverse = data?.reverse;
+
+        /**
+         * @private
+         */
         this.useThrottle = data?.useThrottle;
+
+        /**
+         * @private
+         */
         this.columnHeight = data?.columnHeight || 100;
+
+        /**
+         * @private
+         */
         this.columnWidth = data?.columnWidth || null;
+
+        /**
+         * @private
+         */
         this.columnAlign = data?.columnAlign
             ? data.columnAlign.toUpperCase()
             : horizontalScrollerContstant.START;
 
         // Methods
+
+        /**
+         * @private
+         */
         this.onEnter = data?.onEnter || this.NOOP;
+
+        /**
+         * @private
+         */
         this.onEnterBack = data?.onEnterBack || this.NOOP;
+
+        /**
+         * @private
+         */
         this.onLeave = data?.onLeave || this.NOOP;
+
+        /**
+         * @private
+         */
         this.onLeaveBack = data?.onLeaveBack || this.NOOP;
+
+        /**
+         * @private
+         */
         this.afterInit = data?.afterInit || this.NOOP;
+
+        /**
+         * @private
+         */
         this.afterRefresh = data?.afterRefresh || this.NOOP;
+
+        /**
+         * @private
+         */
         this.afterDestroy = data?.afterDestroy || this.NOOP;
+
+        /**
+         * @private
+         */
         this.onTick = data?.onTick || this.NOOP;
 
         /**
          * Dom element
+         */
+
+        /**
+         * @private
          */
         this.mainContainer = document.querySelector(data.root);
         if (!this.mainContainer) {
@@ -53,44 +310,85 @@ export class HorizontalScroller {
             return;
         }
 
-        this.container = data.container;
+        /**
+         * @private
+         */
+        this.container = data?.container;
+        const scrollerTester = this.mainContainer.querySelector(this.container);
+        if (!scrollerTester) {
+            console.warn('horizontal custom: container node not found');
+            return;
+        }
 
-        // Scroller trigger
-        this.triggerContainer = this.mainContainer.querySelector(data.trigger);
-        if (!this.triggerContainer) {
+        /**
+         * @private
+         */
+        this.trigger = this.mainContainer.querySelector(data.trigger);
+        if (!this.trigger) {
             console.warn('horizontal custom: trigger node not found');
             return;
         }
 
+        /**
+         * @private
+         */
         this.row = this.mainContainer.querySelector(data.row);
-        if (!this.triggerContainer) {
+        if (!this.row) {
             console.warn('horizontal custom: row node not found');
             return;
         }
 
-        this.cards = this.mainContainer.querySelectorAll(data.column);
-        if (!this.triggerContainer) {
+        /**
+         * @private
+         */
+        this.column = this.mainContainer.querySelectorAll(data.column);
+        if (!this.column) {
             console.warn('horizontal custom: column nodeList not found');
             return;
         }
 
+        /**
+         * @private
+         */
         this.shadow = this.mainContainer.querySelectorAll('[data-shadow]');
 
         const originalShadowClass = data?.shadowClass || 'shadow';
+
+        /**
+         * @private
+         */
         this.shadowMainClassTransition = originalShadowClass.replace('.', '');
 
-        //
+        /**
+         * @private
+         */
         this.moduleisActive = false;
+        /**
+         * @private
+         */
         this.horizontalWidth = 0;
-        this.scroller = {};
+
+        /**
+         * @private
+         */
+        this.scrollTriggerInstance = {};
+
+        /**
+         * @private
+         */
         this.percentRange = 0;
 
         // Inizialize children.
+
+        /**
+         * @private
+         */
         this.children = data?.children || [];
         this.children.forEach((element) => {
             element.setScroller(this.row);
             element.setDirection('horizontal');
             element.setBreakPoint(this.breackpoint);
+            element.setQueryType(this.queryType);
             element.init();
         });
 
@@ -100,7 +398,7 @@ export class HorizontalScroller {
                 queryType: this.queryType,
                 breackpoint: this.breackpoint,
                 container: this.container,
-                trigger: data.trigger,
+                trigger: data?.trigger ?? 'trigger',
                 row: data.row,
                 column: data.column,
                 shadow: this.shadowMainClassTransition,
@@ -111,6 +409,13 @@ export class HorizontalScroller {
             });
     }
 
+    /**
+     * @description
+     * Inizialize insatance
+     *
+     * @example
+     * myInstance.init()
+     */
     init() {
         pipe(
             this.getWidth.bind(this),
@@ -127,9 +432,6 @@ export class HorizontalScroller {
             handleFrameIndex.add(() => {
                 handleNextTick.add(() => {
                     this.afterInit?.();
-
-                    // Builtin children control
-                    // Refresh after component inizialization
                     this.children.forEach((element) => {
                         element.refresh();
                     });
@@ -138,8 +440,11 @@ export class HorizontalScroller {
         });
     }
 
+    /**
+     * @private
+     */
     setDimension() {
-        if (!this.triggerContainer || !this.mainContainer || !this.row) {
+        if (!this.trigger || !this.mainContainer || !this.row) {
             return new Promise((resolve) => {
                 resolve();
             });
@@ -151,7 +456,7 @@ export class HorizontalScroller {
                 this.percentRange = (100 * (width - window.innerWidth)) / width;
 
                 if (width > 0) {
-                    this.triggerContainer.style.height = `${width}px`;
+                    this.trigger.style.height = `${width}px`;
                     this.mainContainer.style.height = `${width}px`;
                     this.row.style.width = `${width}px`;
                 }
@@ -161,6 +466,9 @@ export class HorizontalScroller {
         });
     }
 
+    /**
+     * @private
+     */
     getWidth() {
         return new Promise((resolve) => {
             handleFrame.add(() => {
@@ -169,7 +477,7 @@ export class HorizontalScroller {
                     return;
                 }
 
-                this.horizontalWidth = [...this.cards]
+                this.horizontalWidth = [...this.column]
                     .map((item) => {
                         return outerWidth(item);
                     })
@@ -180,8 +488,11 @@ export class HorizontalScroller {
         });
     }
 
+    /**
+     * @private
+     */
     createShadow() {
-        if (!this.triggerContainer) {
+        if (!this.trigger) {
             return new Promise((resolve) => {
                 resolve();
             });
@@ -229,16 +540,22 @@ export class HorizontalScroller {
                     })
                     .join('');
 
-                this.triggerContainer.innerHTML = shadowsTransition;
+                this.trigger.innerHTML = shadowsTransition;
                 resolve();
             });
         });
     }
 
+    /**
+     * @private
+     */
     removeShadow() {
-        if (this.triggerContainer) this.triggerContainer.innerHTML = '';
+        if (this.trigger) this.trigger.innerHTML = '';
     }
 
+    /**
+     * @private
+     */
     updateShadow() {
         return new Promise((resolve) => {
             if (!mq[this.queryType](this.breackpoint)) {
@@ -333,9 +650,7 @@ export class HorizontalScroller {
                     })();
 
                     if (this.useSticky) {
-                        this.triggerContainer.style[
-                            'margin-top'
-                        ] = `-${height}px`;
+                        this.trigger.style['margin-top'] = `-${height}px`;
                     }
 
                     shadowTransitionEl.style.top = `${start}px`;
@@ -352,14 +667,17 @@ export class HorizontalScroller {
         });
     }
 
+    /**
+     * @private
+     */
     initScroller() {
-        if (!this.triggerContainer || !mq[this.queryType](this.breackpoint))
-            return;
+        if (!this.trigger || !mq[this.queryType](this.breackpoint)) return;
 
-        const scroller = new ParallaxClass({
+        const scrollTriggerInstance = new ParallaxClass({
             type: 'scrolltrigger',
             item: this.row,
-            trigger: this.triggerContainer,
+            useWillChange: this.useWillChange,
+            trigger: this.trigger,
             propierties: 'x',
             breackpoint: 'xSmall',
             pin: !this.useSticky,
@@ -386,14 +704,18 @@ export class HorizontalScroller {
                 },
             },
             onTick: ({ value, parentIsMoving }) => {
+                const percent = Math.abs(
+                    -parseInt(
+                        (value * 100) /
+                            (this.horizontalWidth - window.innerWidth)
+                    )
+                );
+
                 // onTick standalone methods.
                 this.onTick({
                     value,
                     parentIsMoving,
-                    percent: -parseInt(
-                        (value * 100) /
-                            (this.horizontalWidth - window.innerWidth)
-                    ),
+                    percent: this.reverse ? 100 - percent : percent,
                 });
 
                 // Builtin children onTick;
@@ -406,12 +728,15 @@ export class HorizontalScroller {
             onLeave: this.onLeave,
             onLeaveBack: this.onLeaveBack,
         });
-        scroller.init();
+        scrollTriggerInstance.init();
 
         this.moduleisActive = true;
-        this.scroller = scroller;
+        this.scrollTriggerInstance = scrollTriggerInstance;
     }
 
+    /**
+     * @private
+     */
     createScroller() {
         pipe(
             this.getWidth.bind(this),
@@ -424,13 +749,13 @@ export class HorizontalScroller {
         });
     }
 
+    /**
+     * @private
+     */
     refreshChildren() {
         handleFrameIndex.add(() => {
             handleNextTick.add(() => {
-                // After Refresh standalone methods.
                 this.afterRefresh?.();
-
-                // Builtin children control;
                 this.children.forEach((element) => {
                     element?.refresh?.();
                 });
@@ -438,6 +763,13 @@ export class HorizontalScroller {
         }, 3);
     }
 
+    /**
+     * @description
+     * Refresh instance
+     *
+     * @example
+     * myInstance.refresh()
+     */
     refresh() {
         if (!this.moduleisActive || !mq[this.queryType](this.breackpoint))
             return;
@@ -447,23 +779,25 @@ export class HorizontalScroller {
             this.setDimension.bind(this),
             this.updateShadow.bind(this)
         )().then(() => {
-            this.scroller?.stopMotion?.();
+            this.scrollTriggerInstance?.stopMotion?.();
 
             if (this.moduleisActive) {
-                this.scroller?.refresh?.();
+                this.scrollTriggerInstance?.refresh?.();
                 this.refreshChildren();
             }
         });
     }
 
+    /**
+     * @private
+     */
     killScroller({ destroyAll = false }) {
         if (this.moduleisActive || destroyAll) {
-            this.scroller?.destroy?.();
-            this.scroller = null;
-            if (this.triggerContainer) this.triggerContainer.style.height = '';
+            this.scrollTriggerInstance?.destroy?.();
+            this.scrollTriggerInstance = null;
+            if (this.trigger) this.trigger.style.height = '';
             if (this.mainContainer) this.mainContainer.style.height = '';
-            if (this.triggerContainer)
-                this.triggerContainer.style.marginTop = '';
+            if (this.trigger) this.trigger.style.marginTop = '';
             this.removeShadow();
             this.moduleisActive = false;
 
@@ -477,9 +811,9 @@ export class HorizontalScroller {
                     if (styleDiv) styleDiv.remove();
 
                     this.mainContainer = null;
-                    this.triggerContainer = null;
+                    this.trigger = null;
                     this.row = [];
-                    this.cards = [];
+                    this.column = [];
                     this.shadow = [];
                     this.afterInit = null;
                     this.afterRefresh = null;
@@ -488,15 +822,12 @@ export class HorizontalScroller {
                     this.onEnterBack = null;
                     this.onLeave = null;
                     this.onLeaveBack = null;
-                    this.scroller = null;
+                    this.scrollTriggerInstance = null;
                     this.moduleisActive = false;
 
                     handleNextTick.add(() => {
-                        // afterDestroy standalone methods
                         this.afterDestroy?.();
                         this.afterDestroy = null;
-
-                        // Destroy children
                         this.children.forEach((element) => {
                             element?.destroy?.();
                             element = null;
@@ -508,6 +839,9 @@ export class HorizontalScroller {
         }
     }
 
+    /**
+     * @private
+     */
     onResize(horizontalResize) {
         if (this.moduleisActive && mq[this.queryType](this.breackpoint)) {
             if (horizontalResize) this.refresh();
@@ -524,6 +858,13 @@ export class HorizontalScroller {
         }
     }
 
+    /**
+     * @description
+     * Destroy instance
+     *
+     * @example
+     * myInstance.destroy()
+     */
     destroy() {
         this.killScroller({ destroyAll: true });
     }

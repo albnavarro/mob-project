@@ -25,6 +25,7 @@ const createScroller = ({ bottomScroller }) => {
         pin: true,
         marker: 'pin',
         propierties: 'y',
+        animateAtStart: false,
         // disableForce3D: true,
         // ease: true,
         // scroller: scroller,
@@ -55,6 +56,7 @@ const createScroller = ({ bottomScroller }) => {
         column: '.scroller__section',
         trigger: '.scroller__triggerT',
         shadowClass: '.shadowClass1',
+        // useWillChange: false,
         // forceTranspond: true, // Tryying to massimize performance, move scroll to body on pin
         useSticky: true,
         useThrottle: true,
@@ -116,6 +118,7 @@ export const noGsap = () => {
         shadowClass: '.shadowClass2',
         forceTranspond: true, // Tryying to massimize performance, move scroll to body on pin
         reverse: true,
+        animateAtStart: false,
         // reverse: true,
         // useSticky: true,
         useThrottle: true,
