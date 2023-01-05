@@ -6,8 +6,12 @@ import { springPresetConfig } from '../spring/springConfig.js';
  * @prop {Number} startFps -  The fallback FPS value before it is detected.
  * Default: `startFps: 60`.
  *
- * @prop {Object.<string, number>} fpsScalePercent - Control the render phase when fps drop occurs. The key represents the number of fps dropped, the value represents the interval of frames needed to perform a new rendering, eg: if from a stable value of 60fps it drops to 44fps (there is a drop of 15 fps) the rendering will be performed every 2 frames and so on. This mechanism is designed to make the browser work less whenever there are bottle caps that prevent it from working smoothly. You can disable this layering by disabling the `useScaleFps` property.
- * Default: `fpsScalePercent: { 0: 1, 15: 2, 30: 3, 45: 4 }`.
+ * @prop {Object.<string, number>} fpsScalePercent - Control the render phase when fps drop occurs.
+    The key represents the number of fps dropped, the value represents the interval of frames needed to perform a new rendering,
+    eg: if from a stable value of 60fps it drops to 35fps (there is a drop of 25 fps) the rendering will be performed every 2 frames and so on.
+    This mechanism is designed to make the browser work less whenever there are bottle caps that prevent it from working smoothly.
+    You can disable this layering by disabling the `useScaleFps` property.
+    Default: `fpsScalePercent: { 0: 1, 25: 2, 40: 3, 50: 4 }`.
  *
  * @prop {Boolean} useScaleFps - Enable or disable conditional rendering based on fps drop.
  * Default: `useScaleFps: true`.
@@ -133,7 +137,7 @@ export const defaultMqValueDefault = 'desktop';
 export const easeDefault = 'easeLinear';
 export const springConfigDefault = 'default';
 export const startFpsDefault = 60;
-export const fpsScalePercentDefault = { 0: 1, 15: 2, 30: 3, 45: 4 };
+export const fpsScalePercentDefault = { 0: 1, 25: 2, 40: 3, 50: 4 };
 export const useScaleFpsDefault = true;
 export const deferredNextTickDefault = false;
 export const throttleDefault = 60;

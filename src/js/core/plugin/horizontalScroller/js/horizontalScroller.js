@@ -38,8 +38,15 @@ import { pipe } from '../../../utils/functionsUtils';
  * @prop {function(Number):void} [ onTick = null ] 
     Function that is launched at each tick.
     The function will have the current value as input parameter.
- * @prop {Boolean} [useWillChange]
-    description
+ * @prop {Boolean} [ useWillChange ]
+    Enable the css property will-change: transform; when the frame rate falls below 3/5 of the optimal value.
+    The property remains active for 1000 frames.
+    If after the previous value the fps value is back to normal the will-change property is disabled.
+    `Use with CAUTION only if necessary.`
+    The default value is `false`.
+ * @prop {boolean} [ animatePin = false ] 
+    Property valid only with `useSticky = false`.
+    A spring animation will be applied to the pinned element on state change.
 
  * @prop {Object} [ useSticky ]
     Use native `postion: sticky` to pin the scroller or use scrolleTrigger pin.
@@ -108,26 +115,42 @@ import { pipe } from '../../../utils/functionsUtils';
 export class HorizontalScroller {
     /**
      * @param  { horizontalScrollerConstructorType } data
-     *
-     * @description
-     *
-     * @example
-     *
-     * HTML:
-        <div class="root">
-            <div class="container">
-                <div class="row">
-                    <section class="column" data-shadow="section1">
-                        <h1>title</h1>
-                    </section>
-                    <section class="column">
-                        <h1 data-shadow="title" data-debug>title</h1>
-                    </section>
-                    ...
-                </div>
-                <div class="trigger"></div>
-            </div>
-        </div>
+    *
+    * @description
+    *
+    * Create new HorizontalScroller instance.
+    *
+    * Special attributes to handle shadow elements:
+    * Apply the following data-attributes to any element
+    *
+    * `data-shadow="<String>"` 
+    * Create a vertical shadow element with a custom className.
+    *
+    * `data-debug` 
+    * Makes the shadow element visible
+    *
+    * Available methods:
+    * myHorizontalScroller.init();
+    * myHorizontalScroller.refresh();
+    * myHorizontalScroller.destroy();
+    *
+    * @example
+    *
+    * HTML:
+       <div class="root">
+           <div class="container">
+               <div class="row">
+                   <section class="column" data-shadow="section1">
+                       <h1>title</h1>
+                   </section>
+                   <section class="column">
+                       <h1 data-shadow="title" data-debug>title</h1>
+                   </section>
+                   ...
+               </div>
+               <div class="trigger"></div>
+           </div>
+       </div>
 
     * JS:
         const myHorizontalScroller = new HorizontalScroller({
@@ -137,9 +160,11 @@ export class HorizontalScroller {
             column: '.column',
             trigger: '.trigger',
             shadowClass: '.myShadowClass,
-            forceTranspond: [ Boolean ],
-            useSticky: [ Boolean ],
             useThrottle: [ Boolean ],
+            useSticky: [ Boolean ],
+            animatePin: [ Boolean ],
+            forceTranspond: [ Boolean ],
+            useWillChange: [ Boolean ],
             animateAtStart: [ Boolean ],
             queryType: [ String ],
             breackpoint: [ String ],
@@ -186,7 +211,7 @@ export class HorizontalScroller {
         /**
          * @private
          */
-        this.useWillChange = data?.useWillChange ?? true;
+        this.useWillChange = data?.useWillChange ?? false;
 
         /**
          * @private
@@ -227,6 +252,11 @@ export class HorizontalScroller {
          * @private
          */
         this.useSticky = data?.useSticky ?? false;
+
+        /**
+         * @private
+         */
+        this.animatePin = data?.animatePin ?? false;
 
         /**
          * @private
@@ -681,6 +711,7 @@ export class HorizontalScroller {
             propierties: 'x',
             breackpoint: 'xSmall',
             pin: !this.useSticky,
+            animatePin: this.animatePin,
             ease: this.ease,
             forceTranspond: this.forceTranspond,
             useThrottle: this.useThrottle,

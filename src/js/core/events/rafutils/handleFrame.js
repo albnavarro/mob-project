@@ -269,7 +269,7 @@ export const handleFrame = (() => {
     /**
      *
      */
-    const dropFps = () => fps < (maxFps / 4) * 3;
+    const dropFps = () => fps < (maxFps / 5) * 3;
 
     /**
      * @description

@@ -110,7 +110,13 @@ import { parallaxUtils } from './parallaxUtils.js';
     The default value is 'x'.
  * @prop {('vertical'|'horizontal')} [ direction = 'vertical' ] - Defines the scroll direction
  * @prop {Boolean} [useWillChange]
-    description
+    Enable the css property will-change: transform; when the frame rate falls below 3/5 of the optimal value.
+    The property remains active for 1000 frames.
+    If after the previous value the fps value is back to normal the will-change property is disabled.
+    `Use with CAUTION only if necessary.`
+    It is valid only for native properties ( x, y , scale, etc...).
+    It is valid only if the disableForce3D property is set to false ( default value ).
+    The default value is `false`.
  */
 
 /**
