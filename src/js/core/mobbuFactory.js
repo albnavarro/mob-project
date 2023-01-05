@@ -855,6 +855,13 @@ export const mobbu = {
 
     /**
      * @description
+     */
+    useDropFrames() {
+        return handleFrame.shouldMakeSomeThing();
+    },
+
+    /**
+     * @description
     Execute a callBack within the first available request animation frame.
     Use this method to modify elements of the DOM
      *

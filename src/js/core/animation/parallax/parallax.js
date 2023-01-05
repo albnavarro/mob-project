@@ -355,12 +355,17 @@ export default class ParallaxClass {
         /**
          * @private
          */
-        this.willChangeIsActive = false;
+        this.isInzialized = false;
 
         /**
          * @private
          */
-        this.isInzialized = false;
+        this.firstScroll = false;
+
+        /**
+         * @private
+         */
+        this.willChangeIsActive = false;
 
         /**
          * @private
@@ -871,11 +876,34 @@ export default class ParallaxClass {
              *  Force transform3D onscroll start
              */
             this.unsubscribeScrollStart = handleScrollStart(() => {
+                this.firstScroll = true;
                 if (!this.disableForce3D) this.force3D = true;
+            });
+
+            /**
+             * Avoid error with scroll module operation
+             * Clean render at the end of the scroll
+             */
+            this.unsubscribeScrollEnd = handleScrollEnd(() => {
+                handleFrame.add(() => {
+                    handleNextTick.add(() => {
+                        this.smoothParallaxJs();
+                    });
+                });
             });
 
             if (this.scroller === window) {
                 getScrollfucuntion(() => {
+                    /**
+                     * Unde handleFrame module operation to skip scroll
+                     * when performance drop down.
+                     * FIrst render is always done
+                     */
+                    if (!handleFrame.getShouldRender() && !this.firstScroll) {
+                        return;
+                    }
+
+                    this.firstScroll = false;
                     this.smoothParallaxJs();
                 });
             }
@@ -1402,6 +1430,7 @@ export default class ParallaxClass {
         // reset value to update animation after resize
         this.lastValue = null;
         this.firstTime = true;
+        this.firstScroll = false;
         //
         if (!mq[this.queryType](this.breackpoint)) {
             if (this.ease) this.motion?.stop?.();
@@ -1894,18 +1923,6 @@ export default class ParallaxClass {
     }
 
     /**
-     *@private
-     */
-    extremeRatioStart() {
-        if (!handleFrame.dropFps() || this.willChangeIsActive) return;
-
-        this.willChangeIsActive = true;
-        handleFrameIndex.add(() => {
-            this.willChangeIsActive = false;
-        }, 1000);
-    }
-
-    /**
      * @private
      */
     getStyle(val) {
@@ -1914,7 +1931,9 @@ export default class ParallaxClass {
         /**
          * If frame drop activate 'will-change: transform;'
          */
-        if (this.useWillChange) this.extremeRatioStart();
+        this.willChangeIsActive = this.useWillChange
+            ? handleFrame.shouldMakeSomeThing()
+            : false;
         const shouldWill =
             this.willChangeIsActive && this.force3D ? 'transform' : '';
 

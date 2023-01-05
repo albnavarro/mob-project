@@ -206,7 +206,7 @@ export default class HandleSyncTimeline {
     /**
      * @private
      */
-    updateTime(time, fps, shouldRender) {
+    updateTime(time, fps) {
         if (this.isStopped || this.fpsIsInLoading) return;
 
         // If loop anitcipate by half frame ( in millsenconds ) next loop so we a have more precise animation
@@ -237,16 +237,14 @@ export default class HandleSyncTimeline {
 
             // When come from playReverse skip first frame becouse is 0
             if (!this.skipFirstRender) {
-                if (shouldRender) {
-                    this.sequencers.forEach((item) => {
-                        item.draw({
-                            partial: this.currentTime,
-                            isLastDraw: false,
-                            useFrame: true,
-                            direction: this.getDirection(),
-                        });
+                this.sequencers.forEach((item) => {
+                    item.draw({
+                        partial: this.currentTime,
+                        isLastDraw: false,
+                        useFrame: true,
+                        direction: this.getDirection(),
                     });
-                }
+                });
 
                 /*
                  * Fire callbackOnUpdate
@@ -394,10 +392,9 @@ export default class HandleSyncTimeline {
      */
     goToNextFrame() {
         handleFrame.add(() => {
-            handleNextTick.add(({ time, fps, shouldRender }) => {
+            handleNextTick.add(({ time, fps }) => {
                 // Prevent fire too many raf
-                if (!this.fpsIsInLoading)
-                    this.updateTime(time, fps, shouldRender);
+                if (!this.fpsIsInLoading) this.updateTime(time, fps);
             });
         });
     }
@@ -677,13 +674,13 @@ export default class HandleSyncTimeline {
             });
 
             handleFrame.add(() => {
-                handleNextTick.add(({ time, fps, shouldRender }) => {
+                handleNextTick.add(({ time, fps }) => {
                     this.startTime = time;
                     this.fpsIsInLoading = false;
                     this.isStopped = false;
                     this.isInPause = false;
                     this.loopCounter = 0;
-                    this.updateTime(time, fps, shouldRender);
+                    this.updateTime(time, fps);
                 });
             });
         });

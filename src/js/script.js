@@ -73,7 +73,7 @@ import { mouseParallaxTest } from './test/mouseParallaxTest.js';
 mobbu.useLoad(() => {
     mobbu.setDefault({
         deferredNextTick: false,
-        fpsScalePercent: { 0: 1, 15: 2, 30: 3, 45: 4 },
+        // fpsScalePercent: { 0: 1, 30: 2, 50: 3 },
         useScaleFps: true,
         // throttle: 60,
         mq: {

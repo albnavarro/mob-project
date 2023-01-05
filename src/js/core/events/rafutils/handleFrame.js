@@ -37,7 +37,6 @@ const firstRunDuration = 2000;
 let frameIsRuning = false;
 let callback = [];
 let time = getTime();
-let prevTime = time;
 let startTime = 0;
 let rawTime = 0;
 let timeElapsed = 0;
@@ -47,8 +46,6 @@ let fps = handleSetUp.get('startFps');
 let maxFps = fps;
 let frames = 0;
 let fpsPrevTime = 0;
-// fpsScale fps
-let dropFps = fps;
 let currentFrame = 0;
 
 /**
@@ -59,6 +56,24 @@ let dropFrameCounter = -1;
 let shouldRender = true;
 let fpsScalePercent = handleSetUp.get('fpsScalePercent');
 let useScaleFpsf = handleSetUp.get('useScaleFps');
+let extremeRatioIsActive = false;
+
+/**
+ * Check if frame dropped.
+ */
+const fpsIsDropped = () => fps < (maxFps / 5) * 3;
+
+/**
+ * If frame dropper for X seconds extremeRatioIsActive = true
+ */
+const extremeRatioStart = () => {
+    if (!fpsIsDropped() || extremeRatioIsActive) return;
+
+    extremeRatioIsActive = true;
+    setTimeout(() => {
+        extremeRatioIsActive = false;
+    }, 4000);
+};
 
 // Stop timer when user change tab
 handleVisibilityChange(({ visibilityState }) => {
@@ -80,7 +95,8 @@ const getRenderStatus = () => {
 
     const activeModule = Object.entries(fpsScalePercent).reduce(
         (acc, [fpsValue, fpsModule]) => {
-            const delta = Math.abs(maxFps - dropFps);
+            // const delta = Math.abs(maxFps - fpsWithMinumVariation);
+            const delta = Math.abs(maxFps - fps);
 
             /**
              * Get delta value in percent
@@ -157,15 +173,6 @@ const render = (timestamp) => {
     rawTime += timeElapsed;
     time = rawTime - startTime;
 
-    /*
-     * Get fps per frame, this value is not very precise
-     * but is usefull to detect instantly a loss
-     * of performane
-     **/
-    dropFps = parseInt(1000 / (time - prevTime));
-    dropFps = dropFps < maxFps && time > firstRunDuration ? dropFps : maxFps;
-    prevTime = time;
-
     /**
      * Get fps
      * Update fps every second
@@ -200,6 +207,11 @@ const render = (timestamp) => {
      * Chek if current frame can fire animation
      * */
     shouldRender = getRenderStatus();
+
+    /**
+     * Start frame check for shouldMakeSomeThing methods.
+     */
+    extremeRatioStart();
 
     /*
         Fire callbnack
@@ -267,9 +279,12 @@ export const handleFrame = (() => {
     const getFps = () => fps;
 
     /**
+     * @description
+     * Return the extremeRatioIsActive status.
+     * IF frame dropped the value is true for X seconds.
      *
      */
-    const dropFps = () => fps < (maxFps / 5) * 3;
+    const shouldMakeSomeThing = () => extremeRatioIsActive;
 
     /**
      * @description
@@ -312,7 +327,7 @@ export const handleFrame = (() => {
         add,
         addMultiple,
         getFps,
-        dropFps,
+        shouldMakeSomeThing,
         getShouldRender,
     };
 })();

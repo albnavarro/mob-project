@@ -67,7 +67,13 @@ export class ParallaxPin {
         this.itemRequireStyleToPin = ['z-index'];
 
         // Parent style that activate transpond
-        this.styleToTranspond = ['transform', 'position'];
+        this.styleToTranspond = [
+            'transform',
+            'position',
+            'translate',
+            'rotate',
+            'scale',
+        ];
 
         // Skip parent style to activate transpond above with this value
         this.nonRelevantRule = ['none', 'static'];
