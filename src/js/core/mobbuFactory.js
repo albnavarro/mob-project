@@ -62,6 +62,7 @@ export const mobbu = {
      *     useScaleFps: true,
      *     deferredNextTick: false,
      *     throttle: 100,
+     *     usePassive: true
      *     mq: {
      *         xSmall: 320,
      *         small: 360,

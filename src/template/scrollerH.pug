@@ -7,6 +7,12 @@ block content
         .container.menu-container.menu-container--top
             include ../includes/navigation.pug
     main
+        .scrollerH-nav
+            button.btn-passive-true(type=button)
+                |passive true
+            button.btn-passive-false(type=button)
+                |passive false
+
         .container.clearfix(style='margin-left:200px;')
             .scrollerH-container
                 input.scrollerInput(type="range" id="test" name="test" min="0" max="100" value="0" step=".5")

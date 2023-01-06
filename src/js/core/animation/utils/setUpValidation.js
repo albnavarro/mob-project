@@ -141,6 +141,7 @@ export const fpsScalePercentDefault = { 0: 1, 30: 2, 50: 3 };
 export const useScaleFpsDefault = true;
 export const deferredNextTickDefault = false;
 export const throttleDefault = 60;
+export const usePassiveDefault = true;
 export const mqDefault = {
     xSmall: 320,
     small: 360,
@@ -192,6 +193,13 @@ export const setupValidation = (obj) => {
         prop: 'deferredNextTick',
         value: obj?.deferredNextTick,
         defaultValue: deferredNextTickDefault,
+        type: Boolean,
+    });
+
+    const usePassive = checkSetUpType({
+        prop: 'usePassive',
+        value: obj?.usePassive,
+        defaultValue: usePassiveDefault,
         type: Boolean,
     });
 
@@ -342,6 +350,7 @@ export const setupValidation = (obj) => {
         useScaleFps,
         deferredNextTick,
         throttle,
+        usePassive,
         mq,
         defaultMq: {
             value: defaultMqValue,

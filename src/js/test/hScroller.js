@@ -2,6 +2,21 @@ import { mobbu } from '../core';
 import { SmoothScrollClass } from '../core/plugin';
 
 export const hScroller = () => {
+    const btnPassiveTrue = document.querySelector('.btn-passive-true');
+    const btnPassiveFalse = document.querySelector('.btn-passive-false');
+
+    btnPassiveTrue.addEventListener('click', () => {
+        mobbu.setDefault({
+            usePassive: true,
+        });
+    });
+
+    btnPassiveFalse.addEventListener('click', () => {
+        mobbu.setDefault({
+            usePassive: false,
+        });
+    });
+
     // FIRST
 
     /**

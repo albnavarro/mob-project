@@ -251,6 +251,10 @@ mobbu.useLoad(() => {
     }
 
     if (body.classList.contains('template-scrollerH')) {
+        mobbu.setDefault({
+            usePassive: false,
+        });
+        mobbu.printDefault();
         hScroller();
     }
 

@@ -1,3 +1,4 @@
+import { handleSetUp, setUpStore } from '../../setup.js';
 import { normalizeWheel } from './normalizeWhell.js';
 
 /**
@@ -29,6 +30,17 @@ function handleMouse(event) {
     let inizialized = false;
     let callback = [];
     let id = 0;
+    let usePassive = handleSetUp.get('usePassive');
+
+    /**
+     * Switch passive event on setUp change.
+     */
+    setUpStore.watch('usePassive', () => {
+        window.removeEventListener(event, handler);
+        inizialized = false;
+
+        init();
+    });
 
     /**
      *
@@ -82,7 +94,7 @@ function handleMouse(event) {
             },
             target,
             type,
-            preventDefault: () => e.preventDefault(),
+            preventDefault: () => (usePassive ? () => {} : e.preventDefault()),
         };
 
         // Add spin value if is wheel event
@@ -104,9 +116,10 @@ function handleMouse(event) {
     function init() {
         if (inizialized) return;
         inizialized = true;
+        usePassive = handleSetUp.get('usePassive');
 
         window.addEventListener(event, handler, {
-            passive: false,
+            passive: usePassive,
         });
     }
 
@@ -154,7 +167,7 @@ function handleMouse(event) {
  *
  * ```
  */
-export const handleMouseClick = new handleMouse(['click']);
+export const handleMouseClick = new handleMouse('click');
 
 /**
  * @description
@@ -172,7 +185,7 @@ export const handleMouseClick = new handleMouse(['click']);
  *
  * ```
  */
-export const handleMouseDown = new handleMouse(['mousedown']);
+export const handleMouseDown = new handleMouse('mousedown');
 
 /**
  * @description
@@ -190,7 +203,7 @@ export const handleMouseDown = new handleMouse(['mousedown']);
  *
  * ```
  */
-export const handleTouchStart = new handleMouse(['touchstart']);
+export const handleTouchStart = new handleMouse('touchstart');
 
 /**
  * @description
@@ -208,7 +221,7 @@ export const handleTouchStart = new handleMouse(['touchstart']);
  *
  * ```
  */
-export const handleMouseMove = new handleMouse(['mousemove']);
+export const handleMouseMove = new handleMouse('mousemove');
 
 /**
  * @description
@@ -226,7 +239,7 @@ export const handleMouseMove = new handleMouse(['mousemove']);
  *
  * ```
  */
-export const handleTouchMove = new handleMouse(['touchmove']);
+export const handleTouchMove = new handleMouse('touchmove');
 
 /**
  * @description
@@ -244,7 +257,7 @@ export const handleTouchMove = new handleMouse(['touchmove']);
  *
  * ```
  */
-export const handleMouseUp = new handleMouse(['mouseup']);
+export const handleMouseUp = new handleMouse('mouseup');
 
 /**
  * @description
@@ -262,7 +275,7 @@ export const handleMouseUp = new handleMouse(['mouseup']);
  *
  * ```
  */
-export const handleTouchEnd = new handleMouse(['touchend']);
+export const handleTouchEnd = new handleMouse('touchend');
 
 /**
  * @description
@@ -290,4 +303,4 @@ export const handleTouchEnd = new handleMouse(['touchend']);
  *
  * ```
  */
-export const handleMouseWheel = new handleMouse(['wheel']);
+export const handleMouseWheel = new handleMouse('wheel');

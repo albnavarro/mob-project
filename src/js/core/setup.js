@@ -18,9 +18,15 @@ import {
     throttleDefault,
     tweenDurationDefault,
     tweenRealtiveDefault,
+    usePassiveDefault,
     useScaleFpsDefault,
 } from './animation/utils/setUpValidation.js';
+import { SimpleStore } from './store/simpleStore.js';
 import { mergeDeep } from './utils/mergeDeep.js';
+
+export const setUpStore = new SimpleStore({
+    usePassive: usePassiveDefault,
+});
 
 /**
  * @typedef {('startFps'|'fpsScalePercent'|'useScaleFps'|'deferredNextTick'|'throttle'|'mq'|'defaultMq'|'sequencer'|'scrollTrigger'|'parallax'|'parallaxTween'|'tween'|'spring'|'lerp')} handleSetUpGetType
@@ -37,6 +43,7 @@ export const handleSetUp = (() => {
         useScaleFps: useScaleFpsDefault,
         deferredNextTick: deferredNextTickDefault,
         throttle: throttleDefault,
+        usePassive: usePassiveDefault,
         mq: mqDefault,
         defaultMq: {
             value: defaultMqValueDefault,
@@ -101,6 +108,7 @@ export const handleSetUp = (() => {
      *     useScaleFps: true,
      *     deferredNextTick: false,
      *     throttle: 100,
+     *     usePassive: true,
      *     mq: {
      *         xSmall: 320,
      *         small: 360,
@@ -192,6 +200,8 @@ export const handleSetUp = (() => {
      */
     const set = (obj) => {
         data = setupValidation(mergeDeep(data, obj));
+
+        if ('usePassive' in obj) setUpStore.set('usePassive', data?.usePassive);
     };
 
     /**

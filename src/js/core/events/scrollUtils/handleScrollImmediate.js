@@ -62,7 +62,7 @@ export const handleScrollImmediate = (() => {
         inizialized = true;
 
         window.addEventListener('scroll', handler, {
-            passive: false,
+            passive: true,
         });
     }
 
