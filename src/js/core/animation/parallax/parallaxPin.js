@@ -64,7 +64,7 @@ export class ParallaxPin {
         this.parentRequireStyle = ['text-align'];
 
         // Item style applied to pin
-        this.itemRequireStyleToPin = ['z-index'];
+        this.itemRequireStyleToPin = ['z-index', 'pointer-events'];
 
         // Parent style that activate transpond
         this.styleToTranspond = [

@@ -19,7 +19,10 @@ $mediaQ: desktop;
             h1 {
                 flex: 0 0 auto;
                 font-size: 300px;
+                pointer-events: none;
+                user-select: none;
                 white-space: nowrap;
+                pointer-events: none;
             }
         }
     }

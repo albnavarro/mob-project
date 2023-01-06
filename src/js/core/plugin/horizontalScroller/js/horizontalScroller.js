@@ -4,6 +4,7 @@ import { handleNextTick } from '../../../events/rafutils/handleNextTick';
 import { handleResize } from '../../../events/resizeUtils/handleResize';
 import {
     getTranslateValues,
+    offset,
     outerHeight,
     outerWidth,
 } from '../../../utils/vanillaFunction';
@@ -211,6 +212,31 @@ export class HorizontalScroller {
         /**
          * @private
          */
+        this.triggerTopPosition = 0;
+
+        /**
+         * @private
+         */
+        this.touchActive = false;
+
+        /**
+         * @private
+         */
+        this.lastTouchValueX = 0;
+
+        /**
+         * @private
+         */
+        this.dragSecureAreaBottom = 0;
+
+        /**
+         * @private
+         */
+        this.dragSecureAreaTop = 100;
+
+        /**
+         * @private
+         */
         this.useWillChange = data?.useWillChange ?? false;
 
         /**
@@ -381,7 +407,6 @@ export class HorizontalScroller {
          * @private
          */
         this.shadow = this.mainContainer.querySelectorAll('[data-shadow]');
-
         const originalShadowClass = data?.shadowClass || 'shadow';
 
         /**
@@ -454,6 +479,7 @@ export class HorizontalScroller {
             this.updateShadow.bind(this)
         )().then(() => {
             this.initScroller();
+            this.addDragListener();
 
             handleResize(({ horizontalResize }) =>
                 this.onResize(horizontalResize)
@@ -468,6 +494,112 @@ export class HorizontalScroller {
                 });
             }, 3);
         });
+    }
+
+    onMouseMove = (e) => {
+        if (!this.touchActive) return;
+
+        const { movementX } = e;
+        const value = this.reverse ? movementX : -movementX;
+        this.onDrag(value);
+        this.touchStart = false;
+    };
+
+    onMouseDown = () => {
+        if (!mq[this.queryType](this.breackpoint)) return;
+
+        if (this.shouldDrag()) this.row.style.cursor = 'move';
+        this.touchActive = true;
+    };
+
+    onMouseUp = () => {
+        this.touchActive = false;
+        this.row.style.cursor = '';
+    };
+
+    onMouseLeave = () => {
+        this.touchActive = false;
+        this.row.style.cursor = '';
+    };
+
+    onTouchStart = (e) => {
+        if (!mq[this.queryType](this.breackpoint)) return;
+
+        this.lastTouchValueX = -e.touches[0].clientX;
+        this.touchActive = true;
+    };
+
+    onTouchEnd = () => {
+        this.touchActive = false;
+    };
+
+    onTouchMove = (e) => {
+        const touchValueX = -e.touches[0].clientX;
+        // const gapX = touchValueX - this.lastTouchValueX;
+        const gapX = this.reverse
+            ? -touchValueX + this.lastTouchValueX
+            : touchValueX - this.lastTouchValueX;
+
+        this.onDrag(gapX);
+        this.lastTouchValueX = touchValueX;
+
+        if (this.shouldDrag() && e.cancelable) e.preventDefault();
+    };
+
+    onDrag(value) {
+        if (!this.shouldDrag()) return;
+        document.documentElement.scrollTop += value;
+    }
+
+    shouldDrag() {
+        const documentScrollTop = document.documentElement.scrollTop;
+
+        return (
+            this.triggerTopPosition - this.dragSecureAreaTop <
+                documentScrollTop &&
+            this.triggerTopPosition +
+                this.dragSecureAreaBottom +
+                this.horizontalWidth >
+                documentScrollTop + window.innerHeight
+        );
+    }
+
+    addDragListener() {
+        this.row.addEventListener('mousedown', this.onMouseDown, {
+            passive: true,
+        });
+
+        this.row.addEventListener('mouseup', this.onMouseUp, {
+            passive: true,
+        });
+
+        this.row.addEventListener('mouseleave', this.onMouseLeave, {
+            passive: true,
+        });
+
+        this.row.addEventListener('touchstart', this.onTouchStart, {
+            passive: true,
+        });
+
+        this.row.addEventListener('touchend', this.onTouchEnd, {
+            passive: true,
+        });
+
+        this.row.addEventListener('mousemove', this.onMouseMove, {
+            passive: true,
+        });
+
+        this.row.addEventListener('touchmove', this.onTouchMove);
+    }
+
+    removeDragListener() {
+        this.row.removeEventListener('mousedown', this.onMouseDown);
+        this.row.removeEventListener('mouseup', this.onMouseUp);
+        this.row.removeEventListener('mouseleave', this.onMouseLeave);
+        this.row.removeEventListener('touchstart', this.onTouchStart);
+        this.row.removeEventListener('touchend', this.onTouchEnd);
+        this.row.removeEventListener('mousemove', this.onMouseMove);
+        this.row.removeEventListener('touchmove', this.onTouchMove);
     }
 
     /**
@@ -763,6 +895,7 @@ export class HorizontalScroller {
 
         this.moduleisActive = true;
         this.scrollTriggerInstance = scrollTriggerInstance;
+        this.triggerTopPosition = offset(this.trigger).top;
     }
 
     /**
@@ -811,6 +944,7 @@ export class HorizontalScroller {
             this.updateShadow.bind(this)
         )().then(() => {
             this.scrollTriggerInstance?.stopMotion?.();
+            this.triggerTopPosition = offset(this.trigger).top;
 
             if (this.moduleisActive) {
                 this.scrollTriggerInstance?.refresh?.();
@@ -837,6 +971,7 @@ export class HorizontalScroller {
                 this.row.style = '';
 
                 if (destroyAll && this.mainContainer) {
+                    this.removeDragListener();
                     const styleDiv =
                         this.mainContainer.querySelector('.scroller-style');
                     if (styleDiv) styleDiv.remove();
