@@ -23,7 +23,7 @@ const createScroller = ({ bottomScroller }) => {
     let parallaxTest = mobbu.createScrollTrigger({
         item: title,
         pin: true,
-        marker: 'pin',
+        // marker: 'pin',
         propierties: 'y',
         animateAtStart: false,
         // useWillChange: true,
@@ -87,7 +87,9 @@ const createScroller = ({ bottomScroller }) => {
             bottomScroller.refresh();
         },
         onTick: ({ value, parentIsMoving, percent }) => {
-            scroller.style.setProperty('--percent', `${percent}%`);
+            mobbu.useFrame(() => {
+                scroller.style.setProperty('--percent', `${percent}%`);
+            });
             // parallaxTest.move({ value, parentIsMoving });
         },
         afterRefresh: () => {

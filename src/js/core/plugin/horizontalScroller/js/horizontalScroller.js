@@ -13,6 +13,7 @@ import { mq } from '../../../utils/mediaManager.js';
 import { handleFrameIndex } from '../../../events/rafutils/handleFrameIndex';
 import { horizontalScrollerContstant } from './horizontalScrollerConstant';
 import { pipe } from '../../../utils/functionsUtils';
+import { handleScroll } from '../../../events/scrollUtils/handleScroll';
 
 /**
  * @typedef {Object} horizontalScrollerType
@@ -233,6 +234,16 @@ export class HorizontalScroller {
          * @private
          */
         this.dragSecureAreaTop = 100;
+
+        /**
+         * @private
+         */
+        this.shouldDragValue = false;
+
+        /**
+         * @private
+         */
+        this.unsubscribeScroll = () => {};
 
         /**
          * @private
@@ -508,18 +519,18 @@ export class HorizontalScroller {
     onMouseDown = () => {
         if (!mq[this.queryType](this.breackpoint)) return;
 
-        if (this.shouldDrag()) this.row.style.cursor = 'move';
+        if (this.shouldDragValue) this.row.style.cursor = 'move';
         this.touchActive = true;
     };
 
     onMouseUp = () => {
         this.touchActive = false;
-        this.row.style.cursor = '';
+        handleFrame.add(() => (this.row.style.cursor = ''));
     };
 
     onMouseLeave = () => {
         this.touchActive = false;
-        this.row.style.cursor = '';
+        handleFrame.add(() => (this.row.style.cursor = ''));
     };
 
     onTouchStart = (e) => {
@@ -535,7 +546,6 @@ export class HorizontalScroller {
 
     onTouchMove = (e) => {
         const touchValueX = -e.touches[0].clientX;
-        // const gapX = touchValueX - this.lastTouchValueX;
         const gapX = this.reverse
             ? -touchValueX + this.lastTouchValueX
             : touchValueX - this.lastTouchValueX;
@@ -543,28 +553,34 @@ export class HorizontalScroller {
         this.onDrag(gapX);
         this.lastTouchValueX = touchValueX;
 
-        if (this.shouldDrag() && e.cancelable) e.preventDefault();
+        if (this.shouldDragValue && e.cancelable) e.preventDefault();
     };
 
     onDrag(value) {
-        if (!this.shouldDrag()) return;
-        document.documentElement.scrollTop += value;
+        if (!this.shouldDragValue) return;
+        handleFrame.add(() => (document.documentElement.scrollTop += value));
     }
 
     shouldDrag() {
-        const documentScrollTop = document.documentElement.scrollTop;
+        handleFrame.add(() => {
+            handleNextTick.add(() => {
+                const documentScrollTop = window.pageYOffset;
 
-        return (
-            this.triggerTopPosition - this.dragSecureAreaTop <
-                documentScrollTop &&
-            this.triggerTopPosition +
-                this.dragSecureAreaBottom +
-                this.horizontalWidth >
-                documentScrollTop + window.innerHeight
-        );
+                this.shouldDragValue =
+                    this.triggerTopPosition - this.dragSecureAreaTop <
+                        documentScrollTop &&
+                    this.triggerTopPosition +
+                        this.dragSecureAreaBottom +
+                        this.horizontalWidth >
+                        documentScrollTop + window.innerHeight;
+            });
+        });
     }
 
     addDragListener() {
+        this.unsubscribeScroll = handleScroll(() => this.shouldDrag());
+        this.shouldDrag();
+
         this.row.addEventListener('mousedown', this.onMouseDown, {
             passive: true,
         });
@@ -593,6 +609,7 @@ export class HorizontalScroller {
     }
 
     removeDragListener() {
+        this.unsubscribeScroll();
         this.row.removeEventListener('mousedown', this.onMouseDown);
         this.row.removeEventListener('mouseup', this.onMouseUp);
         this.row.removeEventListener('mouseleave', this.onMouseLeave);
