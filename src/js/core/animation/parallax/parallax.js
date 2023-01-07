@@ -985,6 +985,13 @@ export default class ParallaxClass {
     /**
      *
      */
+    setScreen(screen) {
+        this.screen = domNodeIsValidAndReturnElOrWin(screen, true);
+    }
+
+    /**
+     *
+     */
     setDirection(direction) {
         this.direction = parallaxDirectionIsValid(direction);
     }

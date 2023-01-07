@@ -38,15 +38,15 @@ export default class SmoothScroller {
         this.HORIZONTAL = 'horizontal';
         this.direction = data?.direction ?? this.VERTICAL;
 
-        this.target = checkType(String, data?.target)
-            ? document.querySelector(data.target)
-            : data.target;
+        this.scroller = checkType(String, data?.scroller)
+            ? document.querySelector(data.scroller)
+            : data.scroller;
 
-        this.container = data?.container
+        this.screen = data?.screen
             ? (() => {
-                  return checkType(String, data.container)
-                      ? document.querySelector(data.container)
-                      : data.container;
+                  return checkType(String, data.screen)
+                      ? document.querySelector(data.screen)
+                      : data.screen;
               })()
             : document.documentElement;
 
@@ -55,8 +55,8 @@ export default class SmoothScroller {
         this.drag = data.drag ?? false;
         this.endValue = 0;
         this.percent = 0;
-        this.containerWidth = 0;
-        this.containerHeight = 0;
+        this.screenWidth = 0;
+        this.screenHeight = 0;
         this.firstTouchValue = 0;
         this.threshold = 30;
         this.maxValue = 0;
@@ -95,6 +95,21 @@ export default class SmoothScroller {
         this.unsubscribeOnComplete = this.NOOP;
 
         this.scrollbarIsRunning = false;
+        //
+        // Inizialize children.
+
+        /**
+         * @private
+         */
+        this.children = data?.children || [];
+        this.children.forEach((element) => {
+            element.setScroller(this.scroller);
+            element.setDirection(this.direction);
+            element.setScreen(this.screen);
+            // element.setBreakPoint(this.breackpoint);
+            // element.setQueryType(this.queryType);
+            element.init();
+        });
     }
 
     init() {
@@ -112,15 +127,15 @@ export default class SmoothScroller {
          * scoped event
          */
         if (this.scopedEvent) {
-            this.target.addEventListener('wheel', this.scopedWhell, {
+            this.scroller.addEventListener('wheel', this.scopedWhell, {
                 passive: true,
             });
 
-            this.target.addEventListener('mousemove', this.scopedTouchMove, {
+            this.scroller.addEventListener('mousemove', this.scopedTouchMove, {
                 passive: true,
             });
 
-            this.target.addEventListener('touchmove', this.scopedTouchMove, {
+            this.scroller.addEventListener('touchmove', this.scopedTouchMove, {
                 passive: true,
             });
         } else {
@@ -139,10 +154,12 @@ export default class SmoothScroller {
         /**
          * Common event
          */
-        this.updateProps();
+        this.refreshScroller();
         this.subscribeResize = handleResize(() => this.refresh());
-        this.subscribeScrollStart = handleScrollStart(() => this.updateProps());
-        this.subscribeScrollEnd = handleScrollEnd(() => this.updateProps());
+        this.subscribeScrollStart = handleScrollStart(() =>
+            this.refreshScroller()
+        );
+        this.subscribeScrollEnd = handleScrollEnd(() => this.refreshScroller());
         this.subscribeTouchStart = handleTouchStart((data) =>
             this.onMouseDown(data)
         );
@@ -161,8 +178,8 @@ export default class SmoothScroller {
         }
 
         // Set link and button to draggable false, prevent mousemouve fail
-        this.target.style['user-select'] = 'none';
-        const activeElement = this.target.querySelectorAll('a, button');
+        this.scroller.style['user-select'] = 'none';
+        const activeElement = this.scroller.querySelectorAll('a, button');
         [...activeElement].forEach((item) => {
             item.setAttribute('draggable', false);
             item.style['user-select'] = 'none';
@@ -176,9 +193,9 @@ export default class SmoothScroller {
 
         this.unsubscribeMotion = this.motion.subscribe(({ val }) => {
             if (this.direction == this.VERTICAL) {
-                this.target.style.transform = `translate3d(0px, 0px, 0px) translateY(${-val}px)`;
+                this.scroller.style.transform = `translate3d(0px, 0px, 0px) translateY(${-val}px)`;
             } else {
-                this.target.style.transform = `translate3d(0px, 0px, 0px) translateX(${-val}px)`;
+                this.scroller.style.transform = `translate3d(0px, 0px, 0px) translateX(${-val}px)`;
             }
 
             handleNextTick.add(() => {
@@ -188,14 +205,21 @@ export default class SmoothScroller {
                         percent: this.percent,
                         parentIsMoving: true,
                     });
+
+                this.children.forEach((element) => {
+                    element.move({
+                        value: -val,
+                        parentIsMoving: true,
+                    });
+                });
             });
         });
 
         this.unsubscribeOnComplete = this.motion.onComplete(({ val }) => {
             if (this.direction == this.VERTICAL) {
-                this.target.style.transform = `translateY(${-val}px)`;
+                this.scroller.style.transform = `translateY(${-val}px)`;
             } else {
-                this.target.style.transform = `translateX(${-val}px)`;
+                this.scroller.style.transform = `translateX(${-val}px)`;
             }
 
             handleNextTick.add(() => {
@@ -205,27 +229,34 @@ export default class SmoothScroller {
                         percent: this.percent,
                         parentIsMoving: false,
                     });
+
+                this.children.forEach((element) => {
+                    element.move({
+                        value: -val,
+                        parentIsMoving: false,
+                    });
+                });
             });
         });
     }
 
-    updateProps() {
+    refreshScroller() {
         this.isScrolling = false;
 
-        this.containerWidth =
-            this.container === document.documentElement
+        this.screenWidth =
+            this.screen === document.documentElement
                 ? window.innerWidth
-                : outerWidth(this.container);
+                : outerWidth(this.screen);
 
-        this.containerHeight =
-            this.container === document.documentElement
+        this.screenHeight =
+            this.screen === document.documentElement
                 ? window.innerHeight
-                : outerHeight(this.container);
+                : outerHeight(this.screen);
 
         this.maxValue =
             this.direction === this.VERTICAL
-                ? this.target.offsetHeight - this.containerHeight
-                : this.target.offsetWidth - this.containerWidth;
+                ? this.scroller.offsetHeight - this.screenHeight
+                : this.scroller.offsetWidth - this.screenWidth;
 
         this.calculateValue();
     }
@@ -276,7 +307,7 @@ export default class SmoothScroller {
      * Global
      */
     onMouseDown({ target, client }) {
-        if (target === this.target || isDescendant(this.target, target)) {
+        if (target === this.scroller || isDescendant(this.scroller, target)) {
             this.firstTouchValue = this.endValue;
             this.dragEnable = true;
             this.prevTouchVal = this.getMousePos(client);
@@ -292,7 +323,7 @@ export default class SmoothScroller {
 
     onTouchMove({ target, client, preventDefault }) {
         if (
-            (target === this.target || isDescendant(this.target, target)) &&
+            (target === this.scroller || isDescendant(this.scroller, target)) &&
             this.dragEnable &&
             this.drag
         ) {
@@ -317,7 +348,7 @@ export default class SmoothScroller {
         if (bodyIsOverflow) return;
 
         this.dragEnable = false;
-        if (target === this.target || isDescendant(this.target, target)) {
+        if (target === this.scroller || isDescendant(this.scroller, target)) {
             preventDefault();
             this.endValue += spinY * this.speed;
             this.calculateValue();
@@ -335,10 +366,6 @@ export default class SmoothScroller {
         this.motion.goTo({ val: this.endValue }).catch(() => {});
     }
 
-    updateScrollbar(fn) {
-        this.onUpdateScrollBar = fn;
-    }
-
     /**
      * Utils
      */
@@ -347,17 +374,10 @@ export default class SmoothScroller {
         this.percent = clamp(percentValue, 0, 100);
         this.endValue = clamp(this.endValue, 0, this.maxValue);
         this.motion.goTo({ val: this.endValue }).catch(() => {});
-
-        if (!this.scrollbarIsRunning) {
-            this.onUpdateScrollBar({
-                scrollValue: -this.endValue,
-                percent: this.percent,
-            });
-        }
     }
 
     preventChecker({ target, preventDefault }) {
-        if (target === this.target || isDescendant(this.target, target)) {
+        if (target === this.scroller || isDescendant(this.scroller, target)) {
             if (
                 Math.abs(this.endValue - this.firstTouchValue) > this.threshold
             ) {
@@ -372,11 +392,15 @@ export default class SmoothScroller {
     }
 
     refresh() {
-        this.updateProps();
+        this.refreshScroller();
 
         handleFrameIndex.add(() => {
             handleNextTick.add(() => {
                 if (this.onAfterRefresh) this.onAfterRefresh();
+
+                this.children.forEach((element) => {
+                    element.refresh();
+                });
             });
         }, 1);
     }
@@ -401,11 +425,24 @@ export default class SmoothScroller {
         this.onUpdateScrollBar = () => {};
         this.motion?.destroy();
         this.motion = null;
+        this.children.forEach((element) => {
+            element?.destroy?.();
+            element = null;
+        });
+        this.children = [];
+        this.onTickCallback = [];
+        this.onAfterRefresh = [];
 
         if (this.scopedEvent) {
-            this.target.removeEventListener('wheel', this.scopedWhell);
-            this.target.removeEventListener('mousemove', this.scopedTouchMove);
-            this.target.removeEventListener('touchmove', this.scopedTouchMove);
+            this.scroller.removeEventListener('wheel', this.scopedWhell);
+            this.scroller.removeEventListener(
+                'mousemove',
+                this.scopedTouchMove
+            );
+            this.scroller.removeEventListener(
+                'touchmove',
+                this.scopedTouchMove
+            );
         }
     }
 }
