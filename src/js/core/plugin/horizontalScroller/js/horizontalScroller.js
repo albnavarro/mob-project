@@ -18,6 +18,8 @@ import { handleScroll } from '../../../events/scrollUtils/handleScroll';
 /**
  * @typedef {Object} horizontalScrollerType
 
+ * @prop {boolean} [ useDrag = false ] 
+    Enable drag.
  * @prop {boolean} [ ease = false ] 
     Defines whether the animation will have ease.
     The default value is `false`.
@@ -244,6 +246,11 @@ export class HorizontalScroller {
          * @private
          */
         this.unsubscribeScroll = () => {};
+
+        /**
+         * @private
+         */
+        this.useDrag = data?.useDrag ?? false;
 
         /**
          * @private
@@ -490,7 +497,7 @@ export class HorizontalScroller {
             this.updateShadow.bind(this)
         )().then(() => {
             this.initScroller();
-            this.addDragListener();
+            if (this.useDrag) this.addDragListener();
 
             handleResize(({ horizontalResize }) =>
                 this.onResize(horizontalResize)
@@ -986,7 +993,8 @@ export class HorizontalScroller {
                 this.row.style = '';
 
                 if (destroyAll && this.mainContainer) {
-                    this.removeDragListener();
+                    if (this.useDrag) this.removeDragListener();
+
                     const styleDiv =
                         this.mainContainer.querySelector('.scroller-style');
                     if (styleDiv) styleDiv.remove();

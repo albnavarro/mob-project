@@ -6,14 +6,14 @@ import { springPresetConfig } from '../spring/springConfig.js';
  * @prop {Number} startFps -  The fallback FPS value before it is detected.
  * Default: `startFps: 60`.
  *
- * @prop {Object.<string, number>} fpsScalePercent - Control the render phase when fps drop occurs.
-    The key represents the number of fps dropped, the value represents the interval of frames needed to perform a new rendering,
-    eg: if from a stable value of 60fps it drops to 35fps (there is a drop of 25 fps) the rendering will be performed every 2 frames and so on.
+ * @prop {Object.<string, number>} fpsScalePercent - Control the scroll phase when fps drop occurs.
+    The key represents the number of fps dropped, the value represents the interval of frames needed to fire a scroll function.
+    eg: if from a stable value of 60fps it drops to 30fps (there is a drop of 30 fps) the scroll function will be performed every 2 scroll and so on.
     This mechanism is designed to make the browser work less whenever there are bottle caps that prevent it from working smoothly.
     You can disable this layering by disabling the `useScaleFps` property.
-    Default: `fpsScalePercent: { 0: 1, 25: 2, 40: 3, 50: 4 }`.
+    Default: `fpsScalePercent: { 0: 1, 30: 2, 50: 3 }`.
  *
- * @prop {Boolean} useScaleFps - Enable or disable conditional rendering based on fps drop.
+ * @prop {Boolean} useScaleFps - Enable or disable conditional module operation on scroll based on fps drop.
  * Default: `useScaleFps: true`.
  *
  * @prop {Boolean}  deferredNextTick - If the property is set to true, all functions related to nextTick will be executed at the end of the request animation frame.

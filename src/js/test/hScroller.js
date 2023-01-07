@@ -212,6 +212,7 @@ export const hScroller = () => {
      */
     const inputRange = document.querySelector('.scrollerInput');
     const smoothScrollFull = new SmoothScrollClass({
+        scopedEvent: true,
         target: '.scrollerH',
         direction: 'HORIZONTAL',
         speed: 40,
