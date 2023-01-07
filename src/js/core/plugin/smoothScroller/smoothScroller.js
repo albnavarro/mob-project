@@ -15,19 +15,28 @@ import {
 } from '../../events/mouseUtils/handleMouse.js';
 import {
     isDescendant,
-    getTranslateValues,
+    // getTranslateValues,
+    outerHeight,
+    outerWidth,
 } from '../../utils/vanillaFunction.js';
 import HandleLerp from '../../animation/lerp/handleLerp.js';
 import HandleSpring from '../../animation/spring/handleSpring.js';
 import { clamp } from '../../animation/utils/animationUtils.js';
 import { normalizeWheel } from '../../events/mouseUtils/normalizeWhell.js';
 import { checkType } from '../../store/storeType.js';
+import { handleNextTick } from '../../events/rafutils/handleNextTick.js';
+import { handleFrameIndex } from '../../events/rafutils/handleFrameIndex.js';
 
-export default class SmoothScrollClass {
+export default class SmoothScroller {
     constructor(data = {}) {
-        this.VERTICAL = 'VERTICAL';
-        this.HORIZONTAL = 'HORIZONTAL';
-        this.direction = data.direction ?? this.VERTICAL;
+        /**
+         * @private
+         */
+        this.NOOP = () => {};
+
+        this.VERTICAL = 'vertical';
+        this.HORIZONTAL = 'horizontal';
+        this.direction = data?.direction ?? this.VERTICAL;
 
         this.target = checkType(String, data?.target)
             ? document.querySelector(data.target)
@@ -60,29 +69,30 @@ export default class SmoothScrollClass {
         this.prevTouchVal = 0;
         this.touchVal = 0;
         //
-        this.onTickCallback = [];
-        this.onUpdateScrollBar = () => {};
+        this.onTickCallback = data?.onTick ?? null;
+        this.onAfterRefresh = data?.afterRefresh ?? null;
 
         // Unsubscribe event
-        this.subscribeResize = () => {};
-        this.subscribeScrollStart = () => {};
-        this.subscribeScrollEnd = () => {};
-        this.subscribeTouchStart = () => {};
-        this.subscribeTouchEnd = () => {};
-        this.subscribeMouseDown = () => {};
-        this.subscribeMouseUp = () => {};
-        this.subscribeMouseWheel = () => {};
-        this.subscribeMouseMove = () => {};
-        this.subscribeTouchMove = () => {};
-        this.subscribeMouseClick = () => {};
+        this.onUpdateScrollBar = this.NOOP;
+        this.subscribeResize = this.NOOP;
+        this.subscribeScrollStart = this.NOOP;
+        this.subscribeScrollEnd = this.NOOP;
+        this.subscribeTouchStart = this.NOOP;
+        this.subscribeTouchEnd = this.NOOP;
+        this.subscribeMouseDown = this.NOOP;
+        this.subscribeMouseUp = this.NOOP;
+        this.subscribeMouseWheel = this.NOOP;
+        this.subscribeMouseMove = this.NOOP;
+        this.subscribeTouchMove = this.NOOP;
+        this.subscribeMouseClick = this.NOOP;
 
         // Animation
         this.LERP = 'lerp';
         this.SPRING = 'spring';
         this.motionType = data.motionType || this.LERP;
         this.motion = null;
-        this.unsubscribeMotion = () => {};
-        this.unsubscribeOnComplete = () => {};
+        this.unsubscribeMotion = this.NOOP;
+        this.unsubscribeOnComplete = this.NOOP;
 
         this.scrollbarIsRunning = false;
     }
@@ -130,7 +140,7 @@ export default class SmoothScrollClass {
          * Common event
          */
         this.updateProps();
-        this.subscribeResize = handleResize(() => this.updateProps());
+        this.subscribeResize = handleResize(() => this.refresh());
         this.subscribeScrollStart = handleScrollStart(() => this.updateProps());
         this.subscribeScrollEnd = handleScrollEnd(() => this.updateProps());
         this.subscribeTouchStart = handleTouchStart((data) =>
@@ -171,11 +181,13 @@ export default class SmoothScrollClass {
                 this.target.style.transform = `translate3d(0px, 0px, 0px) translateX(${-val}px)`;
             }
 
-            this.onTickCallback.forEach((item) => {
-                item({
-                    scrollValue: -val,
-                    percent: this.percent,
-                });
+            handleNextTick.add(() => {
+                if (this.onTickCallback)
+                    this.onTickCallback({
+                        value: -val,
+                        percent: this.percent,
+                        parentIsMoving: true,
+                    });
             });
         });
 
@@ -186,11 +198,42 @@ export default class SmoothScrollClass {
                 this.target.style.transform = `translateX(${-val}px)`;
             }
 
-            this.onTickCallback.forEach((item) => {
-                item(-val);
+            handleNextTick.add(() => {
+                if (this.onTickCallback)
+                    this.onTickCallback({
+                        value: -val,
+                        percent: this.percent,
+                        parentIsMoving: false,
+                    });
             });
         });
     }
+
+    updateProps() {
+        this.isScrolling = false;
+
+        this.containerWidth =
+            this.container === document.documentElement
+                ? window.innerWidth
+                : outerWidth(this.container);
+
+        this.containerHeight =
+            this.container === document.documentElement
+                ? window.innerHeight
+                : outerHeight(this.container);
+
+        this.maxValue =
+            this.direction === this.VERTICAL
+                ? this.target.offsetHeight - this.containerHeight
+                : this.target.offsetWidth - this.containerWidth;
+
+        this.calculateValue();
+    }
+
+    /**
+     * Listener related event.
+     * Scroped
+     */
 
     scopedWhell = (e) => {
         const { spinY } = normalizeWheel(e);
@@ -211,72 +254,27 @@ export default class SmoothScrollClass {
         });
     };
 
-    onTick(fn) {
-        this.onTickCallback.push(fn);
+    onScopedTouchMove({ client }) {
+        if (!this.dragEnable || !this.drag) return;
+
+        this.prevTouchVal = this.touchVal;
+        this.touchVal = this.getMousePos(client);
+        this.endValue += parseInt(this.prevTouchVal - this.touchVal);
+        this.calculateValue();
+        this.scrollbarIsRunning = false;
     }
 
-    updateScrollbar(fn) {
-        this.onUpdateScrollBar = fn;
+    onScopedWhell({ spinY }) {
+        this.dragEnable = false;
+        this.endValue += spinY * this.speed;
+        this.calculateValue();
+        this.scrollbarIsRunning = false;
     }
 
     /**
-     * preventChecker - prevent default if scroll difference from dow to up is less thshold value
-     *
-     * @param  {event} e listener event
-     * @return {void}
+     * Listener related event.
+     * Global
      */
-    preventChecker({ target, preventDefault }) {
-        if (target === this.target || isDescendant(this.target, target)) {
-            if (
-                Math.abs(this.endValue - this.firstTouchValue) > this.threshold
-            ) {
-                preventDefault();
-            }
-        }
-    }
-
-    // RESET DATA
-    updateProps() {
-        this.isScrolling = false;
-
-        this.containerWidth =
-            this.container === document.documentElement
-                ? document.documentElement.clientWidth
-                : this.container.offsetWidth;
-
-        this.containerHeight =
-            this.container === document.documentElement
-                ? document.documentElement.clientHeight
-                : this.container.offsetHeight;
-
-        const resetValue = (() => {
-            if (this.direction === this.VERTICAL) {
-                return -getTranslateValues(this.target).y;
-            } else {
-                return -getTranslateValues(this.target).x;
-            }
-        })();
-
-        this.endValue = resetValue;
-        this.motion.set({ val: resetValue }).catch(() => {});
-
-        this.maxValue = (() => {
-            if (this.direction === this.VERTICAL) {
-                return this.target.offsetHeight - this.containerHeight;
-            } else {
-                return this.target.offsetWidth - this.containerWidth;
-            }
-        })();
-
-        this.calculateValue();
-    }
-
-    // GET POSITION FORM MOUSE/TOUCH EVENT
-    getMousePos(client) {
-        const { x, y } = client;
-        return this.direction === this.VERTICAL ? y : x;
-    }
-
     onMouseDown({ target, client }) {
         if (target === this.target || isDescendant(this.target, target)) {
             this.firstTouchValue = this.endValue;
@@ -311,26 +309,6 @@ export default class SmoothScrollClass {
         }
     }
 
-    onScopedTouchMove({ client }) {
-        if (!this.dragEnable || !this.drag) return;
-
-        this.prevTouchVal = this.touchVal;
-        this.touchVal = this.getMousePos(client);
-
-        const result = parseInt(this.prevTouchVal - this.touchVal);
-        this.endValue += result;
-
-        this.calculateValue();
-        this.scrollbarIsRunning = false;
-    }
-
-    onScopedWhell({ spinY }) {
-        this.dragEnable = false;
-        this.endValue += spinY * this.speed;
-        this.calculateValue();
-        this.scrollbarIsRunning = false;
-    }
-
     onWhell({ target, spinY, preventDefault }) {
         const bodyIsOverflow =
             document.body.style.overflow === 'hidden' &&
@@ -347,6 +325,9 @@ export default class SmoothScrollClass {
         }
     }
 
+    /**
+     * Scrollbar
+     */
     move(percent) {
         this.scrollbarIsRunning = true;
         this.percent = percent;
@@ -354,7 +335,13 @@ export default class SmoothScrollClass {
         this.motion.goTo({ val: this.endValue }).catch(() => {});
     }
 
-    // COMMON CALCULATE VALUE
+    updateScrollbar(fn) {
+        this.onUpdateScrollBar = fn;
+    }
+
+    /**
+     * Utils
+     */
     calculateValue() {
         const percentValue = (this.endValue * 100) / this.maxValue;
         this.percent = clamp(percentValue, 0, 100);
@@ -369,6 +356,34 @@ export default class SmoothScrollClass {
         }
     }
 
+    preventChecker({ target, preventDefault }) {
+        if (target === this.target || isDescendant(this.target, target)) {
+            if (
+                Math.abs(this.endValue - this.firstTouchValue) > this.threshold
+            ) {
+                preventDefault();
+            }
+        }
+    }
+
+    getMousePos(client) {
+        const { x, y } = client;
+        return this.direction === this.VERTICAL ? y : x;
+    }
+
+    refresh() {
+        this.updateProps();
+
+        handleFrameIndex.add(() => {
+            handleNextTick.add(() => {
+                if (this.onAfterRefresh) this.onAfterRefresh();
+            });
+        }, 1);
+    }
+
+    /**
+     * Destrory
+     */
     destroy() {
         this.subscribeResize();
         this.subscribeScrollStart();

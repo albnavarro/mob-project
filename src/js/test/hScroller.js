@@ -1,5 +1,5 @@
 import { mobbu } from '../core';
-import { SmoothScrollClass } from '../core/plugin';
+import { SmoothScroller } from '../core/plugin';
 
 export const hScroller = () => {
     const btnPassiveTrue = document.querySelector('.btn-passive-true');
@@ -87,6 +87,7 @@ export const hScroller = () => {
         range: 7,
         reverse: true,
         onSwitch: 'in-stop',
+        ease: true,
     });
     parallax2.init();
 
@@ -211,27 +212,33 @@ export const hScroller = () => {
      *
      */
     const inputRange = document.querySelector('.scrollerInput');
-    const smoothScrollFull = new SmoothScrollClass({
+    const smoothScrollFull = new SmoothScroller({
         scopedEvent: true,
         target: '.scrollerH',
         direction: 'HORIZONTAL',
         speed: 40,
         ease: 20,
         drag: true,
+        onTick: ({ value, parentIsMoving }) => {
+            parallax0.move({ value, parentIsMoving });
+            parallax1.move({ value, parentIsMoving });
+            parallax2.move({ value, parentIsMoving });
+            parallaxPin.move({ value, parentIsMoving });
+            parallaxIn.move({ value, parentIsMoving });
+            parallaxOut.move({ value, parentIsMoving });
+            parallaxOpacity.move({ value, parentIsMoving });
+        },
+        afterRefresh: () => {
+            parallax0.refresh();
+            parallax1.refresh();
+            parallax2.refresh();
+            parallaxPin.refresh();
+            parallaxIn.refresh();
+            parallaxOut.refresh();
+            parallaxOpacity.refresh();
+        },
     });
     smoothScrollFull.init();
-    smoothScrollFull.onTick(({ scrollValue, percent }) => {
-        // console.log(percent);
-        mobbu.useNextTick(() => {
-            parallax0.move({ value: scrollValue });
-            parallax1.move({ value: scrollValue });
-            parallax2.move({ value: scrollValue });
-            parallaxOpacity.move({ value: scrollValue });
-            parallaxPin.move({ value: scrollValue });
-            parallaxIn.move({ value: scrollValue });
-            parallaxOut.move({ value: scrollValue });
-        });
-    });
 
     smoothScrollFull.updateScrollbar(({ percent }) => {
         inputRange.value = percent;
@@ -280,21 +287,23 @@ export const hScroller = () => {
     /**
      *
      */
-    const smoothScrollContiner = new SmoothScrollClass({
+    const smoothScrollContiner = new SmoothScroller({
         target: '.scrollerH2',
         container: '.scrollerH-container2',
         direction: 'HORIZONTAL',
         speed: 120,
         ease: 20,
         drag: true,
+        onTick: ({ value, parentIsMoving }) => {
+            parallaxb1.move({ value, parentIsMoving });
+            parallaxb2.move({ value, parentIsMoving });
+        },
+        afterRefresh: () => {
+            parallaxb1.refresh();
+            parallaxb2.refresh();
+        },
     });
     smoothScrollContiner.init();
-    smoothScrollContiner.onTick(({ scrollValue }) => {
-        mobbu.useNextTick(() => {
-            parallaxb1.move({ value: scrollValue });
-            parallaxb2.move({ value: scrollValue });
-        });
-    });
 
     // THIRD
     /**
@@ -361,21 +370,25 @@ export const hScroller = () => {
     /**
      *
      */
-    const smoothScrollContiner2 = new SmoothScrollClass({
+    const smoothScrollContiner2 = new SmoothScroller({
         target: '.scrollerH3',
         container: '.scrollerH-container3',
-        direction: 'VERTICAL',
+        direction: 'vertical',
         speed: 120,
         ease: 20,
         drag: true,
+        onTick: ({ value, parentIsMoving }) => {
+            parallaxC1.move({ value, parentIsMoving });
+            parallaxC2.move({ value, parentIsMoving });
+            parallaxC3.move({ value, parentIsMoving });
+            parallaxC4.move({ value, parentIsMoving });
+        },
+        afterRefresh: () => {
+            parallaxC1.refresh();
+            parallaxC2.refresh();
+            parallaxC3.refresh();
+            parallaxC4.refresh();
+        },
     });
     smoothScrollContiner2.init();
-    smoothScrollContiner2.onTick(({ scrollValue }) => {
-        mobbu.useNextTick(() => {
-            parallaxC1.move({ value: scrollValue });
-            parallaxC2.move({ value: scrollValue });
-            parallaxC3.move({ value: scrollValue });
-            parallaxC4.move({ value: scrollValue });
-        });
-    });
 };
