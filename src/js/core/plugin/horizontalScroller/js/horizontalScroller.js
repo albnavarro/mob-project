@@ -558,23 +558,21 @@ export class HorizontalScroller {
 
     onDrag(value) {
         if (!this.shouldDragValue) return;
-        handleFrame.add(() => (document.documentElement.scrollTop += value));
+        handleFrame.add(() =>
+            window.scrollBy({ top: value, left: 0, behavior: 'instant' })
+        );
     }
 
     shouldDrag() {
-        handleFrame.add(() => {
-            handleNextTick.add(() => {
-                const documentScrollTop = window.pageYOffset;
+        const documentScrollTop = window.scrollY;
 
-                this.shouldDragValue =
-                    this.triggerTopPosition - this.dragSecureAreaTop <
-                        documentScrollTop &&
-                    this.triggerTopPosition +
-                        this.dragSecureAreaBottom +
-                        this.horizontalWidth >
-                        documentScrollTop + window.innerHeight;
-            });
-        });
+        this.shouldDragValue =
+            this.triggerTopPosition - this.dragSecureAreaTop <
+                documentScrollTop &&
+            this.triggerTopPosition +
+                this.dragSecureAreaBottom +
+                this.horizontalWidth >
+                documentScrollTop + window.innerHeight;
     }
 
     addDragListener() {
