@@ -20,6 +20,9 @@ import { handleScroll } from '../../../events/scrollUtils/handleScroll';
 
  * @prop {boolean} [ useDrag = false ] 
     Enable drag.
+ * @prop {Number} [ threshold = 30 ] 
+    Modify threshold value for click action.
+    Default value is `30`.
  * @prop {boolean} [ ease = false ] 
     Defines whether the animation will have ease.
     The default value is `false`.
@@ -230,7 +233,7 @@ export class HorizontalScroller {
         /**
          * @private
          */
-        this.dragSecureAreaBottom = 0;
+        this.dragSecureAreaBottom = 100;
 
         /**
          * @private
@@ -245,12 +248,27 @@ export class HorizontalScroller {
         /**
          * @private
          */
+        this.button = [];
+
+        /**
+         * @private
+         */
+        this.scrollValue = 0;
+
+        /**
+         * @private
+         */
         this.unsubscribeScroll = () => {};
 
         /**
          * @private
          */
         this.useDrag = data?.useDrag ?? false;
+
+        /**
+         * @private
+         */
+        this.threshold = data?.threshold ?? 30;
 
         /**
          * @private
@@ -435,6 +453,11 @@ export class HorizontalScroller {
         /**
          * @private
          */
+        this.button = this.row.querySelectorAll('a, button');
+
+        /**
+         * @private
+         */
         this.moduleisActive = false;
         /**
          * @private
@@ -514,6 +537,16 @@ export class HorizontalScroller {
         });
     }
 
+    setLinkAttribute() {
+        [...this.button].forEach((item) =>
+            item.setAttribute('draggable', false)
+        );
+    }
+
+    removeLinkAttribute() {
+        [...this.button].forEach((item) => item.removeAttribute('draggable'));
+    }
+
     onMouseMove = (e) => {
         if (!this.touchActive) return;
 
@@ -528,6 +561,7 @@ export class HorizontalScroller {
 
         if (this.shouldDragValue) this.row.style.cursor = 'move';
         this.touchActive = true;
+        this.firstTouchValue = this.scrollValue;
     };
 
     onMouseUp = () => {
@@ -545,6 +579,7 @@ export class HorizontalScroller {
 
         this.lastTouchValueX = -e.touches[0].clientX;
         this.touchActive = true;
+        this.firstTouchValue = this.scrollValue;
     };
 
     onTouchEnd = () => {
@@ -561,6 +596,11 @@ export class HorizontalScroller {
         this.lastTouchValueX = touchValueX;
 
         if (this.shouldDragValue && e.cancelable) e.preventDefault();
+    };
+
+    preventFireClick = (e) => {
+        if (Math.abs(this.scrollValue - this.firstTouchValue) > this.threshold)
+            e.preventDefault();
     };
 
     onDrag(value) {
@@ -585,6 +625,10 @@ export class HorizontalScroller {
     addDragListener() {
         this.unsubscribeScroll = handleScroll(() => this.shouldDrag());
         this.shouldDrag();
+
+        this.row.addEventListener('click', this.preventFireClick, {
+            passive: false,
+        });
 
         this.row.addEventListener('mousedown', this.onMouseDown, {
             passive: true,
@@ -615,6 +659,7 @@ export class HorizontalScroller {
 
     removeDragListener() {
         this.unsubscribeScroll();
+        this.row.removeEventListener('click', this.preventFireClick);
         this.row.removeEventListener('mousedown', this.onMouseDown);
         this.row.removeEventListener('mouseup', this.onMouseUp);
         this.row.removeEventListener('mouseleave', this.onMouseLeave);
@@ -896,6 +941,8 @@ export class HorizontalScroller {
                     )
                 );
 
+                this.scrollValue = value;
+
                 // onTick standalone methods.
                 this.onTick({
                     value,
@@ -918,6 +965,7 @@ export class HorizontalScroller {
         this.moduleisActive = true;
         this.scrollTriggerInstance = scrollTriggerInstance;
         this.triggerTopPosition = offset(this.trigger).top;
+        this.setLinkAttribute();
     }
 
     /**
@@ -986,6 +1034,7 @@ export class HorizontalScroller {
             if (this.mainContainer) this.mainContainer.style.height = '';
             if (this.trigger) this.trigger.style.marginTop = '';
             this.removeShadow();
+            this.removeLinkAttribute();
             this.moduleisActive = false;
 
             // Make sure that if component is running with ease the style is removed.
@@ -1013,6 +1062,7 @@ export class HorizontalScroller {
                     this.onLeaveBack = null;
                     this.scrollTriggerInstance = null;
                     this.moduleisActive = false;
+                    this.button = [];
 
                     handleNextTick.add(() => {
                         this.afterDestroy?.();

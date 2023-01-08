@@ -6,6 +6,9 @@ import { springPresetConfig } from '../spring/springConfig.js';
  * @prop {Number} startFps -  The fallback FPS value before it is detected.
  * Default: `startFps: 60`.
  *
+ * @prop {Boolean} usePassive
+   Use passive event on mouse/touch event.
+ *
  * @prop {Object.<string, number>} fpsScalePercent - Control the scroll phase when fps drop occurs.
     The key represents the number of fps dropped, the value represents the interval of frames needed to fire a scroll function.
     eg: if from a stable value of 60fps it drops to 30fps (there is a drop of 30 fps) the scroll function will be performed every 2 scroll and so on.
