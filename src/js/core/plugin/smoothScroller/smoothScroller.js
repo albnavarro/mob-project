@@ -235,10 +235,7 @@ export default class SmoothScroller {
                     });
 
                 this.children.forEach((element) => {
-                    this.children.forEach((element) => {
-                        element.triggerScrollEnd();
-                    });
-
+                    element.triggerScrollEnd();
                     element.move({
                         value: -val,
                         parentIsMoving: false,
