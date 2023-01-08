@@ -50,6 +50,16 @@ const createScroller = ({ bottomScroller }) => {
         },
     });
 
+    const parallaxTest2 = document.querySelectorAll('.js-parallax-test');
+    const parallaxArray = [...parallaxTest2].map((item) => {
+        return mobbu.createParallax({
+            item,
+            propierties: 'x',
+            reverse: true,
+            ease: false,
+        });
+    });
+
     const horizontalCustom = new HorizontalScroller({
         root: '.test-custom-scroller',
         container: '.scroller',
@@ -69,7 +79,7 @@ const createScroller = ({ bottomScroller }) => {
         columnHeight: 80,
         columnWidth: 50,
         columnAlign: 'center',
-        children: [parallaxTest],
+        children: [parallaxTest, ...parallaxArray],
         onEnter: () => {
             console.log('horizontalScroller onEnter');
         },
@@ -84,23 +94,18 @@ const createScroller = ({ bottomScroller }) => {
         },
         afterInit: () => {
             console.log('after init');
-            // parallaxTest.refresh();
             bottomScroller.refresh();
         },
-        onTick: ({ value, parentIsMoving, percent }) => {
+        onTick: ({ percent }) => {
             mobbu.useFrame(() => {
                 scroller.style.setProperty('--percent', `${percent}%`);
             });
-            // parallaxTest.move({ value, parentIsMoving });
         },
         afterRefresh: () => {
             console.log('after refresh');
-            // parallaxTest.refresh();
         },
         afterDestroy: () => {
             console.log('after destroy');
-            // parallaxTest.destroy();
-            // parallaxTest = null;
             bottomScroller.refresh();
         },
     });
