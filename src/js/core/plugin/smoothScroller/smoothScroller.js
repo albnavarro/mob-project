@@ -60,7 +60,7 @@ export default class SmoothScroller {
         this.firstTouchValue = 0;
         this.threshold = 30;
         this.maxValue = 0;
-        this.minValue - 0;
+        this.minValue = 0;
 
         // Touch controls
         this.dragEnable = null;
@@ -198,6 +198,10 @@ export default class SmoothScroller {
                 this.scroller.style.transform = `translate3d(0px, 0px, 0px) translateX(${-val}px)`;
             }
 
+            this.children.forEach((element) => {
+                element.triggerScrollStart();
+            });
+
             handleNextTick.add(() => {
                 if (this.onTickCallback)
                     this.onTickCallback({
@@ -231,6 +235,10 @@ export default class SmoothScroller {
                     });
 
                 this.children.forEach((element) => {
+                    this.children.forEach((element) => {
+                        element.triggerScrollEnd();
+                    });
+
                     element.move({
                         value: -val,
                         parentIsMoving: false,
@@ -241,8 +249,6 @@ export default class SmoothScroller {
     }
 
     refreshScroller() {
-        this.isScrolling = false;
-
         this.screenWidth =
             this.screen === document.documentElement
                 ? window.innerWidth

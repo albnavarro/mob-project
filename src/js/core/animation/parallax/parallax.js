@@ -490,11 +490,6 @@ export default class ParallaxClass {
         /**
          * @private
          */
-        this.lastIsInViewPortOnScrollEnd = false;
-
-        /**
-         * @private
-         */
         this.iSControlledFromOutside = false;
 
         /**
@@ -932,13 +927,8 @@ export default class ParallaxClass {
             this.unsubscribeScrollEnd = handleScrollEnd(() => {
                 /**
                  * Force draw no 3d on scroll end with no ease.
-                 * Only first time thant item is outside window
                  */
-                if (!this.lastIsInViewPortOnScrollEnd && !this.isInViewport)
-                    return;
-
                 this.noEasingRender({ forceRender: true });
-                this.lastIsInViewPortOnScrollEnd = this.isInViewport;
             });
         }
 
@@ -1515,6 +1505,29 @@ export default class ParallaxClass {
             const forceRender = this.isInViewport || this.firstTime || null;
             this.noEasingRender({ forceRender, parentIsMoving });
         }
+    }
+
+    /**
+     * @description
+     * Trigger scrollStart event
+     * Used by smoothScroll to activate 3D if child (this) have ease = true
+     */
+    triggerScrollStart() {
+        if (!this.ease) return;
+
+        this.firstScroll = true;
+        if (!this.disableForce3D) this.force3D = true;
+    }
+
+    /**
+     * @description
+     * Trigger scrollEnd event
+     * Used by smoothScroll to deactivate 3D if child (this) have ease = false
+     */
+    triggerScrollEnd() {
+        if (this.ease) return;
+
+        this.noEasingRender({ forceRender: true });
     }
 
     /**
