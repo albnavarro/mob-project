@@ -56,22 +56,40 @@ let dropFrameCounter = -1;
 let shouldRender = true;
 let fpsScalePercent = handleSetUp.get('fpsScalePercent');
 let useScaleFpsf = handleSetUp.get('useScaleFps');
-let extremeRatioIsActive = false;
+let mustMakeSomethingIsActive = false;
+let shouldMakeSomethingIsActive = false;
 
 /**
- * Check if frame dropped.
+ * Check if frame dropped a lot.
  */
-const fpsIsDropped = () => fps < (maxFps / 5) * 3;
+const mustMakeSomethingCheck = () => fps < (maxFps / 5) * 3;
 
 /**
- * If frame dropper for X seconds extremeRatioIsActive = true
+ * Check if frame dropped medium.
  */
-const extremeRatioStart = () => {
-    if (!fpsIsDropped() || extremeRatioIsActive) return;
+const shouldMakeSomethingCheck = () => fps < (maxFps / 5) * 4;
 
-    extremeRatioIsActive = true;
+/**
+ * If frame dropper for X seconds mustMakeSomethingIsActive = true
+ */
+const mustMakeSomethingStart = () => {
+    if (!mustMakeSomethingCheck() || mustMakeSomethingIsActive) return;
+
+    mustMakeSomethingIsActive = true;
     setTimeout(() => {
-        extremeRatioIsActive = false;
+        mustMakeSomethingIsActive = false;
+    }, 4000);
+};
+
+/**
+ * If frame dropper for X seconds shouldMakeSomethingIsActive = true
+ */
+const shouldMakeSomethingStart = () => {
+    if (!shouldMakeSomethingCheck() || shouldMakeSomethingIsActive) return;
+
+    shouldMakeSomethingIsActive = true;
+    setTimeout(() => {
+        shouldMakeSomethingIsActive = false;
     }, 4000);
 };
 
@@ -209,9 +227,14 @@ const render = (timestamp) => {
     shouldRender = getRenderStatus();
 
     /**
-     * Start frame check for shouldMakeSomeThing methods.
+     * Start frame check for mustMakeSomething methods.
      */
-    extremeRatioStart();
+    mustMakeSomethingStart();
+
+    /**
+     * Start frame check for shouldMakeSomething methods.
+     */
+    shouldMakeSomethingStart();
 
     /*
         Fire callbnack
@@ -280,11 +303,19 @@ export const handleFrame = (() => {
 
     /**
      * @description
-     * Return the extremeRatioIsActive status.
+     * Return the mustMakeSomethingIsActive status.
      * IF frame dropped the value is true for X seconds.
      *
      */
-    const shouldMakeSomeThing = () => extremeRatioIsActive;
+    const mustMakeSomething = () => mustMakeSomethingIsActive;
+
+    /**
+     * @description
+     * Return the mustMakeSomethingIsActive status.
+     * IF frame dropped the value is true for X seconds.
+     *
+     */
+    const shouldMakeSomething = () => shouldMakeSomethingIsActive;
 
     /**
      * @description
@@ -327,7 +358,8 @@ export const handleFrame = (() => {
         add,
         addMultiple,
         getFps,
-        shouldMakeSomeThing,
+        mustMakeSomething,
+        shouldMakeSomething,
         getShouldRender,
     };
 })();

@@ -55,9 +55,13 @@ export const scrollStagger = () => {
         // });
 
         myParallaxTween.subscribeCache(item, ({ rotate }) => {
+            const rotateParsed = mobbu.shouldMakeSomething()
+                ? Math.round(rotate)
+                : rotate;
+
             item.style.transform = `translate3D(0,0,0) translate(${
                 50 - unitInverse * unit
-            }px, ${50 - unitInverse * unit}px) rotate(${rotate}deg)`;
+            }px, ${50 - unitInverse * unit}px) rotate(${rotateParsed}deg)`;
         });
     });
 

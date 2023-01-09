@@ -818,7 +818,12 @@ export default class ParallaxClass {
      * <br/>
      */
     init() {
-        if (this.isInzialized) return;
+        if (this.isInzialized) {
+            console.warn(
+                'Parallax/scrollTrigger: The init() method cannot be launched more than once. If you are passing the instance to components like horizontalScroller or smoothScroller via the children property, they will initialize the instance.'
+            );
+            return;
+        }
 
         this.isInzialized = true;
         this.setMotion();
@@ -1949,50 +1954,58 @@ export default class ParallaxClass {
         this.GC.force3DStyle = this.force3D ? 'translate3D(0px, 0px, 0px)' : '';
 
         /**
-         * If frame drop activate 'will-change: transform;'
+         * If frame drop ia lot (2/5) activate 'will-change: transform;'
          */
         this.willChangeIsActive = this.useWillChange
-            ? handleFrame.shouldMakeSomeThing()
+            ? handleFrame.mustMakeSomething()
             : false;
         const shouldWill =
             this.willChangeIsActive && this.force3D ? 'transform' : '';
+
+        /**
+         * If frame drop a little (1/5) remove decimal.
+         * Used by transform ( not scale ).
+         */
+        const valueParsed = handleFrame.shouldMakeSomething()
+            ? Math.round(val)
+            : val;
 
         switch (this.propierties) {
             case parallaxConstant.PROP_VERTICAL:
                 return {
                     // translate: `0 ${val}px`,
                     // transform: `${this.GC.force3DStyle}`,
-                    transform: `${this.GC.force3DStyle} translateY(${val}px)`,
+                    transform: `${this.GC.force3DStyle} translateY(${valueParsed}px)`,
                     willChange: shouldWill,
                 };
 
             case parallaxConstant.PROP_HORIZONTAL:
                 return {
-                    transform: `${this.GC.force3DStyle} translateX(${val}px)`,
+                    transform: `${this.GC.force3DStyle} translateX(${valueParsed}px)`,
                     willChange: shouldWill,
                 };
 
             case parallaxConstant.PROP_ROTATE:
                 return {
-                    transform: `${this.GC.force3DStyle} rotate(${val}deg)`,
+                    transform: `${this.GC.force3DStyle} rotate(${valueParsed}deg)`,
                     willChange: shouldWill,
                 };
 
             case parallaxConstant.PROP_ROTATEY:
                 return {
-                    transform: `${this.GC.force3DStyle} rotateY(${val}deg)`,
+                    transform: `${this.GC.force3DStyle} rotateY(${valueParsed}deg)`,
                     willChange: shouldWill,
                 };
 
             case parallaxConstant.PROP_ROTATEX:
                 return {
-                    transform: `${this.GC.force3DStyle} rotateX(${val}deg)`,
+                    transform: `${this.GC.force3DStyle} rotateX(${valueParsed}deg)`,
                     willChange: shouldWill,
                 };
 
             case parallaxConstant.PROP_ROTATEZ:
                 return {
-                    transform: `${this.GC.force3DStyle} rotateZ(${val}deg)`,
+                    transform: `${this.GC.force3DStyle} rotateZ(${valueParsed}deg)`,
                     willChange: shouldWill,
                 };
 

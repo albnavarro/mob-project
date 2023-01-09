@@ -856,9 +856,22 @@ export const mobbu = {
 
     /**
      * @description
+      If the current FPS drops below `2/5` of its maximum value the methods return true.
+      The value will remain frozen for 4 seconds in order to have time to take the right countermeasures.
+     *
      */
-    useDropFrames() {
-        return handleFrame.shouldMakeSomeThing();
+    mustMakeSomething() {
+        return handleFrame.mustMakeSomething();
+    },
+
+    /**
+     * @description
+      If the current FPS drops below `1/5` of its maximum value the methods return true.
+      The value will remain frozen for 4 seconds in order to have time to take the right countermeasures.
+     *
+     */
+    shouldMakeSomething() {
+        return handleFrame.shouldMakeSomething();
     },
 
     /**

@@ -47,7 +47,7 @@ import { handleScroll } from '../../../events/scrollUtils/handleScroll';
     The function will have the current value as input parameter.
  * @prop {Boolean} [ useWillChange ]
     Enable the css property will-change: transform; when the frame rate falls below 3/5 of the optimal value.
-    The property remains active for 1000 frames.
+    The property remains active for 4 sedonds.
     If after the previous value the fps value is back to normal the will-change property is disabled.
     `Use with CAUTION only if necessary.`
     The default value is `false`.
@@ -143,23 +143,25 @@ export class HorizontalScroller {
     *
     * @example
     *
-    * HTML:
-       <div class="root">
-           <div class="container">
-               <div class="row">
-                   <section class="column" data-shadow="section1">
-                       <h1>title</h1>
-                   </section>
-                   <section class="column">
-                       <h1 data-shadow="title" data-debug>title</h1>
-                   </section>
-                   ...
-               </div>
-               <div class="trigger"></div>
-           </div>
-       </div>
-
-    * JS:
+    ```html
+        HTML:
+        <div class="root">
+            <div class="container">
+                <div class="row">
+                    <section class="column" data-shadow="section1">
+                        <h1>title</h1>
+                    </section>
+                    <section class="column">
+                        <h1 data-shadow="title" data-debug>title</h1>
+                    </section>
+                    ...
+                </div>
+                <div class="trigger"></div>
+            </div>
+        </div>
+    ```
+    ```js
+        JS:
         const myHorizontalScroller = new HorizontalScroller({
             root: '.root',
             container: '.container',
@@ -207,6 +209,7 @@ export class HorizontalScroller {
                 ...
             },
         });
+    ```
     *
      */
     constructor(data = {}) {
