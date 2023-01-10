@@ -7,7 +7,7 @@ const createScroller = ({ bottomScroller }) => {
         '.test-custom-scroller .scroller__row'
     );
 
-    // const tweetTest = tween.createParallaxTween({
+    // const tweetTest = tween.createScrollerTween({
     //     from: { y: 0, scale: 1 },
     //     to: { y: -300, scale: 1.2 },
     // });

@@ -55,7 +55,7 @@ export function indexParallax() {
      * Parallax
      */
     const parallaxItem = document.querySelector('.js-parallax-scale');
-    const tweenScale = tween.createParallaxTween({
+    const tweenScale = tween.createScrollerTween({
         from: { x: 0, scale: 1 },
         to: { x: -50, scale: 1.2 },
     });

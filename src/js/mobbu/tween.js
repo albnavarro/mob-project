@@ -15,10 +15,9 @@ export const tween = {
      * Property schema:
      *
      *
-     * const myParallaxTween = tween.createParallaxTween({
+     * const myScrollerTween = tween.createScrollerTween({
      *   from: Object.<string, number>,
      *   to: Object.<string, number>,
-     *   duration: [ Number ],
      *   ease: [ String ],
      *   stagger:{
      *      each: [ Number ],
@@ -40,13 +39,13 @@ export const tween = {
      *
      * Available methods:
      * ```js
-     * myParallaxTween.subscribe()
-     * myParallaxTween.subscribeCache()
-     * myParallaxTween.onStop()
+     * myScrollerTween.subscribe()
+     * myScrollerTween.subscribeCache()
+     * myScrollerTween.onStop()
      *
      * ```
      */
-    createParallaxTween(data = {}) {
+    createScrollerTween(data = {}) {
         return new ParallaxTween(data);
     },
 

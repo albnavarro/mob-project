@@ -19,7 +19,7 @@ export const scrollStagger = () => {
         valEl.innerHTML = val;
     });
 
-    const myParallaxTween = tween.createParallaxTween({
+    const myParallaxTween = tween.createScrollerTween({
         stagger: { each: 3, from: 'center' },
         ease: 'easeLinear',
         from: { rotate: 0 },

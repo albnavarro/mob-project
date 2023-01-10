@@ -36,7 +36,6 @@ export default class ParallaxTween {
      * const myParallaxTween = new ParallaxTween({
      *   from: Object.<string, number>,
      *   to: Object.<string, number>,
-     *   duration: [ Number ],
      *   ease: [ String ],
      *   stagger:{
      *      each: [ Number ],

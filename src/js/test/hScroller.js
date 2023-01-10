@@ -44,7 +44,7 @@ export const hScroller = () => {
      *
      */
     const parallaxItemTween = document.querySelector('.parallax-js-1');
-    const parallaxTween = tween.createParallaxTween({
+    const parallaxTween = tween.createScrollerTween({
         from: { x: 0, rotate: 0, opacity: 1 },
         to: { x: 50, rotate: 50, opacity: 1.2 },
     });
@@ -153,7 +153,7 @@ export const hScroller = () => {
      *
      */
     const target2 = document.querySelector('.parallax-via-js-out');
-    const myParallaxTween = tween.createParallaxTween({
+    const myParallaxTween = tween.createScrollerTween({
         from: { x: 0, y: 0 },
         to: { x: -pluto.offsetWidth, y: pluto.offsetHeight },
     });
