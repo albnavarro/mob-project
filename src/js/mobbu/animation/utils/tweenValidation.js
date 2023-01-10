@@ -28,6 +28,7 @@ import {
     durationNumberOrFunctionWarining,
     durationWarining,
     functionIsValidAndReturnDefaultWarining,
+    functionWarning,
     initialDataPropWarining,
     initialDataValueWarining,
     lerpPrecisionWarining,
@@ -560,6 +561,22 @@ export const valueIsNumberAndReturnDefault = (value, label, defaultValue) => {
     const isValid = checkType(Number, parseFloat(value));
     if (!isValid && value !== undefined && value !== null)
         naumberWarning(value, label);
+
+    return isValid ? value : defaultValue;
+};
+
+/**
+ *
+ * @param {Function} value
+ * @returns {Function}
+ *
+ * @description
+ * Check if value is Function and return defualt
+ **/
+export const valueIsFunctionAndReturnDefault = (value, label, defaultValue) => {
+    const isValid = checkType(Function, value);
+    if (!isValid && value !== undefined && value !== null)
+        functionWarning(value, label);
 
     return isValid ? value : defaultValue;
 };

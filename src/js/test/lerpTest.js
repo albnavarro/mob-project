@@ -22,7 +22,7 @@ export function lerpTest() {
 
     // BACK TWEEN
     function lerpBack() {
-        timeline.stop();
+        timeline1.stop();
         return mylerp.goTo({ x: 0, y: 0, rotate: 180 }, { velocity: 0.065 });
     }
 

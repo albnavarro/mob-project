@@ -1,3 +1,5 @@
+export const NOOP = () => {};
+
 export const pipe =
     (...functions) =>
     (input) =>

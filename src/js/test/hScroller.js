@@ -197,6 +197,7 @@ export const hScroller = () => {
         direction: 'horizontal',
         speed: 40,
         drag: true,
+        easeType: 'spring',
         children: [
             parallax0,
             parallax1,

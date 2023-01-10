@@ -1,8 +1,8 @@
 import { lightDescription } from './lightbox-description.js';
 import { lightboxUtils } from './lightbox-utils.js';
 import { lightPichZoom } from './lightbox-zoom-pinch.js';
-import { LoadImages } from '../../../js/mobbu/plugin/index.js';
 import { core } from '../../../js/mobbu';
+import { LoadImages } from '../../../js/utility/loadImages.js';
 
 class LightBoxImageClass {
     constructor() {

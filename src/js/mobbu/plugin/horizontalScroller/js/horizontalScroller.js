@@ -12,7 +12,7 @@ import { horizontalScrollerCss } from './horizontalScrollerCss.js';
 import { mq } from '../../../utils/mediaManager.js';
 import { handleFrameIndex } from '../../../events/rafutils/handleFrameIndex';
 import { horizontalScrollerContstant } from './horizontalScrollerConstant';
-import { pipe } from '../../../utils/functionsUtils';
+import { NOOP, pipe } from '../../../utils/functionsUtils';
 import { handleScroll } from '../../../events/scrollUtils/handleScroll';
 
 /**
@@ -216,7 +216,7 @@ export class HorizontalScroller {
         /**
          * @private
          */
-        this.NOOP = () => {};
+        this.propsisValid = true;
 
         /**
          * @private
@@ -355,42 +355,42 @@ export class HorizontalScroller {
         /**
          * @private
          */
-        this.onEnter = data?.onEnter || this.NOOP;
+        this.onEnter = data?.onEnter || NOOP;
 
         /**
          * @private
          */
-        this.onEnterBack = data?.onEnterBack || this.NOOP;
+        this.onEnterBack = data?.onEnterBack || NOOP;
 
         /**
          * @private
          */
-        this.onLeave = data?.onLeave || this.NOOP;
+        this.onLeave = data?.onLeave || NOOP;
 
         /**
          * @private
          */
-        this.onLeaveBack = data?.onLeaveBack || this.NOOP;
+        this.onLeaveBack = data?.onLeaveBack || NOOP;
 
         /**
          * @private
          */
-        this.afterInit = data?.afterInit || this.NOOP;
+        this.afterInit = data?.afterInit || NOOP;
 
         /**
          * @private
          */
-        this.afterRefresh = data?.afterRefresh || this.NOOP;
+        this.afterRefresh = data?.afterRefresh || NOOP;
 
         /**
          * @private
          */
-        this.afterDestroy = data?.afterDestroy || this.NOOP;
+        this.afterDestroy = data?.afterDestroy || NOOP;
 
         /**
          * @private
          */
-        this.onTick = data?.onTick || this.NOOP;
+        this.onTick = data?.onTick || NOOP;
 
         /**
          * Dom element
@@ -401,6 +401,7 @@ export class HorizontalScroller {
          */
         this.mainContainer = document.querySelector(data.root);
         if (!this.mainContainer) {
+            this.propsisValid = false;
             console.warn('horizontal custom: root node not found');
             return;
         }
@@ -411,6 +412,7 @@ export class HorizontalScroller {
         this.container = data?.container;
         const scrollerTester = this.mainContainer.querySelector(this.container);
         if (!scrollerTester) {
+            this.propsisValid = false;
             console.warn('horizontal custom: container node not found');
             return;
         }
@@ -420,6 +422,7 @@ export class HorizontalScroller {
          */
         this.trigger = this.mainContainer.querySelector(data.trigger);
         if (!this.trigger) {
+            this.propsisValid = false;
             console.warn('horizontal custom: trigger node not found');
             return;
         }
@@ -429,6 +432,7 @@ export class HorizontalScroller {
          */
         this.row = this.mainContainer.querySelector(data.row);
         if (!this.row) {
+            this.propsisValid = false;
             console.warn('horizontal custom: row node not found');
             return;
         }
@@ -437,7 +441,8 @@ export class HorizontalScroller {
          * @private
          */
         this.column = this.mainContainer.querySelectorAll(data.column);
-        if (!this.column) {
+        if (!this.column.length) {
+            this.propsisValid = false;
             console.warn('horizontal custom: column nodeList not found');
             return;
         }
@@ -516,6 +521,8 @@ export class HorizontalScroller {
      * myInstance.init()
      */
     init() {
+        if (!this.propsisValid) return;
+
         pipe(
             this.getWidth.bind(this),
             this.setDimension.bind(this),

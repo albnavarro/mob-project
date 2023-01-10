@@ -2,6 +2,7 @@ import { ANIMATION_STOP_REJECT } from '../../events/errorHandler/catchAnimationR
 import { handleFrameIndex } from '../../events/rafutils/handleFrameIndex.js';
 import { loadFps } from '../../events/rafutils/loadFps.js';
 import { checkType } from '../../store/storeType.js';
+import { NOOP } from '../../utils/functionsUtils.js';
 import { getTime } from '../../utils/time.js';
 import { directionConstant } from '../utils/constant.js';
 import {
@@ -181,11 +182,6 @@ export default class HandleAsyncTimeline {
 
         /**
          * @private
-         */
-        this.NOOP = () => {};
-
-        /**
-         * @private
          * @description
          * Timeline state
          */
@@ -199,7 +195,7 @@ export default class HandleAsyncTimeline {
          * @private
          */
         this.starterFunction = {
-            fn: this.NOOP,
+            fn: NOOP,
             active: false,
         };
 
@@ -570,7 +566,7 @@ export default class HandleAsyncTimeline {
                             ? tween.onStartInPause(() => {
                                   return this.isInPause;
                               })
-                            : this.NOOP;
+                            : NOOP;
 
                     fn[action]()
                         .then(() => res())
@@ -812,7 +808,7 @@ export default class HandleAsyncTimeline {
      */
     addToActiveTween(tween) {
         const tweenId = tween?.getId && tween.getId();
-        if (!tweenId) return this.NOOP;
+        if (!tweenId) return NOOP;
 
         const prevActiveTweenCounter = this.activetweenCounter;
         this.activetweenCounter++;
@@ -1216,7 +1212,7 @@ export default class HandleAsyncTimeline {
      * @description
      * Adds a `custom function` to the timeline, the function will be executed after the previous promise and before the next one, `the function will not overlap the tweens`. `This property cannot be used within a group`
      */
-    add(fn = this.NOOP) {
+    add(fn = NOOP) {
         const cb = functionIsValidAndReturnDefault(
             fn,
             () => {},

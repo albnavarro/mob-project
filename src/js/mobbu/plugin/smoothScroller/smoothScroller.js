@@ -27,17 +27,20 @@ import { handleNextTick } from '../../events/rafutils/handleNextTick.js';
 import { handleFrameIndex } from '../../events/rafutils/handleFrameIndex.js';
 import { mq } from '../../utils/mediaManager.js';
 import { handleFrame } from '../../events/rafutils/handleFrame.js';
+import { NOOP } from '../../utils/functionsUtils.js';
+import { parallaxConstant } from '../../animation/parallax/parallaxConstant.js';
+import {
+    valueIsBooleanAndReturnDefault,
+    valueIsFunctionAndReturnDefault,
+    valueIsNumberAndReturnDefault,
+} from '../../animation/utils/tweenValidation.js';
 
 export default class SmoothScroller {
     constructor(data = {}) {
         /**
          * @private
          */
-        this.NOOP = () => {};
-        this.VERTICAL = 'vertical';
-        this.HORIZONTAL = 'horizontal';
-        this.LERP = 'lerp';
-        this.SPRING = 'spring';
+        this.propsIsValid = true;
 
         /**
          * @private
@@ -107,62 +110,62 @@ export default class SmoothScroller {
         /**
          * @private
          */
-        this.onUpdateScrollBar = this.NOOP;
+        this.onUpdateScrollBar = NOOP;
 
         /**
          * @private
          */
-        this.subscribeResize = this.NOOP;
+        this.subscribeResize = NOOP;
 
         /**
          * @private
          */
-        this.subscribeScrollStart = this.NOOP;
+        this.subscribeScrollStart = NOOP;
 
         /**
          * @private
          */
-        this.subscribeScrollEnd = this.NOOP;
+        this.subscribeScrollEnd = NOOP;
 
         /**
          * @private
          */
-        this.subscribeTouchStart = this.NOOP;
+        this.subscribeTouchStart = NOOP;
 
         /**
          * @private
          */
-        this.subscribeTouchEnd = this.NOOP;
+        this.subscribeTouchEnd = NOOP;
 
         /**
          * @private
          */
-        this.subscribeMouseDown = this.NOOP;
+        this.subscribeMouseDown = NOOP;
 
         /**
          * @private
          */
-        this.subscribeMouseUp = this.NOOP;
+        this.subscribeMouseUp = NOOP;
 
         /**
          * @private
          */
-        this.subscribeMouseWheel = this.NOOP;
+        this.subscribeMouseWheel = NOOP;
 
         /**
          * @private
          */
-        this.subscribeMouseMove = this.NOOP;
+        this.subscribeMouseMove = NOOP;
 
         /**
          * @private
          */
-        this.subscribeTouchMove = this.NOOP;
+        this.subscribeTouchMove = NOOP;
 
         /**
          * @private
          */
-        this.subscribeMouseClick = this.NOOP;
+        this.subscribeMouseClick = NOOP;
 
         /**
          * @private
@@ -172,12 +175,12 @@ export default class SmoothScroller {
         /**
          * @private
          */
-        this.unsubscribeMotion = this.NOOP;
+        this.unsubscribeMotion = NOOP;
 
         /**
          * @private
          */
-        this.unsubscribeOnComplete = this.NOOP;
+        this.unsubscribeOnComplete = NOOP;
 
         /**
          * @private
@@ -187,17 +190,22 @@ export default class SmoothScroller {
         /**
          * @private
          */
-        this.direction = data?.direction ?? this.VERTICAL;
+        this.direction = data?.direction ?? parallaxConstant.DIRECTION_VERTICAL;
 
         /**
          * @private
          */
-        this.breackpoint = data?.breackpoint || 'desktop';
+        this.easeType = data.easeType || parallaxConstant.EASE_LERP;
 
         /**
          * @private
          */
-        this.queryType = data?.queryType || 'min';
+        this.breackpoint = data?.breackpoint ?? 'desktop';
+
+        /**
+         * @private
+         */
+        this.queryType = data?.queryType ?? 'min';
 
         /**
          * @private
@@ -205,6 +213,12 @@ export default class SmoothScroller {
         this.scroller = checkType(String, data?.scroller)
             ? document.querySelector(data.scroller)
             : data.scroller;
+
+        if (!this.scroller) {
+            console.warn('SmoothScroller: scroller node not found');
+            this.propsIsValid = false;
+            return;
+        }
 
         /**
          * @private
@@ -217,35 +231,56 @@ export default class SmoothScroller {
               })()
             : document.documentElement;
 
-        /**
-         * @private
-         */
-        this.scopedEvent = data?.scopedEvent ?? false;
+        if (!this.screen) {
+            this.propsIsValid = false;
+            console.warn('SmoothScroller: screen node not found');
+            return;
+        }
 
         /**
          * @private
          */
-        this.speed = data.speed ?? 60;
+        this.scopedEvent = valueIsBooleanAndReturnDefault(
+            data?.scopedEvent,
+            'SmoothScroller: scopedEvent',
+            false
+        );
 
         /**
          * @private
          */
-        this.drag = data.drag ?? false;
+        this.speed = valueIsNumberAndReturnDefault(
+            data?.speed,
+            'SmoothScroller: speed',
+            60
+        );
 
         /**
          * @private
          */
-        this.onTickCallback = data?.onTick ?? null;
+        this.drag = valueIsBooleanAndReturnDefault(
+            data?.drag,
+            'SmoothScroller: drag',
+            false
+        );
 
         /**
          * @private
          */
-        this.onAfterRefresh = data?.afterRefresh ?? null;
+        this.onTickCallback = valueIsFunctionAndReturnDefault(
+            data?.onTick,
+            'SmoothScroller: onTick',
+            null
+        );
 
         /**
          * @private
          */
-        this.motionType = data.motionType || this.LERP;
+        this.onAfterRefresh = valueIsFunctionAndReturnDefault(
+            data?.afterRefresh,
+            'SmoothScroller: afterRefresh',
+            null
+        );
 
         /**
          * @private
@@ -262,8 +297,10 @@ export default class SmoothScroller {
     }
 
     init() {
-        switch (this.motionType) {
-            case this.SPRING:
+        if (!this.propsIsValid) return;
+
+        switch (this.easeType) {
+            case parallaxConstant.EASE_SPRING:
                 this.motion = new HandleSpring();
                 break;
 
@@ -357,7 +394,7 @@ export default class SmoothScroller {
         this.motion.setData({ val: 0 });
 
         this.unsubscribeMotion = this.motion.subscribe(({ val }) => {
-            if (this.direction == this.VERTICAL) {
+            if (this.direction == parallaxConstant.DIRECTION_VERTICAL) {
                 this.scroller.style.transform = `translate3d(0px, 0px, 0px) translateY(${-val}px)`;
             } else {
                 this.scroller.style.transform = `translate3d(0px, 0px, 0px) translateX(${-val}px)`;
@@ -389,7 +426,7 @@ export default class SmoothScroller {
         });
 
         this.unsubscribeOnComplete = this.motion.onComplete(({ val }) => {
-            if (this.direction == this.VERTICAL) {
+            if (this.direction == parallaxConstant.DIRECTION_VERTICAL) {
                 this.scroller.style.transform = `translateY(${-val}px)`;
             } else {
                 this.scroller.style.transform = `translateX(${-val}px)`;
@@ -426,7 +463,7 @@ export default class SmoothScroller {
                 : outerHeight(this.screen);
 
         this.maxValue =
-            this.direction === this.VERTICAL
+            this.direction === parallaxConstant.DIRECTION_VERTICAL
                 ? this.scroller.offsetHeight - this.screenHeight
                 : this.scroller.offsetWidth - this.screenWidth;
 
@@ -519,7 +556,7 @@ export default class SmoothScroller {
     onWhell({ target, spinY, preventDefault }) {
         const bodyIsOverflow =
             document.body.style.overflow === 'hidden' &&
-            this.direction === this.VERTICAL;
+            this.direction === parallaxConstant.DIRECTION_VERTICAL;
 
         if (!mq[this.queryType](this.breackpoint) || bodyIsOverflow) return;
 
@@ -560,14 +597,13 @@ export default class SmoothScroller {
             (target === this.scroller || isDescendant(this.scroller, target)) &&
             Math.abs(this.endValue - this.firstTouchValue) > this.threshold
         ) {
-            console.log('prevent');
             preventDefault();
         }
     }
 
     getMousePos(client) {
         const { x, y } = client;
-        return this.direction === this.VERTICAL ? y : x;
+        return this.direction === parallaxConstant.DIRECTION_VERTICAL ? y : x;
     }
 
     refresh() {

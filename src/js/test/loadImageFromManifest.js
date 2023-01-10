@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { LoadImages } from '../mobbu/plugin';
+import { LoadImages } from '../utility/loadImages';
 
 class loadImageFromManifestClass {
     constructor() {

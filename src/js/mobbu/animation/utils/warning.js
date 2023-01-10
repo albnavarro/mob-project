@@ -226,6 +226,10 @@ export const naumberWarning = (val, label) => {
     console.warn(`${label}: '${val}' is not Number`);
 };
 
+export const functionWarning = (val, label) => {
+    console.warn(`${label}: '${val}' is not Function`);
+};
+
 export const lerpVelocityWarining = () => {
     console.warn(
         'Lerp error: velocity is not valid, must be a Number greater than 0 and less than 1'

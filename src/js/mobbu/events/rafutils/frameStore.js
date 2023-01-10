@@ -1,6 +1,6 @@
 import { SimpleStore } from '../../store/simpleStore.js';
 import { handleSetUp } from '../../setup.js';
-const NOOP = () => {};
+import { NOOP } from '../../utils/functionsUtils.js';
 
 export const frameStore = new SimpleStore({
     currentFrame: 0,
