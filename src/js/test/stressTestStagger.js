@@ -1,4 +1,4 @@
-import { mobbu } from '../core';
+import { timeline, tween } from '../mobbu';
 import { detectSafari } from '../utility/isSafari.js';
 
 export const stressTestStagger = () => {
@@ -6,7 +6,7 @@ export const stressTestStagger = () => {
         '.radial-stress-stagger .radial-stress-stagger__item'
     );
 
-    const tween = mobbu.createTween({
+    const tween1 = tween.createTween({
         ease: 'easeInOutQuad',
         stagger: {
             each: 15,
@@ -20,41 +20,41 @@ export const stressTestStagger = () => {
 
     if (detectSafari()) {
         // items.forEach((item, i) => {
-        //     tween.subscribe(({ scale, rotate, opacity }) => {
+        //     tween1.subscribe(({ scale, rotate, opacity }) => {
         //         item.style.transform = `translate3D(-50%, -50%, 1px) scale(${scale}) rotate(${rotate}deg)`;
         //         item.style.opacity = opacity;
         //     });
         // });
         items.forEach((item) => {
-            tween.subscribeCache(item, ({ scale, rotate, opacity }) => {
+            tween1.subscribeCache(item, ({ scale, rotate, opacity }) => {
                 item.style.transform = `translate3D(0, 0, 1px) scale(${scale}) rotate(${rotate}deg)`;
                 item.style.opacity = opacity;
             });
         });
     } else {
         // items.forEach((item, i) => {
-        //     tween.subscribe(({ scale, rotate, opacity }) => {
+        //     tween1.subscribe(({ scale, rotate, opacity }) => {
         //         item.style.transform = `scale(${scale}) rotate(${rotate}deg)`;
         //         item.style.opacity = opacity;
         //     });
         // });
         items.forEach((item) => {
-            tween.subscribeCache(item, ({ scale, rotate, opacity }) => {
+            tween1.subscribeCache(item, ({ scale, rotate, opacity }) => {
                 item.style.transform = `scale(${scale}) rotate(${rotate}deg)`;
                 item.style.opacity = opacity;
             });
         });
     }
 
-    // tween.destroy();
+    // tween1.destroy();
 
-    const timeline = mobbu
+    const timeline1 = timeline
         .createAsyncTimeline({ repeat: -1, yoyo: true })
-        .goTo(tween, { scale: 1.5 }, { duration: 1000 })
-        .goTo(tween, { scale: 0.5 }, { duration: 500 })
-        .goTo(tween, { rotate: 180, scale: 1.2 }, { duration: 500 })
-        .goTo(tween, { scale: 1.3 }, { duration: 500 })
-        .goTo(tween, { opacity: 0.5 }, { duration: 1200 })
-        .goTo(tween, { opacity: 1, scale: 1 }, { duration: 1200 })
+        .goTo(tween1, { scale: 1.5 }, { duration: 1000 })
+        .goTo(tween1, { scale: 0.5 }, { duration: 500 })
+        .goTo(tween1, { rotate: 180, scale: 1.2 }, { duration: 500 })
+        .goTo(tween1, { scale: 1.3 }, { duration: 500 })
+        .goTo(tween1, { opacity: 0.5 }, { duration: 1200 })
+        .goTo(tween1, { opacity: 1, scale: 1 }, { duration: 1200 })
         .play();
 };

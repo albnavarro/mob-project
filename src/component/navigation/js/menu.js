@@ -14,9 +14,9 @@ import {
     offset,
     getParents,
     getSiblings,
-} from '../../../js/core/utils';
+} from '../../../js/mobbu/utils';
 
-import { mobbu } from '../../../js/core';
+import { core } from '../../../js/mobbu';
 
 export class menuClass {
     constructor(data) {
@@ -123,7 +123,7 @@ export class menuClass {
         this.addHandler();
         this.resetSubmenuHeight();
 
-        mobbu.useResize(() => {
+        core.useResize(() => {
             this.getSubmenuWidth();
             this.getToggleWrapHeight();
             this.resizeMenu();
@@ -133,7 +133,7 @@ export class menuClass {
         if (this.direction == 'horizontal') {
             this.SetPosition();
 
-            mobbu.useResize(() => {
+            core.useResize(() => {
                 this.SetPosition();
             });
         }
@@ -141,7 +141,7 @@ export class menuClass {
 
     // utils for mobile accordion menu slideUp/Down init
     resetSubmenuHeight() {
-        if (mobbu.mq('max', this.mediaQ) && !this.offCanvas) {
+        if (core.mq('max', this.mediaQ) && !this.offCanvas) {
             slideUpDownReset(this.menu);
 
             const targetArray = Array.from(this.allSubmenu);
@@ -203,7 +203,7 @@ export class menuClass {
 
     addHandler() {
         if (
-            (!this.offCanvas && mobbu.mq('max', this.mediaQ)) ||
+            (!this.offCanvas && core.mq('max', this.mediaQ)) ||
             Modernizr.touchevents
         ) {
             this.body.addEventListener('click', (event) =>
@@ -223,7 +223,7 @@ export class menuClass {
     }
 
     offCanvasBack() {
-        if (mobbu.mq('min', this.mediaQ)) return;
+        if (core.mq('min', this.mediaQ)) return;
 
         const selectedMenu = [...this.allSubmenu].filter((element) => {
             return element.classList.contains('is-selected');
@@ -265,7 +265,7 @@ export class menuClass {
         if (parents.length) return;
 
         this.closeSubmenu();
-        if (mobbu.mq('max', this.mediaQ) && this.menuIsOpen) {
+        if (core.mq('max', this.mediaQ) && this.menuIsOpen) {
             this.closeMainMenu();
         }
     }
@@ -280,7 +280,7 @@ export class menuClass {
     }
 
     arrowOnClick(event) {
-        if (!Modernizr.touchevents && mobbu.mq('min', this.mediaQ)) return;
+        if (!Modernizr.touchevents && core.mq('min', this.mediaQ)) return;
 
         const menuType = this.offCanvas ? 'IS_OFFCANVAS' : 'IS_ACCORDION';
         const targetArrow = event.currentTarget;
@@ -396,7 +396,7 @@ export class menuClass {
                             }
                         })();
 
-                        if (mobbu.mq('max', this.mediaQ))
+                        if (core.mq('max', this.mediaQ))
                             closestSubmenu.style.top = `${gap}px`;
                         break;
 
@@ -409,7 +409,7 @@ export class menuClass {
     }
 
     SetPosition() {
-        if (mobbu.mq('min', this.mediaQ)) {
+        if (core.mq('min', this.mediaQ)) {
             this.firstLevelmenuData.forEach((el, index) => {
                 el.parentItemPos = parseInt(offset(el.parentItem).left);
                 el.totalWidth =
@@ -441,7 +441,7 @@ export class menuClass {
         this.menuIsOpen = false;
         enableBodyScroll(this.mainWrap);
 
-        if (mobbu.mq('max', this.mediaQ) && !this.offCanvas) {
+        if (core.mq('max', this.mediaQ) && !this.offCanvas) {
             slideUp(this.menu);
         }
 
@@ -478,7 +478,7 @@ export class menuClass {
             item.classList.remove(this.ARROW_SELECTED);
         });
 
-        if (mobbu.mq('min', this.mediaQ)) {
+        if (core.mq('min', this.mediaQ)) {
             [...this.allSubmenu].forEach((item, i) => {
                 item.style.display = '';
             });
@@ -500,7 +500,7 @@ export class menuClass {
             item.style.top = '';
         });
 
-        if (mobbu.mq('max', this.mediaQ)) {
+        if (core.mq('max', this.mediaQ)) {
             [...this.allSubmenu].forEach((item, i) => {
                 item.style.left = '';
                 item.style.right = '';
@@ -509,7 +509,7 @@ export class menuClass {
     }
 
     CloseOnScroll() {
-        if (mobbu.mq('max', this.mediaQ) && this.menuIsOpen) {
+        if (core.mq('max', this.mediaQ) && this.menuIsOpen) {
             this.closeSubmenu();
             this.closeMainMenu();
         }

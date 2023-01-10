@@ -1,14 +1,14 @@
-import { outerHeight } from '../core/utils';
-import { mobbu } from '../core';
+import { scroller, tween } from '../mobbu';
+import { outerHeight } from '../mobbu/utils';
 
 export const createStagger = () => {
     const items = document.querySelectorAll('.create-stagger__item');
     const trigger = document.querySelector('.scrollStagger');
 
-    let masterSequencer = mobbu.createMasterSequencer();
+    let masterSequencer = tween.createMasterSequencer();
     const duration = 2000;
 
-    const staggers = mobbu.createStaggers({
+    const staggers = tween.createStaggers({
         items,
         stagger: {
             type: 'equal',
@@ -22,7 +22,7 @@ export const createStagger = () => {
     // Create sequencer
     const createSequencer = () => {
         return staggers.map(({ item, start, end }) => {
-            const sequencer = mobbu
+            const sequencer = tween
                 .createSequencer({
                     duration,
                     data: { scale: 0.5 },
@@ -53,7 +53,7 @@ export const createStagger = () => {
     const sequencers = createSequencer();
     console.log(sequencers);
 
-    const parallaxIn = mobbu.createScrollTrigger({
+    const parallaxIn = scroller.createScrollTrigger({
         trigger,
         propierties: 'tween',
         tween: masterSequencer,

@@ -1,4 +1,4 @@
-import { mobbu } from '../../../js/core';
+import { core } from '../../../js/mobbu';
 
 export class AnimateItemClass {
     constructor(data) {
@@ -21,12 +21,12 @@ export class AnimateItemClass {
             if (this.noRepeat && this.firstTime) return;
             entries.forEach((entry) => {
                 if (entry.isIntersecting) {
-                    mobbu.useFrame(() => {
+                    core.useFrame(() => {
                         this.compRoot.classList.add('animate');
                         this.firstTime = true;
                     });
                 } else if (!entry.isIntersecting) {
-                    mobbu.useFrame(() => {
+                    core.useFrame(() => {
                         this.compRoot.classList.remove('animate');
                     });
                 }

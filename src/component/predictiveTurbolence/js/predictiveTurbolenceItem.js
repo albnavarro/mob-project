@@ -1,8 +1,8 @@
 import { forceRedraw } from '../../../js/utility/redrowNode.js';
 import { detectSafari } from '../../../js/utility/isSafari.js';
 import { tUtils } from './predictiveTurbolenceUtils.js';
-import { outerHeight, outerWidth, offset } from '.../../../js/core/utils';
-import { mobbu } from '.../../../js/core';
+import { outerHeight, outerWidth, offset } from '.../../../js/mobbu/utils/';
+import { tween, core } from '../../../js/mobbu';
 
 export class PredictiveTurbolenceItemClass {
     constructor(data) {
@@ -25,7 +25,7 @@ export class PredictiveTurbolenceItemClass {
         this.offsetX = 0;
         this.width = 0;
         this.height = 0;
-        this.spring = mobbu.createSpring();
+        this.spring = tween.createSpring();
         this.unsubscribeSpring = () => {};
         this.unsubscribeScroll = () => {};
         this.unsubscribeResize = () => {};
@@ -37,7 +37,7 @@ export class PredictiveTurbolenceItemClass {
     }
 
     init() {
-        if (!mobbu.mq(this.queryType, this.breackpoint)) return;
+        if (!core.mq(this.queryType, this.breackpoint)) return;
 
         this.spring.setData({ baseFrequency: 0, scale: 0 });
 
@@ -56,14 +56,14 @@ export class PredictiveTurbolenceItemClass {
         this.inzializeSvg();
         this.onResize();
 
-        this.unsubscribeMouseMove = mobbu.useMouseMove(({ page }) => {
+        this.unsubscribeMouseMove = core.useMouseMove(({ page }) => {
             this.setGlobalCoord({ page });
             this.onMove();
         });
-        this.unsubscribeScroll = mobbu.useScroll(({ scrollY }) => {
+        this.unsubscribeScroll = core.useScroll(({ scrollY }) => {
             this.onScroll({ scrollY });
         });
-        this.unsubscribeResize = mobbu.useResize(() => {
+        this.unsubscribeResize = core.useResize(() => {
             this.onResize();
         });
 

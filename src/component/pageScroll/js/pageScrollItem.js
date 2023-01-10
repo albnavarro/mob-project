@@ -1,5 +1,5 @@
-import { outerHeight, outerWidth, offset } from '.../../../js/core/utils';
-import { mobbu } from '.../../../js/core';
+import { outerHeight, outerWidth, offset } from '.../../../js/mobbu/utils/';
+import { tween, core } from '../../../js/mobbu';
 
 export class PageScrollItemClass {
     constructor(data) {
@@ -14,7 +14,7 @@ export class PageScrollItemClass {
         this.endValue = 0;
         this.prevValue = 0;
         this.firstTime = true;
-        this.lerp = mobbu.createLerp();
+        this.lerp = tween.createLerp();
         this.unsubscribeResize = () => {};
         this.unsubscribeScroll = () => {};
         this.unsubscribeLerp = () => {};
@@ -29,13 +29,13 @@ export class PageScrollItemClass {
         this.setShadow();
         this.setOffset();
         this.setContent();
-        this.unsubscribeResize = mobbu.useResize(() => {
+        this.unsubscribeResize = core.useResize(() => {
             this.firstTime = true;
             this.setShadow();
             this.setOffset();
             this.setContent();
         });
-        this.unsubscribeScroll = mobbu.useScroll(() => this.onScroll());
+        this.unsubscribeScroll = core.useScroll(() => this.onScroll());
     }
 
     destroy() {
@@ -48,7 +48,7 @@ export class PageScrollItemClass {
         const width = outerWidth(this.content);
         const height = outerHeight(this.content);
 
-        const style = mobbu.mq(this.queryType, this.breackpoint)
+        const style = core.mq(this.queryType, this.breackpoint)
             ? {
                   width: `${width}px`,
                   height: `${height}px`,
@@ -70,7 +70,7 @@ export class PageScrollItemClass {
     setContent() {
         this.endValue = window.pageYOffset - this.offsetTop;
         const rect = this.root.getBoundingClientRect();
-        const style = mobbu.mq(this.queryType, this.breackpoint)
+        const style = core.mq(this.queryType, this.breackpoint)
             ? {
                   position: 'fixed',
                   top: '0',
@@ -86,7 +86,7 @@ export class PageScrollItemClass {
 
         Object.assign(this.content.style, style);
 
-        if (mobbu.mq(this.queryType, this.breackpoint)) {
+        if (core.mq(this.queryType, this.breackpoint)) {
             this.lerp.set({ y: this.endValue }).catch((err) => {});
         } else {
             this.lerp.set({ y: 0 }).catch((err) => {});
@@ -94,10 +94,10 @@ export class PageScrollItemClass {
     }
 
     onScroll() {
-        if (!mobbu.mq(this.queryType, this.breackpoint)) return;
+        if (!core.mq(this.queryType, this.breackpoint)) return;
         this.endValue = window.pageYOffset - this.offsetTop;
 
-        if (mobbu.mq(this.queryType, this.breackpoint)) {
+        if (core.mq(this.queryType, this.breackpoint)) {
             if (this.firstTime) {
                 this.lerp.set({ y: this.endValue }).catch((err) => {});
             } else {

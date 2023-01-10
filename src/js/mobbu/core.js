@@ -1,14 +1,3 @@
-import HandleAsyncTimeline from './animation/asyncTimeline/handleAsyncTimeline.js';
-import HandleLerp from './animation/lerp/handleLerp.js';
-import { parallaxConstant } from './animation/parallax/parallaxConstant.js';
-import ParallaxClass from './animation/parallax/parallax.js';
-import ParallaxTween from './animation/parallax/parallaxTween.js';
-import HandleMasterSequencer from './animation/sequencer/handleMasterSequencer.js';
-import HandleSequencer from './animation/sequencer/handleSequencer.js';
-import { createStaggers } from './animation/sequencer/sequencerUtils.js';
-import HandleSpring from './animation/spring/handleSpring.js';
-import HandleSyncTimeline from './animation/syncTimeline/handleSyncTimeline.js';
-import HandleTween from './animation/tween/handleTween.js';
 import { handleLoad } from './events/loadutils/handleLoad.js';
 import {
     handleMouseClick,
@@ -39,7 +28,7 @@ import { handleSetUp } from './setup.js';
 import { SimpleStore } from './store/simpleStore.js';
 import { mq } from './utils/mediaManager.js';
 
-export const mobbu = {
+export const core = {
     /**
      * @description
      * - Here it is possible to modify the default values of the various modules of the library
@@ -51,7 +40,7 @@ export const mobbu = {
      * ```js
      * Default value schema:
      *
-     * mobbu.setDefault.set({
+     * core.setDefault.set({
      *     startFps: 60,
      *     fpsScalePercent: {
      *         0: 1,
@@ -165,7 +154,7 @@ export const mobbu = {
      *
      * @example
      * ```js
-     * mobbu.getDefault('parallax');
+     * core.getDefault('parallax');
      * ```
      */
     getDefault(prop = '') {
@@ -178,7 +167,7 @@ export const mobbu = {
      *
      * @example
      * ```js
-     * mobbu.printDefault();
+     * core.printDefault();
      * ```
      */
     printDefault() {
@@ -191,578 +180,6 @@ export const mobbu = {
 
     getInstantFps() {
         return frameStore.getProp('instantFps');
-    },
-
-    /**
-     * @param {import('./animation/sequencer/handleSequencer.js').sequencerTypes & import('./animation/utils/stagger/staggerCostant.js').staggerTypes & import('../core/animation/tween/tweenConfig.js').easeTypes} data
-     *
-     * @example
-     * ```js
-     * Property schema:
-     *
-     *
-     * const mySequencer  = mobbu.createSequencer({
-     *   data: Object.<string, number>,
-     *   duration: [ Number ],
-     *   ease: [ String ],
-     *   stagger:{
-     *      each: [ Number ],
-     *      from: [ Number|String|{x:number,y:number} ],
-     *      grid: {
-     *          col: [ Number ],
-     *          row: [ Number ],
-     *          direction: [ String ]
-     *      },
-     *   },
-     * })
-     *
-     *
-     * ```
-     *
-     * @description
-     * Available methods:
-     * ```js
-     * mySequencer.goTo()
-     * mySequencer.goFrom()
-     * mySequencer.goFromTo()
-     * mySequencer.add()
-     * mySequencer.label()
-     * mySequencer.subscribe()
-     * mySequencer.subscribeCache()
-     * mySequencer.onStop()
-     *
-     * ```
-     */
-    createSequencer(data = {}) {
-        return new HandleSequencer(data);
-    },
-
-    /**
-     * @param {import('./animation/syncTimeline/handleSyncTimeline.js').syncTimelineTypes } data
-     *
-     * @example
-     * ```js
-     * Property schema:
-     *
-     *
-     * const myTimeline = mobbu.createSyncTimeline({
-     *   duration: [ Number ],
-     *   yoyo: [ Boolean ],
-     *   repeat: [ Number ]
-     * })
-     *
-     *
-     * ```
-     *
-     * @description
-     * Available methods:
-     * ```js
-     * myTimeline.add()
-     * myTimeline.onLoopEnd()
-     * myTimeline.onComplete()
-     * myTimeline.onUpdate()
-     * myTimeline.stop()
-     * myTimeline.play()
-     * myTimeline.playReverse()
-     * myTimeline.playFrom()
-     * myTimeline.playFromReverse()
-     * myTimeline.reverse()
-     * myTimeline.pause()
-     * myTimeline.resume()
-     * myTimeline.isActive()
-     * myTimeline.isPaused()
-     * myTimeline.getDirection()
-     * myTimeline.getTime()
-     * myTimeline.destroy()
-     * ```
-     */
-    createSyncTimeline(data = {}) {
-        return new HandleSyncTimeline(data);
-    },
-
-    /**
-     * @param { import('./animation/sequencer/sequencerUtils.js').createSequencerTypes & import('./animation/utils/stagger/staggerCostant.js').staggerTypes } data
-     * @returns {Array<{ start: Number, end: Number,index: Number, item: (HTMLElement|Object) }>} Stagger array
-     *
-     * @example
-     * ```js
-     * Property schema:
-     *
-     *
-     * const staggers = mobbu.createStaggers({
-     *     items: Array.<Element|Object>,
-     *     stagger: {
-     *         type: [ String ],
-     *         from: [ Number|String|{x:number,y:number} ],
-     *         grid: {
-     *             col: [ Number ],
-     *             row: [ Number ],
-     *             direction: [ String ]
-     *         },
-     *     },
-     *     duration: [ Number ],
-     * });
-     *
-     *
-     * staggers.forEach(({ item, start, end, index }) => {
-     *     const sequencer = mobbu
-     *         .createSequencer({ ... })
-     *         .goTo({ ... }, { start, end ...});
-     *     sequencer.subscribe(({ ... }) => { ... });
-     *     masterSequencer.add(sequencer);
-     * });
-     *
-     * ```
-     *
-     * @description
-     *
-     * ```
-     */
-    createStaggers(data = {}) {
-        return createStaggers(data);
-    },
-
-    /**
-     * @param { import('./animation/parallax/parallaxTween.js').parallaxTweenTypes & import('./animation/utils/stagger/staggerCostant.js').staggerTypes & import('./animation/tween/tweenConfig.js').easeTypes} data
-     *
-     * @example
-     * ```js
-     * Property schema:
-     *
-     *
-     * const myParallaxTween = mobbu.createParallaxTween({
-     *   from: Object.<string, number>,
-     *   to: Object.<string, number>,
-     *   duration: [ Number ],
-     *   ease: [ String ],
-     *   stagger:{
-     *      each: [ Number ],
-     *      from: [ Number|String|{x:number,y:number} ],
-     *      grid: {
-     *          col: [ Number ],
-     *          row: [ Number ],
-     *          direction: [ String ]
-     *      },
-     *   },
-     * })
-     *
-     *
-     * ```
-     *
-     * @description
-     * Simplified tween specific to be used with scrollTrigger as an alternative to the more complex sequencer, ParallaxTween requires only one mutation step (from / to).
-     * <br/>
-     *
-     * Available methods:
-     * ```js
-     * myParallaxTween.subscribe()
-     * myParallaxTween.subscribeCache()
-     * myParallaxTween.onStop()
-     *
-     * ```
-     */
-    createParallaxTween(data = {}) {
-        return new ParallaxTween(data);
-    },
-
-    /**
-     * @description
-     *
-     * Support class for grouping multiple sequencers.
-     * Very useful when generating sequencers dynamically, such as through the use of a createStagger.
-     * <br/>
-     * The following example uses a timeline but the same can be done using a scrollTrigger
-     * <br/>
-     *
-     *
-     * @example
-     *
-     * ```js
-     * cont masterSequencer = mobbu.createMasterSequencer();
-     * const staggers = mobbu.createStaggers({})
-     * staggers.forEach(({ item, start, end, index }) => {
-     *     const sequencer = mobbu
-     *         .createSequencer({ ... })
-     *         .goTo({ ... }, { start, end ...});
-     *     sequencer.subscribe(({ ... }) => { ... });
-     *     masterSequencer.add(sequencer);
-     * });
-     * const timeline = mobbu.createSyncTimeline({}).add(masterSequencer)
-     * ```
-     */
-    createMasterSequencer() {
-        return new HandleMasterSequencer();
-    },
-
-    /**
-     * @param { import('./animation/tween/handleTween.js').tweenTypes & import('./animation/utils/stagger/staggerCostant.js').staggerTypes & import('./animation/tween/tweenConfig.js').easeTypes} data
-     *
-     * @example
-     * ```js
-     * Property schema:
-     *
-     *
-     * const myTween = mobbu.createTween({
-     *   data: Object.<string, number>,
-     *   duration: [ Number ],
-     *   ease: [ String ],
-     *   relative: [ Boolean ]
-     *   stagger:{
-     *      each: [ Number ],
-     *      from: [ Number|String|{x:number,y:number} ],
-     *      grid: {
-     *          col: [ Number ],
-     *          row: [ Number ],
-     *          direction: [ String ]
-     *      },
-     *      waitComplete: [ Boolean ],
-     *   },
-     * })
-     *
-     *
-     * ```
-     *
-     * @description
-     * Available methods:
-     * ```js
-     * myTween.set()
-     * myTween.goTo()
-     * myTween.goFrom()
-     * myTween.goFromTo()
-     * myTween.subscribe()
-     * myTween.subscribeCache()
-     * myTween.onComplete()
-     * myTween.updateEase()
-     * myTween.getId()
-     * myTween.get()
-     * myTween.getTo()
-     * myTween.getFrom()
-     * myTween.getToNativeType()
-     * myTween.getFromNativeType()
-     *
-     * ```
-     */
-    createTween(data = {}) {
-        return new HandleTween(data);
-    },
-
-    /**
-     * @param { import('./animation/spring/handleSpring.js').springTypes & import('./animation/utils/stagger/staggerCostant.js').staggerTypes & import('./animation/spring/springConfig.js').springConfigTypes & import('./animation/spring/springConfig.js').springConfigPropsTypes} data
-     *
-     *
-     * @example
-     * ```js
-     * Property schema:
-     *
-     *
-     * const mySpring = new createSpring({
-     *   data: Object.<string, number>,
-     *   config: [ String ],
-     *   configProp: {
-     *      tension: [ Number ],
-     *      mass: [ Number ],
-     *      friction: [ Number ],
-     *      velocity: [ Number ],
-     *      precision: [ Number ],
-     *   },
-     *   relative: [ Boolean ]
-     *   stagger:{
-     *      each: [ Number ],
-     *      from: [ Number|String|{x:number,y:number} ],
-     *      grid: {
-     *          col: [ Number ],
-     *          row: [ Number ],
-     *          direction: [ String ],
-     *      },
-     *      waitComplete: [ Boolean ],
-     *   },
-     * })
-     *
-     *
-     * ```
-     *
-     * @description
-     * Available methods:
-     * ```js
-     * mySpring.set()
-     * mySpring.goTo()
-     * mySpring.goFrom()
-     * mySpring.goFromTo()
-     * mySpring.subscribe()
-     * mySpring.subscribeCache()
-     * mySpring.onComplete()
-     * mySpring.updateConfigProp()
-     * mySpring.updateConfig()
-     * mySpring.getId()
-     * mySpring.get()
-     * mySpring.getTo()
-     * mySpring.getFrom()
-     * mySpring.getToNativeType()
-     * mySpring.getFromNativeType()
-     *
-     * ```
-     */
-    createSpring(data = {}) {
-        return new HandleSpring(data);
-    },
-
-    /**
-     * @param { import('./animation/lerp/handleLerp.js').lerpTypes & import('./animation/lerp/handleLerp.js').lerpPropTypes & import('./animation/utils/stagger/staggerCostant.js').staggerTypes } data
-     *
-     * @example
-     * ```js
-     * Property schema:
-     *
-     *
-     * const myLerp = new mobbu.createLerp({
-     *   data: Object.<string, number>,
-     *   precision: [ Number ],
-     *   velocity: [ Number ],
-     *   relative: [ Boolean ]
-     *   stagger:{
-     *      each: [ Number ],
-     *      from: [ Number|String|{x:number,y:number} ],
-     *      grid: {
-     *          col: [ Number ],
-     *          row: [ Number ],
-     *          direction: [ String ],
-     *      },
-     *      waitComplete: [ Boolean ],
-     *   },
-     * })
-     *
-     *
-     * ```
-     *
-     * @description
-     * Available methods:
-     * ```js
-     * myLerp.set()
-     * myLerp.goTo()
-     * myLerp.goFrom()
-     * myLerp.goFromTo()
-     * myLerp.subscribe()
-     * myLerp.subscribeCache()
-     * myLerp.onComplete()
-     * myLerp.updateVelocity()
-     * myLerp.updatePrecision()
-     * myLerp.getId()
-     * myLerp.get()
-     * myLerp.getTo()
-     * myLerp.getFrom()
-     * myLerp.getToNativeType()
-     * myLerp.getFromNativeType()
-     *
-     * ```
-     */
-    createLerp(data = {}) {
-        return new HandleLerp(data);
-    },
-
-    /**
-     * @param { import('./animation/asyncTimeline/handleAsyncTimeline.js').asyncTimelineTypes } data
-     *
-     * @example
-     * ```js
-     * Property schema:
-     *
-     *
-     * const myTimeline = mobbu.createAsyncTimeline({
-     *   yoyo: [ Boolean ],
-     *   repeat: [ Number ],
-     *   freeMode: [ Number ],
-     *   autoSet: [ Number ],
-     * })
-     *
-     *
-     * ```
-     *
-     * @description
-     * Available methods:
-     * ```js
-     *
-     *
-     * `Methods to create timeline`
-     * myTimeline.set()
-     * myTimeline.goTo()
-     * myTimeline.goFrom()
-     * myTimeline.goFromTo()
-     * myTimeline.add()
-     * myTimeline.addAsync()
-     * myTimeline.sync()
-     * myTimeline.createGroup()
-     * myTimeline.closeGroup()
-     * myTimeline.suspend()
-     * myTimeline.label()
-     *
-     *
-     * `Methods to control timeline`
-     * myTimeline.play()
-     * myTimeline.playFromLabel()
-     * myTimeline.playFrom()
-     * myTimeline.playFromReverse()
-     * myTimeline.playReverse()
-     * myTimeline.reverseNext()
-     * myTimeline.stop()
-     * myTimeline.pause()
-     * myTimeline.resume()
-     * myTimeline.isActive()
-     * myTimeline.isPaused()
-     * myTimeline.isSuspended()
-     * myTimeline.getDirection()
-     * myTimeline.setTween()
-     * myTimeline.get()
-     * myTimeline.onLoopEnd()
-     * myTimeline.onComplete()
-     * myTimeline.destroy()
-     * ```
-     */
-    createAsyncTimeline(data = {}) {
-        return new HandleAsyncTimeline(data);
-    },
-
-    /**
-     * @typedef { import('./animation/parallax/parallax.js').parallaxDefaultTypes & import('./utils/mediaManager.js').breackPointTypeObj & import('./animation/spring/springConfig.js').springConfigParallaxTypes & import('./utils/mediaManager.js').mqTypeObject & import('./animation/parallax/parallax.js').parallaxSpecificTypes } createParallaxType
-     */
-
-    /**
-     * @param { createParallaxType } data
-     *
-     * @example
-     * ```js
-     *  Property schema:
-     *
-     *
-     *  const myParallax = mobbu.createParallax({
-     *      item: String | Element,
-     *      applyTo: [ String | Element ],
-     *      trigger: [ String | Element ],
-     *      screen: [ String | Element ],
-     *      scroller: [ String | Element ],
-     *      breackpoint: [ String ],
-     *      queryType: [ String ],
-     *      direction: [ String ],
-     *      propierties: [ String ],
-     *      tween: [ HandleSequencer | ParallaxTween ],
-     *      range: [ String | Number ],
-     *      align: [ String ],
-     *      onSwitch: [ String ],
-     *      reverse: [ Boolean ],
-     *      ease: [ Boolean ],
-     *      easeType: [ String ],
-     *      lerpConfig: [ Number ],
-     *      springConfig: [ String ],
-     *      opacityEnd: [ Number ],
-     *      opacityStart: [ Number ],
-     *      limiterOff: [ Boolean ],
-     *      perspective: [ Number ],
-     *      disableForce3D: [ Boolean ],
-     *      useThrottle: [ Boolean ],
-     *  });
-     *
-     *
-     * ```
-     *
-     * @description
-     * Available methods:
-     *
-     * ```js
-     *
-     *
-     * myParallax.init()
-     * myParallax.destroy()
-     * myParallax.refresh()
-     * myParallax.move()
-     *
-     * ```
-     *
-     */
-    createParallax(data = {}) {
-        return new ParallaxClass({
-            ...data,
-            ...{ type: parallaxConstant.TYPE_PARALLAX },
-        });
-    },
-
-    /**
-     * @typedef { import('./animation/parallax/parallax.js').parallaxDefaultTypes & import('./utils/mediaManager.js').breackPointTypeObj & import('./animation/spring/springConfig.js').springConfigParallaxTypes & import('./utils/mediaManager.js').mqTypeObject & import('./animation/parallax/parallax.js').scrolltriggerSpecificTypes  } createScrollTriggerType
-     */
-
-    /**
-     * @param { createScrollTriggerType } data
-     *
-     * @example
-     *
-     * ```js
-     *   Property schema:
-     *
-     *
-     *   const myScrollTrigger = mobbu.createScrollTrigger({
-     *       item: String | Element,
-     *       applyTo: [ String | Element ],
-     *       trigger: [ String | Element ],
-     *       screen: [ String | Element ],
-     *       scroller: [ String | Element ],
-     *       breackpoint: [ String ],
-     *       queryType: [ String ],
-     *       direction: [ String ],
-     *       propierties: [ String ],
-     *       tween: [ HandleSequencer | ParallaxTween ],
-     *       range: [ String ],
-     *       dynamicRange: [ Function ],
-     *       fromTo: [ Boolean ],
-     *       start: [ String ],
-     *       dynamicStart: {
-     *          postion: [ String ],
-     *          value: [ Function ]
-     *       },
-     *       end: [ String ],
-     *       dynamicEnd: {
-     *          postion: [ String ],
-     *          value: [ Function ]
-     *       },
-     *       ease: [ Boolean ],
-     *       easeType: [ String ],
-     *       lerpConfig: [ Number ],
-     *       springConfig: [ String ],
-     *       pin: [ Boolean ],
-     *       animatePin: [ Boolean ],
-     *       anticipatePinOnLoad: [ Boolean ],
-     *       marker: [ String ],
-     *       forceTranspond: [ Boolean ],
-     *       animateAtStart: [ Boolean ],
-     *       disableForce3D: [ Boolean ],
-     *       onEnter: [ Function ],
-     *       onEnterBack: [ Function ],
-     *       onLeave: [ Function ],
-     *       onLeaveBack: [ Function ],
-     *       onTick: [ Function ],
-     *       perspective: [ Number ],
-     *       useThrottle: [ Boolean ],
-     *   });
-     *
-     *
-     *
-     * ```
-     *
-     * @description
-     * Available methods:
-     *
-     * ```js
-     *
-     *
-     * myScrollTrigger.init()
-     * myScrollTrigger.destroy()
-     * myScrollTrigger.refresh()
-     * myScrollTrigger.move()
-     *
-     * ```
-     */
-    createScrollTrigger(data = {}) {
-        return new ParallaxClass({
-            ...data,
-            ...{ type: parallaxConstant.TYPE_SCROLLTRIGGER },
-        });
     },
 
     /**
@@ -802,13 +219,13 @@ export const mobbu = {
      * ```js
      *
      * Simlple propierties setup;
-     * const myStore = new SimpleStore({
+     * const myStore = core.createStore({
      *     prop1: 0,
      *     prop2: 0
      * });
      *
      * Complex propierties setup:
-     * const myStore = mobbu.createStore({
+     * const myStore = core.createStore({
      *     myProp: () => ({
      *         value: 10,
      *         type: Number,
@@ -883,7 +300,7 @@ export const mobbu = {
      *
      * @example
      * ```js
-     * mobbu.useframe(({ fps, shouldrender, time }) => {
+     * core.useframe(({ fps, shouldrender, time }) => {
      *     // code ...
      * });
      *
@@ -901,8 +318,8 @@ export const mobbu = {
      *
      * @example
      * ```js
-     * mobbu.useFrame(() => {
-     *     mobbu.useNextTick(({ fps, shouldRender, time }) => {
+     * core.useFrame(() => {
+     *     core.useNextTick(({ fps, shouldRender, time }) => {
      *         // code
      *     });
      * });
@@ -910,20 +327,20 @@ export const mobbu = {
      * Loop request animation frame using handleNextTick:
      *
      * const loop = () => {
-     *     mobbu.useNextTick(() => {
+     *     core.useNextTick(() => {
      *         // read from DOM
      *
-     *         mobbu.useFrame(() => {
+     *         core.useFrame(() => {
      *             // write to the DOM
      *             loop();
      *         });
      *     });
      * };
      *
-     * mobbu.useFrame(() => loop());
+     * core.useFrame(() => loop());
      *
      * To tick exactly after the request animation frame:
-     * mobbu.default('set', { deferredNextTick: true });
+     * core.default('set', { deferredNextTick: true });
      *
      * ```
      */
@@ -940,13 +357,13 @@ export const mobbu = {
      * @example
      * ```js
      * const loop = () => {
-     *     mobbu.useNextFrame(({ fps, shouldRender, time }) => {
+     *     core.useNextFrame(({ fps, shouldRender, time }) => {
      *         // code
      *         loop();
      *     });
      * };
      *
-     * mobbu.useFrame(() => loop());
+     * core.useFrame(() => loop());
      *
      * ```
      */
@@ -963,7 +380,7 @@ export const mobbu = {
      *
      * @example
      * ```js
-     * mobbu.useFrameIndex(({ fps, shouldRender, time }) => {
+     * core.useFrameIndex(({ fps, shouldRender, time }) => {
      *     // code ...
      * }, 5);
      *
@@ -996,7 +413,7 @@ export const mobbu = {
      * @example
      * ```js
      *
-     * mobbu.useLoad(() => {
+     * core.useLoad(() => {
      *     // code
      * });
      *
@@ -1014,7 +431,7 @@ export const mobbu = {
      *
      * @example
      * ```js
-     * mobbu.useResize(
+     * core.useResize(
      *     ({
      *         documentHeight,
      *         horizontalResize,
@@ -1041,7 +458,7 @@ export const mobbu = {
      *
      * @example
      * ```js
-     *  const unsubscribe = mobbu.useVisibilityChange(({ visibilityState }) => {
+     *  const unsubscribe = core.useVisibilityChange(({ visibilityState }) => {
      *      // code
      *  });
      *
@@ -1061,7 +478,7 @@ export const mobbu = {
      *
      * @example
      * ```js
-     * const unsubscribe = mobbu.useMouseClick(
+     * const unsubscribe = core.useMouseClick(
      *     ({ client, page, preventDefault, target, type }) => {
      *         // code
      *     }
@@ -1083,7 +500,7 @@ export const mobbu = {
      *
      * @example
      * ```js
-     * const unsubscribe = mobbu.useMouseDown(
+     * const unsubscribe = core.useMouseDown(
      *     ({ client, page, preventDefault, target, type }) => {
      *         // code
      *     }
@@ -1105,7 +522,7 @@ export const mobbu = {
      *
      * @example
      * ```js
-     * const unsubscribe = mobbu.useTouchStart(
+     * const unsubscribe = core.useTouchStart(
      *     ({ client, page, preventDefault, target, type }) => {
      *         // code
      *     }
@@ -1127,7 +544,7 @@ export const mobbu = {
      *
      * @example
      * ```js
-     * const unsubscribe = mobbu.useMouseMove(
+     * const unsubscribe = core.useMouseMove(
      *     ({ client, page, preventDefault, target, type }) => {
      *         // code
      *     }
@@ -1149,7 +566,7 @@ export const mobbu = {
      *
      * @example
      * ```js
-     * const unsubscribe = mobbu.useTouchMove(
+     * const unsubscribe = core.useTouchMove(
      *     ({ client, page, preventDefault, target, type }) => {
      *         // code
      *     }
@@ -1171,7 +588,7 @@ export const mobbu = {
      *
      * @example
      * ```js
-     * const unsubscribe = mobbu.useMouseUp(
+     * const unsubscribe = core.useMouseUp(
      *     ({ client, page, preventDefault, target, type }) => {
      *         // code
      *     }
@@ -1193,7 +610,7 @@ export const mobbu = {
      *
      * @example
      * ```js
-     * const unsubscribe = mobbu.useTouchEnd(
+     * const unsubscribe = core.useTouchEnd(
      *     ({ client, page, preventDefault, target, type }) => {
      *         // code
      *     }
@@ -1215,7 +632,7 @@ export const mobbu = {
      *
      * @example
      * ```js
-     * const unsubscribe = mobbu.useMouseWheel(
+     * const unsubscribe = core.useMouseWheel(
      *     ({
      *         client,
      *         page,
@@ -1248,7 +665,7 @@ export const mobbu = {
      *
      * @example
      * ```js
-     * const unsubscribe = mobbu.useScroll(({ direction, scrollY }) => {
+     * const unsubscribe = core.useScroll(({ direction, scrollY }) => {
      *     // code
      * });
      *
@@ -1269,7 +686,7 @@ export const mobbu = {
      *
      * @example
      * ```js
-     * const unsubscribe = mobbu.useScrollImmediate(({ direction, scrollY }) => {
+     * const unsubscribe = core.useScrollImmediate(({ direction, scrollY }) => {
      *     // code
      * });
      *
@@ -1290,7 +707,7 @@ export const mobbu = {
      *
      * @example
      * ```js
-     * const unsubscribe = mobbu.useScrollThrottle(({ direction, scrollY }) => {
+     * const unsubscribe = core.useScrollThrottle(({ direction, scrollY }) => {
      *    // code
      * });
      *
@@ -1299,7 +716,7 @@ export const mobbu = {
      * To change the duration of the throttle, change the value of the throttle property to the defaults:
      *
      *
-     * mobbu.setDefault({throttle: 500});
+     * core.setDefault({throttle: 500});
      *
      * ```
      */
@@ -1316,7 +733,7 @@ export const mobbu = {
      *
      * @example
      * ```js
-     * const unsubscribe = mobbu.useScrollStart(({ scrollY }) => {
+     * const unsubscribe = core.useScrollStart(({ scrollY }) => {
      *     // code
      * });
      *
@@ -1337,7 +754,7 @@ export const mobbu = {
      *
      * @example
      * ```js
-     * const unsubscribe = mobbu.useScrollEnd(({ scrollY }) => {
+     * const unsubscribe = core.useScrollEnd(({ scrollY }) => {
      *     // code
      * });
      *
@@ -1361,11 +778,11 @@ export const mobbu = {
      *
      * ```js
      *   Property schema:
-     *   mobbu.mq([String], [string])
+     *   core.mq([String], [string])
      *
-     *   const isDesktop = mobbu.mq('min', 'desktop'); // true/false
-     *   const isMobile = mobbu.mq('max', 'desktop'); // true/false
-     *   const desktopBreackPoint = mobbu.mq('get', 'desktop'); // 992
+     *   const isDesktop = core.mq('min', 'desktop'); // true/false
+     *   const isMobile = core.mq('max', 'desktop'); // true/false
+     *   const desktopBreackPoint = core.mq('get', 'desktop'); // 992
      *
      *
      *
@@ -1383,7 +800,7 @@ export const mobbu = {
                 return mq.getBreackpoint(breackpoint);
 
             default:
-                console.warn(`${action} in mobbu.mq not exist`);
+                console.warn(`${action} in core.mq not exist`);
         }
     },
 };

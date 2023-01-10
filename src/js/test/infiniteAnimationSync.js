@@ -1,4 +1,4 @@
-import { mobbu } from '../core';
+import { timeline, tween } from '../mobbu';
 
 export const infiniteAnimationSync = () => {
     const stagger = document.querySelectorAll('.infinite-tween .shape__target');
@@ -16,7 +16,7 @@ export const infiniteAnimationSync = () => {
     const duration = 10;
     const friction = duration / 2 / Math.PI;
 
-    const infinite = mobbu
+    const infinite = tween
         .createSequencer({
             stagger: { each: 5 },
             data: { x: duration / 4, opacity: 1 },
@@ -31,7 +31,7 @@ export const infiniteAnimationSync = () => {
         .goTo({ opacity: 0 }, { start: 5, end: 7.5, ease: 'easeOutQuad' })
         .goTo({ opacity: 1 }, { start: 7.5, end: 10, ease: 'easeInQuad' });
 
-    stagger.forEach((item, i) => {
+    stagger.forEach((item) => {
         infinite.subscribe(({ x, opacity }) => {
             const val = x / friction;
             const factor = 2 / (3 - Math.cos(2 * val));
@@ -42,7 +42,7 @@ export const infiniteAnimationSync = () => {
         });
     });
 
-    const syncTimeline = mobbu
+    const syncTimeline = timeline
         .createSyncTimeline({
             repeat: -1,
             yoyo: false,

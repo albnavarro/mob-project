@@ -1,4 +1,4 @@
-import { mobbu } from '../core';
+import { timeline, tween } from '../mobbu';
 
 export const gridStaggerSequencer = () => {
     const items = document.querySelectorAll(
@@ -6,7 +6,7 @@ export const gridStaggerSequencer = () => {
     );
     const duration = 4000;
 
-    const tween = mobbu
+    const tween1 = tween
         .createSequencer({
             ease: 'easeInOutBack',
             stagger: {
@@ -21,23 +21,23 @@ export const gridStaggerSequencer = () => {
         .goTo({ x: 100 });
 
     items.forEach((item) => {
-        tween.subscribeCache(item, ({ scale, x }) => {
+        tween1.subscribeCache(item, ({ scale, x }) => {
             item.style.transform = `translate3D(0,0,0) scale(${scale}) translateX(${x}%)`;
         });
     });
 
     items.forEach((item) => {
-        tween.onStop(({ scale, x }) => {
+        tween1.onStop(({ scale, x }) => {
             item.style.transform = `scale(${scale}) translateX(${x}%)`;
         });
     });
 
-    const timeline = mobbu
+    const timeline1 = timeline
         .createSyncTimeline({
             repeat: -1,
             yoyo: true,
             duration,
         })
-        .add(tween)
+        .add(tween1)
         .play();
 };

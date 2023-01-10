@@ -1,11 +1,11 @@
-import { mobbu } from '../core';
+import { timeline, tween } from '../mobbu';
 
 export const gridStaggerTween = () => {
     const items = document.querySelectorAll(
         '.grid-stagger-tween .grid-stagger__item'
     );
 
-    const tween = mobbu.createTween({
+    const tween1 = tween.createTween({
         ease: 'easeInOutQuad',
         stagger: {
             each: 15,
@@ -17,25 +17,25 @@ export const gridStaggerTween = () => {
     });
 
     // items.forEach((item, i) => {
-    //     tween.subscribe(({ scale }) => {
+    //     tween1.subscribe(({ scale }) => {
     //         item.style.transform = `scale(${scale})`;
     //     });
     // });
 
-    items.forEach((item, i) => {
-        tween.subscribeCache(item, ({ scale }) => {
+    items.forEach((item) => {
+        tween1.subscribeCache(item, ({ scale }) => {
             item.style.transform = `scale(${scale})`;
         });
     });
 
-    const timeline = mobbu.createAsyncTimeline({ repeat: -1, yoyo: true });
-    timeline.goTo(
-        tween,
+    const timeline1 = timeline.createAsyncTimeline({ repeat: -1, yoyo: true });
+    timeline1.goTo(
+        tween1,
         { scale: 0.5 },
         {
             duration: 500,
         }
     );
 
-    timeline.play();
+    timeline1.play();
 };

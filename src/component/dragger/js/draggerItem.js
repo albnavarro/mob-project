@@ -1,5 +1,5 @@
-import { isDescendant } from '.../../../js/core/utils';
-import { mobbu } from '.../../../js/core';
+import { isDescendant } from '.../../../js/mobbu/utils/';
+import { tween, core } from '../../../js/mobbu';
 
 export class DraggerItemClass {
     constructor(data) {
@@ -39,7 +39,7 @@ export class DraggerItemClass {
 
         // Animation
         this.endValue = { xValue: 0, yValue: 0 };
-        this.spring = mobbu.createSpring();
+        this.spring = tween.createSpring();
         this.unsubscribeSpring = () => {};
         this.unsubscribeOnComplete = () => {};
 
@@ -54,31 +54,31 @@ export class DraggerItemClass {
     }
 
     init() {
-        this.unsubscribeTouchStart = mobbu.useTouchStart(({ page, target }) => {
+        this.unsubscribeTouchStart = core.useTouchStart(({ page, target }) => {
             this.onMouseDown({ page, target });
         });
 
-        this.unsubscribeMouseDown = mobbu.useMouseDown(({ page, target }) => {
+        this.unsubscribeMouseDown = core.useMouseDown(({ page, target }) => {
             this.onMouseDown({ page, target });
         });
 
-        this.unsubscribeTouchEnd = mobbu.useTouchEnd(() => {
+        this.unsubscribeTouchEnd = core.useTouchEnd(() => {
             this.onMouseUp();
         });
 
-        this.unsubscribeMouseUp = mobbu.useMouseUp(() => {
+        this.unsubscribeMouseUp = core.useMouseUp(() => {
             this.onMouseUp();
         });
 
-        this.unsubscribeMouseMove = mobbu.useMouseMove(({ page }) => {
+        this.unsubscribeMouseMove = core.useMouseMove(({ page }) => {
             this.onMove({ page });
         });
 
-        this.unsubscribeTouchMove = mobbu.useTouchMove(({ page }) => {
+        this.unsubscribeTouchMove = core.useTouchMove(({ page }) => {
             this.onMove({ page });
         });
 
-        this.unsubscribeResize = mobbu.useResize(() => {
+        this.unsubscribeResize = core.useResize(() => {
             this.onResize();
         });
 

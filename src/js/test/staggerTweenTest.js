@@ -1,4 +1,4 @@
-import { mobbu } from '../core';
+import { timeline, tween } from '../mobbu';
 
 export function staggerTweenTest() {
     const btnStart = document.querySelector('.tween .start');
@@ -14,7 +14,7 @@ export function staggerTweenTest() {
     const stagger = document.querySelectorAll('.tween .target-stagger');
 
     // DEFINE SPRING
-    const myTween = mobbu.createTween({
+    const myTween = tween.createTween({
         ease: 'easeInOutBack',
         data: { x: 0, y: 0 },
     });
@@ -23,7 +23,7 @@ export function staggerTweenTest() {
         target.style.transform = `translate3D(0px,0px,0px) translate(${x}px, ${y}px)`;
     });
 
-    const myStagger = mobbu.createTween({
+    const myStagger = tween.createTween({
         stagger: { each: 4, from: 'start' },
         ease: 'easeInOutBack',
         data: { x: 0 },
@@ -49,7 +49,7 @@ export function staggerTweenTest() {
 
     // When use waitComplete: false all the stagger of same tween must have the same each value to syncronize
     // DEFINE TIMELINE
-    const timeline = mobbu
+    const timeline1 = timeline
         .createAsyncTimeline({ repeat: -1, yoyo: true, autoSet: false })
         .goTo(myTween, { x: 500 })
         .goTo(myTween, { y: 500 })
@@ -61,15 +61,15 @@ export function staggerTweenTest() {
 
     // LISTNER
     btnStart.addEventListener('click', () => {
-        timeline.play();
+        timeline1.play();
     });
 
     btnStop.addEventListener('click', () => {
-        timeline.stop();
+        timeline1.stop();
     });
 
     btnPause.addEventListener('click', () => {
-        timeline.pause();
+        timeline1.pause();
     });
 
     btnUnsubscribeStagger.addEventListener('click', () => {
@@ -80,14 +80,14 @@ export function staggerTweenTest() {
     });
 
     btnPlay.addEventListener('click', () => {
-        timeline.resume();
+        timeline1.resume();
     });
 
     btnReverseNext.addEventListener('click', () => {
-        timeline.reverseNext();
+        timeline1.reverseNext();
     });
 
     btnReverse.addEventListener('click', () => {
-        timeline.playReverse();
+        timeline1.playReverse();
     });
 }

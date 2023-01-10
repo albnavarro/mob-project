@@ -3,9 +3,9 @@ import {
     outerWidth,
     outerHeight,
     offset,
-} from '../../../js/core/utils';
-import { mobbu } from '../../../js/core';
-import { bodyScroll } from '../../../js/core/plugin';
+} from '../../../js/mobbu/utils/';
+import { core } from '../../../js/mobbu';
+import { bodyScroll } from '../../../js/mobbu/plugin';
 
 export class tBlocksItemClass {
     constructor(container) {
@@ -23,7 +23,7 @@ export class tBlocksItemClass {
             '.tBlocks__item:not(.tBlocks__item--active)'
         );
 
-        this.store = mobbu.createStore({
+        this.store = core.createStore({
             itemsNotActive: () => ({
                 value: this.container.querySelectorAll(
                     '.tBlocks__item:not(.tBlocks__item--active)'
@@ -107,7 +107,7 @@ export class tBlocksItemClass {
         this.setActiveitemTransformOrigin();
         this.setActiveitemStyle();
 
-        const unsubscribeResize = mobbu.useResize(() => {
+        const unsubscribeResize = core.useResize(() => {
             this.setWidth();
             this.calcCenter();
             this.store.set('clone', { action: this.REMOVE });

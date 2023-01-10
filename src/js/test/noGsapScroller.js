@@ -1,13 +1,13 @@
-import { mobbu } from '../core';
-import { HorizontalScroller } from '../core/plugin/horizontalScroller/js/horizontalScroller';
+import { HorizontalScroller } from '../mobbu/plugin/horizontalScroller/js/horizontalScroller';
+import { scroller, core, tween } from '../mobbu';
 
 const createScroller = ({ bottomScroller }) => {
     const title = document.querySelector('.js-scroll-item');
-    const scroller = document.querySelector(
+    const scroller1 = document.querySelector(
         '.test-custom-scroller .scroller__row'
     );
 
-    // const tweetTest = mobbu.createParallaxTween({
+    // const tweetTest = tween.createParallaxTween({
     //     from: { y: 0, scale: 1 },
     //     to: { y: -300, scale: 1.2 },
     // });
@@ -20,7 +20,7 @@ const createScroller = ({ bottomScroller }) => {
     //     title.style.transform = `translateY(${y}px) scale(${scale})`;
     // });
 
-    let parallaxTest = mobbu.createScrollTrigger({
+    let parallaxTest = scroller.createScrollTrigger({
         item: title,
         pin: true,
         // marker: 'pin',
@@ -52,7 +52,7 @@ const createScroller = ({ bottomScroller }) => {
 
     const parallaxTest2 = document.querySelectorAll('.js-parallax-test');
     const parallaxArray = [...parallaxTest2].map((item) => {
-        return mobbu.createParallax({
+        return scroller.createParallax({
             item,
             propierties: 'x',
             reverse: true,
@@ -97,8 +97,8 @@ const createScroller = ({ bottomScroller }) => {
             bottomScroller.refresh();
         },
         onTick: ({ percent }) => {
-            mobbu.useFrame(() => {
-                scroller.style.setProperty('--percent', `${percent}%`);
+            core.useFrame(() => {
+                scroller1.style.setProperty('--percent', `${percent}%`);
             });
         },
         afterRefresh: () => {

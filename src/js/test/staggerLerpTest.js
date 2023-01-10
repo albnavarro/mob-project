@@ -1,4 +1,4 @@
-import { mobbu } from '../core';
+import { timeline, tween } from '../mobbu';
 import { isIOS } from '../utility/isIOS.js';
 
 export function staggerLerpTest() {
@@ -12,13 +12,13 @@ export function staggerLerpTest() {
     const stagger = document.querySelectorAll('.lerp .target-stagger');
 
     // DEFINE SPRING
-    const myTween = mobbu.createLerp({ data: { x: 0, y: 0 } });
+    const myTween = tween.createLerp({ data: { x: 0, y: 0 } });
 
     myTween.subscribe(({ x, y }) => {
         target.style.transform = `translate3D(0px,0px,0px) translate(${x}px, ${y}px)`;
     });
 
-    const myStagger = mobbu.createLerp({
+    const myStagger = tween.createLerp({
         stagger: { each: 4, from: 'edges' },
         data: { x: 0 },
     });
@@ -37,7 +37,7 @@ export function staggerLerpTest() {
 
     // When use waitComplete: false all the stagger of same tween must have the same each value to syncronize
     // DEFINE TIMELINE
-    const timeline = mobbu
+    const timeline1 = timeline
         .createAsyncTimeline({ repeat: -1, yoyo: true, autoSet: false })
         .goTo(myTween, { x: 500 }, { precision: 1 })
         .goTo(myTween, { y: 500 }, { precision: 1 })
@@ -49,26 +49,26 @@ export function staggerLerpTest() {
 
     // LISTNER
     btnStart.addEventListener('click', () => {
-        timeline.play();
+        timeline1.play();
     });
 
     btnStop.addEventListener('click', () => {
-        timeline.stop();
+        timeline1.stop();
     });
 
     btnPause.addEventListener('click', () => {
-        timeline.pause();
+        timeline1.pause();
     });
 
     btnPlay.addEventListener('click', () => {
-        timeline.resume();
+        timeline1.resume();
     });
 
     btnReverseNext.addEventListener('click', () => {
-        timeline.reverseNext();
+        timeline1.reverseNext();
     });
 
     btnReverse.addEventListener('click', () => {
-        timeline.playReverse();
+        timeline1.playReverse();
     });
 }

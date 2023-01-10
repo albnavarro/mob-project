@@ -1,4 +1,4 @@
-import { mobbu } from '../core';
+import { timeline, tween, core } from '../mobbu';
 
 export const testCanvas = () => {
     const canvas = document.querySelector('#test-canvas');
@@ -33,13 +33,13 @@ export const testCanvas = () => {
         };
     });
 
-    mobbu.useResize(() => {
+    core.useResize(() => {
         canvas.width = canvas.clientWidth;
         canvas.height = canvas.clientHeight;
         draw();
     });
 
-    const tween = mobbu.createTween({
+    const tween1 = tween.createTween({
         ease: 'easeInOutQuad',
         stagger: {
             each: 15,
@@ -52,7 +52,7 @@ export const testCanvas = () => {
     });
 
     // itemsArr.forEach((item, i) => {
-    //     tween.subscribe(({ scale, rotate, opacity }) => {
+    //     tween1.subscribe(({ scale, rotate, opacity }) => {
     //         item.scale = scale;
     //         item.rotate = rotate;
     //         item.opacity = opacity;
@@ -60,7 +60,7 @@ export const testCanvas = () => {
     // });
 
     itemsArr.forEach((item) => {
-        tween.subscribeCache(item, ({ scale, rotate, opacity }) => {
+        tween1.subscribeCache(item, ({ scale, rotate, opacity }) => {
             item.scale = scale;
             item.rotate = rotate;
             item.opacity = opacity;
@@ -90,20 +90,20 @@ export const testCanvas = () => {
         );
     };
 
-    const timeline = mobbu
+    const timeline1 = timeline
         .createAsyncTimeline({ repeat: -1, yoyo: true })
-        .goTo(tween, { scale: 1.5 }, { duration: 1000 })
-        .goTo(tween, { scale: 0.5 }, { duration: 500 })
-        .goTo(tween, { rotate: 180, scale: 1.2 }, { duration: 500 })
-        .goTo(tween, { scale: 1.3 }, { duration: 500 })
-        .goTo(tween, { opacity: 0.5 }, { duration: 1200 })
-        .goTo(tween, { opacity: 1, scale: 1 }, { duration: 1200 })
+        .goTo(tween1, { scale: 1.5 }, { duration: 1000 })
+        .goTo(tween1, { scale: 0.5 }, { duration: 500 })
+        .goTo(tween1, { rotate: 180, scale: 1.2 }, { duration: 500 })
+        .goTo(tween1, { scale: 1.3 }, { duration: 500 })
+        .goTo(tween1, { opacity: 0.5 }, { duration: 1200 })
+        .goTo(tween1, { opacity: 1, scale: 1 }, { duration: 1200 })
         .play();
 
     const loop = () => {
         draw();
-        mobbu.useNextFrame(() => loop());
+        core.useNextFrame(() => loop());
     };
 
-    mobbu.useFrame(() => loop());
+    core.useFrame(() => loop());
 };

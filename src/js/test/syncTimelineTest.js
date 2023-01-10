@@ -1,4 +1,4 @@
-import { mobbu } from '../core';
+import { timeline, tween } from '../mobbu';
 import { isIOS } from '../utility/isIOS.js';
 
 export function syncTimelineTest() {
@@ -45,7 +45,7 @@ export function syncTimelineTest() {
     let rotation = 720;
 
     // SINGLE
-    const seq1 = mobbu
+    const seq1 = tween
         .createSequencer({
             ease: 'easeInOutCubic',
             data: { x: 0, y: 0, rotate: 0, scale: 1 },
@@ -77,7 +77,7 @@ export function syncTimelineTest() {
     });
 
     // STAGGER
-    const seqStagger = mobbu
+    const seqStagger = tween
         .createSequencer({
             stagger: { each: 10, from: 'end' },
             data: { x: 0, scale: 1 },
@@ -100,7 +100,7 @@ export function syncTimelineTest() {
         });
     });
 
-    const syncTimeline = mobbu
+    const syncTimeline = timeline
         .createSyncTimeline({
             repeat: 1,
             yoyo: false,

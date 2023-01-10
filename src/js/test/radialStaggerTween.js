@@ -1,11 +1,11 @@
-import { mobbu } from '../core';
+import { timeline, tween } from '../mobbu';
 
 export const radialStaggerTween = () => {
     const items = document.querySelectorAll(
         '.radial-stagger .radial-stagger__item'
     );
 
-    const tween = mobbu.createTween({
+    const tween1 = tween.createTween({
         ease: 'easeInOutQuad',
         stagger: {
             each: 15,
@@ -17,20 +17,20 @@ export const radialStaggerTween = () => {
     });
 
     // items.forEach((item, i) => {
-    //     tween.subscribe(({ scale }) => {
+    //     tween1.subscribe(({ scale }) => {
     //         item.style.transform = `scale(${scale})`;
     //     });
     // });
 
-    items.forEach((item, i) => {
-        tween.subscribeCache(item, ({ scale }) => {
+    items.forEach((item) => {
+        tween1.subscribeCache(item, ({ scale }) => {
             item.style.transform = `scale(${scale})`;
         });
     });
 
-    const timeline = mobbu
+    const timeline1 = timeline
         .createAsyncTimeline({ repeat: -1, yoyo: true })
-        .goTo(tween, { scale: 0.5 }, { duration: 1000 })
-        .goTo(tween, { scale: 2.5 }, { duration: 500 })
+        .goTo(tween1, { scale: 0.5 }, { duration: 1000 })
+        .goTo(tween1, { scale: 2.5 }, { duration: 500 })
         .play();
 };

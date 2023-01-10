@@ -1,4 +1,4 @@
-import { mobbu } from '../core';
+import { timeline, tween } from '../mobbu';
 
 export const sequencerStaggerTime = () => {
     const items = document.querySelectorAll('.master-stagger__item');
@@ -13,12 +13,12 @@ export const sequencerStaggerTime = () => {
         '.animation-playFromReverse'
     );
 
-    let masterSequencer = mobbu.createMasterSequencer();
+    let masterSequencer = tween.createMasterSequencer();
 
     // Example , not necessary
     const duration = 3000;
 
-    const staggers = mobbu.createStaggers({
+    const staggers = tween.createStaggers({
         items,
         stagger: {
             type: 'equal',
@@ -30,7 +30,7 @@ export const sequencerStaggerTime = () => {
     // Create sequencer
     const createSequencer = () => {
         staggers.forEach(({ item, start, end, index }) => {
-            const sequencer = mobbu
+            const sequencer = tween
                 .createSequencer({ data: { y: 0 }, duration })
                 .goTo({ y: 300 }, { start, end, ease: 'easeInOutBack' })
                 .label(`label${index}`, start)
@@ -57,7 +57,7 @@ export const sequencerStaggerTime = () => {
     /**
      *  Animation
      **/
-    const timeline = mobbu
+    const timeline1 = timeline
         .createSyncTimeline({
             repeat: 3,
             yoyo: true,
@@ -66,34 +66,34 @@ export const sequencerStaggerTime = () => {
         .add(masterSequencer);
 
     play.addEventListener('click', () => {
-        timeline.play();
+        timeline1.play();
     });
 
     reverse.addEventListener('click', () => {
-        timeline.reverse();
+        timeline1.reverse();
     });
 
     playReverse.addEventListener('click', () => {
-        timeline.playReverse();
+        timeline1.playReverse();
     });
 
     stop.addEventListener('click', () => {
-        timeline.stop();
+        timeline1.stop();
     });
 
     pause.addEventListener('click', () => {
-        timeline.pause();
+        timeline1.pause();
     });
 
     resume.addEventListener('click', () => {
-        timeline.resume();
+        timeline1.resume();
     });
 
     playFrom.addEventListener('click', () => {
-        timeline.playFrom('label4');
+        timeline1.playFrom('label4');
     });
 
     playFromReverse.addEventListener('click', () => {
-        timeline.playFromReverse('label4');
+        timeline1.playFromReverse('label4');
     });
 };

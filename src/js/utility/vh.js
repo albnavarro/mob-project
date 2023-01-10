@@ -1,7 +1,7 @@
-import { handleScroll } from '../core/events/scrollUtils/handleScroll.js';
-import { handleResize } from '../core/events/resizeUtils/handleResize.js';
-import { handleNextTick } from '../core/events/rafutils/handleNextTick.js';
-import { handleFrame } from '../core/events/rafutils/handleFrame.js';
+import { handleScroll } from '../mobbu/events/scrollUtils/handleScroll.js';
+import { handleResize } from '../mobbu/events/resizeUtils/handleResize.js';
+import { handleNextTick } from '../mobbu/events/rafutils/handleNextTick.js';
+import { handleFrame } from '../mobbu/events/rafutils/handleFrame.js';
 
 class vhClass {
     constructor(images, callback) {

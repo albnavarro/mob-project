@@ -1,4 +1,4 @@
-import { mobbu } from '../core';
+import { timeline, tween } from '../mobbu';
 
 export function springTest() {
     const btnStart = document.querySelector('.spring-btn-start');
@@ -13,7 +13,7 @@ export function springTest() {
     const target = document.querySelector('.spring-target');
 
     // DEFINE SPRING
-    const mySpring = mobbu.createSpring({
+    const mySpring = tween.createSpring({
         data: { x: 0, y: 0, rotate: 0 },
         configProp: { mass: 0.2 },
         config: 'wobbly',
@@ -25,13 +25,13 @@ export function springTest() {
 
     // BACK TWEEN
     function springBack() {
-        timeline.stop();
+        timeline1.stop();
         mySpring.updateConfig('gentle');
         return mySpring.goTo({ x: 0, y: 0, rotate: 180 });
     }
 
     // DEFINE TIMELINE
-    const timeline = mobbu
+    const timeline1 = timeline
         .createAsyncTimeline({ repeat: 2, yoyo: true, freeMode: true })
         .set(mySpring, { x: 0, y: 0, rotate: 0 })
         .goTo(mySpring, { x: -200 }, { configProp: { precision: 0.5 } })
@@ -60,7 +60,7 @@ export function springTest() {
 
     // LISTNER
     btnStart.addEventListener('click', () => {
-        timeline.play();
+        timeline1.play();
     });
 
     btnBack.addEventListener('click', () => {
@@ -68,30 +68,30 @@ export function springTest() {
     });
 
     btnStop.addEventListener('click', () => {
-        timeline.stop();
+        timeline1.stop();
     });
 
     btnPause.addEventListener('click', () => {
-        timeline.pause();
+        timeline1.pause();
     });
 
     btnPlay.addEventListener('click', () => {
-        timeline.resume();
+        timeline1.resume();
     });
 
     btnReverse.addEventListener('click', () => {
-        timeline.playReverse();
+        timeline1.playReverse();
     });
 
     btnFrom.addEventListener('click', () => {
-        timeline.playFrom('label1');
+        timeline1.playFrom('label1');
     });
 
     btnFromReverse.addEventListener('click', () => {
-        timeline.playFromReverse('label1');
+        timeline1.playFromReverse('label1');
     });
 
     btnReverseNext.addEventListener('click', () => {
-        timeline.reverseNext();
+        timeline1.reverseNext();
     });
 }

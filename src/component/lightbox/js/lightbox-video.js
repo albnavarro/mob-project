@@ -1,6 +1,6 @@
+import { core } from '../../../js/mobbu';
 import { lightDescription } from './lightbox-description.js';
 import { lightboxUtils } from './lightbox-utils.js';
-import { mobbu } from '.../../../js/core';
 
 class LightBoxVideoClass {
     constructor() {
@@ -57,7 +57,7 @@ class LightBoxVideoClass {
             videoWrapper.classList.add('visible');
         }, 200);
 
-        this.unsubscribeResize = mobbu.useResize(() => {
+        this.unsubscribeResize = core.useResize(() => {
             this.setVideoSize(wrapper, hGap, wGap, ratioW, ratioH);
         });
 
@@ -72,15 +72,13 @@ class LightBoxVideoClass {
         const maxWidth = window.innerWidth - newWGap;
         const width = ratioW;
         const height = ratioH;
-        const {
-            ratioWidth,
-            ratioHeight,
-        } = lightboxUtils.calculateAspectRatioFit(
-            width,
-            height,
-            maxWidth,
-            maxHeight
-        );
+        const { ratioWidth, ratioHeight } =
+            lightboxUtils.calculateAspectRatioFit(
+                width,
+                height,
+                maxWidth,
+                maxHeight
+            );
 
         const style = {
             width: `${ratioWidth}px`,

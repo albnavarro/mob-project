@@ -1,4 +1,4 @@
-import { mobbu } from '../core';
+import { timeline, tween } from '../mobbu';
 
 export const freeMode = () => {
     const el1 = document.querySelector('.freemode-item--1');
@@ -13,10 +13,10 @@ export const freeMode = () => {
     /*
      * Tween
      */
-    const tween1 = mobbu.createTween({ data: { y: 0 } });
-    const tween2 = mobbu.createTween({ data: { y: 0 } });
-    const tween3 = mobbu.createTween({ data: { y: 0 } });
-    const tweenStagger = mobbu.createTween({
+    const tween1 = tween.createTween({ data: { y: 0 } });
+    const tween2 = tween.createTween({ data: { y: 0 } });
+    const tween3 = tween.createTween({ data: { y: 0 } });
+    const tweenStagger = tween.createTween({
         data: { rotate: 0 },
         stagger: { each: 10 },
     });
@@ -42,8 +42,8 @@ export const freeMode = () => {
     /*
      * Timeline
      */
-    const goTimeline = mobbu.createAsyncTimeline({ freeMode: true });
-    const backTimeline = mobbu.createAsyncTimeline({ freeMode: true });
+    const goTimeline = timeline.createAsyncTimeline({ freeMode: true });
+    const backTimeline = timeline.createAsyncTimeline({ freeMode: true });
 
     goTimeline
         .createGroup()

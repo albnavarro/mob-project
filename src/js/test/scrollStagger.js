@@ -1,5 +1,6 @@
-import { outerHeight } from '../core/utils';
-import { mobbu } from '../core';
+import { scroller, tween } from '../mobbu';
+import { outerHeight } from '../mobbu/utils';
+import { core } from '../mobbu';
 
 export const scrollStagger = () => {
     const items = document.querySelectorAll('rect');
@@ -18,7 +19,7 @@ export const scrollStagger = () => {
         valEl.innerHTML = val;
     });
 
-    const myParallaxTween = mobbu.createParallaxTween({
+    const myParallaxTween = tween.createParallaxTween({
         stagger: { each: 3, from: 'center' },
         ease: 'easeLinear',
         from: { rotate: 0 },
@@ -55,7 +56,7 @@ export const scrollStagger = () => {
         // });
 
         myParallaxTween.subscribeCache(item, ({ rotate }) => {
-            const rotateParsed = mobbu.shouldMakeSomething()
+            const rotateParsed = core.shouldMakeSomething()
                 ? Math.round(rotate)
                 : rotate;
 
@@ -65,7 +66,7 @@ export const scrollStagger = () => {
         });
     });
 
-    const parallaxIn = mobbu.createScrollTrigger({
+    const parallaxIn = scroller.createScrollTrigger({
         trigger,
         propierties: 'tween',
         tween: myParallaxTween,

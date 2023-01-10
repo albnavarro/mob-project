@@ -1,4 +1,4 @@
-import { mobbu } from '../core';
+import { tween } from '../mobbu';
 
 export const tweenRealtive = () => {
     // Tween
@@ -6,23 +6,23 @@ export const tweenRealtive = () => {
     const resetTween = document.querySelector('.tween-reset');
     const boxTween = document.querySelector('.tween-relative-item--tween');
 
-    const tween = mobbu.createTween({
+    const tween1 = tween.createTween({
         ease: 'easeInOutQuad',
         data: { x: 0, rotate: 0 },
         duration: 500,
         relative: true,
     });
 
-    tween.subscribe(({ x, rotate }) => {
+    tween1.subscribe(({ x, rotate }) => {
         boxTween.style.transform = `translateX(${x}px) rotate(${rotate}deg)`;
     });
 
     playTween.addEventListener('click', () => {
-        tween.goTo({ x: 100, rotate: 45 });
+        tween1.goTo({ x: 100, rotate: 45 });
     });
 
     resetTween.addEventListener('click', () => {
-        tween.goTo({ x: 0, rotate: 0 }, { relative: false, duration: 1000 });
+        tween1.goTo({ x: 0, rotate: 0 }, { relative: false, duration: 1000 });
     });
 
     // Spring
@@ -30,7 +30,7 @@ export const tweenRealtive = () => {
     const resetSpring = document.querySelector('.spring-reset');
     const boxSpring = document.querySelector('.tween-relative-item--spring');
 
-    const spring = mobbu.createSpring({
+    const spring = tween.createSpring({
         data: { x: 0, rotate: 0 },
         relative: true,
     });
@@ -52,7 +52,7 @@ export const tweenRealtive = () => {
     const resetLerp = document.querySelector('.lerp-reset');
     const boxLerp = document.querySelector('.tween-relative-item--lerp');
 
-    const lerp = mobbu.createLerp({
+    const lerp = tween.createLerp({
         data: { x: 0, rotate: 0 },
         relative: true,
     });

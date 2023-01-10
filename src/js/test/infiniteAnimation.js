@@ -1,23 +1,23 @@
-import { mobbu } from '../core';
+import { tween, core } from '../mobbu';
 
 export const infiniteAnimation = () => {
     const stagger = document.querySelectorAll('.infinite-tween .shape__target');
     const play = document.querySelector('.infinite-tween .anim-play');
     const stop = document.querySelector('.infinite-tween .anim-stop');
 
-    const tween = mobbu.createSpring({
+    const tween1 = tween.createSpring({
         stagger: { each: 3 },
         data: { x: 0 },
     });
 
-    tween.set({ x: 0 });
+    tween1.set({ x: 0 });
 
     const xAmplitude = 500;
     const yAmplitude = 400;
     const friction = 30;
 
-    stagger.forEach((item, i) => {
-        tween.subscribe(({ x }) => {
+    stagger.forEach((item) => {
+        tween1.subscribe(({ x }) => {
             const scale = 2 / (3 - Math.cos(2 * (x / friction)));
             const xr = scale * Math.cos(x / friction) * xAmplitude;
             const yr =
@@ -30,8 +30,8 @@ export const infiniteAnimation = () => {
     let isRunning = false;
     const loop = () => {
         counter++;
-        tween.goTo({ x: counter });
-        if (isRunning) mobbu.useNextFrame(() => loop());
+        tween1.goTo({ x: counter });
+        if (isRunning) core.useNextFrame(() => loop());
     };
 
     play.addEventListener('click', () => {

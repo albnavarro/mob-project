@@ -1,5 +1,5 @@
-import { mobbu } from '../../../js/core';
-import { slide } from '../../../js/core/plugin';
+import { slide } from '../../../js/mobbu/plugin';
+import { core } from '../../../js/mobbu';
 
 export class AccordionItemClass {
     constructor(data) {
@@ -34,7 +34,7 @@ export class AccordionItemClass {
     }
 
     openItem(e) {
-        if (!mobbu.mq(this.queryType, this.breackpoint)) return;
+        if (!core.mq(this.queryType, this.breackpoint)) return;
 
         const btn = e.currentTarget;
         const item = btn.closest(this.itemClass);

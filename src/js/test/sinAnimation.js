@@ -1,4 +1,4 @@
-import { mobbu } from '../core';
+import { timeline, tween } from '../mobbu';
 
 export const sinAnimation = () => {
     const stagger = document.querySelectorAll('.sin .shape__target');
@@ -7,12 +7,12 @@ export const sinAnimation = () => {
     const pause = document.querySelector('.sin .anim-pause');
     const resume = document.querySelector('.sin .anim-resume');
 
-    const tween = mobbu.createTween({
+    const tween1 = tween.createTween({
         ease: 'easeInOutQuad',
         stagger: { each: 3 },
         data: { x: 0 },
     });
-    tween.set({ x: 0 });
+    tween1.set({ x: 0 });
 
     const distance = window.innerWidth / 2;
     const stepNumber = 2;
@@ -20,16 +20,16 @@ export const sinAnimation = () => {
     const amplitude = distance / 4;
     const duration = 1000 * stepNumber;
 
-    stagger.forEach((item, i) => {
-        tween.subscribe(({ x }) => {
+    stagger.forEach((item) => {
+        tween1.subscribe(({ x }) => {
             const y = Math.sin(x / step) * amplitude;
             item.style.transform = `translate3D(0px,0px,0px) translate(${x}px, ${y}px)`;
         });
     });
 
-    const timeline = mobbu.createAsyncTimeline({ repeat: -1, yoyo: true });
-    timeline.goFromTo(
-        tween,
+    const timeline1 = timeline.createAsyncTimeline({ repeat: -1, yoyo: true });
+    timeline1.goFromTo(
+        tween1,
         { x: 0 },
         { x: distance },
         {
@@ -38,18 +38,18 @@ export const sinAnimation = () => {
     );
 
     play.addEventListener('click', () => {
-        timeline.play();
+        timeline1.play();
     });
 
     stop.addEventListener('click', () => {
-        timeline.stop();
+        timeline1.stop();
     });
 
     pause.addEventListener('click', () => {
-        timeline.pause();
+        timeline1.pause();
     });
 
     resume.addEventListener('click', () => {
-        timeline.resume();
+        timeline1.resume();
     });
 };

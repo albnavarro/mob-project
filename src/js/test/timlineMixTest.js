@@ -1,4 +1,4 @@
-import { mobbu } from '../core';
+import { timeline, tween, core } from '../mobbu';
 
 export function timlineMixTest() {
     const btnStart = document.querySelector('.mix-btn-start');
@@ -34,7 +34,7 @@ export function timlineMixTest() {
     });
 
     // DEFINE SPRING
-    const springBox1 = mobbu.createSpring({
+    const springBox1 = tween.createSpring({
         data: { x: 0, y: 0, rotate: 0 },
         config: 'wobbly',
     });
@@ -43,7 +43,7 @@ export function timlineMixTest() {
     });
 
     // DEFINE TWEEN
-    const tweenBox1 = mobbu.createTween({
+    const tweenBox1 = tween.createTween({
         data: { x: 0, y: 0, rotate: 0 },
     });
 
@@ -52,27 +52,27 @@ export function timlineMixTest() {
     });
 
     // DEFINE TWEEN 2
-    const tweenBox2 = mobbu.createTween({ data: { rotate: 0 } });
+    const tweenBox2 = tween.createTween({ data: { rotate: 0 } });
     tweenBox2.subscribe(({ rotate }) => {
         target2.style.transform = `rotate(${rotate}deg)`;
     });
 
     // DEFINE TIMELINE
-    const timeline = mobbu.createAsyncTimeline({
+    const timeline1 = timeline.createAsyncTimeline({
         repeat: 1,
         yoyo: false,
         autoSet: true,
     });
 
-    timeline.onComplete(() => {
+    timeline1.onComplete(() => {
         console.log('complete');
     });
 
-    timeline.onLoopEnd(({ loop, direction }) => {
+    timeline1.onLoopEnd(({ loop, direction }) => {
         console.log('onLoopEnd', loop, direction);
     });
 
-    timeline
+    timeline1
         .goTo(springBox1, { x: -200 })
         .goFromTo(
             springBox1,
@@ -88,7 +88,7 @@ export function timlineMixTest() {
         .label({ name: 'label1' })
         .goTo(tweenBox1, { x: -100, rotate: 180 }, { ease: 'easeInElastic' })
         .suspend(() => toggleSuspend)
-        // .add(() => timeline.reverseNext())
+        // .add(() => timeline1.reverseNext())
         .sync({ from: tweenBox1, to: springBox1 })
         .createGroup({ waitComplete: false })
         .goTo(
@@ -100,7 +100,7 @@ export function timlineMixTest() {
         .closeGroup()
         .goTo(springBox1, { x: -400 });
 
-    // timeline
+    // timeline1
     //     .goTo(tweenBox1, { x: -200 })
     //     .goFromTo(tweenBox1, { x: -200 }, { x: 400 })
     //     .label({ name: 'label1' })
@@ -116,44 +116,44 @@ export function timlineMixTest() {
 
     // LISTNER
     btnStart.addEventListener('click', () => {
-        timeline.play().then(() => {
+        timeline1.play().then(() => {
             console.log('resolve promise play');
         });
     });
 
     btnReverse.addEventListener('click', () => {
-        timeline.playReverse().then(() => {
+        timeline1.playReverse().then(() => {
             console.log('resolve promise reverse');
         });
     });
 
     btnStop.addEventListener('click', () => {
-        timeline.stop();
+        timeline1.stop();
     });
 
     btnPause.addEventListener('click', () => {
-        timeline.pause();
+        timeline1.pause();
     });
 
     btnPlay.addEventListener('click', () => {
-        timeline.resume();
+        timeline1.resume();
     });
 
     btnReverseNext.addEventListener('click', () => {
-        timeline.reverseNext();
+        timeline1.reverseNext();
     });
 
     btnFrom.addEventListener('click', () => {
-        timeline.setTween('label1', [tweenBox2, springBox1]).then(() => {
-            timeline.playFrom('label1').then(() => {
+        timeline1.setTween('label1', [tweenBox2, springBox1]).then(() => {
+            timeline1.playFrom('label1').then(() => {
                 console.log('resolve promise playFrom');
             });
         });
     });
 
     btnFromReverse.addEventListener('click', () => {
-        timeline.setTween('label1', [tweenBox2, springBox1]).then(() => {
-            timeline.playFromReverse('label1').then(() => {
+        timeline1.setTween('label1', [tweenBox2, springBox1]).then(() => {
+            timeline1.playFromReverse('label1').then(() => {
                 console.log('resolve promise playFromReverse');
             });
         });
@@ -165,11 +165,11 @@ export function timlineMixTest() {
     });
 
     const loop = () => {
-        btnGetDirection.innerHTML = `direction: ${timeline.getDirection()}`;
-        btnSuspensionStatus.innerHTML = `is in suspension: ${timeline.isSuspended()}`;
-        btnPauseStatus.innerHTML = `is paused: ${timeline.isPaused()}`;
-        btnActiveStatus.innerHTML = `is running: ${timeline.isActive()}`;
-        mobbu.useNextFrame(() => loop());
+        btnGetDirection.innerHTML = `direction: ${timeline1.getDirection()}`;
+        btnSuspensionStatus.innerHTML = `is in suspension: ${timeline1.isSuspended()}`;
+        btnPauseStatus.innerHTML = `is paused: ${timeline1.isPaused()}`;
+        btnActiveStatus.innerHTML = `is running: ${timeline1.isActive()}`;
+        core.useNextFrame(() => loop());
     };
 
     loop();

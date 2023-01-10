@@ -1,4 +1,4 @@
-import { mobbu } from '../core';
+import { timeline, tween } from '../mobbu';
 
 export const circleAnimationTimeline = () => {
     const stagger = document.querySelectorAll(
@@ -11,12 +11,12 @@ export const circleAnimationTimeline = () => {
         '.circle-tween-timeline .anim-resume'
     );
 
-    const tween = mobbu.createTween({
+    const tween1 = tween.createTween({
         ease: 'easeLinear',
         stagger: { each: 3 },
         data: { x: 0 },
     });
-    tween.set({ x: 0 });
+    tween1.set({ x: 0 });
 
     // 0 to 1
     const distance = 100;
@@ -30,17 +30,17 @@ export const circleAnimationTimeline = () => {
     const yRadius = 200;
     const duration = 1000 * stepNumber;
 
-    stagger.forEach((item, i) => {
-        tween.subscribe(({ x }) => {
+    stagger.forEach((item) => {
+        tween1.subscribe(({ x }) => {
             const xr = Math.sin(x / step) * xRadius;
             const yr = Math.cos(x / step) * yRadius;
             item.style.transform = `translate3D(0px,0px,0px) translate(${xr}px, ${yr}px)`;
         });
     });
 
-    const timeline = mobbu.createAsyncTimeline({ repeat: -1 });
-    timeline.goFromTo(
-        tween,
+    const timeline1 = timeline.createAsyncTimeline({ repeat: -1 });
+    timeline1.goFromTo(
+        tween1,
         { x: 0 },
         { x: distance },
         {
@@ -49,18 +49,18 @@ export const circleAnimationTimeline = () => {
     );
 
     play.addEventListener('click', () => {
-        timeline.play();
+        timeline1.play();
     });
 
     stop.addEventListener('click', () => {
-        timeline.stop();
+        timeline1.stop();
     });
 
     pause.addEventListener('click', () => {
-        timeline.pause();
+        timeline1.pause();
     });
 
     resume.addEventListener('click', () => {
-        timeline.resume();
+        timeline1.resume();
     });
 };

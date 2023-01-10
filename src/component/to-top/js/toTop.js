@@ -1,5 +1,5 @@
-import { mobbu } from '../../../js/core';
-import { bodyScroll } from '../../../js/core/plugin';
+import { bodyScroll } from '../../../js/mobbu/plugin';
+import { core } from '../../../js/mobbu';
 
 class totopClass {
     constructor() {
@@ -10,7 +10,7 @@ class totopClass {
     init() {
         this.addHandler();
         this.showArrow();
-        mobbu.useScroll(({ scrollY }) => this.showArrow(scrollY));
+        core.useScroll(({ scrollY }) => this.showArrow(scrollY));
     }
 
     addHandler() {
@@ -23,15 +23,15 @@ class totopClass {
     }
 
     showArrow(scrollY) {
-        mobbu.useFrame(() => {
-            mobbu.useNextTick(() => {
+        core.useFrame(() => {
+            core.useNextTick(() => {
                 if (scrollY >= window.innerWidth && this.hide) {
-                    mobbu.useFrame(() => {
+                    core.useFrame(() => {
                         this.totop.classList.add('visible');
                         this.hide = false;
                     });
                 } else if (scrollY < window.innerWidth && !this.hide) {
-                    mobbu.useFrame(() => {
+                    core.useFrame(() => {
                         this.totop.classList.remove('visible');
                         this.hide = true;
                     });

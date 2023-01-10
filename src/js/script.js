@@ -13,7 +13,6 @@
 // BASE MODULE
 import { vh } from './utility/vh.js';
 import { findElement } from './utility/findElement.js';
-import { mobbu } from './core/';
 
 // NEW VANILLA COMPONENT MODULE
 import { totop } from '../component/to-top/js/toTop.js';
@@ -69,9 +68,10 @@ import { tweenRealtive } from './test/tweenRelative.js';
 import { testCanvas } from './test/testCanvas.js';
 import { freeMode } from './test/freemode.js';
 import { mouseParallaxTest } from './test/mouseParallaxTest.js';
+import { core } from './mobbu';
 
-mobbu.useLoad(() => {
-    mobbu.setDefault({
+core.useLoad(() => {
+    core.setDefault({
         deferredNextTick: true,
         // fpsScalePercent: { 0: 1, 30: 2, 50: 3 },
         useScaleFps: true,
@@ -92,15 +92,15 @@ mobbu.useLoad(() => {
         },
     });
 
-    mobbu.printDefault();
+    core.printDefault();
 
-    // mobbu.useFps(({ averageFPS }) => {
+    // core.useFps(({ averageFPS }) => {
     //     console.log('fps ready at:', averageFPS);
     // });
 
-    // mobbu.useFrameIndex(() => {
+    // core.useFrameIndex(() => {
     //     console.log('test');
-    //     console.log('fps: ', mobbu.getFps());
+    //     console.log('fps: ', core.getFps());
     // }, 500);
 
     const body = document.querySelector('body');
@@ -201,6 +201,9 @@ mobbu.useLoad(() => {
     });
 
     if (body.classList.contains('page-index')) {
+        core.setDefault({
+            usePassive: false,
+        });
         indexParallax();
     }
 
@@ -251,10 +254,10 @@ mobbu.useLoad(() => {
     }
 
     if (body.classList.contains('template-scrollerH')) {
-        mobbu.setDefault({
+        core.setDefault({
             usePassive: false,
         });
-        mobbu.printDefault();
+        core.printDefault();
         hScroller();
     }
 

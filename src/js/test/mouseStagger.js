@@ -1,4 +1,4 @@
-import { mobbu } from '../core';
+import { timeline, tween, core } from '../mobbu';
 
 export const mouseStagger = () => {
     // 1
@@ -7,7 +7,7 @@ export const mouseStagger = () => {
     const smallerBtn = document.querySelector('.down');
     console.log(biggerBtn, smallerBtn);
 
-    const spring = mobbu.createSpring({
+    const spring = tween.createSpring({
         config: 'gentle',
         stagger: { each: 4 },
         data: { x: 0, y: 0 },
@@ -26,14 +26,14 @@ export const mouseStagger = () => {
     });
 
     // In real time (like mousemove) use waitComplete: false, to avoid moviemnt when promise in sot resolved
-    mobbu.useMouseMove(({ client }) => {
+    core.useMouseMove(({ client }) => {
         const { x, y } = client;
         spring.goTo({ x, y });
     });
 
     // 2
     const stagger = document.querySelectorAll('.stagger__item');
-    const tween = mobbu.createTween({
+    const tween1 = tween.createTween({
         ease: 'easeInOutQuad',
         duration: 1000,
         stagger: { each: 10, from: 'start' },
@@ -41,7 +41,7 @@ export const mouseStagger = () => {
     });
 
     stagger.forEach((item) => {
-        tween.subscribe(({ scale }) => {
+        tween1.subscribe(({ scale }) => {
             item.style.transform = `translate3D(0px,0px,0px) scale(${scale})`;
         });
     });
@@ -50,12 +50,12 @@ export const mouseStagger = () => {
     biggerBtn.addEventListener('click', () => (val += 0.5));
     smallerBtn.addEventListener('click', () => (val -= 0.5));
 
-    const timeline = mobbu
+    const timeline1 = timeline
         .createAsyncTimeline({ repeat: -1, yoyo: true })
-        .goTo(tween, { scale: () => val * 2 });
-    // .goTo(tween, { scale: () => val * 3 })
-    timeline.play();
-    timeline.onLoopEnd(({ loop, direction }) => {
+        .goTo(tween1, { scale: () => val * 2 });
+    // .goTo(tween1, { scale: () => val * 3 })
+    timeline1.play();
+    timeline1.onLoopEnd(({ loop, direction }) => {
         // console.log('onLoopEnd', loop, direction);
     });
 };
