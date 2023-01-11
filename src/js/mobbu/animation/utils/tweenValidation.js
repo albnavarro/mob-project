@@ -29,6 +29,7 @@ import {
     durationWarining,
     functionIsValidAndReturnDefaultWarining,
     functionWarning,
+    genericEaseTypeWarining,
     initialDataPropWarining,
     initialDataValueWarining,
     lerpPrecisionWarining,
@@ -793,7 +794,7 @@ export const domNodeIsValidAndReturnNull = (element) => {
  * @description
  * Check if value is a valid direction
  **/
-export const parallaxDirectionIsValid = (direction) => {
+export const directionIsValid = (direction, component) => {
     const choice = [
         parallaxConstant.DIRECTION_VERTICAL,
         parallaxConstant.DIRECTION_HORIZONTAL,
@@ -801,7 +802,7 @@ export const parallaxDirectionIsValid = (direction) => {
 
     const isValid = choice.includes(direction);
     if (!isValid && direction !== undefined && direction !== null)
-        parallaxDirectionWarining(direction);
+        parallaxDirectionWarining(direction, component);
 
     return isValid ? direction : parallaxConstant.DIRECTION_VERTICAL;
 };
@@ -1018,14 +1019,14 @@ export const parallaxRangeIsValid = (value, type) => {
  * @description
  * Check if breackpoint prop is valid
  **/
-export const breakpointIsValid = (mq, label) => {
+export const breakpointIsValid = (mq, label, component) => {
     const mqObj = handleSetUp.get('mq');
     const defaultMq = handleSetUp.get('defaultMq').value;
     const choice = Object.keys(mqObj);
 
     const isValid = checkType(String, mq) && choice.includes(mq);
     if (!isValid && mq !== undefined && mq !== null)
-        breakpointWarning(mq, choice, label);
+        breakpointWarning(mq, choice, label, component);
 
     return isValid ? mq : defaultMq;
 };
@@ -1038,13 +1039,13 @@ export const breakpointIsValid = (mq, label) => {
  * @description
  * Check if queryType prop is valid
  **/
-export const breakpointTypeIsValid = (type, label) => {
+export const breakpointTypeIsValid = (type, label, component) => {
     const defaultType = handleSetUp.get('defaultMq').type;
     const choice = [MQ_MAX, MQ_MIN];
 
     const isValid = checkType(String, type) && choice.includes(type);
     if (!isValid && type !== undefined && type !== null)
-        breakpointWarning(type, choice, label);
+        breakpointWarning(type, choice, label, component);
 
     return isValid ? type : defaultType;
 };
@@ -1159,6 +1160,16 @@ export const parallaxEaseTypeIsValid = (
         : fallbackIfIsValid;
 
     return isValid ? value : fallback;
+};
+
+export const genericEaseTypeIsValid = (value, component) => {
+    const choice = [parallaxConstant.EASE_SPRING, parallaxConstant.EASE_LERP];
+
+    const isValid = choice.includes(value);
+    if (!isValid && value !== undefined && value !== null)
+        genericEaseTypeWarining(value, choice, component);
+
+    return isValid ? value : parallaxConstant.EASE_LERP;
 };
 
 /**

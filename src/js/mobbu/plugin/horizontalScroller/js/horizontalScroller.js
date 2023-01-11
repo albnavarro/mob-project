@@ -14,6 +14,14 @@ import { handleFrameIndex } from '../../../events/rafutils/handleFrameIndex';
 import { horizontalScrollerContstant } from './horizontalScrollerConstant';
 import { NOOP, pipe } from '../../../utils/functionsUtils';
 import { handleScroll } from '../../../events/scrollUtils/handleScroll';
+import {
+    breakpointIsValid,
+    breakpointTypeIsValid,
+    genericEaseTypeIsValid,
+    valueIsBooleanAndReturnDefault,
+    valueIsFunctionAndReturnDefault,
+    valueIsNumberAndReturnDefault,
+} from '../../../animation/utils/tweenValidation';
 
 /**
  * @typedef {Object} horizontalScrollerType
@@ -266,82 +274,145 @@ export class HorizontalScroller {
         /**
          * @private
          */
-        this.useDrag = data?.useDrag ?? false;
+        this.useDrag = valueIsBooleanAndReturnDefault(
+            data?.useDrag,
+            'HorizontalScroller: useDrag',
+            false
+        );
 
         /**
          * @private
          */
-        this.threshold = data?.threshold ?? 30;
+        this.threshold = valueIsNumberAndReturnDefault(
+            data?.threshold,
+            'HorizontalScroller: threshold',
+            30
+        );
 
         /**
          * @private
          */
-        this.useWillChange = data?.useWillChange ?? false;
+        this.useWillChange = valueIsBooleanAndReturnDefault(
+            data?.useWillChange,
+            'HorizontalScroller: useWillChange',
+            false
+        );
 
         /**
          * @private
          */
-        this.breackpoint = data?.breackpoint || 'desktop';
+        this.breackpoint = breakpointIsValid(
+            data?.breackpoint,
+            'breakpoint',
+            'horizontalScroller'
+        );
 
         /**
          * @private
          */
-        this.queryType = data?.queryType || 'min';
+        this.queryType = breakpointTypeIsValid(
+            data?.queryType,
+            'queryType',
+            'horizontalScroller'
+        );
 
         /**
          * @private
          */
-        this.forceTranspond = data?.forceTranspond || false;
+        this.forceTranspond = valueIsBooleanAndReturnDefault(
+            data?.forceTranspond,
+            'HorizontalScroller: forceTranspond',
+            false
+        );
 
         /**
          * @private
          */
-        this.addCss = data.addCss || true;
+        this.addCss = valueIsBooleanAndReturnDefault(
+            data?.addCss,
+            'HorizontalScroller: addCss',
+            true
+        );
 
         /**
          * @private
          */
-        this.animateAtStart = data?.animateAtStart;
+        this.animateAtStart = valueIsBooleanAndReturnDefault(
+            data?.animateAtStart,
+            'HorizontalScroller: animateAtStart',
+            false
+        );
 
         /**
          * @private
          */
-        this.ease = data?.ease;
+        this.ease = valueIsBooleanAndReturnDefault(
+            data?.ease,
+            'HorizontalScroller: ease',
+            false
+        );
 
         /**
          * @private
          */
-        this.easeType = data?.easeType;
+        this.easeType = genericEaseTypeIsValid(
+            data?.easeType,
+            'HorizontalScroller'
+        );
 
         /**
          * @private
          */
-        this.useSticky = data?.useSticky ?? false;
+        this.useSticky = valueIsBooleanAndReturnDefault(
+            data?.useSticky,
+            'HorizontalScroller: useSticky',
+            false
+        );
 
         /**
          * @private
          */
-        this.animatePin = data?.animatePin ?? false;
+        this.animatePin = valueIsBooleanAndReturnDefault(
+            data?.animatePin,
+            'HorizontalScroller: animatePin',
+            false
+        );
 
         /**
          * @private
          */
-        this.reverse = data?.reverse;
+        this.reverse = valueIsBooleanAndReturnDefault(
+            data?.reverse,
+            'HorizontalScroller: reverse',
+            false
+        );
 
         /**
          * @private
          */
-        this.useThrottle = data?.useThrottle;
+        this.useThrottle = valueIsBooleanAndReturnDefault(
+            data?.useThrottle,
+            'HorizontalScroller: useThrottle',
+            false
+        );
 
         /**
          * @private
          */
-        this.columnHeight = data?.columnHeight || 100;
+        this.columnHeight = valueIsNumberAndReturnDefault(
+            data?.columnHeight,
+            'HorizontalScroller: columnHeight',
+            100
+        );
 
         /**
          * @private
          */
-        this.columnWidth = data?.columnWidth || null;
+        this.columnWidth = valueIsNumberAndReturnDefault(
+            data?.columnWidth,
+            'HorizontalScroller: columnWidth',
+            null
+        );
 
         /**
          * @private
@@ -355,43 +426,74 @@ export class HorizontalScroller {
         /**
          * @private
          */
-        this.onEnter = data?.onEnter || NOOP;
+        this.onEnter = valueIsFunctionAndReturnDefault(
+            data?.onEnter,
+            'HorizontalScroller: onEnter',
+            NOOP
+        );
 
         /**
          * @private
          */
-        this.onEnterBack = data?.onEnterBack || NOOP;
+        this.onEnterBack = valueIsFunctionAndReturnDefault(
+            data?.onEnterBack,
+            'HorizontalScroller: onEnterBack',
+            NOOP
+        );
 
         /**
          * @private
          */
-        this.onLeave = data?.onLeave || NOOP;
+        this.onLeave = valueIsFunctionAndReturnDefault(
+            data?.onLeave,
+            'HorizontalScroller: onLeave',
+            NOOP
+        );
 
         /**
          * @private
          */
-        this.onLeaveBack = data?.onLeaveBack || NOOP;
+        this.onLeaveBack = valueIsFunctionAndReturnDefault(
+            data?.onLeaveBack,
+            'HorizontalScroller: onLeaveBack',
+            NOOP
+        );
 
         /**
          * @private
          */
-        this.afterInit = data?.afterInit || NOOP;
+        this.afterInit = valueIsFunctionAndReturnDefault(
+            data?.afterInit,
+            'HorizontalScroller: afterInit',
+            NOOP
+        );
 
         /**
          * @private
          */
-        this.afterRefresh = data?.afterRefresh || NOOP;
+        this.afterRefresh = valueIsFunctionAndReturnDefault(
+            data?.afterRefresh,
+            'HorizontalScroller: afterRefresh',
+            NOOP
+        );
 
         /**
          * @private
          */
-        this.afterDestroy = data?.afterDestroy || NOOP;
+        this.afterDestroy = valueIsFunctionAndReturnDefault(
+            data?.afterDestroy,
+            'HorizontalScroller: afterDestroy',
+            NOOP
+        );
 
         /**
          * @private
          */
-        this.onTick = data?.onTick || NOOP;
-
+        this.onTick = valueIsFunctionAndReturnDefault(
+            data?.onTick,
+            'HorizontalScroller: onTick',
+            NOOP
+        );
         /**
          * Dom element
          */
@@ -482,10 +584,11 @@ export class HorizontalScroller {
          */
         this.percentRange = 0;
 
-        // Inizialize children.
-
         /**
          * @private
+         *
+         * @description
+         * Inizialize children.
          */
         this.children = data?.children || [];
         this.children.forEach((element) => {
@@ -511,6 +614,68 @@ export class HorizontalScroller {
                 columnWidth: this.columnWidth,
                 columnAlign: this.columnAlign,
             });
+
+        /**
+         * Scoped event.
+         */
+        this.onMouseMove = (e) => {
+            if (!this.touchActive) return;
+
+            const { movementX } = e;
+            const value = this.reverse ? movementX : -movementX;
+            this.onDrag(value);
+            this.touchStart = false;
+        };
+
+        this.onMouseDown = () => {
+            if (!mq[this.queryType](this.breackpoint)) return;
+
+            if (this.shouldDragValue) this.row.style.cursor = 'move';
+            this.touchActive = true;
+            this.firstTouchValue = this.scrollValue;
+        };
+
+        this.onMouseUp = () => {
+            this.touchActive = false;
+            handleFrame.add(() => (this.row.style.cursor = ''));
+        };
+
+        this.onMouseLeave = () => {
+            this.touchActive = false;
+            handleFrame.add(() => (this.row.style.cursor = ''));
+        };
+
+        this.onTouchStart = (e) => {
+            if (!mq[this.queryType](this.breackpoint)) return;
+
+            this.lastTouchValueX = -e.touches[0].clientX;
+            this.touchActive = true;
+            this.firstTouchValue = this.scrollValue;
+        };
+
+        this.onTouchEnd = () => {
+            this.touchActive = false;
+        };
+
+        this.onTouchMove = (e) => {
+            const touchValueX = -e.touches[0].clientX;
+            const gapX = this.reverse
+                ? -touchValueX + this.lastTouchValueX
+                : touchValueX - this.lastTouchValueX;
+
+            this.onDrag(gapX);
+            this.lastTouchValueX = touchValueX;
+
+            if (this.shouldDragValue && e.cancelable) e.preventDefault();
+        };
+
+        this.preventFireClick = (e) => {
+            if (
+                Math.abs(this.scrollValue - this.firstTouchValue) >
+                this.threshold
+            )
+                e.preventDefault();
+        };
     }
 
     /**
@@ -556,62 +721,6 @@ export class HorizontalScroller {
     removeLinkAttribute() {
         [...this.button].forEach((item) => item.removeAttribute('draggable'));
     }
-
-    onMouseMove = (e) => {
-        if (!this.touchActive) return;
-
-        const { movementX } = e;
-        const value = this.reverse ? movementX : -movementX;
-        this.onDrag(value);
-        this.touchStart = false;
-    };
-
-    onMouseDown = () => {
-        if (!mq[this.queryType](this.breackpoint)) return;
-
-        if (this.shouldDragValue) this.row.style.cursor = 'move';
-        this.touchActive = true;
-        this.firstTouchValue = this.scrollValue;
-    };
-
-    onMouseUp = () => {
-        this.touchActive = false;
-        handleFrame.add(() => (this.row.style.cursor = ''));
-    };
-
-    onMouseLeave = () => {
-        this.touchActive = false;
-        handleFrame.add(() => (this.row.style.cursor = ''));
-    };
-
-    onTouchStart = (e) => {
-        if (!mq[this.queryType](this.breackpoint)) return;
-
-        this.lastTouchValueX = -e.touches[0].clientX;
-        this.touchActive = true;
-        this.firstTouchValue = this.scrollValue;
-    };
-
-    onTouchEnd = () => {
-        this.touchActive = false;
-    };
-
-    onTouchMove = (e) => {
-        const touchValueX = -e.touches[0].clientX;
-        const gapX = this.reverse
-            ? -touchValueX + this.lastTouchValueX
-            : touchValueX - this.lastTouchValueX;
-
-        this.onDrag(gapX);
-        this.lastTouchValueX = touchValueX;
-
-        if (this.shouldDragValue && e.cancelable) e.preventDefault();
-    };
-
-    preventFireClick = (e) => {
-        if (Math.abs(this.scrollValue - this.firstTouchValue) > this.threshold)
-            e.preventDefault();
-    };
 
     onDrag(value) {
         if (!this.shouldDragValue) return;

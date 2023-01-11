@@ -30,6 +30,10 @@ import { handleFrame } from '../../events/rafutils/handleFrame.js';
 import { NOOP } from '../../utils/functionsUtils.js';
 import { parallaxConstant } from '../../animation/parallax/parallaxConstant.js';
 import {
+    breakpointIsValid,
+    breakpointTypeIsValid,
+    directionIsValid,
+    genericEaseTypeIsValid,
     valueIsBooleanAndReturnDefault,
     valueIsFunctionAndReturnDefault,
     valueIsNumberAndReturnDefault,
@@ -190,22 +194,33 @@ export default class SmoothScroller {
         /**
          * @private
          */
-        this.direction = data?.direction ?? parallaxConstant.DIRECTION_VERTICAL;
+        this.direction = directionIsValid(data?.direction, 'SmoothScroller');
 
         /**
          * @private
          */
-        this.easeType = data.easeType || parallaxConstant.EASE_LERP;
+        this.easeType = genericEaseTypeIsValid(
+            data?.easeType,
+            'SmoothScroller'
+        );
 
         /**
          * @private
          */
-        this.breackpoint = data?.breackpoint ?? 'desktop';
+        this.breackpoint = breakpointIsValid(
+            data?.breackpoint,
+            'breakpoint',
+            'SmoothScroller'
+        );
 
         /**
          * @private
          */
-        this.queryType = data?.queryType ?? 'min';
+        this.queryType = breakpointTypeIsValid(
+            data?.queryType,
+            'queryType',
+            'SmoothScroller'
+        );
 
         /**
          * @private
@@ -294,6 +309,28 @@ export default class SmoothScroller {
             element.setQueryType(this.queryType);
             element.init();
         });
+
+        /**
+         * Scoped event
+         */
+        this.scopedWhell = (e) => {
+            const { spinY } = normalizeWheel(e);
+            this.onScopedWhell({
+                target: e.target,
+                spinY,
+            });
+        };
+
+        this.scopedTouchMove = (e) => {
+            const { clientX, clientY } = e.touches ? e.touches[0] : e;
+
+            this.onScopedTouchMove({
+                client: {
+                    x: clientX,
+                    y: clientY,
+                },
+            });
+        };
     }
 
     init() {
@@ -469,30 +506,6 @@ export default class SmoothScroller {
 
         this.calculateValue();
     }
-
-    /**
-     * Listener related event.
-     * Scroped
-     */
-
-    scopedWhell = (e) => {
-        const { spinY } = normalizeWheel(e);
-        this.onScopedWhell({
-            target: e.target,
-            spinY,
-        });
-    };
-
-    scopedTouchMove = (e) => {
-        const { clientX, clientY } = e.touches ? e.touches[0] : e;
-
-        this.onScopedTouchMove({
-            client: {
-                x: clientX,
-                y: clientY,
-            },
-        });
-    };
 
     onScopedTouchMove({ client }) {
         if (!this.dragEnable || !this.drag) return;

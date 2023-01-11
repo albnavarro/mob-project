@@ -27,7 +27,7 @@ import {
     domNodeIsValidAndReturnNull,
     functionIsValidAndReturnDefault,
     parallaxAlignIsValid,
-    parallaxDirectionIsValid,
+    directionIsValid,
     parallaxDynamicRangeIsValid,
     parallaxDynamicValueIsValid,
     parallaxEaseTypeIsValid,
@@ -693,7 +693,10 @@ export default class ParallaxClass {
 
         this.applyTo = domNodeIsValidAndReturnNull(data?.applyTo);
 
-        this.direction = parallaxDirectionIsValid(data?.direction);
+        this.direction = directionIsValid(
+            data?.direction,
+            'Parallax/Scrolltrigger'
+        );
 
         this.disableForce3D = valueIsBooleanAndReturnDefault(
             data?.disableForce3D,
@@ -718,9 +721,17 @@ export default class ParallaxClass {
             0
         );
 
-        this.breackpoint = breakpointIsValid(data?.breackpoint, 'breakpoint');
+        this.breackpoint = breakpointIsValid(
+            data?.breackpoint,
+            'breakpoint',
+            'parallax/scrolltrigger'
+        );
 
-        this.queryType = breakpointTypeIsValid(data?.queryType, 'queryType');
+        this.queryType = breakpointTypeIsValid(
+            data?.queryType,
+            'queryType',
+            'parallax/scrolltrigger'
+        );
 
         /**
          * Get properties, check if there is sequencer inside a Parallax,
@@ -988,21 +999,29 @@ export default class ParallaxClass {
      *
      */
     setDirection(direction) {
-        this.direction = parallaxDirectionIsValid(direction);
+        this.direction = directionIsValid(direction, 'Parallax/Scrolltrigger');
     }
 
     /**
      *
      */
     setBreakPoint(breackpoint) {
-        this.breackpoint = breakpointIsValid(breackpoint, 'breakpoint');
+        this.breackpoint = breakpointIsValid(
+            breackpoint,
+            'breakpoint',
+            'Parallax/Scrolltrigger'
+        );
     }
 
     /**
      *
      */
     setQueryType(queryType) {
-        this.queryType = breakpointTypeIsValid(queryType, 'queryType');
+        this.queryType = breakpointTypeIsValid(
+            queryType,
+            'queryType',
+            'Parallax/Scrolltrigger'
+        );
     }
 
     /**

@@ -270,9 +270,9 @@ export const addAsyncFunctionWarining = (value) => {
     console.warn(`timeline add async function, ${value} is not a function `);
 };
 
-export const parallaxDirectionWarining = (value) => {
+export const parallaxDirectionWarining = (value, component) => {
     console.warn(
-        `Parallax direction: ${value} is not valid value: must be ${parallaxConstant.DIRECTION_VERTICAL} | ${parallaxConstant.DIRECTION_HORIZONTAL}`
+        `${component} direction: ${value} is not valid value: must be ${parallaxConstant.DIRECTION_VERTICAL} | ${parallaxConstant.DIRECTION_HORIZONTAL}`
     );
 };
 
@@ -340,6 +340,14 @@ export const parallaxEaseTypeWarining = (value, choice) => {
     );
 };
 
+export const genericEaseTypeWarining = (value, choice, component) => {
+    console.warn(
+        `${component} error easeType props: ${value} is not valid must be one of ${possibleChoice(
+            choice
+        )}`
+    );
+};
+
 export const parallaxEaseTypeSpringWarining = () => {
     console.warn(
         'Scrolltrigger warning: spring animation is only available for native properties and ParallaxTween, Check that with the "propierties" property set to "tween" no HandleSequencer is associated with the "tween" property'
@@ -366,9 +374,9 @@ export const parallaxRangeStringWarning = (value) => {
     );
 };
 
-export const breakpointWarning = (mq, choice, label) => {
+export const breakpointWarning = (mq, choice, label, component) => {
     console.warn(
-        `parallax/sctrolltrigger error ${label} propierties: ${mq} is not valid must be one of ${possibleChoice(
+        `${component} error ${label} propierties: ${mq} is not valid must be one of ${possibleChoice(
             choice
         )}`
     );
