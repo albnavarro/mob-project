@@ -721,16 +721,25 @@ export class HorizontalScroller {
         });
     }
 
+    /**
+     * @private
+     */
     setLinkAttribute() {
         [...this.button].forEach((item) =>
             item.setAttribute('draggable', false)
         );
     }
 
+    /**
+     * @private
+     */
     removeLinkAttribute() {
         [...this.button].forEach((item) => item.removeAttribute('draggable'));
     }
 
+    /**
+     * @private
+     */
     onDrag(value) {
         if (!this.shouldDragValue) return;
         handleFrame.add(() =>

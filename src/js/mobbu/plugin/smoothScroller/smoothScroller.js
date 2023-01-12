@@ -428,6 +428,9 @@ export default class SmoothScroller {
             });
         };
 
+        /**
+         * @private
+         */
         this.scopedTouchMove = (e) => {
             const { clientX, clientY } = e.touches ? e.touches[0] : e;
 
@@ -440,6 +443,13 @@ export default class SmoothScroller {
         };
     }
 
+    /**
+     * @description
+     * Inizialize insatance
+     *
+     * @example
+     * myInstance.init()
+     */
     init() {
         if (!this.propsIsValid) return;
 
@@ -523,6 +533,9 @@ export default class SmoothScroller {
         }, 3);
     }
 
+    /**
+     * @private
+     */
     setScrolerStyle() {
         this.scroller.style['user-select'] = 'none';
 
@@ -533,6 +546,9 @@ export default class SmoothScroller {
         });
     }
 
+    /**
+     * @private
+     */
     removeScrolerStyle() {
         this.scroller.style['user-select'] = '';
 
@@ -543,6 +559,9 @@ export default class SmoothScroller {
         });
     }
 
+    /**
+     * @private
+     */
     initMotion() {
         this.motion.setData({ val: 0 });
 
@@ -604,6 +623,9 @@ export default class SmoothScroller {
         });
     }
 
+    /**
+     * @private
+     */
     refreshScroller() {
         this.screenWidth =
             this.screen === document.documentElement
@@ -623,6 +645,9 @@ export default class SmoothScroller {
         this.calculateValue();
     }
 
+    /**
+     * @private
+     */
     onScopedTouchMove({ client }) {
         if (!this.dragEnable || !this.drag) return;
 
@@ -633,6 +658,9 @@ export default class SmoothScroller {
         this.scrollbarIsRunning = false;
     }
 
+    /**
+     * @private
+     */
     onScopedWhell({ spinY }) {
         if (!mq[this.queryType](this.breackpoint)) return;
 
@@ -646,6 +674,10 @@ export default class SmoothScroller {
      * Listener related event.
      * Global
      */
+
+    /**
+     * @private
+     */
     onMouseDown({ target, client }) {
         if (!mq[this.queryType](this.breackpoint)) return;
 
@@ -658,11 +690,17 @@ export default class SmoothScroller {
         }
     }
 
+    /**
+     * @private
+     */
     onMouseUp() {
         this.dragEnable = false;
         this.scrollbarIsRunning = false;
     }
 
+    /**
+     * @private
+     */
     onTouchMove({ target, client, preventDefault }) {
         if (
             (target === this.scroller || isDescendant(this.scroller, target)) &&
@@ -720,6 +758,9 @@ export default class SmoothScroller {
         this.motion.goTo({ val: this.endValue }).catch(() => {});
     }
 
+    /**
+     * @private
+     */
     preventChecker({ target, preventDefault }) {
         if (
             mq[this.queryType](this.breackpoint) &&
@@ -735,6 +776,13 @@ export default class SmoothScroller {
         return this.direction === parallaxConstant.DIRECTION_VERTICAL ? y : x;
     }
 
+    /**
+     * @description
+     * Refresh instance
+     *
+     * @example
+     * myInstance.refresh()
+     */
     refresh() {
         if (!mq[this.queryType](this.breackpoint)) {
             this.removeScrolerStyle();
@@ -762,7 +810,11 @@ export default class SmoothScroller {
     }
 
     /**
-     * Destrory
+     * @description
+     * Destroy instance
+     *
+     * @example
+     * myInstance.destroy()
      */
     destroy() {
         this.removeScrolerStyle();
