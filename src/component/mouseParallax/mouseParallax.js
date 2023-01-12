@@ -1,13 +1,10 @@
+import { core, tween } from '../../js/mobbu';
 import {
+    getTranslateValues,
+    offset,
     outerHeight,
     outerWidth,
-    offset,
-    getTranslateValues,
-} from '../../utils/vanillaFunction.js';
-import HandleSpring from '../../animation/spring/handleSpring.js';
-import { handleResize } from '../../events/resizeUtils/handleResize.js';
-import { handleScroll } from '../../events/scrollUtils/handleScroll.js';
-import { handleMouseMove } from '../../events/mouseUtils/handleMouse.js';
+} from '../../js/mobbu/utils';
 
 export default class MouseParallaxClass {
     constructor(data) {
@@ -20,7 +17,7 @@ export default class MouseParallaxClass {
         this.offSetTop = 0;
         this.offSetLeft = 0;
         this.smooth = 10;
-        this.spring = new HandleSpring();
+        this.spring = tween.createSpring();
         this.unsubscribeSpring = () => {};
         this.unsubscribeOnComplete = () => {};
 
@@ -37,16 +34,16 @@ export default class MouseParallaxClass {
     init() {
         this.getDimension();
 
-        this.unsubscribeMouseMove = handleMouseMove(({ page, client }) => {
+        this.unsubscribeMouseMove = core.useMouseMove(({ page, client }) => {
             this.setGlobalCoord({ page, client });
             this.onMove();
         });
 
-        this.unsubscribeResize = handleResize(() => {
+        this.unsubscribeResize = core.useResize(() => {
             this.getDimension();
         });
 
-        this.unsubscribeScroll = handleScroll(({ scrollY }) => {
+        this.unsubscribeScroll = core.useScroll(({ scrollY }) => {
             this.onScroll(scrollY);
         });
 

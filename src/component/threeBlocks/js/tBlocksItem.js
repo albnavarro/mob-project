@@ -338,7 +338,7 @@ export class tBlocksItemClass {
         );
 
         setTimeout(() => {
-            bodyScroll.to({ target: this.container });
+            bodyScroll.to(this.container);
         }, 500);
     }
 }

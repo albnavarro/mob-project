@@ -1,4 +1,4 @@
-import { MouseParallaxClass } from '../mobbu/plugin';
+import MouseParallaxClass from '../../component/mouseParallax/mouseParallax';
 
 export const mouseParallaxTest = () => {
     const test1 = new MouseParallaxClass({
