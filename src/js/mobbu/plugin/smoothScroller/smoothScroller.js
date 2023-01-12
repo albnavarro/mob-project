@@ -39,7 +39,105 @@ import {
     valueIsNumberAndReturnDefault,
 } from '../../animation/utils/tweenValidation.js';
 
+/**
+ * @typedef {Object} smoothScrollerType
+ * @prop {('vertical'|'horizontal')} [ direction = 'vertical' ] 
+    Defines the scroll direction
+ * @prop {('spring'|'lerp')} [ easeType = 'lerp'] 
+    Defines the type of easing. The default is `lerp`.
+ * @prop {( String|Element )} scroller
+   The node that will have to scroll 
+ * @prop {( String|Element )} [ screen ]
+    The scroller container.
+    The default value is `document.documentElement`.
+ * @prop {Boolean} scopedEvent
+   Use event ( scroll,wheel,etc.. ) on scroller or on document.
+   If the events are used on the scroller they will have the passive property set to true (better performance).
+   Otherwise, based on the general value of the passive property, the listener attached to the document will use the `preventDefault()` function.
+   This will prevent the page from scrolling in turn when scrolling over the component.
+   To set the global passive property use:
+   `core.setDefault({ usePassive: true|false })`;
+ * @prop {Number} speed
+   You can adjust the speed of the wheel event.
+   The default value is `60`.
+ * @prop {Boolean} drag
+   It is possible to enable and disable the drag functionality.
+   The default value is `false`.
+ * @prop {function({value:number, percent:number, parentIsMoving:boolean}):void} [ onTick = null ] 
+   Function that is launched at each tick.
+   The function will have an Object as input parameter.
+   `value`: scroll value
+   `percent`: scroll value in percent
+   `parentIsMoving`: A boolean value indicating whether the scroller has stopped ( last tick )
+ * @prop {function():void} [ afterRefresh = null ] 
+   Function that is launched after refresh
+ * @prop {function():void} [ afterInit = null ] 
+   Function that is launched after inizialization
+ * @prop {function():void} [ afterDestroy = null ] 
+   Function that is launched after destroy
+ * @prop {Array.<ParallaxClass>} children
+   An array of instances of the ParallaxClass class used within the scroller.
+   Es:
+   const parallax = mobbu.createParallax({ ... })
+   const scrolltrigger = mobbu.createScrollTrigger({ ... })
+   ...
+   children: [parallax, scrolltrigger],
+   ...
+
+   The instances contained in the array will be:
+   Drive.
+   Updated.
+   Destroyed.
+
+   The `scroller`,`screen`, `direction`,`branckPoint`,`queryType` properties
+   will be automatically aligned.
+ */
+
+/**
+ * @typedef  { smoothScrollerType & import('../../utils/mediaManager.js').breackPointTypeObj & import('../../utils/mediaManager.js').mqTypeObject } smoothScrollerConstructorType
+ */
 export default class SmoothScroller {
+    /**
+     * @param { smoothScrollerConstructorType } data
+     *
+     * @description
+     *
+       Create new SmoothScroller instance.
+      
+       Available methods:
+       mySmoothScroll.init();
+       mySmoothScroll.refresh();
+       mySmoothScroll.destroy();
+     
+     * @example
+       ```js
+       const mySmoothScroller = new SmoothScroller({
+           screen: [String | Element],
+           scroller: [String | Element],
+           direction: [String],
+           speed: [Number],
+           drag: [Boolean],
+           scopedEvent: [Boolean],
+           children: [child1,child2, ...],
+           ease: [Boolean],
+           easeType: [String],
+           afterInit: () => {
+               ...
+           },
+           onTick: ({ value, parentIsMoving, percent }) => {
+               ...
+           },
+           afterRefresh: () => {
+               ...
+           },
+           afterDestroy: () => {
+               ...
+           },
+       });
+
+       mySmoothScroller.init();
+       ```
+     */
     constructor(data = {}) {
         /**
          * @private
@@ -294,7 +392,16 @@ export default class SmoothScroller {
         this.onAfterRefresh = valueIsFunctionAndReturnDefault(
             data?.afterRefresh,
             'SmoothScroller: afterRefresh',
-            null
+            NOOP
+        );
+
+        /**
+         * @private
+         */
+        this.afterInit = valueIsFunctionAndReturnDefault(
+            data?.afterInit,
+            'SmoothScroller: afterInit',
+            NOOP
         );
 
         /**
@@ -405,6 +512,15 @@ export default class SmoothScroller {
             this.setScrolerStyle();
             this.refreshScroller();
         }
+
+        handleFrameIndex.add(() => {
+            handleNextTick.add(() => {
+                this.afterInit?.();
+                this.children.forEach((element) => {
+                    element.refresh();
+                });
+            });
+        }, 3);
     }
 
     setScrolerStyle() {
@@ -673,6 +789,7 @@ export default class SmoothScroller {
         this.children = [];
         this.onTickCallback = [];
         this.onAfterRefresh = [];
+        this.afterInit = [];
 
         if (this.scopedEvent) {
             this.scroller.removeEventListener('wheel', this.scopedWhell);
@@ -685,5 +802,12 @@ export default class SmoothScroller {
                 this.scopedTouchMove
             );
         }
+
+        handleFrameIndex.add(() => {
+            handleNextTick.add(() => {
+                this.afterDestroy?.();
+                this.afterDestroy = [];
+            });
+        }, 3);
     }
 }

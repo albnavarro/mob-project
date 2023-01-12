@@ -468,9 +468,15 @@ export default class HandleSpring {
     stop() {
         if (this.pauseStatus) this.pauseStatus = false;
         this.values = setFromToByCurrent(this.values);
-        this.callbackCache.forEach(({ cb }) => handleCache.clean(cb));
 
-        // Abort promise
+        /**
+         * If isRunning clear all funture stagger.
+         * If tween is ended and the lst stagger is running, let it reach end position.
+         */
+        if (this.isActive)
+            this.callbackCache.forEach(({ cb }) => handleCache.clean(cb));
+
+        // Reject promise
         if (this.currentReject) {
             this.currentReject(ANIMATION_STOP_REJECT);
             this.promise = null;

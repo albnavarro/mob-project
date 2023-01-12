@@ -504,7 +504,13 @@ export default class HandleTween {
         this.pauseStatus = false;
         this.comeFromResume = false;
         this.values = setFromToByCurrent(this.values);
-        this.callbackCache.forEach(({ cb }) => handleCache.clean(cb));
+
+        /**
+         * If isRunning clear all funture stagger.
+         * If tween is ended and the lst stagger is running, let it reach end position.
+         */
+        if (this.isActive)
+            this.callbackCache.forEach(({ cb }) => handleCache.clean(cb));
 
         // Abort promise
         if (this.currentReject) {

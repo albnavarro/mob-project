@@ -207,11 +207,17 @@ export const hScroller = () => {
             parallaxOut,
             parallaxOpacity,
         ],
+        afterInit: () => {
+            console.log('after init');
+        },
         onTick: ({ percent }) => {
             inputRange.value = percent;
         },
         afterRefresh: () => {
             console.log('after refresh');
+        },
+        afterDestroy: () => {
+            console.log('after destroy');
         },
     });
     smoothScrollFull.init();

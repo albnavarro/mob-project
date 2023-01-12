@@ -50,9 +50,18 @@ import {
  * @prop {function():void} [ onEnterBack = null ] -
  * @prop {function():void} [ onLeave = null ] -
  * @prop {function():void} [ onLeaveBack = null ]-
- * @prop {function(Number):void} [ onTick = null ] 
-    Function that is launched at each tick.
-    The function will have the current value as input parameter.
+ * @prop {function({value:number, percent:number, parentIsMoving:boolean}):void} [ onTick = null ] 
+   Function that is launched at each tick.
+   The function will have an Object as input parameter.
+   `value`: scroll value
+   `percent`: scroll value in percent
+   `parentIsMoving`: A boolean value indicating whether the scroller has stopped ( last tick )
+ * @prop {function():void} [ afterRefresh = null ] 
+   Function that is launched after refresh
+ * @prop {function():void} [ afterInit = null ] 
+   Function that is launched after inizialization
+ * @prop {function():void} [ afterDestroy = null ] 
+   Function that is launched after destroy
  * @prop {Boolean} [ useWillChange ]
     Enable the css property will-change: transform; when the frame rate falls below 3/5 of the optimal value.
     The property remains active for 4 sedonds.
@@ -492,7 +501,7 @@ export class HorizontalScroller {
         this.onTick = valueIsFunctionAndReturnDefault(
             data?.onTick,
             'HorizontalScroller: onTick',
-            NOOP
+            null
         );
         /**
          * Dom element
@@ -1063,11 +1072,12 @@ export class HorizontalScroller {
                 this.scrollValue = value;
 
                 // onTick standalone methods.
-                this.onTick({
-                    value,
-                    parentIsMoving,
-                    percent: this.reverse ? 100 - percent : percent,
-                });
+                if (this.onTick)
+                    this.onTick({
+                        value,
+                        parentIsMoving,
+                        percent: this.reverse ? 100 - percent : percent,
+                    });
 
                 // Builtin children onTick;
                 this.children.forEach((element) => {
