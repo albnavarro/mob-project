@@ -5,7 +5,11 @@ import {
     valueIsNumberAndReturnDefault,
 } from '../../animation/utils/tweenValidation.js';
 import { ANIMATION_STOP_REJECT } from '../../events/errorHandler/catchAnimationReject.js';
-import { handleMouseWheel } from '../../events/mouseUtils/handleMouse.js';
+import {
+    handleMouseDown,
+    handleMouseWheel,
+    handleTouchStart,
+} from '../../events/mouseUtils/handleMouse.js';
 import { checkType } from '../../store/storeType.js';
 import { offset, isNode } from '../../utils/vanillaFunction.js';
 
@@ -47,9 +51,23 @@ export const bodyScroll = (() => {
     }
 
     /**
-     * Stop scrolling on mouseWheel
+     * Stop scrolling on mouseWheel, MouseDown, TouchStart.
      */
     handleMouseWheel(() => {
+        if (!isRunning) return;
+
+        tween.stop();
+        onComplete();
+    });
+
+    handleMouseDown(() => {
+        if (!isRunning) return;
+
+        tween.stop();
+        onComplete();
+    });
+
+    handleTouchStart(() => {
         if (!isRunning) return;
 
         tween.stop();

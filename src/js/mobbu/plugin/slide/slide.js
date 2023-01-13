@@ -1,18 +1,51 @@
 import HandleTween from '../../animation/tween/handleTween.js';
+import { checkType } from '../../store/storeType.js';
 import { outerHeight } from '../../utils/vanillaFunction.js';
 
-/**  slide.subscribe(el);
- *   slide.reset(el);
- *   slide.up(el).then(() => { ... });
- *   slide.down(el).then(() => { ... });
+/**
+ * @description
+ * Slide up-down utils.
+ * It is essentially a small store where you can subscribe to dom elements and manage them.
+ *
+ * @example
+ *
+ * ```js
+ * Subscribe target in store:
+ * const unsubscribe = slide.subscribe(target);
+ *
+ * Reset target:
+ * slide.reset(target);
+ *
+ * Slide up-down:
+ * slide.up(target).then(() => { ... });
+ * slide.down(target).then(() => { ... });
+ *
+ * Remove item from store:
+ * unsubscribe();
+ * ```
  */
 export const slide = (() => {
     let slideItems = [];
     let slideId = 0;
 
-    function setSlideData(el) {
+    /**
+     * @private
+     */
+    function isNode(target) {
+        const isValid = checkType(Element, target);
+
+        if (!isValid)
+            console.warn(`slide utils ${target} is not a valid Dom element`);
+
+        return isValid;
+    }
+
+    /**
+     * @private
+     */
+    function setSlideData(target) {
         const data = {};
-        data.item = el;
+        data.item = target;
         data.id = slideId;
         data.tween = new HandleTween({ ease: 'easeOutQuad' });
         data.unsubscribe = data.tween.subscribe(({ val }) => {
@@ -23,23 +56,37 @@ export const slide = (() => {
         return data;
     }
 
-    function subscribe(el) {
-        // Check if el is already subscribed to slide utils
-        const alreadySubscribe = slideItems.find(({ item }) => item === el);
+    /**
+     * @description
+     * Subscribe element to internal store.
+     *
+     * @param {Element} target - Dom node.
+     * @returns {Function} Unsubscribe function.
+     */
+    function subscribe(target) {
+        if (!isNode(target)) return;
+        /**
+         * Check if target is already subscribed to slide utils
+         */
+        const alreadySubscribe = slideItems.find(({ item }) => item === target);
         if (alreadySubscribe) {
-            console.warn(`slide utils ${el} is alredysubscribed`);
+            console.warn(`slide utils ${target} is alredysubscribed`);
             return;
         }
 
-        // Update items Array
-        const data = setSlideData(el);
+        /**
+         * Update items Array
+         */
+        const data = setSlideData(target);
         slideItems.push(data);
 
         const prevId = slideId;
         slideId++;
         slideItems.push(data);
 
-        // Return unsubscribe
+        /**
+         * Return unsubscribe
+         */
         return () => {
             data.unsubscribe();
             data.tween = null;
@@ -48,13 +95,42 @@ export const slide = (() => {
         };
     }
 
+    /**
+     * @description
+     * Reset target height ( 0px ) .
+     * Set `overflow: hidden` to target.
+     *
+     * @param {Element} target - Dom node.
+     */
     function reset(target) {
+        if (!isNode(target)) return;
+
         target.style.height = 0;
         target.style.overflow = 'hidden';
     }
 
+    /**
+     * @description
+     * Slide up target.
+     * Return a promise.
+     *
+     * @example
+     * ```js
+     * slide.up(myELement)
+     *      .then(() => { ... })
+     *      .catch(() => { ... })
+     * ```
+     *
+     * @param {Element} target - Dom node.
+     * @returns {Promise} Promise fired on animation ends.
+     */
     function up(target) {
         return new Promise((res, reject) => {
+            if (!isNode(target)) {
+                res();
+                return;
+            }
+
             // Reject of target not exist in store
             const currentItem = slideItems.find(({ item }) => item === target);
             if (!currentItem)
@@ -73,8 +149,28 @@ export const slide = (() => {
         });
     }
 
+    /**
+     * @description
+     * Slide down target.
+     * Return a promise.
+     *
+     * @example
+     * ```js
+     * slide.down(myELement)
+     *      .then(() => { ... })
+     *      .catch(() => { ... })
+     * ```
+     *
+     * @param {Element} target - Dom node.
+     * @returns {Promise} Promise fired on animation ends.
+     */
     function down(target) {
         return new Promise((res, reject) => {
+            if (!isNode(target)) {
+                res();
+                return;
+            }
+
             // Reject of target not exist in store
             const currentItem = slideItems.find(({ item }) => item === target);
             if (!currentItem)
