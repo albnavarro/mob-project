@@ -63,6 +63,12 @@ import { ANIMATION_STOP_REJECT } from '../../events/errorHandler/catchAnimationR
  **/
 
 /**
+ * @typedef {Object} tweenCommonStopProps
+ * @prop {Boolean} clearCache 
+    Stop all stagger implemented with subscribeCache methods.
+ */
+
+/**
  * @typedef {Object} tweenSpecialProps
  * @prop {(Number|Function)} [ duration=false ] Defines the default duration of the tween, If a function is used, the value is recalculated every time the method is called, especially useful within a timeline, every time a specific step is performed, the duration of the step is recalculated.
  **/
@@ -495,11 +501,13 @@ export default class HandleTween {
     }
 
     /**
+     * @param {tweenCommonStopProps} Stop props
+     *
      * @description
      *
      * Stop tween and fire reject of current promise.
      */
-    stop() {
+    stop({ clearCache = true } = {}) {
         this.pauseTime = 0;
         this.pauseStatus = false;
         this.comeFromResume = false;
@@ -509,7 +517,7 @@ export default class HandleTween {
          * If isRunning clear all funture stagger.
          * If tween is ended and the lst stagger is running, let it reach end position.
          */
-        if (this.isActive)
+        if (this.isActive && clearCache)
             this.callbackCache.forEach(({ cb }) => handleCache.clean(cb));
 
         // Abort promise

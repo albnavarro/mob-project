@@ -461,11 +461,12 @@ export default class HandleSpring {
     }
 
     /**
+     * @param { import('../tween/handleTween.js').tweenCommonStopProps } Stop props
      * @description
      *
      * Stop tween and fire reject of current promise.
      */
-    stop() {
+    stop({ clearCache = true } = {}) {
         if (this.pauseStatus) this.pauseStatus = false;
         this.values = setFromToByCurrent(this.values);
 
@@ -473,7 +474,7 @@ export default class HandleSpring {
          * If isRunning clear all funture stagger.
          * If tween is ended and the lst stagger is running, let it reach end position.
          */
-        if (this.isActive)
+        if (this.isActive && clearCache)
             this.callbackCache.forEach(({ cb }) => handleCache.clean(cb));
 
         // Reject promise

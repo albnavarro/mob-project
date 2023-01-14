@@ -69,6 +69,7 @@ import { testCanvas } from './test/testCanvas.js';
 import { freeMode } from './test/freemode.js';
 import { mouseParallaxTest } from './test/mouseParallaxTest.js';
 import { core } from './mobbu';
+import { timlineReverseImmediateTest } from './test/timlineReverseImmediateTest.js';
 
 core.useLoad(() => {
     core.setDefault({
@@ -225,6 +226,7 @@ core.useLoad(() => {
         tweenTest();
         lerpTest();
         timlineMixTest();
+        timlineReverseImmediateTest();
     }
 
     if (body.classList.contains('page-asyncTimelineStagger')) {

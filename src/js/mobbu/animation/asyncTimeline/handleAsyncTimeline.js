@@ -274,7 +274,10 @@ export default class HandleAsyncTimeline {
         /**
          * @private
          */
-        this.actionAfterReject = [];
+        this.actionAfterReject = {
+            active: false,
+            fn: () => {},
+        };
 
         /**
          * @private
@@ -330,6 +333,15 @@ export default class HandleAsyncTimeline {
          * @private
          */
         this.currentReject = null;
+
+        /**
+         * @private
+         */
+        this.immediate = {
+            counter: 0,
+            firstReverseStatus: false,
+            currentReverseStatus: false,
+        };
     }
 
     /**
@@ -604,7 +616,7 @@ export default class HandleAsyncTimeline {
                          * ! when stop the timeline manually ( es timeline.stop() )
                          * It will not activate
                          */
-                        if (this.actionAfterReject.length > 0) {
+                        if (this.actionAfterReject.active) {
                             deltaTimeOnpause = 0;
                             delta = delay;
                         }
@@ -788,9 +800,11 @@ export default class HandleAsyncTimeline {
             .catch(() => {
                 // If play or reverse or playFromLabel is fired diring delay tween fail
                 // Afte fail we can fire the action
-                if (this.actionAfterReject.length > 0) {
-                    this.actionAfterReject.forEach((item) => item());
-                    this.actionAfterReject = [];
+                if (this.actionAfterReject.active) {
+                    console.log('actionAfterReject fired');
+                    this.actionAfterReject.fn();
+                    this.actionAfterReject.fn = () => {};
+                    this.actionAfterReject.active = false;
                     return;
                 }
             })
@@ -1672,9 +1686,10 @@ export default class HandleAsyncTimeline {
                         return;
 
                     // If all tween is in delay reject main promise and fire the new pipe
-                    if (this.delayIsRunning) {
+                    if (this.delayIsRunning && !this.actionAfterReject.active) {
                         this.startOnDelay = true;
-                        this.actionAfterReject.push(() => this.play());
+                        this.actionAfterReject.fn = () => this.play();
+                        this.actionAfterReject.active = true;
                         return;
                     }
 
@@ -1756,13 +1771,17 @@ export default class HandleAsyncTimeline {
         this.currentIndex = 0;
         this.labelState.isReverse = isReverse;
         this.labelState.active = true;
-        this.labelState.index = this.tweenList.findIndex((item) => {
-            const [firstItem] = item;
-            const labelCheck = firstItem.data.labelProps?.name;
-            return labelCheck === label;
-        });
+        this.labelState.index = checkType(String, label)
+            ? this.tweenList.findIndex((item) => {
+                  const [firstItem] = item;
+                  const labelCheck = firstItem.data.labelProps?.name;
+                  return labelCheck === label;
+              })
+            : label;
 
-        playLabelIsValid(this.labelState.index, label);
+        if (checkType(String, label))
+            playLabelIsValid(this.labelState.index, label);
+
         this.run();
     }
 
@@ -1882,11 +1901,12 @@ export default class HandleAsyncTimeline {
                     return;
 
                 // If all tween is in delay reject main promise and fire the new pipe
-                if (this.delayIsRunning) {
+                if (this.delayIsRunning && !this.actionAfterReject.active) {
                     this.startOnDelay = true;
-                    this.actionAfterReject.push(() =>
-                        this.playReverse({ forceYoYo: forceYoYonow })
-                    );
+                    this.actionAfterReject.fn = () =>
+                        this.playReverse({ forceYoYo: forceYoYonow });
+                    this.actionAfterReject.active = true;
+
                     return;
                 }
 
@@ -1947,6 +1967,156 @@ export default class HandleAsyncTimeline {
     }
 
     /**
+     * @private
+     *
+     * @description
+     * TODO:
+     * No syncTween! - low
+     * No reverse next until main timeline is on! - medium
+     * No time management - high
+     *
+     * Tips:
+     * Saltare i tween che non sono attivi ?
+     */
+    reverseImmediate() {
+        if (this.isStopped || this.isInPause) return;
+
+        /**
+         * Get current position of all tween
+         */
+        const currentPositions = this.tweenStore.map(({ tween }) => {
+            const currentData = tween.get();
+            return { currentData };
+        });
+
+        /**
+         * Get current index for asyncReduceTween
+         */
+        let index = this.isReverse
+            ? this.tweenList.length - this.currentIndex
+            : this.currentIndex;
+
+        /**
+         * Get reverse status
+         */
+        const isReverse = this.isReverse;
+
+        if (this.immediate.counter === 0) {
+            /**
+             * Store first reverse status
+             * first change direction
+             */
+            this.immediate.firstReverseStatus = isReverse;
+            this.immediate.currentReverseStatus = isReverse;
+        } else {
+            /**
+             * Store currenmt reverse status.
+             * On multiple change direction in same index.
+             */
+            this.immediate.currentReverseStatus =
+                !this.immediate.currentReverseStatus;
+        }
+
+        /**
+         * If all tween is in delay reject main promise and fire the new pipe
+         */
+        if (this.delayIsRunning && !this.actionAfterReject.active) {
+            this.startOnDelay = true;
+            this.actionAfterReject.fn = () => this.reverseImmediate();
+            this.actionAfterReject.active = true;
+            return;
+        }
+
+        this.startOnDelay = false;
+        this.stop({ resetImmediateStatus: false, clearCache: false });
+        this.isStopped = false;
+        this.sessionId++;
+
+        /**
+         * Update current index for next reverse before primiseAll is resolved.
+         */
+        const multiplier = this.immediate.firstReverseStatus ? -1 : 1;
+        this.currentIndex =
+            this.immediate.counter % 2 === 0
+                ? index + 1 * multiplier
+                : index - 1 * multiplier;
+
+        /**
+         * Update number of reverse before promise All is resolverd.
+         */
+        this.immediate.counter++;
+
+        /**
+         * Fire goFromTo (reverse action).
+         */
+        const tweenPromise = this.tweenStore.map(({ tween }, i) => {
+            /**
+             * Get target position.
+             */
+            const data = asyncReduceTween(this.tweenList, tween, index);
+
+            return new Promise((resolve) => {
+                const { currentData } = currentPositions[i];
+
+                const unsubscribeActiveTween = this.addToActiveTween(tween);
+                const unsubscribeTweenStartInPause =
+                    tween && tween?.onStartInPause
+                        ? tween.onStartInPause(() => {
+                              return this.isInPause;
+                          })
+                        : NOOP;
+
+                tween.goFromTo(currentData, data).then(() => {
+                    unsubscribeActiveTween();
+                    unsubscribeTweenStartInPause();
+                    resolve();
+                });
+            });
+        });
+
+        Promise.all(tweenPromise)
+            .then(() => {
+                /**
+                 * Reset number of reverse after promise is ended>
+                 */
+                this.immediate.counter = 0;
+
+                /**
+                 * Go !
+                 */
+                if (this.immediate.currentReverseStatus) {
+                    this.playFrom(index);
+                } else {
+                    this.playFromReverse(index);
+                }
+            })
+            .catch(() => {});
+    }
+
+    /**
+     * @private
+     * Reset reverse immediate status
+     */
+    resetImmediateStatus() {
+        this.immediate = {
+            counter: 0,
+            firstReverseStatus: false,
+            currentReverseStatus: false,
+        };
+    }
+
+    /**
+     * @typedef {Object} asyncTimelineStopTypes
+     * @prop {Boolean} resetImmediateStatus
+        Internal use
+     * @prop {Boolean} clearCache 
+       Stop all stagger implemented with subscribeCache methods.
+     */
+
+    /**
+     * @param {asyncTimelineStopTypes}
+     * @prop {Boolean} resetImmediateStatus
+     *
      * @example
      * ```js
      * myTimeline.stop();
@@ -1956,7 +2126,7 @@ export default class HandleAsyncTimeline {
      * @description
      * Stop timeline.
      */
-    stop() {
+    stop({ resetImmediateStatus = true, clearCache = true } = {}) {
         this.isStopped = true;
         this.currentIndex = 0;
         this.loopCounter = 1;
@@ -1971,6 +2141,8 @@ export default class HandleAsyncTimeline {
         this.addAsyncIsActive = false;
         this.timeOnPause = 0;
 
+        if (resetImmediateStatus) this.resetImmediateStatus();
+
         /*
          * Reset necessary label state
          */
@@ -1978,7 +2150,7 @@ export default class HandleAsyncTimeline {
 
         // Stop all Tween
         this.tweenStore.forEach(({ tween }) => {
-            if (tween?.stop?.()) tween.stop();
+            tween?.stop?.({ clearCache });
         });
 
         // If reverse back to default direction
@@ -2137,6 +2309,17 @@ export default class HandleAsyncTimeline {
     getDirection() {
         if (this.isStopped) return directionConstant.NONE;
 
+        /**
+         * If reverse immediate is running
+         */
+        if (this.immediate.counter > 0)
+            return !this.immediate.currentReverseStatus
+                ? directionConstant.BACKWARD
+                : directionConstant.FORWARD;
+
+        /**
+         * Default
+         */
         return this.isReverse
             ? directionConstant.BACKWARD
             : directionConstant.FORWARD;
@@ -2214,6 +2397,9 @@ export default class HandleAsyncTimeline {
         this.callbackComplete = [];
         this.tweenStore = [];
         this.currentIndex = 0;
-        this.actionAfterReject = [];
+        this.actionAfterReject = {
+            active: false,
+            fn: () => {},
+        };
     }
 }

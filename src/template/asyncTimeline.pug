@@ -124,6 +124,47 @@ block content
                     .parallax__item-test.mix-target
                     .parallax__item-test.mix-target2
 
+                div(style='height:800px;')
+                    // MIX TEST
+                    h1
+                        |Reverse immediate test
+                    button.reverse-immediate-btn-start(type="button")
+                        |start
+                    button.reverse-immediate-btn-stop(type="button")
+                        |stop
+                    button.reverse-immediate-btn-pause(type="button")
+                        |pause
+                    button.reverse-immediate-btn-play(type="button")
+                        |resume
+                    button.reverse-immediate-btn-playFrom(type="button")
+                        |play from label
+                    button.reverse-immediate-btn-playFromReverse(type="button")
+                        |play from label reeversee
+                    button.reverse-immediate-btn-reverseNext(type="button")
+                        |revrse Next
+                    button.reverse-immediate-btn-reverse-immediate(type="button")
+                        |revrse immediate
+                    button.reverse-immediate-btn-reverse(type="button")
+                        |startReverse
+                    hr
+                    button.reverse-immediate-btn-fast-step3(type="button")
+                        |fast step3
+                    button.reverse-immediate-btn-slow-step3(type="button")
+                        |slow step3
+                    button.reverse-immediate-btn-toggle-suspend(type="button")
+                        |toggle suspend
+                        span
+                    hr
+                    .label.reverse-immediate-btn-activeStatus
+                        |is running: false
+                    .label.reverse-immediate-btn-pauseStatus
+                        |is paused: false
+                    .label.reverse-immediate-btn-suspensionStatus
+                        |is in suspension: false
+                    .label.reverse-immediate-btn-getDirection
+                        |direction: none
+                    .parallax__item-test.reverse-immediate-target
+                    .parallax__item-test.reverse-immediate-target2
                 
 
     include ../component/lightbox/pug/lightbox-simple.pug

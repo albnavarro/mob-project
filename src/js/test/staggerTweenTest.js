@@ -6,6 +6,9 @@ export function staggerTweenTest() {
     const btnPause = document.querySelector('.tween .pause');
     const btnPlay = document.querySelector('.tween .play');
     const btnReverseNext = document.querySelector('.tween .reverseNext');
+    const btnReverseImmediate = document.querySelector(
+        '.tween .reverseImmediate'
+    );
     const btnUnsubscribeStagger = document.querySelector(
         '.tween .unsubscibeStagger'
     );
@@ -15,7 +18,7 @@ export function staggerTweenTest() {
 
     // DEFINE SPRING
     const myTween = tween.createTween({
-        ease: 'easeInOutBack',
+        ease: 'easeOutSine',
         data: { x: 0, y: 0 },
     });
 
@@ -25,7 +28,7 @@ export function staggerTweenTest() {
 
     const myStagger = tween.createTween({
         stagger: { each: 4, from: 'start' },
-        ease: 'easeInOutBack',
+        ease: 'easeOutSine',
         data: { x: 0 },
     });
 
@@ -50,14 +53,15 @@ export function staggerTweenTest() {
     // When use waitComplete: false all the stagger of same tween must have the same each value to syncronize
     // DEFINE TIMELINE
     const timeline1 = timeline
-        .createAsyncTimeline({ repeat: -1, yoyo: true, autoSet: false })
+        .createAsyncTimeline({ repeat: -1, yoyo: false, autoSet: false })
         .goTo(myTween, { x: 500 })
         .goTo(myTween, { y: 500 })
         .createGroup({ waitComplete: false })
         .goTo(myTween, { x: 0 })
         .goTo(myStagger, { x: 500 }, { duration: 1500 })
         .closeGroup()
-        .goTo(myTween, { y: 0 });
+        .goTo(myTween, { y: 0 })
+        .goTo(myStagger, { x: 0 }, { duration: 1500 });
 
     // LISTNER
     btnStart.addEventListener('click', () => {
@@ -85,6 +89,10 @@ export function staggerTweenTest() {
 
     btnReverseNext.addEventListener('click', () => {
         timeline1.reverseNext();
+    });
+
+    btnReverseImmediate.addEventListener('click', () => {
+        timeline1.reverseImmediate();
     });
 
     btnReverse.addEventListener('click', () => {
