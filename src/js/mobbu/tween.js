@@ -35,7 +35,6 @@ export const tween = {
      *
      * @description
      * Simplified tween specific to be used with scrollTrigger as an alternative to the more complex sequencer, ParallaxTween requires only one mutation step (from / to).
-     * <br/>
      *
      * Available methods:
      * ```js
@@ -96,11 +95,9 @@ export const tween = {
     /**
      * @description
      *
-     * Support class for grouping multiple sequencers.
-     * Very useful when generating sequencers dynamically, such as through the use of a createStagger.
-     * <br/>
-     * The following example uses a timeline but the same can be done using a scrollTrigger
-     * <br/>
+      Support class for grouping multiple sequencers.
+      Very useful when generating sequencers dynamically, such as through the use of a createStagger.
+      The following example uses a timeline but the same can be done using a scrollTrigger.
      *
      *
      * @example

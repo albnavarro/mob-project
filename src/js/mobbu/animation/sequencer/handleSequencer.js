@@ -636,12 +636,9 @@ export default class HandleSequencer {
      *
      * ```
      * @description
-     * Transform some properties of your choice from the `current value` to the `entered value`, the transformation will start from the value associated with start and will end in the value associated with end.
-     * <br/>
-     * The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change in real time as the result of the function changes
-     * <br/>
-     * It is possible to associate an easing to the transformation, this easing will be applied only in this transformation.
-     * <br/>
+      Transform some properties of your choice from the `current value` to the `entered value`, the transformation will start from the value associated with start and will end in the value associated with end.
+      The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change in real time as the result of the function changes
+      It is possible to associate an easing to the transformation, this easing will be applied only in this transformation.
      */
     goTo(obj, props) {
         const propMerged = { ...this.defaultProp, ...props };
@@ -677,12 +674,9 @@ export default class HandleSequencer {
      *
      * ```
      * @description
-     * Transform some properties of your choice from the `entered value` to the `current value`, the transformation will start from the value associated with start and will end in the value associated with end.
-     * <br/>
-     * The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change in real time as the result of the function changes
-     * <br/>
-     * It is possible to associate an easing to the transformation, this easing will be applied only in this transformation.
-     * <br/>
+      Transform some properties of your choice from the `entered value` to the `current value`, the transformation will start from the value associated with start and will end in the value associated with end.
+      The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change in real time as the result of the function changes
+      It is possible to associate an easing to the transformation, this easing will be applied only in this transformation.
      */
     goFrom(obj, props) {
         const propMerged = { ...this.defaultProp, ...props };
@@ -720,12 +714,9 @@ export default class HandleSequencer {
      * ```
      *
      * @description
-     * Transform some properties of your choice from the `first entered value` to the `second entered value`, the transformation will start from the value associated with start and will end in the value associated with end.
-     * <br/>
-     * The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change in real time as the result of the function changes
-     * <br/>
-     * It is possible to associate an easing to the transformation, this easing will be applied only in this transformation.
-     * <br/>
+      Transform some properties of your choice from the `first entered value` to the `second entered value`, the transformation will start from the value associated with start and will end in the value associated with end.
+      The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change in real time as the result of the function changes
+      It is possible to associate an easing to the transformation, this easing will be applied only in this transformation.
      */
     goFromTo(fromObj, toObj, props) {
         const propMerged = { ...this.defaultProp, ...props };
@@ -762,9 +753,8 @@ export default class HandleSequencer {
      *
      * ```
      * @description
-     * Adds a label associated with a specific step in a range between 0 and duration (default: 10).
-     * Both syncTimeline and scrollTrigger will take care of processing the value as needed
-     * <br/>
+      Adds a label associated with a specific step in a range between 0 and duration (default: 10).
+      Both syncTimeline and scrollTrigger will take care of processing the value as needed
      */
     label(name = '', time = 0) {
         this.labels.push({ name, time });
@@ -799,9 +789,8 @@ export default class HandleSequencer {
      *
      * ```
      * @description
-     * Fire a function at a step in a range between 0 and duration (default: 10)
-     * Both syncTimeline and scrollTrigger will take care of processing the value as needed
-     * <br/>
+      Fire a function at a step in a range between 0 and duration (default: 10)
+      Both syncTimeline and scrollTrigger will take care of processing the value as needed
      */
     add(fn = () => {}, time = 0) {
         const fnIsValid = storeType.isFunction(fn);
@@ -840,8 +829,7 @@ export default class HandleSequencer {
      *
      * ```
      * @description
-     * Callback that returns updated values ready to be usable, it is advisable to use it for single elements, although it works well on a not too large number of elements (approximately 100-200 elements) for large staggers it is advisable to use the subscribeCache method .
-     * <br/>
+     * Callback that returns updated values ready to be usable, it is advisable to use it for single elements, although it works well on a not too large number of elements (approximately 100-200 elements) for large staggers it is advisable to use the subscribeCache method.
      */
     subscribe(cb = () => {}) {
         const unsubscribeCb = setCallBack(cb, this.callback);
@@ -872,10 +860,10 @@ export default class HandleSequencer {
      *
      * ```
      * @description
-     * Similar to subscribe this callBack is launched when the data calculation stops (when the timeline ends or the scroll trigger is inactive).
-     * Useful for applying a different style to an inactive element.
-     * A typical example is to remove the teansform3D property:
-     * <br/>
+       Similar to subscribe this callBack is launched when the data calculation stops (when the timeline ends or the scroll trigger is inactive).
+       Useful for applying a different style to an inactive element.
+       A typical example is to remove the teansform3D property:
+*
      * @example
      * ```js
      * // Use transform3D while item is active
@@ -913,7 +901,6 @@ export default class HandleSequencer {
      * ```
      * @description
      * Callback that returns updated values ready to be usable, specific to manage large staggers.
-     * <br/>
      */
     subscribeCache(item, fn = () => {}) {
         const { unsubscribeCb, unsubscribeCache } = setCallBackCache(
@@ -972,7 +959,6 @@ export default class HandleSequencer {
     /**
      * @description
      * Destroy sequencer
-     * <br/>
      */
     destroy() {
         this.values = [];

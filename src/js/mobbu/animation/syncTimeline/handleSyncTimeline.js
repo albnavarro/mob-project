@@ -909,7 +909,6 @@ export default class HandleSyncTimeline {
      * ```
      * @description
      * Callback thrown at the end of each cycle
-     * <br/>
      */
     onLoopEnd(cb = () => {}) {
         this.callbackLoop.push({ cb, id: this.callbackId });
@@ -938,7 +937,6 @@ export default class HandleSyncTimeline {
      * ```
      * @description
      * Callback thrown at the end of timeline
-     * <br/>
      */
     onComplete(cb = () => {}) {
         this.callbackComplete.push({ cb, id: this.callbackId });
@@ -972,7 +970,6 @@ export default class HandleSyncTimeline {
      * ```
      * @description
      * Callback thrown at each frame during the animation
-     * <br/>
      */
     onUpdate(cb = () => {}) {
         this.callbackOnUpdate.push({ cb, id: this.callbackId });
@@ -989,7 +986,6 @@ export default class HandleSyncTimeline {
     /**
      * @description
      * Destroy timeline and all the sequencer
-     * <br/>
      */
     destroy() {
         this.sequencers.forEach((item) => item.destroy());

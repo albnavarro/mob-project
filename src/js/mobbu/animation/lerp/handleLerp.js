@@ -601,18 +601,16 @@ export default class HandleLerp {
      *
      * ```
      * @description
-     * Transform some properties of your choice from the `current value` to the `entered value`.
-     * <br/>
-     * The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change every time this transformation is called.
-     * <br/>
-     * It is possible to associate the special pros to the current transformation, these properties will be valid only in the current transformation.
-     *  - precision
-     *  - velocity
-     *  - relative
-     *  - reverse
-     *  - immediate (internal use)
-     *  - immediateNoPromise (internal use)
-     * <br/>
+       Transform some properties of your choice from the `current value` to the `entered value`.
+       The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change every time this transformation is called.
+       It is possible to associate the special pros to the current transformation, these properties will be valid only in the current transformation.
+        - precision
+        - velocity
+        - relative
+        - reverse
+        - immediate (internal use)
+        - immediateNoPromise (internal use)
+     *
      */
     goTo(obj, props = {}) {
         if (this.pauseStatus) return;
@@ -645,18 +643,15 @@ export default class HandleLerp {
      *
      * ```
      * @description
-     * Transform some properties of your choice from the `entered value` to the `current value`.
-     * <br/>
-     * The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change every time this transformation is called.
-     * <br/>
-     * It is possible to associate the special pros to the current transformation, these properties will be valid only in the current transformation.
-     *  - precision
-     *  - velocity
-     *  - relative
-     *  - reverse
-     *  - immediate (internal use)
-     *  - immediateNoPromise (internal use)
-     * <br/>
+       Transform some properties of your choice from the `entered value` to the `current value`.
+       The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change every time this transformation is called.
+       It is possible to associate the special pros to the current transformation, these properties will be valid only in the current transformation.
+        - precision
+        - velocity
+        - relative
+        - reverse
+        - immediate (internal use)
+        - immediateNoPromise (internal use)
      */
     goFrom(obj, props = {}) {
         if (this.pauseStatus) return;
@@ -690,18 +685,15 @@ export default class HandleLerp {
      *
      *
      * ```
-     * Transform some properties of your choice from the `first entered value` to the `second entered value`.
-     * <br/>
-     * The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change every time this transformation is called.
-     * <br/>
-     * It is possible to associate the special pros to the current transformation, these properties will be valid only in the current transformation.
-     *  - precision
-     *  - velocity
-     *  - relative
-     *  - reverse
-     *  - immediate (internal use)
-     *  - immediateNoPromise (internal use)
-     * <br/>
+       Transform some properties of your choice from the `first entered value` to the `second entered value`.
+       The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change every time this transformation is called.
+       It is possible to associate the special pros to the current transformation, these properties will be valid only in the current transformation.
+        - precision
+        - velocity
+        - relative
+        - reverse
+        - immediate (internal use)
+        - immediateNoPromise (internal use)
      */
     goFromTo(fromObj, toObj, props = {}) {
         if (this.pauseStatus) return;
@@ -736,14 +728,11 @@ export default class HandleLerp {
      *
      *
      * ```
-     * Transform some properties of your choice from the `current value` to the `entered value` immediately.
-     * <br/>
-     * The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change every time this transformation is called.
-     * <br/>
-     * It is possible to associate the special pros to the current transformation, these properties will be valid only in the current transformation.
-     *  - immediate (internal use)
-     *  - immediateNoPromise (internal use)
-     * <br/>
+       Transform some properties of your choice from the `current value` to the `entered value` immediately.
+       The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change every time this transformation is called.
+       It is possible to associate the special pros to the current transformation, these properties will be valid only in the current transformation.
+        - immediate (internal use)
+        - immediateNoPromise (internal use)
      */
     set(obj, props = {}) {
         if (this.pauseStatus) return;
@@ -940,10 +929,9 @@ export default class HandleLerp {
      * ```
      *
      * @description
-     * Update velocity value. `default value is 0.06`,the closer the value is to 1, the faster the transition will be.
-
-     * The change will be persistent
-     * <br/>
+     * Update velocity value.
+       `default value is 0.06`,the closer the value is to 1, the faster the transition will be.
+        The change will be persistent
      */
     updateVelocity(velocity) {
         this.velocity = lerpVelocityIsValid(velocity);
@@ -963,10 +951,9 @@ export default class HandleLerp {
      * ```
      *
      * @description
-     * Update precision value. When the calculated value is less than this number, the transition will be considered completed, the smaller the value, the greater the precision of the calculation, the `default value is 0.01`.
-
-     * The change will be persistent
-     * <br/>
+     * Update precision value.
+       When the calculated value is less than this number, the transition will be considered completed, the smaller the value, the greater the precision of the calculation, the `default value is 0.01`.
+       The change will be persistent
      */
     updatePrecision(precision) {
         this.velocity = lerpPrecisionIsValid(precision);
@@ -1000,7 +987,6 @@ export default class HandleLerp {
      * ```
      * @description
      * Callback that returns updated values ready to be usable, it is advisable to use it for single elements, although it works well on a not too large number of elements (approximately 100-200 elements) for large staggers it is advisable to use the subscribeCache method .
-     * <br/>
      */
     subscribe(cb) {
         const unsubscribeCb = setCallBack(cb, this.callback);
@@ -1045,10 +1031,10 @@ export default class HandleLerp {
      *
      * ```
      * @description
-     * Similar to subscribe this callBack is launched when the data calculation stops (when the timeline ends or the scroll trigger is inactive).
-     * Useful for applying a different style to an inactive element.
-     * A typical example is to remove the teansform3D property:
-     * <br/>
+       Similar to subscribe this callBack is launched when the data calculation stops (when the timeline ends or the scroll trigger is inactive).
+       Useful for applying a different style to an inactive element.
+       A typical example is to remove the teansform3D property:
+
      * @example
      * ```js
      * // Use transform3D while item is active
@@ -1087,7 +1073,6 @@ export default class HandleLerp {
      * ```
      * @description
      * Callback that returns updated values ready to be usable, specific to manage large staggers.
-     * <br/>
      */
     subscribeCache(item, fn) {
         const { unsubscribeCb, unsubscribeCache } = setCallBackCache(
@@ -1104,7 +1089,6 @@ export default class HandleLerp {
     /**
      * @description
      * Destroy tween
-     * <br/>
      */
     destroy() {
         if (this.promise) this.stop();

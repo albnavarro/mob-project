@@ -53,7 +53,6 @@ export default class ParallaxTween {
      *
      * @description
      * Simplified tween specific to be used with scrollTrigger as an alternative to the more complex sequencer, ParallaxTween requires only one mutation step (from / to).
-     * <br/>
      *
      * Available methods:
      * ```js
@@ -267,10 +266,8 @@ export default class ParallaxTween {
      *
      * ```
      * @description
-     * Transform some properties of your choice from the `current value` to the `entered value`.
-     * <br/>
-     * The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change in real time as the result of the function changes
-     * <br/>
+      Transform some properties of your choice from the `current value` to the `entered value`.
+      The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change in real time as the result of the function changes
      */
     goTo(obj) {
         const data = goToUtils(obj);
@@ -303,7 +300,6 @@ export default class ParallaxTween {
      * ```
      * @description
      * Callback that returns updated values ready to be usable, it is advisable to use it for single elements, although it works well on a not too large number of elements (approximately 100-200 elements) for large staggers it is advisable to use the subscribeCache method .
-     * <br/>
      */
     subscribe(cb) {
         const unsubscribeCb = setCallBack(cb, this.callback);
@@ -337,7 +333,7 @@ export default class ParallaxTween {
      * Similar to subscribe this callBack is launched when the data calculation stops (when the timeline ends or the scroll trigger is inactive).
      * Useful for applying a different style to an inactive element.
      * A typical example is to remove the teansform3D property:
-     * <br/>
+     *
      * @example
      * ```js
      * // Use transform3D while item is active
@@ -375,7 +371,6 @@ export default class ParallaxTween {
      * ```
      * @description
      * Callback that returns updated values ready to be usable, specific to manage large staggers.
-     * <br/>
      */
     subscribeCache(item, fn) {
         const { unsubscribeCb, unsubscribeCache } = setCallBackCache(
@@ -409,7 +404,6 @@ export default class ParallaxTween {
     /**
      * @description
      * Destroy sequencer
-     * <br/>
      */
     destroy() {
         this.values = [];

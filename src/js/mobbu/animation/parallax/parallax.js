@@ -826,7 +826,6 @@ export default class ParallaxClass {
     /**
      * @description
      * Initialize instance
-     * <br/>
      */
     init() {
         if (this.isInzialized) {
@@ -1392,7 +1391,6 @@ export default class ParallaxClass {
     /**
      * @description
      * Destroy instance
-     * <br/>
      */
     destroy() {
         this.motion?.stop?.();
