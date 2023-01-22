@@ -50,6 +50,11 @@ map("v", "<Leader>p", '"0p')
 --  Cut to register 0
 map("v", "<Leader>x", '"0x')
 
+-- Copy to clipboard
+map("n", "<leader>y", [["+y]])
+map("v", "<leader>y", [["+y]])
+map("n", "<leader>Y", [["+Y]])
+
 -- fast replace word from current line to end of file with confirm.
 map("n", "<leader>s", [[:.,$s/\<<C-r><C-w>\>//gc<Left><Left><Left>]], { silent = false })
 
@@ -73,3 +78,9 @@ map("n", "<Leader>Q", ":qa<CR>")
 
 -- Center horizontally
 map("n", "<Leader>z", "zszH")
+
+-- Format all document
+map("n", "<Leader>=", "gg=G``")
+
+-- Select all document
+map("n", "<Leader>a", "ggVG")
