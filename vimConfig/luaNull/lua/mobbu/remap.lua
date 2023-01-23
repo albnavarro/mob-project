@@ -51,9 +51,12 @@ map("v", "<Leader>p", '"0p')
 map("v", "<Leader>x", '"0x')
 
 -- Copy to clipboard
-map("n", "<leader>y", [["+y]])
-map("v", "<leader>y", [["+y]])
-map("n", "<leader>Y", [["+Y]])
+map("n", "<leader>c", [["+y]])
+map("v", "<leader>c", [["+y]])
+
+-- Paste from clipboard
+map("n", "<leader>v", [["+p]])
+map("v", "<leader>v", [["+p]])
 
 -- fast replace word from current line to end of file with confirm.
 map("n", "<leader>s", [[:.,$s/\<<C-r><C-w>\>//gc<Left><Left><Left>]], { silent = false })
