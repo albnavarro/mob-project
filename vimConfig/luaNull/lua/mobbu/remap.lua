@@ -15,8 +15,18 @@ end
 -- Move 1 more lines up or down in normal and visual selection modes.
 map("v", "<C-J>", ":m '>+1<CR>gv=gv")
 map("v", "<C-k>", ":m '<-2<CR>gv=gv")
-map("n", "<C-J>", ":m .+1<CR>==")
-map("n", "<C-k>", ":m .-2<CR>==")
+-- map("n", "<C-J>", ":m .+1<CR>==")
+-- map("n", "<C-k>", ":m .-2<CR>==")
+
+-- Jump by 5 lines
+map("n", "<C-J>", "5j")
+map("n", "<C-k>", "5k")
+
+-- same movement top/bottom/middle ( shift ) on CTRL key fro comform
+-- ready to use <C-j> and <C-k>
+map("n", "<C-h>", "<S-h>")
+map("n", "<C-l>", "<S-l>")
+map("n", "<C-m>", "<S-m>")
 
 -- Move to viewport
 map("n", "<TAB>", "<C-w>w")
@@ -37,10 +47,6 @@ map("n", "<Leader>h", "<C-w><S-h>")
 -- Move up and down and center screen
 map("n", "<C-d>", "<C-d>zz")
 map("n", "<C-u>", "<C-u>zz")
-
--- center screen on next occurence of search
-map("n", "n", "nzzzv")
-map("n", "N", "Nzzzv")
 
 --  Paste from register 0
 map("n", "<Leader>p", '"0p')
