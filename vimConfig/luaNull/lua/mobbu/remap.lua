@@ -19,8 +19,8 @@ map("v", "<C-k>", ":m '<-2<CR>gv=gv")
 -- map("n", "<C-k>", ":m .-2<CR>==")
 
 -- Jump by 5 lines
-map("n", "<C-J>", "5j")
-map("n", "<C-k>", "5k")
+map("n", "<C-J>", "4j")
+map("n", "<C-k>", "4k")
 
 -- same movement top/bottom/middle ( shift ) on CTRL key fro comform
 -- ready to use <C-j> and <C-k>
