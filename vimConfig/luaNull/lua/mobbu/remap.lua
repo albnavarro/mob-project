@@ -13,30 +13,29 @@ end
 -- map("n", "<A-k>", "<C-w>s<bar><C-w>j<bar>:Ex<CR>", { silent = true })
 
 -- Move 1 more lines up or down in normal and visual selection modes.
-map("v", "<C-J>", ":m '>+1<CR>gv=gv")
-map("v", "<C-k>", ":m '<-2<CR>gv=gv")
--- map("n", "<C-J>", ":m .+1<CR>==")
--- map("n", "<C-k>", ":m .-2<CR>==")
+map("v", "<C-h>", ":m '>+1<CR>gv=gv")
+map("v", "<C-l>", ":m '<-2<CR>gv=gv")
+map("n", "<C-h>", ":m .+1<CR>==")
+map("n", "<C-l>", ":m .-2<CR>==")
 
--- Jump by 5 lines
+-- Jump by 5 lines up/down
 map("n", "<C-J>", "4j")
 map("n", "<C-k>", "4k")
 
--- same movement top/bottom/middle ( shift ) on CTRL key fro comform
--- ready to use <C-j> and <C-k>
-map("n", "<C-h>", "<S-h>")
-map("n", "<C-l>", "<S-l>")
-map("n", "<C-m>", "<S-m>")
-
 -- Move to viewport
-map("n", "<TAB>", "<C-w>w")
-map("n", "<S-TAB>", "<C-w>W")
+map("n", "<leader>1", "<C-w>W")
+map("n", "<leader>2", "<C-w>w")
 
 -- Resize viewport
 map("n", "<C-right>", ":exe 'vertical resize' . (winwidth(0) * 3/2)<CR>")
 map("n", "<C-left>", ":exe 'vertical resize' . (winwidth(0) * 2/3)<CR>")
 map("n", "<C-down>", ":exe 'resize' . (winheight(0) * 3/2)<CR>")
 map("n", "<C-up>", ":exe 'resize' . (winheight(0) * 2/3)<CR>")
+
+-- Tab
+map("n", "<leader>tn", ":tabnew <CR>")
+map("n", "<leader>tc", ":tabclose <CR>")
+map("n", "<leader>to", ":tabonly <CR>")
 
 -- move split
 map("n", "<Leader>j", "<C-w><S-j>")

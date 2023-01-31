@@ -22,7 +22,7 @@ nvim_tree.setup({
 		mappings = {
 			list = {
 				{ key = "u", action = "dir_up" },
-				{ key = "<Tab>", action = "" },
+				-- { key = "<Tab>", action = "" },
 			},
 		},
 	},
@@ -43,7 +43,7 @@ end
 vim.api.nvim_create_autocmd({ "VimEnter" }, { callback = open_nvim_tree })
 
 -- remap
-vim.keymap.set("n", "<Leader>tt", ":NvimTreeToggle<CR>")
-vim.keymap.set("n", "<Leader>tf", ":NvimTreeFindFile<CR>")
-vim.keymap.set("n", "<Leader>to", ":NvimTreeFocus<CR>")
-vim.keymap.set("n", "<Leader>tc", ":NvimTreeClose<CR>")
+vim.keymap.set("n", "<Leader>nn", ":NvimTreeToggle<CR>")
+vim.keymap.set("n", "<Leader>nf", ":NvimTreeFindFile<CR>")
+vim.keymap.set("n", "<Leader>no", ":NvimTreeFocus<CR>")
+vim.keymap.set("n", "<Leader>nc", ":NvimTreeClose<CR>")
