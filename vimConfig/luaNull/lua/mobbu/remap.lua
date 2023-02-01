@@ -23,8 +23,11 @@ map("n", "<C-J>", "4j")
 map("n", "<C-k>", "4k")
 
 -- Move to viewport
-map("n", "<leader>1", "<C-w>W")
-map("n", "<leader>2", "<C-w>w")
+map("n", "<leader>1", "1<C-w><C-w>")
+map("n", "<leader>2", "2<C-w><C-w>")
+map("n", "<leader>3", "3<C-w><C-w>")
+map("n", "<leader>4", "4<C-w><C-w>")
+map("n", "<leader>5", "5<C-w><C-w>")
 
 -- Resize viewport
 map("n", "<C-right>", ":exe 'vertical resize' . (winwidth(0) * 3/2)<CR>")
