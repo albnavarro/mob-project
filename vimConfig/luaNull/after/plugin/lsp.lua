@@ -74,7 +74,7 @@ null_ls.setup({
 	sources = {
 		-- formatting.stylelint,
 		formatting.eslint_d,
-		formatting.prettierd,
+		formatting.prettierd.with({ extra_filetypes = { "pug", "twig" } }),
 		formatting.stylua,
 		diagnostics.eslint_d,
 		diagnostics.stylelint,
