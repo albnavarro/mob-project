@@ -19,8 +19,8 @@ map("n", "<C-h>", ":m .+1<CR>==")
 map("n", "<C-l>", ":m .-2<CR>==")
 
 -- Jump by 5 lines up/down
-map("n", "<C-J>", "4j")
-map("n", "<C-k>", "4k")
+-- map("n", "<C-J>", "4j")
+-- map("n", "<C-k>", "4k")
 
 -- Move to viewport
 map("n", "<leader>1", "1<C-w><C-w>")
@@ -47,8 +47,8 @@ map("n", "<Leader>l", "<C-w><S-l>")
 map("n", "<Leader>h", "<C-w><S-h>")
 
 -- Move up and down and center screen
-map("n", "<C-d>", "<C-d>zz")
-map("n", "<C-u>", "<C-u>zz")
+-- map("n", "<C-d>", "<C-d>zz")
+-- map("n", "<C-u>", "<C-u>zz")
 
 --  Paste from register 0
 map("n", "<Leader>p", '"0p')
