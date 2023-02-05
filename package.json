@@ -22,7 +22,7 @@
         "axios": "^0.26.1",
         "body-scroll-lock": "^3.1.5",
         "browser-sync": "^2.27.9",
-        "critical": "^4.0.1",
+        "critical": "^5.0.4",
         "del": "^6.0.0",
         "fontfaceobserver": "^2.1.0",
         "fs-extra": "^10.0.1",
