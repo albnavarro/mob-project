@@ -15,8 +15,6 @@ return require("packer").startup(function(use)
 	-- Packer can manage itself
 	use("wbthomason/packer.nvim")
 
-	use("karb94/neoscroll.nvim")
-
 	use({
 		"nvim-telescope/telescope.nvim",
 		tag = "0.1.0",
