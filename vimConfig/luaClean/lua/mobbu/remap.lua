@@ -18,9 +18,9 @@ map("v", "<C-l>", ":m '<-2<CR>gv=gv")
 map("n", "<C-h>", ":m .+1<CR>==")
 map("n", "<C-l>", ":m .-2<CR>==")
 
--- Jump by 5 lines up/down
-map("n", "<C-J>", "4j")
-map("n", "<C-k>", "4k")
+-- Go to start of line and jump by 5 lines up/down
+map("n", "<C-J>", "04j")
+map("n", "<C-k>", "04k")
 
 -- Move to viewport
 map("n", "<leader>1", "1<C-w><C-w>")
