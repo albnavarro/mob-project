@@ -23,6 +23,7 @@ mason_null_ls.setup({
 
 local formatting = null_ls.builtins.formatting
 local diagnostics = null_ls.builtins.diagnostics
+local code_action = null_ls.builtins.code_actions
 
 local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
 
@@ -44,6 +45,7 @@ null_ls.setup({
 		formatting.stylua,
 		diagnostics.eslint_d,
 		diagnostics.stylelint,
+		code_action.eslint_d,
 	},
 	-- you can reuse a shared lspconfig on_attach callback here
 	on_attach = function(client, bufnr)
