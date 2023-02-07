@@ -12,6 +12,7 @@ treesitter_configs.setup({
 		"scss",
 		"twig",
 		"pug",
+		"php",
 		"json",
 		"lua",
 		"help",
