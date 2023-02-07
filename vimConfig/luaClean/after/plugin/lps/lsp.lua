@@ -139,3 +139,10 @@ for _, server_name in ipairs(get_servers()) do
 		capabilities = cmp_nvim_lsp.default_capabilities(),
 	})
 end
+
+---
+-- Extend emmet_ls to twig and javascript
+---
+lsp_config.emmet_ls.setup({
+	filetypes = { "html", "twig", "javascript" },
+})
