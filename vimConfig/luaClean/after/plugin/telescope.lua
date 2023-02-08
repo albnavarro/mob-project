@@ -15,6 +15,7 @@ vim.keymap.set("n", "<leader>fr", builtin.lsp_references, {})
 vim.keymap.set("n", "<leader>fd", builtin.lsp_document_symbols, {})
 vim.keymap.set("n", "<leader>fj", builtin.jumplist, {})
 vim.keymap.set("n", "<leader>fm", builtin.marks, {})
+vim.keymap.set("n", "<leader>fe", builtin.diagnostics, {})
 vim.keymap.set("n", "<leader>o", builtin.oldfiles, {})
 
 telescope.setup({
