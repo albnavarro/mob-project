@@ -12,4 +12,4 @@ vim.api.nvim_create_user_command(
 )
 
 -- Switch to html syntax
-vim.api.nvim_create_user_command("SyntaxHtml", ":set syntax=html", {})
+vim.api.nvim_create_user_command("SyntaxHtml", ":set filetype=html syntax=html", {})
