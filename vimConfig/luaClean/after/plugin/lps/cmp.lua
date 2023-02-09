@@ -13,9 +13,8 @@ luasnip.config.set_config({
 
 require("luasnip.loaders.from_vscode").lazy_load()
 
--- add html snippet in twig and php.
-luasnip.filetype_extend("twig", { "html" })
-luasnip.filetype_extend("php", { "html" })
+-- add twig snippet in html.
+luasnip.filetype_extend("html", { "twig" })
 
 ---
 -- Autocompletion
