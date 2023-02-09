@@ -43,6 +43,7 @@ null_ls.setup({
 		formatting.eslint_d,
 		formatting.prettierd.with({ extra_filetypes = { "pug", "twig" } }),
 		formatting.stylua,
+		formatting.trim_whitespace,
 		diagnostics.eslint_d,
 		diagnostics.stylelint,
 		code_action.eslint_d,
