@@ -125,6 +125,7 @@ mason_lspconfig.setup({
 		"cssls",
 		"emmet_ls",
 		"sumneko_lua",
+		"svelte",
 	},
 })
 

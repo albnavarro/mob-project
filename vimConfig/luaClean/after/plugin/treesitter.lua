@@ -17,6 +17,7 @@ treesitter_configs.setup({
 		"lua",
 		"help",
 		"vim",
+		"svelte",
 	},
 	sync_install = false,
 	highlight = {
@@ -35,5 +36,6 @@ treesitter_configs.setup({
 	},
 	context_commentstring = {
 		enable = true,
+		enable_autocmd = false,
 	},
 })

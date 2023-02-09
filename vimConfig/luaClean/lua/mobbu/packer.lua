@@ -49,12 +49,8 @@ return require("packer").startup(function(use)
 		end,
 	})
 
-	use({
-		"numToStr/Comment.nvim",
-		config = function()
-			require("Comment").setup()
-		end,
-	})
+	use("numToStr/Comment.nvim")
+	use("JoosepAlviste/nvim-ts-context-commentstring")
 
 	use("lukas-reineke/indent-blankline.nvim")
 
