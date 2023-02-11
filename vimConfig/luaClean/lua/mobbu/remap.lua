@@ -18,9 +18,9 @@ map("v", "<C-l>", ":m '<-2<CR>gv=gv")
 map("n", "<C-h>", ":m .+1<CR>==")
 map("n", "<C-l>", ":m .-2<CR>==")
 
--- Go to start of line and jump by 5 lines up/down
-map("n", "<C-J>", "04j")
-map("n", "<C-k>", "04k")
+-- Go to start of line and jump by 5 lines up/down and add to jumplist.
+map("n", "<C-J>", "04jm'")
+map("n", "<C-k>", "04km'")
 
 -- Move to viewport
 map("n", "<leader>1", "1<C-w><C-w>")
@@ -95,3 +95,7 @@ map("n", "<Leader>=", "gg=G``")
 
 -- Select all document
 map("n", "<Leader>a", "ggVG")
+
+-- more comfort incremental search ignorecase
+map("n", "-", [[/\c]], { silent = false })
+map("n", "_", [[?\c]], { silent = false })
