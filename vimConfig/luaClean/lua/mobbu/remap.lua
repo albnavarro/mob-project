@@ -13,10 +13,10 @@ end
 -- map("n", "<A-k>", "<C-w>s<bar><C-w>j<bar>:Ex<CR>", { silent = true })
 
 -- Move 1 more lines up or down in normal and visual selection modes.
-map("v", "<C-h>", ":m '>+1<CR>gv=gv")
-map("v", "<C-l>", ":m '<-2<CR>gv=gv")
-map("n", "<C-h>", ":m .+1<CR>==")
-map("n", "<C-l>", ":m .-2<CR>==")
+map("v", "<down>", ":m '>+1<CR>gv=gv")
+map("v", "<up>", ":m '<-2<CR>gv=gv")
+map("n", "<down>", ":m .+1<CR>==")
+map("n", "<up>", ":m .-2<CR>==")
 
 -- Go to start of line and jump by 5 lines up/down and add to jumplist.
 map("n", "<C-J>", "04jm'")
@@ -79,13 +79,13 @@ map("v", "<leader>s", ":s/", { silent = false })
 map("v", "n", ":normal<Space>^", { silent = false })
 
 -- :q
-map("n", "<Leader>e", ":q<CR>")
+map("n", "<Leader>q", ":q<CR>")
 
 -- :w
 map("n", "<Leader>w", ":w<CR>")
 
 -- :qa
-map("n", "<Leader>Q", ":qa<CR>")
+map("n", "<Leader>Q", ":qa!<CR>")
 
 -- Center horizontally
 map("n", "<Leader>z", "zszH")
@@ -97,5 +97,5 @@ map("n", "<Leader>=", "gg=G``")
 map("n", "<Leader>a", "ggVG")
 
 -- more comfort incremental search ignorecase
-map("n", "-", [[/\c]], { silent = false })
-map("n", "_", [[?\c]], { silent = false })
+map("n", "<leader>i", [[/\c<left><left>]], { silent = false })
+map("n", "<leader>I", [[?\c<left><left>]], { silent = false })
