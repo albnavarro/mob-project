@@ -96,6 +96,9 @@ map("n", "<Leader>=", "gg=G``")
 -- Select all document
 map("n", "<Leader>a", "ggVG")
 
--- more comfort incremental search ignorecase
-map("n", "<leader>i", [[/\c<left><left>]], { silent = false })
-map("n", "<leader>I", [[?\c<left><left>]], { silent = false })
+-- more comfort incremental search ignorecase with hightlight
+map("n", "<leader>d", [[:let @/ = ""<CR>:set hlsearch<CR>/\c<left><left>]], { silent = false })
+map("n", "<leader>u", [[:let @/ = ""<CR>:set hlsearch<CR>?\c<left><left>]], { silent = false })
+
+-- clear hightlight
+map("n", "<leader>c", [[:set nohlsearch<CR>]], { silent = true })
