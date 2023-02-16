@@ -47,8 +47,8 @@ map("n", "<Leader>l", "<C-w><S-l>")
 map("n", "<Leader>h", "<C-w><S-h>")
 
 -- Move up and down and center screen
-map("n", "<C-d>", "<C-d>zz")
-map("n", "<C-u>", "<C-u>zz")
+-- map("n", "<C-d>", "<C-d>zz")
+-- map("n", "<C-u>", "<C-u>zz")
 
 --  Paste from register 0
 map("n", "<Leader>p", '"0p')
