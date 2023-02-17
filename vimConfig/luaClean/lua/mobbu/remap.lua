@@ -102,7 +102,7 @@ map("n", "<leader>d", [[:let @/ = ""<CR>:set hlsearch<CR>/\c<left><left>]], { si
 map("n", "<leader>u", [[:let @/ = ""<CR>:set hlsearch<CR>?\c<left><left>]], { silent = false })
 
 -- clear hightlight
-map("n", "<leader>c", [[:set nohlsearch<CR>]], { silent = true })
+map("n", "<leader><Esc>", [[:set nohlsearch<CR>]], { silent = true })
 
 -- map space to '.\{-}' in search mode
 map("c", "<Space>", [[getcmdtype() =~ '^[/?]$' ? '.\{-}' : ' ']], { silent = false, expr = true })
