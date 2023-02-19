@@ -28,7 +28,7 @@ function Command_space_pressed()
 	if smart_search_is_active == true then
 		return [[.\{-}]]
 	else
-		return " "
+		return t("<Space>")
 	end
 end
 
