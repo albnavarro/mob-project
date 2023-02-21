@@ -3,7 +3,7 @@ local A = V.api
 local M = {
 	concatenateRegex = [[.\{-}]],
 	active = false,
-	initialScrollOff = A.nvim_get_option("scrolloff"),
+	-- initialScrollOff = A.nvim_get_option("scrolloff"),
 }
 
 -- Termcode convert utils
@@ -40,11 +40,13 @@ end
 local function getWindowLineNumber(useFirstLine)
 	if useFirstLine == true then
 		return A.nvim_win_call(0, function()
-			return V.fn.line("w0") + M.initialScrollOff
+			-- return V.fn.line("w0") + M.initialScrollOff
+			return V.fn.line("w0")
 		end)
 	else
 		return A.nvim_win_call(0, function()
-			return V.fn.line("w$") - M.initialScrollOff
+			-- return V.fn.line("w$") - M.initialScrollOff
+			return V.fn.line("w$")
 		end)
 	end
 end
