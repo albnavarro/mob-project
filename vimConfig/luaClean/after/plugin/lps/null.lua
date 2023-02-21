@@ -39,7 +39,7 @@ end
 
 null_ls.setup({
 	sources = {
-		formatting.stylelint,
+		-- formatting.stylelint,
 		formatting.eslint_d,
 		formatting.prettierd.with({ extra_filetypes = { "pug", "twig" } }),
 		formatting.stylua,

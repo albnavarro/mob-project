@@ -36,9 +36,9 @@ map("n", "<C-down>", ":exe 'resize' . (winheight(0) * 3/2)<CR>")
 map("n", "<C-up>", ":exe 'resize' . (winheight(0) * 2/3)<CR>")
 
 -- Tab
-map("n", "<leader>tn", ":tabnew <CR>")
-map("n", "<leader>tc", ":tabclose <CR>")
-map("n", "<leader>to", ":tabonly <CR>")
+-- map("n", "<leader>tn", ":tabnew <CR>")
+-- map("n", "<leader>tc", ":tabclose <CR>")
+-- map("n", "<leader>to", ":tabonly <CR>")
 
 -- move split
 map("n", "<Leader>j", "<C-w><S-j>")
