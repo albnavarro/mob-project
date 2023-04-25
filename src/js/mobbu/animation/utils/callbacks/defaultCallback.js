@@ -87,10 +87,8 @@ export const defaultCallbackOnComplete = ({
             }, frame);
         });
 
-        callbackCache.forEach(({ cb, frame }, i) => {
+        callbackCache.forEach(({ frame }, i) => {
             handleFrameIndex.add(() => {
-                handleCache.fireObject({ id: cb, obj: cbObject });
-
                 if (stagger.waitComplete) {
                     if (i === slowlestStagger.index) {
                         onComplete();
