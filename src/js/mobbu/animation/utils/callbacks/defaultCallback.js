@@ -73,28 +73,30 @@ export const defaultCallbackOnComplete = ({
     } else {
         callback.forEach(({ cb, frame }, i) => {
             handleFrameIndex.add(() => {
-                cb(cbObject);
-
                 if (stagger.waitComplete) {
                     if (i === slowlestStagger.index) {
+                        cb(cbObject);
                         onComplete();
                     }
                 } else {
                     if (i === fastestStagger.index) {
+                        cb(cbObject);
                         onComplete();
                     }
                 }
             }, frame);
         });
 
-        callbackCache.forEach(({ frame }, i) => {
+        callbackCache.forEach(({ cb, frame }, i) => {
             handleFrameIndex.add(() => {
                 if (stagger.waitComplete) {
                     if (i === slowlestStagger.index) {
+                        handleCache.fireObject({ id: cb, obj: cbObject });
                         onComplete();
                     }
                 } else {
                     if (i === fastestStagger.index) {
+                        handleCache.fireObject({ id: cb, obj: cbObject });
                         onComplete();
                     }
                 }
