@@ -60,7 +60,7 @@
         "gulp-notify": "^4.0.0",
         "gulp-pug-3": "^1.2.2",
         "postcss": "^8.4.12",
-        "prettier": "^3.0.0",
+        "prettier": "^2.8.3",
         "prettier-eslint-cli": "^6.0.1",
         "rollup": "^2.70.1",
         "sass": "^1.49.9",
