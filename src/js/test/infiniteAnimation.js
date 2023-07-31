@@ -10,8 +10,6 @@ export const infiniteAnimation = () => {
         data: { x: 0 },
     });
 
-    tween1.set({ x: 0 });
-
     const xAmplitude = 500;
     const yAmplitude = 400;
     const friction = 30;
@@ -25,6 +23,8 @@ export const infiniteAnimation = () => {
             item.style.transform = `translate3D(0px,0px,0px) translate(${xr}px, ${yr}px)`;
         });
     });
+
+    tween1.set({ x: 0 });
 
     let counter = 0;
     let isRunning = false;

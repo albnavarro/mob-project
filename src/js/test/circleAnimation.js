@@ -9,7 +9,6 @@ export const circleAnimation = () => {
         stagger: { each: 3, from: 'start' },
         data: { x: 0 },
     });
-    tween1.set({ x: 0 });
 
     const step = 0.06;
     const radius = 200;
@@ -21,6 +20,8 @@ export const circleAnimation = () => {
             item.style.transform = `translate3D(0px,0px,0px) translate(${xr}px, ${yr}px)`;
         });
     });
+
+    tween1.set({ x: 0 });
 
     let counter = 0;
     let isRunning = false;

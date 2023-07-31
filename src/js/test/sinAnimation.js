@@ -12,7 +12,6 @@ export const sinAnimation = () => {
         stagger: { each: 3 },
         data: { x: 0 },
     });
-    tween1.set({ x: 0 });
 
     const distance = window.innerWidth / 2;
     const stepNumber = 2;
@@ -36,6 +35,8 @@ export const sinAnimation = () => {
             duration,
         }
     );
+
+    tween1.set({ x: 0 });
 
     play.addEventListener('click', () => {
         timeline1.play();

@@ -16,7 +16,6 @@ export const circleAnimationTimeline = () => {
         stagger: { each: 3 },
         data: { x: 0 },
     });
-    tween1.set({ x: 0 });
 
     // 0 to 1
     const distance = 100;
@@ -37,6 +36,8 @@ export const circleAnimationTimeline = () => {
             item.style.transform = `translate3D(0px,0px,0px) translate(${xr}px, ${yr}px)`;
         });
     });
+
+    tween1.set({ x: 0 });
 
     const timeline1 = timeline.createAsyncTimeline({ repeat: -1 });
     timeline1.goFromTo(

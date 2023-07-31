@@ -10,7 +10,6 @@ export const sinRevertAnimation = () => {
         stagger: { each: 3 },
         data: { x: 0 },
     });
-    tween1.set({ x: 0 });
 
     const distance = window.innerWidth / 2;
     const stepNumber = 4;
@@ -28,6 +27,8 @@ export const sinRevertAnimation = () => {
             previousX = x;
         });
     });
+
+    tween1.set({ x: 0 });
 
     const timeline1 = timeline.createAsyncTimeline({ repeat: -1, yoyo: true });
     timeline1.goFromTo(
