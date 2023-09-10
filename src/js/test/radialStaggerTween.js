@@ -1,4 +1,4 @@
-import { timeline, tween } from '../mobbu';
+import { timeline, tween } from '../mobMotion';
 
 export const radialStaggerTween = () => {
     const items = document.querySelectorAll(

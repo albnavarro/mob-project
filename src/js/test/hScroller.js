@@ -1,5 +1,5 @@
-import { SmoothScroller } from '../mobbu/plugin';
-import { scroller, tween, core } from '../mobbu';
+import { SmoothScroller } from '../mobMotion/plugin';
+import { scroller, tween, core } from '../mobMotion';
 
 export const hScroller = () => {
     const btnPassiveTrue = document.querySelector('.btn-passive-true');

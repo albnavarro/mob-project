@@ -1,4 +1,4 @@
-import { timeline, tween } from '../mobbu';
+import { timeline, tween } from '../mobMotion';
 import { isIOS } from '../utility/isIOS.js';
 
 export function staggerLerpTest() {

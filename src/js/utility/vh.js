@@ -1,7 +1,4 @@
-import { handleScroll } from '../mobbu/events/scrollUtils/handleScroll.js';
-import { handleResize } from '../mobbu/events/resizeUtils/handleResize.js';
-import { handleNextTick } from '../mobbu/events/rafutils/handleNextTick.js';
-import { handleFrame } from '../mobbu/events/rafutils/handleFrame.js';
+import { mobCore } from '../mobCore';
 
 class vhClass {
     constructor(images, callback) {
@@ -10,16 +7,16 @@ class vhClass {
 
     init() {
         this.calcVh();
-        handleScroll(({ scrollY }) => this.onScroll(scrollY));
-        handleResize(() => this.calcVh());
+        mobCore.useScroll(({ scrollY }) => this.onScroll(scrollY));
+        mobCore.useResize(() => this.calcVh());
     }
 
     calcVh() {
-        handleFrame.add(() => {
-            handleNextTick.add(() => {
+        mobCore.useFrame(() => {
+            mobCore.useNextTick(() => {
                 const vh = window.innerHeight * 0.01;
 
-                handleFrame.add(() => {
+                mobCore.useFrame(() => {
                     document.documentElement.style.setProperty(
                         '--vh',
                         `${vh}px`

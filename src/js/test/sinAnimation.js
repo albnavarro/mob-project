@@ -1,4 +1,4 @@
-import { timeline, tween } from '../mobbu';
+import { timeline, tween } from '../mobMotion';
 
 export const sinAnimation = () => {
     const stagger = document.querySelectorAll('.sin .shape__target');

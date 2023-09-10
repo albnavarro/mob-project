@@ -1,4 +1,5 @@
-import { timeline, tween, core } from '../mobbu';
+import { mobCore } from '../mobCore';
+import { timeline, tween } from '../mobMotion';
 
 export function timlineMixTest() {
     const btnStart = document.querySelector('.mix-btn-start');
@@ -169,7 +170,7 @@ export function timlineMixTest() {
         btnSuspensionStatus.innerHTML = `is in suspension: ${timeline1.isSuspended()}`;
         btnPauseStatus.innerHTML = `is paused: ${timeline1.isPaused()}`;
         btnActiveStatus.innerHTML = `is running: ${timeline1.isActive()}`;
-        core.useNextFrame(() => loop());
+        mobCore.useNextFrame(() => loop());
     };
 
     loop();

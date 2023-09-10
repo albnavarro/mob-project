@@ -1,4 +1,4 @@
-import { timeline, tween } from '../mobbu';
+import { timeline, tween } from '../mobMotion';
 
 export function springTest() {
     const btnStart = document.querySelector('.spring-btn-start');

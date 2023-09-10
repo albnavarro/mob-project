@@ -1,10 +1,11 @@
-import { core, tween } from '../../js/mobbu';
+import { tween } from '../../js/mobMotion';
 import {
     getTranslateValues,
     offset,
     outerHeight,
     outerWidth,
-} from '../../js/mobbu/utils';
+} from '../../js/mobCore/utils/index.js';
+import { mobCore } from '../../js/mobCore';
 
 export default class MouseParallaxClass {
     constructor(data) {
@@ -34,16 +35,16 @@ export default class MouseParallaxClass {
     init() {
         this.getDimension();
 
-        this.unsubscribeMouseMove = core.useMouseMove(({ page, client }) => {
+        this.unsubscribeMouseMove = mobCore.useMouseMove(({ page, client }) => {
             this.setGlobalCoord({ page, client });
             this.onMove();
         });
 
-        this.unsubscribeResize = core.useResize(() => {
+        this.unsubscribeResize = mobCore.useResize(() => {
             this.getDimension();
         });
 
-        this.unsubscribeScroll = core.useScroll(({ scrollY }) => {
+        this.unsubscribeScroll = mobCore.useScroll(({ scrollY }) => {
             this.onScroll(scrollY);
         });
 

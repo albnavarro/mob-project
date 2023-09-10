@@ -5,8 +5,9 @@ import {
     outerHeight,
     outerWidth,
     getTranslateValues,
-} from '../../../js/mobbu/utils';
-import { core } from '../../../js/mobbu';
+} from '../../../js/mobCore/utils';
+import { mobCore } from '../../../js/mobCore';
+import { core } from '../../../js/mobMotion';
 
 export class GsapHorizontalCustomClass {
     constructor(data = {}) {
@@ -27,7 +28,7 @@ export class GsapHorizontalCustomClass {
         this.callback = [];
 
         // GSAP store
-        this.store = core.createStore({
+        this.store = mobCore.createStore({
             gsapisActive: false,
             horizontalWidth: 0,
             tl: [],
@@ -43,7 +44,7 @@ export class GsapHorizontalCustomClass {
         this.getWidth();
         this.createShadow();
         this.initGsap();
-        core.useResize(() => this.onResize());
+        mobCore.useResize(() => this.onResize());
     }
 
     onTick(fn) {

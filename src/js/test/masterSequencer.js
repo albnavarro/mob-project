@@ -1,6 +1,6 @@
-import { scroller, tween } from '../mobbu';
-import { core } from '../mobbu';
-import { outerHeight } from '../mobbu/utils';
+import { scroller, tween } from '../mobMotion';
+import { mobCore } from '../mobCore';
+import { outerHeight } from '../mobCore/utils';
 
 export const masterSequencer = () => {
     const items = document.querySelectorAll('.master-stagger__item');
@@ -38,7 +38,7 @@ export const masterSequencer = () => {
     createSequencer();
 
     // Test destroy and create sequencer on resize
-    core.useResize(() => {
+    mobCore.useResize(() => {
         sequencers.forEach(({ unsubscribe }) => unsubscribe());
         masterSequencer.destroy();
         createSequencer();

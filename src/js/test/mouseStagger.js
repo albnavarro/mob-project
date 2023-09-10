@@ -1,4 +1,5 @@
-import { timeline, tween, core } from '../mobbu';
+import { mobCore } from '../mobCore';
+import { timeline, tween } from '../mobMotion';
 
 export const mouseStagger = () => {
     // 1
@@ -26,7 +27,7 @@ export const mouseStagger = () => {
     });
 
     // In real time (like mousemove) use waitComplete: false, to avoid moviemnt when promise in sot resolved
-    core.useMouseMove(({ client }) => {
+    mobCore.useMouseMove(({ client }) => {
         const { x, y } = client;
         spring.goTo({ x, y });
     });

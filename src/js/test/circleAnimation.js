@@ -1,4 +1,5 @@
-import { tween, core } from '../mobbu';
+import { mobCore } from '../mobCore';
+import { tween } from '../mobMotion';
 
 export const circleAnimation = () => {
     const stagger = document.querySelectorAll('.circle-tween .shape__target');
@@ -28,7 +29,7 @@ export const circleAnimation = () => {
     const loop = () => {
         counter++;
         tween1.goTo({ x: counter }).catch(() => {});
-        if (isRunning) core.useNextFrame(() => loop());
+        if (isRunning) mobCore.useNextFrame(() => loop());
     };
 
     play.addEventListener('click', () => {

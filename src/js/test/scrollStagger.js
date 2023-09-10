@@ -1,6 +1,6 @@
-import { scroller, tween } from '../mobbu';
-import { outerHeight } from '../mobbu/utils';
-import { core } from '../mobbu';
+import { mobCore } from '../mobCore';
+import { outerHeight } from '../mobCore/utils';
+import { scroller, tween } from '../mobMotion';
 
 export const scrollStagger = () => {
     const items = document.querySelectorAll('rect');
@@ -56,7 +56,7 @@ export const scrollStagger = () => {
         // });
 
         myParallaxTween.subscribeCache(item, ({ rotate }) => {
-            const rotateParsed = core.shouldMakeSomething()
+            const rotateParsed = mobCore.shouldMakeSomething()
                 ? Math.round(rotate)
                 : rotate;
 

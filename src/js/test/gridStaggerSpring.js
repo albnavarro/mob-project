@@ -1,4 +1,4 @@
-import { timeline, tween } from '../mobbu';
+import { timeline, tween } from '../mobMotion';
 
 export const gridStaggerSpring = () => {
     const items = document.querySelectorAll(

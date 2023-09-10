@@ -1,4 +1,4 @@
-import { scroller, tween } from '../mobbu';
+import { scroller, tween } from '../mobMotion';
 
 export function indexParallax() {
     /**

@@ -1,5 +1,5 @@
-import { scroller, tween } from '../mobbu';
-import { outerHeight } from '../mobbu/utils';
+import { outerHeight } from '../mobCore/utils';
+import { scroller, tween } from '../mobMotion';
 
 export const createStagger = () => {
     const items = document.querySelectorAll('.create-stagger__item');

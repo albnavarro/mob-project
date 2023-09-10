@@ -14,9 +14,9 @@ import {
     offset,
     getParents,
     getSiblings,
-} from '../../../js/mobbu/utils';
-
-import { core } from '../../../js/mobbu';
+} from '../../../js/mobCore/utils/index.js';
+import { mobCore } from '../../../js/mobCore/index.js';
+import { core } from '../../../js/mobMotion/core.js';
 
 export class menuClass {
     constructor(data) {
@@ -123,7 +123,7 @@ export class menuClass {
         this.addHandler();
         this.resetSubmenuHeight();
 
-        core.useResize(() => {
+        mobCore.useResize(() => {
             this.getSubmenuWidth();
             this.getToggleWrapHeight();
             this.resizeMenu();
@@ -133,7 +133,7 @@ export class menuClass {
         if (this.direction == 'horizontal') {
             this.SetPosition();
 
-            core.useResize(() => {
+            mobCore.useResize(() => {
                 this.SetPosition();
             });
         }

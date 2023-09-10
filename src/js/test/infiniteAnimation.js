@@ -1,4 +1,5 @@
-import { tween, core } from '../mobbu';
+import { mobCore } from '../mobCore';
+import { tween } from '../mobMotion';
 
 export const infiniteAnimation = () => {
     const stagger = document.querySelectorAll('.infinite-tween .shape__target');
@@ -31,7 +32,7 @@ export const infiniteAnimation = () => {
     const loop = () => {
         counter++;
         tween1.goTo({ x: counter });
-        if (isRunning) core.useNextFrame(() => loop());
+        if (isRunning) mobCore.useNextFrame(() => loop());
     };
 
     play.addEventListener('click', () => {

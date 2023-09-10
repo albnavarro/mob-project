@@ -1,5 +1,5 @@
-import { outerHeight, outerWidth } from '.../../../js/mobbu/utils';
-import { core } from '../../../js/mobbu';
+import { mobCore } from '../../../js/mobCore/index.js';
+import { outerHeight, outerWidth } from '../../../js/mobCore/utils/index.js';
 
 class LightPichZoomClass {
     constructor() {
@@ -52,39 +52,39 @@ class LightPichZoomClass {
         zoom.appendChild(zoomOut);
         this.setZoomBtnhandler();
 
-        this.unsubscribeWheel = core.useMouseWheel(({ spinY, target }) => {
+        this.unsubscribeWheel = mobCore.useMouseWheel(({ spinY, target }) => {
             this.onWeel({ spinY, target });
         });
 
-        this.unsubscribeTouchStart = core.useTouchStart(
+        this.unsubscribeTouchStart = mobCore.useTouchStart(
             ({ target, preventDefault }) => {
                 this.onMouseDown({ target, preventDefault });
             }
         );
 
-        this.unsubscribeMouseDown = core.useMouseDown(
+        this.unsubscribeMouseDown = mobCore.useMouseDown(
             ({ target, preventDefault }) => {
                 this.onMouseDown({ target, preventDefault });
             }
         );
 
-        this.unsubscribeTouchEnd = core.useTouchEnd(() => {
+        this.unsubscribeTouchEnd = mobCore.useTouchEnd(() => {
             this.onMouseUp();
         });
 
-        this.unsubscribeMouseUp = core.useMouseUp(() => {
+        this.unsubscribeMouseUp = mobCore.useMouseUp(() => {
             this.onMouseUp();
         });
 
-        this.unsubscribeMouseMove = core.useMouseMove(({ page }) => {
+        this.unsubscribeMouseMove = mobCore.useMouseMove(({ page }) => {
             this.onMove(false, page.x, page.y);
         });
 
-        this.unsubscribeTouchMove = core.useTouchMove(({ page }) => {
+        this.unsubscribeTouchMove = mobCore.useTouchMove(({ page }) => {
             this.onMove(false, page.x, page.y);
         });
 
-        this.unsubscribeResize = core.useResize(() => {
+        this.unsubscribeResize = mobCore.useResize(() => {
             this.resetZoom();
         });
     }
@@ -268,7 +268,7 @@ class LightPichZoomClass {
 
         if (this.onDrag || force) {
             // this.image.style.transform = `translateX(${xValue}px) translateY(${yValue}px) scale(${this.scale})`;
-            core.useFrame(() => {
+            mobCore.useFrame(() => {
                 this.image.style.transform = `translateX(${xValue}px) translateY(${yValue}px) scale(${this.scale})`;
             });
         }

@@ -1,4 +1,4 @@
-import { timeline, tween } from '../mobbu';
+import { timeline, tween } from '../mobMotion';
 
 export const freeMode = () => {
     const el1 = document.querySelector('.freemode-item--1');

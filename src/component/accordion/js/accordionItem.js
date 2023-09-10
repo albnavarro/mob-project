@@ -1,5 +1,5 @@
-import { slide } from '../../../js/mobbu/plugin';
-import { core } from '../../../js/mobbu';
+import { core } from '../../../js/mobMotion';
+import { slide } from '../../../js/mobMotion/plugin';
 
 export class AccordionItemClass {
     constructor(data) {

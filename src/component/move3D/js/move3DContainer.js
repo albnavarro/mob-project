@@ -1,6 +1,11 @@
 import { move3DitemClass } from './move3Ditem.js';
-import { outerHeight, outerWidth, offset } from '.../../../js/mobbu/utils/';
-import { tween, core } from '../../../js/mobbu';
+import { tween } from '../../../js/mobMotion';
+import {
+    outerHeight,
+    outerWidth,
+    offset,
+} from '../../../js/mobCore/utils/index.js';
+import { mobCore } from '../../../js/mobCore/index.js';
 
 export class move3DContainerClass {
     constructor(data) {
@@ -76,17 +81,17 @@ export class move3DContainerClass {
         this.setDepth();
         this.getDimension();
 
-        this.unsubscribeMouseMove = core.useMouseMove(({ page }) => {
+        this.unsubscribeMouseMove = mobCore.useMouseMove(({ page }) => {
             this.setGlobalCoord({ page });
             this.onMove();
         });
 
-        this.unsubscribeResize = core.useResize(() => {
+        this.unsubscribeResize = mobCore.useResize(() => {
             this.getDimension();
         });
 
         if (this.pageY) {
-            this.unsubscribeScroll = core.useScroll(({ scrollY }) => {
+            this.unsubscribeScroll = mobCore.useScroll(({ scrollY }) => {
                 this.onScroll(scrollY);
             });
         }
@@ -96,23 +101,23 @@ export class move3DContainerClass {
             this.dragY = window.innerHeight / 2;
             this.item.classList.add('move3D--drag');
 
-            this.unsubscribeTouchMove = core.useTouchStart(({ page }) => {
+            this.unsubscribeTouchMove = mobCore.useTouchStart(({ page }) => {
                 this.onMouseDown({ page });
             });
 
-            this.unsubscribeTouchMove = core.useTouchEnd(() => {
+            this.unsubscribeTouchMove = mobCore.useTouchEnd(() => {
                 this.onMouseUp();
             });
 
-            this.unsubscribeTouchMove = core.useMouseDown(({ page }) => {
+            this.unsubscribeTouchMove = mobCore.useMouseDown(({ page }) => {
                 this.onMouseDown({ page });
             });
 
-            this.unsubscribeTouchMove = core.useMouseUp(() => {
+            this.unsubscribeTouchMove = mobCore.useMouseUp(() => {
                 this.onMouseUp();
             });
 
-            this.unsubscribeTouchMove = core.useTouchMove(({ page }) => {
+            this.unsubscribeTouchMove = mobCore.useTouchMove(({ page }) => {
                 this.setGlobalCoord({ page });
                 this.onMove();
             });

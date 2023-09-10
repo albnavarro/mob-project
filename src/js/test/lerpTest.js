@@ -1,4 +1,4 @@
-import { timeline, tween } from '../mobbu';
+import { timeline, tween } from '../mobMotion';
 
 export function lerpTest() {
     const btnStart = document.querySelector('.lerp-btn-start');

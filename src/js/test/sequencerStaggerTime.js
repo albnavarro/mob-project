@@ -1,4 +1,4 @@
-import { timeline, tween } from '../mobbu';
+import { timeline, tween } from '../mobMotion';
 
 export const sequencerStaggerTime = () => {
     const items = document.querySelectorAll('.master-stagger__item');

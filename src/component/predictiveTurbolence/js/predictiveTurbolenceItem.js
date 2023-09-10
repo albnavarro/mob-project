@@ -1,8 +1,13 @@
 import { forceRedraw } from '../../../js/utility/redrowNode.js';
 import { detectSafari } from '../../../js/utility/isSafari.js';
 import { tUtils } from './predictiveTurbolenceUtils.js';
-import { outerHeight, outerWidth, offset } from '.../../../js/mobbu/utils/';
-import { tween, core } from '../../../js/mobbu';
+import {
+    outerHeight,
+    outerWidth,
+    offset,
+} from '../../../js/mobCore/utils/index.js';
+import { tween, core } from '../../../js/mobMotion';
+import { mobCore } from '../../../js/mobCore/index.js';
 
 export class PredictiveTurbolenceItemClass {
     constructor(data) {
@@ -56,14 +61,14 @@ export class PredictiveTurbolenceItemClass {
         this.inzializeSvg();
         this.onResize();
 
-        this.unsubscribeMouseMove = core.useMouseMove(({ page }) => {
+        this.unsubscribeMouseMove = mobCore.useMouseMove(({ page }) => {
             this.setGlobalCoord({ page });
             this.onMove();
         });
-        this.unsubscribeScroll = core.useScroll(({ scrollY }) => {
+        this.unsubscribeScroll = mobCore.useScroll(({ scrollY }) => {
             this.onScroll({ scrollY });
         });
-        this.unsubscribeResize = core.useResize(() => {
+        this.unsubscribeResize = mobCore.useResize(() => {
             this.onResize();
         });
 

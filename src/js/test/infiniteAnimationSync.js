@@ -1,4 +1,4 @@
-import { timeline, tween } from '../mobbu';
+import { timeline, tween } from '../mobMotion';
 
 export const infiniteAnimationSync = () => {
     const stagger = document.querySelectorAll('.infinite-tween .shape__target');

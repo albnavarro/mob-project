@@ -1,4 +1,4 @@
-import { tween } from '../mobbu';
+import { tween } from '../mobMotion';
 
 export const tweenRealtive = () => {
     // Tween

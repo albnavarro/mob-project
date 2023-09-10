@@ -1,4 +1,5 @@
-import { timeline, tween, core } from '../mobbu';
+import { mobCore } from '../mobCore';
+import { timeline, tween } from '../mobMotion';
 
 export const testCanvas = () => {
     const canvas = document.querySelector('#test-canvas');
@@ -33,7 +34,7 @@ export const testCanvas = () => {
         };
     });
 
-    core.useResize(() => {
+    mobCore.useResize(() => {
         canvas.width = canvas.clientWidth;
         canvas.height = canvas.clientHeight;
         draw();
@@ -102,8 +103,8 @@ export const testCanvas = () => {
 
     const loop = () => {
         draw();
-        core.useNextFrame(() => loop());
+        mobCore.useNextFrame(() => loop());
     };
 
-    core.useFrame(() => loop());
+    mobCore.useFrame(() => loop());
 };

@@ -1,4 +1,4 @@
-import { timeline, tween } from '../mobbu';
+import { timeline, tween } from '../mobMotion';
 
 export function tweenTest() {
     const btnStart = document.querySelector('.tween-btn-start');

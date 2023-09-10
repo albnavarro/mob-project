@@ -1,6 +1,6 @@
 import { gsap } from 'gsap';
 import { ScrollToPlugin } from 'gsap/all';
-import { outerHeight } from '../mobbu/utils';
+import { outerHeight } from '../mobCore/utils';
 
 export function slideUpDownReset(target) {
     target.style.height = 0;

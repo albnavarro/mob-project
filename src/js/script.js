@@ -68,10 +68,11 @@ import { tweenRealtive } from './test/tweenRelative.js';
 import { testCanvas } from './test/testCanvas.js';
 import { freeMode } from './test/freemode.js';
 import { mouseParallaxTest } from './test/mouseParallaxTest.js';
-import { core } from './mobbu';
 import { timlineReverseImmediateTest } from './test/timlineReverseImmediateTest.js';
+import { mobCore } from './mobCore/index.js';
+import { core } from './mobMotion/core.js';
 
-core.useLoad(() => {
+mobCore.useLoad(() => {
     core.setDefault({
         deferredNextTick: true,
         // fpsScalePercent: { 0: 1, 30: 2, 50: 3 },

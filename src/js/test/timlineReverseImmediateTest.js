@@ -1,4 +1,5 @@
-import { timeline, tween, core } from '../mobbu';
+import { mobCore } from '../mobCore';
+import { timeline, tween } from '../mobMotion';
 
 export function timlineReverseImmediateTest() {
     const btnStart = document.querySelector('.reverse-immediate-btn-start');
@@ -163,7 +164,7 @@ export function timlineReverseImmediateTest() {
         btnSuspensionStatus.innerHTML = `is in suspension: ${timeline1.isSuspended()}`;
         btnPauseStatus.innerHTML = `is paused: ${timeline1.isPaused()}`;
         btnActiveStatus.innerHTML = `is running: ${timeline1.isActive()}`;
-        core.useNextFrame(() => loop());
+        mobCore.useNextFrame(() => loop());
     };
 
     loop();

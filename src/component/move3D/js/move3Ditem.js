@@ -1,4 +1,4 @@
-import { tween } from '../../../js/mobbu';
+import { tween } from '../../../js/mobMotion';
 import { move3DUtils } from './move3Dutils.js';
 
 export class move3DitemClass {

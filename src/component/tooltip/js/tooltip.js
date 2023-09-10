@@ -4,7 +4,7 @@ import {
     offset,
     getParents,
     getSiblings,
-} from '../../../js/mobbu/utils';
+} from '../../../js/mobCore/utils/index.js';
 
 class toolTipClass {
     constructor() {

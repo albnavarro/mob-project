@@ -1,5 +1,6 @@
-import { HorizontalScroller } from '../mobbu/plugin/horizontalScroller/js/horizontalScroller';
-import { scroller, core, tween } from '../mobbu';
+import { mobCore } from '../mobCore';
+import { scroller, tween } from '../mobMotion';
+import { HorizontalScroller } from '../mobMotion/plugin';
 
 const createScroller = ({ bottomScroller }) => {
     const title = document.querySelector('.js-scroll-item');
@@ -97,7 +98,7 @@ const createScroller = ({ bottomScroller }) => {
             bottomScroller.refresh();
         },
         onTick: ({ percent }) => {
-            core.useFrame(() => {
+            mobCore.useFrame(() => {
                 scroller1.style.setProperty('--percent', `${percent}%`);
             });
         },
