@@ -17,19 +17,14 @@ import {
     springConfigDefault,
     tweenDurationDefault,
     tweenRealtiveDefault,
-} from './animation/utils/setUpValidation.js';
+} from './animation/utils/setUp/setUpValidation.js';
 import { mergeDeep } from './utils/mergeDeep.js';
 
 /**
- * @typedef {('fpsScalePercent'|'useScaleFps'|'deferredNextTick'|'throttle'|'usePassive'|'mq'|'defaultMq'|'sequencer'|'scrollTrigger'|'parallax'|'parallaxTween'|'tween'|'spring'|'lerp')} handleSetUpGetType
+ * @returns {import('./animation/utils/setUp/type.js').setUpType}
  */
-
-export const handleSetUp = (() => {
-    /**
-     * @constant
-     * @type {import('./animation/utils/setUpValidation.js').handleSetUpSetType}
-     */
-    let data = {
+function getData() {
+    return {
         fpsScalePercent: mobCore.store.getProp('fpsScalePercent'),
         useScaleFps: mobCore.store.getProp('useScaleFps'),
         deferredNextTick: mobCore.store.getProp('deferredNextTick'),
@@ -76,12 +71,20 @@ export const handleSetUp = (() => {
             velocity: 0.06,
         },
     };
+}
+
+/**
+ * @typedef {('fpsScalePercent'|'useScaleFps'|'deferredNextTick'|'throttle'|'usePassive'|'mq'|'defaultMq'|'sequencer'|'scrollTrigger'|'parallax'|'parallaxTween'|'tween'|'spring'|'lerp')} handleSetUpGetType
+ */
+
+export const handleSetUp = (() => {
+    let data = getData();
 
     /**
      * @description
      * - Here it is possible to modify the default values of the various modules of the library
      *
-     * @param {import('./animation/utils/setUpValidation.js').handleSetUpSetType} obj
+     * @param {import('./animation/utils/setUp/type.js').setUpType} obj
      *
      *
      * @example
@@ -189,7 +192,7 @@ export const handleSetUp = (() => {
      * ```
      */
     const set = (obj) => {
-        data = setupValidation(mergeDeep(data, obj));
+        data = setupValidation(mergeDeep(getData(), obj));
 
         /**
          * Update event default.

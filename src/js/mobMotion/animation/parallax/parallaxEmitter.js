@@ -1,5 +1,20 @@
+// @ts-check
+
 import { parallaxConstant } from './parallaxConstant.js';
 
+/**
+ * @param {object} obj
+ * @param {number} obj.prevValue
+ * @param {number} obj.value
+ * @param {number} obj.maxVal
+ * @param {function} obj.onEnter
+ * @param {function} obj.onEnterBack
+ * @param {function} obj.onLeave
+ * @param {function} obj.onLeaveBack
+ *
+ * @returns void
+ *
+ */
 export function parallaxEmitter({
     prevValue,
     value,

@@ -6,11 +6,11 @@ import { mobCore } from '../../../mobCore';
  * @param {Array.<{cb:function,id:number,index:Number,frame:Number}>} callbackPauseArray
  * @param {Function} rafFunction
  * @param {Function} pauseFunction
- * @param {Promise.<undefined>} resolve
+ * @param {(function(any):void)} resolve
  * @returns {void}
  *
  * @description
- * Fire mian requenst animation frame function.
+ * Fire mian request animation frame function.
  * In case the is some function add form timeline fire pauseFUnction.
  */
 export const initRaf = (

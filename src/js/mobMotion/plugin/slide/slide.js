@@ -136,7 +136,7 @@ export const slide = (() => {
             if (!currentItem)
                 reject(new Error('slide element not exist in slide store'));
 
-            // height of item may be chenge once opened outside tween control
+            // height of item may be change once opened outside tween control
             // use fromTo in this case
             const { item, tween } = currentItem;
             const currentHeight = outerHeight(item);

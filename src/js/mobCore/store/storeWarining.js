@@ -47,7 +47,7 @@ export const storeSetWarning = (prop, style) => {
  */
 export const storeSetPropValWarning = (prop, val, style) => {
     console.warn(
-        `%c trying to execute setProp method on '${prop}' propierties: setProp methods doasn't allow objects as value, ${JSON.stringify(
+        `%c trying to execute setProp method on '${prop}' propierties: setProp methods doesn't allow objects as value, ${JSON.stringify(
             val
         )} is an Object`,
         style
@@ -197,7 +197,7 @@ export const storeComputedKeyUsedWarning = (keys, style) => {
  */
 export const storeWatchWarning = (prop, style) => {
     console.warn(
-        `%c SimpleStore error: the property ${prop} to watch doasn't exist in store`,
+        `%c SimpleStore error: the property ${prop} to watch doesn't exist in store`,
         style
     );
 };

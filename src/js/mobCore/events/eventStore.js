@@ -17,7 +17,7 @@ export const eventStore = new SimpleStore({
         type: 'Any',
     }),
     useScaleFps: true,
-    deferredNextTick: false,
+    deferredNextTick: true,
 
     /**
      * Scroll

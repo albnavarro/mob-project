@@ -10,7 +10,7 @@ import { createStaggers } from './animation/sequencer/sequencerUtils.js';
 
 export const tween = {
     /**
-     * @param { import('./animation/parallax/parallaxTween.js').parallaxTweenTypes & import('./animation/utils/stagger/staggerCostant.js').staggerTypes & import('./animation/tween/tweenConfig.js').easeTypes} data
+     * @param {import('./animation/parallax/type.js').parallaxTweenType} data
      *
      * @example
      * ```javascript
@@ -51,7 +51,7 @@ export const tween = {
     },
 
     /**
-     * @param {import('./animation/sequencer/handleSequencer.js').sequencerTypes & import('./animation/utils/stagger/staggerCostant.js').staggerTypes & import('./animation/tween/tweenConfig.js').easeTypes} data
+     * @param {import('./animation/sequencer/type.js').sequencerProps} data
      *
      * @example
      * ```javascript
@@ -122,7 +122,7 @@ export const tween = {
     },
 
     /**
-     * @param { import('./animation/sequencer/sequencerUtils.js').createSequencerTypes & import('./animation/utils/stagger/staggerCostant.js').staggerTypes } data
+     * @param { import('./animation/sequencer/type.js').createSequencerType & import('./animation/utils/stagger/type.js').staggerPropiertiesObject } data
      * @returns {Array<{ start: Number, end: Number,index: Number, item: (HTMLElement|Object) }>} Stagger array
      *
      * @example
@@ -164,7 +164,7 @@ export const tween = {
     },
 
     /**
-     * @param { import('./animation/tween/handleTween.js').tweenTypes & import('./animation/utils/stagger/staggerCostant.js').staggerTypes & import('./animation/tween/tweenConfig.js').easeTypes} data
+     * @param {import('./animation/tween/type.js').tweenProps} data
      *
      * @example
      * ```javascript
@@ -216,7 +216,7 @@ export const tween = {
     },
 
     /**
-     * @param { import('./animation/spring/handleSpring.js').springTypes & import('./animation/utils/stagger/staggerCostant.js').staggerTypes & import('./animation/spring/springConfig.js').springConfigTypes & import('./animation/spring/springConfig.js').springConfigPropsTypes} data
+     * @param {import('./animation/spring/type.js').springTweenProps} data
      *
      *
      * @example
@@ -276,7 +276,7 @@ export const tween = {
     },
 
     /**
-     * @param { import('./animation/lerp/handleLerp.js').lerpTypes & import('./animation/lerp/handleLerp.js').lerpPropTypes & import('./animation/utils/stagger/staggerCostant.js').staggerTypes } data
+     * @param {import('./animation/lerp/type.js').lerpTweenProps} data
      *
      * @example
      * ```javascript

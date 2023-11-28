@@ -9,20 +9,7 @@ import { catchAnimationReject } from '../errorHandler/catchAnimationReject.js';
 import { loadFps } from './loadFps.js';
 import { eventStore } from '../eventStore.js';
 import { defaultTimestep, getTime } from './time.js';
-
-/**
- * @typedef {Object} handleFrameTypes
- * @prop {number} time
-    The total activity time of the request animation frame
- * @prop {number} fps
-    Current fps value, the starting fps value is 60.
-    The effective value of the fps property will occur 30 frames after the initialization of handleFrame,
-    30 frames the minimum interval to have a correct result.
- * @prop {boolean} shouldRender
-    If the useScaleFps global property is on,
-    the property indicates whether there is a drop in frame rate compared
-    to the optimal frame rate calculated at application startup.
- */
+import { useNextLoop } from '../../utils/nextTick.js';
 
 /**
  * Calculate a precise fps
@@ -46,7 +33,7 @@ const firstRunDuration = 2000;
 let frameIsRuning = false;
 
 /**
- * @type {Array.<function(handleFrameTypes):void>}
+ * @type {import('./type.js').handleFrameArrayType}
  */
 let callback = [];
 
@@ -69,6 +56,16 @@ let rawTime = 0;
  * @type {Number}
  */
 let timeElapsed = 0;
+
+/**
+ * @type {Number}
+ */
+let lastTime = 0;
+
+/**
+ * @type {Number}
+ */
+let timeLost = 0;
 
 /**
  * @type {Boolean}
@@ -233,7 +230,7 @@ const getRenderStatus = () => {
 const nextTickFn = () => {
     /*
      * If currentFrame reach currentFrameLimit back to zero to avoid big numbers
-     * executte the opration outside requestAnimationFrame if deferredNextTick is active
+     * executte the operation outside requestAnimationFrame if deferredNextTick is active
      */
     if (currentFrame === currentFrameLimit) {
         currentFrame = 0;
@@ -274,6 +271,7 @@ const nextTickFn = () => {
     } else {
         isStopped = true;
         currentFrame = 0;
+        lastTime = time;
         eventStore.quickSetProp('currentFrame', currentFrame);
     }
 };
@@ -291,16 +289,43 @@ const render = (timestamp) => {
 
     if (isStopped) startTime += timeElapsed;
 
+    /**
+     * Default time calculation.
+     */
     rawTime += timeElapsed;
-    time = rawTime - startTime;
+    time = Math.round(rawTime - startTime);
+
+    /**
+     * Get frame duration.
+     */
+    const frameDuration = Math.round(1000 / fps);
+
+    /**
+     * Get time lost
+     * ( if the difference of current time with last time and frame duration is han 100ms ).
+     * Problem with workspace and switch to dirrent application without fire visibilityChange event.
+     */
+    timeLost = Math.abs(time - lastTime - frameDuration);
+    const timeToSubsctract = timeLost > 100 ? timeLost : 0;
+    time = time - timeToSubsctract;
+    lastTime = time;
+
+    /**
+     * Update frame counter for fps or reset id tab change.
+     */
+    if (isStopped) {
+        fpsPrevTime = time;
+        frames = 0;
+        fps = eventStore.getProp('instantFps');
+    } else {
+        frames++;
+    }
 
     /**
      * Get fps
      * Update fps every second
      **/
-    if (!isStopped) frames++;
-
-    if (time > fpsPrevTime + 1000) {
+    if (time > fpsPrevTime + 1000 && !isStopped) {
         /**
          * Calc fps
          * Set fps when stable after 2 seconds otherwise use instantFps
@@ -314,8 +339,9 @@ const render = (timestamp) => {
 
         /**
          * Prevent fps error;
+         * Se a minimum of 30 fps.
          */
-        if (fps === 0) fps = eventStore.getProp('instantFps');
+        fps = fps < 30 ? eventStore.getProp('instantFps') : fps;
 
         /**
          * Update value every seconds
@@ -330,7 +356,7 @@ const render = (timestamp) => {
     if (fps > maxFps) maxFps = fps;
 
     /**
-     * Chek if current frame can fire animation
+     * Check if current frame can fire animation
      * */
     shouldRender = getRenderStatus();
 
@@ -374,7 +400,7 @@ const render = (timestamp) => {
     const deferredNextTick = eventStore.getProp('deferredNextTick');
 
     if (deferredNextTick) {
-        setTimeout(() => nextTickFn());
+        useNextLoop(() => nextTickFn());
     } else {
         nextTickFn();
     }
@@ -442,7 +468,7 @@ export const handleFrame = (() => {
      * @description
      * Add callback
      *
-     * @param {function(handleFrameTypes):void } cb - callback function
+     * @param {import('./type.js').handleFrameCallbakType} cb - callback function
      * @returns void
      *
      * @example
@@ -462,7 +488,7 @@ export const handleFrame = (() => {
      * @description
      * Add an array of callback
      *
-     * @param {Array.<function(handleFrameTypes):void >} arr - array of callback
+     * @param {import('./type.js').handleFrameArrayType} arr - array of callback
      */
     const addMultiple = (arr = []) => {
         callback = [...callback, ...arr];

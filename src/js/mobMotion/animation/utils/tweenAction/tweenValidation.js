@@ -1,7 +1,7 @@
-import { handleSetUp } from '../../setup';
-import { MQ_MAX, MQ_MIN } from './setUpValidation.js';
-import { parallaxConstant } from '../parallax/parallaxConstant.js';
-import { getTweenFn, tweenConfig } from '../tween/tweenConfig';
+import { handleSetUp } from '../../../setup';
+import { MQ_MAX, MQ_MIN } from '../setUp/setUpValidation.js';
+import { parallaxConstant } from '../../parallax/parallaxConstant.js';
+import { getTweenFn, tweenConfig } from '../../tween/tweenConfig';
 import {
     DIRECTION_COL,
     DIRECTION_RADIAL,
@@ -15,7 +15,7 @@ import {
     STAGGER_TYPE_END,
     STAGGER_TYPE_EQUAL,
     STAGGER_TYPE_START,
-} from './stagger/staggerCostant.js';
+} from '../stagger/staggerCostant.js';
 import {
     addAsyncFunctionWarining,
     asyncTimelineDelayWarning,
@@ -73,14 +73,14 @@ import {
     timelineSetTweenLabelWarining,
     tweenEaseWarning,
     valueStringWarning,
-} from './warning';
+} from '../warning';
 import {
     checkIfIsOnlyNumber,
     checkIfIsOnlyNumberPositiveNegative,
     exactMatchInsesitiveNumberPropArray,
-} from './regexValidation';
-import { getPropiertiesValueFromConstant } from './getConstantFromRegex';
-import { mobCore } from '../../../mobCore';
+} from '../regexValidation';
+import { getPropiertiesValueFromConstant } from '../../parallax/getConstantFromRegex.js';
+import { mobCore } from '../../../../mobCore';
 
 /**
  *
@@ -98,9 +98,9 @@ export const dataTweenValueIsValid = (val) => {
 };
 
 /**
- * @param {Object} myObj
- * @param {Number} myObj.start
- * @param {Number} myObj.end
+ * @param {Object|undefined} myObj
+ * @param {Number|undefined} myObj.start
+ * @param {Number|undefined} myObj.end
  * @returns {Boolean}
  *
  * @description
@@ -116,7 +116,7 @@ export const sequencerRangeValidate = ({ start, end }) => {
 
 /**
  *
- * @param {Number} duration
+ * @param {Number|undefined} duration
  * @returns {Number}
  *
  * @description
@@ -132,7 +132,7 @@ export const durationIsValid = (duration) => {
 
 /**
  *
- * @param {Number} repeat
+ * @param {Number|undefined} repeat
  * @returns {Number}
  *
  * @description
@@ -148,8 +148,8 @@ export const repeatIsValid = (repeat) => {
 
 /**
  *
- * @param {String} ease
- * @returns {String}
+ * @param {String|undefined} ease
+ * @returns {import('../../tween/type').easeTypes}
  *
  * @description
  * Check if ease definition is valid
@@ -163,8 +163,8 @@ export const easeIsValid = (ease) => {
 
 /**
  *
- * @param {String} ease
- * @returns {String}
+ * @param {import('../../tween/type').easeTypes|undefined} ease
+ * @returns {function}
  *
  * @description
  * Check if ease definition is valid
@@ -179,8 +179,8 @@ export const easeParallaxTweenIsValid = (ease) => {
 };
 
 /**
- * @param {String} prop
- * @param {Number} value
+ * @param {String|undefined} prop
+ * @param {Number|undefined} value
  * @returns {Boolean}
  *
  * @description
@@ -197,7 +197,7 @@ export const initialDataPropValidate = (prop, value) => {
 };
 
 /**
- * @param {Number} each
+ * @param {Number|undefined} each
  * @returns {Boolean}
  *
  * @description
@@ -238,7 +238,7 @@ export const validateStaggerFrom = (from) => {
 };
 
 /**
- * @param {Number} val
+ * @param {Number|undefined} val
  * @returns {Boolean}
  *
  * @description
@@ -269,7 +269,7 @@ export const validateStaggerDirection = (direction) => {
 };
 
 /**
- * @param {Boolean} waitComplete
+ * @param {Boolean|undefined} waitComplete
  * @returns {Boolean}
  *
  * @description
@@ -283,7 +283,7 @@ export const validateStaggerWaitComplete = (waitComplete) => {
 };
 
 /**
- * @param {array} arr
+ * @param {array|undefined} arr
  * @returns {boolean}
  *
  * @description
@@ -297,8 +297,8 @@ export const validateStaggerItems = (arr = []) => {
 };
 
 /**
- * @param {array} arr
- * @returns {boolean}
+ * @param {array|undefined} arr
+ * @returns {Array}
  *
  * @description
  * Return the array fallback
@@ -309,7 +309,7 @@ export const staggerItemsIsValid = (arr = []) => {
 };
 
 /**
- * @param {string} arr
+ * @param {string|undefined} arr
  * @returns {boolean}
  *
  * @description
@@ -332,7 +332,7 @@ export const validateStaggerType = (type) => {
 
 /**
  *
- * @param {Number} tween duration
+ * @param {Number|undefined} tween duration
  * @returns {Number}
  *
  * @description
@@ -464,7 +464,7 @@ export const springConfigIsValid = (config) => {
 /**
  *
  * @param {String} spring config
- * @returns {Object}
+ * @returns {import('../../spring/type').springPropsOptional}
  *
  * @description
  * Check if every spring config prop is valid
@@ -518,7 +518,7 @@ export const valueIsBooleanAndTrue = (value, label) => {
 
 /**
  *
- * @param {Boolean} value
+ * @param {Boolean|undefined} value
  * @param {String} label
  * @param {Boolean} defaultValue
  * @returns {Boolean}
@@ -536,11 +536,11 @@ export const valueIsBooleanAndReturnDefault = (value, label, defaultValue) => {
 
 /**
  *
- * @param {String} value
+ * @param {String|undefined} value
  * @returns {String}
  *
  * @description
- * Check if value is String and return defualt
+ * Check if value is String and return default
  **/
 export const valueIsStringAndReturnDefault = (value, label, defaultValue) => {
     const isValid = mobCore.checkType(String, value);
@@ -552,11 +552,11 @@ export const valueIsStringAndReturnDefault = (value, label, defaultValue) => {
 
 /**
  *
- * @param {Number} value
+ * @param {Number|undefined} value
  * @returns {Number}
  *
  * @description
- * Check if value is Number and return defualt
+ * Check if value is Number and return default
  **/
 export const valueIsNumberAndReturnDefault = (value, label, defaultValue) => {
     const isValid = mobCore.checkType(Number, Number.parseFloat(value));
@@ -568,11 +568,11 @@ export const valueIsNumberAndReturnDefault = (value, label, defaultValue) => {
 
 /**
  *
- * @param {Function} value
+ * @param {Function|undefined} value
  * @returns {Function}
  *
  * @description
- * Check if value is Function and return defualt
+ * Check if value is Function and return default
  **/
 export const valueIsFunctionAndReturnDefault = (value, label, defaultValue) => {
     const isValid = mobCore.checkType(Function, value);
@@ -584,7 +584,7 @@ export const valueIsFunctionAndReturnDefault = (value, label, defaultValue) => {
 
 /**
  *
- * @param {Number} velocity
+ * @param {Number|undefined} velocity
  * @returns {Number}
  *
  * @description
@@ -600,7 +600,7 @@ export const lerpVelocityIsValid = (value) => {
 
 /**
  *
- * @param {Number} velocity
+ * @param {Number|undefined} velocity
  * @returns {Number}
  *
  * @description
@@ -616,7 +616,7 @@ export const lerpPrecisionIsValid = (value) => {
 
 /**
  *
- * @param {String} value
+ * @param {String|undefined} value
  * @param {String} label
  * @returns {Boolean}
  *
@@ -633,7 +633,7 @@ export const valueStringIsValid = (value, label) => {
 
 /**
  *
- * @param {Number} value
+ * @param {Number|undefined} value
  * @returns {NUmber|null}
  *
  * @description
@@ -649,7 +649,7 @@ export const asyncTimelineDelayIsValid = (value) => {
 
 /**
  *
- * @param {Object} value
+ * @param {Object|undefined} value
  * @returns {Boolean}
  *
  * @description
@@ -670,8 +670,8 @@ export const asyncTimelineTweenIsValid = (instance) => {
 
 /**
  *
- * @param {Number} index
- * @param {String} label
+ * @param {string|Number|null} index
+ * @param {String|null} label
  *
  * @description
  * Check if label is found
@@ -682,22 +682,22 @@ export const playLabelIsValid = (index, label) => {
 
 /**
  *
- * @param {Function} fn
+ * @param {Function|undefined} fn
  *
  * @description
- * Check if value is A function and return defualt
+ * Check if value is A function and return default
  **/
-export const functionIsValidAndReturnDefault = (fn, defualt, label) => {
+export const functionIsValidAndReturnDefault = (fn, defaultValue, label) => {
     const isValid = mobCore.checkType(Function, fn);
     if (!isValid && fn !== undefined && fn !== null)
         functionIsValidAndReturnDefaultWarining(label, fn);
 
-    return isValid ? fn : defualt;
+    return isValid ? fn : defaultValue;
 };
 
 /**
  *
- * @param {Function} fn
+ * @param {Function|undefined} fn
  *
  * @description
  * Check if value is A function
@@ -716,7 +716,7 @@ export const addAsyncFunctionIsValid = (fn) => {
 
 /**
  *
- * @param {Array} arr
+ * @param {Array|undefined} arr
  *
  * @description
  * Check if value is an Array
@@ -731,7 +731,7 @@ export const timelineSetTweenArrayIsValid = (arr) => {
 
 /**
  *
- * @param {String} label
+ * @param {String|undefined} label
  *
  * @description
  * Check if value is an string
@@ -746,8 +746,8 @@ export const timelineSetTweenLabelIsValid = (label) => {
 
 /**
  *
- * @param {(String|Element)} element
- * @returns {Element}
+ * @param {(string|HTMLElement|Window|undefined)} element
+ * @returns {HTMLElement}
  *
  * @description
  * Check if value is a valid Element and return element|window|element
@@ -769,8 +769,8 @@ export const domNodeIsValidAndReturnElOrWin = (
 
 /**
  *
- * @param {(String|Element)} element
- * @returns {Boolean}
+ * @param {(String|HTMLElement|undefined)} element
+ * @returns {HTMLElement|null}
  *
  * @description
  * Check if value is a valid Element
@@ -788,8 +788,8 @@ export const domNodeIsValidAndReturnNull = (element) => {
 
 /**
  *
- * @param {String} label
- * @returns {Boolean}
+ * @param {String|undefined} label
+ * @returns {string}
  *
  * @description
  * Check if value is a valid direction
@@ -809,7 +809,7 @@ export const directionIsValid = (direction, component) => {
 
 /**
  *
- * @param {Object} obj
+ * @param {Object|undefined} obj
  * @param {label} string
  * @returns {Object} dynamicStart|dynamicEnd|null Object
  *
@@ -827,7 +827,7 @@ export const parallaxDynamicValueIsValid = (obj, label) => {
     // obj is an Object
     const valueIsObject = mobCore.checkType(Object, obj);
     //
-    // position is a String and cotains the right value
+    // position is a String and contains the right value
     const positionIsValid =
         valueIsObject &&
         mobCore.checkType(String, obj?.position) &&
@@ -848,7 +848,7 @@ export const parallaxDynamicValueIsValid = (obj, label) => {
 
 /**
  *
- * @param {Function} value
+ * @param {Function|undefined} value
  * @returns {Function}
  *
  * @description
@@ -866,7 +866,7 @@ export const parallaxDynamicRangeIsValid = (fn) => {
 
 /**
  *
- * @param {Object} value
+ * @param {Object|undefined} value
  * @returns {Object} parallaxTween|HandleSequencer|{}
  *
  * @description
@@ -886,8 +886,8 @@ export const parallaxTweenIsValid = (instance) => {
 
 /**
  *
- * @param {( String|NUmber )} value
- * @returns {( String|NUmber )} ALign value
+ * @param {( String|Number|undefined )} value
+ * @returns {( String|Number )} ALign value
  *
  * @description
  * Check if Align value is valid
@@ -915,7 +915,7 @@ export const parallaxAlignIsValid = (value) => {
 
 /**
  *
- * @param {String} value
+ * @param {String|undefined} value
  * @returns {String} ALign value
  *
  * @description
@@ -939,11 +939,11 @@ export const parallaxOnSwitchIsValid = (value) => {
 
 /**
  *
- * @param {Number} value
+ * @param {Number|undefined} value
  * @returns {Number}
  *
  * @description
- * Check if value is Number and return defualt
+ * Check if value is Number and return default
  **/
 export const parallaxOpacityIsValid = (value, label, defaultValue) => {
     const isValid = mobCore.checkType(Number, Number.parseFloat(value));
@@ -955,7 +955,7 @@ export const parallaxOpacityIsValid = (value, label, defaultValue) => {
 
 /**
  *
- * @param {String} value
+ * @param {String|undefined} value
  * @returns {String}
  *
  * @description
@@ -979,7 +979,7 @@ export const parallaxTypeIsValid = (value) => {
 
 /**
  *
- * @param {String} value
+ * @param {string|number|undefined} value
  * @returns {String}
  *
  * @description
@@ -1015,11 +1015,11 @@ export const parallaxRangeIsValid = (value, type) => {
 
 /**
  *
- * @param {String} value
+ * @param {String|undefined} value
  * @returns {String}
  *
  * @description
- * Check if breackpoint prop is valid
+ * Check if breakpoint prop is valid
  **/
 export const breakpointIsValid = (mq, label, component) => {
     const mqObj = handleSetUp.get('mq');
@@ -1035,7 +1035,7 @@ export const breakpointIsValid = (mq, label, component) => {
 
 /**
  *
- * @param {String} value
+ * @param {String|undefined} value
  * @returns {String}
  *
  * @description
@@ -1054,7 +1054,7 @@ export const breakpointTypeIsValid = (type, label, component) => {
 
 /**
  *
- * @param {String} value
+ * @param {String|undefined} value
  * @returns {String}
  *
  * @description
@@ -1131,7 +1131,7 @@ export const parallaxPropiertiesIsValid = (
 
 /**
  *
- * @param {String} value
+ * @param {String|undefined} value
  * @returns {String}
  *
  * @description
@@ -1176,7 +1176,7 @@ export const genericEaseTypeIsValid = (value, component) => {
 
 /**
  *
- * @param {String} value
+ * @param {String|undefined} value
  * @returns {String}
  *
  * @description
@@ -1200,7 +1200,7 @@ export const parallaxSpringConfigIsValid = (config, type) => {
 
 /**
  *
- * @param {Number} value
+ * @param {Number|undefined} value
  * @returns {Number}
  *
  * @description

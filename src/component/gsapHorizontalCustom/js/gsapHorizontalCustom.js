@@ -7,7 +7,7 @@ import {
     getTranslateValues,
 } from '../../../js/mobCore/utils';
 import { mobCore } from '../../../js/mobCore';
-import { core } from '../../../js/mobMotion';
+import { motionCore } from '../../../js/mobMotion';
 
 export class GsapHorizontalCustomClass {
     constructor(data = {}) {
@@ -63,7 +63,7 @@ export class GsapHorizontalCustomClass {
     }
 
     getWidth() {
-        if (!core.mq(this.queryType, this.breackpoint)) return;
+        if (!motionCore.mq(this.queryType, this.breackpoint)) return;
 
         const horizontalWidth = [...this.cards]
             .map((item) => {
@@ -75,7 +75,7 @@ export class GsapHorizontalCustomClass {
     }
 
     createShadow() {
-        if (!core.mq(this.queryType, this.breackpoint)) return;
+        if (!motionCore.mq(this.queryType, this.breackpoint)) return;
 
         const shadowsTransition = `
             ${[...this.shadow]
@@ -123,7 +123,7 @@ export class GsapHorizontalCustomClass {
     }
 
     updateShadow() {
-        if (!core.mq(this.queryType, this.breackpoint)) return;
+        if (!motionCore.mq(this.queryType, this.breackpoint)) return;
 
         const shadowEl = this.mainContainer.querySelectorAll(
             `.${this.shadowMainClass}`
@@ -221,7 +221,7 @@ export class GsapHorizontalCustomClass {
     initGsap() {
         if (
             !this.triggerContainer ||
-            !core.mq(this.queryType, this.breackpoint)
+            !motionCore.mq(this.queryType, this.breackpoint)
         )
             return;
         this.setDimension();
@@ -265,13 +265,16 @@ export class GsapHorizontalCustomClass {
     onResize() {
         const gsapisActive = this.store.getProp('gsapisActive');
 
-        if (gsapisActive && core.mq(this.queryType, this.breackpoint)) {
+        if (gsapisActive && motionCore.mq(this.queryType, this.breackpoint)) {
             this.getWidth();
             this.setDimension();
             this.updateShadow();
             this.killGsap();
             this.initGsap();
-        } else if (!gsapisActive && core.mq(this.queryType, this.breackpoint)) {
+        } else if (
+            !gsapisActive &&
+            motionCore.mq(this.queryType, this.breackpoint)
+        ) {
             this.getWidth();
             this.createShadow();
             this.updateShadow();

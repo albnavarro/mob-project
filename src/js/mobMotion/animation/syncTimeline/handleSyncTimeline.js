@@ -1,23 +1,19 @@
+// @ts-check
+
 import { clamp } from '../utils/animationUtils.js';
-import { fpsLoadedLog } from '../utils/log.js';
-import { directionConstant } from '../utils/constant.js';
 import { syncTimelineLabelWarning } from '../utils/warning.js';
 import {
     durationIsValid,
     repeatIsValid,
     valueIsBooleanAndReturnDefault,
-} from '../utils/tweenValidation.js';
+} from '../utils/tweenAction/tweenValidation.js';
 import { mobCore } from '../../../mobCore/index.js';
+import { directionConstant } from '../utils/timeline/timelineConstant.js';
+import { fpsLoadedLog } from '../utils/fpsLogInizialization.js';
 
-/**
- * @typedef {Object} syncTimelineTypes
- * @prop {Number} [ duration ] duration in millisecond of timeline,
- * @prop {Boolean} [yoyo=0] Reverse the direction each time the animation ends
- * @prop {Number} [repeat=1] how many times the animation should be repeated, -1 means that the animation will run in an infinite loop
- */
 export default class HandleSyncTimeline {
     /**
-     * @param { syncTimelineTypes } data
+     * @param {import('./type.js').syncTimelineType} data
      *
      * @example
      * ```javascript
@@ -55,11 +51,13 @@ export default class HandleSyncTimeline {
     constructor(data = {}) {
         /**
          * @private
+         * @type {number}
          */
         this.duration = durationIsValid(data?.duration);
 
         /**
          * @private
+         * @type {boolean}
          */
         this.yoyo = valueIsBooleanAndReturnDefault(
             data?.yoyo,
@@ -69,142 +67,164 @@ export default class HandleSyncTimeline {
 
         /**
          * @private
+         * @type {number}
          */
         this.repeat = repeatIsValid(data?.repeat);
 
         /**
          * @private
+         * @type {import('./type.js').syncTimelineSequencers[]}
          */
         this.sequencers = [];
 
         /**
          * @private
+         * @type {number}
          */
-        this.startTime = null;
+        this.startTime = 0;
 
         /**
          * @private
+         * @type {number}
          */
         this.timeElapsed = 0;
 
         /**
          * @private
+         * @type {number}
          */
         this.currentTime = 0;
 
         /**
          * @private
+         * @type {number}
          */
         this.pauseTime = 0;
 
         /**
          * @private
+         * @type {number}
          */
         this.timeAtReverse = 0;
 
         /**
          * @private
+         * @type {number}
          */
         this.timeAtReverseBack = 0;
 
         /**
          * @private
+         * @type {boolean}
          */
         this.isReverse = false;
 
         /**
          * @private
+         * @type {boolean}
          */
         this.startReverse = false;
 
         /**
          * @private
+         * @type {boolean}
          */
         this.isPlayngReverse = false;
 
         /**
          * @private
+         * @type {number}
          */
         this.loopCounter = 0;
 
         /**
          * @private
+         * @type {number}
          */
         this.loopIteration = 0;
 
         /**
          * @private
+         * @type {number}
          */
         this.minLoopIteration = 10;
 
         /**
          * @private
-         */
-        this.sequencers = [];
-
-        /**
-         * @private
+         * @type {boolean}
          */
         this.isStopped = true;
 
         /**
          * @private
+         * @type {boolean}
          */
         this.skipFirstRender = false;
 
         /**
          * @private
+         * @type {boolean}
          */
         this.completed = false;
 
         /**
          * @private
+         * @type {boolean}
          */
         this.fpsIsInLoading = false;
 
         /**
          * @private
+         * @type {boolean}
          */
         this.isInPause = false;
 
         /**
          * @private
+         * @type {number}
          */
         this.callbackId = 0;
 
         /**
          * @private
+         * @type {import('./type.js').syncTimelineEventType[]}
          */
         this.callbackLoop = [];
 
         /**
          * @private
+         * @type {import('./type.js').syncTimelineEventType[]}
          */
         this.callbackComplete = [];
 
         /**
          * @private
+         * @type {import('./type.js').syncTimelineEventType[]}
          */
         this.callbackOnUpdate = [];
 
         /**
          * @private
+         * @type{function|undefined}
          */
-        this.currentResolve = null;
+        this.currentResolve = undefined;
 
         /**
          * @private
+         * @type{function|undefined}
          */
-        this.currentReject = null;
+        this.currentReject = undefined;
     }
 
     /**
      * @private
+     * @param {number} time
+     * @param {number} fps
      */
     updateTime(time, fps) {
         if (this.isStopped || this.fpsIsInLoading) return;
 
-        // If loop anitcipate by half frame ( in millsenconds ) next loop so we a have more precise animation
+        // If loop anitcipate by half frame ( in milliseconds ) next loop so we a have more precise animation
         const frameThreshold =
             !this.repeat ||
             (this.repeat >= 2 && this.loopCounter === this.repeat - 1)
@@ -219,7 +239,7 @@ export default class HandleSyncTimeline {
                 this.timeAtReverseBack;
         }
 
-        this.timeElapsed = Number.parseInt(
+        this.timeElapsed = Math.trunc(
             time - this.startTime - this.pauseTime - this.timeAtReverseBack
         );
 
@@ -230,7 +250,7 @@ export default class HandleSyncTimeline {
         if (!this.isInPause) {
             this.currentTime = clamp(partial, 0, this.duration);
 
-            // When come from playReverse skip first frame becouse is 0
+            // When come from playReverse skip first frame because is 0
             if (!this.skipFirstRender) {
                 this.sequencers.forEach((item) => {
                     item.draw({
@@ -307,7 +327,7 @@ export default class HandleSyncTimeline {
                 this.completed = true;
                 this.loopCounter++;
                 // this callback is fired after a frame so
-                // check end timeline use the right value not resetted
+                // check end timeline use the right value not reset
                 this.loopIteration = 0;
 
                 this.callbackLoop.forEach(({ cb }) =>
@@ -384,6 +404,7 @@ export default class HandleSyncTimeline {
 
     /**
      * @private
+     * @returns {void}
      */
     goToNextFrame() {
         mobCore.useFrame(() => {
@@ -396,6 +417,7 @@ export default class HandleSyncTimeline {
 
     /**
      * @private
+     * @returns {void}
      */
     resetTime() {
         this.timeElapsed = 0;
@@ -407,28 +429,35 @@ export default class HandleSyncTimeline {
 
     /**
      * @private
+     * @param {string} label
+     * @returns {number}
      */
     getTimeFromLabel(label) {
-        const labelObj = this.sequencers.reduce((p, c) => {
-            const currentLabels = c.getLabels();
-            const labelsMatched = currentLabels.find(
-                ({ name: currentName }) => currentName === label
-            );
+        const labelObj = this.sequencers.reduce(
+            (previous, current) => {
+                const currentLabels = current.getLabels();
+                const labelsMatched = currentLabels.find(
+                    ({ name: currentName }) => currentName === label
+                );
 
-            return labelsMatched || p;
-        }, null);
+                return labelsMatched || previous;
+            },
+            { name: '', time: 0 }
+        );
 
         if (!labelObj) syncTimelineLabelWarning(label);
-        return labelObj?.time;
+
+        return labelObj.time;
     }
 
     /**
      * Private
+     * @returns {void}
      */
     rejectPromise() {
         if (this.currentReject) {
             this.currentReject(mobCore.ANIMATION_STOP_REJECT);
-            this.currentReject = null;
+            this.currentReject = undefined;
         }
     }
 
@@ -501,17 +530,20 @@ export default class HandleSyncTimeline {
             if (this.fpsIsInLoading) return;
 
             const isNumber = mobCore.checkType(Number, value);
+            // @ts-ignore
             const labelTime = isNumber ? value : this.getTimeFromLabel(value);
 
             this.rejectPromise();
             this.currentResolve = resolve;
             this.currentReject = reject;
+            // @ts-ignore
             this.playFromTime(labelTime);
         });
     }
 
     /**
      * @private
+     * @param {number} time
      */
     playFromTime(time = 0) {
         // Reset sequancer callback add function state
@@ -531,7 +563,7 @@ export default class HandleSyncTimeline {
         this.loopIteration = 0;
 
         /*
-         * Prevent multile firing
+         * Prevent multiple firing
          */
         this.fpsIsInLoading = true;
         this.startAnimation(time);
@@ -563,11 +595,13 @@ export default class HandleSyncTimeline {
             if (this.fpsIsInLoading) return;
 
             const isNumber = mobCore.checkType(Number, value);
+            // @ts-ignore
             const labelTime = isNumber ? value : this.getTimeFromLabel(value);
 
             this.rejectPromise();
             this.currentResolve = resolve;
             this.currentReject = reject;
+            // @ts-ignore
             this.playFromTimeReverse(labelTime, true);
         });
     }
@@ -612,12 +646,15 @@ export default class HandleSyncTimeline {
                 return;
             }
 
+            // @ts-ignore
             this.playFromTimeReverse(this.duration, true);
         });
     }
 
     /**
      * @private
+     * @param {number} time
+     * @returns {void}
      */
     playFromTimeReverse(time = 0) {
         // Reset sequancer callback add function state
@@ -641,14 +678,18 @@ export default class HandleSyncTimeline {
         this.loopIteration = 0;
 
         /*
-         * Prevent multile firing
+         * Prevent multiple firing
          */
         this.fpsIsInLoading = true;
         this.startAnimation(time);
     }
 
     /**
-     * Find label tha match the occurrency and return the time
+     * @description
+     * Find label than match the occurrency and return the time
+     *
+     * @param {number} partial
+     * @returns {Promise}
      */
     async startAnimation(partial) {
         if (this.repeat === 0) return;
@@ -692,6 +733,9 @@ export default class HandleSyncTimeline {
      *
      * @description
      * Pause timeline
+     *
+     * @returns {void}
+     *
      */
     pause() {
         if (this.isStopped || this.isInPause || this.fpsIsInLoading) return;
@@ -711,6 +755,8 @@ export default class HandleSyncTimeline {
      *
      * @description
      * Resume timeline from pause
+     *
+     * @returns {void}
      */
     resume() {
         if (this.isStopped || !this.isInPause || this.fpsIsInLoading) return;
@@ -730,6 +776,9 @@ export default class HandleSyncTimeline {
      *
      * @description
      * Reverse the direction while the timeline is running
+     *
+     *
+     * @returns {void}
      */
     reverse() {
         if (this.isStopped || this.isInPause || this.fpsIsInLoading) return;
@@ -746,8 +795,8 @@ export default class HandleSyncTimeline {
 
     /**
      * @param {Object} obj
-     * @param {Boolean} obj.clearCache
-     * @returns {this} The instance on which this method was called.
+     * @param {Boolean} [ obj.clearCache ]
+     * @returns {this|undefined} The instance on which this method was called.
      *
      * @example
      * ```javascript
@@ -758,6 +807,8 @@ export default class HandleSyncTimeline {
      *
      * @description
      * Stop timeline
+     *
+     *
      */
     stop({ clearCache = true } = {}) {
         this.isStopped = true;
@@ -791,7 +842,7 @@ export default class HandleSyncTimeline {
     }
 
     /**
-     * @property {(HandleSequencer|HandleMasterSequencer)} sequencer
+     * @param {import('./type.js').syncTimelineSequencers} sequencer
      * @returns {this} The instance on which this method was called.
      *
      * @example
@@ -805,19 +856,26 @@ export default class HandleSyncTimeline {
      * @description
      * Add the instance of a sequencer | masterSequencer to the timeline
      */
-    add(sequencer = {}) {
+    add(sequencer) {
         sequencer.setStretchFactor(this.duration);
         this.sequencers.push(sequencer);
 
         return this;
     }
 
+    /**
+     * @param {number} duration
+     * @returns {this} The instance on which this method was called.
+     */
     setDuration(duration) {
         this.duration = duration;
 
         return this;
     }
 
+    /**
+     * @returns {void}
+     */
     resetSequencerLastValue() {
         this.sequencers.forEach((item) => item.resetLastValue());
     }
@@ -857,7 +915,7 @@ export default class HandleSyncTimeline {
     }
 
     /**
-     * @returns {import('../utils/constant.js').directionStringTypes}
+     * @returns {string}
      *
      * @example
      * ```javascript
@@ -895,12 +953,7 @@ export default class HandleSyncTimeline {
     }
 
     /**
-     * @typedef {Object} syncTimelineLoopType
-     * @prop {number} loop
-     **/
-
-    /**
-     * @param {function(import('../utils/constant.js').directionTypes & syncTimelineLoopType):void } cb - callback function
+     * @param {function(import('../utils/timeline/type.js').directionTypeObjectLoop ):void } cb - callback function
      * @return {Function} unsubscribe callback
      *
      * @example
@@ -956,12 +1009,7 @@ export default class HandleSyncTimeline {
     }
 
     /**
-     * @typedef {Object} syncTimelineTimeType
-     * @prop {Number} time
-     **/
-
-    /**
-     * @param {function(import('../utils/constant.js').directionTypes & syncTimelineTimeType):void } cb - callback function
+     * @param {function(import('../utils/timeline/type.js').directionTypeObjectLoop ):void } cb - callback function
      * @return {Function} unsubscribe callback
      *
      * @example

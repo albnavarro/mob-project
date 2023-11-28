@@ -19,7 +19,7 @@ export const maxDepth = (object) => {
 };
 
 /**
- * @param {import('./simpleStore.js').SimpleStoreType} data
+ * @param {import('./type.js').simpleStoreBaseData} data
  * @param {Boolean} shouldRecursive - max 1 level of recurisivity.
  * @returns {Object<string,(Object<string,any>|any)>}
  *
@@ -50,7 +50,7 @@ export const getDataRecursive = (data, shouldRecursive = true) => {
                 ...p,
 
                 [key]: getDataRecursive(
-                    /** @type {import('./simpleStore.js').SimpleStoreType} */ (
+                    /** @type {import('./type.js').simpleStoreBaseData} */ (
                         value
                     ),
                     false
@@ -80,7 +80,7 @@ export const getDataRecursive = (data, shouldRecursive = true) => {
 };
 
 /**
- * @param {import('./simpleStore.js').SimpleStoreType} data
+ * @param {import('./type.js').simpleStoreBaseData} data
  * @param {String} prop
  * @param {any} fallback
  * @param {Boolean} shouldRecursive - max 1 level of recursivity
@@ -110,7 +110,7 @@ export const getPropRecursive = (
                 ...p,
 
                 [key]: getPropRecursive(
-                    /** @type{import('./simpleStore.js').SimpleStoreType} */ (
+                    /** @type{import('./type.js').simpleStoreBaseData} */ (
                         value
                     ),
                     prop,
@@ -145,7 +145,7 @@ export const getPropRecursive = (
 
 /**
  * @param {Object} obj
- * @param {import('./simpleStore.js').SimpleStoreType} obj.data
+ * @param {import('./type.js').simpleStoreBaseData} obj.data
  * @param {Number} obj.depth
  * @param {String} obj.logStyle
  * @returns {Object<string,(Object<string,any>|any)>}
@@ -161,7 +161,7 @@ export const inizializeStoreData = ({ data, depth, logStyle }) => {
 
 /**
  * @param {Object} obj
- * @param {import('./simpleStore.js').SimpleStoreType} obj.data
+ * @param {import('./type.js').simpleStoreBaseData} obj.data
  * @param {String} obj.prop
  * @param {Number} obj.depth
  * @param {String} obj.logStyle

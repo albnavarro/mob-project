@@ -4,14 +4,9 @@ import { mobCore } from '../../../../mobCore';
 import { callBackStore } from './callBackStore';
 
 /**
- * @callback subscribeCallbackType
- * @param {Object.<string, number>} props
- */
-
-/**
  * @param {Function} currentCallback - callback to execute.
- * @param {Array.<{cb:function,id:number,index:Number,frame:Number}>} arrayOfCallback
- * @returns {{arrayOfCallbackUpdated:Array.<{cb:function,id:number,index:Number,frame:Number}>,unsubscribeCb: function(Array.<{cb:function,id:number,index:Number,frame:Number}>):Array.<{cb:function,id:number,index:Number,frame:Number}> }}
+ * @param {Array.<import('./type').callbackObject>} arrayOfCallback
+ * @returns {{arrayOfCallbackUpdated:Array.<import('./type').callbackObject>,unsubscribeCb: function(Array.<import('./type').callbackObject>):Array.<import('./type').callbackObject> }}
  *
  * @description
  * Add callback to Stack.
@@ -35,7 +30,7 @@ export const setCallBack = (currentCallback, arrayOfCallback) => {
     // Update Incremental id.
     callBackStore.quickSetProp('id', id + 1);
 
-    // Delete item from arrayOfCallback, it is possibile unsubscribe a single stagger.
+    // Delete item from arrayOfCallback, it is possible unsubscribe a single stagger.
     return {
         arrayOfCallbackUpdated,
         unsubscribeCb: (arrayOfCallback) =>
@@ -50,10 +45,10 @@ export const setCallBack = (currentCallback, arrayOfCallback) => {
 /**
  * @param {('Object'|'HTMLElement')} item
  * @param {function(Object.<string, number>):void} currentCallback
- * @param {Array.<{cb:number,id:number,index:Number,frame:Number}>} arrayOfCallback
+ * @param {Array.<import('./type').callbackObject>} arrayOfCallback
  * @param {Array.<function>} unsubscribeCacheArray - unsubscribe function of handleCache.
  *
- * @returns {{arrayOfCallbackUpdated:Array.<{cb:number,id:number,index:Number,frame:Number}>, unsubscribeCache:Array.<function>, unsubscribeCb:function(Array.<{cb:number,id:number,index:Number,frame:Number}>):Array.<{cb:number,id:number,index:Number,frame:Number}> }}
+ * @returns {{arrayOfCallbackUpdated:Array.<import('./type').callbackObject>, unsubscribeCache:Array.<function>, unsubscribeCb:function(Array.<{cb:number,id:number,index:Number,frame:Number}>):Array.<{cb:number,id:number,index:Number,frame:Number}> }}
  */
 export const setCallBackCache = (
     item,

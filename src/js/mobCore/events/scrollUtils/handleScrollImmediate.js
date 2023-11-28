@@ -1,34 +1,17 @@
 // @ts-check
 
-/**
- * @typedef {Object} handleScrollType
- * @prop {number} scrollY - Scroll position
- * @prop {('UP'|'DOWN')} direction
- */
+import { getUnivoqueId } from '../../utils';
 
 /**
  * @type {Boolean}
  */
-let inizialized = false;
+let initialized = false;
 
 /**
- * @type {Array.<{id:number, cb:Function }>}
+ * @type {Map<String,Function>}
  */
-let callback = [];
-
-/**
- * @type {Number}
- */
-let id = 0;
-
-/**
- * @type {String}
- */
+const callbacks = new Map();
 const UP = 'UP';
-
-/**
- * @type {String}
- */
 const DOWN = 'DOWN';
 
 /**
@@ -42,12 +25,12 @@ let prev = window.pageYOffset;
 let val = window.pageYOffset;
 
 /**
- * @type {String}
+ * @type {import('./type').scrollDirection}
  */
 let direction = DOWN;
 
 /**
- * @type {{scrollY: Number, direction:String}}
+ * @type {import('./type').handleScrollTypes}
  */
 let scrollData = {
     scrollY: val,
@@ -61,10 +44,10 @@ function handler() {
     /**
      * if - if there is no subscritor remove handler
      */
-    if (callback.length === 0) {
+    if (callbacks.size === 0) {
         window.removeEventListener('scroll', handler);
 
-        inizialized = false;
+        initialized = false;
         return;
     }
 
@@ -82,17 +65,20 @@ function handler() {
      * Check if browser lost frame.
      * If true skip.
      */
-    callback.forEach(({ cb }) => cb(scrollData));
+    // callback.forEach(({ cb }) => cb(scrollData));
+    for (const value of callbacks.values()) {
+        value(scrollData);
+    }
 }
 
 /**
- * init - if istener is not inizializad remove it
+ * init - if listener is not inizializad remove it
  *
  * @return {void}
  */
 function init() {
-    if (inizialized) return;
-    inizialized = true;
+    if (initialized) return;
+    initialized = true;
 
     window.addEventListener('scroll', handler, {
         passive: true,
@@ -103,7 +89,7 @@ function init() {
  * @description
  * Execute a callback immediately on scroll
  *
- * @param {function(handleScrollType):void } cb - callback function
+ * @param {import('./type').handleScrollCallback} cb - callback function
  * @return {Function} unsubscribe callback
  *
  * @example
@@ -117,17 +103,14 @@ function init() {
  * ```
  */
 const addCb = (cb) => {
-    callback.push({ cb, id: id });
-    const cbId = id;
-    id++;
+    const id = getUnivoqueId();
+    callbacks.set(id, cb);
 
     if (typeof window !== 'undefined') {
         init();
     }
 
-    return () => {
-        callback = callback.filter((item) => item.id !== cbId);
-    };
+    return () => callbacks.delete(id);
 };
 
 /**

@@ -1,5 +1,7 @@
 // @ts-check
 
+import { getUnivoqueId } from '../utils/index.js';
+import { useNextLoop } from '../utils/nextTick.js';
 import { checkEquality } from './checkEquality.js';
 import { checkType, TYPE_IS_ANY, storeType, UNTYPED } from './storeType.js';
 import {
@@ -26,56 +28,40 @@ import {
     storeWatchWarning,
 } from './storeWarining.js';
 
-/**
- * @typedef {('String'|'Number'|'Object'|'Function'|'Array'|'Boolean'|'Element'|'Map'|'Set'|'NodeList'|'Any')} SimpleStoreUsableType
- */
-
-/**
- * @typedef {(Number|String|Function|'FUNCTION'|Array|Boolean|Element|Map|Set|NodeList)} SimpleStoreBasicValues
- */
-
-/**
- * @typedef {function():{value:any,type?:SimpleStoreUsableType,validate?:function(any,any):Boolean,strict?:Boolean,skipEqual?:Boolean}} SimpleStoreTypeBase
- */
-
-/**
- * @typedef {Object<string,( SimpleStoreTypeBase|SimpleStoreBasicValues|Object<string,( SimpleStoreTypeBase|SimpleStoreBasicValues)>)>} SimpleStoreType
- */
-
 export class SimpleStore {
     /**
-     * @param {SimpleStoreType} data
+     * @param {import('./type.js').simpleStoreBaseData} data
      *
      * @description
-     * SimpleStore inizialization.
+     * SimpleStore initialization.
      * The store accepts single properties or objects
-       Each individual property can be initialized with a simple value or via a more complex setup.
-       A complex set-up is created through a function that must return an object with the property `value` and at least one of the following properties:
-       `type` || `validation` || `skipEqual` || `strict`
+     * Each individual property can be initialized with a simple value or via a more complex setup.
+     * A complex set-up is created through a function that must return an object with the property `value` and at least one of the following properties:
+     * `type` || `validation` || `skipEqual` || `strict`
      *
-      `value`:
-       Initial value.
-
-      `type`:
-       Supported types:
-      `String|Number|Object|Function|Array|Boolean|Element|HTMLElement|Map|Set|NodeList|"Any"`.
-       The property will not be updated if it doesn't match, you will have a waring.
-       For custom Object use 'Any'.
-       Support Contructor || String.
-       Es: type: Number || type: 'Number'
-
-       `validation`:
-       Validation function to parse value.
-       This function will have the current value and old value as input parameter and will return a boolean value.
-       The validation status of each property will be displayed in the watchers and will be retrievable using the getValidation() method.
-
-       `strict`:
-       If set to true, the validation function will become blocking and the property will be updated only if the validation function is successful.
-       THe default value is `false`.
-
-       `skipEqual`:
-       If the value is equal to the previous one, the property will not be updated. The watches will not be executed and the property will have no effect on the computed related to it.
-       The default value is `true`.
+     * `value`:
+     * Initial value.
+     *
+     *`type`:
+     * Supported types:
+     *`String|Number|Object|Function|Array|Boolean|Element|HTMLElement|Map|Set|NodeList|"Any"`.
+     * The property will not be updated if it doesn't match, you will have a warning.
+     * For custom Object use 'Any'.
+     * Support Constructor || String.
+     * Es: type: Number || type: 'Number'
+     *
+     * `validation`:
+     * Validation function to parse value.
+     * This function will have the current value and old value as input parameter and will return a boolean value.
+     * The validation status of each property will be displayed in the watchers and will be retrievable using the getValidation() method.
+     *
+     * `strict`:
+     * If set to true, the validation function will become blocking and the property will be updated only if the validation function is successful.
+     * THe default value is `false`.
+     *
+     * `skipEqual`:
+     * If the value is equal to the previous one, the property will not be updated. The watches will not be executed and the property will have no effect on the computed related to it.
+     * The default value is `true`.
      *
      *
      *
@@ -140,32 +126,41 @@ export class SimpleStore {
         /**
          * @private
          *
-         * @type {Number}
-         *
-         * @description
-         * Subscriber id counter
-         */
-        this.counterId = 0;
-
-        /**
-         * @private
-         *
-         * @type {Array.<{prop:String,fn:Function,id:Number}>}
+         * @type {Map<String,{prop:String,fn:Function}>}
          *
          * @description
          * Callback store
          */
-        this.callBackWatcher = [];
+        this.callBackWatcher = new Map();
 
         /**
          * @private
          *
-         * @type {Array.<{prop:String,fn:Function,keys:Array.<string>}>}
+         * @type {Set.<{prop:String,fn:Function,keys:Array.<string>}>}
          *
          * @description
          * Callback store
          */
-        this.callBackComputed = [];
+        this.callBackComputed = new Set();
+
+        /**
+         * @private
+         *
+         * @type {Set.<String>}
+         * @description
+         * Computed propierties update in tick.
+         */
+        this.computedPropFired = new Set();
+
+        /**
+         * @private
+         *
+         * @type {Set.<String>}
+         *
+         * Queque of props changed.
+         * Compued use this queque for checking mutation
+         */
+        this.computedWaitList = new Set();
 
         /**
          * @private
@@ -186,25 +181,6 @@ export class SimpleStore {
          * Depth of initial data object
          */
         this.dataDepth = maxDepth(data);
-
-        /**
-         * @private
-         *
-         * @type {Array.<String>}
-         * @description
-         * Computed propierties update in tick.
-         */
-        this.computedPropFired = [];
-
-        /**
-         * @private
-         *
-         * @type {Array.<String>}
-         *
-         * Queque of props changed.
-         * Compued use this queque for checking mutation
-         */
-        this.computedWaitList = [];
 
         /**
          * @private
@@ -305,11 +281,11 @@ export class SimpleStore {
      * @private
      *
      * @description
-     * Inizialize validation status for each prop.
+     * Initialize validation status for each prop.
      */
     inizializeValidation() {
         /**
-         * Inizialize empty Object if prop is an object.
+         * Initialize empty Object if prop is an object.
          */
         for (const key in this.store) {
             if (storeType.isObject(this.store[key]))
@@ -323,6 +299,33 @@ export class SimpleStore {
             const [key, value] = item;
             this.set(key, value, false);
         });
+    }
+
+    /**
+     * @param {Object} obj
+     * @param {String} obj.prop
+     * @param {any} obj.newValue
+     * @param {any} obj.oldValue
+     * @param {Boolean|Object<String,Boolean>} obj.validationValue
+     */
+    runCallbackQueqe({ prop, newValue, oldValue, validationValue }) {
+        for (const { prop: currentProp, fn } of this.callBackWatcher.values()) {
+            if (currentProp === prop) fn(newValue, oldValue, validationValue);
+        }
+    }
+
+    /**
+     * @param {Object} obj
+     * @param {String} obj.prop
+     * @param {any} obj.newValue
+     * @param {any} obj.oldValue
+     * @param {Boolean|Object<String,Boolean>} obj.validationValue
+     */
+    async runCallbackQueqeAsync({ prop, newValue, oldValue, validationValue }) {
+        for (const { prop: currentProp, fn } of this.callBackWatcher.values()) {
+            if (currentProp === prop)
+                await fn(newValue, oldValue, validationValue);
+        }
     }
 
     /**
@@ -384,19 +387,18 @@ export class SimpleStore {
                  * setters to update the prop
                  */
 
-                const shouldFire =
-                    !this.computedPropFired.includes(propToUpdate);
+                const shouldFire = !this.computedPropFired.has(propToUpdate);
 
                 if (shouldFire) {
                     const computedValue = computedFn(...propValues);
                     this.set(propToUpdate, computedValue);
-                    this.computedPropFired.push(propToUpdate);
+                    this.computedPropFired.add(propToUpdate);
                 }
             });
         });
 
-        this.computedPropFired = [];
-        this.computedWaitList = [];
+        this.computedPropFired.clear();
+        this.computedWaitList.clear();
         this.computedRunning = false;
     }
 
@@ -410,24 +412,24 @@ export class SimpleStore {
      * the callback related to the computed will be fired only once.
      */
     addToComputedWaitLsit(prop) {
-        if (this.callBackComputed.length === 0) return;
+        if (this.callBackComputed.size === 0) return;
 
-        this.computedWaitList.push(prop);
+        this.computedWaitList.add(prop);
 
         if (!this.computedRunning) {
             this.computedRunning = true;
-            setTimeout(() => this.fireComputed());
+            useNextLoop(() => this.fireComputed());
         }
     }
 
     /**
      * @param {String} prop - propierties or object to update
      * @param {(any|function(any):any)} newValue - It is possible to pass the direct value or a function which takes as parameter the current value and which returns the new value
-       If the type of value used is a function, only the new function can be passed
+     * If the type of value used is a function, only the new function can be passed
      * @param {Boolean} [ fireCallback ] - fire watcher callback on update,  default value is `true`
      * @param {Boolean} [ clone ] - Return a clone of original object for Map,Set,Onject and Array,
-       Useful for Map and Set because with this contructor doasn't support spread
-       Default value is `false`.
+     *  Useful for Map and Set because with this constructor doesn't support spread
+     *  Default value is `false`.
      * @returns void
      *
      * @description
@@ -442,15 +444,15 @@ export class SimpleStore {
      * //Function that return a value:
      * myStore.set('myProp', (currentValue) => currentValue + 1);
      *
-     * //Use spred to return a new data without mutate original
+     * //Use spread to return a new data without mutate original
      * myStore.set('myArray', (arr) => [...arr, 1]);
      * myStore.set('myObject', (obj) => ({ ...obj, ...{ prop: <val> }}))
      *
      * // Use a Map and clone original data.
      * myStore.set('mySet', (set) => {
-          set.add(<val>)
-          return set
-       }, true, true);
+     *     set.add(<val>)
+     *     return set
+     *  }, true, true);
      *
      * ```
      */
@@ -561,8 +563,10 @@ export class SimpleStore {
          * Check if last value is equal new value.
          * if true and skipEqual is true for this prop return.
          */
-        const isEqual = checkEquality(this.type[prop], oldVal, val);
-        if (isEqual && this.skipEqual[prop]) return;
+        const isEqual = this.skipEqual[prop]
+            ? checkEquality(this.type[prop], oldVal, val)
+            : false;
+        if (isEqual) return;
 
         /**
          * Finally set new value
@@ -570,11 +574,11 @@ export class SimpleStore {
         this.store[prop] = val;
 
         if (fireCallback) {
-            const fnByProp = this.callBackWatcher.filter(
-                (item) => item.prop === prop
-            );
-            fnByProp.forEach((item) => {
-                item.fn(val, oldVal, this.validationStatusObject[prop]);
+            this.runCallbackQueqe({
+                prop,
+                newValue: val,
+                oldValue: oldVal,
+                validationValue: this.validationStatusObject[prop],
             });
         }
 
@@ -689,7 +693,7 @@ export class SimpleStore {
 
         /**
          * Validate value (value passed to setObj is a Object to merge with original) and store the result in validationStatusObject arr
-         * id there is no validation return true, otherwse get boolean value from fnValidate obj
+         * id there is no validation return true, otherwise get boolean value from fnValidate obj
          */
         Object.entries(newValParsedByStrict).forEach((item) => {
             const [subProp, subVal] = item;
@@ -697,9 +701,9 @@ export class SimpleStore {
 
             /**
              * If in first level we have an object without the 'Any' type  specified
-             * is interpreted like nested object, so fail the fnValidate function if we set a diffrent key with set methods.
-             * Becouse the new key doasn't exist in original object, so log a warining.
-             * The only way to use obj is specify 'Any' key to not broke the gloab object logic.
+             * is interpreted like nested object, so fail the fnValidate function if we set a different key with set methods.
+             * Because the new key doesn't exist in original object, so log a warning.
+             * The only way to use obj is specify 'Any' key to not broke the globe object logic.
              */
             const validateResult = this.fnValidate[prop][subProp]?.(
                 subVal,
@@ -731,33 +735,33 @@ export class SimpleStore {
         /**
          * Check if all old props value is equal new props value.
          */
-        const prevValueIsEqualNew = Object.entries(newObjectValues).every(
-            ([key, value]) => {
-                const isCustomObject = this.type[prop][key] === TYPE_IS_ANY;
+        const prevValueIsEqualNew = shouldSkipEqual
+            ? Object.entries(newObjectValues).every(([key, value]) => {
+                  const isCustomObject = this.type[prop][key] === TYPE_IS_ANY;
 
-                /**
-                 * Check val have nested Object ( not 'Any' )
-                 */
-                const dataDepth = maxDepth(value);
-                if (dataDepth > 1 && !isCustomObject) {
-                    storeSetObjDepthWarning(prop, val, this.logStyle);
-                    return;
-                }
+                  /**
+                   * Check val have nested Object ( not 'Any' )
+                   */
+                  const dataDepth = maxDepth(value);
+                  if (dataDepth > 1 && !isCustomObject) {
+                      storeSetObjDepthWarning(prop, val, this.logStyle);
+                      return;
+                  }
 
-                return checkEquality(
-                    this.type[prop][key],
-                    oldObjectValues[key],
-                    value
-                );
-            }
-        );
+                  return checkEquality(
+                      this.type[prop][key],
+                      oldObjectValues[key],
+                      value
+                  );
+              })
+            : false;
 
         /**
          * If shouldSkipEqual = true and previous object is equal new object return.
          * If at least one modified property of the object has skipEqual set to false
          * then the entire object is considered mutated even if all values are equal
          */
-        if (shouldSkipEqual && prevValueIsEqualNew) return;
+        if (prevValueIsEqualNew) return;
 
         /**
          * Finally update Object.
@@ -765,15 +769,11 @@ export class SimpleStore {
         this.store[prop] = newObjectValues;
 
         if (fireCallback) {
-            const fnByProp = this.callBackWatcher.filter(
-                (item) => item.prop === prop
-            );
-            fnByProp.forEach((item) => {
-                item.fn(
-                    this.store[prop],
-                    oldObjectValues,
-                    this.validationStatusObject[prop]
-                );
+            this.runCallbackQueqe({
+                prop,
+                newValue: this.store[prop],
+                oldValue: oldObjectValues,
+                validationValue: this.validationStatusObject[prop],
             });
         }
 
@@ -798,12 +798,11 @@ export class SimpleStore {
          */
         this.store[prop] = val;
 
-        const fnByProp = this.callBackWatcher.filter(
-            (item) => item.prop === prop
-        );
-
-        fnByProp.forEach((item) => {
-            item.fn(val, oldVal, null);
+        this.runCallbackQueqe({
+            prop,
+            newValue: val,
+            oldValue: oldVal,
+            validationValue: true,
         });
     }
 
@@ -824,7 +823,7 @@ export class SimpleStore {
     }
 
     /**
-     * @param {string} prop - propierites froms store.
+     * @param {string} prop - propierites forms store.
      * @returns {any} property value
      *
      * @description
@@ -832,7 +831,7 @@ export class SimpleStore {
      *
      * @example
      * ```javascript
-     * const myProp = myStore.get('myProp');
+     * const myProp = myStore.getProp('myProp');
      *
      * ```
      */
@@ -863,8 +862,8 @@ export class SimpleStore {
     }
 
     /**
-     * @param {String} prop - property to watch.
-     * @param {function(any,any,(boolean|object)):void} callback - callback Function, fired on prop value change
+     * @param {string} prop - property to watch.
+     * @param {import('./type.js').simpleStoreWatchCallbackType} callback
      * @returns {function():void} unsubscribe function
      *
      * @description
@@ -887,20 +886,10 @@ export class SimpleStore {
             return () => {};
         }
 
-        this.callBackWatcher.push({
-            prop,
-            fn: callback,
-            id: this.counterId,
-        });
+        const id = getUnivoqueId();
+        this.callBackWatcher.set(id, { fn: callback, prop });
 
-        const cbId = this.counterId;
-        this.counterId++;
-
-        return () => {
-            this.callBackWatcher = this.callBackWatcher.filter(
-                (item) => item.id !== cbId
-            );
-        };
+        return () => this.callBackWatcher.delete(id);
     }
 
     /**
@@ -916,16 +905,11 @@ export class SimpleStore {
      */
     emit(prop) {
         if (prop in this.store) {
-            const fnByProp = this.callBackWatcher.filter(
-                (item) => item.prop === prop
-            );
-            fnByProp.forEach((item) => {
-                // Val , OldVal, Validate
-                item.fn(
-                    this.store[prop],
-                    this.store[prop],
-                    this.validationStatusObject[prop]
-                );
+            this.runCallbackQueqe({
+                prop,
+                newValue: this.store[prop],
+                oldValue: this.store[prop],
+                validationValue: this.validationStatusObject[prop],
             });
         } else {
             storeEmitWarning(prop, this.logStyle);
@@ -957,17 +941,13 @@ export class SimpleStore {
      */
     async emitAsync(prop) {
         if (prop in this.store) {
-            const fnByProp = this.callBackWatcher.filter(
-                (item) => item.prop === prop
-            );
+            await this.runCallbackQueqeAsync({
+                prop,
+                newValue: this.store[prop],
+                oldValue: this.store[prop],
+                validationValue: this.validationStatusObject[prop],
+            });
 
-            for (const item of fnByProp) {
-                await item.fn(
-                    this.store[prop], // Val
-                    this.store[prop], // OldVal
-                    this.validationStatusObject[prop] // Validate
-                );
-            }
             return { success: true };
         } else {
             storeEmitWarning(prop, this.logStyle);
@@ -996,7 +976,7 @@ export class SimpleStore {
      * @returns void
      *
      * @description
-     * Modify style of warining.
+     * Modify style of warning.
      * Utils to have a different style for each store.
      *
      * @example
@@ -1009,7 +989,7 @@ export class SimpleStore {
     /**
      * @param  {string} prop - Property in store to update
      * @param  {Array.<String>} keys - Array of property to watch.
-     * @param {function(any,any):any} fn - Callback function launched when one of the properties of the array changes, the result of the function will be the new value of the property. The parameters of the function are the current values of the properties specified in the array.
+     * @param {import('./type.js').simpleStoreComputedCallback} fn - Callback function launched when one of the properties of the array changes, the result of the function will be the new value of the property. The parameters of the function are the current values of the properties specified in the array.
      *
      * @description
      * Update propierties value if some dependency change.
@@ -1030,13 +1010,13 @@ export class SimpleStore {
      * })
      *
      * Prop target is an object and dependency is not an object.
-       When target is on object the result will be mergerd with original object.
+     * When target is on object the result will be mergerd with original object.
      * myStore.computed('objectProp', ['prop1', 'prop2'], (val1, val2) => {
      *     return { sum: val1 + val2 };
      * });
      *
      * Prop target is an object, and dependency is an object.
-       When target is on object the result will be mergerd with original object.
+     * When target is on object the result will be mergerd with original object.
      * myStore.computed('objectProp', ['objectProp1'], (obj) => {
      *     return { sum: obj.val1 + obj.val2 };
      * });
@@ -1068,7 +1048,7 @@ export class SimpleStore {
             return;
         }
 
-        this.callBackComputed.push({
+        this.callBackComputed.add({
             prop,
             keys,
             fn,
@@ -1076,15 +1056,14 @@ export class SimpleStore {
     }
 
     /**
-     * @descrition
+     * @description
      * Delete all data inside store.
      */
     destroy() {
-        this.counterId = 0;
-        this.callBackWatcher = [];
-        this.callBackComputed = [];
-        this.computedPropFired = [];
-        this.computedWaitList = [];
+        this.callBackWatcher.clear();
+        this.callBackComputed.clear();
+        this.computedPropFired.clear();
+        this.computedWaitList.clear();
         this.validationStatusObject = {};
         this.store = {};
         this.type = {};

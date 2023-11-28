@@ -3,55 +3,6 @@
 import { mobCore } from '../../../mobCore';
 
 /**
- * @param {Array} arr
- * @param {String} key
- * @returns {Object}
- *
- * @description
- * Get value of specific key from an array
- * [{ prop: valueByKey }, ...]
- */
-export const getValueObj = (arr, key) => {
-    return arr
-        .map((item) => ({ [item.prop]: Number.parseFloat(item[key]) }))
-        .reduce((p, c) => ({ ...p, ...c }), {});
-};
-
-/**
- * @param {Array} arr
- * @returns {Object}
- *
- * @description
- * Get toValue of specific key from an array ( function or number )
- */
-export const getValueObjToNative = (arr) => {
-    return arr
-        .map((item) => {
-            return item.toIsFn
-                ? { [item.prop]: item.toFn }
-                : { [item.prop]: Number.parseFloat(item.toValue) };
-        })
-        .reduce((p, c) => ({ ...p, ...c }), {});
-};
-
-/**
- * @param {Array} arr
- * @returns {Object}
- *
- * @description
- * Get fromValue of specific key from an array ( function or number )
- */
-export const getValueObjFromNative = (arr) => {
-    return arr
-        .map((item) => {
-            return item.fromIsFn
-                ? { [item.prop]: item.fromFn }
-                : { [item.prop]: Number.parseFloat(item.fromValue) };
-        })
-        .reduce((p, c) => ({ ...p, ...c }), {});
-};
-
-/**
  * @param {any} x
  * @returns {Number}
  *
@@ -79,46 +30,6 @@ export const getRoundedValue = (x) => {
 
         return Number.parseFloat(Number.parseFloat(x).toFixed(4));
     }
-};
-
-/**
- * @param {Array} newData
- * @param {Array} data
- * @returns {Array}
- *
- * @description
- * Merge animation store of specific lerp/spring .. with new data from goTo etc..
- */
-export const mergeArray = (newData, data) => {
-    return data.map((item) => {
-        const itemToMerge = newData.find((newItem) => {
-            return newItem.prop === item.prop;
-        });
-
-        // If exist merge
-        return itemToMerge ? { ...item, ...itemToMerge } : item;
-    });
-};
-
-/**
- * @param {Array} newData
- * @param {Array} data
- * @returns {Array}
- *
- * @description
- * Merge animation store of specific tween .. with new data from goTo etc..
- */
-export const mergeArrayTween = (newData, data) => {
-    return data.map((item) => {
-        const itemToMerge = newData.find((newItem) => {
-            return newItem.prop === item.prop;
-        });
-
-        // If exist merge
-        return itemToMerge
-            ? { ...item, ...itemToMerge, shouldUpdate: true }
-            : { ...item, shouldUpdate: false };
-    });
 };
 
 /**

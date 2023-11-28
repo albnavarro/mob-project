@@ -215,3 +215,13 @@ export function isElement(element) {
               element.nodeType === 1 &&
               typeof element.nodeName === 'string';
 }
+
+/**
+ * @returns {String}
+ *
+ * @description
+ * Generate univoque string id
+ */
+export const getUnivoqueId = () => {
+    return `_${Math.random().toString(36).slice(2, 9)}`;
+};

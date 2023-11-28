@@ -30,46 +30,44 @@ import {
 import { handleVisibilityChange } from './events/visibilityChange/handleVisibilityChange.js';
 import { SimpleStore } from './store/simpleStore.js';
 import { checkType, getTypeName } from './store/storeType.js';
-
-/**
- * @typedef {import('./store/simpleStore').SimpleStoreType} MobbuStoreType
- */
+import { getUnivoqueId } from './utils/index.js';
+import { useNextLoop } from './utils/nextTick.js';
 
 export const mobCore = {
     /**
      * @description
-     * SimpleStore inizialization.
+     * SimpleStore initialization.
      * The store accepts single properties or objects
-       Each individual property can be initialized with a simple value or via a more complex setup.
-       A complex set-up is created through a function that must return an object with the property `value` and at least one of the following properties:
-       `type` || `validation` || `skipEqual` || `strict`
+     *  Each individual property can be initialized with a simple value or via a more complex setup.
+     *  A complex set-up is created through a function that must return an object with the property `value` and at least one of the following properties:
+     *  `type` || `validation` || `skipEqual` || `strict`
      *
-      `value`:
-       Initial value.
-
-      `type`:
-       Supported types:
-      `String|Number|Object|Function|Array|Boolean|Element|HTMLElement|Map|Set|NodeList|"Any"`.
-       The property will not be updated if it doesn't match, you will have a waring.
-       For custom Object use 'Any'.
-       Support Contructor || String.
-       Es: type: Number || type: 'Number'
-
-       `validation`:
-       Validation function to parse value.
-       This function will have the current value and old value as input parameter and will return a boolean value.
-       The validation status of each property will be displayed in the watchers and will be retrievable using the getValidation() method.
-
-       `strict`:
-       If set to true, the validation function will become blocking and the property will be updated only if the validation function is successful.
-       THe default value is `false`.
-
-       `skipEqual`:
-       If the value is equal to the previous one, the property will not be updated. The watches will not be executed and the property will have no effect on the computed related to it.
-       The default value is `true`.
+     * `value`:
+     *  Initial value.
+     *
+     * `type`:
+     *  Supported types:
+     * `String|Number|Object|Function|Array|Boolean|Element|HTMLElement|Map|Set|NodeList|"Any"`.
+     *  The property will not be updated if it doesn't match, you will have a warning.
+     *  For custom Object use 'Any'.
+     *  Support Constructor || String.
+     *  Es: type: Number || type: 'Number'
+     *
+     *  `validation`:
+     *  Validation function to parse value.
+     *  This function will have the current value and old value as input parameter and will return a boolean value.
+     *  The validation status of each property will be displayed in the watchers and will be retrievable using the getValidation() method.
+     *
+     *  `strict`:
+     *  If set to true, the validation function will become blocking and the property will be updated only if the validation function is successful.
+     *  THe default value is `false`.
+     *
+     *  `skipEqual`:
+     *  If the value is equal to the previous one, the property will not be updated. The watches will not be executed and the property will have no effect on the computed related to it.
+     *  The default value is `true`.
      *
      *
-     * @param {import('./store/simpleStore.js').SimpleStoreType} data
+     * @param {import('./store/type.js').simpleStoreBaseData} data
      *
      * @example
      *
@@ -131,23 +129,47 @@ export const mobCore = {
         return new SimpleStore(data);
     },
 
+    /**
+     * @returns {Number}
+     *
+     * @description
+     * Get fps detect on page load.
+     * Start from 60fps.
+     * The real value is calculated after 30 Request animation frame.
+     */
     getInstantFps() {
         return eventStore.getProp('instantFps');
     },
 
+    /**
+     * @returns {Number}
+     *
+     * @description
+     * Get current fps value.
+     */
     getFps() {
         return handleFrame.getFps();
     },
 
+    /**
+     * @returns {Boolean}
+     *
+     * @description
+     * When useScaleFps is on, get the frame status related to fpsScalePercent object:
+     * This methods get the standalone value.
+     *
+     * Note: created for mobMotion internal use.
+     */
     getShouldRender() {
         return handleFrame.getShouldRender();
     },
 
     /**
      * @description
-      If the current FPS drops below `2/5` of its maximum value the methods return true.
-      The value will remain frozen for 4 seconds in order to have time to take the right countermeasures.
+     * If the current FPS drops below `2/5` of its maximum value the methods return true.
+     * The value will remain frozen for 4 seconds in order to have time to take the right countermeasures.
      *
+     * Note: created for mobMotion internal use.
      */
     mustMakeSomething() {
         return handleFrame.mustMakeSomething();
@@ -155,8 +177,10 @@ export const mobCore = {
 
     /**
      * @description
-      If the current FPS drops below `1/5` of its maximum value the methods return true.
-      The value will remain frozen for 4 seconds in order to have time to take the right countermeasures.
+     * If the current FPS drops below `1/5` of its maximum value the methods return true.
+     * The value will remain frozen for 4 seconds in order to have time to take the right countermeasures.
+     *
+     * Note: created for mobMotion internal use.
      *
      */
     shouldMakeSomething() {
@@ -165,10 +189,10 @@ export const mobCore = {
 
     /**
      * @description
-    Execute a callBack within the first available request animation frame.
-    Use this method to modify elements of the DOM
+     * Execute a callBack within the first available request animation frame.
+     * Use this method to modify elements of the DOM
      *
-     * @param {function(import('./events/rafutils/handleFrame.js').handleFrameTypes):void } callback - callback function
+     * @param {import('./events/rafutils/type.js').handleFrameCallbakType} callback - callback function
      *
      * @example
      * ```javascript
@@ -186,7 +210,7 @@ export const mobCore = {
      * @description
      * Execute callbacks after scheduling the request animation frame. Use this method to read data from the DOM. To execute callbacks exactly after the request animation frame, set the global property deferredNextTick to true.
      *
-     * @param {function(import('./events/rafutils/handleFrame.js').handleFrameTypes):void } callback - callback function
+     * @param {import('./events/rafutils/type.js').handleFrameCallbakType} callback - callback function
      *
      * @example
      * ```javascript
@@ -224,7 +248,7 @@ export const mobCore = {
      * @description
      * Execute a callback to the next available frame allowing the creation of a request animation frame loop
      *
-     * @param {function(import('./events/rafutils/handleFrame.js').handleFrameTypes):void } callback - callback function
+     * @param {import('./events/rafutils/type.js').handleFrameCallbakType} callback - callback function
      *
      * @example
      * ```javascript
@@ -247,7 +271,7 @@ export const mobCore = {
      * @description
      * Add callback to a specific frame.
      *
-     * @param {function(import('./events/rafutils/handleFrame.js').handleFrameTypes):void } callback - callback function
+     * @param {import('./events/rafutils/type.js').handleFrameCallbakType} callback - callback function
      * @pram {number} index
      *
      * @example
@@ -268,7 +292,7 @@ export const mobCore = {
         After the method will be resolved the first time, subsequent calls will be resolved immediately returning the previously calculated value.
         The method is launched the first time automatically at the first loading.
      *
-     * @param {function(import('./events/rafutils/loadFps.js').loadFpsType):void } callback - callback function
+     * @param {import('./events/rafutils/type.js').loadFpsCallback} callback - callback function
      * @return {Promise}
      *
      */
@@ -297,13 +321,19 @@ export const mobCore = {
         return handleLoad(callback);
     },
 
+    /**
+     * @description
+     * Get handleCache function.
+     *
+     * Note: created for mobMotion internal use.
+     */
     useCache: handleCache,
 
     /**
      * @description
      * Add callback on resize using a debounce function.
      *
-     * @param {function(import('./events/resizeUtils/handleResize.js').handleResizeTypes):void } callback - callback function fired on resize.
+     * @param {import('./events/resizeUtils/type.js').handleResizeCallback} callback - callback function fired on resize.
      *
      * @example
      * ```javascript
@@ -328,9 +358,9 @@ export const mobCore = {
 
     /**
      * @description
-     * Add callback on resize using a debounce function.
+     * Add callback on tab change.
      *
-     * @param {function(import('./events/visibilityChange/handleVisibilityChange.js').visibilityChangeTYpe):void } callback - callback function fired on tab change.
+     * @param {import('./events/visibilityChange/type.js').visibilityChangeCallback} callback - callback function fired on tab change.
      *
      * @example
      * ```javascript
@@ -350,7 +380,7 @@ export const mobCore = {
      * @description
      * Add callback on mouse click
      *
-     * @param {function(import('./events/mouseUtils/handleMouse.js').mouseType):void } callback - callback function fired on mouse click.
+     * @param {import('./events/mouseUtils/type.js').mouseEventCallback} callback - callback function fired on mouse click.
      *
      * @example
      * ```javascript
@@ -372,7 +402,7 @@ export const mobCore = {
      * @description
      * Add callback on mouse down
      *
-     * @param {function(import('./events/mouseUtils/handleMouse.js').mouseType):void } callback - callback function fired on mouse down.
+     * @param {import('./events/mouseUtils/type.js').mouseEventCallback} callback - callback function fired on mouse down.
      *
      * @example
      * ```javascript
@@ -394,7 +424,7 @@ export const mobCore = {
      * @description
      * Add callback on touch start
      *
-     * @param {function(import('./events/mouseUtils/handleMouse.js').mouseType):void } callback - callback function fired on mouse touch start.
+     * @param {import('./events/mouseUtils/type.js').mouseEventCallback} callback - callback function fired on mouse touch start.
      *
      * @example
      * ```javascript
@@ -416,7 +446,7 @@ export const mobCore = {
      * @description
      * Add callback on mouse move
      *
-     * @param {function(import('./events/mouseUtils/handleMouse.js').mouseType):void } callback - callback function fired on mouse move.
+     * @param {import('./events/mouseUtils/type.js').mouseEventCallback} callback - callback function fired on mouse move.
      *
      * @example
      * ```javascript
@@ -438,7 +468,7 @@ export const mobCore = {
      * @description
      * Add callback on touch move
      *
-     * @param {function(import('./events/mouseUtils/handleMouse.js').mouseType):void } callback - callback function fired on touch move.
+     * @param {import('./events/mouseUtils/type.js').mouseEventCallback} callback - callback function fired on touch move.
      *
      * @example
      * ```javascript
@@ -460,7 +490,7 @@ export const mobCore = {
      * @description
      * Add callback on mouse up
      *
-     * @param {function(import('./events/mouseUtils/handleMouse.js').mouseType):void } callback - callback function fired on mouse up.
+     * @param {import('./events/mouseUtils/type.js').mouseEventCallback} callback - callback function fired on mouse up.
      *
      * @example
      * ```javascript
@@ -482,7 +512,7 @@ export const mobCore = {
      * @description
      * Add callback on touch end.
      *
-     * @param {function(import('./events/mouseUtils/handleMouse.js').mouseType):void } callback - callback function fired on touch end.
+     * @param {import('./events/mouseUtils/type.js').mouseEventCallback} callback - callback function fired on touch end.
      *
      * @example
      * ```javascript
@@ -504,7 +534,7 @@ export const mobCore = {
      * @description
      * Add callback on mouse wheel.
      *
-     * @param {function(import('./events/mouseUtils/handleMouse.js').mouseType):void } callback - callback function fired on mouse wheel.
+     * @param {import('./events/mouseUtils/type.js').mouseEventCallback} callback - callback function fired on mouse wheel.
      *
      * @example
      * ```javascript
@@ -536,7 +566,7 @@ export const mobCore = {
      * @description
      * Perform a callback to the first nextTick available after scrolling
      *
-     * @param {function(import('./events/scrollUtils/handleScrollImmediate.js').handleScrollType):void } callback - callback function
+     * @param {import('./events/scrollUtils/type.js').handleScrollCallback} callback - callback function
      * @return {Function} unsubscribe callback
      *
      * @example
@@ -557,7 +587,7 @@ export const mobCore = {
      * @description
      * Execute a callback immediately on scroll
      *
-     * @param {function(import('./events/scrollUtils/handleScrollImmediate.js').handleScrollType):void } callback - callback function
+     * @param {import('./events/scrollUtils/type.js').handleScrollCallback} callback - callback function
      * @return {Function} unsubscribe callback
      *
      * @example
@@ -578,7 +608,7 @@ export const mobCore = {
      * @description
      * Performs a scroll callback using a throttle function
      *
-     * @param {function(import('./events/scrollUtils/handleScrollImmediate.js').handleScrollType):void } callback - callback function
+     * @param {import('./events/scrollUtils/type.js').handleScrollCallback} callback - callback function
      * @return {Function} unsubscribe callback
      *
      * @example
@@ -605,7 +635,7 @@ export const mobCore = {
      * @description
      * Execute a callback at the beginning of the scroll
      *
-     * @param {function(import('./events/scrollUtils/handleScrollUtils').handleScrollUtilsType):void } callback - callback function
+     * @param {import('./events/scrollUtils/type.js').handleScrollUtilsCallback} callback - callback function
      * @return {Function} unsubscribe callback
      *
      * @example
@@ -626,7 +656,7 @@ export const mobCore = {
      * @description
      * Execute a callback at the end of the scroll
      *
-     * @param {function(import('./events/scrollUtils/handleScrollUtils').handleScrollUtilsType):void } callback - callback function
+     * @param {import('./events/scrollUtils/type.js').handleScrollUtilsCallback} callback - callback function
      * @return {Function} unsubscribe callback
      *
      * @example
@@ -643,10 +673,25 @@ export const mobCore = {
         return handleScrollEnd(callback);
     },
 
+    /**
+     * @param {any} type
+     * @param {any} value
+     * @returns {Boolean}
+     *
+     * @description
+     * Check type of variable.
+     */
     checkType(type, value) {
         return checkType(type, value);
     },
 
+    /**
+     * @param {any} type
+     * @returns {String}
+     *
+     * @description
+     * Get type in String format.
+     */
     getTypeName(type) {
         return getTypeName(type);
     },
@@ -655,19 +700,76 @@ export const mobCore = {
      * @returns {String}
      *
      * @description
-     * Generate univoque id
+     * Generate univoque string id
      */
     getUnivoqueId() {
-        return `_${Math.random().toString(36).slice(2, 9)}`;
+        return getUnivoqueId();
     },
 
+    /**
+     * @returns {Number}
+     *
+     * @description
+     * Get current time.
+     */
     getTime() {
         return getTime();
     },
 
+    /**
+     * @param {function} fn
+     * @returns {void}
+     *
+     * @description
+     * Wait next event loop.
+     */
+    useNextLoop(fn) {
+        useNextLoop(fn);
+    },
+
+    /**
+     * @returns {Object}
+     *
+     * @description
+     * Get event store ( es modify defaults or get current value )
+     * Props:
+     * - usePassive: true
+     * - instantFps: 60
+     * - fpsScalePercent: { 0: 1, 30: 2, 50: 3 }
+     * - useScaleFps:true
+     * - deferredNextTick: true
+     * - throttle: 60
+     *
+     *
+     * @example
+     * ``` javascript
+     * mobCore.store.set('fpsScalePercent', { 1: 10 });
+     * const { useScaleFps } = mobCore.store.get();
+     * ....
+     *
+     * ```
+     */
     store: eventStore,
 
+    /**
+     * @returns {Object}
+     *
+     * @description
+     * Parse wheel event.
+     */
     normalizeWheel: normalizeWheel,
 
+    /**
+     *
+     * @description
+     * Avoid console error when promise is rejected.
+     *
+     * Note: created for mobMotion internal use.
+     *
+     * @example
+     * ``` javascript
+     * reject(mobCore.ANIMATION_STOP_REJECT);
+     * ```
+     */
     ANIMATION_STOP_REJECT: ANIMATION_STOP_REJECT,
 };

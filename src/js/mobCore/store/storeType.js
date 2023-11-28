@@ -90,6 +90,7 @@ export const storeType = {
 
 /**
  * @param {any} type
+ * @returns {String}
  */
 export const getTypeName = (type) => {
     switch (type) {
@@ -161,6 +162,7 @@ export const getTypeName = (type) => {
 /**
  * @param {any} type
  * @param {any} value
+ * @returns {Boolean}
  */
 export const checkType = (type, value) => {
     switch (type) {

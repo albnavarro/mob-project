@@ -1,7 +1,12 @@
-/*
+// @ts-check
+
+/**
+ * @description
  * Set fromValue with currentValue
  *
- **/
+ * @param {Array} arr
+ * @returns {Array}
+ */
 export const setFromByCurrent = (arr) => {
     return arr.map((item) => {
         if (!item.settled) {
@@ -12,10 +17,13 @@ export const setFromByCurrent = (arr) => {
     });
 };
 
-/*
+/**
+ * @description
  * Set fromValue and currentValue with toValue
  *
- **/
+ * @param {Array} arr
+ * @returns {Array}
+ */
 export const setFromCurrentByTo = (arr) => {
     return arr.map((item) => {
         item.fromValue = item.toValue;
@@ -25,10 +33,13 @@ export const setFromCurrentByTo = (arr) => {
     });
 };
 
-/*
+/**
+ * @description
  * Set toValue and fromValue with currentValue
  *
- **/
+ * @param {Array} arr
+ * @returns {Array}
+ */
 export const setFromToByCurrent = (arr) => {
     return arr.map((item) => {
         item.toValue = item.currentValue;
@@ -38,10 +49,16 @@ export const setFromToByCurrent = (arr) => {
     });
 };
 
-/*
+/**
+ * @description
  * Revert fromValue and toValue
  *
- **/
+ * @param {import("./type").valueToparseType} obj
+ * @param {Array} arr
+ *
+ * @returns {Array} arr
+ *
+ */
 export const setReverseValues = (obj, arr) => {
     const keysTorevert = Object.keys(obj);
     return arr.map((item) => {
@@ -55,11 +72,17 @@ export const setReverseValues = (obj, arr) => {
     });
 };
 
-/*
- * Set toValue in realtive mode, sum value from currentValue
+/**
+ * @description
+ * Set toValue in relative mode, sum value from currentValue
  * Used by spring and lerp
  *
- **/
+ * @param {Array} arr
+ * @param {boolean} relative
+ *
+ * @returns {Array} arr
+ *
+ */
 export const setRelative = (arr, relative) => {
     return arr.map((item) => {
         item.toValue = relative
@@ -69,12 +92,22 @@ export const setRelative = (arr, relative) => {
     });
 };
 
-/*
- * Set toValue in realtive mode, sum value from currentValue
+/**
+ * @type {number}
+ */
+const tweenSmallNumber = 0.000_01;
+
+/**
+ * @description
+ * Set toValue in relative mode, sum value from currentValue
  * Used by classic tween
  *
- **/
-const tweenSmallNumber = 0.000_01;
+ * @param {Array} arr
+ * @param {boolean} relative
+ *
+ * @returns {Array} arr
+ *
+ */
 export const setRelativeTween = (arr, relative) => {
     return arr.map((item) => {
         if (item.shouldUpdate) {

@@ -1,7 +1,7 @@
 import { requestInterval } from '../../../js/utility/setInterval.js';
 import { forceRedraw } from '../../../js/utility/redrowNode.js';
 import { detectSafari } from '../../../js/utility/isSafari.js';
-import { core } from '../../../js/mobMotion/core.js';
+import { motionCore } from '../../../js/mobMotion/core.js';
 
 export class GlitchItemClass {
     constructor(data) {
@@ -36,7 +36,7 @@ export class GlitchItemClass {
     }
 
     inzializeSvg() {
-        if (!core.mq(this.queryType, this.breackpoint)) return;
+        if (!motionCore.mq(this.queryType, this.breackpoint)) return;
 
         // Create svg filter element
         const div = document.createElement('div');

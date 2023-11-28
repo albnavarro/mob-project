@@ -6,7 +6,7 @@ import {
     outerWidth,
     offset,
 } from '../../../js/mobCore/utils/index.js';
-import { tween, core } from '../../../js/mobMotion';
+import { tween, motionCore } from '../../../js/mobMotion';
 import { mobCore } from '../../../js/mobCore/index.js';
 
 export class PredictiveTurbolenceItemClass {
@@ -42,7 +42,7 @@ export class PredictiveTurbolenceItemClass {
     }
 
     init() {
-        if (!core.mq(this.queryType, this.breackpoint)) return;
+        if (!motionCore.mq(this.queryType, this.breackpoint)) return;
 
         this.spring.setData({ baseFrequency: 0, scale: 0 });
 

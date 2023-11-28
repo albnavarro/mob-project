@@ -1,103 +1,7 @@
-import { mobCore } from '../../../mobCore/index.js';
-import { springPresetConfig } from '../spring/springConfig.js';
+// @ts-check
 
-/**
- * @typedef {Object} handleSetUpSetType
- *
- * @prop {Boolean} [ usePassive ]
-   Use passive event on mouse/touch event.
- *
- * @prop {Object.<string, number>} [ fpsScalePercent ] - Control the scroll phase when fps drop occurs.
-    The key represents the number of fps dropped, the value represents the interval of frames needed to fire a scroll function.
-    eg: if from a stable value of 60fps it drops to 30fps (there is a drop of 30 fps) the scroll function will be performed every 2 scroll and so on.
-    This mechanism is designed to make the browser work less whenever there are bottle caps that prevent it from working smoothly.
-    You can disable this layering by disabling the `useScaleFps` property.
-    Default: `fpsScalePercent: { 0: 1, 30: 2, 50: 3 }`.
- *
- * @prop {Boolean} [ useScaleFps ] - Enable or disable conditional module operation on scroll based on fps drop.
- * Default: `useScaleFps: true`.
- *
- * @prop {Boolean}  [ deferredNextTick ] - If the property is set to true, all functions related to nextTick will be executed at the end of the request animation frame.
- * Default:  `deferredNextTick: true`.
- *
- * @prop {Number} [ throttle ] - Throttle value in milliseconds.
- * Default: `throttle: 100`.
- *
- * @prop {import('../../utils/mediaManager.js').breackPointTypeObjKeyValue} [ mq ] - Object representing key and value of the default breakpoints.
- * deafult keys: `xSmall, small, medium, tablet, desktop, large, xLarge`.
- * es: `desktop: 992`.
- *
- * @prop {Object} [ defaultMq ] - Object representing the default values of the media queries used by parallax and scrollTrigger.
- * @prop {import('../../utils/mediaManager.js').breackPointType} defaultMq.value - parallax/scrollTrigger breackpoint default value, choice: `xSmall, small, medium, tablet, desktop, large, xLarge`
- * Default:  `{ value: 'desktop' }`
- *
- * @prop {import('../../utils/mediaManager.js').mqChoiceType} [ defaultMq.type ] - parallax/scrollTrigger mediaQuery type default value, choice is `min , max`,
- * Default:  `{ type: 'min' }`
- *
- * @prop {Object} [ sequencer ] - sequencer default properties
- * @prop {Number} sequencer.duration - Default value of the time range of the animation, both syncTimeline and scrollTrigger will take care of processing the value as needed.
- * Default: `{ duration: 10 }`
- *
- * @prop {import('../tween/tweenConfig.js').easeStringTypes} [ sequencer.ease ] - Default essing function used by the sequencer.
- * Default: `{ ease: easeLinear }`
- *
- * @prop {Object} [ scrollTrigger ] - scrollTrigger default properties
- * @prop {import('../spring/springConfig.js').springConfigStringTypes} [ scrollTrigger.springConfig ] - Spring config, choice: `default, gentle, wobbly, bounce, scroller`.
- * Deafult: `{ springConfig: 'default' }`
- *
- * @prop {Number} [ scrollTrigger.lerpConfig ] - default value of lerp velocity,
- * Deafult: `{ lerpConfig: 0.06 }`
- *
- * @prop {Object} [ scrollTrigger.markerColor ] - default marker color.
- * @prop {String} [ scrollTrigger.markerColor.startEnd ] - Default color of start|end marker,
- * Default: `{ startEnd:  '#ff0000' }`.
- *
- * @prop {String} [ scrollTrigger.markerColor.item ] - Default color of item marker. This marker is only visible with the active pin.
- * Default: `{ item: '#14df3b' }`.
- *
- * @prop {Object} [ parallax ] - parallax default properties
- * @prop {Number} parallax.defaultRange - default value of the property that defines the calculation of the distance value,
- * Default: `{ defaultRange: 8 }`
- *
- * @prop {import('../spring/springConfig.js').springConfigStringTypes} [ parallax.springConfig ] - Deafult spring config, choice: `default, gentle, wobbly, bounce, scroller`,
- * Default: `{ springConfig: 'default' }`.
- *
- * @prop {Number} [ parallax.lerpConfig ] - default value of lerp velocity,
- * Default: `{ lerpConfig: 0.06 }`.
- *
- * @prop {Object} [ parallaxTween ] - parallaxTween default properties
- * @prop {Number} parallaxTween.duration - Default value of the time range of the animation, both syncTimeline and scrollTrigger will take care of processing the value as needed.
- * Default: `{ duration: 10 }`.
- *
- * @prop {import('../tween/tweenConfig.js').easeStringTypes} [ parallaxTween.ease ] - Default essing function used by the parallaxTween,
- * Default: `{ ease: 'easeLinear' }`.
- *
- * @prop {Object} [ tween ] - tween default properties
- * @prop {Number} [ tween.duration ] - default tween duration,
- * Default: `{ duration:  1000 }` ( value in milliseconds ).
- *
- * @prop {import('../tween/tweenConfig.js').easeStringTypes} [ tween.ease ] - Default essing function used by the tween,
- * Default: `{ ease: 'easeLinear' }`.
- *
- * @prop {Boolean} [ tween.relative ] - default value of relative properties.
- * Default:  `{ relative: false }`.
- *
- * @prop {Object} [ spring ] - spring default properties
- * @prop {Boolean} [ spring.relative ] - default value of relative properties.
- * Default: `{ relative: false }`.
- *
- * @prop {import('../spring/springConfig.js').springConfigStringTypes} [ spring.config ] - All spring configuration. It is possible to modify or add new configurations.
- *
- * @prop {Object} [ lerp ] - lerp default properties.
- * @prop {Boolean} [ lerp.relative ] - default value of relative properties.
- * Default: `{ relative: false }`.
- *
- * @prop {Number} [ lerp.precision ] - default value of precision properties.
- * Default: `{ precision:  'false' }`.
- *
- * @prop {Number} [ lerp.velocity ] - default value of velocity properties.
- * Default: `{ velocity: 'false' }`.
- */
+import { mobCore } from '../../../../mobCore/index.js';
+import { springPresetConfig } from '../../spring/springConfig.js';
 
 export const easeReference = {
     easeLinear: 'easeLinear',
@@ -160,7 +64,7 @@ export const lerpPrecisionDefault = 0.01;
 export const lerpVelocityDefault = 0.06;
 
 /**
- * @param {handleSetUpSetType} obj
+ * @param {import('./type.js').setUpType} obj
  */
 export const setupValidation = (obj) => {
     const fpsScalePercent = checkSetUpType({
@@ -330,7 +234,7 @@ export const setupValidation = (obj) => {
 
     /**
      * @constant
-     * @type {handleSetUpSetType}
+     * @type {import('./type.js').setUpType}
      */
     const result = {
         fpsScalePercent,
@@ -345,6 +249,7 @@ export const setupValidation = (obj) => {
         },
         sequencer: {
             duration: sequencerDuration,
+            // @ts-ignore
             ease: sequencerEase,
         },
         scrollTrigger: {
@@ -362,10 +267,12 @@ export const setupValidation = (obj) => {
         },
         parallaxTween: {
             duration: parallaxTweenDuration,
+            // @ts-ignore
             ease: parallaxTweenEase,
         },
         tween: {
             duration: tweenDuration,
+            // @ts-ignore
             ease: tweenEase,
             relative: tweenRelative,
         },
@@ -386,6 +293,15 @@ export const setupValidation = (obj) => {
 };
 
 /**
+ * @param {Object} obj
+ * @param {any} obj.prop
+ * @param {any} obj.value
+ * @param {any} obj.defaultValue
+ * @param {any} obj.type
+ *
+ * @returns any
+ *
+ * @description
  * Check if prop valid
  */
 const checkSetUpType = ({ prop, value, defaultValue, type }) => {
@@ -400,6 +316,11 @@ const checkSetUpType = ({ prop, value, defaultValue, type }) => {
     return isValid ? value : defaultValue;
 };
 
+/**
+ * @param {Object} obj
+ *
+ * @returns any
+ */
 const checkSetUpMq = (obj) => {
     const isValid =
         mobCore.checkType(Object, obj) &&
@@ -415,7 +336,14 @@ const checkSetUpMq = (obj) => {
     return isValid ? obj : mqDefault;
 };
 
+/**
+ * @param {string|undefined} value
+ * @param {string} label
+ *
+ * @returns string
+ */
 export const checkSetUpEase = (value, label) => {
+    // @ts-ignore
     const isValid = Object.keys(easeReference).includes(value);
     if (!isValid && value !== undefined && value !== null)
         console.warn(

@@ -1,17 +1,12 @@
-import {
-    getValueObj,
-    getValueObjToNative,
-    getValueObjFromNative,
-    mergeArrayTween,
-    compareKeys,
-    getRoundedValue,
-} from '../utils/animationUtils.js';
+// @ts-check
+
+import { compareKeys, getRoundedValue } from '../utils/animationUtils.js';
 import {
     setFromCurrentByTo,
     setFromToByCurrent,
     setReverseValues,
     setRelativeTween,
-} from '../utils/setValues.js';
+} from '../utils/tweenAction/setValues.js';
 import { mergeDeep } from '../../utils/mergeDeep.js';
 import { setStagger } from '../utils/stagger/setStagger.js';
 import { STAGGER_DEFAULT_INDEX_OBJ } from '../utils/stagger/staggerCostant.js';
@@ -32,51 +27,32 @@ import {
     goFromUtils,
     goFromToUtils,
     setUtils,
-} from '../utils/actions.js';
+} from '../utils/tweenAction/actions.js';
 import { initRaf } from '../utils/initRaf.js';
 import {
     compareKeysWarning,
     staggerIsOutOfRangeWarning,
 } from '../utils/warning.js';
-import { fpsLoadedLog } from '../utils/log.js';
-import { shouldInizializzeStagger } from '../utils/condition.js';
+import { fpsLoadedLog } from '../utils/fpsLogInizialization.js';
 import {
     durationIsNumberOrFunctionIsValid,
     easeTweenIsValid,
     easeTweenIsValidGetFunction,
     relativeIsValid,
     valueIsBooleanAndTrue,
-} from '../utils/tweenValidation.js';
+} from '../utils/tweenAction/tweenValidation.js';
 import { mobCore } from '../../../mobCore/index.js';
+import { shouldInizializzeStagger } from '../utils/stagger/shouldInizialize.js';
+import { mergeArrayTween } from '../utils/tweenAction/mergeArray.js';
+import {
+    getValueObj,
+    getValueObjFromNative,
+    getValueObjToNative,
+} from '../utils/tweenAction/getValues.js';
 
-/**
- * @typedef {Object} tweenCommonSpecialProps
- * @prop {Boolean} [ reverse=false ] Revert tween values
- * @prop {Boolean} [ relative=false ] If set to true each value will be calculated starting from the last used value, by default each value is calculated starting from the value defined in the constructor.
- * @prop {Boolean} [ immediate=false ] (internal use) If set to true the current value is aligned to the target value without launching the rendering callbacks.
- * @prop {Boolean} [ immediateNoPromise=false ] (internal use) If set to true the current value is aligned to the target value without launching the rendering callbacks and without resolve any promise.
- **/
-
-/**
- * @typedef {Object} tweenCommonStopProps
- * @prop {Boolean} [ clearCache = true ]
-    Stop all stagger implemented with subscribeCache methods.
- */
-
-/**
- * @typedef {Object} tweenSpecialProps
- * @prop {(Number|Function)} [ duration=false ] Defines the default duration of the tween, If a function is used, the value is recalculated every time the method is called, especially useful within a timeline, every time a specific step is performed, the duration of the step is recalculated.
- **/
-
-/**
- * @typedef {Object} tweenTypes
- * @prop {Object.<string, number>} [ data ] Initial data Object.
- * @prop {Number} [ duration=1000 ] defines the default duration of the tween, the value can be momentarily changed if necessary every time the goTo, goFrom, goFromTo methods are invoked.
- * @prop {Boolean} [ relative=false ] It defines the initial value of the relative properties, the value can be momentarily changed whenever the goTo, goFrom, goFromTo methods are invoked, the default value is false. If set to true each value will be calculated starting from the last used value, by default each value is calculated starting from the value defined in the constructor.
- **/
 export default class HandleTween {
     /**
-     * @param { tweenTypes & import('../utils/stagger/staggerCostant.js').staggerTypes & import('../tween/tweenConfig.js').easeTypes} [ data ]
+     * @param {import('./type.js').tweenProps} [ data ]
      *
      * @example
      * ```javascript
@@ -120,138 +96,158 @@ export default class HandleTween {
      *
      * ```
      */
-    constructor(data = {}) {
+    constructor(data) {
         /**
          *  This value lives from user call ( goTo etc..) until next call
          **/
 
         /**
          * @private
+         * @type {function}
          */
         this.ease = easeTweenIsValidGetFunction(data?.ease);
 
         /**
          * @private
+         * @type {number}
          */
         this.duration = durationIsNumberOrFunctionIsValid(data?.duration);
 
         /**
          * @private
+         * @type {boolean}
          */
         this.relative = relativeIsValid(data?.relative, 'tween');
 
         /**
-         *  end
-         **/
-
-        /**
          * @private
-         * @type {import('../utils/stagger/staggerCostant.js').staggerTypesObject}
+         * @type {import('../utils/stagger/type.js').staggerObject}
          */
         this.stagger = getStaggerFromProps(data);
 
         /**
          * @private
+         * @type {string}
          */
         this.uniqueId = mobCore.getUnivoqueId();
 
         /**
          * @private
+         * @type {boolean}
          */
         this.isActive = false;
 
         /**
          * @private
+         * @type{( function(any):void )|undefined}
          */
-        this.currentResolve = null;
+        this.currentResolve = undefined;
 
         /**
          * @private
+         * @type{function|undefined}
          */
-        this.currentReject = null;
+        this.currentReject = undefined;
 
         /**
          * @private
+         * @type{Promise|undefined}
          */
-        this.promise = null;
+        this.promise = undefined;
 
         /**
          * @private
+         * @type {import('./type.js').tweenStoreData[]}
          */
         this.values = [];
 
         /**
          * @private
+         * @type {import('./type.js').tweenInitialData[]}
          */
         this.initialData = [];
 
         /**
          * @private
+         * @type {import('../utils/callbacks/type.js').callbackObject[]}
          */
         this.callback = [];
 
         /**
          * @private
+         * @type {import('../utils/callbacks/type.js').callbackObject[]}
          */
         this.callbackCache = [];
 
         /**
          * @private
+         * @type {import('../utils/callbacks/type.js').callbackObject[]}
          */
         this.callbackOnComplete = [];
 
         /**
          * @private
+         * @type {import('../utils/callbacks/type.js').callbackObject[]}
          */
         this.callbackStartInPause = [];
 
         /**
          * @private
+         * @type {Array<function>}
          */
         this.unsubscribeCache = [];
 
         /**
          * @private
+         * @type {boolean}
          */
         this.pauseStatus = false;
 
         /**
          * @private
+         * @type {boolean}
          */
         this.comeFromResume = false;
 
         /**
          * @private
+         * @type {number}
          */
         this.startTime = 0;
 
         /**
          * @private
+         * @type {boolean}
          */
         this.isRunning = false;
 
         /**
          * @private
+         * @type {number}
          */
         this.timeElapsed = 0;
 
         /**
          * @private
+         * @type {number}
          */
         this.pauseTime = 0;
 
         /**
          * @private
+         * @type {boolean}
          */
         this.firstRun = true;
 
         /**
          * @private
+         * @type {boolean}
          */
         this.useStagger = true;
 
         /**
          * @private
+         * @type {boolean}
          */
         this.fpsInLoading = false;
 
@@ -262,6 +258,7 @@ export default class HandleTween {
 
         /**
          * @private
+         * @type{object}
          */
         this.defaultProps = {
             duration: this.duration,
@@ -278,11 +275,13 @@ export default class HandleTween {
 
         /**
          * @private
+         * @type {import('../utils/stagger/type.js').staggerDefaultIndex}
          */
         this.slowlestStagger = STAGGER_DEFAULT_INDEX_OBJ;
 
         /**
          * @private
+         * @type {import('../utils/stagger/type.js').staggerDefaultIndex}
          */
         this.fastestStagger = STAGGER_DEFAULT_INDEX_OBJ;
 
@@ -299,120 +298,117 @@ export default class HandleTween {
     }
 
     /**
+     * @param {number} time
+     * @param {function} res
+     *
+     * @returns {void}
+     */
+    draw(time, res = () => {}) {
+        this.isActive = true;
+
+        if (this.pauseStatus) {
+            this.pauseTime = time - this.startTime - this.timeElapsed;
+        }
+        this.timeElapsed = time - this.startTime - this.pauseTime;
+
+        if (this.isRunning && Math.round(this.timeElapsed) >= this.duration) {
+            this.timeElapsed = this.duration;
+        }
+
+        this.values.forEach((item) => {
+            if (item.shouldUpdate) {
+                item.currentValue = this.ease(
+                    this.timeElapsed,
+                    item.fromValue,
+                    item.toValProcessed,
+                    this.duration
+                );
+                item.currentValue = getRoundedValue(item.currentValue);
+            } else {
+                item.currentValue = item.fromValue;
+            }
+        });
+
+        const isSettled = Math.round(this.timeElapsed) === this.duration;
+
+        // Prepare an obj to pass to the callback
+        const callBackObject = getValueObj(this.values, 'currentValue');
+
+        defaultCallback({
+            stagger: this.stagger,
+            callback: this.callback,
+            callbackCache: this.callbackCache,
+            callBackObject: callBackObject,
+            useStagger: this.useStagger,
+        });
+
+        this.isRunning = true;
+
+        if (isSettled) {
+            const onComplete = () => {
+                this.isActive = false;
+                this.isRunning = false;
+                this.pauseTime = 0;
+
+                // End of animation
+                // Set fromValue with ended value
+                // At the next call fromValue become the start value
+                this.values.forEach((item) => {
+                    if (item.shouldUpdate) {
+                        item.toValue = item.currentValue;
+                        item.fromValue = item.currentValue;
+                    }
+                });
+
+                // On complete
+                if (!this.pauseStatus) {
+                    res();
+
+                    // Set promise reference to null once resolved
+                    this.promise = undefined;
+                    this.currentReject = undefined;
+                    this.currentResolve = undefined;
+                }
+            };
+
+            defaultCallbackOnComplete({
+                onComplete,
+                callback: this.callback,
+                callbackCache: this.callbackCache,
+                callbackOnComplete: this.callbackOnComplete,
+                callBackObject: callBackObject,
+                stagger: this.stagger,
+                slowlestStagger: this.slowlestStagger,
+                fastestStagger: this.fastestStagger,
+                useStagger: this.useStagger,
+            });
+        } else {
+            mobCore.useFrame(() => {
+                mobCore.useNextTick(({ time }) => {
+                    if (this.isActive) this.draw(time, res);
+                });
+            });
+        }
+    }
+
+    /**
      * @private
      * @param {Number} time current global time
      * @param {Boolean} _fps current FPS
      * @param {Function} res current promise resolve
+     *
+     * @returns {void}
      **/
     onReuqestAnim(time, _fps, res) {
         this.startTime = time;
-
-        /**
-         * @type {Object|null}
-         */
-        let o = {};
-
-        const draw = (/** @type{number} */ time) => {
-            this.isActive = true;
-
-            if (this.pauseStatus) {
-                this.pauseTime = time - this.startTime - this.timeElapsed;
-            }
-            this.timeElapsed = time - this.startTime - this.pauseTime;
-
-            if (
-                this.isRunning &&
-                Math.round(this.timeElapsed) >= this.duration
-            ) {
-                this.timeElapsed = this.duration;
-            }
-
-            this.values.forEach((item) => {
-                if (item.shouldUpdate) {
-                    item.currentValue = this.ease(
-                        this.timeElapsed,
-                        item.fromValue,
-                        item.toValProcessed,
-                        this.duration
-                    );
-                    item.currentValue = getRoundedValue(item.currentValue);
-                } else {
-                    item.currentValue = item.fromValue;
-                }
-            });
-
-            o.isSettled = Math.round(this.timeElapsed) === this.duration;
-
-            // Prepare an obj to pass to the callback
-            o.callBackObject = getValueObj(this.values, 'currentValue');
-
-            defaultCallback({
-                stagger: this.stagger,
-                callback: this.callback,
-                callbackCache: this.callbackCache,
-                callBackObject: o.callBackObject,
-                useStagger: this.useStagger,
-            });
-
-            this.isRunning = true;
-
-            if (o.isSettled) {
-                const onComplete = () => {
-                    this.isActive = false;
-                    this.isRunning = false;
-                    this.pauseTime = 0;
-
-                    // End of animation
-                    // Set fromValue with ended value
-                    // At the next call fromValue become the start value
-                    this.values.forEach((item) => {
-                        if (item.shouldUpdate) {
-                            item.toValue = item.currentValue;
-                            item.fromValue = item.currentValue;
-                        }
-                    });
-
-                    // On complete
-                    if (!this.pauseStatus) {
-                        // Remove reference to o Object
-                        o = null;
-
-                        //
-                        res();
-
-                        // Set promise reference to null once resolved
-                        this.promise = null;
-                        this.currentReject = null;
-                        this.currentResolve = null;
-                    }
-                };
-
-                defaultCallbackOnComplete({
-                    onComplete,
-                    callback: this.callback,
-                    callbackCache: this.callbackCache,
-                    callbackOnComplete: this.callbackOnComplete,
-                    callBackObject: o.callBackObject,
-                    stagger: this.stagger,
-                    slowlestStagger: this.slowlestStagger,
-                    fastestStagger: this.fastestStagger,
-                    useStagger: this.useStagger,
-                });
-            } else {
-                mobCore.useFrame(() => {
-                    mobCore.useNextTick(({ time }) => {
-                        if (this.isActive) draw(time);
-                    });
-                });
-            }
-        };
-
-        draw(time);
+        this.draw(time, res);
     }
 
     /**
      * @description
      * Inzialize stagger array
+     *
+     * @returns {Promise<any>}
      */
     async inzializeStagger() {
         /**
@@ -468,6 +464,10 @@ export default class HandleTween {
 
     /**
      * @private
+     * @param {function(any):void} res
+     * @param {function} reject
+     *
+     * @returns {Promise}
      */
     async startRaf(res, reject) {
         if (this.fpsInLoading) return;
@@ -489,7 +489,8 @@ export default class HandleTween {
     }
 
     /**
-     * @param {tweenCommonStopProps} Stop props
+     * @param {import('./type.js').tweenStopProps} Stop props
+     * @returns {void}
      *
      * @description
      *
@@ -511,9 +512,9 @@ export default class HandleTween {
         // Abort promise
         if (this.currentReject) {
             this.currentReject(mobCore.ANIMATION_STOP_REJECT);
-            this.promise = null;
-            this.currentReject = null;
-            this.currentResolve = null;
+            this.promise = undefined;
+            this.currentReject = undefined;
+            this.currentResolve = undefined;
         }
 
         this.isActive = false;
@@ -521,8 +522,9 @@ export default class HandleTween {
 
     /**
      * @description
-     *
      * Pause the tween
+     *
+     * @returns {void}
      */
     pause() {
         if (this.pauseStatus) return;
@@ -531,8 +533,9 @@ export default class HandleTween {
 
     /**
      * @description
-     *
      * Resume tween in pause
+     *
+     * @returns {void}
      */
     resume() {
         if (!this.pauseStatus) return;
@@ -542,6 +545,7 @@ export default class HandleTween {
 
     /**
      * @param {Object.<string, number|function>} obj Initial data structure
+     * @returns {void}
      *
      * @description
      * Set initial data structure, the method is call by data prop in constructor. In case of need it can be called after creating the instance
@@ -589,9 +593,11 @@ export default class HandleTween {
         });
     }
 
-    /*
+    /**
      * @description
      * Reset data value with initial
+     *
+     * @returns {void}
      */
     resetData() {
         this.values = mergeDeep(this.values, this.initialData);
@@ -603,6 +609,7 @@ export default class HandleTween {
      * @description
      * Reject promise and update form value with current
      *
+     * @returns {void}
      */
     updateDataWhileRunning() {
         this.isActive = false;
@@ -610,7 +617,7 @@ export default class HandleTween {
         // Reject promise
         if (this.currentReject) {
             this.currentReject(mobCore.ANIMATION_STOP_REJECT);
-            this.promise = null;
+            this.promise = undefined;
         }
 
         this.values.forEach((item) => {
@@ -624,7 +631,7 @@ export default class HandleTween {
      * @private
      *
      * @description
-     * Mege special props with default props
+     * Merge special props with default props
      *
      * @param  {Object} props
      * @return {Object} props merged
@@ -640,13 +647,12 @@ export default class HandleTween {
     }
 
     /**
-     * @param {Object.<string, number|function>} obj to Values
-     * @param {tweenSpecialProps & tweenCommonSpecialProps & import('../tween/tweenConfig.js').easeTypes} props special props
-     * @returns {Promise} Return a promise which is resolved when tween is over
+     * @param {import('../utils/tweenAction/type.js').valueToparseType} obj to Values
+     * @param {import('./type.js').tweenAction} props special props
+     * @returns {Promise|void} Return a promise which is resolved when tween is over
      *
      * @example
      * ```javascript
-     *
      *
      * myTween.goTo(
      *     { string: ( Number|Function ) },
@@ -663,15 +669,16 @@ export default class HandleTween {
      *
      * ```
      * @description
-       Transform some properties of your choice from the `current value` to the `entered value`.
-       The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change every time this transformation is called.
-       It is possible to associate the special pros to the current transformation, these properties will be valid only in the current transformation.
-        - duration
-        - ease
-        - relative
-        - reverse
-        - immediate (internal use)
-        - immediateNoPromise (internal use)
+     *  Transform some properties of your choice from the `current value` to the `entered value`.
+     *  The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change every time this transformation is called.
+     *  It is possible to associate the special pros to the current transformation, these properties will be valid only in the current transformation.
+     *   - duration
+     *   - ease
+     *   - relative
+     *   - reverse
+     *   - immediate (internal use)
+     *   - immediateNoPromise (internal use)
+     *
      */
     goTo(obj, props = {}) {
         if (this.pauseStatus || this.comeFromResume) this.stop();
@@ -681,9 +688,9 @@ export default class HandleTween {
     }
 
     /**
-     * @param {Object.<string, number|function>} obj from Values
-     * @param {tweenSpecialProps & tweenCommonSpecialProps & import('../tween/tweenConfig.js').easeTypes} props special props
-     * @returns {Promise} Return a promise which is resolved when tween is over
+     * @param {import('../utils/tweenAction/type.js').valueToparseType} obj from Values
+     * @param {import('./type.js').tweenAction} props special props
+     * @returns {Promise|void} Return a promise which is resolved when tween is over
      *
      * @example
      * ```javascript
@@ -704,15 +711,15 @@ export default class HandleTween {
      *
      * ```
      * @description
-       Transform some properties of your choice from the `entered value` to the `current value`.
-       The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change every time this transformation is called.
-       It is possible to associate the special pros to the current transformation, these properties will be valid only in the current transformation.
-        - duration
-        - ease
-        - relative
-        - reverse
-        - immediate (internal use)
-        - immediateNoPromise (internal use)
+     *  Transform some properties of your choice from the `entered value` to the `current value`.
+     *  The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change every time this transformation is called.
+     *  It is possible to associate the special pros to the current transformation, these properties will be valid only in the current transformation.
+     *   - duration
+     *   - ease
+     *   - relative
+     *   - reverse
+     *   - immediate (internal use)
+     *   - immediateNoPromise (internal use)
      */
     goFrom(obj, props = {}) {
         if (this.pauseStatus || this.comeFromResume) this.stop();
@@ -722,10 +729,10 @@ export default class HandleTween {
     }
 
     /**
-     * @param {Object.<string, number|function>} fromObj from Values
-     * @param {Object.<string, number|function>} toObj to Values
-     * @param {tweenSpecialProps & tweenCommonSpecialProps & import('../tween/tweenConfig.js').easeTypes} props special props
-     * @returns {Promise|null} Return a promise which is resolved when tween is over
+     * @param {import('../utils/tweenAction/type.js').valueToparseType} fromObj from Values
+     * @param {import('../utils/tweenAction/type.js').valueToparseType} toObj to Values
+     * @param {import('./type.js').tweenAction} props special props
+     * @returns {Promise|void|null} Return a promise which is resolved when tween is over
      *
      * @example
      * ```javascript
@@ -747,15 +754,15 @@ export default class HandleTween {
      *
      * ```
      * @description
-       Transform some properties of your choice from the `first entered value` to the `second entered value`.
-       The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change every time this transformation is called.
-       It is possible to associate the special pros to the current transformation, these properties will be valid only in the current transformation.
-        - duration
-        - ease
-        - relative
-        - reverse
-        - immediate (internal use)
-        - immediateNoPromise (internal use)
+     *  Transform some properties of your choice from the `first entered value` to the `second entered value`.
+     *  The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change every time this transformation is called.
+     *  It is possible to associate the special pros to the current transformation, these properties will be valid only in the current transformation.
+     *   - duration
+     *   - ease
+     *   - relative
+     *   - reverse
+     *   - immediate (internal use)
+     *   - immediateNoPromise (internal use)
      */
     goFromTo(fromObj, toObj, props = {}) {
         if (this.pauseStatus || this.comeFromResume) this.stop();
@@ -771,9 +778,9 @@ export default class HandleTween {
     }
 
     /**
-     * @param {Object.<string, number|function>} obj to Values
-     * @param {tweenCommonSpecialProps } props special props
-     * @returns {Promise} Return a promise which is resolved when tween is over
+     * @param {import('../utils/tweenAction/type.js').valueToparseType} obj to Values
+     * @param {import('./type.js').tweenCommonPropsTween } props special props
+     * @returns {Promise|void} Return a promise which is resolved when tween is over
      *
      * @example
      * ```javascript
@@ -789,11 +796,11 @@ export default class HandleTween {
      *
      *
      * ```
-       Transform some properties of your choice from the `current value` to the `entered value` immediately.
-       The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change every time this transformation is called.
-       It is possible to associate the special pros to the current transformation, these properties will be valid only in the current transformation.
-        - immediate (internal use)
-        - immediateNoPromise (internal use)
+     *  Transform some properties of your choice from the `current value` to the `entered value` immediately.
+     *  The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change every time this transformation is called.
+     *  It is possible to associate the special pros to the current transformation, these properties will be valid only in the current transformation.
+     *   - immediate (internal use)
+     *   - immediateNoPromise (internal use)
      */
     set(obj, props = {}) {
         if (this.pauseStatus || this.comeFromResume) this.stop();
@@ -808,9 +815,9 @@ export default class HandleTween {
     /**
      * @private
      *
-     * @param {Object.<string, number|function>} data Updated data
-     * @param {tweenSpecialProps & tweenCommonSpecialProps & import('../tween/tweenConfig.js').easeTypes} props special props
-     * @param {Object.<string, number|function>} obj new data obj come from set/goTo/goFrom/goFromTo
+     * @param {import('../utils/tweenAction/type.js').valueToparseType[]} data Updated data
+     * @param {import('./type.js').tweenAction} props special props
+     * @param {import('../utils/tweenAction/type.js').valueToparseType} obj new data obj come from set/goTo/goFrom/goFromTo
      * @returns {Promise|void} Return a promise which is resolved when tween is over
      *
      * @description
@@ -989,7 +996,7 @@ export default class HandleTween {
     /**
      * Update ease with new preset
      *
-     * @param { import('../tween/tweenConfig.js').easeStringTypes } ease
+     * @param {import('./type.js').easeTypes} ease
      *
      */
     updateEase(ease) {
@@ -1000,8 +1007,8 @@ export default class HandleTween {
     }
 
     /**
-     * @param {import('../utils/callbacks/setCallback.js').subscribeCallbackType} cb - callback function.
-     * @return {Function} unsubscribe callback.
+     * @param {function(any):void} cb - callback function.
+     * @return {function} unsubscribe callback.
      *
      * @example
      * ```javascript
@@ -1055,7 +1062,7 @@ export default class HandleTween {
     }
 
     /**
-     * @param {import('../utils/callbacks/setCallback.js').subscribeCallbackType} cb - callback function.
+     * @param {function(any):void} cb - callback function.
      * @return {Function} unsubscribe callback.
      *
      * @example
@@ -1108,7 +1115,7 @@ export default class HandleTween {
 
     /**
      * @param {('Object'|'HTMLElement')} item
-     * @param {import('../utils/callbacks/setCallback.js').subscribeCallbackType} fn - callback function.
+     * @param {function(any):void} fn - callback function.
      * @return {Function} unsubscribe callback
      *
      * @example
@@ -1143,6 +1150,8 @@ export default class HandleTween {
     /**
      * @description
      * Destroy tween
+     *
+     * @returns {void}
      */
     destroy() {
         if (this.promise) this.stop();
@@ -1151,7 +1160,7 @@ export default class HandleTween {
         this.callback = [];
         this.callbackCache = [];
         this.values = [];
-        this.promise = null;
+        this.promise = undefined;
         this.unsubscribeCache.forEach((unsubscribe) => unsubscribe());
         this.unsubscribeCache = [];
     }

@@ -1,3 +1,5 @@
+// @ts-check
+
 import { mq } from '../../utils/mediaManager.js';
 import {
     getTranslateValues,
@@ -7,7 +9,7 @@ import {
 import HandleLerp from '../lerp/handleLerp.js';
 import HandleSpring from '../spring/handleSpring.js';
 import { clamp, getRoundedValue } from '../utils/animationUtils.js';
-import { getRangeUnitMisure } from '../utils/getConstantFromRegex.js';
+import { getRangeUnitMisure } from './getConstantFromRegex.js';
 import {
     breakpointIsValid,
     breakpointTypeIsValid,
@@ -31,215 +33,24 @@ import {
     valueIsBooleanAndReturnDefault,
     valueIsNumberAndReturnDefault,
     valueIsStringAndReturnDefault,
-} from '../utils/tweenValidation.js';
+} from '../utils/tweenAction/tweenValidation.js';
 import { parallaxConstant } from './parallaxConstant.js';
 import { parallaxEmitter } from './parallaxEmitter.js';
 import { parallaxMarker } from './parallaxMarker.js';
 import { ParallaxPin } from './parallaxPin.js';
-import { parallaxUtils } from './parallaxUtils.js';
 import { mobCore } from '../../../mobCore/index.js';
-
-/**
- * @typedef {object} parallaxDefaultTypes
- * @prop {object} [ tween = null ]
-    Instance of ParallaxTween | HandleSequencer
- * @prop {(string|Element)} item
-    Target element.
-    The default value is a empty Element.
- * @prop {(string|Element)} [ scroller = window ]
-    The scrollable node in which the target is contained.
-    The default is window.
- * @prop {(string|Element)} [ screen = window ]
-    A node that contains the scrollable element.
-    The default is window.
- * @prop {(string|Element)} [ trigger = null ]
-    A reference node from which to take the measurements (position, width, height) instead of the target.
-    The default value is null.
- * @prop {(string|Element)} [ applyTo  = null ]
-    A node to apply the transformations to instead of the target.
-    Applicable only with using native transformations ( x, y, scale, etcc... ).
-    The default value is null.
- * @prop {boolean} [ disableForce3D = false ]
-    Disable 3D transform added to enable GPU.
-    Only valid for native properties ( x, y , scale, etc...).
-    The default value is false.
- * @prop {boolean} [ useThrottle = false ]
-    Enable a Throttle function on the scroll.
-    The option will not be enabled with the presence of an active pin to maintain accuracy.
-    The default value is false.
- * @prop {('parallax'|'scrolltrigger')} type = 'parallax'
-    Main property that defines whether the instance will behave as a parallax or as a scrolltrigger.
-    The default is 'parallax'.
- * @prop {(string|number)} [ range = 0 ]
-    Property that defines the calculation of the distance value.
-
-    Parallax:
-    A number between `0.1` and `9.99`. The default value is `0`.
-
-    Scrolltrigger: String of the following type:
-    - x|y: `+/-100px | +/-100vw | +/-100vh | +/-100w | +/-100h `. the default value is `0px`.
-    - rotate|rotateY|rotateX|rotateZ: `45deg` |  `-45deg`, The default value is 0.
-    - scale: `+/-0.5`, The scale property is increased by 0.5, th default value is 0.
-    - opacity: `+/-` number between 0 and 1.
-    - customCssPropierites: ('margin', 'padding-left', etc ...) Each value will be converted to px, no unit misure is needed.
-    - tween: There are no options the value will be controlled by the tween itself.
- * @prop {number} [ perspective = 0 ]
-    Apply the css styles perspective: <value>; transform-style: preserve-3d; to the closest parent node.
-    The default value is false
- * @prop {boolean} [ ease = false ]
-    Defines whether the animation will have ease.
-    The default value is false.
- * @prop {('spring'|'lerp')} [ easeType = 'lerp']
-    Defines the type of easing. The default is 'lerp'.
- * @prop {number} [ lerpConfig = 0.06 ]
-    It defines the initial value of the lerp velocity.
-    The default value is 0.06.
- * @prop {('y'|'x'|'rotate'|'rotateY'|'rotateX'|'rotateZ'|'opacity'|'scale'|'tween')} [ propierties = 'x']
-    Defines the applied property, you can apply a custom css property ( ex: 'margin-left' ).
-    if you choose 'tween' you will need to specify a HandleSequencer or ParallaxTween instance in the tween property.
-    The default value is 'x'.
- * @prop {('vertical'|'horizontal')} [ direction = 'vertical' ] - Defines the scroll direction
- * @prop {Boolean} [useWillChange]
-    Enable the css property will-change: transform; when the frame rate falls below 3/5 of the optimal value.
-    The property remains active for 1000 frames.
-    If after the previous value the fps value is back to normal the will-change property is disabled.
-    `Use with CAUTION only if necessary.`
-    It is valid only for native properties ( x, y , scale, etc...).
-    It is valid only if the disableForce3D property is set to false ( default value ).
-    The default value is `false`.
- */
-
-/**
- * @typedef {object} parallaxSpecificTypes
- * @prop {('start'|'top'|'right'|'center'|'bottom'|'left'|'end'|Number)} [ align = 'center' ]
-     Defines when the calculation reaches the value 0 ( neutral position ).
-     It is possible to use a preset value or a number from 0 to 100 which corresponds to a value calculated with respect to the viewport.
-     The default is 'center'.
-    - `start`: top of document.
-    - `end`: end of document.
-    - `center`: center of viewport.
-    - `top/left`: top/left of viewport.
-    - `bottom/right`: bottom/right of viewport.
- * @prop {('in-stop'|'in-back'|'out-stop'|'out-back')} [ onSwitch = false ]
-    Defines the behavior of the parallax once it reaches point 0 ( neutral position )
-    It can continue, stop or go back.
-    The default value is null, in this case the calculation from positive will become negative.
- * @prop {boolean} [ reverse = false ]
-    Reverse the animation.
-    The default value is false.
- * @prop {number} [ opacityStart = 100]
-    Defines the start value of the opacity animation with respect to the viewport.
-    100 corresponds to 100vh.
-    The default value is 100.
- * @prop {number} [ opacityEnd = 0 ]
-    Defines the end value of the opacity animation with respect to the viewport.
-    100 corresponds to 100vh.
-    The default value is 0
- * @prop {boolean} [ limiterOff = false ] - Parallax remains active as long as the element remains behind the viewport (with a safety margin of 150px), using this option bypasses this check. The default value is false.
- */
-
-/**
- * @typedef {object} scrolltriggerSpecificTypes
- * @prop {boolean} [ pin = false ]
-    Activate the pin.
-    The pin will be applied to the defined element of the item property.
-    The default value is false.
- * @prop {boolean} [ animatePin = false ]
-    A spring animation will be applied to the pinned element on state change.
- * @prop {boolean} [ forceTranspond = false ]
-    The element will always be appended to the document body.
-    The default value is false.
- * @prop {boolean} [ anticipatePinOnLoad = false ]
-    The pin is always activated a little earlier based on the last scroll made.
-    With this property, when loading the page and without having performed any scrolling,
-    the element can be pinned even if slightly earlier than the preset position.
-    The default value is false.
- * @prop {string} [ start = '0px']
-    Defines the start position of the animation, the value is a string made up of 3 optional values:
-
-    1: `bottom|top|left|right`:
-    Indicates the side of the viewport that will be referenced.
-
-    2: `+/-<value>vh|vw|px`:
-    add a value in vh|vw|px, vh in vertical direction, vw in horizontal direction,
-
-    3: `+/-height|halfHeight|width|halfWidth`:
-    You can add the height/width value or half of one of them to the final value.
-    Useful for centering the element.
-
-    The values 2 & 3 will always be added from the chosen position towards the center of the screen,
-    whether the position corresponds to top|bottom left|right
-
-    Expamples: `bottom +50vh -halfHeight` the value corresponding to the element position centered in the viewport.
-    All the values is case insensitive
-
- * @prop {string} [ end = '0px']
- - Defines the end position of the animation, the value is a string made up of 3 optional values:
-
-    1: `bottom|top|left|right`:
-    Indicates the side of the viewport that will be referenced.
-
-    2: `+/-<value>vh|vw|px`:
-    add a value in vh|vw|px, vh in vertical direction, vw in horizontal direction,
-
-    3: `+/-height|halfHeight|width|halfWidth`:
-    You can add the height/width value or half of one of them to the final value.
-    Useful for centering the element.
-
-    The values 2 & 3 will always be added from the chosen position towards the center of the screen,
-    whether the position corresponds to top|bottom left|right
-
-    Expamples: `bottom +50vh -halfHeight` the value corresponding to the element position centered in the viewport.
-    All the values is case insensitive
- * @prop {boolean} [ fromTo = false ]
-    Reverse the animation.
-    The default is false.
- * @prop {string} [ marker = false ]
-    Display start|end values with a solid line.
-    In case you activate the pin property the top|bottom|right|left border of the pin warapper
-    will have a highlight border applied.
-    The value is a text string that will be added to the fixed line.
-    The default value is false.
- * @prop {object} [ dynamicStart = null ]
-    The start position calculated with the help of a function.
-    the resulting value of the function will be calculated starting from the specified position towards the center of the viewport.
-    if the property is used it will take precedence over start.
- * @prop {('bottom'|'top'|'left'|'right')} dynamicStart.position
-    Start position
- * @prop {function():number} dynamicStart.value
-    Function that return a Number
- * @prop {object} [ dynamicEnd = null ]
-    The end position calculated with the help of a function.
-    The resulting value of the function will be calculated starting from the specified position towards the center of the viewport.
-    If the property is used it will take precedence over end.
- * @prop {('bottom'|'top'|'left'|'right')} dynamicEnd.position
-    End position
- * @prop {function():number} dynamicEnd.value
-    Function that return a Number
- * @prop {function():number} [ dynamicRange  = null]
-    The transformation value calculated through the use of a function.
-    The result of the function will be used in px.
-    If used, it will take priority over the range method.
-    if the property is a tween it will have no effect.
- * @prop {boolean} [ animateAtStart = false ]
-    The element will animate with easing (if used) on loading the page or animation.
-    The default value is false.
- * @prop {function():void} [ onEnter = null ] -
- * @prop {function():void} [ onEnterBack = null ] -
- * @prop {function():void} [ onLeave = null ] -
- * @prop {function():void} [ onLeaveBack = null ]-
- * @prop {function(Number):void} [ onTick = null ]
-    Function that is launched at each tick.
-    The function will have the current value as input parameter.
- */
-
-/**
- * @typedef  { parallaxDefaultTypes & import('../../utils/mediaManager.js').breackPointTypeObj & import('../../utils/mediaManager.js').mqTypeObject & import('../spring/springConfig.js').springConfigParallaxTypes & parallaxSpecificTypes & scrolltriggerSpecificTypes } parallaxConstructor
- */
+import {
+    getEndPoint,
+    getRetReverseValue,
+    getStartPoint,
+    getValueOnSwitch,
+    detectViewPortInterception,
+    processFixedLimit,
+} from './parallaxUtils.js';
 
 export default class ParallaxClass {
     /**
-     * @param  { parallaxConstructor } data
+     * @param  { import('./type.js').parallaxCommonType & import('./type.js').parallaxType &  import('./type.js').scrollTriggerType} data
      *
      * @example
      *
@@ -254,7 +65,7 @@ export default class ParallaxClass {
      *      trigger: [ String | Element ],
      *      screen: [ String | Element ],
      *      scroller: [ String | Element ],
-     *      breackpoint: [ String ],
+     *      breakpoint: [ String ],
      *      queryType: [ String ],
      *      direction: [ String ],
      *      propierties: [ String ],
@@ -286,7 +97,7 @@ export default class ParallaxClass {
      *      trigger: [ String | Element ],
      *      screen: [ String | Element ],
      *      scroller: [ String | Element ],
-     *      breackpoint: [ String ],
+     *      breakpoint: [ String ],
      *      queryType: [ String ],
      *      direction: [ String ],
      *      propierties: [ String ],
@@ -341,179 +152,228 @@ export default class ParallaxClass {
      * ```
      */
 
-    constructor(data = {}) {
+    constructor(data) {
         /**
          * @private
+         *
+         * @type {boolean}
          */
         this.isInzialized = false;
 
         /**
          * @private
+         *
+         * @type {boolean}
          */
         this.firstScroll = false;
 
         /**
          * @private
+         *
+         * @type {boolean}
          */
         this.willChangeIsActive = false;
 
         /**
          * @private
+         *
+         * @type {number}
          */
         this.offset = 0;
 
         /**
          * @private
+         *
+         * @type {number}
          */
         this.screenPosition = 0;
 
         /**
          * @private
+         *
+         * @type {number}
          */
         this.endValue = 0;
 
         /**
          * @private
+         *
+         * @type {number}
          */
         this.height = 0;
 
         /**
          * @private
+         *
+         * @type {number}
          */
         this.width = 0;
 
         /**
          * @private
+         *
+         * @type {number}
          */
         this.scrollerScroll = 0;
 
         /**
          * @private
+         *
+         * @type {number}
          */
         this.scrollerHeight = 0;
 
         /**
          * @private
+         *
+         * @type {number}
          */
         this.windowInnerWidth = window.innerWidth;
 
         /**
          * @private
+         *
+         * @type {number}
          */
         this.windowInnerHeight = window.innerHeight;
 
         /**
          * @private
+         *
+         * @type {number}
          */
         this.gap = 150;
 
         /**
          * @private
+         *
+         * @type {number}
          */
         this.numericRange = 0;
 
         /**
          * @private
+         * @type {function}
          */
         this.unsubscribeResize = () => {};
 
         /**
          * @private
+         * @type {function}
          */
         this.unsubscribeScroll = () => {};
 
         /**
          * @private
+         * @type {function}
          */
         this.unsubscribeScrollStart = () => {};
 
         /**
          * @private
+         * @type {function}
          */
         this.unsubscribeScrollEnd = () => {};
 
         /**
          * @private
+         * @type {function}
          */
         this.unsubscribeMarker = () => {};
 
         /**
          * @private
+         * @type {Element|undefined}
          */
-        this.startMarker = null;
+        this.startMarker = undefined;
 
         /**
          * @private
+         * @type {Element|undefined}
          */
-        this.endMarker = null;
+        this.endMarker = undefined;
 
         /**
          * @private
+         * @type {number|undefined}
          */
-        this.lastValue = null;
+        this.lastValue = undefined;
 
         /**
          * @private
+         * @type {number}
          */
         this.prevFixedRawValue = 0;
 
         /**
          * @private
+         * @type {boolean}
          */
-        this.fixedShouldRender = null;
+        this.fixedShouldRender = false;
 
         /**
          * @private
+         * @type {number|undefined}
          */
-        this.prevFixedClamp = null;
+        this.prevFixedClamp = undefined;
 
         /**
          * @private
+         * @type {boolean}
          */
         this.firstTime = true;
 
         /**
          * @private
+         * @type {boolean}
          */
         this.isInViewport = false;
 
         /**
          * @private
+         * @type {boolean}
          */
         this.iSControlledFromOutside = false;
 
         /**
          * @private
+         * @type {boolean}
          */
         this.force3D = false;
 
         /**
          * @private
+         * @type {object|undefined}
          */
-        this.pinInstance = null;
+        this.pinInstance = undefined;
 
         /**
          * @private
+         * @type {string}
          */
         this.unitMisure = '';
 
         /**
          * @private
+         * @type {number}
          */
         this.startPoint = 0;
 
         /**
          * @private
+         * @type {number}
          */
         this.endPoint = 0;
 
         /**
          * @private
+         * @type {function}
          */
         this.unsubscribeMotion = () => {};
 
         /**
          * @private
+         * @type {function}
          */
         this.unsubscribeOnComplete = () => {};
 
@@ -521,102 +381,172 @@ export default class ParallaxClass {
          * Fixed prop
          */
 
-        /*
-         * Pin prop
+        /**
+         * @description
+         * @type {boolean}
          */
         this.pin = valueIsBooleanAndReturnDefault(
             data?.pin,
             'Scrolltrigger pin propierties error:',
             false
         );
+
+        /**
+         * @description
+         * @type {boolean}
+         */
         this.animatePin = valueIsBooleanAndReturnDefault(
             data?.animatePin,
             'Scrolltrigger animatePin propierties error:',
             false
         );
 
+        /**
+         * @description
+         * @type {boolean}
+         */
         this.forceTranspond = valueIsBooleanAndReturnDefault(
             data?.forceTranspond,
             'Scrolltrigger forceTranspond propierties error:',
             false
         );
 
+        /**
+         * @description
+         * @type {boolean}
+         */
         this.anticipatePinOnLoad = valueIsBooleanAndReturnDefault(
             data?.anticipatePinOnLoad,
             'Scrolltrigger anticipatePinOnLoad propierties error:',
             false
         );
 
+        /**
+         * @description
+         * @type {string}
+         */
         this.start = valueIsStringAndReturnDefault(
             data?.start,
             'Scrolltrigger start propierties error:',
             'bottom 0px'
         );
 
+        /**
+         * @description
+         * @type {string}
+         */
         this.end = valueIsStringAndReturnDefault(
             data?.end,
             'Scrolltrigger end propierties error:',
             'top'
         );
 
+        /**
+         * @description
+         * @type {boolean}
+         */
         this.fromTo = valueIsBooleanAndReturnDefault(
             data?.fromTo,
             'Scrolltrigger fromTo propierties error:',
             false
         );
 
+        /**
+         * @description
+         * @type {boolean}
+         */
         this.invertSide = valueIsBooleanAndReturnDefault(
             data?.invertSide,
             'Scrolltrigger invertSide propierties error:',
             false
         );
 
+        /**
+         * @description
+         * @type {string}
+         */
         this.marker = valueIsStringAndReturnDefault(
             data?.marker,
             'Scrolltrigger marker propierties error:',
             null
         );
 
+        /**
+         * @description
+         * @type {import('./type.js').dynamicStartType}
+         */
         this.dynamicStart = data?.dynamicStart
             ? parallaxDynamicValueIsValid(data.dynamicStart, 'dynamicStart')
             : null;
 
+        /**
+         * @description
+         * @type {import('./type.js').dynamicEndType}
+         */
         this.dynamicEnd = data?.dynamicEnd
             ? parallaxDynamicValueIsValid(data.dynamicEnd, 'dynamicEnd')
             : null;
 
+        /**
+         * @description
+         * @type {function}
+         */
         this.dynamicRange = parallaxDynamicRangeIsValid(data?.dynamicRange);
 
+        /**
+         * @description
+         * @type {boolean}
+         */
         this.animateAtStart = valueIsBooleanAndReturnDefault(
             data?.animateAtStart,
             'Scrolltrigger animateAtStart propierties error:',
             false
         );
 
+        /**
+         * @description
+         * @type {function}
+         */
         this.onEnter = functionIsValidAndReturnDefault(
             data?.onEnter,
             false,
             'Scrolltrigger onEnter propierties error'
         );
 
+        /**
+         * @description
+         * @type {function}
+         */
         this.onEnterBack = functionIsValidAndReturnDefault(
             data?.onEnterBack,
             false,
             'Scrolltrigger onEnterBack propierties error'
         );
 
+        /**
+         * @description
+         * @type {function}
+         */
         this.onLeave = functionIsValidAndReturnDefault(
             data?.onLeave,
             false,
             'Scrolltrigger onLeave propierties error'
         );
 
+        /**
+         * @description
+         * @type {function}
+         */
         this.onLeaveBack = functionIsValidAndReturnDefault(
             data?.onLeaveBack,
             false,
             'Scrolltrigger onLeaveBack propierties error'
         );
 
+        /**
+         * @description
+         * @type {function}
+         */
         this.onTickCallback = functionIsValidAndReturnDefault(
             data?.onTick,
             false,
@@ -624,30 +554,51 @@ export default class ParallaxClass {
         );
 
         /**
-         * Parallax  prop
-         * */
+         * @description
+         * @type {string|number}
+         */
         this.align = parallaxAlignIsValid(data?.align);
 
+        /**
+         * @description
+         * @type {string}
+         */
         this.onSwitch = parallaxOnSwitchIsValid(data?.onSwitch);
 
+        /**
+         * @description
+         * @type {boolean}
+         */
         this.reverse = valueIsBooleanAndReturnDefault(
             data?.reverse,
             'Parallax reverse propierties error:',
             false
         );
 
+        /**
+         * @description
+         * @type {number}
+         */
         this.opacityStart = parallaxOpacityIsValid(
             data?.opacityStart,
             'Parallax opacityStart propierties error:',
             100
         );
 
+        /**
+         * @description
+         * @type {number}
+         */
         this.opacityEnd = parallaxOpacityIsValid(
             data?.opacityEnd,
             'Parallax opacityEnd propierties error:',
             0
         );
 
+        /**
+         * @description
+         * @type {boolean}
+         */
         this.limiterOff = valueIsBooleanAndReturnDefault(
             data?.limiterOff,
             'Parallax|Scrolltrigger limiterOff propierties error:',
@@ -658,14 +609,30 @@ export default class ParallaxClass {
          * Common prop
          */
 
+        /**
+         * @description
+         * @type {boolean|undefined}
+         */
         this.useWillChange = data?.useWillChange;
 
+        /**
+         * @description
+         * @type {object}
+         */
         this.tween = parallaxTweenIsValid(data?.tween);
 
+        /**
+         * @description
+         * @type {boolean}
+         */
         const tweenIsSequencer =
             this.tween?.getType &&
             this.tween.getType() === parallaxConstant.TWEEN_TIMELINE;
 
+        /**
+         * @description
+         * @type {boolean}
+         */
         const tweenIsParallaxTween =
             this.tween?.getType &&
             this.tween.getType() === parallaxConstant.TWEEN_TWEEN;
@@ -673,21 +640,49 @@ export default class ParallaxClass {
          *
          */
 
+        /**
+         * @description
+         * @type {HTMLElement|null}
+         */
         this.item = domNodeIsValidAndReturnElOrWin(data?.item, false);
 
+        /**
+         * @description
+         * @type {HTMLElement|Window|null}
+         */
         this.scroller = domNodeIsValidAndReturnElOrWin(data?.scroller, true);
 
+        /**
+         * @description
+         * @type {HTMLElement|Window|null}
+         */
         this.screen = domNodeIsValidAndReturnElOrWin(data?.screen, true);
 
+        /**
+         * @description
+         * @type {HTMLElement|null|null}
+         */
         this.trigger = domNodeIsValidAndReturnNull(data?.trigger);
 
+        /**
+         * @description
+         * @type {HTMLElement|null}
+         */
         this.applyTo = domNodeIsValidAndReturnNull(data?.applyTo);
 
+        /**
+         * @description
+         * @type {string}
+         */
         this.direction = directionIsValid(
             data?.direction,
             'Parallax/Scrolltrigger'
         );
 
+        /**
+         * @description
+         * @type {boolean}
+         */
         this.disableForce3D = valueIsBooleanAndReturnDefault(
             data?.disableForce3D,
             'Parallax|Scrolltrigger disableForce3D propierties error:',
@@ -695,28 +690,52 @@ export default class ParallaxClass {
         );
 
         // With pin active no throttle is usable, pin need precision
+        /**
+         * @description
+         * @type {boolean}
+         */
         this.useThrottle = valueIsBooleanAndReturnDefault(
             data?.useThrottle,
             'Parallax|Scrolltrigger useThrottle propierties error:',
             false
         );
 
+        /**
+         * @description
+         * @type {string}
+         */
         this.type = parallaxTypeIsValid(data?.type);
 
+        /**
+         * @description
+         * @type {string|number}
+         */
         this.range = parallaxRangeIsValid(data?.range, this.type);
 
+        /**
+         * @description
+         * @type {number}
+         */
         this.perspective = valueIsNumberAndReturnDefault(
             data?.perspective,
             'Parallax|Scrolltrigger perspective propierties error:',
             0
         );
 
-        this.breackpoint = breakpointIsValid(
-            data?.breackpoint,
+        /**
+         * @description
+         * @type {string}
+         */
+        this.breakpoint = breakpointIsValid(
+            data?.breakpoint,
             'breakpoint',
             'parallax/scrolltrigger'
         );
 
+        /**
+         * @description
+         * @type {string}
+         */
         this.queryType = breakpointTypeIsValid(
             data?.queryType,
             'queryType',
@@ -724,8 +743,11 @@ export default class ParallaxClass {
         );
 
         /**
+         * @description
          * Get properties, check if there is sequencer inside a Parallax,
          * In case return y propierties
+         *
+         * @type {string}
          */
         this.propierties = parallaxPropiertiesIsValid(
             data?.propierties,
@@ -734,6 +756,13 @@ export default class ParallaxClass {
             tweenIsSequencer
         );
 
+        /**
+         * @description
+         * Get properties, check if there is sequencer inside a Parallax,
+         * In case return y propierties
+         *
+         * @type {boolean}
+         */
         this.ease = valueIsBooleanAndReturnDefault(
             data?.ease,
             'Parallax|Scrolltrigger ease propierties error:',
@@ -741,9 +770,11 @@ export default class ParallaxClass {
         );
 
         /**
+         * @description
          * Get easeType properties, Check if a sequencer is used inside a scrollTrigger
-         * In case retutn a lerp
+         * In case return a lerp
          *
+         * @type {string}
          */
         this.easeType = parallaxEaseTypeIsValid(
             data?.easeType,
@@ -751,22 +782,47 @@ export default class ParallaxClass {
             this.type === parallaxConstant.TYPE_SCROLLTRIGGER
         );
 
+        /**
+         * @description
+         * Get easeType properties, Check if a sequencer is used inside a scrollTrigger
+         * In case return a lerp
+         *
+         * @type {string}
+         */
         this.springConfig = parallaxSpringConfigIsValid(
             data?.springConfig,
             this.type
         );
 
+        /**
+         * @description
+         * Get easeType properties, Check if a sequencer is used inside a scrollTrigger
+         * In case return a lerp
+         *
+         * @type {number}
+         */
         this.lerpConfig = parallaxLerpConfigIsValid(
             data?.lerpConfig,
             this.type
         );
 
-        // Add more precision to motion spring/lerp to trigger better force3D
+        /**
+         * @description
+         * Add more precision to motion spring/lerp to trigger better force3D
+         *
+         * @type {any}
+         */
         this.motionParameters =
             this.easeType === parallaxConstant.EASE_SPRING
                 ? { configProp: { precision: parallaxConstant.EASE_PRECISION } }
                 : { precision: parallaxConstant.EASE_PRECISION };
 
+        /**
+         * @description
+         * Add more precision to motion spring/lerp to trigger better force3D
+         *
+         * @type {object}
+         */
         this.motion = (() => {
             if (tweenIsSequencer) {
                 this.easeType = parallaxConstant.EASE_LERP;
@@ -780,37 +836,6 @@ export default class ParallaxClass {
                 ? new HandleSpring()
                 : new HandleLerp();
         })();
-
-        /*
-        Obj utils to avoid new GC allocation during animation
-        Try to reduce the GC timing
-        Support caluculation in each frame
-        */
-        this.GC = {
-            // getFixedValue
-            partials: null,
-            maxVal: null,
-            partialVal: null,
-            valPerDirection: null,
-            clamp: null,
-            percent: null,
-            // getOpacityValue
-            vhLimit: null,
-            vhStart: null,
-            val: null,
-            valClamped: null,
-            // getIsNaNValue
-            documentHeight: null,
-            // getIsANumberValue
-            align: null,
-            offset: null,
-            range: null,
-            // getStyle
-            reverseVal: null,
-            typeVal: null,
-            force3DStyle: null,
-            scaleVal: null,
-        };
     }
 
     /**
@@ -848,8 +873,13 @@ export default class ParallaxClass {
             this.calcFixedLimit();
         }
 
-        // If use pin we have to get fresh value on scroll
-        // Otherwise we can optimize and fire scoll callback after requerst animationFrame
+        /**
+         * @description
+         * If use pin we have to get fresh value on scroll
+         * Otherwise we can optimize and fire scroll callback after requerst animationFrame
+         *
+         * @param {function():void} cb
+         */
         const getScrollfucuntion = (cb) => {
             if (this.pin) {
                 this.unsubscribeScroll = mobCore.useScrollImmediate(cb);
@@ -868,7 +898,7 @@ export default class ParallaxClass {
         };
 
         /**
-         * If scroller is !== window the istance is controlled by another component
+         * If scroller is !== window the instance is controlled by another component
          * Use move() methods to control children
          */
         if (this.ease) {
@@ -927,7 +957,7 @@ export default class ParallaxClass {
             this.noEasingRender();
 
             /**
-             * Execture render on scrollEnd to remove 3Dtransform
+             * Execute render on scrollEnd to remove 3Dtransform
              */
             this.unsubscribeScrollEnd = mobCore.useScrollEnd(() => {
                 /**
@@ -938,72 +968,82 @@ export default class ParallaxClass {
         }
 
         /**
-         * Inizialize marker
+         * Initialize marker
          */
-        if (this.scroller !== window) {
+        if (this.scroller !== window && this.marker) {
             this.unsubscribeMarker = mobCore.useScroll(() => {
                 // Refresh marker
-                if (this.marker) this.calcFixedLimit();
+                this.calcFixedLimit();
             });
         }
 
         /**
-         * Inizialize refresh
+         * Initialize refresh
          */
         this.unsubscribeResize = mobCore.useResize(({ horizontalResize }) => {
             if (horizontalResize) this.refresh();
         });
 
         /**
-         * Inizialize pin
+         * Initialize pin
          */
         if (this.pin) {
             this.pinInstance = new ParallaxPin();
 
-            if (mq[this.queryType](this.breackpoint)) {
+            if (mq[this.queryType](this.breakpoint)) {
                 mobCore.useNextTick(() => {
                     this.getScrollerOffset();
-                    this.pinInstance.init({ instance: this });
-                    this.pinInstance.onScroll(this.scrollerScroll);
+                    this.pinInstance?.init({ instance: this });
+                    this.pinInstance?.onScroll(this.scrollerScroll);
                 });
             }
         }
     }
 
     /**
+     * @description
      *
+     * @param {HTMLElement|Window} scroller
      */
     setScroller(scroller) {
         this.scroller = domNodeIsValidAndReturnElOrWin(scroller, true);
     }
 
     /**
+     * @description
      *
+     * @param {HTMLElement|Window} screen
      */
     setScreen(screen) {
         this.screen = domNodeIsValidAndReturnElOrWin(screen, true);
     }
 
     /**
+     * @description
      *
+     * @param {string} direction
      */
     setDirection(direction) {
         this.direction = directionIsValid(direction, 'Parallax/Scrolltrigger');
     }
 
     /**
+     * @description
      *
+     * @param {string} breakpoint
      */
-    setBreakPoint(breackpoint) {
-        this.breackpoint = breakpointIsValid(
-            breackpoint,
+    setBreakPoint(breakpoint) {
+        this.breakpoint = breakpointIsValid(
+            breakpoint,
             'breakpoint',
             'Parallax/Scrolltrigger'
         );
     }
 
     /**
+     * @description
      *
+     * @param {string} queryType
      */
     setQueryType(queryType) {
         this.queryType = breakpointTypeIsValid(
@@ -1023,6 +1063,7 @@ export default class ParallaxClass {
                 'transform-style': 'preserve-3d',
             };
             const parent = this.item.parentNode;
+            // @ts-ignore
             Object.assign(parent.style, style);
         }
     }
@@ -1085,10 +1126,7 @@ export default class ParallaxClass {
 
         switch (this.easeType) {
             case parallaxConstant.EASE_LERP: {
-                if (
-                    this.lerpConfig &&
-                    !Number.isNaN(Number.parseFloat(this.lerpConfig))
-                ) {
+                if (this.lerpConfig) {
                     this.motion.updateVelocity(this.lerpConfig);
                 }
                 break;
@@ -1127,7 +1165,7 @@ export default class ParallaxClass {
             );
 
             /**
-             * Extract number froms tring
+             * Extract number forms string
              */
             this.numericRange =
                 Number.parseFloat(strParsed.replaceAll(/^\D+/g, '')) *
@@ -1146,11 +1184,11 @@ export default class ParallaxClass {
     calcFixedLimit() {
         const screenUnit = this.scrollerHeight / 100;
 
-        // Check if there is a function that return a start value dinamically
+        // Check if there is a function that return a start value dynamically
         if (
             this.dynamicStart &&
             this.dynamicStart?.position &&
-            this.dynamicStart?.value
+            this.dynamicStart?.value?.()
         ) {
             const { position, value: fn } = this.dynamicStart;
             const valueResult = fn();
@@ -1159,22 +1197,22 @@ export default class ParallaxClass {
             }
         }
 
-        // Get postion ( es: 'bottom'),
+        // Get position ( es: 'bottom'),
         // Get processed value ( based on px || vh || vw)
-        // Get addtional val ( +height -halfHeight etc ..)
+        // Get additional val ( +height -halfHeight etc ..)
         const {
             value: startPoint,
             additionalVal: additionalStartVal,
             position: startPosition,
-        } = parallaxUtils.getStartPoint(screenUnit, this.start, this.direction);
+        } = getStartPoint(screenUnit, this.start, this.direction);
 
-        // Chek if come from top or left
+        // Check if come from top or left
         this.invertSide =
             startPosition === parallaxConstant.POSITION_TOP ||
             startPosition === parallaxConstant.POSITION_LEFT;
 
-        // Add/substract with height or half value
-        this.startPoint = parallaxUtils.processFixedLimit(
+        // Add/subtract with height or half value
+        this.startPoint = processFixedLimit(
             startPoint,
             additionalStartVal,
             this.direction === parallaxConstant.DIRECTION_VERTICAL
@@ -1185,11 +1223,11 @@ export default class ParallaxClass {
                 : this.height
         );
 
-        // Check if there is a function that return a end value dinamically
+        // Check if there is a function that return a end value dynamically
         if (
             this.dynamicEnd &&
             this.dynamicEnd?.position &&
-            this.dynamicEnd?.value
+            this.dynamicEnd?.value?.()
         ) {
             const { position, value: fn } = this.dynamicEnd;
             const valueResult = fn();
@@ -1198,14 +1236,14 @@ export default class ParallaxClass {
             }
         }
 
-        // Get postion ( es: 'bottom'),
+        // Get position ( es: 'bottom'),
         // Get processed value ( based on px || vh || vw)
-        // Get addtional val ( +height -halfHeight etc ..)
+        // Get additional val ( +height -halfHeight etc ..)
         const {
             value: endPoint,
             additionalVal: additionalEndVal,
             position: endPosition,
-        } = parallaxUtils.getEndPoint(
+        } = getEndPoint(
             screenUnit,
             this.end,
             this.startPoint,
@@ -1214,7 +1252,7 @@ export default class ParallaxClass {
             this.direction
         );
 
-        // Get positive or negative multiplier to add or substract value basedto the position
+        // Get positive or negative multiplier to add or subtract value basedto the position
         const multiplier = (() => {
             if (this.invertSide) {
                 return endPosition === parallaxConstant.POSITION_BOTTOM ||
@@ -1229,8 +1267,8 @@ export default class ParallaxClass {
             }
         })();
 
-        // Add/substract with height or half value
-        this.endPoint = parallaxUtils.processFixedLimit(
+        // Add/subtract with height or half value
+        this.endPoint = processFixedLimit(
             endPoint,
             additionalEndVal,
             this.direction === parallaxConstant.DIRECTION_VERTICAL
@@ -1276,6 +1314,8 @@ export default class ParallaxClass {
     calcOffset() {
         const el = this.trigger === null ? this.item : this.trigger;
 
+        if (!el) return;
+
         let x = 0;
         let y = 0;
         let z = 0;
@@ -1286,31 +1326,36 @@ export default class ParallaxClass {
             z = getTranslateValues(this.trigger).z;
         }
 
-        // Reset transofrm for get right offset value if transform is applyed itself
+        /**
+         * Reset transform for get right offset value if transform is applied itself
+         * @ts-ignore all element is not window ( check the if statement ).
+         */
         el.style.transform = '';
 
         if (this.direction === parallaxConstant.DIRECTION_VERTICAL) {
             this.offset =
                 this.scroller === window
-                    ? Number.parseInt(offset(el).top)
-                    : Number.parseInt(offset(el).top) -
-                      offset(this.scroller).top;
+                    ? Math.trunc(offset(el).top)
+                    : // @ts-ignore
+                      Math.trunc(offset(el).top) - offset(this.scroller).top;
         } else {
             this.offset =
                 this.scroller === window
-                    ? Number.parseInt(offset(el).left)
-                    : Number.parseInt(offset(el).left) -
-                      offset(this.scroller).left;
+                    ? Math.trunc(offset(el).left)
+                    : // @ts-ignore
+                      Math.trunc(offset(el).left) - offset(this.scroller).left;
         }
 
         if (this.screen !== window) {
             this.direction === parallaxConstant.DIRECTION_VERTICAL
-                ? (this.offset -= Number.parseInt(offset(this.screen).top))
-                : (this.offset -= Number.parseInt(position(this.screen).left));
+                ? // @ts-ignore
+                  (this.offset -= Math.trunc(offset(this.screen).top))
+                : // @ts-ignore
+                  (this.offset -= Math.trunc(position(this.screen).left));
         }
 
         if (this.trigger && (x !== 0 || y !== 0 || z !== 0)) {
-            this.trigger.style.tranform = `translate3D(${x}px, ${y}px, ${z}px)`;
+            this.trigger.style.transform = `translate3D(${x}px, ${y}px, ${z}px)`;
         }
     }
 
@@ -1320,10 +1365,15 @@ export default class ParallaxClass {
     calcScreenPosition() {
         if (this.screen === window) return;
 
+        /**
+         * @ts-ignore all element is not window ( check the if statement ).
+         */
         this.screenPosition =
             this.direction === parallaxConstant.DIRECTION_VERTICAL
-                ? Number.parseInt(offset(this.screen).top)
-                : Number.parseInt(position(this.screen).left);
+                ? // @ts-ignore
+                  Number.parseInt(offset(this.screen).top)
+                : // @ts-ignore
+                  Number.parseInt(position(this.screen).left);
     }
 
     /**
@@ -1331,10 +1381,12 @@ export default class ParallaxClass {
      */
     calcHeight() {
         const el = this.trigger === null ? this.item : this.trigger;
+        if (!el) return;
+
         this.height =
             this.direction === parallaxConstant.DIRECTION_VERTICAL
-                ? Number.parseInt(el.offsetHeight)
-                : Number.parseInt(el.offsetWidth);
+                ? Math.trunc(el.offsetHeight)
+                : Math.trunc(el.offsetWidth);
     }
 
     /**
@@ -1342,26 +1394,34 @@ export default class ParallaxClass {
      */
     calcWidth() {
         const el = this.trigger === null ? this.item : this.trigger;
+        if (!el) return;
+
         this.width =
             this.direction === parallaxConstant.DIRECTION_VERTICAL
-                ? Number.parseInt(el.offsetWidth)
-                : Number.parseInt(el.offsetHeight);
+                ? Math.trunc(el.offsetWidth)
+                : Math.trunc(el.offsetHeight);
     }
 
     /**
      * @private
      */
     getScrollerOffset() {
+        /**
+         * @ts-ignore all element is not window ( check the if statement ).
+         */
+
         if (this.scroller === window) {
             this.scrollerScroll =
                 this.direction === parallaxConstant.DIRECTION_VERTICAL
-                    ? this.scroller.pageYOffset
-                    : this.scroller.pageXOffset;
+                    ? this.scroller.scrollY
+                    : this.scroller.scrollX;
         } else {
             this.scrollerScroll =
                 this.direction === parallaxConstant.DIRECTION_VERTICAL
-                    ? -offset(this.scroller).top
-                    : -offset(this.scroller).left;
+                    ? // @ts-ignore
+                      -offset(this.scroller).top
+                    : // @ts-ignore
+                      -offset(this.scroller).left;
         }
     }
 
@@ -1372,6 +1432,9 @@ export default class ParallaxClass {
         this.windowInnerWidth = window.innerWidth;
         this.windowInnerHeight = window.innerHeight;
 
+        /**
+         * @ts-ignore all element is not window ( check the if statement ).
+         */
         if (this.screen === window) {
             this.scrollerHeight =
                 this.direction === parallaxConstant.DIRECTION_VERTICAL
@@ -1380,43 +1443,11 @@ export default class ParallaxClass {
         } else {
             this.scrollerHeight =
                 this.direction === parallaxConstant.DIRECTION_VERTICAL
-                    ? Number.parseInt(this.screen.offsetHeight)
-                    : Number.parseInt(this.screen.offsetWidth);
+                    ? // @ts-ignore
+                      Math.trunc(this.screen.offsetHeight)
+                    : // @ts-ignore
+                      Math.trunc(this.screen.offsetWidth);
         }
-    }
-
-    /**
-     * @description
-     * Destroy instance
-     */
-    destroy() {
-        this.motion?.stop?.();
-        this.unsubscribeScroll();
-        this.unsubscribeScrollStart();
-        this.unsubscribeScrollEnd();
-        this.unsubscribeResize();
-        this.unsubscribeMotion();
-        this.unsubscribeOnComplete();
-        this.unsubscribeMarker();
-        this.motion?.destroy?.();
-        this.dynamicRange = null;
-        this.onEnter = () => {};
-        this.onEnterBack = () => {};
-        this.onLeave = () => {};
-        this.onLeaveBack = () => {};
-        this.onTickCallback = () => {};
-        if (this.pin && this.pinInstance) this.pinInstance?.destroy?.();
-        if (this.startMarker) this.startMarker?.remove?.();
-        if (this.endMarker) this.endMarker?.remove?.();
-        this.motion = null;
-        this.startMarker = null;
-        this.endMarker = null;
-        this.pinInstance = null;
-        this.endValue = 0;
-
-        // Remove style from element, if style prop exist.
-        const el = this.applyTo ?? this.item;
-        if ('style' in el) el.style = '';
     }
 
     /**
@@ -1439,24 +1470,24 @@ export default class ParallaxClass {
             if (
                 this.pin &&
                 this.pinInstance &&
-                mq[this.queryType](this.breackpoint)
+                mq[this.queryType](this.breakpoint)
             ) {
                 this.pinInstance.init({ instance: this });
             }
         }
         //
         // reset value to update animation after resize
-        this.lastValue = null;
+        this.lastValue = undefined;
         this.firstTime = true;
         this.firstScroll = false;
         //
-        if (mq[this.queryType](this.breackpoint)) {
+        if (mq[this.queryType](this.breakpoint)) {
             if (this.ease) {
                 this.smoothParallaxJs();
             } else {
                 this.computeValue();
 
-                // Disable 3d transfrom at first render after refresh.
+                // Disable 3d transform at first render after refresh.
                 this.noEasingRender({ forceRender: true });
             }
         } else {
@@ -1470,32 +1501,24 @@ export default class ParallaxClass {
                     Object.assign(this.applyTo.style, this.getResetStyle());
                 } else {
                     this.resetTweenStyle(this.item);
-                    Object.assign(this.item.style, this.getResetStyle());
+                    if (this.item)
+                        Object.assign(this.item.style, this.getResetStyle());
                 }
             }, 3);
         }
     }
 
     /**
-     * @typedef {Object} parallaxMoveType
-     * @prop {Number} value
-     * @prop {Boolean} parentIsMoving
-     */
-
-    /**
-     * @param {parallaxMoveType}
-     *
-     *
      * @description
      * Method used to control the instance from the outside.
-    The methods acceps two parameters:
-
-    `value`: The scroll position of the parent.
-    If no value is provided, the instance will calculate it autonomously.
-
-    `parentIsMoving`: Value that indicates if the component using the method is moving.
-    The value is used to manage the addition of the translate3D property.
-    The default value is false
+     * The methods acceps two parameters:
+     *
+     * `value`: The scroll position of the parent.
+     * If no value is provided, the instance will calculate it autonomously.
+     *
+     * `parentIsMoving`: Value that indicates if the component using the method is moving.
+     * The value is used to manage the addition of the translate3D property.
+     * The default value is false
      *
      *
      * @example
@@ -1512,18 +1535,22 @@ export default class ParallaxClass {
      *     ...
      * });
      * ```
+     *
+     * @param {import('./type.js').parallaxMoveType} obj
+     *
      */
-    move({ value = null, parentIsMoving = false } = {}) {
-        if (!mq[this.queryType](this.breackpoint) || value === null) return;
+    move({ value, parentIsMoving = false }) {
+        if (!mq[this.queryType](this.breakpoint) || !value) return;
         this.iSControlledFromOutside = true;
 
         const scrollVal = this.getScrollValueOnMove(value);
 
         if (this.ease) {
-            this.smoothParallaxJs({ scrollVal });
+            this.smoothParallaxJs(scrollVal);
         } else {
-            this.computeValue({ scrollVal });
-            const forceRender = this.isInViewport || this.firstTime || null;
+            this.computeValue(scrollVal);
+            const forceRender =
+                this.isInViewport || this.firstTime || undefined;
             this.noEasingRender({ forceRender, parentIsMoving });
         }
     }
@@ -1553,9 +1580,11 @@ export default class ParallaxClass {
 
     /**
      * @private
+     *
+     * @param {number|undefined} value
      */
     getScrollValueOnMove(value) {
-        if (value === null) return null;
+        if (value === undefined) return;
         if (this.screen !== window) return value + this.screenPosition;
 
         return value;
@@ -1571,11 +1600,13 @@ export default class ParallaxClass {
 
     /**
      * @private
+     *
+     * @param {number} [ scrollVal ]
      */
-    smoothParallaxJs({ scrollVal = null } = {}) {
-        if (!mq[this.queryType](this.breackpoint)) return;
+    smoothParallaxJs(scrollVal) {
+        if (!mq[this.queryType](this.breakpoint)) return;
 
-        this.computeValue({ scrollVal });
+        this.computeValue(scrollVal);
 
         // Skip motion fixed type
         if (
@@ -1585,16 +1616,16 @@ export default class ParallaxClass {
         )
             return;
 
-        // Skip motion deafault type
+        // Skip motion default type
         if (
             !this.isInViewport &&
             !this.firstTime &&
-            !this.type !== parallaxConstant.TYPE_SCROLLTRIGGER
+            this.type === parallaxConstant.TYPE_PARALLAX
         )
             return;
 
         // First time render with no easing
-        const action = this.firstTime & !this.animateAtStart ? 'set' : 'goTo';
+        const action = this.firstTime && !this.animateAtStart ? 'set' : 'goTo';
 
         // Maybe a destroy method is callad during animation, so check if exist.
         if (!this.motion) return;
@@ -1607,17 +1638,19 @@ export default class ParallaxClass {
 
     /**
      * @private
+     *
+     * @param {number} [ scrollVal ]
      */
-    computeValue({ scrollVal = null } = {}) {
-        if (!mq[this.queryType](this.breackpoint)) return;
+    computeValue(scrollVal) {
+        if (!mq[this.queryType](this.breakpoint)) return;
 
-        if (scrollVal === null) {
-            this.getScrollerOffset();
-        } else {
+        if (scrollVal) {
             this.scrollerScroll = -scrollVal;
+        } else {
+            this.getScrollerOffset();
         }
 
-        this.isInViewport = parallaxUtils.isInViewport({
+        this.isInViewport = detectViewPortInterception({
             offset: this.offset,
             height: this.height,
             gap: this.gap,
@@ -1625,11 +1658,11 @@ export default class ParallaxClass {
             wHeight: this.scrollerHeight,
         });
 
-        // Skip motion deafult with limiterOff not active
+        // Skip motion default with limiterOff not active
         if (
             !this.isInViewport &&
             !this.limiterOff &&
-            !this.type !== parallaxConstant.TYPE_SCROLLTRIGGER
+            this.type === parallaxConstant.TYPE_PARALLAX
         )
             return;
 
@@ -1652,6 +1685,7 @@ export default class ParallaxClass {
 
                     default: {
                         this.endValue = Number.isNaN(
+                            // @ts-ignore
                             Number.parseInt(this.align)
                         )
                             ? getRoundedValue(this.getIsNaNValue() / 2)
@@ -1665,12 +1699,9 @@ export default class ParallaxClass {
         /**
          * Get reverse value
          */
-        this.GC.reverseVal =
+        const reverseValue =
             this.reverse && this.type !== parallaxConstant.TYPE_SCROLLTRIGGER
-                ? parallaxUtils.getRetReverseValue(
-                      this.propierties,
-                      this.endValue
-                  )
+                ? getRetReverseValue(this.propierties, this.endValue)
                 : this.endValue;
 
         /**
@@ -1678,15 +1709,15 @@ export default class ParallaxClass {
          */
         this.endValue =
             this.type === parallaxConstant.TYPE_SCROLLTRIGGER
-                ? this.GC.reverseVal
-                : this.getSwitchAfterZeroValue(this.GC.reverseVal);
+                ? reverseValue
+                : this.getSwitchAfterZeroValue(reverseValue);
     }
 
     /**
      * @private
      */
     noEasingRender({ forceRender = false, parentIsMoving = false } = {}) {
-        if (!mq[this.queryType](this.breackpoint)) return;
+        if (!mq[this.queryType](this.breakpoint)) return;
 
         mobCore.useFrame(() => {
             this.cleanRender({ forceRender, parentIsMoving });
@@ -1747,15 +1778,17 @@ export default class ParallaxClass {
 
     /**
      * @private
+     *
+     * @param {number} value
      */
-    updateStyle(val) {
+    updateStyle(value) {
         if (this.applyTo) {
-            Object.assign(this.applyTo.style, this.getStyle(val));
-        } else {
-            Object.assign(this.item.style, this.getStyle(val));
+            Object.assign(this.applyTo.style, this.getStyle(value));
+        } else if (this.item) {
+            Object.assign(this.item.style, this.getStyle(value));
         }
 
-        this.lastValue = val;
+        this.lastValue = value;
         this.firstTime = false;
     }
 
@@ -1763,7 +1796,7 @@ export default class ParallaxClass {
      * @private
      */
     getFixedValue() {
-        this.GC.partials = this.invertSide
+        const partials = this.invertSide
             ? -(
                   this.scrollerScroll +
                   this.startPoint +
@@ -1777,31 +1810,27 @@ export default class ParallaxClass {
                   (this.offset + this.endPoint)
               );
 
-        this.GC.maxVal = (this.endPoint / 100) * this.numericRange;
-        this.GC.partialVal = (this.GC.partials / 100) * this.numericRange;
+        const maxVal = (this.endPoint / 100) * this.numericRange;
+        const partialVal = (partials / 100) * this.numericRange;
 
-        this.GC.valPerDirection = (() => {
+        const valePerDirections = (() => {
             if (this.fromTo) {
-                return this.invertSide
-                    ? this.GC.maxVal - this.GC.partialVal
-                    : this.GC.partialVal;
+                return this.invertSide ? maxVal - partialVal : partialVal;
             } else {
-                return this.invertSide
-                    ? this.GC.partialVal
-                    : this.GC.maxVal - this.GC.partialVal;
+                return this.invertSide ? partialVal : maxVal - partialVal;
             }
         })();
 
-        this.GC.clamp =
-            this.GC.maxVal > 0
-                ? -clamp(this.GC.valPerDirection, 0, this.GC.maxVal)
-                : -clamp(this.GC.valPerDirection, this.GC.maxVal, 0);
+        const clampValue =
+            maxVal > 0
+                ? -clamp(valePerDirections, 0, maxVal)
+                : -clamp(valePerDirections, maxVal, 0);
 
-        this.fixedShouldRender = this.prevFixedClamp !== this.GC.clamp;
-        this.prevFixedClamp = this.GC.clamp;
+        this.fixedShouldRender = this.prevFixedClamp !== clampValue;
+        this.prevFixedClamp = clampValue;
         if (!this.fixedShouldRender && !this.firstTime) return this.endValue;
 
-        this.GC.percent = (this.GC.clamp * 100) / this.endPoint;
+        const percentValue = (clampValue * 100) / this.endPoint;
 
         // Fire callback if there is
         if (
@@ -1812,8 +1841,8 @@ export default class ParallaxClass {
         ) {
             parallaxEmitter({
                 prevValue: this.prevFixedRawValue,
-                value: this.GC.valPerDirection,
-                maxVal: this.GC.maxVal,
+                value: valePerDirections,
+                maxVal: maxVal,
                 onEnter: this.onEnter,
                 onEnterBack: this.onEnterBack,
                 onLeave: this.onLeave,
@@ -1821,52 +1850,54 @@ export default class ParallaxClass {
             });
         }
 
-        this.prevFixedRawValue = this.GC.valPerDirection;
+        this.prevFixedRawValue = valePerDirections;
 
         switch (this.propierties) {
             case parallaxConstant.PROP_HORIZONTAL:
             case parallaxConstant.PROP_VERTICAL: {
-                return this.getHVval();
+                return this.getHVval(percentValue);
             }
 
             case parallaxConstant.PROP_SCALE:
             case parallaxConstant.PROP_OPACITY: {
-                return 1 - this.GC.percent;
+                return 1 - percentValue;
             }
 
             default: {
-                return -this.GC.percent;
+                return -percentValue;
             }
         }
     }
 
     /**
      * @private
+     *
+     * @param {number} percent
      */
-    getHVval() {
+    getHVval(percent) {
         switch (this.unitMisure) {
             case parallaxConstant.VW: {
-                return (this.windowInnerWidth / 100) * -this.GC.percent;
+                return (this.windowInnerWidth / 100) * -percent;
             }
 
             case parallaxConstant.VH: {
-                return (this.windowInnerHeight / 100) * -this.GC.percent;
+                return (this.windowInnerHeight / 100) * -percent;
             }
 
             case parallaxConstant.WPERCENT: {
                 return this.direction === parallaxConstant.DIRECTION_VERTICAL
-                    ? (this.width / 100) * -this.GC.percent
-                    : (this.height / 100) * -this.GC.percent;
+                    ? (this.width / 100) * -percent
+                    : (this.height / 100) * -percent;
             }
 
             case parallaxConstant.HPERCENT: {
                 return this.direction === parallaxConstant.DIRECTION_VERTICAL
-                    ? (this.height / 100) * -this.GC.percent
-                    : (this.width / 100) * -this.GC.percent;
+                    ? (this.height / 100) * -percent
+                    : (this.width / 100) * -percent;
             }
 
             default: {
-                return -this.GC.percent;
+                return -percent;
             }
         }
     }
@@ -1875,31 +1906,31 @@ export default class ParallaxClass {
      * @private
      */
     getOpacityValue() {
-        this.GC.vhLimit = (this.scrollerHeight / 100) * this.opacityEnd;
-        this.GC.vhStart =
+        const vhLimit = (this.scrollerHeight / 100) * this.opacityEnd;
+        const vhStart =
             this.scrollerHeight -
             (this.scrollerHeight / 100) * this.opacityStart;
 
-        this.GC.val =
+        const value =
             this.align == parallaxConstant.ALIGN_START
                 ? -this.scrollerScroll * -1
-                : (this.scrollerScroll + this.GC.vhLimit - this.offset) * -1;
+                : (this.scrollerScroll + vhLimit - this.offset) * -1;
 
-        this.GC.valClamped =
+        const valClamped =
             this.align == parallaxConstant.ALIGN_START
-                ? 1 - this.GC.val / this.offset
-                : 1 -
-                  this.GC.val /
-                      (this.scrollerHeight - this.GC.vhStart - this.GC.vhLimit);
+                ? 1 - value / this.offset
+                : 1 - value / (this.scrollerHeight - vhStart - vhLimit);
 
-        return clamp(this.GC.valClamped, 0, 1);
+        return clamp(valClamped, 0, 1);
     }
 
     /**
      * @private
      */
     getIsNaNValue() {
-        this.GC.documentHeight =
+        const rangeNumber = Number(this.range) ?? 0;
+
+        const documentHeight =
             this.direction === parallaxConstant.DIRECTION_VERTICAL
                 ? document.documentElement.scrollHeight
                 : document.documentElement.scrollWidth;
@@ -1907,12 +1938,12 @@ export default class ParallaxClass {
         // Prefixed align
         switch (this.align) {
             case parallaxConstant.ALIGN_START: {
-                return this.scrollerScroll / this.range;
+                return this.scrollerScroll / rangeNumber;
             }
 
             case parallaxConstant.ALIGN_TOP:
             case parallaxConstant.ALIGN_LEFT: {
-                return (this.scrollerScroll - this.offset) / this.range;
+                return (this.scrollerScroll - this.offset) / rangeNumber;
             }
 
             case parallaxConstant.ALIGN_CENTER: {
@@ -1920,7 +1951,7 @@ export default class ParallaxClass {
                     (this.scrollerScroll +
                         (this.scrollerHeight / 2 - this.height / 2) -
                         this.offset) /
-                    this.range
+                    rangeNumber
                 );
             }
 
@@ -1930,42 +1961,48 @@ export default class ParallaxClass {
                     (this.scrollerScroll +
                         (this.scrollerHeight - this.height) -
                         this.offset) /
-                    this.range
+                    rangeNumber
                 );
             }
 
             case parallaxConstant.ALIGN_END: {
                 return (
                     -(
-                        this.GC.documentHeight -
+                        documentHeight -
                         (this.scrollerScroll + this.scrollerHeight)
-                    ) / this.range
+                    ) / rangeNumber
                 );
+            }
+
+            default: {
+                return 0;
             }
         }
     }
 
     /**
      * @private
+     * Here the value is a number.
      */
     getIsANumberValue() {
-        this.GC.align = Number.parseFloat(this.align);
-        this.GC.offset = this.offset;
-        this.GC.range = this.range;
+        const align = Number(this.align);
+        const range = Number(this.range);
 
         return (
             (this.scrollerScroll +
-                (this.scrollerHeight / 100) * this.GC.align -
-                this.GC.offset) /
-            this.GC.range
+                (this.scrollerHeight / 100) * align -
+                this.offset) /
+            range
         );
     }
 
     /**
      * @private
+     *
+     * @param {number} value
      */
     getSwitchAfterZeroValue(value) {
-        return parallaxUtils.getValueOnSwitch({
+        return getValueOnSwitch({
             switchPropierties: this.onSwitch,
             isReverse: this.reverse,
             value,
@@ -1974,9 +2011,11 @@ export default class ParallaxClass {
 
     /**
      * @private
+     *
+     * @param {number} value
      */
-    getStyle(val) {
-        this.GC.force3DStyle = this.force3D ? 'translate3D(0px, 0px, 0px)' : '';
+    getStyle(value) {
+        const force3DStyle = this.force3D ? 'translate3D(0px, 0px, 0px)' : '';
 
         /**
          * If frame drop ia lot (2/5) activate 'will-change: transform;'
@@ -1992,72 +2031,72 @@ export default class ParallaxClass {
          * Used by transform ( not scale ).
          */
         const valueParsed = mobCore.shouldMakeSomething()
-            ? Math.round(val)
-            : val;
+            ? Math.round(value)
+            : value;
 
         switch (this.propierties) {
             case parallaxConstant.PROP_VERTICAL: {
                 return {
                     // translate: `0 ${val}px`,
-                    // transform: `${this.GC.force3DStyle}`,
-                    transform: `${this.GC.force3DStyle} translateY(${valueParsed}px)`,
+                    // transform: `${force3DStyle}`,
+                    transform: `${force3DStyle} translateY(${valueParsed}px)`,
                     willChange: shouldWill,
                 };
             }
 
             case parallaxConstant.PROP_HORIZONTAL: {
                 return {
-                    transform: `${this.GC.force3DStyle} translateX(${valueParsed}px)`,
+                    transform: `${force3DStyle} translateX(${valueParsed}px)`,
                     willChange: shouldWill,
                 };
             }
 
             case parallaxConstant.PROP_ROTATE: {
                 return {
-                    transform: `${this.GC.force3DStyle} rotate(${valueParsed}deg)`,
+                    transform: `${force3DStyle} rotate(${valueParsed}deg)`,
                     willChange: shouldWill,
                 };
             }
 
             case parallaxConstant.PROP_ROTATEY: {
                 return {
-                    transform: `${this.GC.force3DStyle} rotateY(${valueParsed}deg)`,
+                    transform: `${force3DStyle} rotateY(${valueParsed}deg)`,
                     willChange: shouldWill,
                 };
             }
 
             case parallaxConstant.PROP_ROTATEX: {
                 return {
-                    transform: `${this.GC.force3DStyle} rotateX(${valueParsed}deg)`,
+                    transform: `${force3DStyle} rotateX(${valueParsed}deg)`,
                     willChange: shouldWill,
                 };
             }
 
             case parallaxConstant.PROP_ROTATEZ: {
                 return {
-                    transform: `${this.GC.force3DStyle} rotateZ(${valueParsed}deg)`,
+                    transform: `${force3DStyle} rotateZ(${valueParsed}deg)`,
                     willChange: shouldWill,
                 };
             }
 
             case parallaxConstant.PROP_OPACITY: {
-                return { opacity: `${val}` };
+                return { opacity: `${value}` };
             }
 
             case parallaxConstant.PROP_SCALE: {
-                this.GC.scaleVal =
+                const scaleVal =
                     this.type === parallaxConstant.TYPE_SCROLLTRIGGER
-                        ? val
-                        : 1 + val / 1000;
+                        ? value
+                        : 1 + value / 1000;
                 return {
-                    transform: `${this.GC.force3DStyle} scale(${this.GC.scaleVal})`,
+                    transform: `${force3DStyle} scale(${scaleVal})`,
                     willChange: shouldWill,
                 };
             }
 
             default: {
                 return {
-                    [this.propierties.toLowerCase()]: `${val}px`,
+                    [this.propierties.toLowerCase()]: `${value}px`,
                 };
             }
         }
@@ -2066,8 +2105,11 @@ export default class ParallaxClass {
     /**
      * @private
      * Reset sequencer/parallaxTween style
+     *
+     * @param {HTMLElement|null} item
      */
     resetTweenStyle(item) {
+        // @ts-ignore
         if (this.tween) item.style = '';
     }
 
@@ -2097,5 +2139,49 @@ export default class ParallaxClass {
                 return { [this.propierties.toLowerCase()]: `` };
             }
         }
+    }
+
+    /**
+     * @description
+     * Destroy instance
+     */
+    destroy() {
+        this.motion?.stop?.();
+        this.unsubscribeScroll();
+        this.unsubscribeScrollStart();
+        this.unsubscribeScrollEnd();
+        this.unsubscribeResize();
+        this.unsubscribeMotion();
+        this.unsubscribeOnComplete();
+        this.unsubscribeMarker();
+        this.motion?.destroy?.();
+        this.dynamicRange = () => {};
+        this.onEnter = () => {};
+        this.onEnterBack = () => {};
+        this.onLeave = () => {};
+        this.onLeaveBack = () => {};
+        this.onTickCallback = () => {};
+        if (this.pin && this.pinInstance) this.pinInstance?.destroy?.();
+        if (this.startMarker) this.startMarker?.remove?.();
+        if (this.endMarker) this.endMarker?.remove?.();
+        this.motion = null;
+        this.startMarker = undefined;
+        this.endMarker = undefined;
+        this.pinInstance = null;
+        this.endValue = 0;
+
+        // Remove style from element, if style prop exist.
+        const el = this.applyTo ?? this.item;
+        // @ts-ignore
+        if (el && 'style' in el) el.style = '';
+
+        /**
+         * Remove HTMLELement reference.
+         */
+        this.item = null;
+        this.scroller = null;
+        this.screen = null;
+        this.trigger = null;
+        this.applyTo = null;
     }
 }

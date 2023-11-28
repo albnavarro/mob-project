@@ -1,19 +1,13 @@
-import {
-    getValueObj,
-    getValueObjToNative,
-    getValueObjFromNative,
-    mergeArray,
-    lerp,
-    compareKeys,
-    getRoundedValue,
-} from '../utils/animationUtils.js';
+// @ts-check
+
+import { lerp, compareKeys, getRoundedValue } from '../utils/animationUtils.js';
 import {
     setFromByCurrent,
     setFromCurrentByTo,
     setFromToByCurrent,
     setReverseValues,
     setRelative,
-} from '../utils/setValues.js';
+} from '../utils/tweenAction/setValues.js';
 import { mergeDeep } from '../../utils/mergeDeep.js';
 import { setStagger } from '../utils/stagger/setStagger.js';
 import { STAGGER_DEFAULT_INDEX_OBJ } from '../utils/stagger/staggerCostant.js';
@@ -34,38 +28,32 @@ import {
     goFromUtils,
     goFromToUtils,
     setUtils,
-} from '../utils/actions.js';
+} from '../utils/tweenAction/actions.js';
 import { initRaf } from '../utils/initRaf.js';
-import { resume } from '../utils/resume.js';
 import {
     compareKeysWarning,
     staggerIsOutOfRangeWarning,
 } from '../utils/warning.js';
-import { fpsLoadedLog } from '../utils/log.js';
-import { shouldInizializzeStagger } from '../utils/condition.js';
+import { fpsLoadedLog } from '../utils/fpsLogInizialization.js';
 import {
     lerpPrecisionIsValid,
     lerpVelocityIsValid,
     relativeIsValid,
     valueIsBooleanAndTrue,
-} from '../utils/tweenValidation.js';
+} from '../utils/tweenAction/tweenValidation.js';
 import { mobCore } from '../../../mobCore/index.js';
-
-/**
- * @typedef {Object} lerpTypes
- * @prop {Object.<string, number>} [ data ] Initial data Object.
- * @prop {Boolean} [ relative=false ] It defines the initial value of the relative properties, the value can be momentarily changed whenever the goTo, goFrom, goFromTo methods are invoked, the default value is false. If set to true each value will be calculated starting from the last used value, by default each value is calculated starting from the value defined in the constructor.
- **/
-
-/**
- * @typedef {Object} lerpPropTypes
- * @prop {Number} [ velocity ] It defines the initial value of the velocity properties, the value can be momentarily changed whenever the goTo, goFrom, goFromTo methods are invoked, `default value is 0.06`,the closer the value is to 1, the faster the transition will be.
- * @prop {Number} [ precision ] It defines the initial value of the precision properties, the value can be momentarily changed whenever the goTo, goFrom, goFromTo methods are invoked, when the calculated value is less than this number, the transition will be considered completed, the smaller the value, the greater the precision of the calculation, the `default value is 0.01`.
- **/
+import { shouldInizializzeStagger } from '../utils/stagger/shouldInizialize.js';
+import { resume } from '../utils/resumeTween.js';
+import {
+    getValueObj,
+    getValueObjFromNative,
+    getValueObjToNative,
+} from '../utils/tweenAction/getValues.js';
+import { mergeArray } from '../utils/tweenAction/mergeArray.js';
 
 export default class HandleLerp {
     /**
-     * @param { lerpTypes & lerpPropTypes & import('../utils/stagger/staggerCostant.js').staggerTypes } [ data  = {}]
+     * @param {import('./type.js').lerpTweenProps} [ data  = {}]
      *
      * @example
      * ```javascript
@@ -110,121 +98,135 @@ export default class HandleLerp {
      *
      * ```
      */
-    constructor(data = {}) {
+    constructor(data) {
         /**
          * @private
-         * @type {import('../utils/stagger/staggerCostant.js').staggerTypesObject}
+         * @type {import('../utils/stagger/type.js').staggerObject}
          */
         this.stagger = getStaggerFromProps(data);
 
         /**
-         * This value lives from user call ( goTo etc..) until next call
-         **/
-
-        /**
          * @private
+         * @type {boolean}
          */
         this.relative = relativeIsValid(data?.relative, 'lerp');
 
         /**
          * @private
+         * @type {number}
          */
         this.velocity = lerpVelocityIsValid(data?.velocity);
 
         /**
          * @private
+         * @type {number}
          */
         this.precision = lerpPrecisionIsValid(data?.precision);
 
         /**
-         * End
-         **/
-
-        /**
          * @private
+         * @type {string}
          */
         this.uniqueId = mobCore.getUnivoqueId();
 
         /**
          * @private
+         * @type {boolean}
          */
         this.isActive = false;
 
         /**
          * @private
+         * @type{( function(any):void )|undefined}
          */
-        this.currentResolve = null;
+        this.currentResolve = undefined;
 
         /**
          * @private
+         * @type{function|undefined}
          */
-        this.currentReject = null;
+        this.currentReject = undefined;
 
         /**
          * @private
+         * @type{Promise|undefined}
          */
-        this.promise = null;
+        this.promise = undefined;
 
         /**
          * @private
+         * @type {import('./type.js').lerpValues[]}
          */
         this.values = [];
 
         /**
          * @private
+         * @type {import('./type.js').lerpInitialData[]}
          */
         this.initialData = [];
 
         /**
          * @private
+         * @type {import('../utils/callbacks/type.js').callbackObject[]}
          */
         this.callback = [];
 
         /**
          * @private
+         * @type {import('../utils/callbacks/type.js').callbackObject[]}
          */
         this.callbackCache = [];
 
         /**
          * @private
+         * @type {import('../utils/callbacks/type.js').callbackObject[]}
          */
         this.callbackOnComplete = [];
 
         /**
          * @private
+         * @type {import('../utils/callbacks/type.js').callbackObject[]}
          */
         this.callbackStartInPause = [];
 
         /**
          * @private
+         * @type {Array<function>}
          */
         this.unsubscribeCache = [];
 
         /**
          * @private
+         * @type {boolean}
          */
         this.pauseStatus = false;
 
         /**
          * @private
+         * @type {boolean}
          */
         this.firstRun = true;
 
         /**
          * @private
+         * @type {boolean}
          */
         this.useStagger = true;
 
         /**
          * @private
+         * @type {boolean}
          */
         this.fpsInLoading = false;
 
         /**
          * @private
          *
+         * @description
          * This value is the base value merged with new value in custom prop
          * passed form user in goTo etc..
+         *
+         * @type {import('./type.js').lerpDefault}
          **/
         this.defaultProps = {
             reverse: false,
@@ -237,13 +239,14 @@ export default class HandleLerp {
 
         /**
          * @private
-         * Stagger value
+         * @type {import('../utils/stagger/type.js').staggerDefaultIndex}
          **/
         this.slowlestStagger = STAGGER_DEFAULT_INDEX_OBJ;
 
         /**
          * @private
-         **/
+         * @type {import('../utils/stagger/type.js').staggerDefaultIndex}
+         */
         this.fastestStagger = STAGGER_DEFAULT_INDEX_OBJ;
 
         /**
@@ -255,10 +258,99 @@ export default class HandleLerp {
     }
 
     /**
+     * @param {number} _time
+     * @param {number} fps
+     * @param {function} res
+     *
+     * @returns {void}
+     */
+    draw(_time, fps, res = () => {}) {
+        this.isActive = true;
+
+        this.values.forEach((item) => {
+            if (item.settled) return;
+
+            item.currentValue = lerp(
+                item.currentValue,
+                item.toValue,
+                (this.velocity / fps) * 60
+            );
+
+            item.currentValue = getRoundedValue(item.currentValue);
+
+            item.settled =
+                Number(Math.abs(item.toValue - item.currentValue).toFixed(4)) <=
+                this.precision;
+
+            if (item.settled) {
+                item.currentValue = item.toValue;
+            }
+        });
+
+        // Prepare an obj to pass to the callback
+        const callBackObject = getValueObj(this.values, 'currentValue');
+
+        defaultCallback({
+            stagger: this.stagger,
+            callback: this.callback,
+            callbackCache: this.callbackCache,
+            callBackObject: callBackObject,
+            useStagger: this.useStagger,
+        });
+
+        // Check if all values is completed
+        const allSettled = this.values.every((item) => item.settled === true);
+
+        if (allSettled) {
+            const onComplete = () => {
+                this.isActive = false;
+
+                // End of animation
+                // Set fromValue with ended value
+                // At the next call fromValue become the start value
+                this.values.forEach((item) => {
+                    item.fromValue = item.toValue;
+                });
+
+                // On complete
+                if (!this.pauseStatus) {
+                    res();
+
+                    // Set promise reference to null once resolved
+                    this.promise = undefined;
+                    this.currentReject = undefined;
+                    this.currentResolve = undefined;
+                }
+            };
+
+            // Prepare an obj to pass to the callback with rounded value ( end user value)
+            const cbObjectSettled = getValueObj(this.values, 'toValue');
+
+            defaultCallbackOnComplete({
+                onComplete,
+                callback: this.callback,
+                callbackCache: this.callbackCache,
+                callbackOnComplete: this.callbackOnComplete,
+                callBackObject: cbObjectSettled,
+                stagger: this.stagger,
+                slowlestStagger: this.slowlestStagger,
+                fastestStagger: this.fastestStagger,
+                useStagger: this.useStagger,
+            });
+        } else {
+            mobCore.useFrame(() => {
+                mobCore.useNextTick(({ time, fps }) => {
+                    if (this.isActive) this.draw(time, fps, res);
+                });
+            });
+        }
+    }
+
+    /**
      * @private
      *
-     * @param {Number} time current global time
-     * @param {Boolean} fps current FPS
+     * @param {number} time current global time
+     * @param {number} fps current FPS
      * @param {function} res current promise resolve
      **/
     onReuqestAnim(time, fps, res) {
@@ -266,106 +358,14 @@ export default class HandleLerp {
             item.currentValue = Number.parseFloat(item.fromValue);
         });
 
-        /**
-         * @type {Object|null}
-         */
-        let o = {};
-
-        o.velocity = this.velocity;
-
-        const draw = (_time, fps) => {
-            this.isActive = true;
-
-            this.values.forEach((item) => {
-                if (item.settled) return;
-
-                item.currentValue = lerp(
-                    item.currentValue,
-                    item.toValue,
-                    (o.velocity / fps) * 60
-                );
-
-                item.currentValue = getRoundedValue(item.currentValue);
-
-                item.settled =
-                    Number(
-                        Math.abs(item.toValue - item.currentValue).toFixed(4)
-                    ) <= this.precision;
-
-                if (item.settled) {
-                    item.currentValue = item.toValue;
-                }
-            });
-
-            // Prepare an obj to pass to the callback
-            o.callBackObject = getValueObj(this.values, 'currentValue');
-
-            defaultCallback({
-                stagger: this.stagger,
-                callback: this.callback,
-                callbackCache: this.callbackCache,
-                callBackObject: o.callBackObject,
-                useStagger: this.useStagger,
-            });
-
-            // Check if all values is completed
-            o.allSettled = this.values.every((item) => item.settled === true);
-
-            if (o.allSettled) {
-                const onComplete = () => {
-                    this.isActive = false;
-
-                    // End of animation
-                    // Set fromValue with ended value
-                    // At the next call fromValue become the start value
-                    this.values.forEach((item) => {
-                        item.fromValue = item.toValue;
-                    });
-
-                    // On complete
-                    if (!this.pauseStatus) {
-                        // Remove reference to o Object
-                        o = null;
-
-                        //
-                        res();
-
-                        // Set promise reference to null once resolved
-                        this.promise = null;
-                        this.currentReject = null;
-                        this.currentResolve = null;
-                    }
-                };
-
-                // Prepare an obj to pass to the callback with rounded value ( end user value)
-                const cbObjectSettled = getValueObj(this.values, 'toValue');
-
-                defaultCallbackOnComplete({
-                    onComplete,
-                    callback: this.callback,
-                    callbackCache: this.callbackCache,
-                    callbackOnComplete: this.callbackOnComplete,
-                    callBackObject: cbObjectSettled,
-                    stagger: this.stagger,
-                    slowlestStagger: this.slowlestStagger,
-                    fastestStagger: this.fastestStagger,
-                    useStagger: this.useStagger,
-                });
-            } else {
-                mobCore.useFrame(() => {
-                    mobCore.useNextTick(({ time, fps }) => {
-                        if (this.isActive) draw(time, fps);
-                    });
-                });
-            }
-        };
-
-        draw(time, fps);
+        this.draw(time, fps, res);
     }
 
     /**
      * @description
      * Inzialize stagger array
+     *
+     * @returns {Promise<any>}
      */
     async inzializeStagger() {
         /**
@@ -421,6 +421,10 @@ export default class HandleLerp {
 
     /**
      * @private
+     * @param {function(any):void} res
+     * @param {function} reject
+     *
+     * @returns {Promise}
      */
     async startRaf(res, reject) {
         if (this.fpsInLoading) return;
@@ -442,9 +446,10 @@ export default class HandleLerp {
     }
 
     /**
-     * @param { import('../tween/handleTween.js').tweenCommonStopProps } Stop props
-     * @description
+     * @param {import('../tween/type.js').tweenStopProps} Stop props
+     * @returns {void}
      *
+     * @description
      * Stop tween and fire reject of current promise.
      */
     stop({ clearCache = true } = {}) {
@@ -461,9 +466,9 @@ export default class HandleLerp {
         // Reject promise
         if (this.currentReject) {
             this.currentReject(mobCore.ANIMATION_STOP_REJECT);
-            this.promise = null;
-            this.currentReject = null;
-            this.currentResolve = null;
+            this.promise = undefined;
+            this.currentReject = undefined;
+            this.currentResolve = undefined;
         }
 
         // Reset RAF
@@ -472,8 +477,9 @@ export default class HandleLerp {
 
     /**
      * @description
-     *
      * Pause the tween
+     *
+     * @returns {void}
      */
     pause() {
         if (this.pauseStatus) return;
@@ -484,8 +490,9 @@ export default class HandleLerp {
 
     /**
      * @description
-     *
      * Resume tween in pause
+     *
+     * @returns {void}
      */
     resume() {
         if (!this.pauseStatus) return;
@@ -497,7 +504,8 @@ export default class HandleLerp {
     }
 
     /**
-     * @param {Object.<string, number|function>} obj Initial data structure
+     * @param {import('../utils/tweenAction/type.js').valueToparseType} obj Initial data structure
+     * @returns {void}
      *
      * @description
      * Set initial data structure, the method is call by data prop in constructor. In case of need it can be called after creating the instance
@@ -536,9 +544,11 @@ export default class HandleLerp {
         });
     }
 
-    /*
+    /**
      * @description
      * Reset data value with initial
+     *
+     * @returns {void}
      */
     resetData() {
         this.values = mergeDeep(this.values, this.initialData);
@@ -548,9 +558,9 @@ export default class HandleLerp {
      * @private
      *
      * @description
-     * Mege special props with default props
+     * Merge special props with default props
      *
-     * @param  {Object} props
+     * @param  {import('./type.js').lerpActions} props
      * @return {Object} props merged
      *
      */
@@ -565,8 +575,8 @@ export default class HandleLerp {
     }
 
     /**
-     * @param {Object.<string, number|function>} obj to Values
-     * @param { import('../tween/handleTween.js').tweenCommonSpecialProps & lerpPropTypes} props special props
+     * @param {import('../utils/tweenAction/type.js').valueToparseType} obj to Values
+     * @param {import('./type.js').lerpActions} props special props
      * @returns {Promise|void} Return a promise which is resolved when tween is over
      *
      * @example
@@ -588,15 +598,15 @@ export default class HandleLerp {
      *
      * ```
      * @description
-       Transform some properties of your choice from the `current value` to the `entered value`.
-       The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change every time this transformation is called.
-       It is possible to associate the special pros to the current transformation, these properties will be valid only in the current transformation.
-        - precision
-        - velocity
-        - relative
-        - reverse
-        - immediate (internal use)
-        - immediateNoPromise (internal use)
+     *  Transform some properties of your choice from the `current value` to the `entered value`.
+     *  The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change every time this transformation is called.
+     *  It is possible to associate the special pros to the current transformation, these properties will be valid only in the current transformation.
+     *   - precision
+     *   - velocity
+     *   - relative
+     *   - reverse
+     *   - immediate (internal use)
+     *   - immediateNoPromise (internal use)
      *
      */
     goTo(obj, props = {}) {
@@ -607,8 +617,8 @@ export default class HandleLerp {
     }
 
     /**
-     * @param {Object.<string, number|function>} obj from Values
-     * @param { import('../tween/handleTween.js').tweenCommonSpecialProps & lerpPropTypes } props special props
+     * @param {import('../utils/tweenAction/type.js').valueToparseType} obj from Values
+     * @param {import('./type.js').lerpActions} props special props
      * @returns {Promise|void} Return a promise which is resolved when tween is over
      *
      * @example
@@ -630,15 +640,15 @@ export default class HandleLerp {
      *
      * ```
      * @description
-       Transform some properties of your choice from the `entered value` to the `current value`.
-       The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change every time this transformation is called.
-       It is possible to associate the special pros to the current transformation, these properties will be valid only in the current transformation.
-        - precision
-        - velocity
-        - relative
-        - reverse
-        - immediate (internal use)
-        - immediateNoPromise (internal use)
+     *  Transform some properties of your choice from the `entered value` to the `current value`.
+     *  The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change every time this transformation is called.
+     *  It is possible to associate the special pros to the current transformation, these properties will be valid only in the current transformation.
+     *   - precision
+     *   - velocity
+     *   - relative
+     *   - reverse
+     *   - immediate (internal use)
+     *   - immediateNoPromise (internal use)
      */
     goFrom(obj, props = {}) {
         if (this.pauseStatus) return;
@@ -648,9 +658,9 @@ export default class HandleLerp {
     }
 
     /**
-     * @param {Object.<string, number|function>} fromObj from Values
-     * @param {Object.<string, number|function>} toObj to Values
-     * @param { import('../tween/handleTween.js').tweenCommonSpecialProps & lerpPropTypes } props special props
+     * @param {import('../utils/tweenAction/type.js').valueToparseType} fromObj from Values
+     * @param {import('../utils/tweenAction/type.js').valueToparseType} toObj to Values
+     * @param {import('./type.js').lerpActions } props special props
      * @returns {Promise|null|void} Return a promise which is resolved when tween is over
      *
      * @example
@@ -672,15 +682,15 @@ export default class HandleLerp {
      *
      *
      * ```
-       Transform some properties of your choice from the `first entered value` to the `second entered value`.
-       The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change every time this transformation is called.
-       It is possible to associate the special pros to the current transformation, these properties will be valid only in the current transformation.
-        - precision
-        - velocity
-        - relative
-        - reverse
-        - immediate (internal use)
-        - immediateNoPromise (internal use)
+     *  Transform some properties of your choice from the `first entered value` to the `second entered value`.
+     *  The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change every time this transformation is called.
+     *  It is possible to associate the special pros to the current transformation, these properties will be valid only in the current transformation.
+     *   - precision
+     *   - velocity
+     *   - relative
+     *   - reverse
+     *   - immediate (internal use)
+     *   - immediateNoPromise (internal use)
      */
     goFromTo(fromObj, toObj, props = {}) {
         if (this.pauseStatus) return;
@@ -698,8 +708,8 @@ export default class HandleLerp {
     }
 
     /**
-     * @param {Object.<string, number|function>} obj to Values
-     * @param { import('../tween/handleTween.js').tweenCommonSpecialProps } props special props
+     * @param {import('../utils/tweenAction/type.js').valueToparseType} obj to Values
+     * @param {import('../tween/type.js').tweenCommonProps} props special props
      * @returns {Promise|void} Return a promise which is resolved when tween is over
      *
      * @example
@@ -716,11 +726,11 @@ export default class HandleLerp {
      *
      *
      * ```
-       Transform some properties of your choice from the `current value` to the `entered value` immediately.
-       The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change every time this transformation is called.
-       It is possible to associate the special pros to the current transformation, these properties will be valid only in the current transformation.
-        - immediate (internal use)
-        - immediateNoPromise (internal use)
+     *  Transform some properties of your choice from the `current value` to the `entered value` immediately.
+     *  The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change every time this transformation is called.
+     *  It is possible to associate the special pros to the current transformation, these properties will be valid only in the current transformation.
+     *   - immediate (internal use)
+     *   - immediateNoPromise (internal use)
      */
     set(obj, props = {}) {
         if (this.pauseStatus) return;
@@ -732,9 +742,9 @@ export default class HandleLerp {
     /**
      * @private
      *
-     * @param {Object.<string, number|function>} data Updated data
-     * @param { import('../tween/handleTween.js').tweenCommonSpecialProps & lerpPropTypes} props special props
-     * @param {Object.<string, number|function>} obj new data obj come from set/goTo/goFrom/goFromTo
+     * @param {import('../utils/tweenAction/type.js').valueToparseType[]} data Updated data
+     * @param {import('./type.js').lerpActions} props special props
+     * @param {import('../utils/tweenAction/type.js').valueToparseType} obj new data obj come from set/goTo/goFrom/goFromTo
      * @returns {Promise|void} Return a promise which is resolved when tween is over
      *
      * @description
@@ -953,7 +963,7 @@ export default class HandleLerp {
     }
 
     /**
-     * @param {import('../utils/callbacks/setCallback.js').subscribeCallbackType} cb - callback function.
+     * @param {function(any):void} cb - callback function.
      * @return {Function} unsubscribe callback.
      *
      * @example
@@ -1006,7 +1016,7 @@ export default class HandleLerp {
     }
 
     /**
-     * @param {import('../utils/callbacks/setCallback.js').subscribeCallbackType} cb - callback function.
+     * @param {function} cb - callback function.
      * @return {Function} unsubscribe callback.
      *
      * @example
@@ -1059,7 +1069,7 @@ export default class HandleLerp {
 
     /**
      * @param {('Object'|'HTMLElement')} item
-     * @param {import('../utils/callbacks/setCallback.js').subscribeCallbackType} fn - callback function.
+     * @param {function(any):void} fn - callback function.
      * @return {Function} unsubscribe callback
      *
      * @example
@@ -1102,7 +1112,7 @@ export default class HandleLerp {
         this.callback = [];
         this.callbackCache = [];
         this.values = [];
-        this.promise = null;
+        this.promise = undefined;
         this.unsubscribeCache.forEach((unsubscribe) => unsubscribe());
         this.unsubscribeCache = [];
     }

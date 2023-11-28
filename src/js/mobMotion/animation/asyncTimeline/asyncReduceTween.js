@@ -1,8 +1,17 @@
+// @ts-check
+
 import { asyncReduceData } from './asyncReduceData';
 
-/*
+/**
+ * @param {Array<import('./type').asyncTimelineTweenItem[]>} tweenList
+ * @param {object} tween
+ * @param {number} index
+ *
+ * @returns {import('../utils/tweenAction/type').valueToparseType}
+ *
+ * @description
  * Get Obj data of tween in specific index
- * Indlude check when multiple tween is syncronized
+ * Indlude check when multiple tween is synchronized
  * index: get data until specific index
  */
 export const asyncReduceTween = (tweenList, tween, index) => {
@@ -17,7 +26,7 @@ export const asyncReduceTween = (tweenList, tween, index) => {
         const action = currentFirstData.action;
 
         /*
-         * If tween is syncronize with another tween,
+         * If tween is synchronize with another tween,
          * switch currenTween to the new one
          */
         if (action === 'sync') {
@@ -25,11 +34,11 @@ export const asyncReduceTween = (tweenList, tween, index) => {
 
             const from = {
                 tween: syncProp.from,
-                id: syncProp.from.getId?.(),
+                id: syncProp.from?.getId?.(),
             };
             const to = {
                 tween: syncProp.to,
-                id: syncProp.to.getId?.(),
+                id: syncProp.to?.getId?.(),
             };
 
             /*
@@ -58,9 +67,10 @@ export const asyncReduceTween = (tweenList, tween, index) => {
         /*
          * Filter only the prop in use in this step
          */
-        const propsInUse = currentValueTo
-            ? asyncReduceData(currentValueTo, currentTween.data.valuesTo)
-            : {};
+        const propsInUse =
+            currentValueTo && currentTween
+                ? asyncReduceData(currentValueTo, currentTween.data.valuesTo)
+                : {};
 
         return { ...p, ...propsInUse };
     }, initialData);

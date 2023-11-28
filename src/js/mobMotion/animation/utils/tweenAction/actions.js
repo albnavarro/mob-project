@@ -1,12 +1,12 @@
 // @ts-check
 
-import { mobCore } from '../../../mobCore/index.js';
+import { mobCore } from '../../../../mobCore/index.js';
 import { dataTweenValueIsValid } from './tweenValidation.js';
-import { dataTweenValueIsNotValidWarning } from './warning.js';
+import { dataTweenValueIsNotValidWarning } from '../warning.js';
 
 /**
- * @param {{ string: number|function():number }} obj
- * @returns {Array<{prop:string,toValue:number,toFn:(function|number),toIsFn:boolean,settled:boolean}>}
+ * @param {import('./type.js').valueToparseType} obj
+ * @return {Object}
  *
  * @description
  * Set goTo value, used by spring and lerp
@@ -27,7 +27,8 @@ export const goToUtils = (obj) => {
 
         const toValue = mobCore.checkType(Number, obj[item])
             ? obj[item]
-            : obj[item]();
+            : // @ts-ignore
+              obj[item]();
 
         return {
             prop: item,
@@ -40,8 +41,8 @@ export const goToUtils = (obj) => {
 };
 
 /**
- * @param {{ string: number|function():number }} obj
- * @returns {Array<{prop:string,fromValue:number,currentValue:number,fromFn:(function|number),fromIsFn:boolean,settled:boolean}>}
+ * @param {import('./type.js').valueToparseType} obj
+ * @return {Object}
  *
  * @description
  * Set goFrom value, used by spring and lerp
@@ -62,7 +63,8 @@ export const goFromUtils = (obj) => {
         }
         const value = mobCore.checkType(Number, obj[item])
             ? obj[item]
-            : obj[item]();
+            : // @ts-ignore
+              obj[item]();
 
         return {
             prop: item,
@@ -76,9 +78,9 @@ export const goFromUtils = (obj) => {
 };
 
 /**
- * @param {{ string: number|function():number }} fromObj
- * @param {{ string: number|function():number }} toObj
- * @returns {Array<{ prop:string, fromValue:number, fromFn:(function|number), fromIsFn:boolean, currentValue:number, toValue:number, toFn:(function|number), toIsFn:boolean, settled:boolean }>}
+ * @param {import('./type.js').valueToparseType} fromObj
+ * @param {import('./type.js').valueToparseType} toObj
+ * @return {Object}
  *
  * @description
  * Set goFromTo value, used by spring and lerp
@@ -108,11 +110,13 @@ export const goFromToUtils = (fromObj, toObj) => {
 
         const fromValue = mobCore.checkType(Number, fromObj[item])
             ? fromObj[item]
-            : fromObj[item]();
+            : // @ts-ignore
+              fromObj[item]();
 
         const toValue = mobCore.checkType(Number, toObj[item])
             ? toObj[item]
-            : toObj[item]();
+            : // @ts-ignore
+              toObj[item]();
 
         return {
             prop: item,
@@ -129,8 +133,8 @@ export const goFromToUtils = (fromObj, toObj) => {
 };
 
 /**
- * @param {{ string: number|function():number }} obj
- * @returns {Array<{ prop:string, fromValue:number, fromFn:(function|number), fromIsFn:boolean, currentValue:number, toValue:number, toFn:(function|number), toIsFn:boolean, settled:boolean }>}
+ * @param {import('./type.js').valueToparseType} obj
+ * @returns {Object}
  *
  * @description
  * Set set value, used by spring and lerp
@@ -154,7 +158,8 @@ export const setUtils = (obj) => {
         }
         const value = mobCore.checkType(Number, obj[item])
             ? obj[item]
-            : obj[item]();
+            : // @ts-ignore
+              obj[item]();
 
         return {
             prop: item,

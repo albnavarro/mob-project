@@ -10,7 +10,7 @@ const callbacks = [];
  * @description
  * Add callback
  *
- * @param {function(import('./handleFrame.js').handleFrameTypes):void } callBack - callback function
+ * @param {import('./type.js').handleFrameCallbakType} callBack - callback function
  *
  * @example
  * ```javascript
@@ -33,7 +33,7 @@ const add = (callBack) => {
  * @description
  * Reset callback
  *
- * @returns {Array.<function(import('./handleFrame.js').handleFrameTypes):void >}
+ * @returns {import('./type.js').handleFrameArrayType}
  *
  */
 const get = () => {

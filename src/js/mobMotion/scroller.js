@@ -5,11 +5,7 @@ import ParallaxClass from './animation/parallax/parallax.js';
 
 export const scroller = {
     /**
-     * @typedef { import('./animation/parallax/parallax.js').parallaxDefaultTypes & import('./utils/mediaManager.js').breackPointTypeObj & import('./animation/spring/springConfig.js').springConfigParallaxTypes & import('./utils/mediaManager.js').mqTypeObject & import('./animation/parallax/parallax.js').parallaxSpecificTypes } createParallaxType
-     */
-
-    /**
-     * @param { createParallaxType } data
+     * @param {import('./animation/parallax/type.js').parallaxCommonType & import('./animation/parallax/type.js').parallaxType} data
      *
      * @example
      * ```javascript
@@ -22,7 +18,7 @@ export const scroller = {
      *      trigger: [ String | Element ],
      *      screen: [ String | Element ],
      *      scroller: [ String | Element ],
-     *      breackpoint: [ String ],
+     *      breakpoint: [ String ],
      *      queryType: [ String ],
      *      direction: [ String ],
      *      propierties: [ String ],
@@ -63,16 +59,13 @@ export const scroller = {
     createParallax(data) {
         return new ParallaxClass({
             ...data,
+            // @ts-ignore
             type: parallaxConstant.TYPE_PARALLAX,
         });
     },
 
     /**
-     * @typedef { import('./animation/parallax/parallax.js').parallaxDefaultTypes & import('./utils/mediaManager.js').breackPointTypeObj & import('./animation/spring/springConfig.js').springConfigParallaxTypes & import('./utils/mediaManager.js').mqTypeObject & import('./animation/parallax/parallax.js').scrolltriggerSpecificTypes  } createScrollTriggerType
-     */
-
-    /**
-     * @param { createScrollTriggerType } data
+     * @param {import('./animation/parallax/type.js').parallaxCommonType & import('./animation/parallax/type.js').scrollTriggerType } data
      *
      * @example
      *
@@ -86,7 +79,7 @@ export const scroller = {
      *       trigger: [ String | Element ],
      *       screen: [ String | Element ],
      *       scroller: [ String | Element ],
-     *       breackpoint: [ String ],
+     *       breakpoint: [ String ],
      *       queryType: [ String ],
      *       direction: [ String ],
      *       propierties: [ String ],
@@ -101,7 +94,7 @@ export const scroller = {
      *       },
      *       end: [ String ],
      *       dynamicEnd: {
-     *          postion: [ String ],
+     *          position: [ String ],
      *          value: [ Function ]
      *       },
      *       ease: [ Boolean ],
@@ -144,6 +137,7 @@ export const scroller = {
     createScrollTrigger(data) {
         return new ParallaxClass({
             ...data,
+            // @ts-ignore
             type: parallaxConstant.TYPE_SCROLLTRIGGER,
         });
     },

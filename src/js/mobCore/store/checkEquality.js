@@ -71,7 +71,7 @@ const objectAreEqual = (obj1, obj2, checkDataOrder = false) => {
     }
 
     if (checkDataOrderParanoic && checkDataOrder) {
-        // whill result in {a:1, b:2} !== {b:2, a:1}
+        // will result in {a:1, b:2} !== {b:2, a:1}
         // its not normal, but if you want this behavior, set checkDataOrderParanoic = true
         const propOrder = obj1Props.toString() === obj2Props.toString();
         if (!propOrder) {

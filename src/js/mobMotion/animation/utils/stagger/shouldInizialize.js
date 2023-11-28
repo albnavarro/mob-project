@@ -1,13 +1,13 @@
 // @ts-check
 
-import { mobCore } from '../../../mobCore';
-import { staggerEachWarning } from './warning';
+import { mobCore } from '../../../../mobCore';
+import { staggerEachWarning } from '../warning';
 
 /**
  * @param {Number} each
  * @param {Boolean} firstRun
- * @param {Array.<{cb:function,id:number,index:Number,frame:Number}>} arrayToCompare1
- * @param {Array.<{cb:function,id:number,index:Number,frame:Number}>} arrayToCompare2
+ * @param {Array.<import('../callbacks/type').callbackObject>} arrayToCompare1
+ * @param {Array.<import('../callbacks/type').callbackObject>} arrayToCompare2
  */
 export const shouldInizializzeStagger = (
     each,

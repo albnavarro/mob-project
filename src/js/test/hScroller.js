@@ -1,18 +1,18 @@
 import { SmoothScroller } from '../mobMotion/plugin';
-import { scroller, tween, core } from '../mobMotion';
+import { scroller, tween, motionCore } from '../mobMotion';
 
 export const hScroller = () => {
     const btnPassiveTrue = document.querySelector('.btn-passive-true');
     const btnPassiveFalse = document.querySelector('.btn-passive-false');
 
     btnPassiveTrue.addEventListener('click', () => {
-        core.setDefault({
+        motionCore.setDefault({
             usePassive: true,
         });
     });
 
     btnPassiveFalse.addEventListener('click', () => {
-        core.setDefault({
+        motionCore.setDefault({
             usePassive: false,
         });
     });

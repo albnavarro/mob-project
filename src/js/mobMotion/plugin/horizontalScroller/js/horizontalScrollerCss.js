@@ -21,7 +21,7 @@ const getAlign = (columnAlign) => {
 export const horizontalScrollerCss = ({
     mainContainer,
     queryType,
-    breackpoint,
+    breakpoint,
     container,
     trigger,
     row,
@@ -34,7 +34,7 @@ export const horizontalScrollerCss = ({
 }) => {
     // if (horizontalCustomCssIsAlive) return;
     // horizontalCustomCssIsAlive = true;
-    const media = mq.getBreackpoint(breackpoint);
+    const media = mq.getBreackpoint(breakpoint);
 
     /**
      * Add if

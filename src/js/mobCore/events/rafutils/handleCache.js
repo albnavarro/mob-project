@@ -87,7 +87,7 @@ const update = ({ id, callBackObject, frame }) => {
  * @returns void
  *
  * @description
- * Remove item from chache.
+ * Remove item from cache.
  */
 const remove = (id) => {
     if (id in subscriber) delete subscriber[id];
@@ -131,7 +131,7 @@ const get = (id) => {
  * @returns void
  *
  * @description
- * Render obj on specific frame and delete renderd object.
+ * Render obj on specific frame and delete rendered object.
  */
 const fire = (frameCounter, shouldRender) => {
     Object.values(subscriber).forEach(({ data, fn, el }) => {

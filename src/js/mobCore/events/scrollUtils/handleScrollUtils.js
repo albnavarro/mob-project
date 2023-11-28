@@ -4,11 +4,7 @@ import { handleScrollImmediate } from './handleScrollImmediate.js';
 import { debounceFuncion } from '../debounce.js';
 import { handleFrame } from '../rafutils/handleFrame.js';
 import { handleNextTick } from '../rafutils/handleNextTick.js';
-
-/**
- * @typedef {Object} handleScrollUtilsType
- * @prop {number} scrollY - Scroll position
- */
+import { getUnivoqueId } from '../../utils/index.js';
 
 /**
  * @type {function}
@@ -32,17 +28,12 @@ function handleScrollUtils(type) {
     /**
      * @type {Boolean}
      */
-    let inizialized = false;
+    let initialized = false;
 
     /**
-     * @type {Array.<{id:number, cb:Function }>}
+     * @type {Map<String,Function>}
      */
-    let callback = [];
-
-    /**
-     * @type {Number}
-     */
-    let id = 0;
+    const callbacks = new Map();
 
     /**
      * @type {Boolean}
@@ -58,7 +49,7 @@ function handleScrollUtils(type) {
         /**
          * if - if there is no subscritor remove handler
          */
-        if (callback.length === 0) {
+        if (callbacks.size === 0) {
             unsubscribeScrollEnd();
 
             // Unsubscribe from scroll callback
@@ -66,7 +57,7 @@ function handleScrollUtils(type) {
                 unsubscribeScrollStart();
             }
 
-            inizialized = false;
+            initialized = false;
             return;
         }
 
@@ -77,24 +68,24 @@ function handleScrollUtils(type) {
                     scrollY: window.pageYOffset,
                 };
 
-                // Fire end fo scroll
+                // Fire end of scroll
                 if (type === 'END') {
-                    callback.forEach(({ cb }) => {
-                        cb(scrollData);
-                    });
+                    for (const value of callbacks.values()) {
+                        value(scrollData);
+                    }
                 }
             }, 0);
         });
     }
 
     /**
-     * init - if istener is not inizializad remove it
+     * init - if listener is not inizializad remove it
      *
      * @return {void}
      */
     function init() {
-        if (inizialized) return;
-        inizialized = true;
+        if (initialized) return;
+        initialized = true;
 
         // Add debunce function to detect scroll end
         debouceFunctionReference = debounceFuncion(() => handler());
@@ -113,30 +104,27 @@ function handleScrollUtils(type) {
                 if (!isScrolling) {
                     isScrolling = true;
 
-                    callback.forEach(({ cb }) => {
-                        cb(scrollData);
-                    });
+                    for (const value of callbacks.values()) {
+                        value(scrollData);
+                    }
                 }
             });
         }
     }
 
     /**
-     * @param {function(handleScrollUtilsType):void } cb - callback function
+     * @param {import('./type.js').handleScrollUtilsCallback} cb - callback function
      * @return {Function} unsubscribe callback
      */
     const addCb = (cb) => {
-        callback.push({ cb, id: id });
-        const cbId = id;
-        id++;
+        const id = getUnivoqueId();
+        callbacks.set(id, cb);
 
         if (typeof window !== 'undefined') {
             init();
         }
 
-        return () => {
-            callback = callback.filter((item) => item.id !== cbId);
-        };
+        return () => callbacks.delete(id);
     };
 
     return addCb;

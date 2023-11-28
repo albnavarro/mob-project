@@ -1,18 +1,13 @@
-import {
-    getValueObj,
-    getValueObjToNative,
-    getValueObjFromNative,
-    mergeArray,
-    compareKeys,
-    getRoundedValue,
-} from '../utils/animationUtils.js';
+// @ts-check
+
+import { compareKeys, getRoundedValue } from '../utils/animationUtils.js';
 import {
     setFromByCurrent,
     setFromCurrentByTo,
     setFromToByCurrent,
     setReverseValues,
     setRelative,
-} from '../utils/setValues.js';
+} from '../utils/tweenAction/setValues.js';
 import { mergeDeep } from '../../utils/mergeDeep.js';
 import { setStagger } from '../utils/stagger/setStagger.js';
 import { STAGGER_DEFAULT_INDEX_OBJ } from '../utils/stagger/staggerCostant.js';
@@ -33,33 +28,34 @@ import {
     goFromUtils,
     goFromToUtils,
     setUtils,
-} from '../utils/actions.js';
+} from '../utils/tweenAction/actions.js';
 import { initRaf } from '../utils/initRaf.js';
-import { resume } from '../utils/resume.js';
 import {
     compareKeysWarning,
     staggerIsOutOfRangeWarning,
 } from '../utils/warning.js';
-import { fpsLoadedLog } from '../utils/log.js';
-import { shouldInizializzeStagger } from '../utils/condition.js';
+import { fpsLoadedLog } from '../utils/fpsLogInizialization.js';
 import {
     relativeIsValid,
     springConfigIsValid,
     springConfigIsValidAndGetNew,
     springConfigPropIsValid,
     valueIsBooleanAndTrue,
-} from '../utils/tweenValidation.js';
+} from '../utils/tweenAction/tweenValidation.js';
 import { handleSetUp } from '../../setup.js';
 import { mobCore } from '../../../mobCore/index.js';
+import { shouldInizializzeStagger } from '../utils/stagger/shouldInizialize.js';
+import { resume } from '../utils/resumeTween.js';
+import {
+    getValueObj,
+    getValueObjFromNative,
+    getValueObjToNative,
+} from '../utils/tweenAction/getValues.js';
+import { mergeArray } from '../utils/tweenAction/mergeArray.js';
 
-/**
- * @typedef {Object} springTypes
- * @prop {Object.<string, number>} [ data ] Initial data Object.
- * @prop {Boolean} [ relative=false ] It defines the initial value of the relative properties, the value can be momentarily changed whenever the goTo, goFrom, goFromTo methods are invoked, the default value is false. If set to true each value will be calculated starting from the last used value, by default each value is calculated starting from the value defined in the constructor.
- **/
 export default class HandleSpring {
     /**
-     * @param { springTypes & import('../utils/stagger/staggerCostant.js').staggerTypes & import('../spring/springConfig.js').springConfigTypes & import('../spring/springConfig.js').springConfigPropsTypes} [ data = {} ]
+     * @param {import('./type.js').springTweenProps} [ data = {} ]
      *
      * @example
      * ```javascript
@@ -110,24 +106,26 @@ export default class HandleSpring {
      *
      * ```
      */
-    constructor(data = {}) {
+    constructor(data) {
         /**
          * @private
-         * @type {import('../utils/stagger/staggerCostant.js').staggerTypesObject}
+         * @type {import('../utils/stagger/type.js').staggerObject}
          */
         this.stagger = getStaggerFromProps(data);
 
         /**
          * @private
+         * @type {boolean}
          */
         this.relative = relativeIsValid(data?.relative, 'spring');
 
         /**
          * @private
+         * @type {import('./type.js').springProps}
          *
          * This value lives from user call ( goTo etc..) until next call
          **/
-        this.config = springConfigIsValidAndGetNew(data?.config);
+        this.configProps = springConfigIsValidAndGetNew(data?.config);
 
         /**
          * Update config with single props
@@ -136,81 +134,97 @@ export default class HandleSpring {
 
         /**
          * @private
+         * @type {string}
          */
         this.uniqueId = mobCore.getUnivoqueId();
 
         /**
          * @private
+         * @type {boolean}
          */
         this.isActive = false;
 
         /**
          * @private
+         * @type{( function(any):void )|undefined}
          */
-        this.currentResolve = null;
+        this.currentResolve = undefined;
 
         /**
          * @private
+         * @type{function|undefined}
          */
-        this.currentReject = null;
+        this.currentReject = undefined;
 
         /**
          * @private
+         * @type{Promise|undefined}
          */
-        this.promise = null;
+        this.promise = undefined;
 
         /**
          * @private
+         * @type {import('./type.js').springValues[]}
          */
         this.values = [];
 
         /**
          * @private
+         * @type {import('./type.js').springInitialData[]}
          */
         this.initialData = [];
 
         /**
          * @private
+         * @type {import('../utils/callbacks/type.js').callbackObject[]}
          */
         this.callback = [];
 
         /**
          * @private
+         * @type {import('../utils/callbacks/type.js').callbackObject[]}
          */
         this.callbackCache = [];
 
         /**
          * @private
+         * @type {import('../utils/callbacks/type.js').callbackObject[]}
          */
         this.callbackOnComplete = [];
 
         /**
          * @private
+         * @type {import('../utils/callbacks/type.js').callbackObject[]}
          */
         this.callbackStartInPause = [];
 
         /**
          * @private
+         * @type {Array<function>}
          */
         this.unsubscribeCache = [];
 
         /**
          * @private
+         * @type {boolean}
          */
         this.pauseStatus = false;
 
         /**
          * @private
+         * @type {boolean}
          */
         this.firstRun = true;
 
         /**
          * @private
+         * @type {boolean}
          */
         this.useStagger = true;
 
         /**
          * @private
+         * @type {boolean}
          */
         this.fpsInLoading = false;
 
@@ -218,10 +232,12 @@ export default class HandleSpring {
          * @private
          * This value is the base value merged with new value in custom prop
          * passed form user in goTo etc..
+         *
+         * @type {import('./type.js').springDefault}
          **/
         this.defaultProps = {
             reverse: false,
-            config: this.config,
+            configProps: this.configProps,
             relative: this.relative,
             immediate: false,
             immediateNoPromise: false,
@@ -229,12 +245,14 @@ export default class HandleSpring {
 
         /**
          * @private
+         * @type {import('../utils/stagger/type.js').staggerDefaultIndex}
          */
         this.slowlestStagger = STAGGER_DEFAULT_INDEX_OBJ;
 
         /**
-        Stagger value
-         **/
+         * @private
+         * @type {import('../utils/stagger/type.js').staggerDefaultIndex}
+         */
         this.fastestStagger = STAGGER_DEFAULT_INDEX_OBJ;
 
         /**
@@ -247,129 +265,148 @@ export default class HandleSpring {
     }
 
     /**
+     * @param {number} _time
+     * @param {number} fps
+     * @param {function} res
+     * @param {number} tension
+     * @param {number} friction
+     * @param {number} mass
+     * @param {number} precision
+     *
+     * @returns {void}
+     */
+    draw(_time, fps, res = () => {}, tension, friction, mass, precision) {
+        this.isActive = true;
+
+        this.values.forEach((item) => {
+            const tensionForce = -tension * (item.currentValue - item.toValue);
+            const dampingForce = -friction * item.velocity;
+            const acceleration = (tensionForce + dampingForce) / mass;
+
+            item.velocity = item.velocity + (acceleration * 1) / fps;
+            item.currentValue = item.currentValue + (item.velocity * 1) / fps;
+
+            item.currentValue = getRoundedValue(item.currentValue);
+
+            const isVelocity = Math.abs(item.velocity) <= 0.1;
+
+            const isDisplacement =
+                tension === 0
+                    ? true
+                    : Math.abs(item.toValue - item.currentValue.toFixed(4)) <=
+                      precision;
+
+            item.settled = isVelocity && isDisplacement;
+        });
+
+        /**
+         * Prepare an obj to pass to the callback
+         */
+        const callBackObject = getValueObj(this.values, 'currentValue');
+
+        defaultCallback({
+            stagger: this.stagger,
+            callback: this.callback,
+            callbackCache: this.callbackCache,
+            callBackObject: callBackObject,
+            useStagger: this.useStagger,
+        });
+
+        /**
+         * Check if all values is completed
+         */
+        const allSettled = this.values.every((item) => item.settled === true);
+
+        if (allSettled) {
+            const onComplete = () => {
+                this.isActive = false;
+
+                /**
+                 * End of animation
+                 * Set fromValue with ended value
+                 * At the next call fromValue become the start value
+                 */
+                this.values.forEach((item) => {
+                    item.fromValue = item.toValue;
+                });
+
+                /**
+                 * On complete
+                 */
+                if (!this.pauseStatus) {
+                    res();
+
+                    /**
+                     * Set promise reference to null once resolved
+                     */
+                    this.promise = undefined;
+                    this.currentReject = undefined;
+                    this.currentResolve = undefined;
+                }
+            };
+
+            /**
+             * Prepare an obj to pass to the callback with rounded value ( end user value)
+             */
+            const cbObjectSettled = getValueObj(this.values, 'toValue');
+
+            defaultCallbackOnComplete({
+                onComplete,
+                callback: this.callback,
+                callbackCache: this.callbackCache,
+                callbackOnComplete: this.callbackOnComplete,
+                callBackObject: cbObjectSettled,
+                stagger: this.stagger,
+                slowlestStagger: this.slowlestStagger,
+                fastestStagger: this.fastestStagger,
+                useStagger: this.useStagger,
+            });
+        } else {
+            mobCore.useFrame(() => {
+                mobCore.useNextTick(({ time, fps }) => {
+                    if (this.isActive)
+                        this.draw(
+                            time,
+                            fps,
+                            res,
+                            tension,
+                            friction,
+                            mass,
+                            precision
+                        );
+                });
+            });
+        }
+    }
+
+    /**
      * @private
      *
-     * @param {Number} time current global time
-     * @param {Boolean} fps current FPS
+     * @param {number} time current global time
+     * @param {number} fps current FPS
      * @param {function} res current promise resolve
      **/
     onReuqestAnim(time, fps, res) {
         this.values.forEach((item) => {
-            item.velocity = Number.parseFloat(this.config.velocity);
-            item.currentValue = Number.parseFloat(item.fromValue);
-
-            // Normalize toValue in case is a string
-            item.toValue = Number.parseFloat(item.toValue);
+            item.velocity = Math.trunc(this.configProps.velocity);
         });
 
-        // Normalize spring config props
-
         /**
-         * @type {Object|null}
+         * Normalize spring config props
          */
-        let o = {};
+        const tension = this.configProps.tension;
+        const friction = this.configProps.friction;
+        const mass = Math.max(1, this.configProps.mass);
+        const precision = this.configProps.precision;
 
-        o.tension = Number.parseFloat(this.config.tension);
-        o.friction = Number.parseFloat(this.config.friction);
-        o.mass = Number.parseFloat(this.config.mass);
-        o.precision = Number.parseFloat(this.config.precision);
-
-        const draw = (_time, fps) => {
-            this.isActive = true;
-
-            this.values.forEach((item) => {
-                o.tensionForce =
-                    -o.tension * (item.currentValue - item.toValue);
-                o.dampingForce = -o.friction * item.velocity;
-                o.acceleration = (o.tensionForce + o.dampingForce) / o.mass;
-
-                item.velocity = item.velocity + (o.acceleration * 1) / fps;
-                item.currentValue =
-                    item.currentValue + (item.velocity * 1) / fps;
-
-                item.currentValue = getRoundedValue(item.currentValue);
-
-                o.isVelocity = Math.abs(item.velocity) <= 0.1;
-
-                o.isDisplacement =
-                    o.tension === 0
-                        ? true
-                        : Math.abs(
-                              item.toValue - item.currentValue.toFixed(4)
-                          ) <= o.precision;
-
-                item.settled = o.isVelocity && o.isDisplacement;
-            });
-
-            // Prepare an obj to pass to the callback
-            o.callBackObject = getValueObj(this.values, 'currentValue');
-
-            defaultCallback({
-                stagger: this.stagger,
-                callback: this.callback,
-                callbackCache: this.callbackCache,
-                callBackObject: o.callBackObject,
-                useStagger: this.useStagger,
-            });
-
-            // Check if all values is completed
-            o.allSettled = this.values.every((item) => item.settled === true);
-
-            if (o.allSettled) {
-                const onComplete = () => {
-                    this.isActive = false;
-
-                    // End of animation
-                    // Set fromValue with ended value
-                    // At the next call fromValue become the start value
-                    this.values.forEach((item) => {
-                        item.fromValue = item.toValue;
-                    });
-
-                    // On complete
-                    if (!this.pauseStatus) {
-                        // Remove reference to o Object
-                        o = null;
-
-                        //
-                        res();
-
-                        // Set promise reference to null once resolved
-                        this.promise = null;
-                        this.currentReject = null;
-                        this.currentResolve = null;
-                    }
-                };
-
-                // Prepare an obj to pass to the callback with rounded value ( end user value)
-                const cbObjectSettled = getValueObj(this.values, 'toValue');
-
-                defaultCallbackOnComplete({
-                    onComplete,
-                    callback: this.callback,
-                    callbackCache: this.callbackCache,
-                    callbackOnComplete: this.callbackOnComplete,
-                    callBackObject: cbObjectSettled,
-                    stagger: this.stagger,
-                    slowlestStagger: this.slowlestStagger,
-                    fastestStagger: this.fastestStagger,
-                    useStagger: this.useStagger,
-                });
-            } else {
-                mobCore.useFrame(() => {
-                    mobCore.useNextTick(({ time, fps }) => {
-                        if (this.isActive) draw(time, fps);
-                    });
-                });
-            }
-        };
-
-        draw(time, fps);
+        this.draw(time, fps, res, tension, friction, mass, precision);
     }
 
     /**
      * @description
      * Inzialize stagger array
+     *
+     * @returns {Promise<any>}
      */
     async inzializeStagger() {
         /**
@@ -425,6 +462,10 @@ export default class HandleSpring {
 
     /**
      * @private
+     * @param {function(any):void} res
+     * @param {function} reject
+     *
+     * @returns {Promise}
      */
     async startRaf(res, reject) {
         if (this.fpsInLoading) return;
@@ -446,9 +487,10 @@ export default class HandleSpring {
     }
 
     /**
-     * @param { import('../tween/handleTween.js').tweenCommonStopProps } Stop props
-     * @description
+     * @param {import('../tween/type.js').tweenStopProps} Stop props
+     * @returns {void}
      *
+     * @description
      * Stop tween and fire reject of current promise.
      */
     stop({ clearCache = true } = {}) {
@@ -465,9 +507,9 @@ export default class HandleSpring {
         // Reject promise
         if (this.currentReject) {
             this.currentReject(mobCore.ANIMATION_STOP_REJECT);
-            this.promise = null;
-            this.currentReject = null;
-            this.currentResolve = null;
+            this.promise = undefined;
+            this.currentReject = undefined;
+            this.currentResolve = undefined;
         }
 
         // Reset RAF
@@ -478,8 +520,9 @@ export default class HandleSpring {
 
     /**
      * @description
-     *
      * Pause the tween
+     *
+     * @returns {void}
      */
     pause() {
         if (this.pauseStatus) return;
@@ -490,8 +533,9 @@ export default class HandleSpring {
 
     /**
      * @description
-     *
      * Resume tween in pause
+     *
+     * @returns {void}
      */
     resume() {
         if (!this.pauseStatus) return;
@@ -504,6 +548,7 @@ export default class HandleSpring {
 
     /**
      * @param {Object.<string, number|function>} obj Initial data structure
+     * @returns {void}
      *
      * @description
      * Set initial data structure, the method is call by data prop in constructor. In case of need it can be called after creating the instance
@@ -523,7 +568,7 @@ export default class HandleSpring {
                 prop: prop,
                 toValue: value,
                 fromValue: value,
-                velocity: this.config.velocity,
+                velocity: this.configProps.velocity,
                 currentValue: value,
                 fromFn: () => {},
                 fromIsFn: false,
@@ -543,9 +588,11 @@ export default class HandleSpring {
         });
     }
 
-    /*
+    /**
      * @description
      * Reset data value with initial
+     *
+     * @returns {void}
      */
     resetData() {
         this.values = mergeDeep(this.values, this.initialData);
@@ -555,26 +602,32 @@ export default class HandleSpring {
      * @private
      *
      * @description
-     * Mege special props with default props
+     * Merge special props with default props
      *
-     * @param  {Object} props
+     * @param  {import('./type.js').springActions} props
      * @return {Object} props merged
      *
      */
     mergeProps(props) {
+        const springParams = handleSetUp.get('spring');
+
         /**
-         * Get new config preset
+         * @description
+         * Get new config preset single values.
+         *
+         * @type {import('./type.js').springPresentConfigType}
          */
-        const { config: allConfig } = handleSetUp.get('spring');
+        const allPresetConfig = springParams.config;
         const newConfigPreset = springConfigIsValid(props?.config)
-            ? allConfig[props.config]
-            : this.defaultProps.config;
+            ? // @ts-ignore
+              allPresetConfig[props.config]
+            : this.defaultProps.configProps;
 
         /*
          * Modify single propierties of newConfigPreset
          */
-        const configToMerge = springConfigPropIsValid(props?.configProp);
-        const newConfig = { ...newConfigPreset, ...configToMerge };
+        const configPropsToMerge = springConfigPropIsValid(props?.configProp);
+        const newConfigProps = { ...newConfigPreset, ...configPropsToMerge };
 
         /*
          * Merge all
@@ -582,18 +635,19 @@ export default class HandleSpring {
         const newProps = {
             ...this.defaultProps,
             ...props,
-            config: newConfig,
+            configProps: newConfigProps,
         };
-        const { config, relative } = newProps;
-        this.config = config;
+
+        const { configProps, relative } = newProps;
+        this.configProps = configProps;
         this.relative = relative;
 
         return newProps;
     }
 
     /**
-     * @param {Object.<string, number|function>} obj to Values
-     * @param { import('../tween/handleTween.js').tweenCommonSpecialProps & import('../spring/springConfig.js').springConfigTypes & import('../spring/springConfig.js').springConfigPropsTypes} props special props
+     * @param {import('../utils/tweenAction/type.js').valueToparseType} obj to Values
+     * @param {import('./type.js').springActions} props special props
      * @returns {Promise|void} Return a promise which is resolved when tween is over
      *
      * @example
@@ -621,15 +675,15 @@ export default class HandleSpring {
      *
      * ```
      * @description
-       Transform some properties of your choice from the `current value` to the `entered value`.
-       The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change every time this transformation is called.
-       It is possible to associate the special pros to the current transformation, these properties will be valid only in the current transformation.
-        - config
-        - configProp
-        - relative
-        - reverse
-        - immediate (internal use)
-        - immediateNoPromise (internal use)
+     *  Transform some properties of your choice from the `current value` to the `entered value`.
+     *  The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change every time this transformation is called.
+     *  It is possible to associate the special pros to the current transformation, these properties will be valid only in the current transformation.
+     *   - config
+     *   - configProp
+     *   - relative
+     *   - reverse
+     *   - immediate (internal use)
+     *   - immediateNoPromise (internal use)
      */
     goTo(obj, props = {}) {
         if (this.pauseStatus) return;
@@ -639,8 +693,8 @@ export default class HandleSpring {
     }
 
     /**
-     * @param {Object.<string, number|function>} obj from Values
-     * @param { import('../tween/handleTween.js').tweenCommonSpecialProps & import('../spring/springConfig.js').springConfigTypes & import('../spring/springConfig.js').springConfigPropsTypes} props special props
+     * @param {import('../utils/tweenAction/type.js').valueToparseType} obj from Values
+     * @param {import('./type.js').springActions} props special props
      * @returns {Promise|void} Return a promise which is resolved when tween is over
      *
      * @example
@@ -668,15 +722,15 @@ export default class HandleSpring {
      *
      * ```
      * @description
-       Transform some properties of your choice from the `entered value` to the `current value`.
-       The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change every time this transformation is called.
-       It is possible to associate the special pros to the current transformation, these properties will be valid only in the current transformation.
-        - config
-        - configProp
-        - relative
-        - reverse
-        - immediate (internal use)
-        - immediateNoPromise (internal use)
+     *  Transform some properties of your choice from the `entered value` to the `current value`.
+     *  The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change every time this transformation is called.
+     *  It is possible to associate the special pros to the current transformation, these properties will be valid only in the current transformation.
+     *   - config
+     *   - configProp
+     *   - relative
+     *   - reverse
+     *   - immediate (internal use)
+     *   - immediateNoPromise (internal use)
      */
     goFrom(obj, props = {}) {
         if (this.pauseStatus) return;
@@ -686,9 +740,9 @@ export default class HandleSpring {
     }
 
     /**
-     * @param {Object.<string, number|function>} fromObj from Values
-     * @param {Object.<string, number|function>} toObj to Values
-     * @param { import('../tween/handleTween.js').tweenCommonSpecialProps & import('../spring/springConfig.js').springConfigTypes & import('../spring/springConfig.js').springConfigPropsTypes} props special props
+     * @param {import('../utils/tweenAction/type.js').valueToparseType} fromObj from Values
+     * @param {import('../utils/tweenAction/type.js').valueToparseType} toObj to Values
+     * @param {import('./type.js').springActions } props special props
      * @returns {Promise|null|void} Return a promise which is resolved when tween is over
      *
      * @example
@@ -716,15 +770,15 @@ export default class HandleSpring {
      *
      *
      * ```
-       Transform some properties of your choice from the `first entered value` to the `second entered value`.
-       The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change every time this transformation is called.
-       It is possible to associate the special pros to the current transformation, these properties will be valid only in the current transformation.
-        - config
-        - configProp
-        - relative
-        - reverse
-        - immediate (internal use)
-        - immediateNoPromise (internal use)
+     *  Transform some properties of your choice from the `first entered value` to the `second entered value`.
+     *  The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change every time this transformation is called.
+     *  It is possible to associate the special pros to the current transformation, these properties will be valid only in the current transformation.
+     *   - config
+     *   - configProp
+     *   - relative
+     *   - reverse
+     *   - immediate (internal use)
+     *   - immediateNoPromise (internal use)
      */
     goFromTo(fromObj, toObj, props = {}) {
         if (this.pauseStatus) return;
@@ -739,8 +793,8 @@ export default class HandleSpring {
     }
 
     /**
-     * @param {Object.<string, number|function>} obj to Values
-     * @param { import('../tween/handleTween.js').tweenCommonSpecialProps } props special props
+     * @param {import('../utils/tweenAction/type.js').valueToparseType} obj to Values
+     * @param {import('../tween/type.js').tweenCommonProps} props special props
      * @returns {Promise|void} Return a promise which is resolved when tween is over
      *
      * @example
@@ -757,11 +811,11 @@ export default class HandleSpring {
      *
      *
      * ```
-       Transform some properties of your choice from the `current value` to the `entered value` immediately.
-       The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change every time this transformation is called.
-       It is possible to associate the special pros to the current transformation, these properties will be valid only in the current transformation.
-        - immediate (internal use)
-        - immediateNoPromise (internal use)
+     *  Transform some properties of your choice from the `current value` to the `entered value` immediately.
+     *  The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change every time this transformation is called.
+     *  It is possible to associate the special pros to the current transformation, these properties will be valid only in the current transformation.
+     *   - immediate (internal use)
+     *   - immediateNoPromise (internal use)
      */
     set(obj, props = {}) {
         if (this.pauseStatus) return;
@@ -773,9 +827,9 @@ export default class HandleSpring {
     /**
      * @private
      *
-     * @param {Object.<string, number|function>} data Updated data
-     * @param { import('../tween/handleTween.js').tweenCommonSpecialProps & import('../spring/springConfig.js').springConfigTypes & import('../spring/springConfig.js').springConfigPropsTypes} props special props
-     * @param {Object.<string, number|function>} obj new data obj come from set/goTo/goFrom/goFromTo
+     * @param {import('../utils/tweenAction/type.js').valueToparseType[]} data Updated data
+     * @param {import('./type.js').springActions} props special props
+     * @param {import('../utils/tweenAction/type.js').valueToparseType} obj new data obj come from set/goTo/goFrom/goFromTo
      * @returns {Promise|void} Return a promise which is resolved when tween is over
      *
      * @description
@@ -950,12 +1004,7 @@ export default class HandleSpring {
     }
 
     /**
-     * @param {Object} configProp single spring config propierties
-     * @param {Number} [ configProp.tension ] tension - A positive number
-     * @param {Number} [ configProp.mass ] mass - A positive number
-     * @param {Number} [ configProp.friction ] friction - A positive number
-     * @param {Number} [ configProp.velocity ] velocity - A positive number
-     * @param {Number} [ configProp.precision ] precision - A positive number
+     * @param {import('./type.js').springPropsOptional} configProp - single spring config propierties
      *
      *  @example
      *  ```javascript
@@ -973,29 +1022,30 @@ export default class HandleSpring {
      */
     updateConfigProp(configProp = {}) {
         const configToMerge = springConfigPropIsValid(configProp);
-        this.config = { ...this.config, ...configToMerge };
+        this.configProps = { ...this.configProps, ...configToMerge };
 
         this.defaultProps = mergeDeep(this.defaultProps, {
-            config: configToMerge,
+            configProps: configToMerge,
         });
     }
 
     /**
-     * @param  { import('../spring/springConfig.js').springConfigStringTypes} config
      *
      * @description
      * updateConfig - Update config object with new preset
      *
+     * @param  {import('./type.js').springChoiceConfig} config
+     *
      */
     updateConfig(config) {
-        this.config = springConfigIsValidAndGetNew(config);
+        this.configProps = springConfigIsValidAndGetNew(config);
         this.defaultProps = mergeDeep(this.defaultProps, {
-            config: this.config,
+            configProps: this.configProps,
         });
     }
 
     /**
-     * @param {import('../utils/callbacks/setCallback.js').subscribeCallbackType} cb - callback function.
+     * @param {function(any):void} cb - callback function.
      * @return {Function} unsubscribe callback.
      *
      * @example
@@ -1050,7 +1100,7 @@ export default class HandleSpring {
     }
 
     /**
-     * @param {import('../utils/callbacks/setCallback.js').subscribeCallbackType} cb - callback function.
+     * @param {function(any):void} cb - callback function.
      * @return {Function} unsubscribe callback.
      *
      * @example
@@ -1102,7 +1152,7 @@ export default class HandleSpring {
 
     /**
      * @param {('Object'|'HTMLElement')} item
-     * @param {import('../utils/callbacks/setCallback.js').subscribeCallbackType} fn - callback function.
+     * @param {function(any):void} fn - callback function.
      * @return {Function} unsubscribe callback
      *
      * @example
@@ -1145,7 +1195,7 @@ export default class HandleSpring {
         this.callback = [];
         this.callbackCache = [];
         this.values = [];
-        this.promise = null;
+        this.promise = undefined;
         this.unsubscribeCache.forEach((unsubscribe) => unsubscribe());
         this.unsubscribeCache = [];
     }

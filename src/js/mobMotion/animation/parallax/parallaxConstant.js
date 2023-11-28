@@ -3,242 +3,242 @@
 export const parallaxConstant = {
     // Constant misure units
     /**
-     * @type {('px')}
+     * @type {string}
      */
     PX: 'px',
 
     /**
-     * @type {('vh')}
+     * @type {string}
      */
     VH: 'vh',
 
     /**
-     * @type {('vw')}
+     * @type {string}
      */
     VW: 'vw',
 
     /**
-     * @type {('w')}
+     * @type {string}
      */
     WPERCENT: 'w',
 
     /**
-     * @type {('h')}
+     * @type {string}
      */
     HPERCENT: 'h',
 
     /**
-     * @type {('deg')}
+     * @type {string}
      */
     DEGREE: 'deg',
 
     // AdditionalChoiceContant
 
     /**
-     * @type {('+height')}
+     * @type {string}
      */
     PLUS_HEIGHT: '+height',
 
     /**
-     * @type {('+halfHeight')}
+     * @type {string}
      */
     PLUS_HEIGHT_HALF: '+halfHeight',
 
     /**
-     * @type {('+width')}
+     * @type {string}
      */
     PLUS_WIDTH: '+width',
 
     /**
-     * @type {('+halfWidth')}
+     * @type {string}
      */
     PLUS_WIDTH_HALF: '+halfWidth',
 
     /**
-     * @type {('-height')}
+     * @type {string}
      */
     MINUS_HEIGHT: '-height',
 
     /**
-     * @type {('-halfHeight')}
+     * @type {string}
      */
     MINUS_HEIGHT_HALF: '-halfHeight',
 
     /**
-     * @type {('-width')}
+     * @type {string}
      */
     MINUS_WIDTH: '-width',
 
     /**
-     * @type {('-halfWidth')}
+     * @type {string}
      */
     MINUS_WIDTH_HALF: '-halfWidth',
 
     // End Start position Constant
     /**
-     * @type {('bottom')}
+     * @type {string}
      */
     POSITION_BOTTOM: 'bottom',
 
     /**
-     * @type {('top')}
+     * @type {string}
      */
     POSITION_TOP: 'top',
 
     /**
-     * @type {('left')}
+     * @type {string}
      */
     POSITION_LEFT: 'left',
 
     /**
-     * @type {('right')}
+     * @type {string}
      */
     POSITION_RIGHT: 'right',
 
     // Constant direction
     /**
-     * @type {('vertical')}
+     * @type {string}
      */
     DIRECTION_VERTICAL: 'vertical',
 
     /**
-     * @type {('horizontal')}
+     * @type {string}
      */
     DIRECTION_HORIZONTAL: 'horizontal',
 
     // Constant computation type
     /**
-     * @type {('parallax')}
+     * @type {string}
      */
     TYPE_PARALLAX: 'parallax',
 
     /**
-     * @type {('scrolltrigger')}
+     * @type {string}
      */
     TYPE_SCROLLTRIGGER: 'scrolltrigger',
 
     // Constant propierties
 
     /**
-     * @type {('y')}
+     * @type {string}
      */
     PROP_VERTICAL: 'y',
 
     /**
-     * @type {('x')}
+     * @type {string}
      */
     PROP_HORIZONTAL: 'x',
 
     /**
-     * @type {('rotate')}
+     * @type {string}
      */
     PROP_ROTATE: 'rotate',
 
     /**
-     * @type {('rotateY')}
+     * @type {string}
      */
     PROP_ROTATEY: 'rotateY',
 
     /**
-     * @type {('rotateX')}
+     * @type {string}
      */
     PROP_ROTATEX: 'rotateX',
 
     /**
-     * @type {('rotateZ')}
+     * @type {string}
      */
     PROP_ROTATEZ: 'rotateZ',
 
     /**
-     * @type {('opacity')}
+     * @type {string}
      */
     PROP_OPACITY: 'opacity',
 
     /**
-     * @type {('scale')}
+     * @type {string}
      */
     PROP_SCALE: 'scale',
 
     /**
-     * @type {('tween')}
+     * @type {string}
      */
     PROP_TWEEN: 'tween',
 
     /**
-     * @type {('parallaxTween')}
+     * @type {string}
      */
     TWEEN_TWEEN: 'parallaxTween',
 
     /**
-     * @type {('sequencer')}
+     * @type {string}
      */
     TWEEN_TIMELINE: 'sequencer',
 
     // Align constant
     /**
-     * @type {('start')}
+     * @type {string}
      */
     ALIGN_START: 'start',
 
     /**
-     * @type {('top')}
+     * @type {string}
      */
     ALIGN_TOP: 'top',
 
     /**
-     * @type {('right')}
+     * @type {string}
      */
     ALIGN_RIGHT: 'right',
 
     /**
-     * @type {('center')}
+     * @type {string}
      */
     ALIGN_CENTER: 'center',
 
     /**
-     * @type {('bottom')}
+     * @type {string}
      */
     ALIGN_BOTTOM: 'bottom',
 
     /**
-     * @type {('left')}
+     * @type {string}
      */
     ALIGN_LEFT: 'left',
 
     /**
-     * @type {('end')}
+     * @type {string}
      */
     ALIGN_END: 'end',
 
     // Switch constant
     /**
-     * @type {('in-stop')}
+     * @type {string}
      */
     IN_STOP: 'in-stop',
 
     /**
-     * @type {('in-back')}
+     * @type {string}
      */
     IN_BACK: 'in-back',
 
     /**
-     * @type {('out-stop')}
+     * @type {string}
      */
     OUT_STOP: 'out-stop',
 
     /**
-     * @type {('out-back')}
+     * @type {string}
      */
     OUT_BACK: 'out-back',
 
     // Ease type constant
     /**
-     * @type {('spring')}
+     * @type {string}
      */
     EASE_SPRING: 'spring',
 
     /**
-     * @type {('lerp')}
+     * @type {string}
      */
     EASE_LERP: 'lerp',
 
@@ -248,37 +248,37 @@ export const parallaxConstant = {
     EASE_PRECISION: 0.001,
 
     /**
-     * @type {('up')}
+     * @type {string}
      */
     SCROLL_UP: 'up',
 
     /**
-     * @type {('down')}
+     * @type {string}
      */
     SCROLL_DOWN: 'down',
 
     /**
-     * @type {('ON_LEAVE')}
+     * @type {string}
      */
     ON_LEAVE: 'ON_LEAVE',
 
     /**
-     * @type {('ON_LEAVE_BACK')}
+     * @type {string}
      */
     ON_LEAVE_BACK: 'ON_LEAVE_BACK',
 
     /**
-     * @type {('ON_ENTER')}
+     * @type {string}
      */
     ON_ENTER: 'ON_ENTER',
 
     /**
-     * @type {('ON_ENTER_BACK')}
+     * @type {string}
      */
     ON_ENTER_BACK: 'ON_ENTER_BACK',
 
     /**
-     * @type {('ON_NOOP')}
+     * @type {string}
      */
     ON_NOOP: 'ON_NOOP',
 };

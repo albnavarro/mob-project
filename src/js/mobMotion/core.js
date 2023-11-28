@@ -3,12 +3,12 @@
 import { handleSetUp } from './setup.js';
 import { mq } from './utils/mediaManager.js';
 
-export const core = {
+export const motionCore = {
     /**
      * @description
      * - Here it is possible to modify the default values of the various modules of the library
      *
-     * @param {import('./animation/utils/setUpValidation.js').handleSetUpSetType} props
+     * @param {import('./animation/utils/setUp/type.js').setUpType} props
      *
      *
      * @example
@@ -116,7 +116,7 @@ export const core = {
      *
      * ```
      */
-    setDefault(props = {}) {
+    setDefault(props) {
         handleSetUp.set(props);
     },
 
@@ -150,8 +150,8 @@ export const core = {
     },
 
     /**
-     * @param { import('./utils/mediaManager.js').mqType } action
-     * @param { import('./utils/mediaManager.js').breackPointType } breackpoint
+     * @param {import('./utils/type.js').mqActionMethods} action
+     * @param {import('./utils/type.js').mqValues} breakpoint
      *
      * @return {(Boolean|Number)} Returns a boolean value if the action value is equal to 'min' or 'max', returns a numeric value if it is equal to 'get'
      *
@@ -171,18 +171,18 @@ export const core = {
      *
      * ```
      **/
-    mq(action, breackpoint) {
+    mq(action, breakpoint) {
         switch (action) {
             case 'min': {
-                return mq.min(breackpoint);
+                return mq.min(breakpoint);
             }
 
             case 'max': {
-                return mq.max(breackpoint);
+                return mq.max(breakpoint);
             }
 
             case 'get': {
-                return mq.getBreackpoint(breackpoint);
+                return mq.getBreackpoint(breakpoint);
             }
         }
     },

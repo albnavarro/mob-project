@@ -70,7 +70,7 @@ const fire = ({ currentFrame, time, fps, shouldRender }) => {
  * Add callback to a specific frame.
  *
  * @memberof module:handleFrameIndex
- * @param {function(import('./handleFrame.js').handleFrameTypes):void } callback - callback function
+ * @param {import('./type.js').handleFrameCallbakType} callback - callback function
  * @param {number} index
  *
  * @example
@@ -104,7 +104,7 @@ const add = (callback, index) => {
 
 /**
  * @description
- * Get callabck array length
+ * Get callback array length
  *
  * @returns {number}
  */

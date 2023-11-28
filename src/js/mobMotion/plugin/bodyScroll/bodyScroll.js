@@ -4,18 +4,8 @@ import {
     easeTweenIsValid,
     valueIsBooleanAndReturnDefault,
     valueIsNumberAndReturnDefault,
-} from '../../animation/utils/tweenValidation.js';
+} from '../../animation/utils/tweenAction/tweenValidation.js';
 import { offset, isNode } from '../../../mobCore/utils/index.js';
-
-/**
- * @typedef {Object} bodyScrollDataType
- * @prop {Number} duration
-   Duration of scroll.
-   The deafult valueis `500` ms.
-   @prop {Boolean} overflow
-   Set overflow:hidden to the body on scroll.
-   The deafult value is `false`.
- */
 
 /**
  * @description
@@ -88,7 +78,7 @@ export const bodyScroll = (() => {
      *```
      *
      * @param {(Number|Element)} target
-     * @param {bodyScrollDataType & import('../../animation/tween/tweenConfig.js').easeTypes} data
+     * @param {import('./type.js').bodyScrollType} data
      */
     function to(target = null, data = {}) {
         if (typeof window !== 'undefined') {

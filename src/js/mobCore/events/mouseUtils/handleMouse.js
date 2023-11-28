@@ -1,31 +1,15 @@
 // @ts-check
 
+import { getUnivoqueId } from '../../utils/index.js';
 import { eventStore } from '../eventStore.js';
 import { normalizeWheel } from './normalizeWhell.js';
 
 /**
- * @typedef {Object} mouseType
- * @prop {Object} page
- * @prop {Number} page.x
- * @prop {Number} page.y
- * @prop {Object} client
- * @prop {Number} client.x
- * @prop {Number} client.y
- * @prop {Element} target
- * @prop {('click'|'mousedown'|'mousemove'|'mouseup'|'touchstart'|'touchmove'|'touchend'|'wheel')} type
- * @prop {function} preventDefault
- * @prop {Number} [ spinX ] - available only on mouseWheel
- * @prop {Number} [ spinY ] - available only on mouseWheel
- * @prop {Number} [ pixelX ] - available only on mouseWheel
- * @prop {Number} [ pixelY ] - available only on mouseWheel
- */
-
-/**
  * @param {Object} obj
- * @param {('click'|'mousedown'|'mousemove'|'mouseup'|'touchstart'|'touchmove'|'touchend'|'wheel')} obj.type
+ * @param {import('./type.js').mouseEvent} obj.type
  * @param {Object} obj.e
- * @returns Object
- * @description
+ *
+ * @returns { Object }
  */
 function getPageData({ type, e }) {
     // 'touchend'
@@ -37,7 +21,7 @@ function getPageData({ type, e }) {
 
 /**
  * @param {Object} obj
- * @param {('click'|'mousedown'|'mousemove'|'mouseup'|'touchstart'|'touchmove'|'touchend'|'wheel')} obj.type
+ * @param {import('./type.js').mouseEvent} obj.type
  * @param {Object} obj.e
  * @returns Object
  * @description
@@ -51,23 +35,18 @@ function getClientData({ type, e }) {
 }
 
 /**
- * @param {('click'|'mousedown'|'mousemove'|'mouseup'|'touchstart'|'touchmove'|'touchend'|'wheel')} event
+ * @param {import('./type.js').mouseEvent} event
  */
 function handleMouse(event) {
     /**
      * @type {boolean}
      */
-    let inizialized = false;
+    let initialized = false;
 
     /**
-     * @type {Array.<{id:number, cb:Function }>}
+     * @type {Map<String,Function>}
      */
-    let callback = [];
-
-    /**
-     * @type {Number}
-     */
-    let id = 0;
+    const callbacks = new Map();
 
     /**
      * @type {{usePassive:( Boolean )}}
@@ -80,7 +59,7 @@ function handleMouse(event) {
      */
     eventStore.watch('usePassive', () => {
         window.removeEventListener(event, handler);
-        inizialized = false;
+        initialized = false;
 
         init();
     });
@@ -92,15 +71,15 @@ function handleMouse(event) {
         /**
          * if - if there is no subscritor remove handler
          */
-        if (callback.length === 0) {
+        if (callbacks.size === 0) {
             window.removeEventListener(event, handler);
 
-            inizialized = false;
+            initialized = false;
             return;
         }
 
         /**
-         * @type {('click'|'mousedown'|'mousemove'|'mouseup'|'touchstart'|'touchmove'|'touchend'|'wheel')} event
+         * @type {import('./type.js').mouseEvent} event
          */
         const type = e.type;
 
@@ -140,9 +119,9 @@ function handleMouse(event) {
             Object.assign(mouseData, { spinX, spinY, pixelX, pixelY });
         }
 
-        callback.forEach(({ cb }) => {
-            cb(mouseData);
-        });
+        for (const value of callbacks.values()) {
+            value(mouseData);
+        }
     }
 
     /**
@@ -152,8 +131,8 @@ function handleMouse(event) {
      * @return {void}
      */
     function init() {
-        if (inizialized) return;
-        inizialized = true;
+        if (initialized) return;
+        initialized = true;
         usePassive = eventStore.getProp('usePassive');
 
         window.addEventListener(event, handler, {
@@ -165,7 +144,7 @@ function handleMouse(event) {
      * @description
      * add callback on mouse action
      *
-     * @param {function(mouseType):void } cb - callback function fired on mouse action.
+     * @param {import('./type.js').mouseEventCallback} cb - callback function fired on mouse action.
      *
      * @example
      * ```javascript
@@ -173,17 +152,14 @@ function handleMouse(event) {
      * ```
      */
     const addCb = (cb) => {
-        callback.push({ cb, id: id });
-        const cbId = id;
-        id++;
+        const id = getUnivoqueId();
+        callbacks.set(id, cb);
 
         if (typeof window !== 'undefined') {
             init();
         }
 
-        return () => {
-            callback = callback.filter((item) => item.id !== cbId);
-        };
+        return () => callbacks.delete(id);
     };
 
     return addCb;

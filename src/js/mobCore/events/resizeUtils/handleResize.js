@@ -1,21 +1,17 @@
 // @ts-check
 
+import { getUnivoqueId } from '../../utils/index.js';
 import { debounceFuncion } from '../debounce.js';
 
 /**
  * @type {Boolean}
  */
-let inizialized = false;
+let initialized = false;
 
 /**
- * @type {Array.<{id:number, cb:Function }>}
+ * @type {Map<String,Function>}
  */
-let callback = [];
-
-/**
- * @type {Number}
- */
-let id = 0;
+const callbacks = new Map();
 
 /**
  * @type {Function}
@@ -39,11 +35,11 @@ function handler() {
     /**
      * If there is no subscritor remove handler.
      */
-    if (callback.length === 0) {
+    if (callbacks.size === 0) {
         // @ts-ignore
         window.removeEventListener('resize', debouceFunctionReference);
 
-        inizialized = false;
+        initialized = false;
         return;
     }
 
@@ -90,7 +86,9 @@ function handler() {
     };
 
     // Fire end of resize
-    callback.forEach(({ cb }) => cb(resizeData));
+    for (const value of callbacks.values()) {
+        value(resizeData);
+    }
 }
 
 /**
@@ -99,8 +97,8 @@ function handler() {
  * @return {void}
  */
 function init() {
-    if (inizialized) return;
-    inizialized = true;
+    if (initialized) return;
+    initialized = true;
 
     // Add debunce function to detect scroll end
     debouceFunctionReference = debounceFuncion(() => handler());
@@ -111,10 +109,10 @@ function init() {
 }
 
 /**
+ * @param {import('./type.js').handleResizeCallback} cb - callback function fired on resize.
+ *
  * @description
  * Add callback on resize using a debounce function.
- *
- * @param {function(handleResizeTypes):void } cb - callback function fired on resize.
  *
  * @example
  * ```javascript
@@ -134,26 +132,14 @@ function init() {
  * ```
  */
 const addCb = (cb) => {
-    callback.push({ cb, id: id });
-    const cbId = id;
-    id++;
+    const id = getUnivoqueId();
+    callbacks.set(id, cb);
 
     if (typeof window !== 'undefined') {
         init();
     }
 
-    return () => {
-        callback = callback.filter((item) => item.id !== cbId);
-    };
+    return () => callbacks.delete(id);
 };
 
-/**
- * @typedef {Object} handleResizeTypes
- * @prop {number} scrollY - Scroll postion
- * @prop {number} windowsHeight - Height of the window
- * @prop {number} windowsWidth - Width of the window
- * @prop {number} documentHeight - Height of the document
- * @prop {boolean} verticalResize - Boolean value indicating whether the height of the viewport changed during the resize.
- * @prop {boolean} horizontalResize - Boolean value indicating whether the width of the viewport changed during the resize.
- */
 export const handleResize = (() => addCb)();
