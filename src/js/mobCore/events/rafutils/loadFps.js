@@ -27,6 +27,7 @@ let loadFpsIsReady = false;
 export const loadFps = (duration = 30) => {
     if (loadFpsIsReady) {
         const { instantFps } = eventStore.get();
+
         return new Promise((resolve) => {
             resolve({ averageFPS: instantFps });
         });
@@ -41,7 +42,7 @@ export const loadFps = (duration = 30) => {
         /**
          * @type {Number}
          */
-        const maxFrames = 20;
+        const maxFrames = 25;
 
         /**
          * @type {Number}
@@ -81,8 +82,11 @@ export const loadFps = (duration = 30) => {
             // remember time for next frame
             then = now;
 
-            // compute frames per second
-            const fps = 1 / deltaTime;
+            // compute frames per second, prevent inifinit || NaN.
+            const rawFps = Number.isFinite(1 / deltaTime) ? 1 / deltaTime : 60;
+
+            // Doasn/t consider fps < 60.
+            const fps = Math.max(rawFps, 60);
 
             // add the current fps and remove the oldest fps
             totalFPS += fps - (frameTimes[frameCursor] || 0);

@@ -59,18 +59,18 @@ export default class HandleLerp {
      * ```javascript
      * const myLerp = new HandleLerp({
      *   data: Object.<string, number>,
-     *   precision: [ Number ],
-     *   velocity: [ Number ],
-     *   relative: [ Boolean ]
+     *   precision: Number,
+     *   velocity: Number,
+     *   relative: Boolean
      *   stagger:{
-     *      each: [ Number ],
-     *      from: [ Number|String|{x:number,y:number} ],
+     *      each: Number,
+     *      from: Number|String|{x:number,y:number},
      *      grid: {
-     *          col: [ Number ],
-     *          row: [ Number ],
-     *          direction: [ String ],
+     *          col: Number,
+     *          row: Number,
+     *          direction: String,
      *      },
-     *      waitComplete: [ Boolean ],
+     *      waitComplete: Boolean,
      *   },
      * })
      *

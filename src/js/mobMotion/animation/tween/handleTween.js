@@ -58,18 +58,18 @@ export default class HandleTween {
      * ```javascript
      * const myTween = new HandleTween({
      *   data: Object.<string, number>,
-     *   duration: [ Number ],
-     *   ease: [ String ],
-     *   relative: [ Boolean ]
+     *   duration: Number,
+     *   ease: String,
+     *   relative: Boolean
      *   stagger:{
-     *      each: [ Number ],
-     *      from: [ Number|String|{x:number,y:number} ],
+     *      each: Number,
+     *      from: Number|String|{x:number,y:number},
      *      grid: {
-     *          col: [ Number ],
-     *          row: [ Number ],
-     *          direction: [ String ]
+     *          col: Number,
+     *          row: Number,
+     *          direction: String
      *      },
-     *      waitComplete: [ Boolean ],
+     *      waitComplete: Boolean,
      *   },
      * })
      *

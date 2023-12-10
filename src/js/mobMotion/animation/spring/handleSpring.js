@@ -61,24 +61,24 @@ export default class HandleSpring {
      * ```javascript
      * const mySpring = new HandleSpring({
      *   data: Object.<string, number>,
-     *   config: [ String ],
+     *   config: String,
      *   configProp: {
-     *      tension: [ Number ],
-     *      mass: [ Number ],
-     *      friction: [ Number ],
-     *      velocity: [ Number ],
-     *      precision: [ Number ],
+     *      tension: Number,
+     *      mass: Number,
+     *      friction: Number,
+     *      velocity: Number,
+     *      precision: Number,
      *   },
-     *   relative: [ Boolean ]
+     *   relative: Boolean
      *   stagger:{
-     *      each: [ Number ],
-     *      from: [ Number|String|{x:number,y:number} ],
+     *      each: Number,
+     *      from: Number|String|{x:number,y:number},
      *      grid: {
-     *          col: [ Number ],
-     *          row: [ Number ],
-     *          direction: [ String ],
+     *          col: Number,
+     *          row: Number,
+     *          direction: String,
      *      },
-     *      waitComplete: [ Boolean ],
+     *      waitComplete: Boolean,
      *   },
      * })
      *

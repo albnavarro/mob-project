@@ -21,7 +21,7 @@ export interface asyncTimelineType {
      * By default when a play or a playReverse is performed a `set method` is executed on each tween using the `initial values` (play)
      * or the `final values` (playReverse) to make each tween start from a 'neutral' position regardless of its value current.
      * Sets are not saved in the timeline but are temporary.
-     * If the `freeMode` property is set to `false` the sets are not executed so that multiple timelines can control the same tweens always starting from the current value of each tween. `The default is false`.
+     * If the `freeMode` property is set to `true` the sets are not executed so that multiple timelines can control the same tweens always starting from the current value of each tween. `The default is false`.
      */
     freeMode?: boolean;
 
