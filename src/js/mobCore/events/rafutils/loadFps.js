@@ -3,7 +3,7 @@
 import { eventStore } from '../eventStore';
 
 /**
- * @type {Boolean}
+ * @type {boolean}
  */
 let loadFpsIsReady = false;
 
@@ -35,42 +35,42 @@ export const loadFps = (duration = 30) => {
 
     return new Promise((resolve) => {
         /**
-         * @type {Array.<Number>}
+         * @type {Array.<number>}
          */
         const frameTimes = [];
 
         /**
-         * @type {Number}
+         * @type {number}
          */
         const maxFrames = 25;
 
         /**
-         * @type {Number}
+         * @type {number}
          */
         let frameCursor = 0;
 
         /**
-         * @type {Number}
+         * @type {number}
          */
         let numFrames = 0;
 
         /**
-         * @type {Number}
+         * @type {number}
          */
         let totalFPS = 0;
 
         /**
-         * @type {Number}
+         * @type {number}
          */
         let then = 0;
 
         /**
-         * @type {Number}
+         * @type {number}
          */
         let frameCounter = 0;
 
         /**
-         * @param {Number} now
+         * @param {number} now
          */
         const render = (now) => {
             // convert to seconds

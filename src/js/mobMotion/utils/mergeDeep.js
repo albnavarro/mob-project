@@ -4,6 +4,7 @@ export const mergeDeep = (target, source, isMergingArrays = true) => {
     target = ((obj) => {
         let cloneObj;
         try {
+            // eslint-disable-next-line unicorn/prefer-structured-clone
             cloneObj = JSON.parse(JSON.stringify(obj));
         } catch {
             // If the stringify fails due to circular reference, the merge defaults

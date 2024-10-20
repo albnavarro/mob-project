@@ -11,12 +11,12 @@ import {
  * Support function for parallaxPropiertiesIsValid
  * Get exact prop name from constant ( resolve sensitive typing )
  *
- * @param {string} value
+ * @param {string|undefined} value
  * @returns string
  */
 export const getPropiertiesValueFromConstant = (value) => {
     /**
-     * If null provent regex error
+     * If null prevent regex error
      */
     if (!value) return value;
 
@@ -40,6 +40,12 @@ export const getPropiertiesValueFromConstant = (value) => {
 
     if (exactMatchInsensitive(value, parallaxConstant.PROP_SCALE))
         return parallaxConstant.PROP_SCALE;
+
+    if (exactMatchInsensitive(value, parallaxConstant.PROP_SCALE_X))
+        return parallaxConstant.PROP_SCALE_X;
+
+    if (exactMatchInsensitive(value, parallaxConstant.PROP_SCALE_Y))
+        return parallaxConstant.PROP_SCALE_Y;
 
     if (exactMatchInsensitive(value, parallaxConstant.PROP_TWEEN))
         return parallaxConstant.PROP_TWEEN;

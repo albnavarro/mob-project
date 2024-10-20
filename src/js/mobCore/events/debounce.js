@@ -2,7 +2,7 @@
 
 /**
  * @param {Function} fn
- * @param {Number} [ time ]
+ * @param {number} [ time ]
  * @returns {Function}
  *
  * @description

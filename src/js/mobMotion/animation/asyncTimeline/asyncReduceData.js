@@ -1,8 +1,8 @@
 // @ts-check
 
 /**
- * @param {import("../utils/tweenAction/type").valueToparseType} data
- * @param {import("../utils/tweenAction/type").valueToparseType} activeData
+ * @param {Record<string, number | (() => number)>} data
+ * @param {Record<string, number | (() => number)>} activeData
  *
  * @description
  * From data object return an object filtered by props in activeData

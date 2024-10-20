@@ -24,7 +24,7 @@ import { mobCore } from '../../../../mobCore';
 
  * @prop {boolean} [ useDrag = false ]
     Enable drag.
- * @prop {Number} [ threshold = 30 ]
+ * @prop {number} [ threshold = 30 ]
     Modify threshold value for click action.
     Default value is `30`.
  * @prop {boolean} [ ease = false ]
@@ -59,7 +59,7 @@ import { mobCore } from '../../../../mobCore';
    Function that is launched after initialization
  * @prop {function():void} [ afterDestroy = null ]
    Function that is launched after destroy
- * @prop {Boolean} [ useWillChange ]
+ * @prop {boolean} [ useWillChange ]
     Enable the css property will-change: transform; when the frame rate falls below 3/5 of the optimal value.
     The property remains active for 4 sedonds.
     If after the previous value the fps value is back to normal the will-change property is disabled.
@@ -72,15 +72,15 @@ import { mobCore } from '../../../../mobCore';
  * @prop {Object} [ useSticky ]
     Use native `position: sticky` to pin the scroller or use scrolleTrigger pin.
     Default value is `false`.
- * @prop {Boolean} [ addCss ]
+ * @prop {boolean} [ addCss ]
     Generate scoped css.
     Default value is `true`.
- * @prop {Number} [columnHeight]
+ * @prop {number} [columnHeight]
     If the addCss property is active, it is possible to define a default height for the columns.
     The value must be a number between 0 and 100.
     The unit of measure used in vh
     The default value is `100`.
- * @prop {Number} [columnWidth]
+ * @prop {number} [columnWidth]
     If the addCss property is active, it is possible to define a default width for the columns.
     The value must be a number between 0 and 100.
     The unit of measure used in `vh`
@@ -517,7 +517,10 @@ export class HorizontalScroller {
         /**
          * @private
          */
-        this.mainContainer = document.querySelector(data.root);
+        this.mainContainer = mobCore.checkType(String, data.root)
+            ? document.querySelector(data.root)
+            : data.root;
+
         if (!this.mainContainer) {
             this.propsisValid = false;
             console.warn('horizontal custom: root node not found');

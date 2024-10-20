@@ -88,7 +88,7 @@ export const relativePropInsideTimelineWarning = () => {
 };
 
 /**
- * @param {function} val
+ * @param {Function} val
  *
  * @returns void
  */
@@ -643,7 +643,7 @@ export const genericEaseTypeWarining = (value, choice, component) => {
  */
 export const parallaxEaseTypeSpringWarining = () => {
     console.warn(
-        'Scrolltrigger warning: spring animation is only available for native properties and ParallaxTween, Check that with the "propierties" property set to "tween" no HandleSequencer is associated with the "tween" property'
+        'Scrolltrigger warning: spring animation is only available for native properties and scrollerTween, Check that with the "propierties" property set to "tween" no HandleSequencer is associated with the "tween" property'
     );
 };
 

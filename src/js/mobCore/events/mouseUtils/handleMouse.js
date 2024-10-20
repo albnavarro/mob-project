@@ -44,12 +44,12 @@ function handleMouse(event) {
     let initialized = false;
 
     /**
-     * @type {Map<String,Function>}
+     * @type {Map<string,function>}
      */
     const callbacks = new Map();
 
     /**
-     * @type {{usePassive:( Boolean )}}
+     * @type {{usePassive:( boolean )}}
      */
     // @ts-ignore
     let { usePassive } = eventStore.get();
@@ -84,12 +84,12 @@ function handleMouse(event) {
         const type = e.type;
 
         /**
-         * @type {{ pageX:Number, pageY:Number }}
+         * @type {{ pageX:number, pageY:number }}
          */
         const { pageX, pageY } = getPageData({ type, e });
 
         /**
-         * @type {{ clientX:Number, clientY:Number }}
+         * @type {{ clientX:number, clientY:number }}
          */
         const { clientX, clientY } = getClientData({ type, e });
 

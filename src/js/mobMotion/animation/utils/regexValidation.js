@@ -6,7 +6,9 @@
  */
 const escapeRegExp = (text) => {
     // @ts-ignore
-    return text ? text.replaceAll(/[\s#$()*+,.?[\\\]^{|}-]/g, '\\$&') : '';
+    return text
+        ? text.replaceAll(/[\s#$()*+,.?[\\\]^{|}-]/g, String.raw`\$&`)
+        : '';
 };
 
 /**

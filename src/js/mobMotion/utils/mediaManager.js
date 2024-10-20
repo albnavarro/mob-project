@@ -4,7 +4,7 @@ import { handleSetUp } from '../setup.js';
 
 /**
  * @param { import('./type.js').mqValues } breakpoint
- * @return {Boolean}
+ * @return {boolean}
  */
 const max = (breakpoint = 'desktop') => {
     return window.innerWidth < handleSetUp.get('mq')[breakpoint];
@@ -12,7 +12,7 @@ const max = (breakpoint = 'desktop') => {
 
 /**
  * @param { import('./type.js').mqValues } breakpoint
- * @return {Boolean}
+ * @return {boolean}
  */
 const min = (breakpoint = 'desktop') => {
     return window.innerWidth >= handleSetUp.get('mq')[breakpoint];
@@ -20,7 +20,7 @@ const min = (breakpoint = 'desktop') => {
 
 /**
  * @param { import('./type.js').mqValues } breakpoint
- * @return {Number}
+ * @return {number}
  */
 const getBreackpoint = (breakpoint = 'desktop') => {
     return handleSetUp.get('mq')[breakpoint];

@@ -26,22 +26,22 @@ import {
     Defines the scroll direction
  * @prop {('spring'|'lerp')} [ easeType = 'lerp']
     Defines the type of easing. The default is `lerp`.
- * @prop {( String|Element )} scroller
+ * @prop {( string|Element )} scroller
    The node that will have to scroll
- * @prop {( String|Element )} [ screen ]
+ * @prop {( string|Element )} [ screen ]
     The scroller container.
     The default value is `document.documentElement`.
- * @prop {Boolean} scopedEvent
+ * @prop {boolean} scopedEvent
    Use event ( scroll,wheel,etc.. ) on scroller or on document.
    If the events are used on the scroller they will have the passive property set to true (better performance).
    Otherwise, based on the general value of the passive property, the listener attached to the document will use the `preventDefault()` function.
    This will prevent the page from scrolling in turn when scrolling over the component.
    To set the global passive property use:
    `core.setDefault({ usePassive: true|false })`;
- * @prop {Number} speed
+ * @prop {number} speed
    You can adjust the speed of the wheel event.
    The default value is `60`.
- * @prop {Boolean} drag
+ * @prop {boolean} drag
    It is possible to enable and disable the drag functionality.
    The default value is `false`.
  * @prop {function({value:number, percent:number, parentIsMoving:boolean}):void} [ onTick = null ]
@@ -58,8 +58,6 @@ import {
  * @prop {function():void} [ afterRefresh = null ]
    Function that is launched after refresh
  * @prop {function():void} [ afterInit = null ]
-   Function that is launched after initialization
- * @prop {function():void} [ afterDestroy = null ]
    Function that is launched after destroy
  * @prop {Array.<ParallaxClass>} children
    An array of instances of the ParallaxClass class used within the scroller.
@@ -129,9 +127,6 @@ export default class SmoothScroller {
                ...
            },
            afterRefresh: () => {
-               ...
-           },
-           afterDestroy: () => {
                ...
            },
        });
@@ -298,6 +293,11 @@ export default class SmoothScroller {
         /**
          * @private
          */
+        this.isDestroyed = false;
+
+        /**
+         * @private
+         */
         this.easeType = genericEaseTypeIsValid(
             data?.easeType,
             'SmoothScroller'
@@ -384,7 +384,7 @@ export default class SmoothScroller {
         this.onTickCallback = valueIsFunctionAndReturnDefault(
             data?.onTick,
             'SmoothScroller: onTick',
-            null
+            NOOP
         );
 
         /**
@@ -393,7 +393,7 @@ export default class SmoothScroller {
         this.onUpdateCallback = valueIsFunctionAndReturnDefault(
             data?.onUpdate,
             'SmoothScroller: onUpdate',
-            null
+            NOOP
         );
 
         /**
@@ -543,6 +543,8 @@ export default class SmoothScroller {
 
         mobCore.useFrameIndex(() => {
             mobCore.useNextTick(() => {
+                if (this.isDestroyed) return;
+
                 this.afterInit?.();
                 this.children.forEach((element) => {
                     element.refresh();
@@ -568,6 +570,8 @@ export default class SmoothScroller {
      * @private
      */
     removeScrolerStyle() {
+        if (!this.scroller) return;
+
         this.scroller.style['user-select'] = '';
 
         const activeElement = this.scroller.querySelectorAll('a, button');
@@ -598,12 +602,11 @@ export default class SmoothScroller {
             });
 
             mobCore.useNextTick(() => {
-                if (this.onTickCallback)
-                    this.onTickCallback({
-                        value: -val,
-                        percent: this.percent,
-                        parentIsMoving: true,
-                    });
+                this.onTickCallback({
+                    value: -val,
+                    percent: this.percent,
+                    parentIsMoving: true,
+                });
 
                 this.children.forEach((element) => {
                     element.move({
@@ -621,12 +624,11 @@ export default class SmoothScroller {
                     : `translateX(${-val}px)`;
 
             mobCore.useNextTick(() => {
-                if (this.onTickCallback)
-                    this.onTickCallback({
-                        value: -val,
-                        percent: this.percent,
-                        parentIsMoving: false,
-                    });
+                this.onTickCallback({
+                    value: -val,
+                    percent: this.percent,
+                    parentIsMoving: false,
+                });
 
                 this.children.forEach((element) => {
                     element.triggerScrollEnd();
@@ -756,7 +758,7 @@ export default class SmoothScroller {
      * @description
      * Move scroller
      *
-     * @prop {Number} new position in percent, from 0 to 100
+     * @prop {number} new position in percent, from 0 to 100
      *
      * @example
      * myInstance.move(val);
@@ -775,7 +777,7 @@ export default class SmoothScroller {
      * @description
      * Move scroller immediatr
      *
-     * @prop {Number} new position in percent, from 0 to 100
+     * @prop {number} new position in percent, from 0 to 100
      *
      * @example
      * myInstance.set(val);
@@ -868,6 +870,7 @@ export default class SmoothScroller {
      * myInstance.destroy()
      */
     destroy() {
+        this.isDestroyed = true;
         this.removeScrolerStyle();
         this.subscribeResize();
         this.subscribeScrollStart();
@@ -882,7 +885,7 @@ export default class SmoothScroller {
         this.subscribeMouseClick();
         this.unsubscribeMotion();
         this.unsubscribeOnComplete();
-        this.onUpdateScrollBar = () => {};
+        this.onUpdateScrollBar = NOOP;
         this.motion?.destroy();
         this.motion = null;
         this.children.forEach((element) => {
@@ -890,18 +893,18 @@ export default class SmoothScroller {
             element = null;
         });
         this.children = [];
-        this.onTickCallback = [];
-        this.onUpdateCallback = [];
-        this.onAfterRefresh = [];
-        this.afterInit = [];
+        this.onTickCallback = NOOP;
+        this.onUpdateCallback = NOOP;
+        this.onAfterRefresh = NOOP;
+        this.afterInit = NOOP;
 
         if (this.scopedEvent) {
-            this.scroller.removeEventListener('wheel', this.scopedWhell);
-            this.scroller.removeEventListener(
+            this.scroller?.removeEventListener('wheel', this.scopedWhell);
+            this.scroller?.removeEventListener(
                 'mousemove',
                 this.scopedTouchMove
             );
-            this.scroller.removeEventListener(
+            this.scroller?.removeEventListener(
                 'touchmove',
                 this.scopedTouchMove
             );
@@ -909,8 +912,6 @@ export default class SmoothScroller {
 
         mobCore.useFrameIndex(() => {
             mobCore.useNextTick(() => {
-                this.afterDestroy?.();
-                this.afterDestroy = [];
                 this.scroller = null;
                 this.screen = null;
             });

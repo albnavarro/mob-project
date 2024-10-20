@@ -3,36 +3,30 @@
 import { eventStore } from '../eventStore.js';
 
 /**
- * @type {Object}
+ * @type {Map<number, Function[]>}
  */
-const indexCallbackObject = {};
+const indexCallbackMap = new Map();
 
 /**
- * @type {Number}
- */
-let amountOfFrameToFire = 0;
-
-/**
- * @param {Number} currentFrameLimit
+ * @param {number} currentFrameLimit
  *
  * @description
  * Update each callback's frame when handleFrame resets its index to avoid too large numbers>
  */
 const updateKeys = (currentFrameLimit) => {
-    Object.keys(indexCallbackObject).forEach((key) => {
-        delete Object.assign(indexCallbackObject, {
-            [`${Number.parseInt(key) - currentFrameLimit}`]:
-                indexCallbackObject[key],
-        })[key];
+    const oldMapToArray = [...indexCallbackMap.entries()];
+    indexCallbackMap.clear();
+
+    oldMapToArray.forEach(([index, value]) => {
+        indexCallbackMap.set(index - currentFrameLimit, value);
     });
 };
 
 /**
- * @param { Object } obj
- * @param {Number} obj.currentFrame
- * @param {Number} obj.time
- * @param {Number} obj.fps
- * @param {Boolean} obj.shouldRender
+ * @param {Object} obj
+ * @param {number} obj.currentFrame
+ * @param {number} obj.time
+ * @param {number} obj.fps
  * @return void
  *
  * @description
@@ -41,10 +35,10 @@ const updateKeys = (currentFrameLimit) => {
  * @examples
  *
  * ```javascript
- * handleFrameIndex.fire(({ currentFrame, fps, shouldRender, time });      *
+ * handleFrameIndex.fire(({ currentFrame, fps,  time });      *
  * ```
  */
-const fire = ({ currentFrame, time, fps, shouldRender }) => {
+const fire = ({ currentFrame, time, fps }) => {
     /**
      * @type {Array.<Function>}
      *
@@ -52,17 +46,11 @@ const fire = ({ currentFrame, time, fps, shouldRender }) => {
      * Get arrays of callBack related to the current currentFrame
      * indexCb is a 'global' variables instead constant to reduce garbage collector
      */
-    const indexCallbackArray = indexCallbackObject[currentFrame];
-    if (!indexCallbackArray) return;
+    const callabacks = indexCallbackMap.get(currentFrame) ?? [];
+    if (!callabacks || callabacks.length === 0) return;
 
-    indexCallbackArray.forEach((item) => item({ time, fps, shouldRender }));
-
-    /**
-     * Remove cb array once fired
-     */
-    indexCallbackObject[currentFrame] = null;
-    delete indexCallbackObject[currentFrame];
-    amountOfFrameToFire = amountOfFrameToFire - 1;
+    callabacks.forEach((item) => item({ time, fps }));
+    indexCallbackMap.delete(currentFrame);
 };
 
 /**
@@ -75,7 +63,7 @@ const fire = ({ currentFrame, time, fps, shouldRender }) => {
  *
  * @example
  * ```javascript
- * handleFrameIndex.add(({ fps, shouldRender, time }) => {
+ * handleFrameIndex.add(({ fps,  time }) => {
  *     // code ...
  * }, 5);
  *
@@ -83,22 +71,16 @@ const fire = ({ currentFrame, time, fps, shouldRender }) => {
  */
 const add = (callback, index) => {
     /**
-     * @type {Number}
+     * @type {number}
      */
     const frameIndex = index + eventStore.getProp('currentFrame');
 
     /**
      *  Add callback to array related to specific index idf exxist or create
-     *  use frameIndex for key of Object so i can get the sb array in in the fastest way possible
      *  in a bigger set of callaback
      */
-    if (indexCallbackObject[frameIndex]) {
-        indexCallbackObject[frameIndex].push(callback);
-    } else {
-        indexCallbackObject[frameIndex] = [callback];
-        amountOfFrameToFire++;
-    }
-
+    const callabacks = indexCallbackMap.get(frameIndex) ?? [];
+    indexCallbackMap.set(frameIndex, [...callabacks, callback]);
     eventStore.emit('requestFrame');
 };
 
@@ -109,7 +91,7 @@ const add = (callback, index) => {
  * @returns {number}
  */
 const getAmountOfFrameToFire = () => {
-    return amountOfFrameToFire;
+    return indexCallbackMap.size;
 };
 
 /**

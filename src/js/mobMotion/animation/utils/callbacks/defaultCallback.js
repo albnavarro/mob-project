@@ -3,12 +3,7 @@
 import { mobCore } from '../../../../mobCore/index.js';
 
 /**
- * @param {Object} obj
- * @param {import('../stagger/type.js').staggerObject} obj.stagger
- * @param {Array.<import('./type.js').callbackObject>} obj.callback
- * @param {Array.<import('./type.js').callbackObject>} obj.callbackCache
- * @param {import('../stagger/type.js').staggerDefaultIndex} obj.callBackObject
- * @param {Boolean} obj.useStagger
+ * @type {import('./type.js').defaultCallback}
  *
  * @description
  * Fire callback while Running
@@ -61,16 +56,7 @@ export const defaultCallback = ({
 };
 
 /**
- * @param {Object} obj
- * @param {Function} obj.onComplete
- * @param {import('../stagger/type.js').staggerObject} obj.stagger
- * @param {Array.<import('./type.js').callbackObject>} obj.callback
- * @param {Array.<import('./type.js').callbackObject>} obj.callbackCache
- * @param {Array.<import('./type.js').callbackObject>} obj.callbackOnComplete
- * @param {import('../stagger/type.js').staggerDefaultIndex} obj.callBackObject
- * @param {import('../stagger/type.js').staggerDefaultIndex} obj.slowlestStagger
- * @param {import('../stagger/type.js').staggerDefaultIndex} obj.fastestStagger
- * @param {Boolean} obj.useStagger
+ * @type {import('./type.js').defaultCallbackOnComplete}
  *
  * @description
  *Callback on complete

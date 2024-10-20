@@ -3,14 +3,14 @@
 import { mobCore } from '../../../mobCore';
 
 /**
- * @param {Array.<{cb:function,id:number,index:Number,frame:Number}>} callbackPauseArray
- * @param {Function} rafFunction
- * @param {Function} pauseFunction
+ * @param {import('./callbacks/type').callbackObject<(arg0: any) => boolean>[]} callbackPauseArray
+ * @param {(time: number, fps: number, resolve: (arg0: any) => void) => void} rafFunction
+ * @param {() => void} pauseFunction
  * @param {(function(any):void)} resolve
  * @returns {void}
  *
  * @description
- * Fire mian request animation frame function.
+ * Fire mean request animation frame function.
  * In case the is some function add form timeline fire pauseFUnction.
  */
 export const initRaf = (

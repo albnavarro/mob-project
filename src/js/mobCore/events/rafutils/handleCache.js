@@ -1,14 +1,10 @@
 // @ts-check
 
+import { getUnivoqueId } from '../../utils';
 import { eventStore } from '../eventStore';
 
 /**
- * @type {Number}
- */
-let id = 0;
-
-/**
- * @type {Number}
+ * @type {number}
  *
  * @description
  * Increment and decrement when we add or fire a item.
@@ -18,44 +14,43 @@ let id = 0;
 let cacheCoutner = 0;
 
 /**
- * @type {Object.<number, { el: (Object|HTMLElement), fn: Function, data: Object.<number, Object> }>}
+ * @type {Map.<string, { el: (Object|HTMLElement), fn: Function, data: Map.<number, Object> }>}
  */
-const subscriber = {};
+const subscriberMap = new Map();
 
 /**
  * @param {Object|HTMLElement} el
  * @param {Function} fn
- * @returns {{id:Number,unsubscribe:function():void}}
+ * @returns {{id:string,unsubscribe:function():void}}
  *
  * @description
  * Add new item to cache.
  */
 const add = (el = {}, fn = () => {}) => {
-    subscriber[id] = {
+    const id = getUnivoqueId();
+
+    subscriberMap.set(id, {
         el,
         fn,
-        data: {},
-    };
-
-    /**
-     * @type {Number}
-     */
-    const prevId = id;
-    id++;
+        data: new Map(),
+    });
 
     return {
-        id: prevId,
+        id,
         unsubscribe: () => {
-            if (subscriber?.[prevId]) {
+            if (subscriberMap.has(id)) {
                 /*
                  * When we remove some items before fired we have to update the
                  * cachecounter so handleFrame can stop
                  */
-                const frameToSubstract = Object.keys(
-                    subscriber[prevId].data
-                ).length;
+                const item = subscriberMap.get(id);
+                if (!item) return;
+
+                const frameToSubstract = item.data.size;
+                subscriberMap.delete(id);
+                if (!frameToSubstract) return;
+
                 cacheCoutner = cacheCoutner - frameToSubstract;
-                delete subscriber[prevId];
             }
         },
     };
@@ -63,95 +58,102 @@ const add = (el = {}, fn = () => {}) => {
 
 /**
  * @param {Object} obj
- * @param {Number} obj.id
+ * @param {string} obj.id
  * @param {Object} obj.callBackObject
- * @param {Number} obj.frame
+ * @param {number} obj.frame
  * @returns void
  *
  * @description
  * Add new data on existing id in a specific frame.
  */
 const update = ({ id, callBackObject, frame }) => {
-    if (!subscriber[id]) return;
+    if (!subscriberMap.has(id)) return;
 
     const { currentFrame } = eventStore.get();
-    const { data } = subscriber[id];
-    if (data[frame + currentFrame]) return;
-    data[frame + currentFrame] = callBackObject;
+    const item = subscriberMap.get(id);
+
+    if (!item?.data) return;
+    const { data } = item;
+
+    /**
+     * If frame is overridden the counter is not synchronized with real
+     * number of callback.
+     * So skip.
+     */
+    if (data.has(frame + currentFrame)) return;
+
+    data.set(frame + currentFrame, callBackObject);
     cacheCoutner++;
 };
 
 /**
  * @memberof module:handleCache
- * @param {Number} id
+ * @param {string} id
  * @returns void
  *
  * @description
  * Remove item from cache.
  */
 const remove = (id) => {
-    if (id in subscriber) delete subscriber[id];
+    if (subscriberMap.has(id)) subscriberMap.delete(id);
 };
 
 /**
- * @param {Number} id
+ * @param {string} id
  * @returns void
  *
  * @description
  * Reset item data
  */
 const clean = (id) => {
-    const el = subscriber?.[id];
+    const el = subscriberMap.get(id);
     if (!el) return;
 
     /*
      * When we remove some items before fired we have to update the
      * cachecounter so handleFrame can stop
      */
-    const frameToSubstract = Object.keys(el.data).length;
+    const frameToSubstract = el.data.size;
     cacheCoutner = cacheCoutner - frameToSubstract;
-    el.data = {};
+    el.data.clear();
 };
 
 /**
  * @memberof module:handleCache
- * @param {Number} id
+ * @param {string} id
  * @returns {Object.<number, { el: (Object|HTMLElement), fn: Function, data: Object.<number, Object> }>}
  *
  * @description
  * Get item object
  */
 const get = (id) => {
-    return subscriber?.[id] ?? {};
+    return subscriberMap.get(id) ?? {};
 };
 
 /**
- * @param {Number} frameCounter - frame to render.
- * @param {Boolean} shouldRender - should render.
+ * @param {number} frameCounter - frame to render.
  * @returns void
  *
  * @description
  * Render obj on specific frame and delete rendered object.
  */
-const fire = (frameCounter, shouldRender) => {
-    Object.values(subscriber).forEach(({ data, fn, el }) => {
-        const callBackObject = data?.[frameCounter];
+const fire = (frameCounter) => {
+    for (const value of subscriberMap.values()) {
+        const { data, fn, el } = value;
+        const callBackObject = data.get(frameCounter);
 
         if (callBackObject) {
-            if (shouldRender) {
-                fn(callBackObject, el);
-            }
+            fn(callBackObject, el);
 
-            data[frameCounter] = null;
-            delete data[frameCounter];
+            data.delete(frameCounter);
             cacheCoutner--;
         }
-    });
+    }
 };
 
 /**
  * @param {Object} obj
- * @param {Number} obj.id
+ * @param {string} obj.id
  * @param {Object} obj.obj
  * @returns void
  *
@@ -159,14 +161,17 @@ const fire = (frameCounter, shouldRender) => {
  * Render immediately obj using existing id/function
  */
 const fireObject = ({ id, obj = {} }) => {
-    if (!subscriber?.[id]) return;
+    if (!subscriberMap.has(id)) return;
 
-    const { el, fn } = subscriber[id];
+    const item = subscriberMap.get(id);
+    if (!item) return;
+
+    const { el, fn } = item;
     fn(obj, el);
 };
 
 /**
- * @returns {Number}
+ * @returns {number}
  *
  * @description
  * Get current number of frame to render.
@@ -174,19 +179,23 @@ const fireObject = ({ id, obj = {} }) => {
 const getCacheCounter = () => cacheCoutner;
 
 /**
- * @param {Number} maxFramecounter
+ * @param {number} maxFramecounter
  *
  * @description
  * When frameCounter become too big reset and recalculate all the frame values.
  */
 const updateFrameId = (maxFramecounter) => {
-    Object.values(subscriber).forEach(({ data }) => {
-        Object.keys(data).forEach((key) => {
-            delete Object.assign(data, {
-                [`${Number.parseInt(key) - maxFramecounter}`]: data[key],
-            })[key];
-        });
-    });
+    for (const [key, value] of subscriberMap) {
+        const { data, fn, el } = value;
+
+        const newMap = new Map();
+        for (const [frame, object] of data) {
+            newMap.set(frame - maxFramecounter, object);
+            data.delete(frame);
+        }
+
+        subscriberMap.set(key, { data: newMap, fn, el });
+    }
 };
 
 /**

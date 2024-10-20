@@ -1,7 +1,9 @@
+//@ts-check
+
 /**
- * @param {Array} arr
- * @param {String} key
- * @returns {Object}
+ * @param {Record<'prop', any>[]} arr
+ * @param {string} key
+ * @returns {Record<string, number>}
  *
  * @description
  * Get value of specific key from an array
@@ -14,8 +16,8 @@ export const getValueObj = (arr, key) => {
 };
 
 /**
- * @param {Array} arr
- * @returns {Object}
+ * @param {Record<'toIsFn'|'toFn'|'prop'|'toValue', any>[]} arr
+ * @return {Record<string, number|(() => number)>}
  *
  * @description
  * Get toValue of specific key from an array ( function or number )
@@ -31,8 +33,8 @@ export const getValueObjToNative = (arr) => {
 };
 
 /**
- * @param {Array} arr
- * @returns {Object}
+ * @param {Record<'fromIsFn'|'fromFn'|'prop'|'fromValue', any>[]} arr
+ * @return {Record<string, number|(() => number)>}
  *
  * @description
  * Get fromValue of specific key from an array ( function or number )

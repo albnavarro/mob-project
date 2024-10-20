@@ -199,8 +199,8 @@ export const createStaggers = (data) => {
      * Create stagger Array
      */
     const { staggerArray } = setStagger({
-        arr: [...items].map((item) => ({ item })),
-        endArr: [],
+        arrayDefault: [...items].map((item) => ({ item })),
+        arrayOnStop: [],
         stagger: stagger,
         slowlestStagger: STAGGER_DEFAULT_INDEX_OBJ,
         fastestStagger: STAGGER_DEFAULT_INDEX_OBJ,

@@ -8,12 +8,12 @@ import { eventStore } from '../eventStore.js';
 import { getUnivoqueId } from '../../utils/index.js';
 
 /**
- * @type {Boolean}
+ * @type {boolean}
  */
 let initialized = false;
 
 /**
- * @type {Map<String,Function>}
+ * @type {Map<string,function>}
  */
 const callbacks = new Map();
 

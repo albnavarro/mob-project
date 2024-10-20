@@ -23,12 +23,12 @@ loadFps();
 const currentFrameLimit = 10_000_000;
 
 /**
- * @type {Number}
+ * @type {number}
  */
 const firstRunDuration = 2000;
 
 /**
- * @type {Boolean}
+ * @type {boolean}
  */
 let frameIsRuning = false;
 
@@ -38,42 +38,42 @@ let frameIsRuning = false;
 let callback = [];
 
 /**
- * @type {Number}
+ * @type {number}
  */
 let time = getTime();
 
 /**
- * @type {Number}
+ * @type {number}
  */
 let startTime = 0;
 
 /**
- * @type {Number}
+ * @type {number}
  */
 let rawTime = 0;
 
 /**
- * @type {Number}
+ * @type {number}
  */
 let timeElapsed = 0;
 
 /**
- * @type {Number}
+ * @type {number}
  */
 let lastTime = 0;
 
 /**
- * @type {Number}
+ * @type {number}
  */
 let timeLost = 0;
 
 /**
- * @type {Boolean}
+ * @type {boolean}
  */
 let isStopped = false;
 
 /**
- * @type {Number}
+ * @type {number}
  *
  * @description
  * Stable fps
@@ -81,58 +81,37 @@ let isStopped = false;
 let fps = 60;
 
 /**
- * @type {Number}
+ * @type {number}
  */
 let maxFps = fps;
 
 /**
- * @type {Number}
+ * @type {number}
  */
 let frames = 0;
 
 /**
- * @type {Number}
+ * @type {number}
  */
 let fpsPrevTime = 0;
 
 /**
- * @type {Number}
+ * @type {number}
  */
 let currentFrame = 0;
 
 /**
- * Check if frame drop by fpsScalePercent value
- * when value is -1 || 2 animation ( or whoever use it ) is rendered
- * */
-let dropFrameCounter = -1;
-
-/**
- * @type {Boolean}
- */
-let shouldRender = true;
-
-/**
- * @type {Object.<number, number>}
- */
-let fpsScalePercent = eventStore.getProp('fpsScalePercent');
-
-/**
- * @type {Boolean}
- */
-let useScaleFpsf = eventStore.getProp('useScaleFps');
-
-/**
- * @type {Boolean}
+ * @type {boolean}
  */
 let mustMakeSomethingIsActive = false;
 
 /**
- * @type {Boolean}
+ * @type {boolean}
  */
 let shouldMakeSomethingIsActive = false;
 
 /**
- * @returns {Boolean}
+ * @returns {boolean}
  *
  * @description
  * Check if frame dropped a lot.
@@ -140,7 +119,7 @@ let shouldMakeSomethingIsActive = false;
 const mustMakeSomethingCheck = () => fps < (maxFps / 5) * 3;
 
 /**
- * @returns {Boolean}
+ * @returns {boolean}
  *
  * Check if frame dropped medium.
  */
@@ -193,35 +172,6 @@ eventStore.watch('requestFrame', () => {
 });
 
 /**
- * @returns {Boolean}
- *
- * @description
- * Check if animation is renderable in current frame
- */
-const getRenderStatus = () => {
-    if (!useScaleFpsf) return true;
-
-    const activeModule = Object.entries(fpsScalePercent).reduce(
-        (acc, [fpsValue, fpsModule]) => {
-            // const delta = Math.abs(maxFps - fpsWithMinumVariation);
-            const delta = Math.abs(maxFps - fps);
-
-            /**
-             * Get delta value in percent
-             * Assuming that fpsValue in in percent
-             * Compare and check if we are under fpsValue
-             **/
-            const deltaPercent = Math.round((delta * 100) / maxFps);
-            const isOutOfRange = deltaPercent > Number.parseInt(fpsValue);
-            return isOutOfRange ? fpsModule : acc;
-        },
-        1
-    );
-    dropFrameCounter = (dropFrameCounter + 1) % activeModule;
-    return dropFrameCounter === 0;
-};
-
-/**
  * @returns void
  *
  * @description
@@ -242,7 +192,7 @@ const nextTickFn = () => {
     /*
         Fire next tick
         */
-    handleNextTick.fire({ time, fps, shouldRender });
+    handleNextTick.fire({ time, fps });
 
     /**
      * Get next callback
@@ -277,7 +227,7 @@ const nextTickFn = () => {
 };
 
 /**
- * @param {Number} timestamp
+ * @param {number} timestamp
  * @returns void
  */
 const render = (timestamp) => {
@@ -342,23 +292,12 @@ const render = (timestamp) => {
          * Se a minimum of 30 fps.
          */
         fps = fps < 30 ? eventStore.getProp('instantFps') : fps;
-
-        /**
-         * Update value every seconds
-         **/
-        fpsScalePercent = eventStore.getProp('fpsScalePercent');
-        useScaleFpsf = eventStore.getProp('useScaleFps');
     }
 
     /**
      * Update max fps
      */
     if (fps > maxFps) maxFps = fps;
-
-    /**
-     * Check if current frame can fire animation
-     * */
-    shouldRender = getRenderStatus();
 
     /**
      * Start frame check for mustMakeSomething methods.
@@ -373,17 +312,17 @@ const render = (timestamp) => {
     /**
      *Fire callbnack
      */
-    callback.forEach((item) => item({ time, fps, shouldRender }));
+    callback.forEach((item) => item({ time, fps }));
 
     /*
      * Fire callback related to specific index frame
      */
-    handleFrameIndex.fire({ currentFrame, time, fps, shouldRender });
+    handleFrameIndex.fire({ currentFrame, time, fps });
 
     /**
      *Fire handleCache callBack
      */
-    handleCache.fire(currentFrame, shouldRender);
+    handleCache.fire(currentFrame);
 
     /**
      *  Update currentFrame
@@ -439,7 +378,7 @@ export const handleFrame = (() => {
     const getFps = () => fps;
 
     /**
-     * @returns {Boolean}
+     * @returns {boolean}
      *
      * @description
      * Return the mustMakeSomethingIsActive status.
@@ -448,21 +387,13 @@ export const handleFrame = (() => {
     const mustMakeSomething = () => mustMakeSomethingIsActive;
 
     /**
-     * @returns {Boolean}
+     * @returns {boolean}
      *
      * @description
      * Return the mustMakeSomethingIsActive status.
      * If frame dropped the value is true for X seconds.
      */
     const shouldMakeSomething = () => shouldMakeSomethingIsActive;
-
-    /**
-     * @returns {Boolean}
-     *
-     * @description
-     * Get drop frame status.
-     */
-    const getShouldRender = () => shouldRender;
 
     /**
      * @description
@@ -473,7 +404,7 @@ export const handleFrame = (() => {
      *
      * @example
      * ```javascript
-     * handleFrame.add(({ fps, shouldRender, time }) => {
+     * handleFrame.add(({ fps, time }) => {
      *     // code ...
      * });
      *
@@ -501,6 +432,5 @@ export const handleFrame = (() => {
         getFps,
         mustMakeSomething,
         shouldMakeSomething,
-        getShouldRender,
     };
 })();

@@ -1,26 +1,58 @@
-import { SimpleStore } from '../store/simpleStore';
+// import { SimpleStore } from '../store/classVersion/simpleStore';
+import { mobStore } from '../store/mobStore.js';
 
-export const eventStore = new SimpleStore({
+export const eventStore = mobStore({
     /**
-     * Mouse event
+     * @description
+     * Use passive event.
      */
-    usePassive: true,
+    usePassive: () => ({
+        value: true,
+        type: Boolean,
+    }),
 
     /**
+     * @description
      * Frame Event
      */
-    currentFrame: 0,
-    instantFps: 60,
-    requestFrame: () => {},
-    fpsScalePercent: () => ({
-        value: { 0: 1, 30: 2, 50: 3 },
-        type: 'Any',
+    currentFrame: () => ({
+        value: 0,
+        type: Number,
     }),
-    useScaleFps: true,
-    deferredNextTick: true,
 
     /**
-     * Scroll
+     * @description
+     * Initial fps value
      */
-    throttle: 60,
+    instantFps: () => ({
+        value: 60,
+        type: Number,
+    }),
+
+    /**
+     * @description
+     * Trigger nexFrame
+     */
+    requestFrame: () => ({
+        value: () => {},
+        type: Function,
+    }),
+
+    /**
+     * @description
+     * Send nextTick on next loop
+     */
+    deferredNextTick: () => ({
+        value: true,
+        type: Boolean,
+    }),
+
+    /**
+     * @description
+     * Throttle scroll value
+     */
+    throttle: () => ({
+        value: 60,
+        type: Number,
+    }),
 });

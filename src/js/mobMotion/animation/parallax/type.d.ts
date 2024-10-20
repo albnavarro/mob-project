@@ -2,7 +2,7 @@ import { mqAction, mqValues } from '../../utils/type';
 import { springChoiceConfig } from '../spring/type';
 import { easeTypes } from '../tween/type';
 import { staggerObjectOptional } from '../utils/stagger/type';
-import { valueToparseType } from '../utils/tweenAction/type';
+import ParallaxTween from './parallaxTween';
 
 export interface dynamicStartType {
     position: 'bottom' | 'top' | 'left' | 'right';
@@ -37,7 +37,7 @@ export interface parallaxCommonType {
      * @description
      * Instance of ParallaxTween | HandleSequencer
      */
-    tween?: Object;
+    tween?: object;
 
     /**
      * @description
@@ -147,6 +147,8 @@ export interface parallaxCommonType {
         | 'rotateZ'
         | 'opacity'
         | 'scale'
+        | 'scaleX'
+        | 'scaleY'
         | 'tween';
 
     /**
@@ -382,7 +384,7 @@ export interface scrollTriggerType {
      * Function that is launched at each tick.
      * The function will have the current value as input parameter.
      */
-    onTick?: () => void;
+    onTick?: (arg0: parallaxMoveType) => void;
 }
 
 export interface parallaxMoveType {
@@ -391,22 +393,41 @@ export interface parallaxMoveType {
 }
 
 export interface parallaxTweenType {
-    from: valueToparseType;
-    to: valueToparseType;
+    from: Record<string, number>;
+    to: Record<string, number>;
     stagger?: staggerObjectOptional;
     ease?: easeTypes;
     duration?: number;
 }
 
 export interface parallaxTweenValue {
-    currentValue: number | function;
+    currentValue: number | (() => number);
     prop: string;
     settled: boolean;
-    fromFn?: number | function;
-    fromIsFn?: number | function;
-    toFn?: number | function;
+    fromFn: () => number;
+    fromIsFn?: boolean;
+    toFn: () => number;
     toIsFn?: boolean;
-    toValProcessed: number | func;
-    toValue: number | function;
-    fromValue: number | function;
+    toValProcessed: number | (() => number);
+    toValue: number;
+    fromValue: number;
 }
+
+export type parallaxTweenSetData = (
+    arg0: Record<string, number>
+) => ParallaxTween;
+
+export type parallaxTweenGoTo = (
+    arg0: Record<string, number | (() => number)>
+) => ParallaxTween;
+
+export type parallaxTweenSubscribe = (arg0: () => void) => () => void;
+export type parallaxTweenOnStop = (arg0: () => void) => () => void;
+
+export type parallaxTweenSubscribeCache = (
+    item: object | HTMLElement,
+    cb: (arg0: Record<string, number>) => void
+) => () => void;
+
+export type parallaxTweenGetDuration = () => number;
+export type parallaxTweenGetType = () => string;

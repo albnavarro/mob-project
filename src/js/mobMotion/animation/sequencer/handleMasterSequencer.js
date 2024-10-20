@@ -78,7 +78,7 @@ export default class HandleMasterSequencer {
     }
 
     /**
-     * @returns {void}
+     * @returns {number}
      */
     getDuration() {
         return this.children.length > 0 ? this.children[0].getDuration() : 0;

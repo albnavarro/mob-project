@@ -15,21 +15,14 @@ import { staggerColRowWarning } from '../warning.js';
 import { mobCore } from '../../../../mobCore/index.js';
 
 /**
- * @param {object} obj
- * @param {Array} obj.arr
- * @param {Array} obj.endArr
- * @param {import('./type.js').staggerObject} obj.stagger
- * @param {import('./type.js').staggerDefaultIndex} obj.slowlestStagger
- * @param {import('./type.js').staggerDefaultIndex} obj.fastestStagger
- *
- * @returns {{staggerArray:Array,staggerArrayOnComplete:Array, fastestStagger:import('./type.js').staggerDefaultIndex, slowlestStagger:import('./type.js').staggerDefaultIndex}}
+ * @type {import('./type.js').getStagger}
  */
 const getRadial = ({
-    arr,
+    arrayDefault,
+    arrayOnStop,
     stagger,
     slowlestStagger,
     fastestStagger,
-    endArr,
 }) => {
     /**
      * Check if from is an Object
@@ -57,7 +50,7 @@ const getRadial = ({
         stagger.from = { ...stagger.from, y: 0 };
     }
 
-    const { cleanArray: cleanCb } = getRadialArray(arr, stagger);
+    const { cleanArray: cleanCb } = getRadialArray(arrayDefault, stagger);
 
     // Get stagger index the minumn and the fastest and the slowest
     let counter = 0;
@@ -97,8 +90,8 @@ const getRadial = ({
      * @type {Array<Array<import('./type.js').setStagger>>}
      */
     const cleanEndCb = (() => {
-        if (endArr.length > 0) {
-            const { cleanArray } = getRadialArray(endArr, stagger);
+        if (arrayOnStop.length > 0) {
+            const { cleanArray } = getRadialArray(arrayOnStop, stagger);
             return cleanArray.flat();
         } else {
             return [];
@@ -131,18 +124,11 @@ const getRadial = ({
 };
 
 /**
- * @param {object} obj
- * @param {Array} obj.arr
- * @param {Array} obj.endArr
- * @param {import('./type.js').staggerObject} obj.stagger
- * @param {import('./type.js').staggerDefaultIndex} obj.slowlestStagger
- * @param {import('./type.js').staggerDefaultIndex} obj.fastestStagger
- *
- * @returns {{staggerArray:Array,staggerArrayOnComplete:Array, fastestStagger:import('./type.js').staggerDefaultIndex, slowlestStagger:import('./type.js').staggerDefaultIndex}}
+ * @type {import('./type.js').getStagger}
  */
 const getDefault = ({
-    arr,
-    endArr,
+    arrayDefault,
+    arrayOnStop,
     stagger,
     slowlestStagger,
     fastestStagger,
@@ -174,8 +160,8 @@ const getDefault = ({
      * DEFAULT STAGGER
      **/
     return getDefaultStagger({
-        arr,
-        endArr,
+        arrayDefault,
+        arrayOnStop,
         stagger,
         slowlestStagger,
         fastestStagger,
@@ -183,18 +169,11 @@ const getDefault = ({
 };
 
 /**
- * @param {object} obj
- * @param {Array} obj.arr
- * @param {Array} obj.endArr
- * @param {import('./type.js').staggerObject} obj.stagger
- * @param {import('./type.js').staggerDefaultIndex} obj.slowlestStagger
- * @param {import('./type.js').staggerDefaultIndex} obj.fastestStagger
- *
- * @returns {{staggerArray:Array,staggerArrayOnComplete:Array, fastestStagger:import('./type.js').staggerDefaultIndex, slowlestStagger:import('./type.js').staggerDefaultIndex}}
+ * @type {import('./type.js').setSatgger}
  */
 export const setStagger = ({
-    arr,
-    endArr,
+    arrayDefault,
+    arrayOnStop,
     stagger,
     slowlestStagger,
     fastestStagger,
@@ -202,15 +181,15 @@ export const setStagger = ({
     const result =
         stagger?.grid?.direction === DIRECTION_RADIAL
             ? getRadial({
-                  arr,
-                  endArr,
+                  arrayDefault,
+                  arrayOnStop,
                   stagger,
                   slowlestStagger,
                   fastestStagger,
               })
             : getDefault({
-                  arr,
-                  endArr,
+                  arrayDefault,
+                  arrayOnStop,
                   stagger,
                   slowlestStagger,
                   fastestStagger,

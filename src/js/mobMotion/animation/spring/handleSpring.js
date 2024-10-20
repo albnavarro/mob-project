@@ -1,6 +1,6 @@
 // @ts-check
 
-import { compareKeys, getRoundedValue } from '../utils/animationUtils.js';
+import { compareKeys } from '../utils/animationUtils.js';
 import {
     setFromByCurrent,
     setFromCurrentByTo,
@@ -52,6 +52,7 @@ import {
     getValueObjToNative,
 } from '../utils/tweenAction/getValues.js';
 import { mergeArray } from '../utils/tweenAction/mergeArray.js';
+import { springGetValuesOndraw } from './getValuesOndraw.js';
 
 export default class HandleSpring {
     /**
@@ -146,13 +147,13 @@ export default class HandleSpring {
 
         /**
          * @private
-         * @type{( function(any):void )|undefined}
+         * @type{(value:any) => void|null}
          */
         this.currentResolve = undefined;
 
         /**
          * @private
-         * @type{function|undefined}
+         * @type{(value:any) => void|null}
          */
         this.currentReject = undefined;
 
@@ -164,7 +165,7 @@ export default class HandleSpring {
 
         /**
          * @private
-         * @type {import('./type.js').springValues[]}
+         * @type {import('./type.js').springValues[]|[]}
          */
         this.values = [];
 
@@ -176,31 +177,31 @@ export default class HandleSpring {
 
         /**
          * @private
-         * @type {import('../utils/callbacks/type.js').callbackObject[]}
+         * @type {import('../utils/callbacks/type.js').callbackObject<(arg0:Record<string, number>) => void>[]}
          */
         this.callback = [];
 
         /**
          * @private
-         * @type {import('../utils/callbacks/type.js').callbackObject[]}
+         * @type {import('../utils/callbacks/type.js').callbackObject<string>[]}
          */
         this.callbackCache = [];
 
         /**
          * @private
-         * @type {import('../utils/callbacks/type.js').callbackObject[]}
+         * @type {import('../utils/callbacks/type.js').callbackObject<(arg0:Record<string, number>) => void>[]}
          */
         this.callbackOnComplete = [];
 
         /**
          * @private
-         * @type {import('../utils/callbacks/type.js').callbackObject[]}
+         * @type {import('../utils/callbacks/type.js').callbackObject<(arg0:any) => boolean>[]}
          */
         this.callbackStartInPause = [];
 
         /**
          * @private
-         * @type {Array<function>}
+         * @type {Array<() => void>}
          */
         this.unsubscribeCache = [];
 
@@ -267,7 +268,7 @@ export default class HandleSpring {
     /**
      * @param {number} _time
      * @param {number} fps
-     * @param {function} res
+     * @param {Function} res
      * @param {number} tension
      * @param {number} friction
      * @param {number} mass
@@ -278,25 +279,13 @@ export default class HandleSpring {
     draw(_time, fps, res = () => {}, tension, friction, mass, precision) {
         this.isActive = true;
 
-        this.values.forEach((item) => {
-            const tensionForce = -tension * (item.currentValue - item.toValue);
-            const dampingForce = -friction * item.velocity;
-            const acceleration = (tensionForce + dampingForce) / mass;
-
-            item.velocity = item.velocity + (acceleration * 1) / fps;
-            item.currentValue = item.currentValue + (item.velocity * 1) / fps;
-
-            item.currentValue = getRoundedValue(item.currentValue);
-
-            const isVelocity = Math.abs(item.velocity) <= 0.1;
-
-            const isDisplacement =
-                tension === 0
-                    ? true
-                    : Math.abs(item.toValue - item.currentValue.toFixed(4)) <=
-                      precision;
-
-            item.settled = isVelocity && isDisplacement;
+        this.values = springGetValuesOndraw({
+            values: this.values,
+            tension,
+            friction,
+            mass,
+            precision,
+            fps,
         });
 
         /**
@@ -326,8 +315,11 @@ export default class HandleSpring {
                  * Set fromValue with ended value
                  * At the next call fromValue become the start value
                  */
-                this.values.forEach((item) => {
-                    item.fromValue = item.toValue;
+                this.values = [...this.values].map((item) => {
+                    return {
+                        ...item,
+                        fromValue: item.toValue,
+                    };
                 });
 
                 /**
@@ -361,22 +353,24 @@ export default class HandleSpring {
                 fastestStagger: this.fastestStagger,
                 useStagger: this.useStagger,
             });
-        } else {
-            mobCore.useFrame(() => {
-                mobCore.useNextTick(({ time, fps }) => {
-                    if (this.isActive)
-                        this.draw(
-                            time,
-                            fps,
-                            res,
-                            tension,
-                            friction,
-                            mass,
-                            precision
-                        );
-                });
-            });
+
+            return;
         }
+
+        mobCore.useFrame(() => {
+            mobCore.useNextTick(({ time, fps }) => {
+                if (this.isActive)
+                    this.draw(
+                        time,
+                        fps,
+                        res,
+                        tension,
+                        friction,
+                        mass,
+                        precision
+                    );
+            });
+        });
     }
 
     /**
@@ -384,11 +378,14 @@ export default class HandleSpring {
      *
      * @param {number} time current global time
      * @param {number} fps current FPS
-     * @param {function} res current promise resolve
+     * @param {Function} res current promise resolve
      **/
     onReuqestAnim(time, fps, res) {
-        this.values.forEach((item) => {
-            item.velocity = Math.trunc(this.configProps.velocity);
+        this.values = [...this.values].map((item) => {
+            return {
+                ...item,
+                velocity: Math.trunc(this.configProps.velocity),
+            };
         });
 
         /**
@@ -439,8 +436,8 @@ export default class HandleSpring {
                 fastestStagger,
                 slowlestStagger,
             } = setStagger({
-                arr: cb,
-                endArr: this.callbackOnComplete,
+                arrayDefault: cb,
+                arrayOnStop: this.callbackOnComplete,
                 stagger: this.stagger,
                 slowlestStagger: this.slowlestStagger,
                 fastestStagger: this.fastestStagger,
@@ -462,8 +459,8 @@ export default class HandleSpring {
 
     /**
      * @private
-     * @param {function(any):void} res
-     * @param {function} reject
+     * @param {(value:any) => void} res
+     * @param {(value:any) => void} reject
      *
      * @returns {Promise}
      */
@@ -487,11 +484,7 @@ export default class HandleSpring {
     }
 
     /**
-     * @param {import('../tween/type.js').tweenStopProps} Stop props
-     * @returns {void}
-     *
-     * @description
-     * Stop tween and fire reject of current promise.
+     * @type {import('./type.js').springStop}
      */
     stop({ clearCache = true } = {}) {
         if (this.pauseStatus) this.pauseStatus = false;
@@ -519,10 +512,7 @@ export default class HandleSpring {
     }
 
     /**
-     * @description
-     * Pause the tween
-     *
-     * @returns {void}
+     * @type {import('./type.js').springPause}
      */
     pause() {
         if (this.pauseStatus) return;
@@ -532,10 +522,7 @@ export default class HandleSpring {
     }
 
     /**
-     * @description
-     * Resume tween in pause
-     *
-     * @returns {void}
+     * @type {import('./type.js').springResume}
      */
     resume() {
         if (!this.pauseStatus) return;
@@ -547,7 +534,7 @@ export default class HandleSpring {
     }
 
     /**
-     * @param {Object.<string, number|function>} obj Initial data structure
+     * @param {Record<string, number>} obj Initial data structure
      * @returns {void}
      *
      * @description
@@ -570,9 +557,9 @@ export default class HandleSpring {
                 fromValue: value,
                 velocity: this.configProps.velocity,
                 currentValue: value,
-                fromFn: () => {},
+                fromFn: () => 0,
                 fromIsFn: false,
-                toFn: () => {},
+                toFn: () => 0,
                 toIsFn: false,
                 settled: false,
             };
@@ -589,10 +576,7 @@ export default class HandleSpring {
     }
 
     /**
-     * @description
-     * Reset data value with initial
-     *
-     * @returns {void}
+     * @type {import('./type.js').springResetData}
      */
     resetData() {
         this.values = mergeDeep(this.values, this.initialData);
@@ -600,13 +584,10 @@ export default class HandleSpring {
 
     /**
      * @private
+     * @type  {import('./type.js').springMergeProps}
      *
      * @description
      * Merge special props with default props
-     *
-     * @param  {import('./type.js').springActions} props
-     * @return {Object} props merged
-     *
      */
     mergeProps(props) {
         const springParams = handleSetUp.get('spring');
@@ -646,44 +627,7 @@ export default class HandleSpring {
     }
 
     /**
-     * @param {import('../utils/tweenAction/type.js').valueToparseType} obj to Values
-     * @param {import('./type.js').springActions} props special props
-     * @returns {Promise|void} Return a promise which is resolved when tween is over
-     *
-     * @example
-     * ```javascript
-     *
-     *
-     * mySpring.goTo(
-     *     { string: ( Number|Function ) },
-     *     {
-     *         reverse: [ Boolean ],
-     *         config: [ String ],
-     *         configProp: {
-     *            tension: [ Number ],
-     *            mass: [ Number ],
-     *            friction: [ Number ],
-     *            velocity: [ Number ],
-     *            precision: [ Number ],
-     *         },
-     *         relative: [ Boolean ],
-     *         immediate [ Boolean ],
-     *         immediateNoPromise: [ Boolean ]
-     *     }
-     * ).then(() => { ... }).catch(() => { ... });
-     *
-     *
-     * ```
-     * @description
-     *  Transform some properties of your choice from the `current value` to the `entered value`.
-     *  The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change every time this transformation is called.
-     *  It is possible to associate the special pros to the current transformation, these properties will be valid only in the current transformation.
-     *   - config
-     *   - configProp
-     *   - relative
-     *   - reverse
-     *   - immediate (internal use)
-     *   - immediateNoPromise (internal use)
+     * @type {import('./type.js').springGoTo}
      */
     goTo(obj, props = {}) {
         if (this.pauseStatus) return;
@@ -693,44 +637,7 @@ export default class HandleSpring {
     }
 
     /**
-     * @param {import('../utils/tweenAction/type.js').valueToparseType} obj from Values
-     * @param {import('./type.js').springActions} props special props
-     * @returns {Promise|void} Return a promise which is resolved when tween is over
-     *
-     * @example
-     * ```javascript
-     *
-     *
-     * mySpring.goFrom(
-     *     { string: ( Number|Function ) },
-     *     {
-     *         reverse: [ Boolean ],
-     *         config: [ String ],
-     *         configProp: {
-     *            tension: [ Number ],
-     *            mass: [ Number ],
-     *            friction: [ Number ],
-     *            velocity: [ Number ],
-     *            precision: [ Number ],
-     *         },
-     *         relative: [ Boolean ],
-     *         immediate [ Boolean ],
-     *         immediateNoPromise: [ Boolean ]
-     *     }
-     * ).then(() => { ... }).catch(() => { ... });
-     *
-     *
-     * ```
-     * @description
-     *  Transform some properties of your choice from the `entered value` to the `current value`.
-     *  The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change every time this transformation is called.
-     *  It is possible to associate the special pros to the current transformation, these properties will be valid only in the current transformation.
-     *   - config
-     *   - configProp
-     *   - relative
-     *   - reverse
-     *   - immediate (internal use)
-     *   - immediateNoPromise (internal use)
+     * @type {import('./type.js').springGoFrom}
      */
     goFrom(obj, props = {}) {
         if (this.pauseStatus) return;
@@ -740,45 +647,7 @@ export default class HandleSpring {
     }
 
     /**
-     * @param {import('../utils/tweenAction/type.js').valueToparseType} fromObj from Values
-     * @param {import('../utils/tweenAction/type.js').valueToparseType} toObj to Values
-     * @param {import('./type.js').springActions } props special props
-     * @returns {Promise|null|void} Return a promise which is resolved when tween is over
-     *
-     * @example
-     * ```javascript
-     *
-     *
-     * mySpring.goFromTo(
-     *     { string: ( Number|Function ) },
-     *     { string: ( Number|Function ) },
-     *     {
-     *         reverse: [ Boolean ],
-     *         config: [ String ],
-     *         configProp: {
-     *            tension: [ Number ],
-     *            mass: [ Number ],
-     *            friction: [ Number ],
-     *            velocity: [ Number ],
-     *            precision: [ Number ],
-     *         },
-     *         relative: [ Boolean ],
-     *         immediate [ Boolean ],
-     *         immediateNoPromise: [ Boolean ]
-     *     }
-     * ).then(() => { ... }).catch(() => { ... });
-     *
-     *
-     * ```
-     *  Transform some properties of your choice from the `first entered value` to the `second entered value`.
-     *  The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change every time this transformation is called.
-     *  It is possible to associate the special pros to the current transformation, these properties will be valid only in the current transformation.
-     *   - config
-     *   - configProp
-     *   - relative
-     *   - reverse
-     *   - immediate (internal use)
-     *   - immediateNoPromise (internal use)
+     * @type {import('./type.js').springGoFromTo}
      */
     goFromTo(fromObj, toObj, props = {}) {
         if (this.pauseStatus) return;
@@ -793,29 +662,7 @@ export default class HandleSpring {
     }
 
     /**
-     * @param {import('../utils/tweenAction/type.js').valueToparseType} obj to Values
-     * @param {import('../tween/type.js').tweenCommonProps} props special props
-     * @returns {Promise|void} Return a promise which is resolved when tween is over
-     *
-     * @example
-     * ```javascript
-     *
-     *
-     * mySpring.set(
-     *     { string: ( Number|Function ) },
-     *     {
-     *         immediate [ Boolean ],
-     *         immediateNoPromise: [ Boolean ]
-     *     }
-     * ).then(() => { ... }).catch(() => { ... });
-     *
-     *
-     * ```
-     *  Transform some properties of your choice from the `current value` to the `entered value` immediately.
-     *  The target value can be a number or a function that returns a number, when using a function the target value will become dynamic and will change every time this transformation is called.
-     *  It is possible to associate the special pros to the current transformation, these properties will be valid only in the current transformation.
-     *   - immediate (internal use)
-     *   - immediateNoPromise (internal use)
+     * @type {import('./type.js').springSet}
      */
     set(obj, props = {}) {
         if (this.pauseStatus) return;
@@ -826,15 +673,7 @@ export default class HandleSpring {
 
     /**
      * @private
-     *
-     * @param {import('../utils/tweenAction/type.js').valueToparseType[]} data Updated data
-     * @param {import('./type.js').springActions} props special props
-     * @param {import('../utils/tweenAction/type.js').valueToparseType} obj new data obj come from set/goTo/goFrom/goFromTo
-     * @returns {Promise|void} Return a promise which is resolved when tween is over
-     *
-     * @description
-     * Common oparation for set/goTo/goFrom/goFromTo methods.
-     * It is the method that updates the internal store
+     * @type {import('./type.js').springDoAction} data Updated data
      */
     doAction(data, props, obj) {
         this.values = mergeArray(data, this.values);
@@ -871,7 +710,7 @@ export default class HandleSpring {
      * @description
      * Get current values, If the single value is a function it returns the result of the function.
      *
-     * @return {Object} current value obj.
+     * @type {import('./type.js').springGetValue}
      *
      * @example
      * ```javascript
@@ -888,7 +727,7 @@ export default class HandleSpring {
      * @description
      * Get initial values, If the single value is a function it returns the result of the function.
      *
-     * @return {Object} initial value obj.
+     * @type {import('./type.js').springGetValue}
      *
      * @example
      * ```javascript
@@ -905,7 +744,7 @@ export default class HandleSpring {
      * @description
      * Get from values, If the single value is a function it returns the result of the function.
      *
-     * @return {Object} from value obj.
+     * @type {import('./type.js').springGetValue}
      *
      * @example
      * ```javascript
@@ -922,7 +761,7 @@ export default class HandleSpring {
      * @description
      * Get to values, If the single value is a function it returns the result of the function.
      *
-     * @return {Object} to value obj.
+     * @type {import('./type.js').springGetValue}
      *
      * @example
      * ```javascript
@@ -939,7 +778,7 @@ export default class HandleSpring {
      * @description
      * Get From values, if the single value is a function it returns the same function.
      *
-     * @return {Object} from value obj.
+     * @type {import('./type.js').springGetValueNative}
      *
      * @example
      * ```javascript
@@ -956,7 +795,7 @@ export default class HandleSpring {
      * @description
      * Get To values, if the single value is a function it returns the same function.
      *
-     * @return {Object} to value obj.
+     * @type {import('./type.js').springGetValueNative}
      *
      * @example
      * ```javascript
@@ -973,7 +812,7 @@ export default class HandleSpring {
      * @description
      * Get tween type
      *
-     * @return {string} tween type
+     * @type {import('./type.js').springGetType} tween type
      *
      * @example
      * ```javascript
@@ -990,7 +829,7 @@ export default class HandleSpring {
      * @description
      * Get univoque Id
      *
-     * @return {string} Univoque Id
+     * @type {import('./type.js').springGetId}
      *
      * @example
      * ```javascript
@@ -1004,7 +843,7 @@ export default class HandleSpring {
     }
 
     /**
-     * @param {import('./type.js').springPropsOptional} configProp - single spring config propierties
+     * @type {import('./type.js').springUdateConfigProp}
      *
      *  @example
      *  ```javascript
@@ -1034,7 +873,7 @@ export default class HandleSpring {
      * @description
      * updateConfig - Update config object with new preset
      *
-     * @param  {import('./type.js').springChoiceConfig} config
+     * @type {import('./type.js').springUdateConfig}
      *
      */
     updateConfig(config) {
@@ -1045,26 +884,7 @@ export default class HandleSpring {
     }
 
     /**
-     * @param {function(any):void} cb - callback function.
-     * @return {Function} unsubscribe callback.
-     *
-     * @example
-     * ```javascript
-     * //Single DOM element
-     * const unsubscribe = mySpring.subscribe(({ x,y... }) => {
-     *      domEl.style.prop = `...`
-     * })
-     * unsubscribe()
-     *
-     *
-     * //Multiple DOM element ( stagger )
-     * const unsubscribeStagger = [...elements].map((item) => {
-     *   return mySpring.subscribe(({ x, y... }) => {
-     *       item.style.prop = ...
-     *   });
-     * });
-     * unsubscribeStagger.forEach((item) => item());
-     *
+     * @type {import('./type.js').springSubscribe}
      *
      * ```
      * @description
@@ -1085,8 +905,8 @@ export default class HandleSpring {
      * Callback to manage the departure of tweens in a timeline. If a delay is applied to the tween and before the delay ends the timeline pauses the tween at the end of the delay will automatically pause.
      * Add callback to start in pause to stack
      *
-     * @param  {function} cb cal function
-     * @return {function} unsubscribe callback
+     * @param  {() => void} cb cal function
+     * @return {() => void} unsubscribe callback
      *
      */
     onStartInPause(cb) {
@@ -1094,51 +914,23 @@ export default class HandleSpring {
             cb,
             this.callbackStartInPause
         );
-        this.callbackStartInPause = arrayOfCallbackUpdated;
+        this.callbackStartInPause =
+            /** @type{import('../utils/callbacks/type.js').callbackObject<(arg0:any) => boolean>[]} */ (
+                arrayOfCallbackUpdated
+            );
 
         return () => (this.callbackStartInPause = []);
     }
 
     /**
-     * @param {function(any):void} cb - callback function.
-     * @return {Function} unsubscribe callback.
-     *
-     * @example
-     * ```javascript
-     * //Single DOM element
-     * const unsubscribe = mySpring.onComplete(({ x,y... }) => {
-     *      domEl.style.prop = `...`
-     * })
-     * unsubscribe()
+     * @type {import('./type.js').springOnComplete}
      *
      *
-     * //Multiple DOM element ( stagger )
-     * const unsubscribeStagger = [...elements].map((item) => {
-     *   return mySpring.onComplete(({ x, y... }) => {
-     *       item.style.prop = ...
-     *   });
-     * });
-     * unsubscribeStagger.forEach((item) => item());
-     *
-     *
-     * ```
      * @description
-     * Similar to subscribe this callBack is launched when the data calculation stops (when the timeline ends or the scroll trigger is inactive).
-     * Useful for applying a different style to an inactive element.
-     * A typical example is to remove the teansform3D property:
-     * @example
-     * ```javascript
-     * // Use transform3D while item is active
-     * mySpring.subscribe(({x}) => {
-     *      domEl.style.transform = ` transform3D(0,0,0) translateX(${x}px)`
-     * })
-     *
-     * // Remove transform3D when item is inactive
-     * mySpring.onComplete(({x}) => {
-     *      domEl.style.transform = `translateX(${x}px)`
-     * })
-     * ```
-     */
+     *  Similar to subscribe this callBack is launched when the data calculation stops (when the timeline ends or the scroll trigger is inactive).
+     *  Useful for applying a different style to an inactive element.
+     *  A typical example is to remove the teansform3D property:
+     **/
     onComplete(cb) {
         const { arrayOfCallbackUpdated, unsubscribeCb } = setCallBack(
             cb,
@@ -1151,22 +943,8 @@ export default class HandleSpring {
     }
 
     /**
-     * @param {('Object'|'HTMLElement')} item
-     * @param {function(any):void} fn - callback function.
-     * @return {Function} unsubscribe callback
+     * @type {import('./type.js').springSubscribeCache}
      *
-     * @example
-     *```javascript
-     * //Multiple DOM element ( stagger )
-     * const unsubscribeStagger = [...elements].map((item) => {
-     *   return mySpring.subscribeCache(item, ({ x, y... }) => {
-     *       item.style.prop = ...
-     *   });
-     * });
-     * unsubscribeStagger.forEach((item) => item());
-     *
-     *
-     * ```
      * @description
      * Callback that returns updated values ready to be usable, specific to manage large staggers.
      */

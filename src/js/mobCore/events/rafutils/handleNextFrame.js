@@ -15,7 +15,7 @@ const callbacks = [];
  * @example
  * ```javascript
  * const loop = () => {
- *     handleNextFrame.add(({ fps, shouldRender, time }) => {
+ *     handleNextFrame.add(({ fps, time }) => {
  *         // code
  *         loop();
  *     });

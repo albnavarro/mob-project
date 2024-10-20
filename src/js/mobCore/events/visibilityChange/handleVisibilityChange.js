@@ -3,12 +3,12 @@
 import { getUnivoqueId } from '../../utils';
 
 /**
- * @type {Boolean}
+ * @type {boolean}
  */
 let initialized = false;
 
 /**
- * @type {Map<String,Function>}
+ * @type {Map<string,Function>}
  */
 const callbacks = new Map();
 

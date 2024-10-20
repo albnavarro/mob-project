@@ -162,6 +162,16 @@ export const parallaxConstant = {
     /**
      * @type {string}
      */
+    PROP_SCALE_X: 'scaleX',
+
+    /**
+     * @type {string}
+     */
+    PROP_SCALE_Y: 'scaleY',
+
+    /**
+     * @type {string}
+     */
     PROP_TWEEN: 'tween',
 
     /**
@@ -243,7 +253,7 @@ export const parallaxConstant = {
     EASE_LERP: 'lerp',
 
     /**
-     * @type {Number}
+     * @type {number}
      */
     EASE_PRECISION: 0.001,
 

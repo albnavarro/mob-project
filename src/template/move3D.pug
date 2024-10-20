@@ -1,339 +1,366 @@
 extends default/_wrapper.pug
 
 block content
-            
     header
         .container
             include ../includes/langSelector.pug
         .container.menu-container.menu-container--top
             include ../includes/navigation.pug
     main
-        .move3D-wrap.move3D.js-move3d(
-            data-perspective="600")
+        .move3D-wrap.move3D.js-move3d(data-perspective='600')
             .move3D__scene
                 .move3D__container
-                    .move3D__item(
-                        data-depth='200'
-                        data-animate)
+                    .move3D__item(data-depth='200', data-animate)
                         .circle
                         .move3D__item.item-3d.item-3d--top(
-                            data-depth='0'
-                            data-rotate='x'
-                            data-range="20"
-                            data-anchorPoint='bottom'
-                            data-animate)
+                            data-depth='0',
+                            data-rotate='x',
+                            data-range='20',
+                            data-anchorPoint='bottom',
+                            data-animate
+                        )
                             .circle
                             .move3D__item.item-3d.item-3d--top(
-                                data-depth='0'
-                                data-rotate='x'
-                                data-range="30"
-                                data-anchorPoint='bottom'
-                                data-animate)
+                                data-depth='0',
+                                data-rotate='x',
+                                data-range='30',
+                                data-anchorPoint='bottom',
+                                data-animate
+                            )
                                 .circle
                         .move3D__item.item-3d.item-3d--bottom(
-                            data-depth='0'
-                            data-rotate='x'
-                            data-range="20"
-                            data-anchorPoint='top'
-                            data-animate)
+                            data-depth='0',
+                            data-rotate='x',
+                            data-range='20',
+                            data-anchorPoint='top',
+                            data-animate
+                        )
                             .circle
                             .move3D__item.item-3d.item-3d--bottom(
-                                data-depth='0'
-                                data-rotate='x'
-                                data-range="30"
-                                data-anchorPoint='top'
-                                data-animate)
+                                data-depth='0',
+                                data-rotate='x',
+                                data-range='30',
+                                data-anchorPoint='top',
+                                data-animate
+                            )
                                 .circle
                         .move3D__item.item-3d.item-3d--right(
-                            data-depth='0'
-                            data-rotate='y'
-                            data-range="20"
-                            data-anchorPoint='left'
-                            data-animate)
+                            data-depth='0',
+                            data-rotate='y',
+                            data-range='20',
+                            data-anchorPoint='left',
+                            data-animate
+                        )
                             .circle
                             .move3D__item.item-3d.item-3d--right(
-                                data-depth='0'
-                                data-rotate='y'
-                                data-range="30"
-                                data-anchorPoint='left'
-                                data-animate)
+                                data-depth='0',
+                                data-rotate='y',
+                                data-range='30',
+                                data-anchorPoint='left',
+                                data-animate
+                            )
                                 .circle
                                 .move3D__item.item-3d.item-3d--right(
-                                    data-depth='0'
-                                    data-rotate='y'
-                                    data-range="40"
-                                    data-anchorPoint='left'
-                                    data-animate)
+                                    data-depth='0',
+                                    data-rotate='y',
+                                    data-range='40',
+                                    data-anchorPoint='left',
+                                    data-animate
+                                )
                                     .circle
                         .move3D__item.item-3d.item-3d--left(
-                            data-depth='0'
-                            data-rotate='y'
-                            data-range="20"
-                            data-anchorPoint='right'
-                            data-animate)
+                            data-depth='0',
+                            data-rotate='y',
+                            data-range='20',
+                            data-anchorPoint='right',
+                            data-animate
+                        )
                             .circle
                             .move3D__item.item-3d.item-3d--left(
-                                data-depth='0'
-                                data-rotate='y'
-                                data-range="30"
-                                data-anchorPoint='right'
-                                data-animate)
+                                data-depth='0',
+                                data-rotate='y',
+                                data-range='30',
+                                data-anchorPoint='right',
+                                data-animate
+                            )
                                 .circle
                                 .move3D__item.item-3d.item-3d--left(
-                                    data-depth='0'
-                                    data-rotate='y'
-                                    data-range="40"
-                                    data-anchorPoint='right'
-                                    data-animate)
+                                    data-depth='0',
+                                    data-rotate='y',
+                                    data-range='40',
+                                    data-anchorPoint='right',
+                                    data-animate
+                                )
                                     .circle
                         .move3D__item.item-3d.item-3d--top-right(
-                            data-depth='0'
-                            data-rotate='xy'
-                            data-range="20"
-                            data-anchorPoint='bottom-left'
-                            data-animate)
+                            data-depth='0',
+                            data-rotate='xy',
+                            data-range='20',
+                            data-anchorPoint='bottom-left',
+                            data-animate
+                        )
                             .circle
                             .move3D__item.item-3d.item-3d--top-right(
-                                data-depth='0'
-                                data-rotate='xy'
-                                data-range="30"
-                                data-anchorPoint='bottom-left'
-                                data-animate)
+                                data-depth='0',
+                                data-rotate='xy',
+                                data-range='30',
+                                data-anchorPoint='bottom-left',
+                                data-animate
+                            )
                                 .circle
                         .move3D__item.item-3d.item-3d--top-left(
-                            data-depth='0'
-                            data-rotate='xy'
-                            data-range="20"
-                            data-anchorPoint='bottom-right'
-                            data-animate)
+                            data-depth='0',
+                            data-rotate='xy',
+                            data-range='20',
+                            data-anchorPoint='bottom-right',
+                            data-animate
+                        )
                             .circle
                         .move3D__item.item-3d.item-3d--bottom-right(
-                            data-depth='0'
-                            data-rotate='xy'
-                            data-range="20"
-                            data-anchorPoint='top-left'
-                            data-animate)
+                            data-depth='0',
+                            data-rotate='xy',
+                            data-range='20',
+                            data-anchorPoint='top-left',
+                            data-animate
+                        )
                             .circle
                         .move3D__item.item-3d.item-3d--bottom-left(
-                            data-depth='0'
-                            data-rotate='xy'
-                            data-range="20"
-                            data-anchorPoint='top-right'
-                            data-animate)
+                            data-depth='0',
+                            data-rotate='xy',
+                            data-range='20',
+                            data-anchorPoint='top-right',
+                            data-animate
+                        )
                             .circle
-                            
-        
-        
-        .move3D-wrap.move3D.js-move3d(
-            data-perspective="600")
+
+        .move3D-wrap.move3D.js-move3d(data-perspective='600')
             .move3D__scene
                 .move3D__container
-                    .move3D__item(
-                        data-depth='-200'
-                        data-animate)
+                    .move3D__item(data-depth='-200', data-animate)
                         .circle
                         .move3D__item.item-3d.item-3d--top(
-                            data-depth='100'
-                            data-rotate='x'
-                            data-range="-20"
-                            data-anchorPoint='bottom'
-                            data-animate)
+                            data-depth='100',
+                            data-rotate='x',
+                            data-range='-20',
+                            data-anchorPoint='bottom',
+                            data-animate
+                        )
                             .circle
                             .move3D__item.item-3d.item-3d--top(
-                                data-depth='0'
-                                data-rotate='x'
-                                data-range="-60"
-                                data-anchorPoint='bottom'
-                                data-animate)
+                                data-depth='0',
+                                data-rotate='x',
+                                data-range='-60',
+                                data-anchorPoint='bottom',
+                                data-animate
+                            )
                                 .circle
                         .move3D__item.item-3d.item-3d--bottom(
-                            data-depth='100'
-                            data-rotate='x'
-                            data-range="-20"
-                            data-anchorPoint='top'
-                            data-animate)
+                            data-depth='100',
+                            data-rotate='x',
+                            data-range='-20',
+                            data-anchorPoint='top',
+                            data-animate
+                        )
                             .circle
                             .move3D__item.item-3d.item-3d--bottom(
-                                data-depth='0'
-                                data-rotate='x'
-                                data-range="-60"
-                                data-anchorPoint='top'
-                                data-animate)
+                                data-depth='0',
+                                data-rotate='x',
+                                data-range='-60',
+                                data-anchorPoint='top',
+                                data-animate
+                            )
                                 .circle
                         .move3D__item.item-3d.item-3d--right(
-                            data-depth='0'
-                            data-rotate='y'
-                            data-range="-20"
-                            data-initialRotate="-30"
-                            data-anchorPoint='left'
-                            data-animate)
+                            data-depth='0',
+                            data-rotate='y',
+                            data-range='-20',
+                            data-initialRotate='-30',
+                            data-anchorPoint='left',
+                            data-animate
+                        )
                             .circle
                             .move3D__item.item-3d.item-3d--right(
-                                data-depth='0'
-                                data-rotate='x'
-                                data-range="-30"
-                                data-initialRotate="-30"
-                                data-anchorPoint='bottom'
-                                data-animate)
+                                data-depth='0',
+                                data-rotate='x',
+                                data-range='-30',
+                                data-initialRotate='-30',
+                                data-anchorPoint='bottom',
+                                data-animate
+                            )
                                 .circle
                                 .move3D__item.item-3d.item-3d--right(
-                                    data-depth='0'
-                                    data-rotate='x'
-                                    data-range="-40"
-                                    data-initialRotate="-30"
-                                    data-anchorPoint='bottom'
-                                    data-animate)
+                                    data-depth='0',
+                                    data-rotate='x',
+                                    data-range='-40',
+                                    data-initialRotate='-30',
+                                    data-anchorPoint='bottom',
+                                    data-animate
+                                )
                                     .circle
                         .move3D__item.item-3d.item-3d--left(
-                            data-depth='0'
-                            data-rotate='y'
-                            data-range="-20"
-                            data-anchorPoint='right'
-                            data-animate)
+                            data-depth='0',
+                            data-rotate='y',
+                            data-range='-20',
+                            data-anchorPoint='right',
+                            data-animate
+                        )
                             .circle
                             .move3D__item.item-3d.item-3d--left(
-                                data-depth='0'
-                                data-rotate='y'
-                                data-range="-30"
-                                data-anchorPoint='right'
-                                data-animate)
+                                data-depth='0',
+                                data-rotate='y',
+                                data-range='-30',
+                                data-anchorPoint='right',
+                                data-animate
+                            )
                                 .circle
                                 .move3D__item.item-3d.item-3d--left(
-                                    data-depth='0'
-                                    data-rotate='y'
-                                    data-range="-40"
-                                    data-anchorPoint='right'
-                                    data-animate)
+                                    data-depth='0',
+                                    data-rotate='y',
+                                    data-range='-40',
+                                    data-anchorPoint='right',
+                                    data-animate
+                                )
                                     .circle
                                     .move3D__item.item-3d.item-3d--top(
-                                        data-depth='0'
-                                        data-rotate='x'
-                                        data-initialRotate="0"
-                                        data-range="-60"
-                                        data-anchorPoint='bottom'
-                                        data-animate)
+                                        data-depth='0',
+                                        data-rotate='x',
+                                        data-initialRotate='0',
+                                        data-range='-60',
+                                        data-anchorPoint='bottom',
+                                        data-animate
+                                    )
                                         .circle
                         .move3D__item.item-3d.item-3d--top-right(
-                            data-depth='0'
-                            data-rotate='xy'
-                            data-range="-20"
-                            data-anchorPoint='bottom-left'
-                            data-animate)
+                            data-depth='0',
+                            data-rotate='xy',
+                            data-range='-20',
+                            data-anchorPoint='bottom-left',
+                            data-animate
+                        )
                             .circle
                             .move3D__item.item-3d.item-3d--top-right(
-                                data-depth='0'
-                                data-rotate='xy'
-                                data-range="-30"
-                                data-anchorPoint='bottom-left'
-                                data-animate)
+                                data-depth='0',
+                                data-rotate='xy',
+                                data-range='-30',
+                                data-anchorPoint='bottom-left',
+                                data-animate
+                            )
                                 .circle
                         .move3D__item.item-3d.item-3d--top-left(
-                            data-depth='0'
-                            data-rotate='xy'
-                            data-range="-20"
-                            data-anchorPoint='bottom-right'
-                            data-animate)
+                            data-depth='0',
+                            data-rotate='xy',
+                            data-range='-20',
+                            data-anchorPoint='bottom-right',
+                            data-animate
+                        )
                             .circle
                         .move3D__item.item-3d.item-3d--bottom-right(
-                            data-depth='0'
-                            data-rotate='xy'
-                            data-range="-20"
-                            data-anchorPoint='top-left'
-                            data-animate)
+                            data-depth='0',
+                            data-rotate='xy',
+                            data-range='-20',
+                            data-anchorPoint='top-left',
+                            data-animate
+                        )
                             .circle
                         .move3D__item.item-3d.item-3d--bottom-left(
-                            data-depth='0'
-                            data-rotate='xy'
-                            data-range="-20"
-                            data-anchorPoint='top-right'
-                            data-animate)
+                            data-depth='0',
+                            data-rotate='xy',
+                            data-range='-20',
+                            data-anchorPoint='top-right',
+                            data-animate
+                        )
                             .circle
-                            
-                            
-        .move3D-wrap.move3D.js-move3d(
-            data-perspective="1000"
-            data-drag)
+
+        .move3D-wrap.move3D.js-move3d(data-perspective='1000', data-drag)
             .move3D__scene
                 .move3D__container
                     .move3D__item.item-3d.item-3d--top(
-                        data-depth='200'
-                        data-rotate='x'
-                        data-range="20"
-                        data-anchorPoint='bottom'
-                        data-animate)
+                        data-depth='200',
+                        data-rotate='x',
+                        data-range='20',
+                        data-anchorPoint='bottom',
+                        data-animate
+                    )
                         .circle
                     .move3D__item
                         .circle
                     .move3D__item.item-3d.item-3d--bottom(
-                        data-depth='200'
-                        data-rotate='x'
-                        data-range="20"
-                        data-anchorPoint='top'
-                        data-animate)
+                        data-depth='200',
+                        data-rotate='x',
+                        data-range='20',
+                        data-anchorPoint='top',
+                        data-animate
+                    )
                         .circle
                         .move3D__item.item-3d.item-3d--bottom(
-                            data-depth='0'
-                            data-rotate='x'
-                            data-range="20"
-                            data-anchorPoint='top'
-                            data-animate)
+                            data-depth='0',
+                            data-rotate='x',
+                            data-range='20',
+                            data-anchorPoint='top',
+                            data-animate
+                        )
                             .circle
                     .move3D__item.item-3d.item-3d--right(
-                        data-depth='200'
-                        data-rotate='y'
-                        data-range="20"
-                        data-anchorPoint='left'
-                        data-animate)
+                        data-depth='200',
+                        data-rotate='y',
+                        data-range='20',
+                        data-anchorPoint='left',
+                        data-animate
+                    )
                         .circle
                         .move3D__item.item-3d.item-3d--right(
-                            data-depth='0'
-                            data-rotate='y'
-                            data-range="20"
-                            data-anchorPoint='left'
-                            data-animate)
+                            data-depth='0',
+                            data-rotate='y',
+                            data-range='20',
+                            data-anchorPoint='left',
+                            data-animate
+                        )
                             .circle
                     .move3D__item.item-3d.item-3d--left(
-                        data-depth='200'
-                        data-rotate='y'
-                        data-range="20"
-                        data-anchorPoint='right'
-                        data-animate)
+                        data-depth='200',
+                        data-rotate='y',
+                        data-range='20',
+                        data-anchorPoint='right',
+                        data-animate
+                    )
                         .circle
                         .move3D__item.item-3d.item-3d--left(
-                            data-depth='0'
-                            data-rotate='y'
-                            data-range="20"
-                            data-anchorPoint='right'
-                            data-animate)
+                            data-depth='0',
+                            data-rotate='y',
+                            data-range='20',
+                            data-anchorPoint='right',
+                            data-animate
+                        )
                             .circle
                     .move3D__item.item-3d.item-3d--top-right(
-                        data-depth='200'
-                        data-rotate='xy'
-                        data-range="20"
-                        data-anchorPoint='bottom-left'
-                        data-animate)
+                        data-depth='200',
+                        data-rotate='xy',
+                        data-range='20',
+                        data-anchorPoint='bottom-left',
+                        data-animate
+                    )
                         .circle
                     .move3D__item.item-3d.item-3d--top-left(
-                        data-depth='200'
-                        data-rotate='xy'
-                        data-range="20"
-                        data-anchorPoint='bottom-right'
-                        data-animate)
+                        data-depth='200',
+                        data-rotate='xy',
+                        data-range='20',
+                        data-anchorPoint='bottom-right',
+                        data-animate
+                    )
                         .circle
                     .move3D__item.item-3d.item-3d--bottom-right(
-                        data-depth='200'
-                        data-rotate='xy'
-                        data-range="20"
-                        data-anchorPoint='top-left'
-                        data-animate)
+                        data-depth='200',
+                        data-rotate='xy',
+                        data-range='20',
+                        data-anchorPoint='top-left',
+                        data-animate
+                    )
                         .circle
                     .move3D__item.item-3d.item-3d--bottom-left(
-                        data-depth='200'
-                        data-rotate='xy'
-                        data-range="20"
-                        data-anchorPoint='top-right'
-                        data-animate)
+                        data-depth='200',
+                        data-rotate='xy',
+                        data-range='20',
+                        data-anchorPoint='top-right',
+                        data-animate
+                    )
                         .circle
-            
-
-        

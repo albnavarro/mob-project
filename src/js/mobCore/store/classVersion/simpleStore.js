@@ -1,7 +1,7 @@
 // @ts-check
 
-import { getUnivoqueId } from '../utils/index.js';
-import { useNextLoop } from '../utils/nextTick.js';
+import { getUnivoqueId } from '../../utils/index.js';
+import { useNextLoop } from '../../utils/nextTick.js';
 import { checkEquality } from './checkEquality.js';
 import { checkType, TYPE_IS_ANY, storeType, UNTYPED } from './storeType.js';
 import {
@@ -119,14 +119,14 @@ export class SimpleStore {
      */
     constructor(data = {}) {
         /**
-         * @type {String}
+         * @type {string}
          */
         this.logStyle = 'padding: 10px;';
 
         /**
          * @private
          *
-         * @type {Map<String,{prop:String,fn:Function}>}
+         * @type {Map<string,{prop:string,fn:function}>}
          *
          * @description
          * Callback store
@@ -136,7 +136,7 @@ export class SimpleStore {
         /**
          * @private
          *
-         * @type {Set.<{prop:String,fn:Function,keys:Array.<string>}>}
+         * @type {Set.<{prop:string,fn:function,keys:Array.<string>}>}
          *
          * @description
          * Callback store
@@ -146,7 +146,7 @@ export class SimpleStore {
         /**
          * @private
          *
-         * @type {Set.<String>}
+         * @type {Set.<string>}
          * @description
          * Computed propierties update in tick.
          */
@@ -155,7 +155,7 @@ export class SimpleStore {
         /**
          * @private
          *
-         * @type {Set.<String>}
+         * @type {Set.<string>}
          *
          * Queque of props changed.
          * Compued use this queque for checking mutation
@@ -165,7 +165,7 @@ export class SimpleStore {
         /**
          * @private
          *
-         * @type {Object<string,(Boolean|Object<string,Boolean>)>}
+         * @type {Object<string,(boolean|Object<string,boolean>)>}
          *
          * @description
          * Object that store calidation status for each props
@@ -175,7 +175,7 @@ export class SimpleStore {
         /**
          * @private
          *
-         * @type {Number}
+         * @type {number}
          *
          * @description
          * Depth of initial data object
@@ -185,7 +185,7 @@ export class SimpleStore {
         /**
          * @private
          *
-         * @type {Boolean}
+         * @type {boolean}
          *
          * @description
          * Next tick ( settimeout 0 ) is fired.
@@ -226,7 +226,7 @@ export class SimpleStore {
         /**
          * @private
          *
-         * @type {Object<string,(Object<string,Function>|Function)>}
+         * @type {Object<string,(Object<string,function>|function)>}
          *
          * @description
          * Main Object that store the validate function for every prop.
@@ -243,7 +243,7 @@ export class SimpleStore {
         /**
          * @private
          *
-         * @type {Object<string,(Object<string,Boolean>|Boolean)>}
+         * @type {Object<string,(Object<string,boolean>|boolean)>}
          *
          * @description
          * Main Object that store the strict state of each prop.
@@ -260,7 +260,7 @@ export class SimpleStore {
         /**
          * @private
          *
-         * @type {Object<string,(Object<string,Boolean>|Boolean)>}
+         * @type {Object<string,(Object<string,boolean>|boolean)>}
          *
          * @description
          * Main Object that store the skipEqual state.
@@ -303,10 +303,10 @@ export class SimpleStore {
 
     /**
      * @param {Object} obj
-     * @param {String} obj.prop
+     * @param {string} obj.prop
      * @param {any} obj.newValue
      * @param {any} obj.oldValue
-     * @param {Boolean|Object<String,Boolean>} obj.validationValue
+     * @param {boolean|Object<string,boolean>} obj.validationValue
      */
     runCallbackQueqe({ prop, newValue, oldValue, validationValue }) {
         for (const { prop: currentProp, fn } of this.callBackWatcher.values()) {
@@ -316,10 +316,10 @@ export class SimpleStore {
 
     /**
      * @param {Object} obj
-     * @param {String} obj.prop
+     * @param {string} obj.prop
      * @param {any} obj.newValue
      * @param {any} obj.oldValue
-     * @param {Boolean|Object<String,Boolean>} obj.validationValue
+     * @param {boolean|Object<string,boolean>} obj.validationValue
      */
     async runCallbackQueqeAsync({ prop, newValue, oldValue, validationValue }) {
         for (const { prop: currentProp, fn } of this.callBackWatcher.values()) {
@@ -423,11 +423,11 @@ export class SimpleStore {
     }
 
     /**
-     * @param {String} prop - propierties or object to update
+     * @param {string} prop - propierties or object to update
      * @param {(any|function(any):any)} newValue - It is possible to pass the direct value or a function which takes as parameter the current value and which returns the new value
      * If the type of value used is a function, only the new function can be passed
-     * @param {Boolean} [ fireCallback ] - fire watcher callback on update,  default value is `true`
-     * @param {Boolean} [ clone ] - Return a clone of original object for Map,Set,Onject and Array,
+     * @param {boolean} [ fireCallback ] - fire watcher callback on update,  default value is `true`
+     * @param {boolean} [ clone ] - Return a clone of original object for Map,Set,Onject and Array,
      *  Useful for Map and Set because with this constructor doesn't support spread
      *  Default value is `false`.
      * @returns void
@@ -499,9 +499,9 @@ export class SimpleStore {
     /**
      * @private
      *
-     * @param {String} prop - propierties to update
+     * @param {string} prop - propierties to update
      * @param {any} val - new value
-     * @param {Boolean} fireCallback - fire watcher callback on update,  default value is `true`
+     * @param {boolean} fireCallback - fire watcher callback on update,  default value is `true`
      *
      * @description
      * Update non-object propierties
@@ -545,7 +545,7 @@ export class SimpleStore {
         /**
          * Get validate status
          */
-        const isValidated = /** @type {Object<string,Function>} */ (
+        const isValidated = /** @type {Object<string,function>} */ (
             this.fnValidate
         )[prop]?.(val, oldVal);
 
@@ -588,9 +588,9 @@ export class SimpleStore {
     /**
      * @private
      *
-     * @param {String} prop - propierties to update
+     * @param {string} prop - propierties to update
      * @param {any} val - new value
-     * @param {Boolean} fireCallback - fire watcher callback on update,  default value is `true`
+     * @param {boolean} fireCallback - fire watcher callback on update,  default value is `true`
      *
      * @description
      * Update object propierties
@@ -781,7 +781,7 @@ export class SimpleStore {
     }
 
     /**
-     * @param {String} prop - propierties to update
+     * @param {string} prop - propierties to update
      * @param {any} val - new value
      *
      * @description
@@ -972,7 +972,7 @@ export class SimpleStore {
     }
 
     /**
-     * @param {String} string
+     * @param {string} string
      * @returns void
      *
      * @description
@@ -1040,7 +1040,7 @@ export class SimpleStore {
         /**
          * if - Key to watch can't be a prop used in some computed to avoid infinite loop
          *
-         * @param  {Boolean} keysIsusedInSomeComputed
+         * @param  {boolean} keysIsusedInSomeComputed
          * @return {void}
          */
         if (keysIsusedInSomeComputed) {

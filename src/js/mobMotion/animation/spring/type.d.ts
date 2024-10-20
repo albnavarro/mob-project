@@ -1,5 +1,4 @@
 import { staggerObjectOptional } from '../utils/stagger/type';
-import { valueToparseType } from '../utils/tweenAction/type';
 
 export interface springProps {
     friction: number;
@@ -18,7 +17,6 @@ export interface springPropsOptional {
 }
 
 export interface springPresentConfigType {
-    default?: springProps;
     gentle?: springProps;
     wobbly?: springProps;
     bounce?: springProps;
@@ -35,7 +33,7 @@ export type springChoiceConfig =
     | 'scroller';
 
 export interface springTweenProps {
-    data: valueToparseType;
+    data: Record<string, number>;
     relative?: boolean;
     stagger?: staggerObjectOptional;
     config?: springChoiceConfig;
@@ -61,16 +59,67 @@ export interface springDefault {
 
 export interface springInitialData {
     prop: string;
-    toValue: number | function;
-    fromValue: number | function;
-    currentValue: number | function;
+    toValue: number;
+    fromValue: number;
+    currentValue: number;
 }
 
 export interface springValues extends springInitialData {
     velocity: number;
-    fromFn: function;
+    fromFn: () => number;
     fromIsFn: boolean;
-    toFn: function;
+    toFn: () => number;
     toIsFn: boolean;
     settled: boolean;
 }
+
+export type springSetData = (arg0: Record<string, number>) => void;
+
+export type springGoTo = (
+    obj: Record<string, number | (() => number)>,
+    props: springActions
+) => void | Promise<any>;
+
+export type springGoFrom = (
+    obj: Record<string, number | (() => number)>,
+    props: springActions
+) => void | Promise<any>;
+
+export type springGoFromTo = (
+    fromObj: Record<string, number | (() => number)>,
+    toObj: Record<string, number | (() => number)>,
+    props: springActions
+) => void | Promise<any>;
+
+export type springSet = (
+    obj: Record<string, number | (() => number)>,
+    props: springActions
+) => void | Promise<any>;
+
+export type springDoAction = (
+    data: (goToParamsType | goFromType | goFromToType)[],
+    props: springActions,
+    obj: Record<string, number | (() => number)>
+) => void | Promise<any>;
+
+export type springMergeProps = (props: springActions) => springDefault;
+
+export type springStop = (arg0?: tweenStopProps) => void;
+export type springPause = () => void;
+export type springResume = () => void;
+export type springResetData = () => void;
+export type springGetValue = () => Record<string, number>;
+export type springGetValueNative = () => Record<
+    string,
+    number | (() => number)
+>;
+export type springGetType = () => string;
+export type springGetId = () => string;
+export type springUdateConfigProp = (arg0: springPropsOptional) => void;
+export type springUdateConfig = (arg0: springChoiceConfig) => void;
+export type springSubscribe = (cb: () => void) => () => void;
+export type springSubscribeCache = (
+    item: object | HTMLElement,
+    cb: (arg0: Record<string, number>) => void
+) => () => void;
+export type springOnComplete = (cb: () => void) => () => void;

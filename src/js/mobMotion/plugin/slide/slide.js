@@ -1,6 +1,41 @@
+//@ts-check
+
 import { mobCore } from '../../../mobCore/index.js';
 import { outerHeight } from '../../../mobCore/utils/index.js';
 import HandleTween from '../../animation/tween/handleTween.js';
+
+/** @type {Map<HTMLElement,import('./type.js').Slide>} */
+const slideItems = new Map();
+
+/**
+ * @type {(target: HTMLElement) => boolean}
+ */
+const isNode = (target) => {
+    const isValid = mobCore.checkType(Element, target);
+
+    if (!isValid)
+        console.warn(`slide utils ${target} is not a valid Dom element`);
+
+    return isValid;
+};
+
+/**
+ * @description
+ * Subscribe element to internal store.
+ *
+ * @param {HTMLElement} target
+ * @returns {import('./type.js').Slide} Unsubscribe function.
+ */
+const setSlideData = (target) => {
+    const tween = new HandleTween({ ease: 'easeOutQuad', data: { val: 0 } });
+
+    return {
+        tween,
+        unsubscribe: tween.subscribe(({ val }) => {
+            target.style.height = `${val}px`;
+        }),
+    };
+};
 
 /**
  * @description
@@ -25,89 +60,55 @@ import HandleTween from '../../animation/tween/handleTween.js';
  * ```
  */
 export const slide = (() => {
-    let slideItems = [];
-    let slideId = 0;
-
-    /**
-     * @private
-     */
-    function isNode(target) {
-        const isValid = mobCore.checkType(Element, target);
-
-        if (!isValid)
-            console.warn(`slide utils ${target} is not a valid Dom element`);
-
-        return isValid;
-    }
-
-    /**
-     * @private
-     */
-    function setSlideData(target) {
-        const data = {};
-        data.item = target;
-        data.id = slideId;
-        data.tween = new HandleTween({ ease: 'easeOutQuad' });
-        data.unsubscribe = data.tween.subscribe(({ val }) => {
-            data.item.style.height = `${val}px`;
-        });
-
-        data.tween.setData({ val: 0 });
-        return data;
-    }
-
     /**
      * @description
      * Subscribe element to internal store.
      *
-     * @param {Element} target - Dom node.
-     * @returns {Function} Unsubscribe function.
+     * @param {HTMLElement} target - Dom node.
+     * @returns {() => void} Unsubscribe function.
      */
-    function subscribe(target) {
-        if (!isNode(target)) return;
+    const subscribe = (target) => {
+        if (!isNode(target)) return () => {};
+
         /**
          * Check if target is already subscribed to slide utils
          */
-        const alreadySubscribe = slideItems.find(({ item }) => item === target);
+        const alreadySubscribe = slideItems.has(target);
         if (alreadySubscribe) {
             console.warn(`slide utils ${target} is alredysubscribed`);
-            return;
+            return () => {};
         }
 
         /**
          * Update items Array
          */
         const data = setSlideData(target);
-        slideItems.push(data);
-
-        const prevId = slideId;
-        slideId++;
-        slideItems.push(data);
+        slideItems.set(target, data);
 
         /**
          * Return unsubscribe
          */
         return () => {
             data.unsubscribe();
-            data.tween = null;
-            data.item = null;
-            slideItems = slideItems.filter(({ id }) => id !== prevId);
+            const { tween } = data;
+            tween.destroy();
+            slideItems.delete(target);
         };
-    }
+    };
 
     /**
      * @description
      * Reset target height ( 0px ) .
      * Set `overflow: hidden` to target.
      *
-     * @param {Element} target - Dom node.
+     * @param {HTMLElement} target - Dom node.
      */
-    function reset(target) {
+    const reset = (target) => {
         if (!isNode(target)) return;
 
-        target.style.height = 0;
+        target.style.height = '0';
         target.style.overflow = 'hidden';
-    }
+    };
 
     /**
      * @description
@@ -121,33 +122,34 @@ export const slide = (() => {
      *      .catch(() => { ... })
      * ```
      *
-     * @param {Element} target - Dom node.
+     * @param {HTMLElement} target - Dom node.
      * @returns {Promise} Promise fired on animation ends.
      */
-    function up(target) {
-        return new Promise((res, reject) => {
-            if (!isNode(target)) {
-                res();
-                return;
-            }
+    const up = async (target) => {
+        // @ts-ignore
+        if (!isNode(target)) {
+            return new Promise((resolve) => resolve(true));
+        }
 
-            // Reject of target not exist in store
-            const currentItem = slideItems.find(({ item }) => item === target);
-            if (!currentItem)
-                reject(new Error('slide element not exist in slide store'));
+        // Reject of target not exist in store
+        const currentItem = slideItems.get(target);
+        if (!currentItem) {
+            console.warn('slide element not exist in slide store');
+            return new Promise((resolve) => resolve(true));
+        }
 
-            // height of item may be change once opened outside tween control
-            // use fromTo in this case
-            const { item, tween } = currentItem;
-            const currentHeight = outerHeight(item);
+        // height of item may be change once opened outside tween control
+        // use fromTo in this case
+        // @ts-ignore
+        const { tween } = currentItem;
+        const currentHeight = outerHeight(target);
 
-            tween
-                .goFromTo({ val: currentHeight }, { val: 0 }, { duration: 500 })
-                .then(() => {
-                    res();
-                });
-        });
-    }
+        await tween.goFromTo(
+            { val: currentHeight },
+            { val: 0 },
+            { duration: 500 }
+        );
+    };
 
     /**
      * @description
@@ -161,33 +163,33 @@ export const slide = (() => {
      *      .catch(() => { ... })
      * ```
      *
-     * @param {Element} target - Dom node.
+     * @param {HTMLElement} target - Dom node.
      * @returns {Promise} Promise fired on animation ends.
      */
-    function down(target) {
-        return new Promise((res, reject) => {
-            if (!isNode(target)) {
-                res();
-                return;
-            }
+    const down = async (target) => {
+        if (!isNode(target)) {
+            return new Promise((resolve) => resolve(true));
+        }
 
-            // Reject of target not exist in store
-            const currentItem = slideItems.find(({ item }) => item === target);
-            if (!currentItem)
-                reject(new Error('slide element not exist in slide store'));
+        // Reject of target not exist in store
+        const currentItem = slideItems.get(target);
+        if (!currentItem) {
+            console.warn('slide element not exist in slide store');
+            return new Promise((resolve) => resolve(true));
+        }
 
-            const { item, tween } = currentItem;
-            const { val: currentHeight } = tween.get();
-            item.style.height = `auto`;
-            const height = outerHeight(item);
-            item.style.height = `${currentHeight}px`;
+        // @ts-ignore
+        const { tween } = currentItem;
+        const { val: currentHeight } = tween.get();
+        target.style.height = `auto`;
+        const height = outerHeight(target);
+        target.style.height = `${currentHeight}px`;
 
-            tween.goTo({ val: height }, { duration: 500 }).then(() => {
-                item.style.height = `auto`;
-                res();
-            });
+        await tween.goTo({ val: height }, { duration: 500 });
+        mobCore.useNextTick(() => {
+            target.style.height = `auto`;
         });
-    }
+    };
 
     return { subscribe, reset, up, down };
 })();

@@ -14,6 +14,7 @@ import {
     parallaxWarningVhIsNotAllowed,
     parallaxWarningVwIsNotAllowed,
 } from './warning.js';
+import { mobCore } from '../../../mobCore/index.js';
 
 /**
  * @description
@@ -422,7 +423,7 @@ export const processFixedLimit = (value, stringValue, height, width) => {
 
 /**
  * @param {object} obj
- * @param {string} obj.switchPropierties
+ * @param {string|boolean} obj.switchPropierties
  * @param {boolean} obj.isReverse
  * @param {number} obj.value
  *
@@ -478,4 +479,30 @@ export const getRetReverseValue = (propierties, val) => {
             return -val;
         }
     }
+};
+
+/**
+ * @param {Object} param
+ * @param {import('../../../mobCore/events/scrollUtils/type.js').handleScrollCallback} param.callback
+ * @param {boolean} param.pin
+ * @param {boolean} param.ease
+ * @param {boolean} param.useThrottle
+ * @returns {() => void}
+ */
+export const getScrollFunction = ({ callback, pin, ease, useThrottle }) => {
+    /**
+     * If use pin we have to get fresh value on scroll
+     * Otherwise we can optimize and fire scroll callback after requerst animationFrame
+     */
+    if (pin) return mobCore.useScrollImmediate(callback);
+
+    /**
+     * Use throttle if needed and there is a ease;
+     */
+    if (ease && useThrottle) return mobCore.useScrollThrottle(callback);
+
+    /**
+     * Default scroll
+     */
+    return mobCore.useScroll(callback);
 };

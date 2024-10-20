@@ -59,7 +59,7 @@ export default class ParallaxTween {
     constructor(data) {
         /**
          * @private
-         * @type {function}
+         * @type {Function}
          */
         this.ease = easeParallaxTweenIsValid(data?.ease);
 
@@ -83,25 +83,25 @@ export default class ParallaxTween {
 
         /**
          * @private
-         * @type{import('../utils/callbacks/type.js').callbackObject[]}
+         * @type {import('../utils/callbacks/type.js').callbackObject<(arg0:Record<string, number>) => void>[]}
          */
         this.callbackOnStop = [];
 
         /**
          * @private
-         * @type{import('../utils/callbacks/type.js').callbackObject[]}
+         * @type {import('../utils/callbacks/type.js').callbackObject<(arg0:Record<string, number>) => void>[]}
          */
         this.callback = [];
 
         /**
          * @private
-         * @type{import('../utils/callbacks/type.js').callbackObject[]}
+         * @type{import('../utils/callbacks/type.js').callbackObject<string>[]}
          */
         this.callbackCache = [];
 
         /**
          * @private
-         * @type {Array<function>}
+         * @type {Array<() => void>}
          */
         this.unsubscribeCache = [];
 
@@ -142,8 +142,8 @@ export default class ParallaxTween {
             }
 
             const { staggerArray, staggerArrayOnComplete } = setStagger({
-                arr: cb,
-                endArr: this.callbackOnStop,
+                arrayDefault: cb,
+                arrayOnStop: this.callbackOnStop,
                 stagger: this.stagger,
                 slowlestStagger: STAGGER_DEFAULT_INDEX_OBJ, //sequencer doesn't support fastestStagger
                 fastestStagger: STAGGER_DEFAULT_INDEX_OBJ, //sequencer doesn't support fastestStagger
@@ -160,8 +160,8 @@ export default class ParallaxTween {
 
     /**
      * @param {object} obj
-     * @param {Number} obj.partial - render at specific partial between 0 and duration
-     * @param {Boolean} obj.isLastDraw - use the callback defined by the onStop method
+     * @param {number} obj.partial - render at specific partial between 0 and duration
+     * @param {boolean} obj.isLastDraw - use the callback defined by the onStop method
      *
      * @example
      * ```js
@@ -175,26 +175,30 @@ export default class ParallaxTween {
      * @description
      */
     draw({ partial, isLastDraw }) {
-        const mainFn = () => {
-            this.values.forEach((item) => {
-                const toValue = item.toIsFn ? item.toFn() : item.toValue;
-                const fromValue = item.fromIsFn
-                    ? item.fromFn()
-                    : item.fromValue;
-                const toValProcessed = toValue - fromValue;
+        this.values = [...this.values].map((item) => {
+            const { toIsFn, toFn, toValue, fromIsFn, fromFn, fromValue } = item;
 
-                item.currentValue = this.ease(
-                    partial,
-                    fromValue,
-                    toValProcessed,
-                    this.duration
-                );
-                item.currentValue = getRoundedValue(item.currentValue);
-            });
+            const toValueParsed = toIsFn ? toFn() : toValue;
+            const fromValueParsed = fromIsFn ? fromFn() : fromValue;
+            const toValFinal = toValueParsed - fromValueParsed;
 
-            // Prepare an obj to pass to the callback
-            const callBackObject = getValueObj(this.values, 'currentValue');
+            const currentValue = this.ease(
+                partial,
+                fromValueParsed,
+                toValFinal,
+                this.duration
+            );
 
+            return {
+                ...item,
+                currentValue: getRoundedValue(currentValue),
+            };
+        });
+
+        // Prepare an obj to pass to the callback
+        const callBackObject = getValueObj(this.values, 'currentValue');
+
+        mobCore.useNextTick(() => {
             // Fire callback
             syncCallback({
                 each: this.stagger.each,
@@ -205,15 +209,12 @@ export default class ParallaxTween {
                 callbackCache: this.callbackCache,
                 callbackOnStop: this.callbackOnStop,
             });
-        };
-
-        mobCore.useNextTick(() => mainFn());
+        });
     }
 
     /**
      *
-     * @param {import('../utils/tweenAction/type.js').valueToparseType} obj Initial data Object
-     * @returns {this} The instance on which this method was called.
+     * @type {import('./type.js').parallaxTweenSetData}
      */
     setData(obj) {
         const valToArray = Object.entries(obj);
@@ -227,6 +228,12 @@ export default class ParallaxTween {
                 fromValue: value,
                 currentValue: value,
                 settled: false,
+
+                /**
+                 * Only for type check.
+                 */
+                fromFn: () => 0,
+                toFn: () => 0,
             };
         });
 
@@ -238,7 +245,7 @@ export default class ParallaxTween {
      *
      * Return the new array maeged with main array created in setData
      *
-     * @param  {import('./type.js').parallaxTweenValue[]} newData new datato merge
+     * @param  {import('../utils/tweenAction/type.js').goToParamsType[]} newData new datato merge
      * @return {void}
      */
     mergeData(newData) {
@@ -253,17 +260,7 @@ export default class ParallaxTween {
     }
 
     /**
-     * @private
-     *
-     * @param {import('../utils/tweenAction/type.js').valueToparseType} obj to values
-     * @returns {this} The instance on which this method was called.
-     *
-     * @example
-     * ```js
-     * myParallaxTween.goTo(
-     *     { string: number|function, ... }
-     * );
-     *
+     * @type {import('./type.js').parallaxTweenGoTo}
      *
      * ```
      * @description
@@ -277,28 +274,8 @@ export default class ParallaxTween {
     }
 
     /**
-     * @param {function(any):void} cb - callback function.
-     * @return {Function} unsubscribe callback.
+     * @type {import('./type.js').parallaxTweenSubscribe}
      *
-     * @example
-     * ```js
-     * //Single DOM element
-     * const unsubscribe = myParallaxTween.subscribe(({ x,y... }) => {
-     *      domEl.style.prop = `...`
-     * })
-     * unsubscribe()
-     *
-     *
-     * //Multiple DOM element ( stagger )
-     * const unsubscribeStagger = [...elements].map((item) => {
-     *   return myParallaxTween.subscribe(({ x, y... }) => {
-     *       item.style.prop = ...
-     *   });
-     * });
-     * unsubscribeStagger.forEach((item) => item());
-     *
-     *
-     * ```
      * @description
      * Callback that returns updated values ready to be usable, it is advisable to use it for single elements, although it works well on a not too large number of elements (approximately 100-200 elements) for large staggers it is advisable to use the subscribeCache method .
      */
@@ -313,45 +290,12 @@ export default class ParallaxTween {
     }
 
     /**
-     * @param {function(any):void} cb - callback function.
-     * @return {Function} unsubscribe callback.
+     * @type {import('./type.js').parallaxTweenOnStop}
      *
-     * @example
-     * ```js
-     * //Single DOM element
-     * const unsubscribe = myParallaxTween.onStop(({ x,y... }) => {
-     *      domEl.style.prop = `...`
-     * })
-     * unsubscribe()
-     *
-     *
-     * //Multiple DOM element ( stagger )
-     * const unsubscribeStagger = [...elements].map((item) => {
-     *   return myParallaxTween.onStop(({ x, y... }) => {
-     *       item.style.prop = ...
-     *   });
-     * });
-     * unsubscribeStagger.forEach((item) => item());
-     *
-     *
-     * ```
      * @description
      * Similar to subscribe this callBack is launched when the data calculation stops (when the timeline ends or the scroll trigger is inactive).
      * Useful for applying a different style to an inactive element.
      * A typical example is to remove the teansform3D property:
-     *
-     * @example
-     * ```js
-     * // Use transform3D while item is active
-     * mySequencer.subscribe(({x}) => {
-     *      domEl.style.transform = ` transform3D(0,0,0) translateX(${x}px)`
-     * })
-     *
-     * // Remove transform3D when item is inactive
-     * mySequencer.onStop(({x}) => {
-     *      domEl.style.transform = `translateX(${x}px)`
-     * })
-     * ```
      */
     onStop(cb) {
         const { arrayOfCallbackUpdated, unsubscribeCb } = setCallBack(
@@ -364,24 +308,7 @@ export default class ParallaxTween {
     }
 
     /**
-     * @param {('Object'|'HTMLElement')} item
-     * @param {function(any):void} fn - callback function.
-     * @return {Function} unsubscribe callback
-     *
-     * @example
-     *```js
-     * //Multiple DOM element ( stagger )
-     * const unsubscribeStagger = [...elements].map((item) => {
-     *   return myParallaxTween.subscribeCache(item, ({ x, y... }) => {
-     *       item.style.prop = ...
-     *   });
-     * });
-     * unsubscribeStagger.forEach((item) => item());
-     *
-     *
-     * ```
-     * @description
-     * Callback that returns updated values ready to be usable, specific to manage large staggers.
+     * @type {import('./type.js').parallaxTweenSubscribeCache}
      */
     subscribeCache(item, fn) {
         const { arrayOfCallbackUpdated, unsubscribeCb, unsubscribeCache } =
@@ -400,7 +327,7 @@ export default class ParallaxTween {
     /**
      * @description
      * Get duration
-     * @return {Number}
+     * @type {import('./type.js').parallaxTweenGetDuration}
      */
     getDuration() {
         return this.duration;
@@ -409,6 +336,7 @@ export default class ParallaxTween {
     /**
      * @description
      * Get tween type - 'parallaxTween'
+     * @type {import('./type.js').parallaxTweenGetType}
      */
     getType() {
         return this.type;
@@ -417,6 +345,7 @@ export default class ParallaxTween {
     /**
      * @description
      * Destroy sequencer
+     * @type {() => void}
      */
     destroy() {
         this.values = [];

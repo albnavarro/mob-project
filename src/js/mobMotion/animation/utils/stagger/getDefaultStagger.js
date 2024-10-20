@@ -25,7 +25,7 @@ const isOdd = (num) => num % 2;
 const getRandomInt = (max) => Math.floor(Math.random() * max);
 
 /**
- * @param {array} arr
+ * @param {array} arrayChunk
  * @param {number} each
  * @param {number} index
  * @returns number
@@ -33,14 +33,14 @@ const getRandomInt = (max) => Math.floor(Math.random() * max);
  * @description
  * Get random frame without duplicate
  */
-export const getRandomChoice = (arr, each, index) => {
+export const getRandomChoice = (arrayChunk, each, index) => {
     // Get previous result
     const previousFrame = new Set(
-        arr.slice(0, index).map((item) => item.frame)
+        arrayChunk.slice(0, index).map((item) => item.frame)
     );
 
     // Get possible result
-    const posibileFrame = arr.map((_item, i) => i * each);
+    const posibileFrame = arrayChunk.map((_item, i) => i * each);
 
     // Get array of possible result without previous
     const randomChoice = posibileFrame.filter((x) => !previousFrame.has(x));
@@ -52,8 +52,8 @@ export const getRandomChoice = (arr, each, index) => {
  * @param {number} index
  * @param {number} arraylenght
  * @param {import('./type.js').staggerObject} stagger
- * @param {Array<number>} randomChoice
- * @returns object<'index':number, 'frame':number>
+ * @param {number[]} randomChoice
+ * @returns {{'index':number, 'frame':number}}
  *
  * @description
  * Get frame per index
@@ -180,9 +180,11 @@ const getStaggerIndex = (index, arraylenght, stagger, randomChoice = []) => {
     if (from && checkType(Number, from)) {
         // Secure check from must be a value in array length
 
+        // @ts-ignore
         const half = from >= arraylenght ? arraylenght - 1 : from;
 
         return (() => {
+            // @ts-ignore
             if (index > half) {
                 // From 0 half
                 return {
@@ -192,6 +194,7 @@ const getStaggerIndex = (index, arraylenght, stagger, randomChoice = []) => {
                 };
             }
 
+            // @ts-ignore
             if (index < half) {
                 // From half to end half
                 return {
@@ -215,7 +218,7 @@ const getStaggerIndex = (index, arraylenght, stagger, randomChoice = []) => {
 };
 
 /**
- * @param {Array} arr
+ * @param {any[]} arrayDefault
  * @param {import('./type.js').staggerObject} stagger
  * @param {number} chunckSizeCol
  *
@@ -225,10 +228,10 @@ const getStaggerIndex = (index, arraylenght, stagger, randomChoice = []) => {
  * Default grid direction is COL
  * In case of ROW grid convert col to row, something like rotate the matrix
  */
-const getItemsByRow = (arr, stagger, chunckSizeCol) => {
+const getItemsByRow = (arrayDefault, stagger, chunckSizeCol) => {
     // Reorder main array if direction === row
     if (stagger.grid.direction === DIRECTION_ROW) {
-        const chunkByCol = sliceIntoChunks(arr, chunckSizeCol);
+        const chunkByCol = sliceIntoChunks(arrayDefault, chunckSizeCol);
 
         const colToRowArray = [
             ...new Array(stagger.grid.col).keys(),
@@ -240,21 +243,21 @@ const getItemsByRow = (arr, stagger, chunckSizeCol) => {
         // @ts-ignore
         return [...colToRowArray].flat();
     } else {
-        return arr;
+        return arrayDefault;
     }
 };
 
 /**
  * @param {object} obj
- * @param {Array} obj.arr
- * @param {Array} obj.endArr
+ * @param {Array} obj.arrayDefault
+ * @param {Array} obj.arrayOnStop
  * @param {import('./type.js').staggerObject} obj.stagger
  * @param {import('./type.js').staggerDefaultIndex} obj.slowlestStagger
  * @param {import('./type.js').staggerDefaultIndex} obj.fastestStagger
  */
 export const getDefaultStagger = ({
-    arr,
-    endArr,
+    arrayDefault,
+    arrayOnStop,
     stagger,
     slowlestStagger,
     fastestStagger,
@@ -264,18 +267,22 @@ export const getDefaultStagger = ({
      * With a value greater than 1 row/col logic is active
      */
     const chunckSizeCol =
-        stagger?.grid?.col <= 1 ? arr.length : stagger.grid.col;
+        stagger?.grid?.col <= 1 ? arrayDefault.length : stagger.grid.col;
     const chunckSizeRow =
-        stagger?.grid?.row <= 1 ? arr.length : stagger.grid.row;
+        stagger?.grid?.row <= 1 ? arrayDefault.length : stagger.grid.row;
 
     // main callBack
-    const itemByRow = getItemsByRow(arr, stagger, chunckSizeCol);
+    const itemByRow = getItemsByRow(arrayDefault, stagger, chunckSizeCol);
     const staggerArray = itemByRow.map((item) => {
         return item && item !== undefined ? item : { index: 0, frame: 0 };
     });
 
     // onComplete callBack
-    const itemCompleteByRow = getItemsByRow(endArr, stagger, chunckSizeCol);
+    const itemCompleteByRow = getItemsByRow(
+        arrayOnStop,
+        stagger,
+        chunckSizeCol
+    );
     const staggerArrayOnComplete = itemCompleteByRow.map((item) => {
         return item && item !== undefined ? item : { index: 0, frame: 0 };
     });

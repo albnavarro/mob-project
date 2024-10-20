@@ -12,14 +12,6 @@ export interface handleFrameType {
      * 30 frames the minimum interval to have a correct result.
      */
     fps: number;
-
-    /**
-     * @description
-     * If the useScaleFps global property is on,
-     * the property indicates whether there is a drop in frame rate compared
-     * to the optimal frame rate calculated at application startup.
-     */
-    shouldRender: boolean;
 }
 
 export type handleFrameCallbakType = (arg0: handleFrameType) => void;

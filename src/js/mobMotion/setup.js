@@ -25,8 +25,6 @@ import { mergeDeep } from './utils/mergeDeep.js';
  */
 function getData() {
     return {
-        fpsScalePercent: mobCore.store.getProp('fpsScalePercent'),
-        useScaleFps: mobCore.store.getProp('useScaleFps'),
         deferredNextTick: mobCore.store.getProp('deferredNextTick'),
         throttle: mobCore.store.getProp('throttle'),
         usePassive: mobCore.store.getProp('usePassive'),
@@ -74,7 +72,7 @@ function getData() {
 }
 
 /**
- * @typedef {('fpsScalePercent'|'useScaleFps'|'deferredNextTick'|'throttle'|'usePassive'|'mq'|'defaultMq'|'sequencer'|'scrollTrigger'|'parallax'|'parallaxTween'|'tween'|'spring'|'lerp')} handleSetUpGetType
+ * @typedef {('deferredNextTick'|'throttle'|'usePassive'|'mq'|'defaultMq'|'sequencer'|'scrollTrigger'|'parallax'|'parallaxTween'|'tween'|'spring'|'lerp')} handleSetUpGetType
  */
 
 export const handleSetUp = (() => {
@@ -92,13 +90,6 @@ export const handleSetUp = (() => {
      * Default value schema:
      *
      * handleSetUp.set({
-     *     fpsScalePercent: {
-     *         0: 1,
-     *         15: 2,
-     *         30: 3,
-     *         45: 4,
-     *     },
-     *     useScaleFps: true,
      *     deferredNextTick: false,
      *     throttle: 100,
      *     usePassive: true,
@@ -199,12 +190,6 @@ export const handleSetUp = (() => {
          */
         if ('usePassive' in obj)
             mobCore.store.set('usePassive', data.usePassive);
-
-        if ('fpsScalePercent' in obj)
-            mobCore.store.set('fpsScalePercent', data.fpsScalePercent);
-
-        if ('useScaleFps' in obj)
-            mobCore.store.set('useScaleFps', data.useScaleFps);
 
         if ('deferredNextTick' in obj)
             mobCore.store.set('deferredNextTick', data.deferredNextTick);

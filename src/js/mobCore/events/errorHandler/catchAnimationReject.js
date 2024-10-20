@@ -1,7 +1,7 @@
 // @ts-check
 
 /**
- * @type {String}
+ * @type {string}
  */
 export const ANIMATION_STOP_REJECT = 'animationStop';
 

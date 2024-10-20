@@ -24,11 +24,6 @@ import {
     goFromToSyncUtils,
 } from './syncActions.js';
 import {
-    propToSet,
-    getFirstValidValueBack,
-    checkIsLastUsableProp,
-} from './reduceFunction.js';
-import {
     durationIsValid,
     easeIsValid,
     initialDataPropValidate,
@@ -39,6 +34,10 @@ import { mobCore } from '../../../mobCore/index.js';
 import { directionConstant } from '../utils/timeline/timelineConstant.js';
 import { getValueObj } from '../utils/tweenAction/getValues.js';
 import { STAGGER_DEFAULT_INDEX_OBJ } from '../utils/stagger/staggerCostant.js';
+import { sequencerGetValusOnDraw } from './getValuesOnDraw.js';
+import { setPropFromAncestor } from './setPropFromAncestor.js';
+import { insertNewRow } from './insertNewRow.js';
+import { mergeNewValues } from './mergeNewValues.js';
 
 export default class HandleSequencer {
     /**
@@ -105,19 +104,19 @@ export default class HandleSequencer {
 
         /**
          * @private
-         * @type {import('../utils/callbacks/type.js').callbackObject[]}
+         * @type {import('../utils/callbacks/type.js').callbackObject<(arg0:Record<string, number>) => void>[]}
          */
         this.callback = [];
 
         /**
          * @private
-         * @type {import('../utils/callbacks/type.js').callbackObject[]}
+         * @type {import('../utils/callbacks/type.js').callbackObject<string>[]}
          */
         this.callbackCache = [];
 
         /**
          * @private
-         * @type {import('../utils/callbacks/type.js').callbackObject[]}
+         * @type {import('../utils/callbacks/type.js').callbackObject<(arg0:Record<string, number>) => void>[]}
          */
         this.callbackOnStop = [];
 
@@ -129,7 +128,7 @@ export default class HandleSequencer {
 
         /**
          * @private
-         * @type {Array<function>}
+         * @type {Array<() => void>}
          */
         this.unsubscribeCache = [];
 
@@ -167,9 +166,9 @@ export default class HandleSequencer {
 
         /**
          * @private
-         * @type {string|undefined}
+         * @type {import('../utils/timeline/type.js').directionType}
          */
-        this.direction = undefined;
+        this.direction = 'none';
 
         /**
          * @private
@@ -179,9 +178,9 @@ export default class HandleSequencer {
 
         /**
          * @private
-         * @type {string|undefined}
+         * @type {import('../utils/timeline/type.js').directionType}
          */
-        this.lastDirection = undefined;
+        this.lastDirection = 'none';
 
         /**
          * @private
@@ -228,8 +227,8 @@ export default class HandleSequencer {
             }
 
             const { staggerArray, staggerArrayOnComplete } = setStagger({
-                arr: cb,
-                endArr: this.callbackOnStop,
+                arrayDefault: cb,
+                arrayOnStop: this.callbackOnStop,
                 stagger: this.stagger,
                 slowlestStagger: STAGGER_DEFAULT_INDEX_OBJ, //sequencer doesn't support fastestStagger
                 fastestStagger: STAGGER_DEFAULT_INDEX_OBJ, //sequencer doesn't support fastestStagger
@@ -251,7 +250,7 @@ export default class HandleSequencer {
      * @param {number} obj.partial
      * @param {boolean} obj.isLastDraw
      * @param {boolean} obj.useFrame
-     * @param {string} obj.direction
+     * @param {import('../utils/timeline/type.js').directionType} obj.direction
      *
      * @example
      * ```javascript
@@ -272,132 +271,110 @@ export default class HandleSequencer {
         useFrame = false,
         direction = directionConstant.NONE,
     }) {
-        const mainFn = () => {
-            /*
-             * First time run or atfer reset lasValue
-             * all the last value is null so get the current value
-             */
-            if (this.firstRun) {
-                this.lastPartial = partial;
-                this.actionAtFirstRender(partial);
-            }
-
-            /**
-             * Inside a timeline the direction is controlled by timeline and pass the value
-             * because timeline know the loop state and direction is stable
-             * Inside a parallax we have a fallback, but we don't have a loop
-             *
-             * On first run check is jumped
-             */
-            if (
-                !this.firstRun &&
-                this.lastPartial &&
-                (!direction || direction === directionConstant.NONE)
-            ) {
-                this.direction =
-                    partial >= this.lastPartial
-                        ? directionConstant.FORWARD
-                        : directionConstant.BACKWARD;
-            }
-
-            if (
-                !this.firstRun &&
-                (direction === directionConstant.BACKWARD ||
-                    direction === directionConstant.FORWARD)
-            ) {
-                this.direction = direction;
-            }
-
-            this.values.forEach((item) => {
-                item.settled = false;
-            });
-
-            this.timeline.forEach(({ start, end, values }, i) => {
-                values.forEach((item) => {
-                    const currentEl = this.values.find(
-                        ({ prop }) => prop === item.prop
-                    );
-
-                    if (!currentEl) return;
-
-                    /**
-                     * Id the prop is settled or is inactive skip
-                     */
-                    if (currentEl.settled || !item.active) return;
-
-                    /**
-                     * Check if in the next step of timeline the same prop is active an start before partial
-                     */
-                    const isLastUsableProp = checkIsLastUsableProp(
-                        this.timeline,
-                        i,
-                        item.prop,
-                        partial
-                    );
-
-                    /**
-                     * If in the next step the same props is active and start before partial skip
-                     */
-                    if (!isLastUsableProp) return;
-
-                    const toValue = mobCore.checkType(Number, item.toValue)
-                        ? item.toValue
-                        : // @ts-ignore
-                          item.toValue();
-
-                    const fromValue = mobCore.checkType(Number, item.fromValue)
-                        ? item.fromValue
-                        : // @ts-ignore
-                          item.fromValue();
-
-                    /**
-                     * At least we get the current value
-                     */
-                    const duration = end - start;
-                    const inactivePosition =
-                        partial < end ? fromValue : toValue;
-
-                    item.currentValue =
-                        partial >= start && partial <= end
-                            ? item.ease(
-                                  partial - start,
-                                  fromValue,
-                                  toValue - fromValue,
-                                  duration
-                              )
-                            : inactivePosition;
-
-                    item.currentValue = getRoundedValue(item.currentValue);
-                    currentEl.currentValue = item.currentValue;
-                    currentEl.settled = true;
-                });
-            });
-
-            const callBackObject = getValueObj(this.values, 'currentValue');
-
-            syncCallback({
-                each: this.stagger.each,
-                useStagger: this.useStagger,
-                isLastDraw,
-                callBackObject,
-                callback: this.callback,
-                callbackCache: this.callbackCache,
-                callbackOnStop: this.callbackOnStop,
-            });
-
-            this.fireAddCallBack(partial);
-
-            this.useStagger = true;
-            this.lastPartial = partial;
-            this.lastDirection = this.direction;
-            this.firstRun = false;
-        };
-
         if (useFrame) {
-            mainFn();
-        } else {
-            mobCore.useNextTick(() => mainFn());
+            this.onDraw({
+                partial,
+                isLastDraw,
+                direction,
+            });
+            return;
         }
+
+        mobCore.useNextTick(() =>
+            this.onDraw({
+                partial,
+                isLastDraw,
+                direction,
+            })
+        );
+    }
+
+    /**
+     * @private
+     *
+     * @param {object} obj
+     * @param {number} obj.partial
+     * @param {boolean} obj.isLastDraw
+     * @param {import('../utils/timeline/type.js').directionType} obj.direction
+     *
+     */
+    onDraw({
+        partial = 0,
+        isLastDraw = false,
+        direction = directionConstant.NONE,
+    }) {
+        /*
+         * First time run or atfer reset lasValue
+         * all the last value is null so get the current value
+         */
+        if (this.firstRun) {
+            this.lastPartial = partial;
+            this.actionAtFirstRender(partial);
+        }
+
+        /**
+         * Inside a timeline the direction is controlled by timeline and pass the value
+         * because timeline know the loop state and direction is stable
+         * Inside a parallax we have a fallback, but we don't have a loop
+         *
+         * On first run check is jumped
+         */
+        if (
+            !this.firstRun &&
+            this.lastPartial &&
+            (!direction || direction === directionConstant.NONE)
+        ) {
+            this.direction =
+                partial >= this.lastPartial
+                    ? directionConstant.FORWARD
+                    : directionConstant.BACKWARD;
+        }
+
+        if (
+            !this.firstRun &&
+            (direction === directionConstant.BACKWARD ||
+                direction === directionConstant.FORWARD)
+        ) {
+            this.direction = direction;
+        }
+
+        /**
+         * Reset settled status
+         */
+        this.values = [...this.values].map((item) => {
+            return {
+                ...item,
+                settled: false,
+            };
+        });
+
+        /**
+         * Get new values
+         */
+        this.values = sequencerGetValusOnDraw({
+            timeline: this.timeline,
+            valuesState: this.values,
+            partial,
+        });
+
+        const callBackObject = getValueObj(this.values, 'currentValue');
+
+        syncCallback({
+            each: this.stagger.each,
+            useStagger: this.useStagger,
+            isLastDraw,
+            callBackObject,
+            callback: this.callback,
+            callbackCache: this.callbackCache,
+            callbackOnStop: this.callbackOnStop,
+        });
+
+        this.fireAddCallBack(partial);
+
+        this.useStagger = true;
+        this.lastPartial = partial;
+        this.lastDirection = this.direction;
+        this.firstRun = false;
     }
 
     /**
@@ -408,7 +385,7 @@ export default class HandleSequencer {
     resetLastValue() {
         this.firstRun = true;
         this.lastPartial = 0;
-        this.lastDirection = undefined;
+        this.lastDirection = directionConstant.NONE;
     }
 
     /**
@@ -495,6 +472,8 @@ export default class HandleSequencer {
     }
 
     /**
+     * @type {import('./type.js').sequencerSetStretchFacor}
+     *
      * @description
      * Set factor between timeline duration and sequencer getDuration
      * So start and end propierties will be proportionate to the duration of the timeline
@@ -503,24 +482,37 @@ export default class HandleSequencer {
     setStretchFactor(duration = 0) {
         const stretchFactor = duration / this.duration;
 
-        this.timeline.forEach(({ start, end }, i) => {
-            this.timeline[i].start = getRoundedValue(start * stretchFactor);
-            this.timeline[i].end = getRoundedValue(end * stretchFactor);
+        this.timeline = [...this.timeline].map((item) => {
+            const { start, end } = item;
+
+            return {
+                ...item,
+                start: getRoundedValue(start * stretchFactor),
+                end: getRoundedValue(end * stretchFactor),
+            };
         });
 
-        this.labels.forEach(({ time }, i) => {
-            this.labels[i].time = getRoundedValue(time * stretchFactor);
+        this.labels = [...this.labels].map((item) => {
+            const { time } = item;
+
+            return {
+                ...item,
+                time: getRoundedValue(time * stretchFactor),
+            };
         });
 
-        this.callbackAdd.forEach(({ time }, i) => {
-            this.callbackAdd[i].time = getRoundedValue(time * stretchFactor);
+        this.callbackAdd = [...this.callbackAdd].map((item) => {
+            const { time } = item;
+
+            return {
+                ...item,
+                time: getRoundedValue(time * stretchFactor),
+            };
         });
     }
 
     /**
-     *
-     * @prop {Object.<string, number>} obj Initial data Object
-     * @returns {this} The instance on which this method was called.
+     * @type {import('./type.js').sequencerSetData}
      */
     setData(obj = {}) {
         this.values = Object.entries(obj).map((item) => {
@@ -539,92 +531,17 @@ export default class HandleSequencer {
             };
         });
 
+        /**
+         * First time add a set with initial data.
+         * We create a value for ancestor/reduce mechenism
+         * This row has priority 0, so we are sure that is the first row of timeline array.
+         */
+        this.goTo(obj, { start: 0, end: 0 });
         return this;
     }
 
     /**
-     * Return the new array maeged with main array created in setData
-     *
-     * @private
-     *
-     * @param  {Array} newData new datato merge
-     * @param {import('./type.js').sequencerValue[]} data
-     *
-     * @return {import('./type.js').sequencerValue[]}
-     */
-    mergeArray(newData, data) {
-        return data.map((item) => {
-            const itemToMerge = newData.find((newItem) => {
-                return newItem.prop === item.prop;
-            });
-
-            const inactiveItem = {
-                prop: item.prop,
-                active: false,
-            };
-
-            // If exist merge
-            return itemToMerge
-                ? { ...item, ...itemToMerge, active: true }
-                : inactiveItem;
-        });
-    }
-
-    /**
-     * @private
-     *
-     * @param {import('./type.js').sequencerRow[]} arr
-     * @returns {import('./type.js').sequencerRow[]} arr
-     *
-     * @description
-     * Sorts the array by the lowest start value
-     */
-    orderByStart(arr) {
-        return arr.sort((a, b) => {
-            return a.start - b.start;
-        });
-    }
-
-    /**
-     * @private
-     *
-     * @description
-     * setPropFromAncestor
-     * - Example when we come from goTo methods:
-     *
-     *  When we define the toValue we have to associate the right fromValue value
-     *  ( ease methods need fromValue and toValue to calculate current value)
-     *  we search back into the array until we found an active item with the same prop ( for example: rotate )
-     *  we take the the first usable toValue and use we it as current fromValue
-     *
-     * @param  {string} propToFind first ancestor prop <toValue> || <fromValue>
-     */
-    setPropFromAncestor(propToFind) {
-        this.timeline.forEach(({ values }, i) => {
-            values.forEach(({ prop, active }, iValues) => {
-                if (!active) return;
-
-                // Goback into the array
-                const previousValidValue = getFirstValidValueBack(
-                    this.timeline,
-                    i,
-                    prop,
-                    propToFind
-                );
-
-                // If we found a value apply it
-                if (previousValidValue !== null) {
-                    values[iValues][propToSet[propToFind].set] =
-                        previousValidValue;
-                }
-            });
-        });
-    }
-
-    /**
-     * @param {import('../utils/tweenAction/type.js').valueToparseType} obj  to values
-     * @param {import('./type.js').sequencerAction} props special properties
-     * @returns {this} The instance on which this method was called.
+     * @type {import('./type.js').sequencerGoTo}
      *
      * @example
      * ```javascript
@@ -647,22 +564,34 @@ export default class HandleSequencer {
         if (!sequencerRangeValidate({ start, end })) return this;
 
         const data = goToSyncUtils(obj, ease);
-        const newValues = this.mergeArray(data, this.values);
-        this.timeline.push({
+        const newValues = mergeNewValues({ data, values: this.values });
+        const activeProp = Object.keys(obj);
+
+        /**
+         * Update timeline and order by start value and priority.
+         */
+        const newTimeline = insertNewRow({
+            timeline: this.timeline,
             values: newValues,
-            start: start ?? 0,
-            end: end ?? this.duration,
+            start,
+            end,
+            duration: this.duration,
+            propToFind: 'fromValue',
         });
 
-        this.timeline = this.orderByStart(this.timeline);
-        this.setPropFromAncestor('fromValue');
+        /**
+         * Update to formValue with fist usable formValue in previous row.is
+         */
+        this.timeline = setPropFromAncestor({
+            timeline: newTimeline,
+            activeProp,
+        });
+
         return this;
     }
 
     /**
-     * @param {import('../utils/tweenAction/type.js').valueToparseType} obj from values
-     * @param {import('./type.js').sequencerAction} props special properties
-     * @returns {this} The instance on which this method was called.
+     * @type {import('./type.js').sequencerGoFrom} obj  to values
      *
      * @example
      * ```javascript
@@ -685,22 +614,34 @@ export default class HandleSequencer {
         if (!sequencerRangeValidate({ start, end })) return this;
 
         const data = goFromSyncUtils(obj, ease);
-        const newValues = this.mergeArray(data, this.values);
-        this.timeline.push({
+        const newValues = mergeNewValues({ data, values: this.values });
+        const activeProp = Object.keys(obj);
+
+        /**
+         * Update timeline and order by start value and priority.
+         */
+        const newTimeline = insertNewRow({
+            timeline: this.timeline,
             values: newValues,
-            start: start ?? 0,
-            end: end ?? this.duration,
+            start,
+            end,
+            duration: this.duration,
+            propToFind: 'toValue',
         });
 
-        this.timeline = this.orderByStart(this.timeline);
-        this.setPropFromAncestor('toValue');
+        /**
+         * Update to formValue with fist usable formValue in previous row.is
+         */
+        this.timeline = setPropFromAncestor({
+            timeline: newTimeline,
+            activeProp,
+        });
+
         return this;
     }
 
     /**
-     * @param {import('../utils/tweenAction/type.js').valueToparseType} fromObj from values
-     * @param {import('../utils/tweenAction/type.js').valueToparseType} toObj to values
-     * @param {import('./type.js').sequencerAction} props special properties
+     * @type {import('./type.js').sequencerGoFromTo}
      *
      * @example
      * ```javascript
@@ -725,26 +666,30 @@ export default class HandleSequencer {
         if (!sequencerRangeValidate({ start, end })) return this;
 
         if (!compareKeys(fromObj, toObj)) {
-            compareKeysWarning('lerp goFromTo:', fromObj, toObj);
+            compareKeysWarning('sequencer goFromTo:', fromObj, toObj);
             return;
         }
 
         const data = goFromToSyncUtils(fromObj, toObj, ease);
-        const newValues = this.mergeArray(data, this.values);
-        this.timeline.push({
+        const newValues = mergeNewValues({ data, values: this.values });
+
+        /**
+         * Update timeline and order by start value and priority.
+         */
+        this.timeline = insertNewRow({
+            timeline: this.timeline,
             values: newValues,
-            start: start ?? 0,
-            end: end ?? this.duration,
+            start,
+            end,
+            duration: this.duration,
+            propToFind: '',
         });
 
-        this.timeline = this.orderByStart(this.timeline);
         return this;
     }
 
     /**
-     * @param {string} name
-     * @param {number} [ time = 0 ] time
-     * @returns {this} The instance on which this method was called.
+     * @type {import('./type.js').sequencerLabel}
      *
      * @example
      * ```javascript
@@ -763,16 +708,14 @@ export default class HandleSequencer {
 
     /**
      * Return the array of entered labels
-     * @returns {import('./type.js').labelType[]} labels array
+     * @type {import('./type.js').sequencerGetLabels}
      */
     getLabels() {
         return this.labels;
     }
 
     /**
-     * @param {function(import('../utils/timeline/type.js').directionTypeObjectSequencer ):void } fn - callback function
-     * @param {number} time - Value grater than 0 and minor duration.
-     * @returns {this} The instance on which this method was called.
+     * @type {import('./type.js').sequencerAdd}
      *
      * @description
      * Fire a function at a step in a range greater the 0 and minor duration.
@@ -780,24 +723,6 @@ export default class HandleSequencer {
      *
      * To interpect both end ( 0 and duration )
      * use the syncTimeline/scrollTrigger built in function:
-     *
-     * ```javascript
-     * // For syncTimeline:
-     * myTimeline.onLoopEnd()
-     *
-     * // For scrollTrigger:
-     * myScrolltrigger.onEnter();
-     * myScrolltrigger.onEnterBack();
-     * myScrolltrigger.onLeave();
-     * myScrolltrigger.onLeaveBack();
-     * ```
-     *
-     * @example
-     * ```javascript
-     * mySequencer.add(({direction: string, value: number, isForced: boolean}) => {
-     *      //code
-     * }, time:number);
-     * ```
      */
     add(fn = () => {}, time = 0) {
         const fnIsValid = mobCore.checkType(Function, fn);
@@ -813,28 +738,8 @@ export default class HandleSequencer {
     }
 
     /**
-     * @param {function(any):void} cb - callback function.
-     * @return {Function} unsubscribe callback.
+     * @type {import('./type.js').sequencerSubscribe}
      *
-     * @example
-     * ```javascript
-     * //Single DOM element
-     * const unsubscribe = mySequencer.subscribe(({ x,y... }) => {
-     *      domEl.style.prop = `...`
-     * })
-     * unsubscribe()
-     *
-     *
-     * //Multiple DOM element ( stagger )
-     * const unsubscribeStagger = [...elements].map((item) => {
-     *   return mySequencer.subscribe(({ x, y... }) => {
-     *       item.style.prop = ...
-     *   });
-     * });
-     * unsubscribeStagger.forEach((item) => item());
-     *
-     *
-     * ```
      * @description
      * Callback that returns updated values ready to be usable, it is advisable to use it for single elements, although it works well on a not too large number of elements (approximately 100-200 elements) for large staggers it is advisable to use the subscribeCache method.
      */
@@ -849,45 +754,12 @@ export default class HandleSequencer {
     }
 
     /**
-     * @param {function(any):void} cb - callback function.
-     * @return {Function} unsubscribe callback.
+     * @type {import('./type.js').sequencerOnStop}
      *
-     * @example
-     * ```javascript
-     * //Single DOM element
-     * const unsubscribe = mySequencer.onStop(({ x,y... }) => {
-     *      domEl.style.prop = `...`
-     * })
-     * unsubscribe()
-     *
-     *
-     * //Multiple DOM element ( stagger )
-     * const unsubscribeStagger = [...elements].map((item) => {
-     *   return mySequencer.onStop(({ x, y... }) => {
-     *       item.style.prop = ...
-     *   });
-     * });
-     * unsubscribeStagger.forEach((item) => item());
-     *
-     *
-     * ```
      * @description
      *  Similar to subscribe this callBack is launched when the data calculation stops (when the timeline ends or the scroll trigger is inactive).
      *  Useful for applying a different style to an inactive element.
      *  A typical example is to remove the teansform3D property:
-     *
-     * @example
-     * ```javascript
-     * // Use transform3D while item is active
-     * mySequencer.subscribe(({x}) => {
-     *      domEl.style.transform = ` transform3D(0,0,0) translateX(${x}px)`
-     * })
-     *
-     * // Remove transform3D when item is inactive
-     * mySequencer.onStop(({x}) => {
-     *      domEl.style.transform = `translateX(${x}px)`
-     * })
-     * ```
      */
     onStop(cb) {
         const { arrayOfCallbackUpdated, unsubscribeCb } = setCallBack(
@@ -900,22 +772,8 @@ export default class HandleSequencer {
     }
 
     /**
-     * @param {(Object|HTMLElement)} item
-     * @param {function(any):void} fn - callback function.
-     * @return {Function} unsubscribe callback
+     * @type {import('./type.js').sequencerSubscribeCache}
      *
-     * @example
-     *```javascript
-     * //Multiple DOM element ( stagger )
-     * const unsubscribeStagger = [...elements].map((item) => {
-     *   return mySequencer.subscribeCache(item, ({ x, y... }) => {
-     *       item.style.prop = ...
-     *   });
-     * });
-     * unsubscribeStagger.forEach((item) => item());
-     *
-     *
-     * ```
      * @description
      * Callback that returns updated values ready to be usable, specific to manage large staggers.
      */
@@ -936,7 +794,7 @@ export default class HandleSequencer {
     /**
      * @description
      * Get duration
-     * @return {Number}
+     * @type {import('./type.js').sequencerGetDuration}
      */
     getDuration() {
         return this.duration;
@@ -945,13 +803,14 @@ export default class HandleSequencer {
     /**
      * @description
      * Set duration
-     * @param {Number} val
+     * @type {import('./type.js').sequencerSetDuration}
      */
     setDuration(val = 0) {
         this.duration = val;
     }
 
     /**
+     * @type {import('./type.js').sequencerGetType}
      * @description
      * Get tween type - 'sequencer'
      */
@@ -976,6 +835,7 @@ export default class HandleSequencer {
     }
 
     /**
+     * @type {() => void}
      * @description
      * Destroy sequencer
      */

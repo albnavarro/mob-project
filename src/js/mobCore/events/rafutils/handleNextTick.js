@@ -10,12 +10,12 @@ const callbacks = [];
  * Add callback
  *
  * @param {import('./type.js').handleFrameCallbakType} cb - callback function
- * @param {Number} [ priority ]
+ * @param {number} [ priority ]
  *
  * @example
  * ```javascript
  * handleFrame.add(() => {
- *     handleNextTick.add(({ fps, shouldRender, time }) => {
+ *     handleNextTick.add(({ fps, time }) => {
  *         // code
  *     });
  * });
@@ -50,15 +50,15 @@ const add = (cb = () => {}, priority = 100) => {
  *
  * @example
  * ```javascript
-   handleNextTick.fire({ time, fps, shouldRender });
+   handleNextTick.fire({ time, fps });
  *
  * ```
  */
-const fire = ({ time, fps, shouldRender }) => {
+const fire = ({ time, fps }) => {
     if (callbacks.length === 0) return;
 
     callbacks.sort((a, b) => a.priority - b.priority);
-    callbacks.forEach(({ cb }) => cb({ time, fps, shouldRender }));
+    callbacks.forEach(({ cb }) => cb({ time, fps }));
     callbacks.length = 0;
 };
 

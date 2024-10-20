@@ -4,9 +4,7 @@ import { mobCore } from '../../../../mobCore';
 import { callBackStore } from './callBackStore';
 
 /**
- * @param {Function} currentCallback - callback to execute.
- * @param {Array.<import('./type').callbackObject>} arrayOfCallback
- * @returns {{arrayOfCallbackUpdated:Array.<import('./type').callbackObject>,unsubscribeCb: function(Array.<import('./type').callbackObject>):Array.<import('./type').callbackObject> }}
+ * @type {import('./type').setCallBack}
  *
  * @description
  * Add callback to Stack.
@@ -43,12 +41,7 @@ export const setCallBack = (currentCallback, arrayOfCallback) => {
 };
 
 /**
- * @param {('Object'|'HTMLElement')} item
- * @param {function(Object.<string, number>):void} currentCallback
- * @param {Array.<import('./type').callbackObject>} arrayOfCallback
- * @param {Array.<function>} unsubscribeCacheArray - unsubscribe function of handleCache.
- *
- * @returns {{arrayOfCallbackUpdated:Array.<import('./type').callbackObject>, unsubscribeCache:Array.<function>, unsubscribeCb:function(Array.<{cb:number,id:number,index:Number,frame:Number}>):Array.<{cb:number,id:number,index:Number,frame:Number}> }}
+ * @type {import('./type').setCallBackCache}
  */
 export const setCallBackCache = (
     item,
@@ -89,7 +82,7 @@ export const setCallBackCache = (
 
             // Disable single stagger without modify staggers order
             return arrayOfCallback.map(({ id, cb, index, frame }) => {
-                if (id === prevId) cb = -1;
+                if (id === prevId) cb = '';
                 return { id, cb, index, frame };
             });
         },

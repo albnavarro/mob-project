@@ -7,12 +7,12 @@ import { handleNextTick } from '../rafutils/handleNextTick.js';
 import { getUnivoqueId } from '../../utils/index.js';
 
 /**
- * @type {function}
+ * @type {Function}
  */
 let unsubscribeScrollStart = () => {};
 
 /**
- * @type {function}
+ * @type {Function}
  */
 let unsubscribeScrollEnd = () => {};
 
@@ -26,17 +26,17 @@ let debouceFunctionReference = () => {};
  */
 function handleScrollUtils(type) {
     /**
-     * @type {Boolean}
+     * @type {boolean}
      */
     let initialized = false;
 
     /**
-     * @type {Map<String,Function>}
+     * @type {Map<string,function>}
      */
     const callbacks = new Map();
 
     /**
-     * @type {Boolean}
+     * @type {boolean}
      */
     let isScrolling = false;
 
@@ -65,7 +65,7 @@ function handleScrollUtils(type) {
             handleNextTick.add(() => {
                 // Prepare data to callback
                 const scrollData = {
-                    scrollY: window.pageYOffset,
+                    scrollY: window.scrollY,
                 };
 
                 // Fire end of scroll

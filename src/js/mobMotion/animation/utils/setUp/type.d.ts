@@ -1,27 +1,13 @@
+import { mqAction, mqValues } from '../../../utils/type';
+import { springChoiceConfig, springPresentConfigType } from '../../spring/type';
+import { easeTypes } from '../../tween/type';
+
 export interface setUpType {
     /**
      * @description
      * Use passive event on mouse/touch event.
      */
     usePassive?: boolean;
-
-    /**
-     * @description
-     * Control the scroll phase when fps drop occurs.
-     * The key represents the number of fps dropped, the value represents the interval of frames needed to fire a scroll function.
-     * eg: if from a stable value of 60fps it drops to 30fps (there is a drop of 30 fps) the scroll function will be performed every 2 scroll and so on.
-     * This mechanism is designed to make the browser work less whenever there are bottle caps that prevent it from working smoothly.
-     * You can disable this layering by disabling the `useScaleFps` property.
-     * Default: `fpsScalePercent: { 0: 1, 30: 2, 50: 3 }`.
-     */
-    fpsScalePercent?: { [key: string]: number };
-
-    /**
-     * @description
-     * Enable or disable conditional module operation on scroll based on fps drop.
-     * Default: `useScaleFps: true`.
-     */
-    useScaleFps?: boolean;
 
     /**
      * @description
@@ -43,7 +29,7 @@ export interface setUpType {
      * default keys: `xSmall, small, medium, tablet, desktop, large, xLarge`.
      * es: `desktop: 992`.
      */
-    mq?: { [key: string]: number };
+    mq?: Record<string, number>;
 
     /**
      * @description
@@ -55,14 +41,14 @@ export interface setUpType {
          * Parallax/scrollTrigger breakpoint default value, choice: `xSmall, small, medium, tablet, desktop, large, xLarge`
          * Default:  `{ value: 'desktop' }`
          */
-        value?: import('../../../utils/type').mqValues;
+        value?: mqValues;
 
         /**
          * @description
          * Parallax/scrollTrigger mediaQuery type default value, choice is `min , max`,
          * Default:  `{ type: 'min' }`
          */
-        type?: import('../../../utils/type').mqAction;
+        type?: mqAction;
     };
 
     sequencer?: {
@@ -76,7 +62,7 @@ export interface setUpType {
          * Default essing function used by the sequencer.
          * Default: `{ ease: easeLinear }`
          */
-        ease?: import('../../tween/type').easeTypes;
+        ease?: easeTypes;
     };
 
     scrollTrigger?: {
@@ -92,7 +78,7 @@ export interface setUpType {
          * Spring config, choice: `default, gentle, wobbly, bounce, scroller`.
          * Default: `{ springConfig: 'default' }`
          */
-        springConfig?: import('../../spring/type').springChoiceConfig;
+        springConfig?: springChoiceConfig;
 
         markerColor?: {
             /**
@@ -124,7 +110,7 @@ export interface setUpType {
          * Default spring config, choice: `default, gentle, wobbly, bounce, scroller`,
          * Default: `{ springConfig: 'default' }`.
          */
-        springConfig?: import('../../spring/type').springChoiceConfig;
+        springConfig?: springChoiceConfig;
 
         /**
          * @description
@@ -147,7 +133,7 @@ export interface setUpType {
          * Default essing function used by the parallaxTween,
          * Default: `{ ease: 'easeLinear' }`.
          */
-        ease?: import('../../tween/type').easeTypes;
+        ease?: easeTypes;
     };
 
     tween?: {
@@ -163,7 +149,7 @@ export interface setUpType {
          * Default essing function used by the tween,
          * Default: `{ ease: 'easeLinear' }`.
          */
-        ease?: import('../../tween/type').easeTypes;
+        ease?: easeTypes;
 
         /**
          * @description
@@ -186,7 +172,7 @@ export interface setUpType {
          * Default spring config, choice: `default, gentle, wobbly, bounce, scroller`,
          * Default: `{ springConfig: 'default' }`.
          */
-        config?: import('../../spring/type').springPresentConfigType;
+        config?: springPresentConfigType;
     };
 
     lerp?: {
@@ -200,14 +186,14 @@ export interface setUpType {
         /**
          * @description
          * Default value of precision properties.
-         * Default: `{ precision:  'false' }`.
+         * Default: `{ precision:  0.01 }`.
          */
         precision?: number;
 
         /**
          * @description
          * Default value of velocity properties.
-         * Default: `{ velocity: 'false' }`.
+         * Default: `{ velocity: 0.06 }`.
          */
         velocity?: number;
     };

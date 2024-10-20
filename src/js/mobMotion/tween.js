@@ -6,11 +6,12 @@ import HandleMasterSequencer from './animation/sequencer/handleMasterSequencer.j
 import HandleSequencer from './animation/sequencer/handleSequencer.js';
 import HandleSpring from './animation/spring/handleSpring.js';
 import HandleTween from './animation/tween/handleTween.js';
-import { createStaggers } from './animation/sequencer/sequencerUtils.js';
+import { createStaggers } from './animation/sequencer/createStagger.js';
 
 export const tween = {
     /**
      * @param {import('./animation/parallax/type.js').parallaxTweenType} data
+     * @return {ParallaxTween}
      *
      * @example
      * ```javascript
@@ -52,6 +53,7 @@ export const tween = {
 
     /**
      * @param {import('./animation/sequencer/type.js').sequencerProps} data
+     * @returns {HandleSequencer}
      *
      * @example
      * ```javascript
@@ -165,6 +167,7 @@ export const tween = {
 
     /**
      * @param {import('./animation/tween/type.js').tweenProps} data
+     * @returns {HandleTween}
      *
      * @example
      * ```javascript
@@ -217,6 +220,7 @@ export const tween = {
 
     /**
      * @param {import('./animation/spring/type.js').springTweenProps} data
+     * @returns {HandleSpring}
      *
      *
      * @example
@@ -277,6 +281,7 @@ export const tween = {
 
     /**
      * @param {import('./animation/lerp/type.js').lerpTweenProps} data
+     * @returns {HandleLerp}
      *
      * @example
      * ```javascript

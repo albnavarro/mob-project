@@ -4,7 +4,7 @@ import { getUnivoqueId } from '../../utils/index.js';
 import { debounceFuncion } from '../debounce.js';
 
 /**
- * @type {Boolean}
+ * @type {boolean}
  */
 let initialized = false;
 
@@ -56,28 +56,28 @@ function handler() {
     const windowsWidth = window.innerWidth;
 
     /**
-     * @type {Boolean}
+     * @type {boolean}
      */
     const verticalResize = windowsHeight !== previousWindowHeight;
 
     /**
-     * @type {Boolean}
+     * @type {boolean}
      */
     const horizontalResize = windowsWidth !== previousWindowWidth;
 
     /**
-     * @type {Number}
+     * @type {number}
      */
     previousWindowHeight = windowsHeight;
 
     /**
-     * @type {Number}
+     * @type {number}
      */
     previousWindowWidth = windowsWidth;
 
     // Prepare data to callback
     const resizeData = {
-        scrollY: window.pageYOffset,
+        scrollY: window.scrollY,
         windowsHeight,
         windowsWidth,
         documentHeight: document.documentElement.scrollHeight,

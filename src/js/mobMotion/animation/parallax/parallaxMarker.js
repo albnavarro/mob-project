@@ -56,6 +56,7 @@ const getMarker = ({ startMarker, endMarker, label }) => {
  * @returns {{top:number,right:number,bottom:number,left:number}}
  */
 const getPosition = ({ screen }) => {
+    // eslint-disable-next-line unicorn/prefer-global-this
     if (screen === window) {
         return {
             top: 0,

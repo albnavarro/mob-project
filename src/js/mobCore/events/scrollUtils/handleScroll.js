@@ -6,12 +6,12 @@ import { handleNextTick } from '../rafutils/handleNextTick.js';
 import { handleScrollImmediate } from './handleScrollImmediate.js';
 
 /**
- * @type {Boolean}
+ * @type {boolean}
  */
 let initialized = false;
 
 /**
- * @type {Map<String,Function>}
+ * @type {Map<string,function>}
  */
 const callbacks = new Map();
 

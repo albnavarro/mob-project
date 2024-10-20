@@ -4,7 +4,7 @@ import { mobCore } from '../../../mobCore';
 
 /**
  * @param {any} x
- * @returns {Number}
+ * @returns {number}
  *
  * @description
  * Sanitize Number in case is in calculator enutation.
@@ -12,39 +12,39 @@ import { mobCore } from '../../../mobCore';
 export const getRoundedValue = (x) => {
     if (mobCore.checkType(Number, x)) {
         return Math.round(x * 10_000) / 10_000 || 0;
-    } else {
-        if (Math.abs(x) < 1) {
-            const e = Number.parseInt(x.toString().split('e-')[1]);
-            if (e) {
-                x *= Math.pow(10, e - 1);
-                x = '0.' + new Array(e).join('0') + x.toString().slice(2);
-            }
-        } else {
-            let e = Number.parseInt(x.toString().split('+')[1]);
-            if (e > 20) {
-                e -= 20;
-                x /= Math.pow(10, e);
-                x += new Array(e + 1).join('0');
-            }
-        }
-
-        return Number.parseFloat(Number.parseFloat(x).toFixed(4));
     }
+
+    if (Math.abs(x) < 1) {
+        const e = Number.parseInt(x.toString().split('e-')[1]);
+        if (e) {
+            x *= Math.pow(10, e - 1);
+            x = '0.' + new Array(e).join('0') + x.toString().slice(2);
+        }
+    } else {
+        let e = Number.parseInt(x.toString().split('+')[1]);
+        if (e > 20) {
+            e -= 20;
+            x /= Math.pow(10, e);
+            x += new Array(e + 1).join('0');
+        }
+    }
+
+    return Number.parseFloat(Number.parseFloat(x).toFixed(4));
 };
 
 /**
- * @param {Number} num
- * @param {Number} min
- * @param {Number} max
+ * @param {number} num
+ * @param {number} min
+ * @param {number} max
  */
 export const clamp = (num, min, max) => {
     return Math.min(Math.max(num, min), max);
 };
 
 /**
- * @param {Number} start
- * @param {Number} end
- * @param {Number} amt
+ * @param {number} start
+ * @param {number} end
+ * @param {number} amt
  */
 export const lerp = (start, end, amt) => {
     return (1 - amt) * start + amt * end;
@@ -53,7 +53,7 @@ export const lerp = (start, end, amt) => {
 /**
  * @param {Object} a
  * @param {Object} b
- * @returns {Boolean}
+ * @returns {boolean}
  *
  * @description
  * Check if all keys of object is equal to another.
@@ -70,8 +70,8 @@ export const compareKeys = (a, b) => {
 };
 
 /**
- * @param {Array} arr
- * @param {Number} chunkSize
+ * @param {any[]} arr
+ * @param {number} chunkSize
  *
  * @description
  * Subdivide array into chunks
@@ -86,8 +86,8 @@ export const sliceIntoChunks = (arr, chunkSize) => {
 };
 
 /**
- * @param {Array} arr
- * @param {Number} n
+ * @param {any[]} arr
+ * @param {number} n
  *
  * @description
  * Subdivide array into columns

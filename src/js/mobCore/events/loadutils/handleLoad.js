@@ -3,12 +3,12 @@
 import { getUnivoqueId } from '../../utils';
 
 /**
- * @type{Boolean}
+ * @type{boolean}
  */
 let initialized = false;
 
 /**
- * @type {Map<String,Function>}
+ * @type {Map<string,function>}
  */
 const callbacks = new Map();
 
@@ -53,7 +53,7 @@ function init() {
  * @description
  * Add callback on page load
  *
- * @param {function} cb - Callback function executed on page load
+ * @param {Function} cb - Callback function executed on page load
  * @returns {function():void}
  *
  * @example

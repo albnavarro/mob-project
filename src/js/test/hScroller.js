@@ -113,6 +113,10 @@ export const hScroller = () => {
         target.style.transform = `translate3D(0,0,0) translate(${x}px, ${y}px)`;
     });
 
+    myParallaxTimeline.onStop(({ x, y }) => {
+        target.style.transform = `translate(${x}px, ${y}px)`;
+    });
+
     const parallaxIn = scroller.createScrollTrigger({
         item: target,
         trigger: '.pluto3',

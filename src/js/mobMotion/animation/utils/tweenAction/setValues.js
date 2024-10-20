@@ -4,8 +4,8 @@
  * @description
  * Set fromValue with currentValue
  *
- * @param {Array} arr
- * @returns {Array}
+ * @param {Record<'settled'|'fromValue'|'currentValue', any>[]} arr
+ * @returns {any[]}
  */
 export const setFromByCurrent = (arr) => {
     return arr.map((item) => {
@@ -21,8 +21,8 @@ export const setFromByCurrent = (arr) => {
  * @description
  * Set fromValue and currentValue with toValue
  *
- * @param {Array} arr
- * @returns {Array}
+ * @param {Record<'toValue'|'fromValue'|'currentValue', any>[]} arr
+ * @returns {any[]}
  */
 export const setFromCurrentByTo = (arr) => {
     return arr.map((item) => {
@@ -37,8 +37,8 @@ export const setFromCurrentByTo = (arr) => {
  * @description
  * Set toValue and fromValue with currentValue
  *
- * @param {Array} arr
- * @returns {Array}
+ * @param {Record<'toValue'|'fromValue'|'currentValue', any>[]} arr
+ * @returns {any[]}
  */
 export const setFromToByCurrent = (arr) => {
     return arr.map((item) => {
@@ -53,10 +53,9 @@ export const setFromToByCurrent = (arr) => {
  * @description
  * Revert fromValue and toValue
  *
- * @param {import("./type").valueToparseType} obj
- * @param {Array} arr
- *
- * @returns {Array} arr
+ * @param {Record<string, number | (() => number)>} obj
+ * @param {Record<'prop'|'toValue'|'fromValue'|'currentValue', any>[]} arr
+ * @returns {any[]} arr
  *
  */
 export const setReverseValues = (obj, arr) => {
@@ -77,10 +76,9 @@ export const setReverseValues = (obj, arr) => {
  * Set toValue in relative mode, sum value from currentValue
  * Used by spring and lerp
  *
- * @param {Array} arr
+ * @param {Record<'toValue'|'currentValue', any>[]} arr
  * @param {boolean} relative
- *
- * @returns {Array} arr
+ * @returns {any[]} arr
  *
  */
 export const setRelative = (arr, relative) => {
@@ -102,10 +100,9 @@ const tweenSmallNumber = 0.000_01;
  * Set toValue in relative mode, sum value from currentValue
  * Used by classic tween
  *
- * @param {Array} arr
+ * @param {Record<'shouldUpdate'|'toValProcessed'|'toValue'|'currentValue'|'fromValue', any>[]} arr
  * @param {boolean} relative
- *
- * @returns {Array} arr
+ * @returns {any[]} arr
  *
  */
 export const setRelativeTween = (arr, relative) => {

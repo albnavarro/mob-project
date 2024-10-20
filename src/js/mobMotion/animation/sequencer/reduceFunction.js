@@ -1,15 +1,12 @@
 // @ts-check
 
-/**
- * @type{Object}
- */
 export const propToSet = {
     fromValue: {
         get: 'toValue',
         set: 'fromValue',
     },
     toValue: {
-        get: 'fromValue',
+        get: 'toValue',
         set: 'toValue',
     },
 };
@@ -18,25 +15,33 @@ export const propToSet = {
  * @param {import("./type").sequencerRow[]} arr
  * @param {number} index
  * @param {string} prop
- * @param {string} propToFind
+ * @param {import("./type").propToFind} propToFind
  *
- * @returns {import("./type").sequencerRow[]|null}
+ * @returns {import("./type").sequencerRow[]|undefined}
  */
 export const getFirstValidValueBack = (arr, index, prop, propToFind) => {
-    return arr.slice(0, index).reduceRight((p, { values: valuesForward }) => {
-        /**
-         * Find active prop if exist
-         */
-        const result = valuesForward.find(({ prop: propToCompare, active }) => {
-            return active && propToCompare === prop;
-        });
+    return arr
+        .slice(0, index)
+        .reduceRight((previous, { values: valuesForward }) => {
+            /**
+             * Find active prop if exist
+             */
+            const result = valuesForward.find(
+                ({ prop: propToCompare, active }) => {
+                    return active && propToCompare === prop;
+                }
+            );
 
-        /**
-         * Return only first valid value then skip the successive
-         * we return the value only when the accumulatore is null, so the first time we fond a value
-         */
-        return result && p === null ? result[propToSet[propToFind].get] : p;
-    }, null);
+            /**
+             * Return only first valid value then skip the successive
+             * we return the value only when the accumulatore is null, so the first time we fond a value
+             */
+            return result && !previous
+                ? result[propToSet[propToFind].get]
+                : previous;
+
+            // eslint-disable-next-line unicorn/no-useless-undefined
+        }, undefined);
 };
 
 /**
@@ -48,7 +53,7 @@ export const getFirstValidValueBack = (arr, index, prop, propToFind) => {
  * @returns {boolean}
  */
 export const checkIsLastUsableProp = (arr, index, prop, partial) => {
-    return arr.slice(index + 1, arr.length).reduce((p, { start, values }) => {
+    return arr.slice(index + 1).reduce((p, { start, values }) => {
         const nextActiveItem = values.find((nextItem) => {
             return nextItem.prop === prop && nextItem.active;
         });

@@ -19,7 +19,7 @@ export interface mouseEventTypes {
     };
     target: Element;
     type: mouseEvent;
-    preventDefault: function;
+    preventDefault: () => void;
 
     /**
      * @description

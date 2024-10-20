@@ -2,7 +2,7 @@
 
 /**
  * @param {HTMLElement} element
- * @returns {Number}
+ * @returns {number}
  *
  * @description
  * Return HTMLElement height with margin.
@@ -18,7 +18,7 @@ export function outerHeight(element) {
 
 /**
  * @param {HTMLElement} element
- * @returns {Number}
+ * @returns {number}
  *
  * @description
  * Return HTMLElement width with margin.
@@ -64,7 +64,7 @@ export function position(element) {
 
 /**
  * @param {HTMLElement} element
- * @param {String} selector
+ * @param {string} selector
  * @returns {Array.<ChildNode>}
  *
  * @description
@@ -92,7 +92,7 @@ export function getSiblings(element, selector) {
 
 /**
  * @param {HTMLElement} element
- * @param {String} selector
+ * @param {string} selector
  * @returns {Array.<ChildNode>}
  *
  * @description
@@ -185,7 +185,7 @@ export function getTranslateValues(element) {
 
 /**
  * @param {Element} element
- * @returns {Boolean}
+ * @returns {boolean}
  *
  * @description
  * Returns true if it is a DOM node
@@ -201,7 +201,7 @@ export function isNode(element) {
 
 /**
  * @param {Element} element
- * @returns {Boolean}
+ * @returns {boolean}
  *
  * @description
  * Returns true if it is a DOM element
@@ -217,7 +217,7 @@ export function isElement(element) {
 }
 
 /**
- * @returns {String}
+ * @returns {string}
  *
  * @description
  * Generate univoque string id

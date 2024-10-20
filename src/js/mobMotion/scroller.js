@@ -6,6 +6,7 @@ import ParallaxClass from './animation/parallax/parallax.js';
 export const scroller = {
     /**
      * @param {import('./animation/parallax/type.js').parallaxCommonType & import('./animation/parallax/type.js').parallaxType} data
+     * @returns {ParallaxClass}
      *
      * @example
      * ```javascript
@@ -66,6 +67,7 @@ export const scroller = {
 
     /**
      * @param {import('./animation/parallax/type.js').parallaxCommonType & import('./animation/parallax/type.js').scrollTriggerType } data
+     * @returns {ParallaxClass}
      *
      * @example
      *

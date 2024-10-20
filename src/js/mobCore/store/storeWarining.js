@@ -3,8 +3,8 @@
 import { getTypeName } from './storeType';
 
 /**
- * @param {Number} data
- * @param {String} style
+ * @param {number} data
+ * @param {string} style
  * @returns void
  */
 export const storeDepthWarning = (data, style) => {
@@ -16,8 +16,8 @@ export const storeDepthWarning = (data, style) => {
 
 /**
  * @param {Array.<String>} keys
- * @param {String} prop
- * @param {String} style
+ * @param {string} prop
+ * @param {string} style
  * @returns void
  */
 export const storeComputedWarning = (keys, prop, style) => {
@@ -28,8 +28,8 @@ export const storeComputedWarning = (keys, prop, style) => {
 };
 
 /**
- * @param {String} prop
- * @param {String} style
+ * @param {string} prop
+ * @param {string} style
  * @returns void
  */
 export const storeSetWarning = (prop, style) => {
@@ -40,23 +40,23 @@ export const storeSetWarning = (prop, style) => {
 };
 
 /**
- * @param {String} prop
- * @param {String} val
- * @param {String} style
+ * @param {string} prop
+ * @param {string} val
+ * @param {string} style
  * @returns void
  */
 export const storeSetPropValWarning = (prop, val, style) => {
     console.warn(
         `%c trying to execute setProp method on '${prop}' propierties: setProp methods doesn't allow objects as value, ${JSON.stringify(
             val
-        )} is an Object`,
+        )} is an Object, use 'Any' type for custom object`,
         style
     );
 };
 
 /**
- * @param {String} prop
- * @param {String} style
+ * @param {string} prop
+ * @param {string} style
  * @returns void
  */
 export const storeSetPropPropWarning = (prop, style) => {
@@ -69,10 +69,10 @@ export const storeSetPropPropWarning = (prop, style) => {
 };
 
 /**
- * @param {String} prop
+ * @param {string} prop
  * @param {any} val
- * @param {String} type
- * @param {String} style
+ * @param {any} type
+ * @param {string} style
  * @returns void
  */
 export const storeSetPropTypeWarning = (prop, val, type, style) => {
@@ -85,9 +85,9 @@ export const storeSetPropTypeWarning = (prop, val, type, style) => {
 };
 
 /**
- * @param {String} prop
+ * @param {string} prop
  * @param {any} val
- * @param {String} style
+ * @param {string} style
  * @returns void
  */
 export const storeSetObjectValWarning = (prop, val, style) => {
@@ -98,8 +98,8 @@ export const storeSetObjectValWarning = (prop, val, style) => {
 };
 
 /**
- * @param {String} prop
- * @param {String} style
+ * @param {string} prop
+ * @param {string} style
  * @returns void
  */
 export const storeSetObjectPropWarning = (prop, style) => {
@@ -111,8 +111,8 @@ export const storeSetObjectPropWarning = (prop, style) => {
 
 /**
  * @param {Array.<String>} key
- * @param {String} prop
- * @param {String} style
+ * @param {string} prop
+ * @param {string} style
  * @returns void
  */
 export const storeSetObjKeysWarning = (key, prop, style) => {
@@ -123,9 +123,9 @@ export const storeSetObjKeysWarning = (key, prop, style) => {
 };
 
 /**
- * @param {String} prop
+ * @param {string} prop
  * @param {any} val
- * @param {String} style
+ * @param {string} style
  * @returns void
  */
 export const storeSetObjDepthWarning = (prop, val, style) => {
@@ -138,11 +138,11 @@ export const storeSetObjDepthWarning = (prop, val, style) => {
 };
 
 /**
- * @param {String} prop
- * @param {String} subProp
+ * @param {string} prop
+ * @param {string} subProp
  * @param {any} subVal
- * @param {String} type
- * @param {String} style
+ * @param {string} type
+ * @param {string} style
  * @returns void
  */
 export const storeSetObjTypeWarning = (prop, subProp, subVal, type, style) => {
@@ -155,8 +155,8 @@ export const storeSetObjTypeWarning = (prop, subProp, subVal, type, style) => {
 };
 
 /**
- * @param {String} prop
- * @param {String} style
+ * @param {string} prop
+ * @param {string} style
  * @returns void
  */
 export const storeGetPropWarning = (prop, style) => {
@@ -167,8 +167,8 @@ export const storeGetPropWarning = (prop, style) => {
 };
 
 /**
- * @param {String} prop
- * @param {String} style
+ * @param {string} prop
+ * @param {string} style
  * @returns void
  */
 export const storeEmitWarning = (prop, style) => {
@@ -180,7 +180,7 @@ export const storeEmitWarning = (prop, style) => {
 
 /**
  * @param {Array.<String>} keys
- * @param {String} style
+ * @param {string} style
  * @returns void
  */
 export const storeComputedKeyUsedWarning = (keys, style) => {
@@ -191,8 +191,8 @@ export const storeComputedKeyUsedWarning = (keys, style) => {
 };
 
 /**
- * @param {String} prop
- * @param {String} style
+ * @param {string} prop
+ * @param {string} style
  * @returns void
  */
 export const storeWatchWarning = (prop, style) => {
@@ -203,8 +203,8 @@ export const storeWatchWarning = (prop, style) => {
 };
 
 /**
- * @param {String} style
- * @param {String} CUSTOM_OBJECT
+ * @param {string} style
+ * @param {string} CUSTOM_OBJECT
  * @returns void
  */
 export const storeObjectIsNotAnyWarning = (style, CUSTOM_OBJECT) => {

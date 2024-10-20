@@ -1,7 +1,7 @@
 // @ts-check
 
 /**
- *@type {Function}
+ *@type {() => void}
  */
 export const NOOP = () => {};
 

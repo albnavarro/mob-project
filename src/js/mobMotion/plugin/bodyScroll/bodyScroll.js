@@ -1,3 +1,5 @@
+//@ts-check
+
 import { mobCore } from '../../../mobCore/index.js';
 import HandleTween from '../../animation/tween/handleTween.js';
 import {
@@ -7,57 +9,64 @@ import {
 } from '../../animation/utils/tweenAction/tweenValidation.js';
 import { offset, isNode } from '../../../mobCore/utils/index.js';
 
+/** @type {import('../../animation/tween/type.js').easeTypes} */
+const defaultPreset = 'easeOutQuad';
+
+/** @type {HandleTween} */
+const tween = new HandleTween({ ease: defaultPreset, data: { val: 0 } });
+
+/** @type{boolean} */
+let isRunning = false;
+
+/** @type{boolean} */
+let overflow = false;
+
+/**
+ * @description
+ * Init tween
+ */
+tween.subscribe(({ val }) => {
+    window.scrollTo({
+        top: val,
+        left: 0,
+        behavior: 'auto',
+    });
+});
+
+/** @type{() => void} */
+const onComplete = () => {
+    if (overflow) document.body.style.overflow = '';
+    tween?.updateEase?.(defaultPreset);
+};
+
+/** @type{() => void} */
+const stopTween = () => {
+    if (!isRunning) return;
+
+    tween.stop();
+    onComplete();
+};
+
+/**
+ * Stop scrolling on mouseWheel, MouseDown, TouchStart.
+ */
+mobCore.useMouseWheel(() => {
+    stopTween();
+});
+
+mobCore.useMouseDown(() => {
+    stopTween();
+});
+
+mobCore.useTouchStart(() => {
+    stopTween();
+});
+
 /**
  * @description
  * Scroll body to values or element.
  */
 export const bodyScroll = (() => {
-    const defaultPreset = 'easeOutQuad';
-    const tween = new HandleTween({ ease: defaultPreset, data: { val: 0 } });
-    let isRunning = false;
-    let overflow = false;
-    let ease = defaultPreset;
-
-    tween.subscribe(({ val }) => {
-        window.scrollTo({
-            top: val,
-            left: 0,
-            behavior: 'auto',
-        });
-    });
-
-    /**
-     * Restore settings
-     */
-    function onComplete() {
-        if (overflow) document.body.style.overflow = '';
-        if (ease) tween.updateEase(defaultPreset);
-    }
-
-    /**
-     * Stop scrolling on mouseWheel, MouseDown, TouchStart.
-     */
-    mobCore.useMouseWheel(() => {
-        if (!isRunning) return;
-
-        tween.stop();
-        onComplete();
-    });
-
-    mobCore.useMouseDown(() => {
-        if (!isRunning) return;
-
-        tween.stop();
-        onComplete();
-    });
-
-    mobCore.useTouchStart(() => {
-        if (!isRunning) return;
-
-        tween.stop();
-        onComplete();
-    });
-
     /**
      * @description
      *
@@ -76,76 +85,78 @@ export const bodyScroll = (() => {
        });
 
      *```
-     *
      * @param {(Number|Element)} target
-     * @param {import('./type.js').bodyScrollType} data
+     * @param {import('./type.js').bodyScrollType} [ data ]
      */
-    function to(target = null, data = {}) {
-        if (typeof window !== 'undefined') {
-            const targetParsed = (() => {
-                if (!target) return 0;
+    const to = (target, data) => {
+        if (typeof globalThis === 'undefined') return;
 
-                const isValid =
-                    isNode(target) || mobCore.checkType(Number, target);
+        const targetParsed = (() => {
+            if (!target) return 0;
 
-                if (!isValid) {
-                    console.warn(
-                        `bodyScroll ${target} is not valid target, must be a node or a number`
-                    );
-                    return 0;
-                }
+            // @ts-ignore
+            const isValid = isNode(target) || mobCore.checkType(Number, target);
 
-                return isNode(target) ? offset(target).top : target;
-            })();
+            if (!isValid) {
+                console.warn(
+                    `bodyScroll ${target} is not valid target, must be a node or a number`
+                );
+                return 0;
+            }
 
-            /**
-             * Props
-             */
-            const duration = valueIsNumberAndReturnDefault(
-                data?.duration,
-                'bodyScroll: duration',
-                500
+            // @ts-ignore
+            return isNode(target)
+                ? offset(/** @type{HTMLElement} */ (target)).top
+                : /** @type{number} */ (target);
+        })();
+
+        /**
+         * Props
+         */
+        const duration = valueIsNumberAndReturnDefault(
+            data?.duration,
+            'bodyScroll: duration',
+            500
+        );
+
+        overflow = valueIsBooleanAndReturnDefault(
+            data?.overflow,
+            'bodyScroll: overflow',
+            false
+        );
+
+        if (easeTweenIsValid(data?.ease)) {
+            tween?.updateEase?.(
+                /** @type{import('../../animation/tween/type.js').easeTypes} */ (
+                    data?.ease
+                )
             );
-
-            overflow = valueIsBooleanAndReturnDefault(
-                data?.overflow,
-                'bodyScroll: overflow',
-                false
-            );
-
-            ease = data?.ease ? easeTweenIsValid(data?.ease) : null;
-            if (overflow) document.body.style.overflow = 'hidden';
-
-            /**
-             * Update easeType
-             */
-            if (ease) tween?.updateEase?.(ease);
-
-            /**
-             * Get current scroll value.
-             */
-            const scrollNow = window.pageYOffset;
-
-            return new Promise((resolve, reject) => {
-                isRunning = true;
-                tween
-                    .goFromTo(
-                        { val: scrollNow },
-                        { val: targetParsed },
-                        { duration }
-                    )
-                    .then(() => {
-                        onComplete();
-                        isRunning = false;
-                        resolve();
-                    })
-                    .catch(() => {
-                        isRunning = false;
-                        reject(mobCore.ANIMATION_STOP_REJECT);
-                    });
-            });
         }
-    }
+
+        if (overflow) document.body.style.overflow = 'hidden';
+
+        return new Promise((resolve) => {
+            isRunning = true;
+
+            // @ts-ignore
+            tween
+                .goFromTo(
+                    { val: window.scrollY },
+                    { val: targetParsed },
+                    { duration }
+                )
+                .then(() => {
+                    onComplete();
+                    isRunning = false;
+                    resolve(true);
+                })
+                .catch(() => {
+                    onComplete();
+                    isRunning = false;
+                    resolve(true);
+                });
+        });
+    };
 
     return {
         to,

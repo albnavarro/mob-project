@@ -6,8 +6,7 @@ import { asyncReduceData } from './asyncReduceData';
  * @param {Array<import('./type').asyncTimelineTweenItem[]>} tweenList
  * @param {object} tween
  * @param {number} index
- *
- * @returns {import('../utils/tweenAction/type').valueToparseType}
+ * @returns {Record<string, number|(() => number)>}
  *
  * @description
  * Get Obj data of tween in specific index
@@ -33,7 +32,7 @@ export const asyncReduceTween = (tweenList, tween, index) => {
             const syncProp = currentFirstData?.syncProp;
 
             const from = {
-                tween: syncProp.from,
+                // tween: syncProp.from,
                 id: syncProp.from?.getId?.(),
             };
             const to = {

@@ -1,5 +1,4 @@
 import { staggerObjectOptional } from '../utils/stagger/type';
-import { valueToparseType } from '../utils/tweenAction/type';
 
 export type easeTypes =
     | 'easeLinear'
@@ -35,7 +34,7 @@ export type easeTypes =
     | 'easeInOutBounce';
 
 export interface tweenProps {
-    data: valueToparseType;
+    data: Record<string, number>;
     duration?: number;
     relative?: boolean;
     stagger?: staggerObjectOptional;
@@ -62,24 +61,80 @@ export interface tweenAction {
     ease?: easeTypes;
 }
 
+export interface tweenDefault {
+    duration: number;
+    ease: string;
+    relative: boolean;
+    reverse: boolean;
+    immediate: boolean;
+    immediateNoPromise: boolean;
+}
+
 export interface tweenStopProps {
     clearCache?: boolean;
 }
 
 export interface tweenInitialData {
     prop: string;
-    toValue: number | function;
-    fromValue: number | function;
-    currentValue: number | function;
+    toValue: number;
+    fromValue: number;
+    currentValue: number;
     shouldUpdate: boolean;
-    fromFn: function;
+    fromFn: () => number;
     fromIsFn: boolean;
-    toFn: function;
+    toFn: () => number;
     toIsFn: boolean;
     settled: boolean;
 }
 
 export interface tweenStoreData extends tweenInitialData {
-    toValueOnPause: number | function;
-    toValProcessed: number | function;
+    toValueOnPause: number | (() => number);
+    toValProcessed: number | (() => number);
 }
+
+export type tweenSetData = (arg0: Record<string, number>) => void;
+
+export type tweenGoTo = (
+    obj: Record<string, number | (() => number)>,
+    props: tweenAction
+) => void | Promise<any>;
+
+export type tweenGoFrom = (
+    obj: Record<string, number | (() => number)>,
+    props: tweenAction
+) => void | Promise<any>;
+
+export type tweenGoFromTo = (
+    fromObj: Record<string, number | (() => number)>,
+    toObj: Record<string, number | (() => number)>,
+    props: tweenAction
+) => void | Promise<any>;
+
+export type tweenSet = (
+    obj: Record<string, number | (() => number)>,
+    props: tweenAction
+) => void | Promise<any>;
+
+export type tweenDoAction = (
+    data: (goToParamsType | goFromType | goFromToType)[],
+    props: tweenAction,
+    obj: Record<string, number | (() => number)>
+) => void | Promise<any>;
+
+export type tweenMergeProps = (props: tweenAction) => tweenDefault;
+
+export type tweenStop = (arg0?: tweenStopProps) => void;
+export type tweenPause = () => void;
+export type tweenResume = () => void;
+export type tweenResetData = () => void;
+export type tweenGetValue = () => Record<string, number>;
+export type tweenGetValueNative = () => Record<string, number | (() => number)>;
+export type tweenGetType = () => string;
+export type tweenGetId = () => string;
+export type tweenUpdateEase = (arg0: easeTypes) => void;
+export type tweenSubscribe = (cb: () => void) => () => void;
+export type tweenSubscribeCache = (
+    item: object | HTMLElement,
+    cb: (arg0: Record<string, number>) => void
+) => () => void;
+export type tweenOnComplete = (cb: () => void) => () => void;

@@ -28,8 +28,8 @@ import {
     handleScrollStart,
 } from './events/scrollUtils/handleScrollUtils';
 import { handleVisibilityChange } from './events/visibilityChange/handleVisibilityChange.js';
-import { SimpleStore } from './store/simpleStore.js';
-import { checkType, getTypeName } from './store/storeType.js';
+import { checkType, getTypeName } from './store/classVersion/storeType.js';
+import { mobStore } from './store/mobStore.js';
 import { getUnivoqueId } from './utils/index.js';
 import { useNextLoop } from './utils/nextTick.js';
 
@@ -67,7 +67,7 @@ export const mobCore = {
      *  The default value is `true`.
      *
      *
-     * @param {import('./store/type.js').simpleStoreBaseData} data
+     * @param {import('./store/type.js').mobStoreBaseData} data
      *
      * @example
      *
@@ -126,11 +126,11 @@ export const mobCore = {
      * ```
      */
     createStore(data = {}) {
-        return new SimpleStore(data);
+        return mobStore(data);
     },
 
     /**
-     * @returns {Number}
+     * @returns {number}
      *
      * @description
      * Get fps detect on page load.
@@ -142,26 +142,13 @@ export const mobCore = {
     },
 
     /**
-     * @returns {Number}
+     * @returns {number}
      *
      * @description
      * Get current fps value.
      */
     getFps() {
         return handleFrame.getFps();
-    },
-
-    /**
-     * @returns {Boolean}
-     *
-     * @description
-     * When useScaleFps is on, get the frame status related to fpsScalePercent object:
-     * This methods get the standalone value.
-     *
-     * Note: created for mobMotion internal use.
-     */
-    getShouldRender() {
-        return handleFrame.getShouldRender();
     },
 
     /**
@@ -215,7 +202,7 @@ export const mobCore = {
      * @example
      * ```javascript
      * mobCore.useFrame(() => {
-     *     mobCore.useNextTick(({ fps, shouldRender, time }) => {
+     *     mobCore.useNextTick(({ fps, time }) => {
      *         // code
      *     });
      * });
@@ -253,7 +240,7 @@ export const mobCore = {
      * @example
      * ```javascript
      * const loop = () => {
-     *     mobCore.useNextFrame(({ fps, shouldRender, time }) => {
+     *     mobCore.useNextFrame(({ fps, time }) => {
      *         // code
      *         loop();
      *     });
@@ -276,7 +263,7 @@ export const mobCore = {
      *
      * @example
      * ```javascript
-     * mobCore.useFrameIndex(({ fps, shouldRender, time }) => {
+     * mobCore.useFrameIndex(({ fps, time }) => {
      *     // code ...
      * }, 5);
      *
@@ -676,7 +663,7 @@ export const mobCore = {
     /**
      * @param {any} type
      * @param {any} value
-     * @returns {Boolean}
+     * @returns {boolean}
      *
      * @description
      * Check type of variable.
@@ -687,7 +674,7 @@ export const mobCore = {
 
     /**
      * @param {any} type
-     * @returns {String}
+     * @returns {string}
      *
      * @description
      * Get type in String format.
@@ -697,7 +684,7 @@ export const mobCore = {
     },
 
     /**
-     * @returns {String}
+     * @returns {string}
      *
      * @description
      * Generate univoque string id
@@ -707,7 +694,7 @@ export const mobCore = {
     },
 
     /**
-     * @returns {Number}
+     * @returns {number}
      *
      * @description
      * Get current time.
@@ -717,7 +704,7 @@ export const mobCore = {
     },
 
     /**
-     * @param {function} fn
+     * @param {Function} fn
      * @returns {void}
      *
      * @description
@@ -735,16 +722,14 @@ export const mobCore = {
      * Props:
      * - usePassive: true
      * - instantFps: 60
-     * - fpsScalePercent: { 0: 1, 30: 2, 50: 3 }
-     * - useScaleFps:true
      * - deferredNextTick: true
      * - throttle: 60
      *
      *
      * @example
      * ``` javascript
-     * mobCore.store.set('fpsScalePercent', { 1: 10 });
-     * const { useScaleFps } = mobCore.store.get();
+     * mobCore.store.set('throttle', 300);
+     * const { throttle } = mobCore.store.get();
      * ....
      *
      * ```

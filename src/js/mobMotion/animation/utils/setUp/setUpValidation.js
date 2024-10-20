@@ -67,20 +67,6 @@ export const lerpVelocityDefault = 0.06;
  * @param {import('./type.js').setUpType} obj
  */
 export const setupValidation = (obj) => {
-    const fpsScalePercent = checkSetUpType({
-        prop: 'fpsScalePercent',
-        value: obj?.fpsScalePercent,
-        defaultValue: mobCore.store.getProp('fpsScalePercent'),
-        type: Object,
-    });
-
-    const useScaleFps = checkSetUpType({
-        prop: 'useScaleFps',
-        value: obj?.useScaleFps,
-        defaultValue: mobCore.store.getProp('useScaleFps'),
-        type: Boolean,
-    });
-
     const deferredNextTick = checkSetUpType({
         prop: 'deferredNextTick',
         value: obj?.deferredNextTick,
@@ -237,8 +223,6 @@ export const setupValidation = (obj) => {
      * @type {import('./type.js').setUpType}
      */
     const result = {
-        fpsScalePercent,
-        useScaleFps,
         deferredNextTick,
         throttle,
         usePassive,

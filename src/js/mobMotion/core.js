@@ -17,13 +17,6 @@ export const motionCore = {
      *
      * core.setDefault.set({
      *     startFps: 60,
-     *     fpsScalePercent: {
-     *         0: 1,
-     *         15: 2,
-     *         30: 3,
-     *         45: 4,
-     *     },
-     *     useScaleFps: true,
      *     deferredNextTick: false,
      *     throttle: 100,
      *     usePassive: true
@@ -153,7 +146,7 @@ export const motionCore = {
      * @param {import('./utils/type.js').mqActionMethods} action
      * @param {import('./utils/type.js').mqValues} breakpoint
      *
-     * @return {(Boolean|Number)} Returns a boolean value if the action value is equal to 'min' or 'max', returns a numeric value if it is equal to 'get'
+     * @return {(boolean|number)} Returns a boolean value if the action value is equal to 'min' or 'max', returns a numeric value if it is equal to 'get'
      *
      * @description
      *

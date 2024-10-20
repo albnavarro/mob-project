@@ -4,10 +4,7 @@ import { mobCore } from '../../../../mobCore';
 import { staggerEachWarning } from '../warning';
 
 /**
- * @param {Number} each
- * @param {Boolean} firstRun
- * @param {Array.<import('../callbacks/type').callbackObject>} arrayToCompare1
- * @param {Array.<import('../callbacks/type').callbackObject>} arrayToCompare2
+ * @type {import('./type').shouldInizializzeStagger}
  */
 export const shouldInizializzeStagger = (
     each,

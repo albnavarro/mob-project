@@ -5,7 +5,7 @@ import { getTime } from './rafutils/time';
 
 /**
  * @param {Function} func
- * @param {Number} limit
+ * @param {number} limit
  * @returns {Function}
  *
  * @description
@@ -15,6 +15,7 @@ export const throttle = (func, limit) => {
     let lastRan;
 
     return function () {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const context = this;
         const args = arguments;
 
