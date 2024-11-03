@@ -24,13 +24,8 @@ import {
     lerpGetId,
     lerpGetType,
     lerpGetValue,
-    lerpGoFrom,
-    lerpGoFromTo,
-    lerpGoTo,
     lerpOnComplete,
     lerpPause,
-    lerpSet,
-    lerpSetData,
     lerpStop,
     lerpSubscribe,
     lerpSubscribeCache,
@@ -66,13 +61,8 @@ import {
     springGetType,
     springGetValue,
     springGetValueNative,
-    springGoFrom,
-    springGoFromTo,
-    springGoTo,
     springOnComplete,
     springPause,
-    springSet,
-    springSetData,
     springStop,
     springSubscribe,
     springSubscribeCache,
@@ -103,28 +93,32 @@ import {
     tweenGetType,
     tweenGetValue,
     tweenGetValueNative,
-    tweenGoFrom,
-    tweenGoFromTo,
-    tweenGoTo,
     tweenOnComplete,
     tweenPause,
-    tweenSet,
-    tweenSetData,
     tweenStop,
     tweenSubscribe,
     tweenSubscribeCache,
     tweenUpdateEase,
 } from './animation/tween/type';
 import { directionType } from './animation/utils/timeline/type';
+import {
+    GoFrom,
+    GoFromTo,
+    GoTo,
+    Set,
+    SetData,
+    SetImmediate,
+} from './utils/type';
 
 export interface Lerp {
     stop: lerpStop;
     pause: lerpPause;
-    setData: lerpSetData;
-    goTo: lerpGoTo;
-    goFrom: lerpGoFrom;
-    goFromTo: lerpGoFromTo;
-    set: lerpSet;
+    setData: SetData;
+    goTo: GoTo;
+    goFrom: GoFrom;
+    goFromTo: GoFromTo;
+    set: Set;
+    setImmediate: SetImmediate;
     get: lerpGetValue;
     getInitialData: lerpGetValue;
     getFrom: lerpGetValue;
@@ -144,11 +138,12 @@ export interface Lerp {
 export interface Spring {
     stop: springStop;
     pause: springPause;
-    setData: springSetData;
-    goTo: springGoTo;
-    goFrom: springGoFrom;
-    goFromTo: springGoFromTo;
-    set: springSet;
+    setData: SetData;
+    goTo: GoTo;
+    goFrom: GoFrom;
+    goFromTo: GoFromTo;
+    set: Set;
+    setImmediate: SetImmediate;
     get: springGetValue;
     getInitialData: springGetValue;
     getFrom: springGetValue;
@@ -168,11 +163,12 @@ export interface Spring {
 export interface Tween {
     stop: tweenStop;
     pause: tweenPause;
-    setData: tweenSetData;
-    goTo: tweenGoTo;
-    goFrom: tweenGoFrom;
-    goFromTo: tweenGoFromTo;
-    set: tweenSet;
+    setData: SetData;
+    goTo: GoTo;
+    goFrom: GoFrom;
+    goFromTo: GoFromTo;
+    set: Set;
+    setImmediate: SetImmediate;
     get: tweenGetValue;
     getInitialData: tweenGetValue;
     getFrom: tweenGetValue;

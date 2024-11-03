@@ -50,7 +50,6 @@ export interface asyncTimelineTypeSpecialProps {
     relative?: boolean;
     delay?: number;
     immediate?: boolean;
-    immediateNoPromise?: boolean;
 }
 
 export interface asyncTimelineTween {
@@ -140,7 +139,7 @@ export type asyncTimelineSet = (
 export type asyncTimelineGoTo = (
     tween: any,
     valuesTo: Record<string, number>,
-    tweenProps: asyncTimelineTypeSpecialProps
+    tweenProps?: asyncTimelineTypeSpecialProps
 ) => HandleAsyncTimeline;
 
 export type asyncTimelineGoFrom = (

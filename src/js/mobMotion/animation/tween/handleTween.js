@@ -53,6 +53,146 @@ import { tweenGetValueOnDraw } from './getValuesOnDraw.js';
 
 export default class HandleTween {
     /**
+     * @type {Function}
+     *  This value lives from user call ( goTo etc..) until next call
+     */
+    #ease;
+
+    /**
+     * @type {number}
+     */
+    #duration;
+
+    /**
+     * @type {boolean}
+     */
+    #relative;
+
+    /**
+     * @type {import('../utils/stagger/type.js').staggerObject}
+     */
+    #stagger;
+
+    /**
+     * @type {string}
+     */
+    #uniqueId;
+
+    /**
+     * @type {boolean}
+     */
+    #isActive;
+
+    /**
+     * @type{(value:any) => void|null}
+     */
+    #currentReject;
+
+    /**
+     * @type{Promise<void>|undefined}
+     */
+    #promise;
+
+    /**
+     * @type {import('./type.js').tweenStoreData[]}
+     */
+    #values;
+
+    /**
+     * @type {import('./type.js').tweenInitialData[]}
+     */
+    #initialData;
+
+    /**
+     * @type {import('../utils/callbacks/type.js').callbackObject<(arg0:Record<string, number>) => void>[]}
+     */
+    #callback;
+
+    /**
+     * @type {import('../utils/callbacks/type.js').callbackObject<string>[]}
+     */
+    #callbackCache;
+
+    /**
+     * @type {import('../utils/callbacks/type.js').callbackObject<(arg0:Record<string, number>) => void>[]}
+     */
+    #callbackOnComplete;
+
+    /**
+     * @type {import('../utils/callbacks/type.js').callbackObject<(arg0:any) => boolean>[]}
+     */
+    #callbackStartInPause;
+
+    /**
+     * @type {Array<() => void>}
+     */
+    #unsubscribeCache;
+
+    /**
+     * @type {boolean}
+     */
+    #pauseStatus;
+
+    /**
+     * @type {boolean}
+     */
+    #comeFromResume;
+
+    /**
+     * @type {number}
+     */
+    #startTime;
+
+    /**
+     * @type {boolean}
+     */
+    #isRunning;
+
+    /**
+     * @type {number}
+     */
+    #timeElapsed;
+
+    /**
+     * @type {number}
+     */
+    #pauseTime;
+
+    /**
+     * @type {boolean}
+     */
+    #firstRun;
+
+    /**
+     * @type {boolean}
+     */
+    #useStagger;
+
+    /**
+     * @type {boolean}
+     */
+    #fpsInLoading;
+
+    /**
+     * @description
+     * This value is the base value merged with new value in custom prop
+     * passed form user in goTo etc..
+     *
+     * @type{import('./type.js').tweenDefault}
+     */
+    #defaultProps;
+
+    /**
+     * @type {import('../utils/stagger/type.js').staggerDefaultIndex}
+     */
+    #slowlestStagger;
+
+    /**
+     * @type {import('../utils/stagger/type.js').staggerDefaultIndex}
+     */
+    #fastestStagger;
+
+    /**
      * @param {import('./type.js').tweenProps} [ data ]
      *
      * @example
@@ -98,202 +238,40 @@ export default class HandleTween {
      * ```
      */
     constructor(data) {
-        /**
-         *  This value lives from user call ( goTo etc..) until next call
-         **/
-
-        /**
-         * @private
-         * @type {Function}
-         */
-        this.ease = easeTweenIsValidGetFunction(data?.ease);
-
-        /**
-         * @private
-         * @type {number}
-         */
-        this.duration = durationIsNumberOrFunctionIsValid(data?.duration);
-
-        /**
-         * @private
-         * @type {boolean}
-         */
-        this.relative = relativeIsValid(data?.relative, 'tween');
-
-        /**
-         * @private
-         * @type {import('../utils/stagger/type.js').staggerObject}
-         */
-        this.stagger = getStaggerFromProps(data);
-
-        /**
-         * @private
-         * @type {string}
-         */
-        this.uniqueId = mobCore.getUnivoqueId();
-
-        /**
-         * @private
-         * @type {boolean}
-         */
-        this.isActive = false;
-
-        /**
-         * @private
-         * @type{(value:any) => void|null}
-         */
-        this.currentResolve = undefined;
-
-        /**
-         * @private
-         * @type{(value:any) => void|null}
-         */
-        this.currentReject = undefined;
-
-        /**
-         * @private
-         * @type{Promise|undefined}
-         */
-        this.promise = undefined;
-
-        /**
-         * @private
-         * @type {import('./type.js').tweenStoreData[]}
-         */
-        this.values = [];
-
-        /**
-         * @private
-         * @type {import('./type.js').tweenInitialData[]}
-         */
-        this.initialData = [];
-
-        /**
-         * @private
-         * @type {import('../utils/callbacks/type.js').callbackObject<(arg0:Record<string, number>) => void>[]}
-         */
-        this.callback = [];
-
-        /**
-         * @private
-         * @type {import('../utils/callbacks/type.js').callbackObject<string>[]}
-         */
-        this.callbackCache = [];
-
-        /**
-         * @private
-         * @type {import('../utils/callbacks/type.js').callbackObject<(arg0:Record<string, number>) => void>[]}
-         */
-        this.callbackOnComplete = [];
-
-        /**
-         * @private
-         * @type {import('../utils/callbacks/type.js').callbackObject<(arg0:any) => boolean>[]}
-         */
-        this.callbackStartInPause = [];
-
-        /**
-         * @private
-         * @type {Array<() => void>}
-         */
-        this.unsubscribeCache = [];
-
-        /**
-         * @private
-         * @type {boolean}
-         */
-        this.pauseStatus = false;
-
-        /**
-         * @private
-         * @type {boolean}
-         */
-        this.comeFromResume = false;
-
-        /**
-         * @private
-         * @type {number}
-         */
-        this.startTime = 0;
-
-        /**
-         * @private
-         * @type {boolean}
-         */
-        this.isRunning = false;
-
-        /**
-         * @private
-         * @type {number}
-         */
-        this.timeElapsed = 0;
-
-        /**
-         * @private
-         * @type {number}
-         */
-        this.pauseTime = 0;
-
-        /**
-         * @private
-         * @type {boolean}
-         */
-        this.firstRun = true;
-
-        /**
-         * @private
-         * @type {boolean}
-         */
-        this.useStagger = true;
-
-        /**
-         * @private
-         * @type {boolean}
-         */
-        this.fpsInLoading = false;
-
-        /**
-        This value is the base value merged with new value in custom prop
-        passed form user in goTo etc..
-         **/
-
-        /**
-         * @private
-         * @type{import('./type.js').tweenDefault}
-         */
-        this.defaultProps = {
-            duration: this.duration,
+        this.#ease = easeTweenIsValidGetFunction(data?.ease);
+        this.#duration = durationIsNumberOrFunctionIsValid(data?.duration);
+        this.#relative = relativeIsValid(data?.relative, 'tween');
+        this.#stagger = getStaggerFromProps(data);
+        this.#uniqueId = mobCore.getUnivoqueId();
+        this.#isActive = false;
+        this.#currentReject = undefined;
+        this.#promise = undefined;
+        this.#values = [];
+        this.#initialData = [];
+        this.#callback = [];
+        this.#callbackCache = [];
+        this.#callbackOnComplete = [];
+        this.#callbackStartInPause = [];
+        this.#unsubscribeCache = [];
+        this.#pauseStatus = false;
+        this.#comeFromResume = false;
+        this.#startTime = 0;
+        this.#isRunning = false;
+        this.#timeElapsed = 0;
+        this.#pauseTime = 0;
+        this.#firstRun = true;
+        this.#useStagger = true;
+        this.#fpsInLoading = false;
+        this.#defaultProps = {
+            duration: this.#duration,
             ease: easeTweenIsValid(data?.ease),
-            relative: this.relative,
+            relative: this.#relative,
             reverse: false,
             immediate: false,
-            immediateNoPromise: false,
         };
+        this.#slowlestStagger = STAGGER_DEFAULT_INDEX_OBJ;
+        this.#fastestStagger = STAGGER_DEFAULT_INDEX_OBJ;
 
-        /**
-        Stagger value
-         **/
-
-        /**
-         * @private
-         * @type {import('../utils/stagger/type.js').staggerDefaultIndex}
-         */
-        this.slowlestStagger = STAGGER_DEFAULT_INDEX_OBJ;
-
-        /**
-         * @private
-         * @type {import('../utils/stagger/type.js').staggerDefaultIndex}
-         */
-        this.fastestStagger = STAGGER_DEFAULT_INDEX_OBJ;
-
-        /**
-         * Set initial store data if defined in constructor props
-         * If not use setData methods
-         */
-
-        /**
-         * @private
-         */
         const props = data?.data || null;
         if (props) this.setData(props);
     }
@@ -304,52 +282,55 @@ export default class HandleTween {
      *
      * @returns {void}
      */
-    draw(time, res = () => {}) {
-        this.isActive = true;
+    #draw(time, res = () => {}) {
+        this.#isActive = true;
 
-        if (this.pauseStatus) {
-            this.pauseTime = time - this.startTime - this.timeElapsed;
+        if (this.#pauseStatus) {
+            this.#pauseTime = time - this.#startTime - this.#timeElapsed;
         }
-        this.timeElapsed = time - this.startTime - this.pauseTime;
+        this.#timeElapsed = time - this.#startTime - this.#pauseTime;
 
-        if (this.isRunning && Math.round(this.timeElapsed) >= this.duration) {
-            this.timeElapsed = this.duration;
+        if (
+            this.#isRunning &&
+            Math.round(this.#timeElapsed) >= this.#duration
+        ) {
+            this.#timeElapsed = this.#duration;
         }
 
-        this.values = tweenGetValueOnDraw({
-            values: this.values,
-            timeElapsed: this.timeElapsed,
-            duration: this.duration,
-            ease: this.ease,
+        this.#values = tweenGetValueOnDraw({
+            values: this.#values,
+            timeElapsed: this.#timeElapsed,
+            duration: this.#duration,
+            ease: this.#ease,
         });
 
-        const isSettled = Math.round(this.timeElapsed) === this.duration;
+        const isSettled = Math.round(this.#timeElapsed) === this.#duration;
 
         // Prepare an obj to pass to the callback
-        const callBackObject = getValueObj(this.values, 'currentValue');
+        const callBackObject = getValueObj(this.#values, 'currentValue');
 
         defaultCallback({
-            stagger: this.stagger,
-            callback: this.callback,
-            callbackCache: this.callbackCache,
+            stagger: this.#stagger,
+            callback: this.#callback,
+            callbackCache: this.#callbackCache,
             callBackObject: callBackObject,
-            useStagger: this.useStagger,
+            useStagger: this.#useStagger,
         });
 
-        this.isRunning = true;
+        this.#isRunning = true;
 
         if (isSettled) {
             const onComplete = () => {
-                this.isActive = false;
-                this.isRunning = false;
-                this.pauseTime = 0;
+                this.#isActive = false;
+                this.#isRunning = false;
+                this.#pauseTime = 0;
 
                 /**
                  * End of animation
                  * Set fromValue with ended value
                  * At the next call fromValue become the start value
                  */
-                this.values = [...this.values].map((item) => {
+                this.#values = [...this.#values].map((item) => {
                     if (!item.shouldUpdate) return item;
 
                     return {
@@ -360,26 +341,25 @@ export default class HandleTween {
                 });
 
                 // On complete
-                if (!this.pauseStatus) {
+                if (!this.#pauseStatus) {
                     res();
 
                     // Set promise reference to null once resolved
-                    this.promise = undefined;
-                    this.currentReject = undefined;
-                    this.currentResolve = undefined;
+                    this.#promise = undefined;
+                    this.#currentReject = undefined;
                 }
             };
 
             defaultCallbackOnComplete({
                 onComplete,
-                callback: this.callback,
-                callbackCache: this.callbackCache,
-                callbackOnComplete: this.callbackOnComplete,
+                callback: this.#callback,
+                callbackCache: this.#callbackCache,
+                callbackOnComplete: this.#callbackOnComplete,
                 callBackObject: callBackObject,
-                stagger: this.stagger,
-                slowlestStagger: this.slowlestStagger,
-                fastestStagger: this.fastestStagger,
-                useStagger: this.useStagger,
+                stagger: this.#stagger,
+                slowlestStagger: this.#slowlestStagger,
+                fastestStagger: this.#fastestStagger,
+                useStagger: this.#useStagger,
             });
 
             return;
@@ -387,22 +367,21 @@ export default class HandleTween {
 
         mobCore.useFrame(() => {
             mobCore.useNextTick(({ time }) => {
-                if (this.isActive) this.draw(time, res);
+                if (this.#isActive) this.#draw(time, res);
             });
         });
     }
 
     /**
-     * @private
      * @param {number} time current global time
      * @param {boolean} _fps current FPS
      * @param {Function} res current promise resolve
      *
      * @returns {void}
      **/
-    onReuqestAnim(time, _fps, res) {
-        this.startTime = time;
-        this.draw(time, res);
+    #onReuqestAnim(time, _fps, res) {
+        this.#startTime = time;
+        this.#draw(time, res);
     }
 
     /**
@@ -411,7 +390,7 @@ export default class HandleTween {
      *
      * @returns {Promise<any>}
      */
-    async inzializeStagger() {
+    async #inzializeStagger() {
         /**
          * First time il there is a stagger load fps then go next step
          * next time no need to calcaulte stagger and jump directly next step
@@ -419,20 +398,20 @@ export default class HandleTween {
          **/
         if (
             shouldInizializzeStagger(
-                this.stagger.each,
-                this.firstRun,
-                this.callbackCache,
-                this.callback
+                this.#stagger.each,
+                this.#firstRun,
+                this.#callbackCache,
+                this.#callback
             )
         ) {
             const { averageFPS } = await mobCore.useFps();
 
             fpsLoadedLog('tween', averageFPS);
-            const cb = getStaggerArray(this.callbackCache, this.callback);
+            const cb = getStaggerArray(this.#callbackCache, this.#callback);
 
-            if (this.stagger.grid.col > cb.length) {
+            if (this.#stagger.grid.col > cb.length) {
                 staggerIsOutOfRangeWarning(cb.length);
-                this.firstRun = false;
+                this.#firstRun = false;
                 return;
             }
 
@@ -443,47 +422,45 @@ export default class HandleTween {
                 slowlestStagger,
             } = setStagger({
                 arrayDefault: cb,
-                arrayOnStop: this.callbackOnComplete,
-                stagger: this.stagger,
-                slowlestStagger: this.slowlestStagger,
-                fastestStagger: this.fastestStagger,
+                arrayOnStop: this.#callbackOnComplete,
+                stagger: this.#stagger,
+                slowlestStagger: this.#slowlestStagger,
+                fastestStagger: this.#fastestStagger,
             });
 
-            if (this.callbackCache.length > this.callback.length) {
-                this.callbackCache = staggerArray;
+            if (this.#callbackCache.length > this.#callback.length) {
+                this.#callbackCache = staggerArray;
             } else {
-                this.callback = staggerArray;
+                this.#callback = staggerArray;
             }
-            this.callbackOnComplete = staggerArrayOnComplete;
-            this.slowlestStagger = slowlestStagger;
-            this.fastestStagger = fastestStagger;
-            this.firstRun = false;
+            this.#callbackOnComplete = staggerArrayOnComplete;
+            this.#slowlestStagger = slowlestStagger;
+            this.#fastestStagger = fastestStagger;
+            this.#firstRun = false;
         }
 
         return { ready: true };
     }
 
     /**
-     * @private
      * @param {(value:any) => void} res
      * @param {(value:any) => void} reject
      *
      * @returns {Promise}
      */
-    async startRaf(res, reject) {
-        if (this.fpsInLoading) return;
-        this.currentResolve = res;
-        this.currentReject = reject;
+    async #startRaf(res, reject) {
+        if (this.#fpsInLoading) return;
+        this.#currentReject = reject;
 
-        if (this.firstRun) {
-            this.fpsInLoading = true;
-            await this.inzializeStagger();
-            this.fpsInLoading = false;
+        if (this.#firstRun) {
+            this.#fpsInLoading = true;
+            await this.#inzializeStagger();
+            this.#fpsInLoading = false;
         }
 
         initRaf(
-            this.callbackStartInPause,
-            this.onReuqestAnim.bind(this),
+            this.#callbackStartInPause,
+            this.#onReuqestAnim.bind(this),
             this.pause.bind(this),
             res
         );
@@ -493,51 +470,50 @@ export default class HandleTween {
      * @type {import('./type.js').tweenStop}
      */
     stop({ clearCache = true } = {}) {
-        this.pauseTime = 0;
-        this.pauseStatus = false;
-        this.comeFromResume = false;
-        this.values = setFromToByCurrent(this.values);
+        this.#pauseTime = 0;
+        this.#pauseStatus = false;
+        this.#comeFromResume = false;
+        this.#values = setFromToByCurrent(this.#values);
 
         /**
          * If isRunning clear all funture stagger.
          * If tween is ended and the lst stagger is running, let it reach end position.
          */
-        if (this.isActive && clearCache)
-            this.callbackCache.forEach(({ cb }) => mobCore.useCache.clean(cb));
+        if (this.#isActive && clearCache)
+            this.#callbackCache.forEach(({ cb }) => mobCore.useCache.clean(cb));
 
         // Abort promise
-        if (this.currentReject) {
-            this.currentReject(mobCore.ANIMATION_STOP_REJECT);
-            this.promise = undefined;
-            this.currentReject = undefined;
-            this.currentResolve = undefined;
+        if (this.#currentReject) {
+            this.#currentReject(mobCore.ANIMATION_STOP_REJECT);
+            this.#promise = undefined;
+            this.#currentReject = undefined;
         }
 
-        this.isActive = false;
+        this.#isActive = false;
     }
 
     /**
      * @type {import('./type.js').tweenPause}
      */
     pause() {
-        if (this.pauseStatus) return;
-        this.pauseStatus = true;
+        if (this.#pauseStatus) return;
+        this.#pauseStatus = true;
     }
 
     /**
      * @type {import('./type.js').tweenResume}
      */
     resume() {
-        if (!this.pauseStatus) return;
-        this.pauseStatus = false;
-        this.comeFromResume = true;
+        if (!this.#pauseStatus) return;
+        this.#pauseStatus = false;
+        this.#comeFromResume = true;
     }
 
     /**
-     * @type {import('./type.js').tweenSetData}
+     * @type {import('../../utils/type.js').SetData}
      */
     setData(obj) {
-        this.values = Object.entries(obj).map((item) => {
+        this.#values = Object.entries(obj).map((item) => {
             const [prop, value] = item;
             return {
                 prop: prop,
@@ -555,7 +531,7 @@ export default class HandleTween {
             };
         });
 
-        this.initialData = this.values.map((item) => {
+        this.#initialData = this.#values.map((item) => {
             return {
                 prop: item.prop,
                 toValue: item.toValue,
@@ -575,27 +551,25 @@ export default class HandleTween {
      * @type {import('./type.js').tweenResetData}
      */
     resetData() {
-        this.values = mergeDeep(this.values, this.initialData);
+        this.#values = mergeDeep(this.#values, this.#initialData);
     }
 
     /**
-     * @private
-     *
      * @description
      * Reject promise and update form value with current
      *
      * @returns {void}
      */
-    updateDataWhileRunning() {
-        this.isActive = false;
+    #updateDataWhileRunning() {
+        this.#isActive = false;
 
         // Reject promise
-        if (this.currentReject) {
-            this.currentReject(mobCore.ANIMATION_STOP_REJECT);
-            this.promise = undefined;
+        if (this.#currentReject) {
+            this.#currentReject(mobCore.ANIMATION_STOP_REJECT);
+            this.#promise = undefined;
         }
 
-        this.values = [...this.values].map((item) => {
+        this.#values = [...this.#values].map((item) => {
             if (!item.shouldUpdate) return item;
 
             return {
@@ -606,107 +580,120 @@ export default class HandleTween {
     }
 
     /**
-     * @private
-     *
      * @type  {import('./type.js').tweenMergeProps}
      *
      * @description
      * Merge special props with default props
      *
      */
-    mergeProps(props) {
-        const newProps = { ...this.defaultProps, ...props };
+    #mergeProps(props) {
+        const newProps = { ...this.#defaultProps, ...props };
         const { ease, duration, relative } = newProps;
-        this.ease = easeTweenIsValidGetFunction(ease);
-        this.relative = relativeIsValid(relative, 'tween');
-        this.duration = durationIsNumberOrFunctionIsValid(duration);
+        this.#ease = easeTweenIsValidGetFunction(ease);
+        this.#relative = relativeIsValid(relative, 'tween');
+        this.#duration = durationIsNumberOrFunctionIsValid(duration);
         return newProps;
     }
 
     /**
-     * @type {import('./type.js').tweenGoTo} obj to Values
+     * @type {import('../../utils/type.js').GoTo<import('./type.js').tweenAction>} obj to Values
      */
-    goTo(obj, props = {}) {
-        if (this.pauseStatus || this.comeFromResume) this.stop();
-        this.useStagger = true;
+    goTo(obj, props) {
+        if (this.#pauseStatus || this.#comeFromResume) this.stop();
+        this.#useStagger = true;
         const data = goToUtils(obj);
-        return this.doAction(data, props, obj);
+        return this.#doAction(data, props, obj);
     }
 
     /**
-     * @type {import('./type.js').tweenGoFrom}
+     * @type {import('../../utils/type.js').GoFrom<import('./type.js').tweenAction>} obj to Values
      */
-    goFrom(obj, props = {}) {
-        if (this.pauseStatus || this.comeFromResume) this.stop();
-        this.useStagger = true;
+    goFrom(obj, props) {
+        if (this.#pauseStatus || this.#comeFromResume) this.stop();
+        this.#useStagger = true;
         const data = goFromUtils(obj);
-        return this.doAction(data, props, obj);
+        return this.#doAction(data, props, obj);
     }
 
     /**
-     * @type {import('./type.js').tweenGoFromTo}
+     * @type {import('../../utils/type.js').GoFromTo<import('./type.js').tweenAction>} obj to Values
      */
-    goFromTo(fromObj, toObj, props = {}) {
-        if (this.pauseStatus || this.comeFromResume) this.stop();
-        this.useStagger = true;
+    goFromTo(fromObj, toObj, props) {
+        if (this.#pauseStatus || this.#comeFromResume) this.stop();
+        this.#useStagger = true;
 
         if (!compareKeys(fromObj, toObj)) {
             compareKeysWarning('tween goFromTo:', fromObj, toObj);
-            return this.promise;
+            return this.#promise;
         }
 
         const data = goFromToUtils(fromObj, toObj);
-        return this.doAction(data, props, fromObj);
+        return this.#doAction(data, props, fromObj);
     }
 
     /**
-     * @type {import('./type.js').tweenSet}
+     * @type {import('../../utils/type.js').Set<import('./type.js').tweenAction>} obj to Values
      */
-    set(obj, props = {}) {
-        if (this.pauseStatus || this.comeFromResume) this.stop();
-        this.useStagger = false;
+    set(obj, props) {
+        if (this.#pauseStatus || this.#comeFromResume) this.stop();
+        this.#useStagger = false;
         const data = setUtils(obj);
 
         // In set mode duration is small as possible
-        props.duration = 1;
-        return this.doAction(data, props, obj);
+        const propsParsed = props ? { ...props, duration: 1 } : { duration: 1 };
+        return this.#doAction(data, propsParsed, obj);
     }
 
     /**
-     * @private
-     * @type {import('./type.js').tweenDoAction} data Updated data
+     * @type {import('../../utils/type.js').SetImmediate<import('./type.js').tweenAction>} obj to Values
      */
-    doAction(data, props, obj) {
-        this.values = mergeArrayTween(data, this.values);
-        if (this.isActive) this.updateDataWhileRunning();
+    setImmediate(obj, props) {
+        if (this.#pauseStatus || this.#comeFromResume) this.stop();
+        this.#useStagger = false;
 
-        const { reverse, immediate, immediateNoPromise } =
-            this.mergeProps(props);
+        const data = setUtils(obj);
+        const propsParsed = props ? { ...props, duration: 1 } : { duration: 1 };
+        this.#values = mergeArrayTween(data, this.#values);
 
+        if (this.#isActive) this.#updateDataWhileRunning();
+
+        const { reverse } = this.#mergeProps(propsParsed);
         if (valueIsBooleanAndTrue(reverse, 'reverse'))
-            this.value = setReverseValues(obj, this.values);
+            this.#values = setReverseValues(obj, this.#values);
 
-        this.values = setRelativeTween(this.values, this.relative);
+        this.#values = setRelativeTween(this.#values, this.#relative);
+        this.#values = setFromCurrentByTo(this.#values);
+
+        this.#isActive = false;
+        return;
+    }
+
+    /**
+     * @type {import('../../utils/type.js').DoAction<import('./type.js').tweenAction>} obj to Values
+     */
+    #doAction(data, props = {}, obj) {
+        this.#values = mergeArrayTween(data, this.#values);
+        if (this.#isActive) this.#updateDataWhileRunning();
+
+        const { reverse, immediate } = this.#mergeProps(props);
+        if (valueIsBooleanAndTrue(reverse, 'reverse'))
+            this.#values = setReverseValues(obj, this.#values);
+
+        this.#values = setRelativeTween(this.#values, this.#relative);
 
         if (valueIsBooleanAndTrue(immediate, 'immediate ')) {
-            this.isActive = false;
-            this.values = setFromCurrentByTo(this.values);
+            this.#isActive = false;
+            this.#values = setFromCurrentByTo(this.#values);
             return Promise.resolve();
         }
 
-        if (valueIsBooleanAndTrue(immediateNoPromise, 'immediateNoPromise')) {
-            this.isActive = false;
-            this.values = setFromCurrentByTo(this.values);
-            return;
-        }
-
-        if (!this.isActive) {
-            this.promise = new Promise((res, reject) => {
-                this.startRaf(res, reject);
+        if (!this.#isActive) {
+            this.#promise = new Promise((res, reject) => {
+                this.#startRaf(res, reject);
             });
         }
 
-        if (this.promise) return this.promise;
+        if (this.#promise) return this.#promise;
     }
 
     /**
@@ -723,7 +710,7 @@ export default class HandleTween {
      * ```
      */
     get() {
-        return getValueObj(this.values, 'currentValue');
+        return getValueObj(this.#values, 'currentValue');
     }
 
     /**
@@ -740,7 +727,7 @@ export default class HandleTween {
      * ```
      */
     getInitialData() {
-        return getValueObj(this.initialData, 'currentValue');
+        return getValueObj(this.#initialData, 'currentValue');
     }
 
     /**
@@ -757,7 +744,7 @@ export default class HandleTween {
      * ```
      */
     getFrom() {
-        return getValueObj(this.values, 'fromValue');
+        return getValueObj(this.#values, 'fromValue');
     }
 
     /**
@@ -774,7 +761,7 @@ export default class HandleTween {
      * ```
      */
     getTo() {
-        return getValueObj(this.values, 'toValue');
+        return getValueObj(this.#values, 'toValue');
     }
 
     /**
@@ -791,7 +778,7 @@ export default class HandleTween {
      * ```
      */
     getFromNativeType() {
-        return getValueObjFromNative(this.values);
+        return getValueObjFromNative(this.#values);
     }
 
     /**
@@ -808,7 +795,7 @@ export default class HandleTween {
      * ```
      */
     getToNativeType() {
-        return getValueObjToNative(this.values);
+        return getValueObjToNative(this.#values);
     }
 
     /**
@@ -842,7 +829,7 @@ export default class HandleTween {
      * ```
      */
     getId() {
-        return this.uniqueId;
+        return this.#uniqueId;
     }
 
     /**
@@ -852,8 +839,8 @@ export default class HandleTween {
      *
      */
     updateEase(ease) {
-        this.ease = easeTweenIsValidGetFunction(ease);
-        this.defaultProps = mergeDeep(this.defaultProps, {
+        this.#ease = easeTweenIsValidGetFunction(ease);
+        this.#defaultProps = mergeDeep(this.#defaultProps, {
             ease,
         });
     }
@@ -868,11 +855,11 @@ export default class HandleTween {
     subscribe(cb) {
         const { arrayOfCallbackUpdated, unsubscribeCb } = setCallBack(
             cb,
-            this.callback
+            this.#callback
         );
-        this.callback = arrayOfCallbackUpdated;
+        this.#callback = arrayOfCallbackUpdated;
 
-        return () => (this.callback = unsubscribeCb(this.callback));
+        return () => (this.#callback = unsubscribeCb(this.#callback));
     }
 
     /**
@@ -887,14 +874,14 @@ export default class HandleTween {
     onStartInPause(cb) {
         const { arrayOfCallbackUpdated } = setCallBack(
             cb,
-            this.callbackStartInPause
+            this.#callbackStartInPause
         );
-        this.callbackStartInPause =
+        this.#callbackStartInPause =
             /** @type{import('../utils/callbacks/type.js').callbackObject<(arg0:any) => boolean>[]} */ (
                 arrayOfCallbackUpdated
             );
 
-        return () => (this.callbackStartInPause = []);
+        return () => (this.#callbackStartInPause = []);
     }
 
     /**
@@ -909,12 +896,14 @@ export default class HandleTween {
     onComplete(cb) {
         const { arrayOfCallbackUpdated, unsubscribeCb } = setCallBack(
             cb,
-            this.callbackOnComplete
+            this.#callbackOnComplete
         );
-        this.callbackOnComplete = arrayOfCallbackUpdated;
+        this.#callbackOnComplete = arrayOfCallbackUpdated;
 
         return () =>
-            (this.callbackOnComplete = unsubscribeCb(this.callbackOnComplete));
+            (this.#callbackOnComplete = unsubscribeCb(
+                this.#callbackOnComplete
+            ));
     }
 
     /**
@@ -928,13 +917,13 @@ export default class HandleTween {
             setCallBackCache(
                 item,
                 fn,
-                this.callbackCache,
-                this.unsubscribeCache
+                this.#callbackCache,
+                this.#unsubscribeCache
             );
 
-        this.callbackCache = arrayOfCallbackUpdated;
-        this.unsubscribeCache = unsubscribeCache;
-        return () => (this.callbackCache = unsubscribeCb(this.callbackCache));
+        this.#callbackCache = arrayOfCallbackUpdated;
+        this.#unsubscribeCache = unsubscribeCache;
+        return () => (this.#callbackCache = unsubscribeCb(this.#callbackCache));
     }
 
     /**
@@ -944,14 +933,14 @@ export default class HandleTween {
      * @returns {void}
      */
     destroy() {
-        if (this.promise) this.stop();
-        this.callbackOnComplete = [];
-        this.callbackStartInPause = [];
-        this.callback = [];
-        this.callbackCache = [];
-        this.values = [];
-        this.promise = undefined;
-        this.unsubscribeCache.forEach((unsubscribe) => unsubscribe());
-        this.unsubscribeCache = [];
+        if (this.#promise) this.stop();
+        this.#callbackOnComplete = [];
+        this.#callbackStartInPause = [];
+        this.#callback = [];
+        this.#callbackCache = [];
+        this.#values = [];
+        this.#promise = undefined;
+        this.#unsubscribeCache.forEach((unsubscribe) => unsubscribe());
+        this.#unsubscribeCache = [];
     }
 }

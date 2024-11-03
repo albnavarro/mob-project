@@ -576,7 +576,7 @@ export const valueIsNumberAndReturnDefault = (value, label, defaultValue) => {
 /**
  *
  * @param {Function|undefined} value
- * @returns {Function}
+ * @returns {() => void}
  *
  * @description
  * Check if value is Function and return default
@@ -1029,7 +1029,7 @@ export const parallaxRangeIsValid = (value, type) => {
  * @param {string|undefined} mq
  * @param {string} label
  * @param {string} component
- * @returns {string}
+ * @returns {import('../../../utils/type').mqValues}
  *
  * @description
  * Check if breakpoint prop is valid
@@ -1052,7 +1052,7 @@ export const breakpointIsValid = (mq, label, component) => {
  * @param {string|undefined} type
  * @param {string} label
  * @param {string} component
- * @returns {string}
+ * @returns {import('../../../utils/type').mqAction}
  *
  * @description
  * Check if queryType prop is valid

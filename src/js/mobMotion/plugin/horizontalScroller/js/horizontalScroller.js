@@ -1,3 +1,5 @@
+//@ts-check
+
 import ParallaxClass from '../../../animation/parallax/parallax';
 import {
     getTranslateValues,
@@ -19,681 +21,691 @@ import {
 } from '../../../animation/utils/tweenAction/tweenValidation';
 import { mobCore } from '../../../../mobCore';
 
-/**
- * @typedef {Object} horizontalScrollerType
-
- * @prop {boolean} [ useDrag = false ]
-    Enable drag.
- * @prop {number} [ threshold = 30 ]
-    Modify threshold value for click action.
-    Default value is `30`.
- * @prop {boolean} [ ease = false ]
-    Defines whether the animation will have ease.
-    The default value is `false`.
- * @prop {boolean} [ animateAtStart = false ]
-    The element will animate with easing (if used) on loading the page or animation.
-    The default value is `false`.
- * @prop {('spring'|'lerp')} [ easeType = 'lerp']
-    Defines the type of easing. The default is `lerp`.
- * @prop {boolean} [ useThrottle = false ]
-    Enable a Throttle function on the scroll.
-    The option will not be enabled with the presence of an active pin to maintain accuracy.
-    The default value is `false`.
- * @prop {boolean} [ forceTranspond = false ]
-    Property valid only with `useSticky = false`.
-    The element will always be appended to the document body.
-    The default value is false.
- * @prop {function():void} [ onEnter = null ] -
- * @prop {function():void} [ onEnterBack = null ] -
- * @prop {function():void} [ onLeave = null ] -
- * @prop {function():void} [ onLeaveBack = null ]-
- * @prop {function({value:number, percent:number, parentIsMoving:boolean}):void} [ onTick = null ]
-   Function that is launched at each tick.
-   The function will have an Object as input parameter.
-   `value`: scroll value
-   `percent`: scroll value in percent
-   `parentIsMoving`: A boolean value indicating whether the scroller has stopped ( last tick )
- * @prop {function():void} [ afterRefresh = null ]
-   Function that is launched after refresh
- * @prop {function():void} [ afterInit = null ]
-   Function that is launched after initialization
- * @prop {function():void} [ afterDestroy = null ]
-   Function that is launched after destroy
- * @prop {boolean} [ useWillChange ]
-    Enable the css property will-change: transform; when the frame rate falls below 3/5 of the optimal value.
-    The property remains active for 4 sedonds.
-    If after the previous value the fps value is back to normal the will-change property is disabled.
-    `Use with CAUTION only if necessary.`
-    The default value is `false`.
- * @prop {boolean} [ animatePin = false ]
-    Property valid only with `useSticky = false`.
-    A spring animation will be applied to the pinned element on state change.
-
- * @prop {Object} [ useSticky ]
-    Use native `position: sticky` to pin the scroller or use scrolleTrigger pin.
-    Default value is `false`.
- * @prop {boolean} [ addCss ]
-    Generate scoped css.
-    Default value is `true`.
- * @prop {number} [columnHeight]
-    If the addCss property is active, it is possible to define a default height for the columns.
-    The value must be a number between 0 and 100.
-    The unit of measure used in vh
-    The default value is `100`.
- * @prop {number} [columnWidth]
-    If the addCss property is active, it is possible to define a default width for the columns.
-    The value must be a number between 0 and 100.
-    The unit of measure used in `vh`
-    The default value is null ( no value will be applied ).
-* @prop {('start'|'center'|'end')} columnAlign
-    If the addCss property is active, it is possible to define the vertical alignment of the columns.
-    The default value is `start`.
-* @prop {string} root
-    Root element.
-    Accept only a unique class in the form of a string (dot included)
-    It is necessary to provide a string in order to create the necessary css.
-* @prop {string} container
-    Container element.
-    Accept only a unique class in the form of a string (dot included)
-    It is necessary to provide a string in order to create the necessary css.
-* @prop {string} row
-    Row element.
-    Accept only a unique class in the form of a string (dot included)
-    It is necessary to provide a string in order to create the necessary css.
-* @prop {string} column
-    Column element.
-    Accept only a unique class in the form of a string (dot included)
-    It is necessary to provide a string in order to create the necessary css.
-* @prop {string} trigger
-    Trigger element.
-    Accept only a unique class in the form of a string (dot included)
-    It is necessary to provide a string in order to create the necessary css.
-* @prop {string} shadowClass
-    The name of the class that will be used to create vertical shadow elements.
-    In this case the dot is optional.
-* @prop {Array.<ParallaxClass>} children
-    An array of instances of the ParallaxClass class used within the scroller.
-    Es:
-    const parallax = mobbu.createParallax({ ... })
-    const scrolltrigger = mobbu.createScrollTrigger({ ... })
-    ...
-    children: [parallax, scrolltrigger],
-    ...
-
-    The instances contained in the array will be:
-    Drive.
-    Updated.
-    Destroyed.
-
-    The `scroller`,`direction`,`branckPoint`,`queryType` properties
-    will be automatically aligned.
-  */
-
-/**
- * @typedef {Object} mqTypeObject
- * @prop {import('../../../utils/type.js').mqAction} [ queryType = "min" ] - Defines whether the defined breakpoint will be a max-with or a min-width. The default is 'min-width'.
- **/
-
-/**
- * @typedef {Object} breackPointTypeObj
- * @prop {import('../../../utils/type.js').mqValues} [ breakpoint ]
- */
-
-/**
- * @typedef  { horizontalScrollerType & breackPointTypeObj & mqTypeObject } horizontalScrollerConstructorType
- */
-
 export class HorizontalScroller {
     /**
-     * @param  { horizontalScrollerConstructorType } data
-    *
-    * @description
-    *
-    * Create new HorizontalScroller instance.
-    *
-    * Special attributes to handle shadow elements:
-    * Apply the following data-attributes to any element
-    *
-    * `data-shadow="<String>"`
-    * Create a vertical shadow element with a custom className.
-    *
-    * `data-debug`
-    * Makes the shadow element visible
-    *
-    * Available methods:
-    * myHorizontalScroller.init();
-    * myHorizontalScroller.refresh();
-    * myHorizontalScroller.destroy();
-    *
-    * @example
-    *
-    ```html
-        HTML:
-        <div class="root">
-            <div class="container">
-                <div class="row">
-                    <section class="column" data-shadow="section1">
-                        <h1>title</h1>
-                    </section>
-                    <section class="column">
-                        <h1 data-shadow="title" data-debug>title</h1>
-                    </section>
-                    ...
-                </div>
-                <div class="trigger"></div>
-            </div>
-        </div>
-    ```
-    ```javascript
-        JS:
-        const myHorizontalScroller = new HorizontalScroller({
-            root: '.root',
-            container: '.container',
-            row: '.row',
-            column: '.column',
-            trigger: '.trigger',
-            shadowClass: '.myShadowClass,
-            useThrottle: [ Boolean ],
-            useSticky: [ Boolean ],
-            animatePin: [ Boolean ],
-            forceTranspond: [ Boolean ],
-            useWillChange: [ Boolean ],
-            animateAtStart: [ Boolean ],
-            queryType: [ String ],
-            breakpoint: [ String ],
-            ease: [ Boolean ],
-            easeType: [ String ],
-            addCss: [ Boolean ],
-            columnHeight: [ Number ],
-            columnWidth: [ Number ],
-            columnAlign: [ String ],
-            children: [child1,child2, ...],
-            onEnter: () => {
-                ...
-            },
-            onEnterBack: () => {
-                ...
-            },
-            onLeave: () => {
-                ...
-            },
-            onLeaveBack: () => {
-                ...
-            },
-            afterInit: () => {
-                ...
-            },
-            onTick: ({ value, parentIsMoving, percent }) => {
-                ...
-            },
-            afterRefresh: () => {
-                ...
-            },
-            afterDestroy: () => {
-                ...
-            },
-        });
-    ```
-    *
+     * @type {boolean}
      */
-    constructor(data = {}) {
-        /**
-         * @private
-         */
-        this.propsisValid = true;
+    #propsisValid;
 
-        /**
-         * @private
-         */
-        this.triggerTopPosition = 0;
+    /**
+     * @type {number}
+     */
+    #triggerTopPosition;
 
-        /**
-         * @private
-         */
-        this.touchActive = false;
+    /**
+     * @type {boolean}
+     */
+    #touchActive;
 
-        /**
-         * @private
-         */
-        this.lastTouchValueX = 0;
+    /**
+     * @type {number}
+     */
+    #lastTouchValueX;
 
-        /**
-         * @private
-         */
-        this.dragSecureAreaBottom = 100;
+    /**
+     * @type {number}
+     */
+    #dragSecureAreaBottom;
 
-        /**
-         * @private
-         */
-        this.dragSecureAreaTop = 100;
+    /**
+     * @type {number}
+     */
+    #dragSecureAreaTop;
 
-        /**
-         * @private
-         */
-        this.shouldDragValue = false;
+    /**
+     * @type {boolean}
+     */
+    #shouldDragValue;
 
-        /**
-         * @private
-         */
-        this.button = [];
+    /**
+     * @type {number}
+     */
+    #scrollValue;
 
-        /**
-         * @private
-         */
-        this.scrollValue = 0;
+    /**
+     * @type {() => void}
+     */
+    #unsubscribeScroll;
 
-        /**
-         * @private
-         */
-        this.unsubscribeScroll = () => {};
+    /**
+     * @type {boolean}
+     */
+    #useDrag;
 
-        /**
-         * @private
-         */
-        this.useDrag = valueIsBooleanAndReturnDefault(
+    /**
+     * @type {number}
+     */
+    #threshold;
+
+    /**
+     * @type {boolean}
+     */
+    #useWillChange;
+
+    /**
+     * @type {import('../../../utils/type').mqValues}
+     */
+    #breakpoint;
+
+    /**
+     * @type {import('../../../utils/type').mqAction}
+     */
+    #queryType;
+
+    /**
+     * @type {boolean}
+     */
+    #forceTranspond;
+
+    /**
+     * @type {boolean}
+     */
+    #addCss;
+
+    /**
+     * @type {boolean}
+     */
+    #animateAtStart;
+
+    /**
+     * @type {boolean}
+     */
+    #ease;
+
+    /**
+     * @type {'lerp'|'spring'}
+     */
+    #easeType;
+
+    /**
+     * @type {boolean}
+     */
+    #useSticky;
+
+    /**
+     * @type {boolean}
+     */
+    #animatePin;
+
+    /**
+     * @type {boolean}
+     */
+    #reverse;
+
+    /**
+     * @type {boolean}
+     */
+    #useThrottle;
+
+    /**
+     * @type {number}
+     */
+    #columnHeight;
+
+    /**
+     * @type {number}
+     */
+    #columnWidth;
+
+    /**
+     * @type {string}
+     */
+    #columnAlign;
+
+    /**
+     * @type {() => void}
+     */
+    #onEnter;
+
+    /**
+     * @type {() => void}
+     */
+    #onEnterBack;
+
+    /**
+     * @type {() => void}
+     */
+    #onLeave;
+
+    /**
+     * @type {() => void}
+     */
+    #onLeaveBack;
+
+    /**
+     * @type {() => void}
+     */
+    #afterInit;
+
+    /**
+     * @type {() => void}
+     */
+    #afterRefresh;
+
+    /**
+     * @type {() => void}
+     */
+    #afterDestroy;
+
+    /**
+     * @type {import('./type.d.ts').horizontalScrollerOnTick}
+     */
+    #onTick;
+    /**
+     * Dom element
+     */
+
+    /**
+     * @type {HTMLElement}
+     */
+    #mainContainer;
+
+    /**
+     * @type {string}
+     */
+    #container;
+
+    /**
+     * @type {HTMLElement}
+     */
+    #trigger;
+
+    /**
+     * @type {HTMLElement}
+     */
+    #row;
+
+    /**
+     * @type {NodeListOf<HTMLElement>}
+     */
+    #columns;
+
+    /**
+     * @type {NodeListOf<HTMLElement>}
+     */
+    #shadows;
+
+    /**
+     *
+     */
+    #shadowMainClassTransition;
+
+    /**
+     * @type {NodeListOf<HTMLElement>|[]}
+     */
+    #buttons;
+
+    /**
+     * @type {boolean}
+     */
+    #moduleisActive;
+
+    /**
+     * @type {number}
+     */
+    #horizontalWidth;
+
+    /**
+     *
+     */
+    #scrollTriggerInstance;
+
+    /**
+     * @type {number}
+     */
+    #percentRange;
+
+    /**
+     * @description
+     * Initialize children.
+     *
+     * @type {ParallaxClass[]}
+     */
+    #children;
+
+    /**
+     * Scoped event.
+     * @type {(arg0: MouseEvent) => void}
+     * @return {void}
+     */
+    #onMouseMove;
+
+    /**
+     * @type {(arg0: MouseEvent) => void}
+     * @return {void}
+     */
+    #onMouseDown;
+
+    /**
+     * @type {(arg0: MouseEvent) => void}
+     * @return {void}
+     */
+    #onMouseUp;
+
+    /**
+     * @type {(arg0: MouseEvent) => void}
+     * @return {void}
+     */
+    #onMouseLeave;
+
+    /**
+     * @type {(arg0: TouchEvent) => void}
+     * @return {void}
+     */
+    #onTouchStart;
+
+    /**
+     * @type {() => void}
+     * @return {void}
+     */
+    #onTouchEnd;
+
+    /**
+     * @type {(arg0: TouchEvent) => void}
+     * @return {void}
+     */
+    #onTouchMove;
+
+    /**
+     * @type {EventListener}
+     * @return {void}
+     */
+    #preventFireClick;
+
+    /**
+     * @type {number}
+     */
+    #firstTouchValue;
+
+    /**
+     * @param  { import('./type.d.ts').HorizontalScroller } data
+     *
+     * @description
+     *
+     * Create new HorizontalScroller instance.
+     *
+     * Special attributes to handle shadow elements:
+     * Apply the following data-attributes to any element
+     *
+     * `data-shadow="<String>"`
+     * Create a vertical shadow element with a custom className.
+     *
+     * `data-debug`
+     * Makes the shadow element visible
+     *
+     * Available methods:
+     * myHorizontalScroller.init();
+     * myHorizontalScroller.refresh();
+     * myHorizontalScroller.destroy();
+     *
+     * @example
+     *
+     * ```html
+     *     HTML:
+     *     <div class="root">
+     *         <div class="container">
+     *             <div class="row">
+     *                 <section class="column" data-shadow="section1">
+     *                     <h1>title</h1>
+     *                 </section>
+     *                 <section class="column">
+     *                     <h1 data-shadow="title" data-debug>title</h1>
+     *                 </section>
+     *                 ...
+     *             </div>
+     *             <div class="trigger"></div>
+     *         </div>
+     *     </div>
+     * ```
+     * ```javascript
+     *     JS:
+     *     const myHorizontalScroller = new HorizontalScroller({
+     *         root: '.root',
+     *         container: '.container',
+     *         row: '.row',
+     *         column: '.column',
+     *         trigger: '.trigger',
+     *         shadowClass: '.myShadowClass,
+     *         useThrottle: [ Boolean ],
+     *         useSticky: [ Boolean ],
+     *         animatePin: [ Boolean ],
+     *         forceTranspond: [ Boolean ],
+     *         useWillChange: [ Boolean ],
+     *         animateAtStart: [ Boolean ],
+     *         queryType: [ String ],
+     *         breakpoint: [ String ],
+     *         ease: [ Boolean ],
+     *         easeType: [ String ],
+     *         addCss: [ Boolean ],
+     *         columnHeight: [ Number ],
+     *         columnWidth: [ Number ],
+     *         columnAlign: [ String ],
+     *         children: [child1,child2, ...],
+     *         onEnter: () => {
+     *             ...
+     *         },
+     *         onEnterBack: () => {
+     *             ...
+     *         },
+     *         onLeave: () => {
+     *             ...
+     *         },
+     *         onLeaveBack: () => {
+     *             ...
+     *         },
+     *         afterInit: () => {
+     *             ...
+     *         },
+     *         onTick: ({ value, parentIsMoving, percent }) => {
+     *             ...
+     *         },
+     *         afterRefresh: () => {
+     *             ...
+     *         },
+     *         afterDestroy: () => {
+     *             ...
+     *         },
+     *     });
+     * ```
+     *
+     */
+    constructor(data) {
+        this.#propsisValid = true;
+        this.#triggerTopPosition = 0;
+        this.#touchActive = false;
+        this.#lastTouchValueX = 0;
+        this.#dragSecureAreaBottom = 100;
+        this.#dragSecureAreaTop = 100;
+        this.#shouldDragValue = false;
+        this.#scrollValue = 0;
+        this.#unsubscribeScroll = () => {};
+
+        this.#useDrag = valueIsBooleanAndReturnDefault(
             data?.useDrag,
             'HorizontalScroller: useDrag',
             false
         );
 
-        /**
-         * @private
-         */
-        this.threshold = valueIsNumberAndReturnDefault(
+        this.#threshold = valueIsNumberAndReturnDefault(
             data?.threshold,
             'HorizontalScroller: threshold',
             30
         );
 
-        /**
-         * @private
-         */
-        this.useWillChange = valueIsBooleanAndReturnDefault(
+        this.#useWillChange = valueIsBooleanAndReturnDefault(
             data?.useWillChange,
             'HorizontalScroller: useWillChange',
             false
         );
 
-        /**
-         * @private
-         */
-        this.breakpoint = breakpointIsValid(
+        this.#breakpoint = breakpointIsValid(
             data?.breakpoint,
             'breakpoint',
             'horizontalScroller'
         );
 
-        /**
-         * @private
-         */
-        this.queryType = breakpointTypeIsValid(
+        this.#queryType = breakpointTypeIsValid(
             data?.queryType,
             'queryType',
             'horizontalScroller'
         );
 
-        /**
-         * @private
-         */
-        this.forceTranspond = valueIsBooleanAndReturnDefault(
+        this.#forceTranspond = valueIsBooleanAndReturnDefault(
             data?.forceTranspond,
             'HorizontalScroller: forceTranspond',
             false
         );
 
-        /**
-         * @private
-         */
-        this.addCss = valueIsBooleanAndReturnDefault(
+        this.#addCss = valueIsBooleanAndReturnDefault(
             data?.addCss,
             'HorizontalScroller: addCss',
             true
         );
 
-        /**
-         * @private
-         */
-        this.animateAtStart = valueIsBooleanAndReturnDefault(
+        this.#animateAtStart = valueIsBooleanAndReturnDefault(
             data?.animateAtStart,
             'HorizontalScroller: animateAtStart',
             false
         );
 
-        /**
-         * @private
-         */
-        this.ease = valueIsBooleanAndReturnDefault(
+        this.#ease = valueIsBooleanAndReturnDefault(
             data?.ease,
             'HorizontalScroller: ease',
             false
         );
 
-        /**
-         * @private
-         */
-        this.easeType = genericEaseTypeIsValid(
+        this.#easeType = genericEaseTypeIsValid(
             data?.easeType,
             'HorizontalScroller'
         );
 
-        /**
-         * @private
-         */
-        this.useSticky = valueIsBooleanAndReturnDefault(
+        this.#useSticky = valueIsBooleanAndReturnDefault(
             data?.useSticky,
             'HorizontalScroller: useSticky',
             false
         );
 
-        /**
-         * @private
-         */
-        this.animatePin = valueIsBooleanAndReturnDefault(
+        this.#animatePin = valueIsBooleanAndReturnDefault(
             data?.animatePin,
             'HorizontalScroller: animatePin',
             false
         );
 
-        /**
-         * @private
-         */
-        this.reverse = valueIsBooleanAndReturnDefault(
+        this.#reverse = valueIsBooleanAndReturnDefault(
             data?.reverse,
             'HorizontalScroller: reverse',
             false
         );
 
-        /**
-         * @private
-         */
-        this.useThrottle = valueIsBooleanAndReturnDefault(
+        this.#useThrottle = valueIsBooleanAndReturnDefault(
             data?.useThrottle,
             'HorizontalScroller: useThrottle',
             false
         );
 
-        /**
-         * @private
-         */
-        this.columnHeight = valueIsNumberAndReturnDefault(
+        this.#columnHeight = valueIsNumberAndReturnDefault(
             data?.columnHeight,
             'HorizontalScroller: columnHeight',
             100
         );
 
-        /**
-         * @private
-         */
-        this.columnWidth = valueIsNumberAndReturnDefault(
+        this.#columnWidth = valueIsNumberAndReturnDefault(
             data?.columnWidth,
             'HorizontalScroller: columnWidth',
             null
         );
 
-        /**
-         * @private
-         */
-        this.columnAlign = data?.columnAlign
+        this.#columnAlign = data?.columnAlign
             ? data.columnAlign.toUpperCase()
             : horizontalScrollerContstant.START;
 
-        // Methods
-
-        /**
-         * @private
-         */
-        this.onEnter = valueIsFunctionAndReturnDefault(
+        this.#onEnter = valueIsFunctionAndReturnDefault(
             data?.onEnter,
             'HorizontalScroller: onEnter',
             NOOP
         );
 
-        /**
-         * @private
-         */
-        this.onEnterBack = valueIsFunctionAndReturnDefault(
+        this.#onEnterBack = valueIsFunctionAndReturnDefault(
             data?.onEnterBack,
             'HorizontalScroller: onEnterBack',
             NOOP
         );
 
-        /**
-         * @private
-         */
-        this.onLeave = valueIsFunctionAndReturnDefault(
+        this.#onLeave = valueIsFunctionAndReturnDefault(
             data?.onLeave,
             'HorizontalScroller: onLeave',
             NOOP
         );
 
-        /**
-         * @private
-         */
-        this.onLeaveBack = valueIsFunctionAndReturnDefault(
+        this.#onLeaveBack = valueIsFunctionAndReturnDefault(
             data?.onLeaveBack,
             'HorizontalScroller: onLeaveBack',
             NOOP
         );
 
-        /**
-         * @private
-         */
-        this.afterInit = valueIsFunctionAndReturnDefault(
+        this.#afterInit = valueIsFunctionAndReturnDefault(
             data?.afterInit,
             'HorizontalScroller: afterInit',
             NOOP
         );
 
-        /**
-         * @private
-         */
-        this.afterRefresh = valueIsFunctionAndReturnDefault(
+        this.#afterRefresh = valueIsFunctionAndReturnDefault(
             data?.afterRefresh,
             'HorizontalScroller: afterRefresh',
             NOOP
         );
 
-        /**
-         * @private
-         */
-        this.afterDestroy = valueIsFunctionAndReturnDefault(
+        this.#afterDestroy = valueIsFunctionAndReturnDefault(
             data?.afterDestroy,
             'HorizontalScroller: afterDestroy',
             NOOP
         );
 
-        /**
-         * @private
-         */
-        this.onTick = valueIsFunctionAndReturnDefault(
+        this.#onTick = valueIsFunctionAndReturnDefault(
             data?.onTick,
             'HorizontalScroller: onTick',
             null
         );
-        /**
-         * Dom element
-         */
 
-        /**
-         * @private
-         */
-        this.mainContainer = mobCore.checkType(String, data.root)
+        // @ts-ignore
+        this.#mainContainer = mobCore.checkType(String, data.root)
             ? document.querySelector(data.root)
             : data.root;
 
-        if (!this.mainContainer) {
-            this.propsisValid = false;
+        if (!this.#mainContainer) {
+            this.#propsisValid = false;
             console.warn('horizontal custom: root node not found');
             return;
         }
 
-        /**
-         * @private
-         */
-        this.container = data?.container;
-        const scrollerTester = this.mainContainer.querySelector(this.container);
+        this.#container = data?.container;
+
+        // @ts-ignore
+        const scrollerTester = this.#mainContainer.querySelector(
+            this.#container
+        );
+
         if (!scrollerTester) {
-            this.propsisValid = false;
+            this.#propsisValid = false;
             console.warn('horizontal custom: container node not found');
             return;
         }
 
-        /**
-         * @private
-         */
-        this.trigger = this.mainContainer.querySelector(data.trigger);
-        if (!this.trigger) {
-            this.propsisValid = false;
+        // @ts-ignore
+        this.#trigger = this.#mainContainer.querySelector(data.trigger);
+        if (!this.#trigger) {
+            this.#propsisValid = false;
             console.warn('horizontal custom: trigger node not found');
             return;
         }
 
-        /**
-         * @private
-         */
-        this.row = this.mainContainer.querySelector(data.row);
-        if (!this.row) {
-            this.propsisValid = false;
+        // @ts-ignore
+        this.#row = this.#mainContainer.querySelector(data.row);
+        if (!this.#row) {
+            this.#propsisValid = false;
             console.warn('horizontal custom: row node not found');
             return;
         }
 
-        /**
-         * @private
-         */
-        this.column = this.mainContainer.querySelectorAll(data.column);
-        if (this.column.length === 0) {
-            this.propsisValid = false;
+        this.#columns = this.#mainContainer.querySelectorAll(data.column);
+        if (this.#columns.length === 0) {
+            this.#propsisValid = false;
             console.warn('horizontal custom: column nodeList not found');
             return;
         }
 
-        /**
-         * @private
-         */
-        this.shadow = this.mainContainer.querySelectorAll('[data-shadow]');
+        this.#shadows = this.#mainContainer.querySelectorAll('[data-shadow]');
         const originalShadowClass = data?.shadowClass || 'shadow';
+        this.#shadowMainClassTransition = originalShadowClass.replace('.', '');
+        // @ts-ignore
+        this.#buttons = this.#row.querySelectorAll('a, button');
+        this.#moduleisActive = false;
+        this.#horizontalWidth = 0;
+        this.#scrollTriggerInstance = {};
+        this.#percentRange = 0;
+        this.#children = data?.children || [];
 
-        /**
-         * @private
-         */
-        this.shadowMainClassTransition = originalShadowClass.replace('.', '');
-
-        /**
-         * @private
-         */
-        this.button = this.row.querySelectorAll('a, button');
-
-        /**
-         * @private
-         */
-        this.moduleisActive = false;
-        /**
-         * @private
-         */
-        this.horizontalWidth = 0;
-
-        /**
-         * @private
-         */
-        this.scrollTriggerInstance = {};
-
-        /**
-         * @private
-         */
-        this.percentRange = 0;
-
-        /**
-         * @private
-         *
-         * @description
-         * Initialize children.
-         */
-        this.children = data?.children || [];
-        this.children.forEach((element) => {
-            element.setScroller(this.row);
+        this.#children.forEach((element) => {
+            element.setScroller(this.#row);
             element.setDirection('horizontal');
-            element.setBreakPoint(this.breakpoint);
-            element.setQueryType(this.queryType);
+            element.setBreakPoint(this.#breakpoint);
+            element.setQueryType(this.#queryType);
             element.init();
         });
 
-        if (this.addCss)
+        if (this.#addCss)
             horizontalScrollerCss({
-                mainContainer: this.mainContainer,
-                queryType: this.queryType,
-                breakpoint: this.breakpoint,
-                container: this.container,
+                mainContainer: this.#mainContainer,
+                queryType: this.#queryType,
+                breakpoint: this.#breakpoint,
+                container: this.#container,
                 trigger: data?.trigger ?? 'trigger',
                 row: data.row,
                 column: data.column,
-                shadow: this.shadowMainClassTransition,
-                useSticky: this.useSticky,
-                columnHeight: this.columnHeight,
-                columnWidth: this.columnWidth,
-                columnAlign: this.columnAlign,
+                shadow: this.#shadowMainClassTransition,
+                useSticky: this.#useSticky,
+                columnHeight: this.#columnHeight,
+                columnWidth: this.#columnWidth,
+                columnAlign: this.#columnAlign,
             });
 
-        /**
-         * Scoped event.
-         */
-        this.onMouseMove = (e) => {
-            if (!this.touchActive) return;
+        this.#onMouseMove = (event) => {
+            if (!this.#touchActive) return;
 
-            const { movementX } = e;
-            const value = this.reverse ? movementX : -movementX;
+            const { movementX } = event;
+            const value = this.#reverse ? movementX : -movementX;
             this.onDrag(value);
-            this.touchStart = false;
         };
 
-        this.onMouseDown = () => {
-            if (!mq[this.queryType](this.breakpoint)) return;
+        this.#onMouseDown = () => {
+            if (!mq[this.#queryType](this.#breakpoint)) return;
 
-            if (this.shouldDragValue) this.row.style.cursor = 'move';
-            this.touchActive = true;
-            this.firstTouchValue = this.scrollValue;
+            if (this.#shouldDragValue) this.#row.style.cursor = 'move';
+            this.#touchActive = true;
+            this.#firstTouchValue = this.#scrollValue;
         };
 
-        this.onMouseUp = () => {
-            this.touchActive = false;
-            mobCore.useFrame(() => (this.row.style.cursor = ''));
+        this.#onMouseUp = () => {
+            this.#touchActive = false;
+            mobCore.useFrame(() => (this.#row.style.cursor = ''));
         };
 
-        this.onMouseLeave = () => {
-            this.touchActive = false;
-            mobCore.useFrame(() => (this.row.style.cursor = ''));
+        this.#onMouseLeave = () => {
+            this.#touchActive = false;
+            mobCore.useFrame(() => (this.#row.style.cursor = ''));
         };
 
-        this.onTouchStart = (e) => {
-            if (!mq[this.queryType](this.breakpoint)) return;
+        this.#onTouchStart = (event) => {
+            if (!mq[this.#queryType](this.#breakpoint)) return;
 
-            this.lastTouchValueX = -e.touches[0].clientX;
-            this.touchActive = true;
-            this.firstTouchValue = this.scrollValue;
+            this.#lastTouchValueX = -event.touches[0].clientX;
+            this.#touchActive = true;
+            this.#firstTouchValue = this.#scrollValue;
         };
 
-        this.onTouchEnd = () => {
-            this.touchActive = false;
+        this.#onTouchEnd = () => {
+            this.#touchActive = false;
         };
 
-        this.onTouchMove = (e) => {
-            const touchValueX = -e.touches[0].clientX;
-            const gapX = this.reverse
-                ? -touchValueX + this.lastTouchValueX
-                : touchValueX - this.lastTouchValueX;
+        this.#onTouchMove = (event) => {
+            const touchValueX = -event.touches[0].clientX;
+            const gapX = this.#reverse
+                ? -touchValueX + this.#lastTouchValueX
+                : touchValueX - this.#lastTouchValueX;
 
             this.onDrag(gapX);
-            this.lastTouchValueX = touchValueX;
+            this.#lastTouchValueX = touchValueX;
 
-            if (this.shouldDragValue && e.cancelable) e.preventDefault();
+            if (this.#shouldDragValue && event.cancelable)
+                event.preventDefault();
         };
 
-        this.preventFireClick = (e) => {
+        this.#preventFireClick = (event) => {
             if (
-                Math.abs(this.scrollValue - this.firstTouchValue) >
-                this.threshold
+                Math.abs(this.#scrollValue - this.#firstTouchValue) >
+                this.#threshold
             )
-                e.preventDefault();
+                event.preventDefault();
         };
     }
 
@@ -703,9 +715,11 @@ export class HorizontalScroller {
      *
      * @example
      * myInstance.init()
+     *
+     * @type {() => void}
      */
     init() {
-        if (!this.propsisValid) return;
+        if (!this.#propsisValid) return;
 
         pipe(
             this.getWidth.bind(this),
@@ -714,7 +728,7 @@ export class HorizontalScroller {
             this.updateShadow.bind(this)
         )().then(() => {
             this.initScroller();
-            if (this.useDrag) this.addDragListener();
+            if (this.#useDrag) this.addDragListener();
 
             mobCore.useResize(({ horizontalResize }) =>
                 this.onResize(horizontalResize)
@@ -722,8 +736,8 @@ export class HorizontalScroller {
 
             mobCore.useFrameIndex(() => {
                 mobCore.useNextTick(() => {
-                    this.afterInit?.();
-                    this.children.forEach((element) => {
+                    this.#afterInit?.();
+                    this.#children.forEach((element) => {
                         element.refresh();
                     });
                 });
@@ -733,223 +747,258 @@ export class HorizontalScroller {
 
     /**
      * @private
+     * @type {() => void}
      */
     setLinkAttribute() {
-        [...this.button].forEach((item) =>
-            item.setAttribute('draggable', false)
+        [...this.#buttons].forEach((item) =>
+            item.setAttribute('draggable', 'false')
         );
     }
 
     /**
      * @private
+     * @type {() => void}
      */
     removeLinkAttribute() {
-        [...this.button].forEach((item) => item.removeAttribute('draggable'));
+        [...this.#buttons].forEach((item) => item.removeAttribute('draggable'));
     }
 
     /**
      * @private
+     * @type {(value: number) => void}
      */
     onDrag(value) {
-        if (!this.shouldDragValue) return;
+        if (!this.#shouldDragValue) return;
         mobCore.useFrame(() =>
             window.scrollBy({ top: value, left: 0, behavior: 'instant' })
         );
     }
 
+    /**
+     * @type {() => void}
+     */
     shouldDrag() {
         const documentScrollTop = window.scrollY;
 
-        this.shouldDragValue =
-            this.triggerTopPosition - this.dragSecureAreaTop <
+        this.#shouldDragValue =
+            this.#triggerTopPosition - this.#dragSecureAreaTop <
                 documentScrollTop &&
-            this.triggerTopPosition +
-                this.dragSecureAreaBottom +
-                this.horizontalWidth >
+            this.#triggerTopPosition +
+                this.#dragSecureAreaBottom +
+                this.#horizontalWidth >
                 documentScrollTop + window.innerHeight;
     }
 
+    /**
+     * @type {() => void}
+     */
     addDragListener() {
-        this.unsubscribeScroll = mobCore.useScroll(() => this.shouldDrag());
+        this.#unsubscribeScroll = mobCore.useScroll(() => this.shouldDrag());
         this.shouldDrag();
 
-        this.row.addEventListener('click', this.preventFireClick, {
+        this.#row.addEventListener('click', this.#preventFireClick, {
             passive: false,
         });
 
-        this.row.addEventListener('mousedown', this.onMouseDown, {
+        this.#row.addEventListener('mousedown', this.#onMouseDown, {
             passive: true,
         });
 
-        this.row.addEventListener('mouseup', this.onMouseUp, {
+        this.#row.addEventListener('mouseup', this.#onMouseUp, {
             passive: true,
         });
 
-        this.row.addEventListener('mouseleave', this.onMouseLeave, {
+        this.#row.addEventListener('mouseleave', this.#onMouseLeave, {
             passive: true,
         });
 
-        this.row.addEventListener('touchstart', this.onTouchStart, {
+        this.#row.addEventListener('touchstart', this.#onTouchStart, {
             passive: true,
         });
 
-        this.row.addEventListener('touchend', this.onTouchEnd, {
+        this.#row.addEventListener('touchend', this.#onTouchEnd, {
             passive: true,
         });
 
-        this.row.addEventListener('mousemove', this.onMouseMove, {
+        this.#row.addEventListener('mousemove', this.#onMouseMove, {
             passive: true,
         });
 
-        this.row.addEventListener('touchmove', this.onTouchMove, {
+        this.#row.addEventListener('touchmove', this.#onTouchMove, {
             passive: true,
         });
     }
 
+    /**
+     * @type {() => void}
+     */
     removeDragListener() {
-        this.unsubscribeScroll();
-        this.row.removeEventListener('click', this.preventFireClick);
-        this.row.removeEventListener('mousedown', this.onMouseDown);
-        this.row.removeEventListener('mouseup', this.onMouseUp);
-        this.row.removeEventListener('mouseleave', this.onMouseLeave);
-        this.row.removeEventListener('touchstart', this.onTouchStart);
-        this.row.removeEventListener('touchend', this.onTouchEnd);
-        this.row.removeEventListener('mousemove', this.onMouseMove);
-        this.row.removeEventListener('touchmove', this.onTouchMove);
+        this.#unsubscribeScroll();
+        this.#row.removeEventListener('click', this.#preventFireClick);
+        this.#row.removeEventListener('mousedown', this.#onMouseDown);
+        this.#row.removeEventListener('mouseup', this.#onMouseUp);
+        this.#row.removeEventListener('mouseleave', this.#onMouseLeave);
+        this.#row.removeEventListener('touchstart', this.#onTouchStart);
+        this.#row.removeEventListener('touchend', this.#onTouchEnd);
+        this.#row.removeEventListener('mousemove', this.#onMouseMove);
+        this.#row.removeEventListener('touchmove', this.#onTouchMove);
     }
 
     /**
      * @private
+     * @type {() => Promise<boolean>}
      */
     setDimension() {
-        if (!this.trigger || !this.mainContainer || !this.row) {
+        if (!this.#trigger || !this.#mainContainer || !this.#row) {
             return new Promise((resolve) => {
-                resolve();
+                resolve(true);
             });
         }
 
         return new Promise((resolve) => {
             mobCore.useFrame(() => {
-                const width = this.horizontalWidth;
-                this.percentRange = (100 * (width - window.innerWidth)) / width;
+                const width = this.#horizontalWidth;
+                this.#percentRange =
+                    (100 * (width - window.innerWidth)) / width;
 
                 if (width > 0) {
-                    this.trigger.style.height = `${width}px`;
-                    this.mainContainer.style.height = `${width}px`;
-                    this.row.style.width = `${width}px`;
+                    this.#trigger.style.height = `${width}px`;
+                    this.#mainContainer.style.height = `${width}px`;
+                    this.#row.style.width = `${width}px`;
                 }
 
-                resolve();
+                resolve(true);
             });
         });
     }
 
     /**
      * @private
+     * @type {() => Promise<boolean>}
      */
     getWidth() {
         return new Promise((resolve) => {
             mobCore.useFrame(() => {
-                if (!mq[this.queryType](this.breakpoint)) {
-                    resolve();
+                if (!mq[this.#queryType](this.#breakpoint)) {
+                    resolve(true);
                     return;
                 }
 
-                this.horizontalWidth = [...this.column]
+                this.#horizontalWidth = [...this.#columns]
                     .map((item) => {
                         return outerWidth(item);
                     })
                     .reduce((a, b) => a + b, 0);
 
-                resolve();
+                resolve(true);
             });
         });
     }
 
     /**
      * @private
+     * @type {() => Promise<boolean>}
      */
     createShadow() {
-        if (!this.trigger) {
+        if (!this.#trigger) {
             return new Promise((resolve) => {
-                resolve();
+                resolve(true);
             });
         }
 
         return new Promise((resolve) => {
             mobCore.useFrame(() => {
-                if (!mq[this.queryType](this.breakpoint)) {
-                    resolve();
+                if (!mq[this.#queryType](this.#breakpoint)) {
+                    resolve(true);
                     return;
                 }
 
-                const shadowsTransition = [...this.shadow]
+                const shadowsTransition = [...this.#shadows]
                     .map((item) => {
-                        const shadowClass = item.dataset.shadow;
-                        const debug = item.dataset.debug ? 'debug' : '';
-                        const left = item.dataset.debug
-                            ? `left left : ${shadowClass}`
+                        const shadowLabel = item.dataset['shadow'];
+                        const useDebug = Object.hasOwn(item.dataset, 'debug');
+                        const debugClass = useDebug ? 'debug' : '';
+
+                        const leftLabel = useDebug
+                            ? `left left : ${shadowLabel}`
                             : '';
-                        const inCenter = item.dataset.debug
-                            ? `in center : ${shadowClass}`
+                        const inCenterLabel = useDebug
+                            ? `in center : ${shadowLabel}`
                             : '';
-                        const outCenter = item.dataset.debug
-                            ? `center out : ${shadowClass}`
+                        const outCenterlabel = useDebug
+                            ? `center out : ${shadowLabel}`
                             : '';
-                        const end = item.dataset.debug
-                            ? `in out : ${shadowClass}`
+                        const endLabel = useDebug
+                            ? `in out : ${shadowLabel}`
                             : '';
 
-                        return `
-                            <div class='${this.shadowMainClassTransition} ${this.shadowMainClassTransition}--${shadowClass}' data-shadow='${shadowClass}'>
-                                <span class="${this.shadowMainClassTransition}--in-center ${debug}">
-                                    ${inCenter}
-                                </span>
-                                <span class="${this.shadowMainClassTransition}--out-center ${debug}">
-                                    ${outCenter}
-                                </span>
-                                <span class="${this.shadowMainClassTransition}--left ${debug}">
-                                    ${left}
-                                </span>
-                                <span class="${this.shadowMainClassTransition}--end ${debug}">
-                                    ${end}
-                                </span>
-                            </div>`;
+                        return /* HTML */ ` <div
+                            class="${this.#shadowMainClassTransition} ${this
+                                .#shadowMainClassTransition}--${shadowLabel}"
+                            data-shadow="${shadowLabel}"
+                        >
+                            <span
+                                class="${this
+                                    .#shadowMainClassTransition}--in-center ${debugClass}"
+                            >
+                                ${inCenterLabel}
+                            </span>
+                            <span
+                                class="${this
+                                    .#shadowMainClassTransition}--out-center ${debugClass}"
+                            >
+                                ${outCenterlabel}
+                            </span>
+                            <span
+                                class="${this
+                                    .#shadowMainClassTransition}--left ${debugClass}"
+                            >
+                                ${leftLabel}
+                            </span>
+                            <span
+                                class="${this
+                                    .#shadowMainClassTransition}--end ${debugClass}"
+                            >
+                                ${endLabel}
+                            </span>
+                        </div>`;
                     })
                     .join('');
 
-                this.trigger.innerHTML = shadowsTransition;
-                resolve();
+                this.#trigger.innerHTML = shadowsTransition;
+                resolve(true);
             });
         });
     }
 
     /**
      * @private
+     * @type {() => void}
      */
     removeShadow() {
-        if (this.trigger) this.trigger.innerHTML = '';
+        if (this.#trigger) this.#trigger.innerHTML = '';
     }
 
     /**
      * @private
+     * @type {() => Promise<boolean>}
      */
     updateShadow() {
         return new Promise((resolve) => {
-            if (!mq[this.queryType](this.breakpoint)) {
-                resolve();
+            if (!mq[this.#queryType](this.#breakpoint)) {
+                resolve(true);
                 return;
             }
 
             mobCore.useFrame(() => {
-                [...this.shadow].forEach((item) => {
-                    const percentrange = this.percentRange / 100;
-                    const shadowData = item.dataset.shadow;
+                [...this.#shadows].forEach((item) => {
+                    const percentrange = this.#percentRange / 100;
+                    const shadowData = item.dataset['shadow'];
                     const width = outerWidth(item);
-                    const height = outerHeight(this.row);
-                    const { x } = getTranslateValues(this.row);
-                    const offset = this.reverse
-                        ? this.horizontalWidth -
+                    const height = outerHeight(this.#row);
+                    const { x } = getTranslateValues(this.#row);
+                    const offset = this.#reverse
+                        ? this.#horizontalWidth -
                           (item.getBoundingClientRect().right - x)
                         : item.getBoundingClientRect().left - x;
                     const screenRatio = window.innerWidth / window.innerHeight;
@@ -957,21 +1006,41 @@ export class HorizontalScroller {
                         window.innerWidth - window.innerHeight;
                     const widthAmount = offset / screenRatio;
                     const diffAmount = offset - offset / screenRatio;
-                    const shadowTransitionEl = this.mainContainer.querySelector(
-                        `.${this.shadowMainClassTransition}[data-shadow="${shadowData}"]`
+
+                    /**
+                     * @type {HTMLElement|null}
+                     */
+                    const shadowTransitionEl =
+                        this.#mainContainer.querySelector(
+                            `.${this.#shadowMainClassTransition}[data-shadow="${shadowData}"]`
+                        );
+
+                    /**
+                     * @type {HTMLElement|null|undefined}
+                     */
+                    const inCenterMarker = shadowTransitionEl?.querySelector(
+                        `.${this.#shadowMainClassTransition}--in-center`
                     );
 
-                    const inCenterMarker = shadowTransitionEl.querySelector(
-                        `.${this.shadowMainClassTransition}--in-center`
+                    /**
+                     * @type {HTMLElement|null|undefined}
+                     */
+                    const outCenterMarker = shadowTransitionEl?.querySelector(
+                        `.${this.#shadowMainClassTransition}--out-center`
                     );
-                    const outCenterMarker = shadowTransitionEl.querySelector(
-                        `.${this.shadowMainClassTransition}--out-center`
+
+                    /**
+                     * @type {HTMLElement|null|undefined}
+                     */
+                    const leftMarker = shadowTransitionEl?.querySelector(
+                        `.${this.#shadowMainClassTransition}--left`
                     );
-                    const leftMarker = shadowTransitionEl.querySelector(
-                        `.${this.shadowMainClassTransition}--left`
-                    );
-                    const endMarker = shadowTransitionEl.querySelector(
-                        `.${this.shadowMainClassTransition}--end`
+
+                    /**
+                     * @type {HTMLElement|null|undefined}
+                     */
+                    const endMarker = shadowTransitionEl?.querySelector(
+                        `.${this.#shadowMainClassTransition}--end`
                     );
 
                     // Strength shadow end item to bottom of page
@@ -1031,48 +1100,61 @@ export class HorizontalScroller {
                         return end / 2 + plusHalf;
                     })();
 
-                    if (this.useSticky) {
-                        this.trigger.style['margin-top'] = `-${height}px`;
+                    if (this.#useSticky) {
+                        this.#trigger.style['margin-top'] = `-${height}px`;
                     }
 
-                    shadowTransitionEl.style.top = `${start}px`;
-                    inCenterMarker.style.height = `${inCenter}px`;
-                    outCenterMarker.style.height = `${inCenter}px`;
-                    outCenterMarker.style.top = `${inCenter}px`;
-                    leftMarker.style.height = `${left}px`;
-                    endMarker.style.height = `${end + plusFull}px`;
-                    shadowTransitionEl.style.height = `${left}px`;
+                    if (shadowTransitionEl)
+                        shadowTransitionEl.style.top = `${start}px`;
+
+                    if (inCenterMarker)
+                        inCenterMarker.style.height = `${inCenter}px`;
+
+                    if (outCenterMarker)
+                        outCenterMarker.style.height = `${inCenter}px`;
+
+                    if (outCenterMarker)
+                        outCenterMarker.style.top = `${inCenter}px`;
+
+                    if (leftMarker) leftMarker.style.height = `${left}px`;
+
+                    if (endMarker)
+                        endMarker.style.height = `${end + plusFull}px`;
+
+                    if (shadowTransitionEl)
+                        shadowTransitionEl.style.height = `${left}px`;
                 });
 
-                resolve();
+                resolve(true);
             });
         });
     }
 
     /**
      * @private
+     * @type {() => void}
      */
     initScroller() {
-        if (!this.trigger || !mq[this.queryType](this.breakpoint)) return;
+        if (!this.#trigger || !mq[this.#queryType](this.#breakpoint)) return;
 
         const scrollTriggerInstance = new ParallaxClass({
             type: 'scrolltrigger',
-            item: this.row,
-            useWillChange: this.useWillChange,
-            trigger: this.trigger,
+            item: this.#row,
+            useWillChange: this.#useWillChange,
+            trigger: this.#trigger,
             propierties: 'x',
             breakpoint: 'xSmall',
-            pin: !this.useSticky,
-            animatePin: this.animatePin,
-            ease: this.ease,
-            forceTranspond: this.forceTranspond,
-            useThrottle: this.useThrottle,
-            easeType: this.easeType,
+            pin: !this.#useSticky,
+            animatePin: this.#animatePin,
+            ease: this.#ease,
+            forceTranspond: this.#forceTranspond,
+            useThrottle: this.#useThrottle,
+            easeType: this.#easeType,
             springConfig: 'scroller',
-            animateAtStart: this.animateAtStart,
-            fromTo: this.reverse,
+            animateAtStart: this.#animateAtStart,
+            fromTo: this.#reverse,
             dynamicRange: () => {
-                return -(this.horizontalWidth - window.innerWidth);
+                return -(this.#horizontalWidth - window.innerWidth);
             },
             dynamicStart: {
                 position: 'bottom',
@@ -1083,47 +1165,50 @@ export class HorizontalScroller {
             dynamicEnd: {
                 position: 'bottom',
                 value: () => {
-                    return this.horizontalWidth;
+                    return this.#horizontalWidth;
                 },
             },
             onTick: ({ value, parentIsMoving }) => {
+                const valueParsed = value ?? 0;
+
                 const percent = Math.abs(
-                    -Number.parseInt(
-                        (value * 100) /
-                            (this.horizontalWidth - window.innerWidth)
+                    -Math.round(
+                        (valueParsed * 100) /
+                            (this.#horizontalWidth - window.innerWidth)
                     )
                 );
 
-                this.scrollValue = value;
+                this.#scrollValue = valueParsed;
 
                 // onTick standalone methods.
-                if (this.onTick)
-                    this.onTick({
-                        value,
+                if (this.#onTick)
+                    this.#onTick({
+                        value: valueParsed,
                         parentIsMoving,
-                        percent: this.reverse ? 100 - percent : percent,
+                        percent: this.#reverse ? 100 - percent : percent,
                     });
 
                 // Builtin children onTick;
-                this.children.forEach((element) => {
-                    element.move({ value, parentIsMoving });
+                this.#children.forEach((element) => {
+                    element.move({ value: valueParsed, parentIsMoving });
                 });
             },
-            onEnter: this.onEnter,
-            onEnterBack: this.onEnterBack,
-            onLeave: this.onLeave,
-            onLeaveBack: this.onLeaveBack,
+            onEnter: this.#onEnter,
+            onEnterBack: this.#onEnterBack,
+            onLeave: this.#onLeave,
+            onLeaveBack: this.#onLeaveBack,
         });
         scrollTriggerInstance.init();
 
-        this.moduleisActive = true;
-        this.scrollTriggerInstance = scrollTriggerInstance;
-        this.triggerTopPosition = offset(this.trigger).top;
+        this.#moduleisActive = true;
+        this.#scrollTriggerInstance = scrollTriggerInstance;
+        this.#triggerTopPosition = offset(this.#trigger).top;
         this.setLinkAttribute();
     }
 
     /**
      * @private
+     * @type {() => void}
      */
     createScroller() {
         pipe(
@@ -1139,12 +1224,13 @@ export class HorizontalScroller {
 
     /**
      * @private
+     * @type {() => void}
      */
     refreshChildren() {
         mobCore.useFrameIndex(() => {
             mobCore.useNextTick(() => {
-                this.afterRefresh?.();
-                this.children.forEach((element) => {
+                this.#afterRefresh?.();
+                this.#children.forEach((element) => {
                     element?.refresh?.();
                 });
             });
@@ -1157,9 +1243,11 @@ export class HorizontalScroller {
      *
      * @example
      * myInstance.refresh()
+     *
+     * @type {() => Promise<boolean>}
      */
     refresh() {
-        if (!this.moduleisActive || !mq[this.queryType](this.breakpoint))
+        if (!this.#moduleisActive || !mq[this.#queryType](this.#breakpoint))
             return;
 
         return new Promise((resolve) => {
@@ -1168,72 +1256,90 @@ export class HorizontalScroller {
                 this.setDimension.bind(this),
                 this.updateShadow.bind(this)
             )().then(() => {
-                this.scrollTriggerInstance?.stopMotion?.();
-                this.triggerTopPosition = offset(this.trigger).top;
+                this.#scrollTriggerInstance?.stopMotion?.();
+                this.#triggerTopPosition = offset(this.#trigger).top;
 
-                if (this.moduleisActive) {
-                    this.scrollTriggerInstance?.refresh?.();
+                if (this.#moduleisActive) {
+                    this.#scrollTriggerInstance?.refresh?.();
                     this.refreshChildren();
                 }
-                resolve();
+                resolve(true);
             });
         });
     }
 
     /**
      * @private
+     * @type {(arg0: {destroyAll?: boolean}) => void}
      */
     killScroller({ destroyAll = false }) {
-        if (this.moduleisActive || destroyAll) {
-            this.scrollTriggerInstance?.destroy?.();
-            this.scrollTriggerInstance = null;
-            if (this.trigger) this.trigger.style.height = '';
-            if (this.mainContainer) this.mainContainer.style.height = '';
-            if (this.trigger) this.trigger.style.marginTop = '';
+        if (this.#moduleisActive || destroyAll) {
+            this.#scrollTriggerInstance?.destroy?.();
+            // @ts-ignore
+            this.#scrollTriggerInstance = null;
+            if (this.#trigger) this.#trigger.style.height = '';
+            if (this.#mainContainer) this.#mainContainer.style.height = '';
+            if (this.#trigger) this.#trigger.style.marginTop = '';
             this.removeShadow();
             this.removeLinkAttribute();
-            this.moduleisActive = false;
+            this.#moduleisActive = false;
 
             // Make sure that if component is running with ease the style is removed.
             mobCore.useFrameIndex(() => {
-                this.row.style = '';
+                // this.row.style = '';
+                this.#row.attributeStyleMap.clear();
 
-                if (destroyAll && this.mainContainer) {
-                    if (this.useDrag) this.removeDragListener();
+                if (destroyAll && this.#mainContainer) {
+                    if (this.#useDrag) this.removeDragListener();
 
                     const styleDiv =
-                        this.mainContainer.querySelector('.scroller-style');
+                        this.#mainContainer.querySelector('.scroller-style');
                     if (styleDiv) styleDiv.remove();
 
-                    this.mainContainer = null;
-                    this.trigger = null;
-                    this.row = [];
-                    this.column = [];
-                    this.shadow = [];
-                    this.afterInit = null;
-                    this.afterRefresh = null;
-                    this.onTick = null;
-                    this.onEnter = null;
-                    this.onEnterBack = null;
-                    this.onLeave = null;
-                    this.onLeaveBack = null;
-                    this.scrollTriggerInstance = null;
-                    this.moduleisActive = false;
-                    this.button = [];
+                    /**
+                     * All element is null only on Destroy.
+                     * Avoid to use union type with null.
+                     */
 
-                    this.mainContainer = null;
-                    this.container = null;
-                    this.trigger = null;
-                    this.row = null;
+                    // @ts-ignore
+                    this.#mainContainer = null;
+                    // @ts-ignore
+                    this.#trigger = null;
+                    // @ts-ignore
+                    this.#row = null;
+                    // @ts-ignore
+                    this.#columns = [];
+                    // @ts-ignore
+                    this.#shadows = [];
+                    this.#afterInit = NOOP;
+                    this.#afterRefresh = NOOP;
+                    this.#onTick = NOOP;
+                    this.#onEnter = NOOP;
+                    this.#onEnterBack = NOOP;
+                    this.#onLeave = NOOP;
+                    this.#onLeaveBack = NOOP;
+                    this.#scrollTriggerInstance = undefined;
+                    this.#moduleisActive = false;
+                    this.#buttons = [];
+
+                    // @ts-ignore
+                    this.#mainContainer = null;
+                    // @ts-ignore
+                    this.#container = null;
+                    // @ts-ignore
+                    this.#trigger = null;
+                    // @ts-ignore
+                    this.#row = null;
 
                     mobCore.useNextTick(() => {
-                        this.afterDestroy?.();
-                        this.afterDestroy = null;
-                        this.children.forEach((element) => {
+                        this.#afterDestroy?.();
+                        this.#afterDestroy = NOOP;
+                        this.#children.forEach((element) => {
                             element?.destroy?.();
+                            // @ts-ignore
                             element = null;
                         });
-                        this.children = [];
+                        this.#children = [];
                     });
                 }
             }, 3);
@@ -1241,19 +1347,19 @@ export class HorizontalScroller {
     }
 
     /**
-     * @private
+     * @type {(horizontalResize: boolean) => void}
      */
     onResize(horizontalResize) {
-        if (this.moduleisActive && mq[this.queryType](this.breakpoint)) {
+        if (this.#moduleisActive && mq[this.#queryType](this.#breakpoint)) {
             if (horizontalResize) this.refresh();
         } else if (
-            !this.moduleisActive &&
-            mq[this.queryType](this.breakpoint)
+            !this.#moduleisActive &&
+            mq[this.#queryType](this.#breakpoint)
         ) {
             this.createScroller();
         } else if (
-            this.moduleisActive &&
-            !mq[this.queryType](this.breakpoint)
+            this.#moduleisActive &&
+            !mq[this.#queryType](this.#breakpoint)
         ) {
             this.killScroller({ destroyAll: false });
         }
@@ -1265,6 +1371,8 @@ export class HorizontalScroller {
      *
      * @example
      * myInstance.destroy()
+     *
+     * @type {() => void}
      */
     destroy() {
         this.killScroller({ destroyAll: true });

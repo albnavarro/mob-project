@@ -23,6 +23,51 @@ import { STAGGER_DEFAULT_INDEX_OBJ } from '../utils/stagger/staggerCostant.js';
 
 export default class ParallaxTween {
     /**
+     * @type {Function}
+     */
+    #ease;
+
+    /**
+     * @type {number}
+     */
+    #duration;
+
+    /**
+     * @type {import('../utils/stagger/type.js').staggerObject}
+     */
+    #stagger;
+
+    /**
+     * @type {import('./type.js').parallaxTweenValue[]}
+     */
+    #values;
+
+    /**
+     * @type {import('../utils/callbacks/type.js').callbackObject<(arg0:Record<string, number>) => void>[]}
+     */
+    #callbackOnStop;
+
+    /**
+     * @type {import('../utils/callbacks/type.js').callbackObject<(arg0:Record<string, number>) => void>[]}
+     */
+    #callback;
+
+    /**
+     * @type{import('../utils/callbacks/type.js').callbackObject<string>[]}
+     */
+    #callbackCache;
+
+    /**
+     * @type {Array<() => void>}
+     */
+    #unsubscribeCache;
+
+    /**
+     * @type {string}
+     */
+    #type;
+
+    /**
      * @param {import('./type.js').parallaxTweenType} data
      *
      * @example
@@ -57,59 +102,15 @@ export default class ParallaxTween {
      * ```
      */
     constructor(data) {
-        /**
-         * @private
-         * @type {Function}
-         */
-        this.ease = easeParallaxTweenIsValid(data?.ease);
-
-        /**
-         * @private
-         * @type {number}
-         */
-        this.duration = durationIsValid(data?.duration);
-
-        /**
-         * @private
-         * @type {import('../utils/stagger/type.js').staggerObject}
-         */
-        this.stagger = getStaggerFromProps(data);
-
-        /**
-         * @private
-         * @type {import('./type.js').parallaxTweenValue[]}
-         */
-        this.values = [];
-
-        /**
-         * @private
-         * @type {import('../utils/callbacks/type.js').callbackObject<(arg0:Record<string, number>) => void>[]}
-         */
-        this.callbackOnStop = [];
-
-        /**
-         * @private
-         * @type {import('../utils/callbacks/type.js').callbackObject<(arg0:Record<string, number>) => void>[]}
-         */
-        this.callback = [];
-
-        /**
-         * @private
-         * @type{import('../utils/callbacks/type.js').callbackObject<string>[]}
-         */
-        this.callbackCache = [];
-
-        /**
-         * @private
-         * @type {Array<() => void>}
-         */
-        this.unsubscribeCache = [];
-
-        /**
-         * @private
-         * @type {string}
-         */
-        this.type = 'parallaxTween';
+        this.#ease = easeParallaxTweenIsValid(data?.ease);
+        this.#duration = durationIsValid(data?.duration);
+        this.#stagger = getStaggerFromProps(data);
+        this.#values = [];
+        this.#callbackOnStop = [];
+        this.#callback = [];
+        this.#callbackCache = [];
+        this.#unsubscribeCache = [];
+        this.#type = 'parallaxTween';
 
         /**
          * Set initial store data if defined in constructor props
@@ -131,30 +132,30 @@ export default class ParallaxTween {
      */
     inzializeStagger() {
         if (
-            this.stagger.each > 0 &&
-            (this.callbackCache.length > 0 || this.callback.length > 0)
+            this.#stagger.each > 0 &&
+            (this.#callbackCache.length > 0 || this.#callback.length > 0)
         ) {
-            const cb = getStaggerArray(this.callbackCache, this.callback);
+            const cb = getStaggerArray(this.#callbackCache, this.#callback);
 
-            if (this.stagger.grid.col > cb.length) {
+            if (this.#stagger.grid.col > cb.length) {
                 staggerIsOutOfRangeWarning(cb.length);
                 return;
             }
 
             const { staggerArray, staggerArrayOnComplete } = setStagger({
                 arrayDefault: cb,
-                arrayOnStop: this.callbackOnStop,
-                stagger: this.stagger,
+                arrayOnStop: this.#callbackOnStop,
+                stagger: this.#stagger,
                 slowlestStagger: STAGGER_DEFAULT_INDEX_OBJ, //sequencer doesn't support fastestStagger
                 fastestStagger: STAGGER_DEFAULT_INDEX_OBJ, //sequencer doesn't support fastestStagger
             });
 
-            if (this.callbackCache.length > this.callback.length) {
-                this.callbackCache = staggerArray;
+            if (this.#callbackCache.length > this.#callback.length) {
+                this.#callbackCache = staggerArray;
             } else {
-                this.callback = staggerArray;
+                this.#callback = staggerArray;
             }
-            this.callbackOnStop = staggerArrayOnComplete;
+            this.#callbackOnStop = staggerArrayOnComplete;
         }
     }
 
@@ -175,18 +176,18 @@ export default class ParallaxTween {
      * @description
      */
     draw({ partial, isLastDraw }) {
-        this.values = [...this.values].map((item) => {
+        this.#values = [...this.#values].map((item) => {
             const { toIsFn, toFn, toValue, fromIsFn, fromFn, fromValue } = item;
 
             const toValueParsed = toIsFn ? toFn() : toValue;
             const fromValueParsed = fromIsFn ? fromFn() : fromValue;
             const toValFinal = toValueParsed - fromValueParsed;
 
-            const currentValue = this.ease(
+            const currentValue = this.#ease(
                 partial,
                 fromValueParsed,
                 toValFinal,
-                this.duration
+                this.#duration
             );
 
             return {
@@ -196,18 +197,18 @@ export default class ParallaxTween {
         });
 
         // Prepare an obj to pass to the callback
-        const callBackObject = getValueObj(this.values, 'currentValue');
+        const callBackObject = getValueObj(this.#values, 'currentValue');
 
         mobCore.useNextTick(() => {
             // Fire callback
             syncCallback({
-                each: this.stagger.each,
+                each: this.#stagger.each,
                 useStagger: true,
                 isLastDraw,
                 callBackObject,
-                callback: this.callback,
-                callbackCache: this.callbackCache,
-                callbackOnStop: this.callbackOnStop,
+                callback: this.#callback,
+                callbackCache: this.#callbackCache,
+                callbackOnStop: this.#callbackOnStop,
             });
         });
     }
@@ -219,7 +220,7 @@ export default class ParallaxTween {
     setData(obj) {
         const valToArray = Object.entries(obj);
 
-        this.values = valToArray.map((item) => {
+        this.#values = valToArray.map((item) => {
             const [prop, value] = item;
             return {
                 prop: prop,
@@ -241,15 +242,13 @@ export default class ParallaxTween {
     }
 
     /**
-     * @private
-     *
      * Return the new array maeged with main array created in setData
      *
      * @param  {import('../utils/tweenAction/type.js').goToParamsType[]} newData new datato merge
      * @return {void}
      */
-    mergeData(newData) {
-        this.values = this.values.map((item) => {
+    #mergeData(newData) {
+        this.#values = this.#values.map((item) => {
             const itemToMerge = newData.find((newItem) => {
                 return newItem.prop === item.prop;
             });
@@ -269,7 +268,7 @@ export default class ParallaxTween {
      */
     goTo(obj) {
         const data = goToUtils(obj);
-        this.mergeData(data);
+        this.#mergeData(data);
         return this;
     }
 
@@ -282,11 +281,11 @@ export default class ParallaxTween {
     subscribe(cb) {
         const { arrayOfCallbackUpdated, unsubscribeCb } = setCallBack(
             cb,
-            this.callback
+            this.#callback
         );
 
-        this.callback = arrayOfCallbackUpdated;
-        return () => (this.callback = unsubscribeCb(this.callback));
+        this.#callback = arrayOfCallbackUpdated;
+        return () => (this.#callback = unsubscribeCb(this.#callback));
     }
 
     /**
@@ -300,11 +299,12 @@ export default class ParallaxTween {
     onStop(cb) {
         const { arrayOfCallbackUpdated, unsubscribeCb } = setCallBack(
             cb,
-            this.callbackOnStop
+            this.#callbackOnStop
         );
-        this.callbackOnStop = arrayOfCallbackUpdated;
+        this.#callbackOnStop = arrayOfCallbackUpdated;
 
-        return () => (this.callbackOnStop = unsubscribeCb(this.callbackOnStop));
+        return () =>
+            (this.#callbackOnStop = unsubscribeCb(this.#callbackOnStop));
     }
 
     /**
@@ -315,13 +315,13 @@ export default class ParallaxTween {
             setCallBackCache(
                 item,
                 fn,
-                this.callbackCache,
-                this.unsubscribeCache
+                this.#callbackCache,
+                this.#unsubscribeCache
             );
 
-        this.callbackCache = arrayOfCallbackUpdated;
-        this.unsubscribeCache = unsubscribeCache;
-        return () => (this.callbackCache = unsubscribeCb(this.callbackCache));
+        this.#callbackCache = arrayOfCallbackUpdated;
+        this.#unsubscribeCache = unsubscribeCache;
+        return () => (this.#callbackCache = unsubscribeCb(this.#callbackCache));
     }
 
     /**
@@ -330,7 +330,7 @@ export default class ParallaxTween {
      * @type {import('./type.js').parallaxTweenGetDuration}
      */
     getDuration() {
-        return this.duration;
+        return this.#duration;
     }
 
     /**
@@ -339,7 +339,7 @@ export default class ParallaxTween {
      * @type {import('./type.js').parallaxTweenGetType}
      */
     getType() {
-        return this.type;
+        return this.#type;
     }
 
     /**
@@ -348,11 +348,11 @@ export default class ParallaxTween {
      * @type {() => void}
      */
     destroy() {
-        this.values = [];
-        this.callbackOnStop = [];
-        this.callback = [];
-        this.callbackCache = [];
-        this.unsubscribeCache.forEach((unsubscribe) => unsubscribe());
-        this.unsubscribeCache = [];
+        this.#values = [];
+        this.#callbackOnStop = [];
+        this.#callback = [];
+        this.#callbackCache = [];
+        this.#unsubscribeCache.forEach((unsubscribe) => unsubscribe());
+        this.#unsubscribeCache = [];
     }
 }

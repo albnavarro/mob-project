@@ -1,5 +1,5 @@
 /**
- * @param {Record<'prop', any>[]} newData
+ * @param {import("./type").allActionType[]} newData
  * @param {Record<'prop', any>[]} data
  * @returns {any[]}
  *
@@ -18,7 +18,7 @@ export const mergeArray = (newData, data) => {
 };
 
 /**
- * @param {import("../../tween/type").tweenStoreData[]} newData
+ * @param {import("./type").allActionType[]} newData
  * @param {import("../../tween/type").tweenStoreData[]} data
  * @returns {import("../../tween/type").tweenStoreData[]}
  *

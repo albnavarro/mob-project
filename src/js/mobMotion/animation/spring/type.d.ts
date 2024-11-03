@@ -44,7 +44,6 @@ export interface springActions {
     reverse?: boolean;
     relative?: boolean;
     immediate?: boolean;
-    immediateNoPromise?: boolean;
     config?: springChoiceConfig;
     configProp?: springPropsOptional;
 }
@@ -54,7 +53,6 @@ export interface springDefault {
     configProps: springProps;
     relative: boolean;
     immediate: boolean;
-    immediateNoPromise: boolean;
 }
 
 export interface springInitialData {
@@ -73,37 +71,7 @@ export interface springValues extends springInitialData {
     settled: boolean;
 }
 
-export type springSetData = (arg0: Record<string, number>) => void;
-
-export type springGoTo = (
-    obj: Record<string, number | (() => number)>,
-    props: springActions
-) => void | Promise<any>;
-
-export type springGoFrom = (
-    obj: Record<string, number | (() => number)>,
-    props: springActions
-) => void | Promise<any>;
-
-export type springGoFromTo = (
-    fromObj: Record<string, number | (() => number)>,
-    toObj: Record<string, number | (() => number)>,
-    props: springActions
-) => void | Promise<any>;
-
-export type springSet = (
-    obj: Record<string, number | (() => number)>,
-    props: springActions
-) => void | Promise<any>;
-
-export type springDoAction = (
-    data: (goToParamsType | goFromType | goFromToType)[],
-    props: springActions,
-    obj: Record<string, number | (() => number)>
-) => void | Promise<any>;
-
 export type springMergeProps = (props: springActions) => springDefault;
-
 export type springStop = (arg0?: tweenStopProps) => void;
 export type springPause = () => void;
 export type springResume = () => void;

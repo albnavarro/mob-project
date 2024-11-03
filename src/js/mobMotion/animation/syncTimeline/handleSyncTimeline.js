@@ -217,11 +217,10 @@ export default class HandleSyncTimeline {
     }
 
     /**
-     * @private
      * @param {number} time
      * @param {number} fps
      */
-    updateTime(time, fps) {
+    #updateTime(time, fps) {
         if (this.isStopped || this.fpsIsInLoading) return;
 
         // If loop anitcipate by half frame ( in milliseconds ) next loop so we a have more precise animation
@@ -286,12 +285,12 @@ export default class HandleSyncTimeline {
             !this.isStopped
         ) {
             this.completed = false;
-            this.goToNextFrame();
+            this.#goToNextFrame();
             return;
         }
 
         // Reset sequancer callback add function state
-        this.resetSequencerLastValue();
+        this.#resetSequencerLastValue();
 
         /*
          * Start revere animation
@@ -302,7 +301,7 @@ export default class HandleSyncTimeline {
             this.timeAtReverse = 0;
             this.timeAtReverseBack = 0;
             this.startReverse = false;
-            this.goToNextFrame();
+            this.#goToNextFrame();
             return;
         }
 
@@ -360,7 +359,7 @@ export default class HandleSyncTimeline {
             });
 
             this.isStopped = true;
-            this.resetTime();
+            this.#resetTime();
             this.startTime = time;
             if (this.isReverse) this.isReverse = false;
 
@@ -375,7 +374,7 @@ export default class HandleSyncTimeline {
          **/
         if (this.yoyo) {
             this.reverse();
-            this.goToNextFrame();
+            this.#goToNextFrame();
             return;
         }
 
@@ -383,43 +382,41 @@ export default class HandleSyncTimeline {
          * Reverse playing
          **/
         if (this.isPlayngReverse) {
-            this.resetTime();
+            this.#resetTime();
             this.startTime = time;
             if (!this.isReverse) this.isPlayngReverse = !this.isPlayngReverse;
             this.timeElapsed = this.duration;
             this.currentTime = this.duration;
             this.pauseTime = this.duration;
-            this.goToNextFrame();
+            this.#goToNextFrame();
             return;
         }
 
         /**
          * Default playing
          **/
-        this.resetTime();
+        this.#resetTime();
         this.startTime = time;
         if (this.isReverse) this.isPlayngReverse = !this.isPlayngReverse;
-        this.goToNextFrame();
+        this.#goToNextFrame();
     }
 
     /**
-     * @private
      * @returns {void}
      */
-    goToNextFrame() {
+    #goToNextFrame() {
         mobCore.useFrame(() => {
             mobCore.useNextTick(({ time, fps }) => {
                 // Prevent fire too many raf
-                if (!this.fpsIsInLoading) this.updateTime(time, fps);
+                if (!this.fpsIsInLoading) this.#updateTime(time, fps);
             });
         });
     }
 
     /**
-     * @private
      * @returns {void}
      */
-    resetTime() {
+    #resetTime() {
         this.timeElapsed = 0;
         this.pauseTime = 0;
         this.currentTime = 0;
@@ -428,11 +425,10 @@ export default class HandleSyncTimeline {
     }
 
     /**
-     * @private
      * @param {string} label
      * @returns {number}
      */
-    getTimeFromLabel(label) {
+    #getTimeFromLabel(label) {
         const labelObj = this.sequencers.reduce(
             (previous, current) => {
                 const currentLabels = current.getLabels();
@@ -451,10 +447,9 @@ export default class HandleSyncTimeline {
     }
 
     /**
-     * Private
      * @returns {void}
      */
-    rejectPromise() {
+    #rejectPromise() {
         if (this.currentReject) {
             this.currentReject(mobCore.ANIMATION_STOP_REJECT);
             this.currentReject = undefined;
@@ -474,7 +469,7 @@ export default class HandleSyncTimeline {
             const useCurrent = props?.useCurrent;
             if (this.fpsIsInLoading) return;
 
-            this.rejectPromise();
+            this.#rejectPromise();
             this.currentResolve = resolve;
             this.currentReject = reject;
 
@@ -487,7 +482,7 @@ export default class HandleSyncTimeline {
                 return;
             }
 
-            this.playFromTime();
+            this.#playFromTime();
         });
     }
 
@@ -517,24 +512,23 @@ export default class HandleSyncTimeline {
 
             const isNumber = mobCore.checkType(Number, value);
             // @ts-ignore
-            const labelTime = isNumber ? value : this.getTimeFromLabel(value);
+            const labelTime = isNumber ? value : this.#getTimeFromLabel(value);
 
-            this.rejectPromise();
+            this.#rejectPromise();
             this.currentResolve = resolve;
             this.currentReject = reject;
             // @ts-ignore
-            this.playFromTime(labelTime);
+            this.#playFromTime(labelTime);
         });
     }
 
     /**
-     * @private
      * @param {number} time
      */
-    playFromTime(time = 0) {
+    #playFromTime(time = 0) {
         // Reset sequancer callback add function state
-        this.resetSequencerLastValue();
-        this.resetTime();
+        this.#resetSequencerLastValue();
+        this.#resetTime();
 
         /*
          * Set time
@@ -552,7 +546,7 @@ export default class HandleSyncTimeline {
          * Prevent multiple firing
          */
         this.fpsIsInLoading = true;
-        this.startAnimation(time);
+        this.#startAnimation(time);
     }
 
     /**
@@ -581,13 +575,13 @@ export default class HandleSyncTimeline {
 
             const isNumber = mobCore.checkType(Number, value);
             // @ts-ignore
-            const labelTime = isNumber ? value : this.getTimeFromLabel(value);
+            const labelTime = isNumber ? value : this.#getTimeFromLabel(value);
 
-            this.rejectPromise();
+            this.#rejectPromise();
             this.currentResolve = resolve;
             this.currentReject = reject;
             // @ts-ignore
-            this.playFromTimeReverse(labelTime, true);
+            this.#playFromTimeReverse(labelTime, true);
         });
     }
 
@@ -616,7 +610,7 @@ export default class HandleSyncTimeline {
             const useCurrent = props?.useCurrent;
             if (this.fpsIsInLoading) return;
 
-            this.rejectPromise();
+            this.#rejectPromise();
             this.currentResolve = resolve;
             this.currentReject = reject;
 
@@ -630,18 +624,17 @@ export default class HandleSyncTimeline {
             }
 
             // @ts-ignore
-            this.playFromTimeReverse(this.duration, true);
+            this.#playFromTimeReverse(this.duration, true);
         });
     }
 
     /**
-     * @private
      * @param {number} time
      * @returns {void}
      */
-    playFromTimeReverse(time = 0) {
+    #playFromTimeReverse(time = 0) {
         // Reset sequancer callback add function state
-        this.resetSequencerLastValue();
+        this.#resetSequencerLastValue();
 
         /*
          * Set time
@@ -664,7 +657,7 @@ export default class HandleSyncTimeline {
          * Prevent multiple firing
          */
         this.fpsIsInLoading = true;
-        this.startAnimation(time);
+        this.#startAnimation(time);
     }
 
     /**
@@ -674,7 +667,7 @@ export default class HandleSyncTimeline {
      * @param {number} partial
      * @returns {Promise}
      */
-    async startAnimation(partial) {
+    async #startAnimation(partial) {
         if (this.repeat === 0) return;
 
         const { averageFPS } = await mobCore.useFps();
@@ -700,7 +693,7 @@ export default class HandleSyncTimeline {
                 this.isStopped = false;
                 this.isInPause = false;
                 this.loopCounter = 0;
-                this.updateTime(time, fps);
+                this.#updateTime(time, fps);
             });
         });
     }
@@ -732,7 +725,7 @@ export default class HandleSyncTimeline {
         if (this.isStopped || this.isInPause || this.fpsIsInLoading) return;
 
         // Reset sequancer callback add function state
-        this.resetSequencerLastValue();
+        this.#resetSequencerLastValue();
         this.isReverse = !this.isReverse;
         if (this.isReverse) {
             this.timeAtReverse = this.timeElapsed;
@@ -747,7 +740,7 @@ export default class HandleSyncTimeline {
     stop({ clearCache = true } = {}) {
         this.isStopped = true;
         this.isInPause = false;
-        this.rejectPromise();
+        this.#rejectPromise();
 
         if (clearCache) {
             this.sequencers.forEach((item) => {
@@ -808,7 +801,7 @@ export default class HandleSyncTimeline {
     /**
      * @returns {void}
      */
-    resetSequencerLastValue() {
+    #resetSequencerLastValue() {
         this.sequencers.forEach((item) => item.resetLastValue());
     }
 

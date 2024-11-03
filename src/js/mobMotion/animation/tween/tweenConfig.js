@@ -5,26 +5,26 @@ import { tweenEaseWarning } from '../utils/warning.js';
 
 export const tweenConfig = {
     [easeReference.easeLinear]: (
-        elapsed,
-        initialValue,
-        amountOfChange,
-        duration
+        /** @type {number} */ elapsed,
+        /** @type {number} */ initialValue,
+        /** @type {number} */ amountOfChange,
+        /** @type {number} */ duration
     ) => {
         return (amountOfChange * elapsed) / duration + initialValue;
     },
     [easeReference.easeInQuad]: (
-        elapsed,
-        initialValue,
-        amountOfChange,
-        duration
+        /** @type {number} */ elapsed,
+        /** @type {number} */ initialValue,
+        /** @type {number} */ amountOfChange,
+        /** @type {number} */ duration
     ) => {
         return amountOfChange * (elapsed /= duration) * elapsed + initialValue;
     },
     [easeReference.easeOutQuad]: (
-        elapsed,
-        initialValue,
-        amountOfChange,
-        duration
+        /** @type {number} */ elapsed,
+        /** @type {number} */ initialValue,
+        /** @type {number} */ amountOfChange,
+        /** @type {number} */ duration
     ) => {
         return (
             -amountOfChange * (elapsed /= duration) * (elapsed - 2) +
@@ -32,10 +32,10 @@ export const tweenConfig = {
         );
     },
     [easeReference.easeInOutQuad]: (
-        elapsed,
-        initialValue,
-        amountOfChange,
-        duration
+        /** @type {number} */ elapsed,
+        /** @type {number} */ initialValue,
+        /** @type {number} */ amountOfChange,
+        /** @type {number} */ duration
     ) => {
         if ((elapsed /= duration / 2) < 1) {
             return (amountOfChange / 2) * elapsed * elapsed + initialValue;
@@ -46,10 +46,10 @@ export const tweenConfig = {
         );
     },
     [easeReference.easeInCubic]: (
-        elapsed,
-        initialValue,
-        amountOfChange,
-        duration
+        /** @type {number} */ elapsed,
+        /** @type {number} */ initialValue,
+        /** @type {number} */ amountOfChange,
+        /** @type {number} */ duration
     ) => {
         return (
             amountOfChange * (elapsed /= duration) * elapsed * elapsed +
@@ -57,10 +57,10 @@ export const tweenConfig = {
         );
     },
     [easeReference.easeOutCubic]: (
-        elapsed,
-        initialValue,
-        amountOfChange,
-        duration
+        /** @type {number} */ elapsed,
+        /** @type {number} */ initialValue,
+        /** @type {number} */ amountOfChange,
+        /** @type {number} */ duration
     ) => {
         return (
             amountOfChange *
@@ -69,10 +69,10 @@ export const tweenConfig = {
         );
     },
     [easeReference.easeInOutCubic]: (
-        elapsed,
-        initialValue,
-        amountOfChange,
-        duration
+        /** @type {number} */ elapsed,
+        /** @type {number} */ initialValue,
+        /** @type {number} */ amountOfChange,
+        /** @type {number} */ duration
     ) => {
         if ((elapsed /= duration / 2) < 1) {
             return (
@@ -86,10 +86,10 @@ export const tweenConfig = {
         );
     },
     [easeReference.easeInQuart]: (
-        elapsed,
-        initialValue,
-        amountOfChange,
-        duration
+        /** @type {number} */ elapsed,
+        /** @type {number} */ initialValue,
+        /** @type {number} */ amountOfChange,
+        /** @type {number} */ duration
     ) => {
         return (
             amountOfChange *
@@ -101,10 +101,10 @@ export const tweenConfig = {
         );
     },
     [easeReference.easeOutQuart]: (
-        elapsed,
-        initialValue,
-        amountOfChange,
-        duration
+        /** @type {number} */ elapsed,
+        /** @type {number} */ initialValue,
+        /** @type {number} */ amountOfChange,
+        /** @type {number} */ duration
     ) => {
         return (
             -amountOfChange *
@@ -117,10 +117,10 @@ export const tweenConfig = {
         );
     },
     [easeReference.easeInOutQuart]: (
-        elapsed,
-        initialValue,
-        amountOfChange,
-        duration
+        /** @type {number} */ elapsed,
+        /** @type {number} */ initialValue,
+        /** @type {number} */ amountOfChange,
+        /** @type {number} */ duration
     ) => {
         if ((elapsed /= duration / 2) < 1) {
             return (
@@ -135,10 +135,10 @@ export const tweenConfig = {
         );
     },
     [easeReference.easeInQuint]: (
-        elapsed,
-        initialValue,
-        amountOfChange,
-        duration
+        /** @type {number} */ elapsed,
+        /** @type {number} */ initialValue,
+        /** @type {number} */ amountOfChange,
+        /** @type {number} */ duration
     ) => {
         return (
             amountOfChange *
@@ -151,10 +151,10 @@ export const tweenConfig = {
         );
     },
     [easeReference.easeOutQuint]: (
-        elapsed,
-        initialValue,
-        amountOfChange,
-        duration
+        /** @type {number} */ elapsed,
+        /** @type {number} */ initialValue,
+        /** @type {number} */ amountOfChange,
+        /** @type {number} */ duration
     ) => {
         return (
             amountOfChange *
@@ -168,10 +168,10 @@ export const tweenConfig = {
         );
     },
     [easeReference.easeInOutQuint]: (
-        elapsed,
-        initialValue,
-        amountOfChange,
-        duration
+        /** @type {number} */ elapsed,
+        /** @type {number} */ initialValue,
+        /** @type {number} */ amountOfChange,
+        /** @type {number} */ duration
     ) => {
         if ((elapsed /= duration / 2) < 1) {
             return (
@@ -191,10 +191,10 @@ export const tweenConfig = {
         );
     },
     [easeReference.easeInSine]: (
-        elapsed,
-        initialValue,
-        amountOfChange,
-        duration
+        /** @type {number} */ elapsed,
+        /** @type {any} */ initialValue,
+        /** @type {number} */ amountOfChange,
+        /** @type {number} */ duration
     ) => {
         return (
             -amountOfChange * Math.cos((elapsed / duration) * (Math.PI / 2)) +
@@ -203,10 +203,10 @@ export const tweenConfig = {
         );
     },
     [easeReference.easeOutSine]: (
-        elapsed,
-        initialValue,
-        amountOfChange,
-        duration
+        /** @type {number} */ elapsed,
+        /** @type {number} */ initialValue,
+        /** @type {number} */ amountOfChange,
+        /** @type {number} */ duration
     ) => {
         return (
             amountOfChange * Math.sin((elapsed / duration) * (Math.PI / 2)) +
@@ -214,10 +214,10 @@ export const tweenConfig = {
         );
     },
     [easeReference.easeInOutSine]: (
-        elapsed,
-        initialValue,
-        amountOfChange,
-        duration
+        /** @type {number} */ elapsed,
+        /** @type {number} */ initialValue,
+        /** @type {number} */ amountOfChange,
+        /** @type {number} */ duration
     ) => {
         return (
             (-amountOfChange / 2) *
@@ -226,10 +226,10 @@ export const tweenConfig = {
         );
     },
     [easeReference.easeInExpo]: (
-        elapsed,
-        initialValue,
-        amountOfChange,
-        duration
+        /** @type {number} */ elapsed,
+        /** @type {number} */ initialValue,
+        /** @type {number} */ amountOfChange,
+        /** @type {number} */ duration
     ) => {
         return elapsed === 0
             ? initialValue
@@ -237,10 +237,10 @@ export const tweenConfig = {
                   initialValue;
     },
     [easeReference.easeOutExpo]: (
-        elapsed,
-        initialValue,
-        amountOfChange,
-        duration
+        /** @type {number} */ elapsed,
+        /** @type {number} */ initialValue,
+        /** @type {number} */ amountOfChange,
+        /** @type {number} */ duration
     ) => {
         return elapsed === duration
             ? initialValue + amountOfChange
@@ -248,10 +248,10 @@ export const tweenConfig = {
                   initialValue;
     },
     [easeReference.easeInOutExpo]: (
-        elapsed,
-        initialValue,
-        amountOfChange,
-        duration
+        /** @type {number} */ elapsed,
+        /** @type {number} */ initialValue,
+        /** @type {number} */ amountOfChange,
+        /** @type {number} */ duration
     ) => {
         if (elapsed === 0) {
             return initialValue;
@@ -271,10 +271,10 @@ export const tweenConfig = {
         );
     },
     [easeReference.easeInCirc]: (
-        elapsed,
-        initialValue,
-        amountOfChange,
-        duration
+        /** @type {number} */ elapsed,
+        /** @type {number} */ initialValue,
+        /** @type {number} */ amountOfChange,
+        /** @type {number} */ duration
     ) => {
         return (
             -amountOfChange *
@@ -283,10 +283,10 @@ export const tweenConfig = {
         );
     },
     [easeReference.easeOutCirc]: (
-        elapsed,
-        initialValue,
-        amountOfChange,
-        duration
+        /** @type {number} */ elapsed,
+        /** @type {number} */ initialValue,
+        /** @type {number} */ amountOfChange,
+        /** @type {number} */ duration
     ) => {
         return (
             amountOfChange *
@@ -295,10 +295,10 @@ export const tweenConfig = {
         );
     },
     [easeReference.easeInOutCirc]: (
-        elapsed,
-        initialValue,
-        amountOfChange,
-        duration
+        /** @type {number} */ elapsed,
+        /** @type {number} */ initialValue,
+        /** @type {number} */ amountOfChange,
+        /** @type {number} */ duration
     ) => {
         if ((elapsed /= duration / 2) < 1) {
             return (
@@ -313,10 +313,10 @@ export const tweenConfig = {
         );
     },
     [easeReference.easeInElastic]: (
-        elapsed,
-        initialValue,
-        amountOfChange,
-        duration
+        /** @type {number} */ elapsed,
+        /** @type {number} */ initialValue,
+        /** @type {number} */ amountOfChange,
+        /** @type {number} */ duration
     ) => {
         let s = 1.701_58;
         let p = 0;
@@ -345,10 +345,10 @@ export const tweenConfig = {
         );
     },
     [easeReference.easeOutElastic]: (
-        elapsed,
-        initialValue,
-        amountOfChange,
-        duration
+        /** @type {number} */ elapsed,
+        /** @type {any} */ initialValue,
+        /** @type {number} */ amountOfChange,
+        /** @type {number} */ duration
     ) => {
         let s = 1.701_58;
         let p = 0;
@@ -377,10 +377,10 @@ export const tweenConfig = {
         );
     },
     [easeReference.easeInOutElastic]: (
-        elapsed,
-        initialValue,
-        amountOfChange,
-        duration
+        /** @type {number} */ elapsed,
+        /** @type {number} */ initialValue,
+        /** @type {number} */ amountOfChange,
+        /** @type {number} */ duration
     ) => {
         let s = 1.701_58;
         let p = 0;
@@ -421,10 +421,10 @@ export const tweenConfig = {
         );
     },
     [easeReference.easeInBack]: (
-        elapsed,
-        initialValue,
-        amountOfChange,
-        duration,
+        /** @type {number} */ elapsed,
+        /** @type {number} */ initialValue,
+        /** @type {number} */ amountOfChange,
+        /** @type {number} */ duration,
         s = 1.701_58
     ) => {
         return (
@@ -436,10 +436,10 @@ export const tweenConfig = {
         );
     },
     [easeReference.easeOutBack]: (
-        elapsed,
-        initialValue,
-        amountOfChange,
-        duration,
+        /** @type {number} */ elapsed,
+        /** @type {number} */ initialValue,
+        /** @type {number} */ amountOfChange,
+        /** @type {number} */ duration,
         s = 1.701_58
     ) => {
         return (
@@ -452,10 +452,10 @@ export const tweenConfig = {
         );
     },
     easeInOutBack: (
-        elapsed,
-        initialValue,
-        amountOfChange,
-        duration,
+        /** @type {number} */ elapsed,
+        /** @type {number} */ initialValue,
+        /** @type {number} */ amountOfChange,
+        /** @type {number} */ duration,
         s = 1.701_58
     ) => {
         if ((elapsed /= duration / 2) < 1) {
@@ -473,10 +473,10 @@ export const tweenConfig = {
         );
     },
     [easeReference.easeInBounce]: (
-        elapsed,
-        initialValue,
-        amountOfChange,
-        duration
+        /** @type {number} */ elapsed,
+        /** @type {number} */ initialValue,
+        /** @type {number} */ amountOfChange,
+        /** @type {number} */ duration
     ) => {
         return (
             amountOfChange -
@@ -490,10 +490,10 @@ export const tweenConfig = {
         );
     },
     [easeReference.easeOutBounce]: (
-        elapsed,
-        initialValue,
-        amountOfChange,
-        duration
+        /** @type {number} */ elapsed,
+        /** @type {number} */ initialValue,
+        /** @type {number} */ amountOfChange,
+        /** @type {number} */ duration
     ) => {
         if ((elapsed /= duration) < 1 / 2.75) {
             return amountOfChange * (7.5625 * elapsed * elapsed) + initialValue;
@@ -518,10 +518,10 @@ export const tweenConfig = {
         }
     },
     [easeReference.easeInOutBounce]: (
-        elapsed,
-        initialValue,
-        amountOfChange,
-        duration
+        /** @type {number} */ elapsed,
+        /** @type {number} */ initialValue,
+        /** @type {number} */ amountOfChange,
+        /** @type {number} */ duration
     ) => {
         if (elapsed < duration / 2) {
             return (
@@ -554,6 +554,9 @@ export const printEaseKey = () => {
     console.log(Object.keys(tweenConfig));
 };
 
+/**
+ * @type {(arg0: string) => () => void}
+ */
 export const getTweenFn = (prop) => {
     if (prop in tweenConfig) {
         return tweenConfig[prop];

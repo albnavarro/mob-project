@@ -54,6 +54,125 @@ import { lerpGetValuesOnDraw } from './getValuesOnDraw.js';
 
 export default class HandleLerp {
     /**
+     * @type {import('../utils/stagger/type.js').staggerObject}
+     */
+    #stagger;
+
+    /**
+     * @type {boolean}
+     */
+    #relative;
+
+    /**
+     * @type {number}
+     */
+    #velocity;
+
+    /**
+     * @type {number}
+     */
+    #precision;
+
+    /**
+     * @type {string}
+     */
+    #uniqueId;
+
+    /**
+     * @type {boolean}
+     */
+    #isActive;
+
+    /**
+     * @type{(value:any) => void|null }
+     */
+    #currentResolve;
+
+    /**
+     * @type{(value:any) => void|null}
+     */
+    #currentReject;
+
+    /**
+     * @type{Promise<void>|undefined}
+     */
+    #promise;
+
+    /**
+     * @type {import('./type.js').lerpValues[]|[]}
+     */
+    #values;
+
+    /**
+     * @type {import('./type.js').lerpInitialData[]}
+     */
+    #initialData;
+
+    /**
+     * @type {import('../utils/callbacks/type.js').callbackObject<(arg0:Record<string, number>) => void>[]}
+     */
+    #callback;
+
+    /**
+     * @type {import('../utils/callbacks/type.js').callbackObject<string>[]}
+     */
+    #callbackCache;
+
+    /**
+     * @type {import('../utils/callbacks/type.js').callbackObject<(arg0:Record<string, number>) => void>[]}
+     */
+    #callbackOnComplete;
+
+    /**
+     * @type {import('../utils/callbacks/type.js').callbackObject<(arg0:any) => boolean>[]}
+     */
+    #callbackStartInPause;
+
+    /**
+     * @type {Array<() => void>}
+     */
+    #unsubscribeCache;
+
+    /**
+     * @type {boolean}
+     */
+    #pauseStatus;
+
+    /**
+     * @type {boolean}
+     */
+    #firstRun;
+
+    /**
+     * @type {boolean}
+     */
+    #useStagger;
+
+    /**
+     * @type {boolean}
+     */
+    #fpsInLoading;
+
+    /**
+     * @description
+     * This value is the base value merged with new value in custom prop
+     * passed form user in goTo etc..
+     *
+     * @type {import('./type.js').lerpDefault}
+     **/
+    #defaultProps;
+
+    /**
+     * @type {import('../utils/stagger/type.js').staggerDefaultIndex}
+     **/
+    #slowlestStagger;
+
+    /**
+     * @type {import('../utils/stagger/type.js').staggerDefaultIndex}
+     */
+    #fastestStagger;
+
+    /**
      * @param {import('./type.js').lerpTweenProps} [ data  = {}]
      *
      * @example
@@ -100,155 +219,35 @@ export default class HandleLerp {
      * ```
      */
     constructor(data) {
-        /**
-         * @private
-         * @type {import('../utils/stagger/type.js').staggerObject}
-         */
-        this.stagger = getStaggerFromProps(data);
-
-        /**
-         * @private
-         * @type {boolean}
-         */
-        this.relative = relativeIsValid(data?.relative, 'lerp');
-
-        /**
-         * @private
-         * @type {number}
-         */
-        this.velocity = lerpVelocityIsValid(data?.velocity);
-
-        /**
-         * @private
-         * @type {number}
-         */
-        this.precision = lerpPrecisionIsValid(data?.precision);
-
-        /**
-         * @private
-         * @type {string}
-         */
-        this.uniqueId = mobCore.getUnivoqueId();
-
-        /**
-         * @private
-         * @type {boolean}
-         */
-        this.isActive = false;
-
-        /**
-         * @private
-         * @type{(value:any) => void|null }
-         */
-        this.currentResolve = undefined;
-
-        /**
-         * @private
-         * @type{(value:any) => void|null}
-         */
-        this.currentReject = undefined;
-
-        /**
-         * @private
-         * @type{Promise|undefined}
-         */
-        this.promise = undefined;
-
-        /**
-         * @private
-         * @type {import('./type.js').lerpValues[]|[]}
-         */
-        this.values = [];
-
-        /**
-         * @private
-         * @type {import('./type.js').lerpInitialData[]}
-         */
-        this.initialData = [];
-
-        /**
-         * @private
-         * @type {import('../utils/callbacks/type.js').callbackObject<(arg0:Record<string, number>) => void>[]}
-         */
-        this.callback = [];
-
-        /**
-         * @private
-         * @type {import('../utils/callbacks/type.js').callbackObject<string>[]}
-         */
-        this.callbackCache = [];
-
-        /**
-         * @private
-         * @type {import('../utils/callbacks/type.js').callbackObject<(arg0:Record<string, number>) => void>[]}
-         */
-        this.callbackOnComplete = [];
-
-        /**
-         * @private
-         * @type {import('../utils/callbacks/type.js').callbackObject<(arg0:any) => boolean>[]}
-         */
-        this.callbackStartInPause = [];
-
-        /**
-         * @private
-         * @type {Array<() => void>}
-         */
-        this.unsubscribeCache = [];
-
-        /**
-         * @private
-         * @type {boolean}
-         */
-        this.pauseStatus = false;
-
-        /**
-         * @private
-         * @type {boolean}
-         */
-        this.firstRun = true;
-
-        /**
-         * @private
-         * @type {boolean}
-         */
-        this.useStagger = true;
-
-        /**
-         * @private
-         * @type {boolean}
-         */
-        this.fpsInLoading = false;
-
-        /**
-         * @private
-         *
-         * @description
-         * This value is the base value merged with new value in custom prop
-         * passed form user in goTo etc..
-         *
-         * @type {import('./type.js').lerpDefault}
-         **/
-        this.defaultProps = {
+        this.#stagger = getStaggerFromProps(data);
+        this.#relative = relativeIsValid(data?.relative, 'lerp');
+        this.#velocity = lerpVelocityIsValid(data?.velocity);
+        this.#precision = lerpPrecisionIsValid(data?.precision);
+        this.#uniqueId = mobCore.getUnivoqueId();
+        this.#isActive = false;
+        this.#currentResolve = undefined;
+        this.#currentReject = undefined;
+        this.#promise = undefined;
+        this.#values = [];
+        this.#initialData = [];
+        this.#callback = [];
+        this.#callbackCache = [];
+        this.#callbackOnComplete = [];
+        this.#callbackStartInPause = [];
+        this.#unsubscribeCache = [];
+        this.#pauseStatus = false;
+        this.#firstRun = true;
+        this.#useStagger = true;
+        this.#fpsInLoading = false;
+        this.#defaultProps = {
             reverse: false,
-            velocity: this.velocity,
-            precision: this.precision,
-            relative: this.relative,
+            velocity: this.#velocity,
+            precision: this.#precision,
+            relative: this.#relative,
             immediate: false,
-            immediateNoPromise: false,
         };
-
-        /**
-         * @private
-         * @type {import('../utils/stagger/type.js').staggerDefaultIndex}
-         **/
-        this.slowlestStagger = STAGGER_DEFAULT_INDEX_OBJ;
-
-        /**
-         * @private
-         * @type {import('../utils/stagger/type.js').staggerDefaultIndex}
-         */
-        this.fastestStagger = STAGGER_DEFAULT_INDEX_OBJ;
+        this.#slowlestStagger = STAGGER_DEFAULT_INDEX_OBJ;
+        this.#fastestStagger = STAGGER_DEFAULT_INDEX_OBJ;
 
         /**
          * Set initial store data if defined in constructor props
@@ -265,68 +264,68 @@ export default class HandleLerp {
      *
      * @returns {void}
      */
-    draw(_time, fps, res = () => {}) {
-        this.isActive = true;
+    #draw(_time, fps, res = () => {}) {
+        this.#isActive = true;
 
         // Update values.
-        this.values = lerpGetValuesOnDraw({
-            values: this.values,
+        this.#values = lerpGetValuesOnDraw({
+            values: this.#values,
             fps,
-            velocity: this.velocity,
-            precision: this.precision,
+            velocity: this.#velocity,
+            precision: this.#precision,
         });
 
         // Prepare an obj to pass to the callback.
-        const callBackObject = getValueObj(this.values, 'currentValue');
+        const callBackObject = getValueObj(this.#values, 'currentValue');
 
         defaultCallback({
-            stagger: this.stagger,
-            callback: this.callback,
-            callbackCache: this.callbackCache,
+            stagger: this.#stagger,
+            callback: this.#callback,
+            callbackCache: this.#callbackCache,
             callBackObject: callBackObject,
-            useStagger: this.useStagger,
+            useStagger: this.#useStagger,
         });
 
         // Check if all values is completed.
-        const allSettled = this.values.every((item) => item.settled === true);
+        const allSettled = this.#values.every((item) => item.settled === true);
 
         if (allSettled) {
             const onComplete = () => {
-                this.isActive = false;
+                this.#isActive = false;
 
                 /**
                  * End of animation
                  * Set fromValue with ended value
                  * At the next call fromValue become the start value
                  */
-                this.values = [...this.values].map((item) => {
+                this.#values = [...this.#values].map((item) => {
                     return { ...item, fromValue: item.toValue };
                 });
 
                 // On complete
-                if (!this.pauseStatus) {
+                if (!this.#pauseStatus) {
                     res();
 
                     // Set promise reference to null once resolved
-                    this.promise = undefined;
-                    this.currentReject = undefined;
-                    this.currentResolve = undefined;
+                    this.#promise = undefined;
+                    this.#currentReject = undefined;
+                    this.#currentResolve = undefined;
                 }
             };
 
             // Prepare an obj to pass to the callback with rounded value ( end user value)
-            const cbObjectSettled = getValueObj(this.values, 'toValue');
+            const cbObjectSettled = getValueObj(this.#values, 'toValue');
 
             defaultCallbackOnComplete({
                 onComplete,
-                callback: this.callback,
-                callbackCache: this.callbackCache,
-                callbackOnComplete: this.callbackOnComplete,
+                callback: this.#callback,
+                callbackCache: this.#callbackCache,
+                callbackOnComplete: this.#callbackOnComplete,
                 callBackObject: cbObjectSettled,
-                stagger: this.stagger,
-                slowlestStagger: this.slowlestStagger,
-                fastestStagger: this.fastestStagger,
-                useStagger: this.useStagger,
+                stagger: this.#stagger,
+                slowlestStagger: this.#slowlestStagger,
+                fastestStagger: this.#fastestStagger,
+                useStagger: this.#useStagger,
             });
 
             return;
@@ -334,24 +333,22 @@ export default class HandleLerp {
 
         mobCore.useFrame(() => {
             mobCore.useNextTick(({ time, fps }) => {
-                if (this.isActive) this.draw(time, fps, res);
+                if (this.#isActive) this.#draw(time, fps, res);
             });
         });
     }
 
     /**
-     * @private
-     *
      * @param {number} time current global time
      * @param {number} fps current FPS
      * @param {(value:any) => void} res current promise resolve
      **/
-    onReuqestAnim(time, fps, res) {
-        this.values = [...this.values].map((item) => {
+    #onReuqestAnim(time, fps, res) {
+        this.#values = [...this.#values].map((item) => {
             return { ...item, currentValue: item.fromValue };
         });
 
-        this.draw(time, fps, res);
+        this.#draw(time, fps, res);
     }
 
     /**
@@ -360,7 +357,7 @@ export default class HandleLerp {
      *
      * @returns {Promise<any>}
      */
-    async inzializeStagger() {
+    async #inzializeStagger() {
         /**
          * First time il there is a stagger load fps then go next step
          * next time no need to calcaulte stagger and jump directly next step
@@ -368,20 +365,20 @@ export default class HandleLerp {
          **/
         if (
             shouldInizializzeStagger(
-                this.stagger.each,
-                this.firstRun,
-                this.callbackCache,
-                this.callback
+                this.#stagger.each,
+                this.#firstRun,
+                this.#callbackCache,
+                this.#callback
             )
         ) {
             const { averageFPS } = await mobCore.useFps();
 
             fpsLoadedLog('lerp', averageFPS);
-            const cb = getStaggerArray(this.callbackCache, this.callback);
+            const cb = getStaggerArray(this.#callbackCache, this.#callback);
 
-            if (this.stagger.grid.col > cb.length) {
+            if (this.#stagger.grid.col > cb.length) {
                 staggerIsOutOfRangeWarning(cb.length);
-                this.firstRun = false;
+                this.#firstRun = false;
                 return;
             }
 
@@ -392,47 +389,46 @@ export default class HandleLerp {
                 slowlestStagger,
             } = setStagger({
                 arrayDefault: cb,
-                arrayOnStop: this.callbackOnComplete,
-                stagger: this.stagger,
-                slowlestStagger: this.slowlestStagger,
-                fastestStagger: this.fastestStagger,
+                arrayOnStop: this.#callbackOnComplete,
+                stagger: this.#stagger,
+                slowlestStagger: this.#slowlestStagger,
+                fastestStagger: this.#fastestStagger,
             });
 
-            if (this.callbackCache.length > this.callback.length) {
-                this.callbackCache = staggerArray;
+            if (this.#callbackCache.length > this.#callback.length) {
+                this.#callbackCache = staggerArray;
             } else {
-                this.callback = staggerArray;
+                this.#callback = staggerArray;
             }
-            this.callbackOnComplete = staggerArrayOnComplete;
-            this.slowlestStagger = slowlestStagger;
-            this.fastestStagger = fastestStagger;
-            this.firstRun = false;
+            this.#callbackOnComplete = staggerArrayOnComplete;
+            this.#slowlestStagger = slowlestStagger;
+            this.#fastestStagger = fastestStagger;
+            this.#firstRun = false;
         }
 
         return { ready: true };
     }
 
     /**
-     * @private
      * @param {(arg0: any) => void} res
      * @param {(value: any) => void|null} reject
      *
      * @returns {Promise}
      */
-    async startRaf(res, reject) {
-        if (this.fpsInLoading) return;
-        this.currentResolve = res;
-        this.currentReject = reject;
+    async #startRaf(res, reject) {
+        if (this.#fpsInLoading) return;
+        this.#currentResolve = res;
+        this.#currentReject = reject;
 
-        if (this.firstRun) {
-            this.fpsInLoading = true;
-            await this.inzializeStagger();
-            this.fpsInLoading = false;
+        if (this.#firstRun) {
+            this.#fpsInLoading = true;
+            await this.#inzializeStagger();
+            this.#fpsInLoading = false;
         }
 
         initRaf(
-            this.callbackStartInPause,
-            this.onReuqestAnim.bind(this),
+            this.#callbackStartInPause,
+            this.#onReuqestAnim.bind(this),
             this.pause.bind(this),
             res
         );
@@ -442,58 +438,58 @@ export default class HandleLerp {
      * @type {import('./type.js').lerpStop}
      */
     stop({ clearCache = true } = {}) {
-        if (this.pauseStatus) this.pauseStatus = false;
-        this.values = setFromToByCurrent(this.values);
+        if (this.#pauseStatus) this.#pauseStatus = false;
+        this.#values = setFromToByCurrent(this.#values);
 
         /**
          * If isRunning clear all funture stagger.
          * If tween is ended and the lst stagger is running, let it reach end position.
          */
-        if (this.isActive && clearCache)
-            this.callbackCache.forEach(({ cb }) => mobCore.useCache.clean(cb));
+        if (this.#isActive && clearCache)
+            this.#callbackCache.forEach(({ cb }) => mobCore.useCache.clean(cb));
 
         // Reject promise
-        if (this.currentReject) {
-            this.currentReject(mobCore.ANIMATION_STOP_REJECT);
-            this.promise = undefined;
-            this.currentReject = undefined;
-            this.currentResolve = undefined;
+        if (this.#currentReject) {
+            this.#currentReject(mobCore.ANIMATION_STOP_REJECT);
+            this.#promise = undefined;
+            this.#currentReject = undefined;
+            this.#currentResolve = undefined;
         }
 
         // Reset RAF
-        if (this.isActive) this.isActive = false;
+        if (this.#isActive) this.#isActive = false;
     }
 
     /**
      * @type {import('./type.js').lerpPause}
      */
     pause() {
-        if (this.pauseStatus) return;
-        this.pauseStatus = true;
-        if (this.isActive) this.isActive = false;
-        this.values = setFromByCurrent(this.values);
+        if (this.#pauseStatus) return;
+        this.#pauseStatus = true;
+        if (this.#isActive) this.#isActive = false;
+        this.#values = setFromByCurrent(this.#values);
     }
 
     /**
      * @type {import('./type.js').lerpResume}
      */
     resume() {
-        if (!this.pauseStatus) return;
-        this.pauseStatus = false;
+        if (!this.#pauseStatus) return;
+        this.#pauseStatus = false;
 
-        if (!this.isActive && this.currentResolve) {
-            resume(this.onReuqestAnim.bind(this), this.currentResolve);
+        if (!this.#isActive && this.#currentResolve) {
+            resume(this.#onReuqestAnim.bind(this), this.#currentResolve);
         }
     }
 
     /**
-     * @type {import('./type.js').lerpSetData}
+     * @type {import('../../utils/type.js').SetData}
      *
      * @description
      * Set initial data structure, the method is call by data prop in constructor. In case of need it can be called after creating the instance
      */
     setData(obj) {
-        this.values = Object.entries(obj).map((item) => {
+        this.#values = Object.entries(obj).map((item) => {
             const [prop, value] = item;
             return {
                 prop: prop,
@@ -508,7 +504,7 @@ export default class HandleLerp {
             };
         });
 
-        this.initialData = this.values.map((item) => {
+        this.#initialData = this.#values.map((item) => {
             return {
                 prop: item.prop,
                 toValue: item.toValue,
@@ -522,104 +518,116 @@ export default class HandleLerp {
      * @type {import('./type.js').lerpResetData}
      */
     resetData() {
-        this.values = mergeDeep(this.values, this.initialData);
+        this.#values = mergeDeep(this.#values, this.#initialData);
     }
 
     /**
-     * @private
      * @type  {import('./type.js').lerpMergeProps}
      */
-    mergeProps(props) {
-        const newProps = { ...this.defaultProps, ...props };
+    #mergeProps(props) {
+        const newProps = { ...this.#defaultProps, ...props };
         const { velocity, precision, relative } = newProps;
-        this.relative = relativeIsValid(relative, 'lerp');
-        this.velocity = lerpVelocityIsValid(velocity);
-        this.precision = lerpPrecisionIsValid(precision);
+        this.#relative = relativeIsValid(relative, 'lerp');
+        this.#velocity = lerpVelocityIsValid(velocity);
+        this.#precision = lerpPrecisionIsValid(precision);
 
         return newProps;
     }
 
     /**
-     * @type {import('./type.js').lerpGoTo} obj to Values
+     * @type {import('../../utils/type.js').GoTo<import('./type.js').lerpActions>} obj to Values
      */
-    goTo(obj, props = {}) {
-        if (this.pauseStatus) return;
-        this.useStagger = true;
+    goTo(obj, props) {
+        if (this.#pauseStatus) return;
+        this.#useStagger = true;
         const data = goToUtils(obj);
-        return this.doAction(data, props, obj);
+        return this.#doAction(data, props, obj);
     }
 
     /**
-     * @type {import('./type.js').lerpGoFrom} obj from Values
+     * @type {import('../../utils/type.js').GoFrom<import('./type.js').lerpActions>} obj to Values
      */
-    goFrom(obj, props = {}) {
-        if (this.pauseStatus) return;
-        this.useStagger = true;
+    goFrom(obj, props) {
+        if (this.#pauseStatus) return;
+        this.#useStagger = true;
         const data = goFromUtils(obj);
-        return this.doAction(data, props, obj);
+        return this.#doAction(data, props, obj);
     }
 
     /**
-     * @type {import('./type.js').lerpGoFromTo} fromObj from Values
+     * @type {import('../../utils/type.js').GoFromTo<import('./type.js').lerpActions>} obj to Values
      */
-    goFromTo(fromObj, toObj, props = {}) {
-        if (this.pauseStatus) return;
-        this.useStagger = true;
+    goFromTo(fromObj, toObj, props) {
+        if (this.#pauseStatus) return;
+        this.#useStagger = true;
 
         // Check if fromObj has the same keys of toObj
         if (!compareKeys(fromObj, toObj)) {
             compareKeysWarning('lerp goFromTo:', fromObj, toObj);
-            return this.promise;
+            return this.#promise;
         }
 
         const data = goFromToUtils(fromObj, toObj);
 
-        return this.doAction(data, props, fromObj);
+        return this.#doAction(data, props, fromObj);
     }
 
     /**
-     * @type {import('./type.js').lerpSet} obj to Values
+     * @type {import('../../utils/type.js').Set<import('./type.js').lerpActions>} obj to Values
      */
-    set(obj, props = {}) {
-        if (this.pauseStatus) return;
-        this.useStagger = false;
+    set(obj, props) {
+        if (this.#pauseStatus) return;
+        this.#useStagger = false;
         const data = setUtils(obj);
-        return this.doAction(data, props, obj);
+        return this.#doAction(data, props, obj);
     }
 
     /**
-     * @private
-     * @type {import('./type.js').lerpDoAction}
+     * @type {import('../../utils/type.js').SetImmediate<import('./type.js').lerpActions>} obj to Values
      */
-    doAction(data, props, obj) {
-        this.values = mergeArray(data, this.values);
-        const { reverse, immediate, immediateNoPromise } =
-            this.mergeProps(props);
+    setImmediate(obj, props) {
+        if (this.#pauseStatus) return;
+        this.#useStagger = false;
+
+        const data = setUtils(obj);
+        this.#values = mergeArray(data, this.#values);
+
+        const { reverse } = this.#mergeProps(props);
+        if (valueIsBooleanAndTrue(reverse, 'reverse'))
+            this.#values = setReverseValues(obj, this.#values);
+
+        this.#values = setRelative(this.#values, this.#relative);
+        this.#values = setFromCurrentByTo(this.#values);
+
+        this.#isActive = false;
+        return;
+    }
+
+    /**
+     * @type {import('../../utils/type.js').DoAction<import('./type.js').lerpActions>} obj to Values
+     */
+    #doAction(data, props, obj) {
+        this.#values = mergeArray(data, this.#values);
+        const { reverse, immediate } = this.#mergeProps(props);
 
         if (valueIsBooleanAndTrue(reverse, 'reverse'))
-            this.values = setReverseValues(obj, this.values);
+            this.#values = setReverseValues(obj, this.#values);
 
-        this.values = setRelative(this.values, this.relative);
+        this.#values = setRelative(this.#values, this.#relative);
 
         if (valueIsBooleanAndTrue(immediate, 'immediate ')) {
-            this.isActive = false;
-            this.values = setFromCurrentByTo(this.values);
+            this.#isActive = false;
+            this.#values = setFromCurrentByTo(this.#values);
             return Promise.resolve();
         }
 
-        if (valueIsBooleanAndTrue(immediateNoPromise, 'immediateNoPromise')) {
-            this.isActive = false;
-            this.values = setFromCurrentByTo(this.values);
-            return;
-        }
-
-        if (!this.isActive) {
-            this.promise = new Promise((res, reject) => {
-                this.startRaf(res, reject);
+        if (!this.#isActive) {
+            this.#promise = new Promise((res, reject) => {
+                this.#startRaf(res, reject);
             });
         }
 
-        if (this.promise) return this.promise;
+        if (this.#promise) return this.#promise;
     }
 
     /**
@@ -636,7 +644,7 @@ export default class HandleLerp {
      * ```
      */
     get() {
-        return getValueObj(this.values, 'currentValue');
+        return getValueObj(this.#values, 'currentValue');
     }
 
     /**
@@ -653,7 +661,7 @@ export default class HandleLerp {
      * ```
      */
     getInitialData() {
-        return getValueObj(this.initialData, 'currentValue');
+        return getValueObj(this.#initialData, 'currentValue');
     }
 
     /**
@@ -670,7 +678,7 @@ export default class HandleLerp {
      * ```
      */
     getFrom() {
-        return getValueObj(this.values, 'fromValue');
+        return getValueObj(this.#values, 'fromValue');
     }
 
     /**
@@ -687,7 +695,7 @@ export default class HandleLerp {
      * ```
      */
     getTo() {
-        return getValueObj(this.values, 'toValue');
+        return getValueObj(this.#values, 'toValue');
     }
 
     /**
@@ -704,7 +712,7 @@ export default class HandleLerp {
      * ```
      */
     getFromNativeType() {
-        return getValueObjFromNative(this.values);
+        return getValueObjFromNative(this.#values);
     }
 
     /**
@@ -721,7 +729,7 @@ export default class HandleLerp {
      * ```
      */
     getToNativeType() {
-        return getValueObjToNative(this.values);
+        return getValueObjToNative(this.#values);
     }
 
     /**
@@ -755,7 +763,7 @@ export default class HandleLerp {
      * ```
      */
     getId() {
-        return this.uniqueId;
+        return this.#uniqueId;
     }
 
     /**
@@ -774,9 +782,9 @@ export default class HandleLerp {
         The change will be persistent
      */
     updateVelocity(velocity) {
-        this.velocity = lerpVelocityIsValid(velocity);
-        this.defaultProps = mergeDeep(this.defaultProps, {
-            velocity: this.velocity,
+        this.#velocity = lerpVelocityIsValid(velocity);
+        this.#defaultProps = mergeDeep(this.#defaultProps, {
+            velocity: this.#velocity,
         });
     }
 
@@ -796,9 +804,9 @@ export default class HandleLerp {
        The change will be persistent
      */
     updatePrecision(precision) {
-        this.velocity = lerpPrecisionIsValid(precision);
-        this.defaultProps = mergeDeep(this.defaultProps, {
-            precision: this.precision,
+        this.#velocity = lerpPrecisionIsValid(precision);
+        this.#defaultProps = mergeDeep(this.#defaultProps, {
+            precision: this.#precision,
         });
     }
 
@@ -812,10 +820,10 @@ export default class HandleLerp {
     subscribe(cb) {
         const { arrayOfCallbackUpdated, unsubscribeCb } = setCallBack(
             cb,
-            this.callback
+            this.#callback
         );
-        this.callback = arrayOfCallbackUpdated;
-        return () => (this.callback = unsubscribeCb(this.callback));
+        this.#callback = arrayOfCallbackUpdated;
+        return () => (this.#callback = unsubscribeCb(this.#callback));
     }
 
     /**
@@ -830,13 +838,13 @@ export default class HandleLerp {
     onStartInPause(cb) {
         const { arrayOfCallbackUpdated } = setCallBack(
             cb,
-            this.callbackStartInPause
+            this.#callbackStartInPause
         );
-        this.callbackStartInPause =
+        this.#callbackStartInPause =
             /** @type{import('../utils/callbacks/type.js').callbackObject<(arg0:any) => boolean>[]} */ (
                 arrayOfCallbackUpdated
             );
-        return () => (this.callbackStartInPause = []);
+        return () => (this.#callbackStartInPause = []);
     }
 
     /**
@@ -851,12 +859,14 @@ export default class HandleLerp {
     onComplete(cb) {
         const { arrayOfCallbackUpdated, unsubscribeCb } = setCallBack(
             cb,
-            this.callbackOnComplete
+            this.#callbackOnComplete
         );
-        this.callbackOnComplete = arrayOfCallbackUpdated;
+        this.#callbackOnComplete = arrayOfCallbackUpdated;
 
         return () =>
-            (this.callbackOnComplete = unsubscribeCb(this.callbackOnComplete));
+            (this.#callbackOnComplete = unsubscribeCb(
+                this.#callbackOnComplete
+            ));
     }
 
     /**
@@ -870,13 +880,13 @@ export default class HandleLerp {
             setCallBackCache(
                 item,
                 fn,
-                this.callbackCache,
-                this.unsubscribeCache
+                this.#callbackCache,
+                this.#unsubscribeCache
             );
 
-        this.callbackCache = arrayOfCallbackUpdated;
-        this.unsubscribeCache = unsubscribeCache;
-        return () => (this.callbackCache = unsubscribeCb(this.callbackCache));
+        this.#callbackCache = arrayOfCallbackUpdated;
+        this.#unsubscribeCache = unsubscribeCache;
+        return () => (this.#callbackCache = unsubscribeCb(this.#callbackCache));
     }
 
     /**
@@ -884,14 +894,14 @@ export default class HandleLerp {
      * Destroy tween
      */
     destroy() {
-        if (this.promise) this.stop();
-        this.callbackOnComplete = [];
-        this.callbackStartInPause = [];
-        this.callback = [];
-        this.callbackCache = [];
-        this.values = [];
-        this.promise = undefined;
-        this.unsubscribeCache.forEach((unsubscribe) => unsubscribe());
-        this.unsubscribeCache = [];
+        if (this.#promise) this.stop();
+        this.#callbackOnComplete = [];
+        this.#callbackStartInPause = [];
+        this.#callback = [];
+        this.#callbackCache = [];
+        this.#values = [];
+        this.#promise = undefined;
+        this.#unsubscribeCache.forEach((unsubscribe) => unsubscribe());
+        this.#unsubscribeCache = [];
     }
 }

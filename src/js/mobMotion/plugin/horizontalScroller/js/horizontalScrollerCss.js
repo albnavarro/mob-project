@@ -1,3 +1,5 @@
+//@ts-check
+
 // let horizontalCustomCssIsAlive = false;
 import { mq } from '../../../utils/mediaManager.js';
 import { horizontalScrollerContstant } from './horizontalScrollerConstant.js';

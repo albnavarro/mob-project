@@ -6,8 +6,8 @@
 export const NOOP = () => {};
 
 /**
- * @param {...function():promise} functions
- * @returns {function(any):Promise}
+ * @param {...() => Promise<any>} functions
+ * @returns {Awaited<any>}
  *
  * @description
  * Pipe chain of function that return a promise.
@@ -26,7 +26,7 @@ export const NOOP = () => {};
  */
 export const pipe =
     (...functions) =>
-    (input) =>
+    (/** @type {any} */ input) =>
         functions.reduce(
             (chain, func) => chain.then(func),
             Promise.resolve(input)

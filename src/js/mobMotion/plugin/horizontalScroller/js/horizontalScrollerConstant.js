@@ -1,3 +1,5 @@
+//@ts-check
+
 export const horizontalScrollerContstant = {
     END: 'END',
     START: 'START',

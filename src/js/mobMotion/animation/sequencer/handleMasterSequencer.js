@@ -24,16 +24,19 @@
  * ```
  */
 export default class HandleMasterSequencer {
-    constructor() {
-        /**
-         * @trype {string}
-         */
-        this.type = 'sequencer';
+    /**
+     * @trype {string}
+     */
+    #type;
 
-        /**
-         * @type {import("./type").masterSequencerItem[]}
-         */
-        this.children = [];
+    /**
+     * @type {import("./type").masterSequencerItem[]}
+     */
+    #children;
+
+    constructor() {
+        this.#type = 'sequencer';
+        this.#children = [];
     }
 
     /**
@@ -45,7 +48,7 @@ export default class HandleMasterSequencer {
      * @returns {void}
      */
     draw({ partial, isLastDraw, useFrame }) {
-        this.children.forEach((item) => {
+        this.#children.forEach((item) => {
             item.draw({ partial, isLastDraw, useFrame });
         });
     }
@@ -55,14 +58,14 @@ export default class HandleMasterSequencer {
      * @returns {void}
      */
     add(item) {
-        this.children.push(item);
+        this.#children.push(item);
     }
 
     /**
      * @returns {void}
      */
     inzializeStagger() {
-        this.children.forEach((item) => {
+        this.#children.forEach((item) => {
             item.inzializeStagger();
         });
     }
@@ -72,7 +75,7 @@ export default class HandleMasterSequencer {
      * @returns {void}
      */
     setDuration(val) {
-        this.children.forEach((item) => {
+        this.#children.forEach((item) => {
             item.setDuration(val);
         });
     }
@@ -81,7 +84,7 @@ export default class HandleMasterSequencer {
      * @returns {number}
      */
     getDuration() {
-        return this.children.length > 0 ? this.children[0].getDuration() : 0;
+        return this.#children.length > 0 ? this.#children[0].getDuration() : 0;
     }
 
     /**
@@ -89,7 +92,7 @@ export default class HandleMasterSequencer {
      * @returns {void}
      */
     setStretchFactor(val) {
-        this.children.forEach((item) => {
+        this.#children.forEach((item) => {
             item.setStretchFactor(val);
         });
     }
@@ -98,21 +101,21 @@ export default class HandleMasterSequencer {
      * @returns {Array<string>}
      */
     getLabels() {
-        return this.children.flatMap((item) => item.getLabels());
+        return this.#children.flatMap((item) => item.getLabels());
     }
 
     /**
      * @returns {void}
      */
     resetLastValue() {
-        this.children.forEach((item) => item.resetLastValue());
+        this.#children.forEach((item) => item.resetLastValue());
     }
 
     /**
      * @returns {void}
      */
     disableStagger() {
-        this.children.forEach((item) => {
+        this.#children.forEach((item) => {
             item.disableStagger();
         });
     }
@@ -121,7 +124,7 @@ export default class HandleMasterSequencer {
      * @returns {void}
      */
     cleanCachedId() {
-        this.children.forEach((item) => {
+        this.#children.forEach((item) => {
             item.cleanCachedId();
         });
     }
@@ -130,16 +133,16 @@ export default class HandleMasterSequencer {
      * @returns {string}
      */
     getType() {
-        return this.type;
+        return this.#type;
     }
 
     /**
      * @returns {void}
      */
     destroy() {
-        this.children.forEach((item) => {
+        this.#children.forEach((item) => {
             item.destroy();
         });
-        this.children = [];
+        this.#children = [];
     }
 }

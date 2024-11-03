@@ -57,10 +57,7 @@ export const asyncReduceTween = (tweenList, tween, index) => {
          * Align isntant without promise the tween so we have all the data of tween
          * the current and the previous merged
          */
-        currentTween?.data?.tween?.set?.(currentTween?.data?.valuesTo, {
-            immediateNoPromise: true,
-        });
-
+        currentTween?.data?.tween?.setImmediate?.(currentTween?.data?.valuesTo);
         const currentValueTo = currentTween?.data?.tween?.getToNativeType?.();
 
         /*
