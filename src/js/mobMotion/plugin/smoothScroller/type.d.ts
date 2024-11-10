@@ -1,4 +1,4 @@
-import { mouseEventTypes } from '../../../mobCore/events/mouseUtils/type';
+import { MouseEventParsed } from '../../../mobCore/events/mouseUtils/type';
 import { mqAction, mqValues } from '../../utils/type';
 
 type onTick = (arg0: {
@@ -125,4 +125,4 @@ export interface SmoothScroller {
     breakpoint?: mqValues;
 }
 
-export type onMouseEvent = (arg0: Partial<mouseEventTypes>) => void;
+export type onMouseEvent = (arg0: Partial<MouseEventParsed>) => void;

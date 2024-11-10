@@ -20,8 +20,8 @@ import {
     defaultCallback,
 } from '../utils/callbacks/defaultCallback.js';
 import {
-    setCallBack,
-    setCallBackCache,
+    updateSubScribers,
+    updateSubscribersCache,
 } from '../utils/callbacks/setCallback.js';
 import {
     goToUtils,
@@ -84,12 +84,12 @@ export default class HandleLerp {
     #isActive;
 
     /**
-     * @type{(value:any) => void|null }
+     * @type{(value:any) => void|undefined }
      */
     #currentResolve;
 
     /**
-     * @type{(value:any) => void|null}
+     * @type{(value:any) => void|undefined}
      */
     #currentReject;
 
@@ -124,7 +124,7 @@ export default class HandleLerp {
     #callbackOnComplete;
 
     /**
-     * @type {import('../utils/callbacks/type.js').callbackObject<(arg0:any) => boolean>[]}
+     * @type {{ cb: () => boolean }[]}
      */
     #callbackStartInPause;
 
@@ -253,7 +253,7 @@ export default class HandleLerp {
          * Set initial store data if defined in constructor props
          * If not use setData methods
          */
-        const props = data?.data || null;
+        const props = data?.data;
         if (props) this.setData(props);
     }
 
@@ -411,7 +411,7 @@ export default class HandleLerp {
 
     /**
      * @param {(arg0: any) => void} res
-     * @param {(value: any) => void|null} reject
+     * @param {(value: any) => void} reject
      *
      * @returns {Promise}
      */
@@ -628,6 +628,9 @@ export default class HandleLerp {
         }
 
         if (this.#promise) return this.#promise;
+
+        // fallback
+        return Promise.resolve();
     }
 
     /**
@@ -818,7 +821,7 @@ export default class HandleLerp {
      * Callback that returns updated values ready to be usable, it is advisable to use it for single elements, although it works well on a not too large number of elements (approximately 100-200 elements) for large staggers it is advisable to use the subscribeCache method .
      */
     subscribe(cb) {
-        const { arrayOfCallbackUpdated, unsubscribeCb } = setCallBack(
+        const { arrayOfCallbackUpdated, unsubscribeCb } = updateSubScribers(
             cb,
             this.#callback
         );
@@ -827,23 +830,38 @@ export default class HandleLerp {
     }
 
     /**
+     * @type {import('./type.js').lerpSubscribeCache}
+     *
+     * @description
+     * Callback that returns updated values ready to be usable, specific to manage large staggers.
+     */
+    subscribeCache(item, fn) {
+        const { arrayOfCallbackUpdated, unsubscribeCb, unsubscribeCache } =
+            updateSubscribersCache(
+                item,
+                fn,
+                this.#callbackCache,
+                this.#unsubscribeCache
+            );
+
+        this.#callbackCache = arrayOfCallbackUpdated;
+        this.#unsubscribeCache = unsubscribeCache;
+        return () => (this.#callbackCache = unsubscribeCb(this.#callbackCache));
+    }
+
+    /**
      * Support callback to asyncTimeline.
      * Callback to manage the departure of tweens in a timeline. If a delay is applied to the tween and before the delay ends the timeline pauses the tween at the end of the delay will automatically pause.
      * Add callback to start in pause to stack
      *
-     * @param  {() => void} cb cal function
+     * @param  {() => boolean} cb cal function
      * @return {() => void} unsubscribe callback
      *
      */
     onStartInPause(cb) {
-        const { arrayOfCallbackUpdated } = setCallBack(
-            cb,
-            this.#callbackStartInPause
-        );
-        this.#callbackStartInPause =
-            /** @type{import('../utils/callbacks/type.js').callbackObject<(arg0:any) => boolean>[]} */ (
-                arrayOfCallbackUpdated
-            );
+        const arrayOfCallbackUpdated = [...this.#callbackStartInPause, { cb }];
+        this.#callbackStartInPause = arrayOfCallbackUpdated;
+
         return () => (this.#callbackStartInPause = []);
     }
 
@@ -857,7 +875,7 @@ export default class HandleLerp {
      *  A typical example is to remove the teansform3D property:
      **/
     onComplete(cb) {
-        const { arrayOfCallbackUpdated, unsubscribeCb } = setCallBack(
+        const { arrayOfCallbackUpdated, unsubscribeCb } = updateSubScribers(
             cb,
             this.#callbackOnComplete
         );
@@ -867,26 +885,6 @@ export default class HandleLerp {
             (this.#callbackOnComplete = unsubscribeCb(
                 this.#callbackOnComplete
             ));
-    }
-
-    /**
-     * @type {import('./type.js').lerpSubscribeCache}
-     *
-     * @description
-     * Callback that returns updated values ready to be usable, specific to manage large staggers.
-     */
-    subscribeCache(item, fn) {
-        const { arrayOfCallbackUpdated, unsubscribeCb, unsubscribeCache } =
-            setCallBackCache(
-                item,
-                fn,
-                this.#callbackCache,
-                this.#unsubscribeCache
-            );
-
-        this.#callbackCache = arrayOfCallbackUpdated;
-        this.#unsubscribeCache = unsubscribeCache;
-        return () => (this.#callbackCache = unsubscribeCb(this.#callbackCache));
     }
 
     /**

@@ -1,5 +1,6 @@
 // @ts-check
 
+import { clamp } from './animation/utils/animationUtils.js';
 import { handleSetUp } from './setup.js';
 import { mq } from './utils/mediaManager.js';
 
@@ -178,5 +179,15 @@ export const motionCore = {
                 return mq.getBreackpoint(breakpoint);
             }
         }
+    },
+
+    /**
+     * @param {number} num
+     * @param {number} min
+     * @param {number} max
+     * @returns {number}
+     */
+    clamp(num, min, max) {
+        return clamp(num, min, max);
     },
 };

@@ -7,8 +7,8 @@ import {
     getStaggerArray,
 } from '../utils/stagger/staggerUtils.js';
 import {
-    setCallBack,
-    setCallBackCache,
+    updateSubScribers,
+    updateSubscribersCache,
 } from '../utils/callbacks/setCallback.js';
 import { syncCallback } from '../utils/callbacks/syncCallback.js';
 import { goToUtils } from '../utils/tweenAction/actions.js';
@@ -279,7 +279,7 @@ export default class ParallaxTween {
      * Callback that returns updated values ready to be usable, it is advisable to use it for single elements, although it works well on a not too large number of elements (approximately 100-200 elements) for large staggers it is advisable to use the subscribeCache method .
      */
     subscribe(cb) {
-        const { arrayOfCallbackUpdated, unsubscribeCb } = setCallBack(
+        const { arrayOfCallbackUpdated, unsubscribeCb } = updateSubScribers(
             cb,
             this.#callback
         );
@@ -297,7 +297,7 @@ export default class ParallaxTween {
      * A typical example is to remove the teansform3D property:
      */
     onStop(cb) {
-        const { arrayOfCallbackUpdated, unsubscribeCb } = setCallBack(
+        const { arrayOfCallbackUpdated, unsubscribeCb } = updateSubScribers(
             cb,
             this.#callbackOnStop
         );
@@ -312,7 +312,7 @@ export default class ParallaxTween {
      */
     subscribeCache(item, fn) {
         const { arrayOfCallbackUpdated, unsubscribeCb, unsubscribeCache } =
-            setCallBackCache(
+            updateSubscribersCache(
                 item,
                 fn,
                 this.#callbackCache,

@@ -211,12 +211,12 @@ export default class HandleAsyncTimeline {
     #callbackComplete;
 
     /**
-     * @type{(value:any) => void|null}
+     * @type{(value:any) => void|undefined}
      */
     #currentResolve;
 
     /**
-     * @type{(value:any) => void|null}
+     * @type{(value:any) => void|undefined}
      */
     #currentReject;
 

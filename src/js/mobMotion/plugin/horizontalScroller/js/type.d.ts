@@ -1,4 +1,4 @@
-import { mouseEventTypes } from '../../../../mobCore/events/mouseUtils/type';
+import { MouseEventParsed } from '../../../../mobCore/events/mouseUtils/type';
 import ParallaxClass from '../../../animation/parallax/parallax';
 import { mqAction, mqValues } from '../../../utils/type';
 
@@ -184,4 +184,4 @@ export interface HorizontalScroller {
     breakpoint?: mqValues;
 }
 
-export type onMouseEvent = (arg0: Partial<mouseEventTypes>) => void;
+export type onMouseEvent = (arg0: Partial<MouseEventParsed>) => void;

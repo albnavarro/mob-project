@@ -3,7 +3,7 @@
 import { mobCore } from '../../../mobCore';
 
 /**
- * @param {import('./callbacks/type').callbackObject<(arg0: any) => boolean>[]} callbackPauseArray
+ * @param {{ cb: () => boolean }[]} callbackPauseArray
  * @param {(time: number, fps: number, resolve: (arg0: any) => void) => void} rafFunction
  * @param {() => void} pauseFunction
  * @param {(function(any):void)} resolve

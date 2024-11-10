@@ -10,7 +10,7 @@ import { callBackStore } from './callBackStore';
  * Add callback to Stack.
  *
  */
-export const setCallBack = (currentCallback, arrayOfCallback) => {
+export const updateSubScribers = (currentCallback, arrayOfCallback) => {
     // Get new unbubscribeId.
     const { id } = callBackStore.get();
 
@@ -43,7 +43,7 @@ export const setCallBack = (currentCallback, arrayOfCallback) => {
 /**
  * @type {import('./type').setCallBackCache}
  */
-export const setCallBackCache = (
+export const updateSubscribersCache = (
     item,
     currentCallback,
     arrayOfCallback,
