@@ -3,8 +3,8 @@
 import { ARRAY, MAP, SET, TYPE_IS_ANY } from './storeType';
 
 /**
- * @param {Map} m1
- * @param {Map} m2
+ * @param {Map<any, any>} m1
+ * @param {Map<any, any>} m2
  * @returns {boolean}
  */
 const mapsAreEqual = (m1, m2) =>
@@ -12,16 +12,16 @@ const mapsAreEqual = (m1, m2) =>
     [...m1.keys()].every((key) => m1.get(key) === m2.get(key));
 
 /**
- * @param {Set} a
- * @param {Set} b
+ * @param {Set<any>} a
+ * @param {Set<any>} b
  * @returns {boolean}
  */
 const setsAreEqual = (a, b) =>
     a.size === b.size && [...a].every((value) => b.has(value));
 
 /**
- * @param {Array} a
- * @param {Array} b
+ * @param {[]} a
+ * @param {[]} b
  * @returns {boolean}
  *
  * @description
@@ -39,8 +39,8 @@ const arrayAreEquals = (a, b) => {
 };
 
 /**
- * @param {Object} obj1
- * @param {Object} obj2
+ * @param {any} obj1
+ * @param {any} obj2
  * @returns {boolean}
  *
  * @description

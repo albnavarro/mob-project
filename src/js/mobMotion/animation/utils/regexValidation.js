@@ -58,7 +58,7 @@ export const exactMatchInsesitiveNumberProp = (string, pattern) => {
 /**
  * @description
  *
- * @param {array} arr
+ * @param {string[]} arr
  * @param {string} string
  * @returns boolean
  */
@@ -73,7 +73,7 @@ export const exactMatchInsesitiveNumberPropArray = (arr, string) => {
 /**
  * @description
  *
- * @param {array} arr
+ * @param {string[]} arr
  * @param {string} string
  * @returns boolean
  */

@@ -83,12 +83,12 @@ export default class HandleSpring {
     #isActive;
 
     /**
-     * @type{(value:any) => void|undefined}
+     * @type{((value:any) => void)|undefined }
      */
     #currentResolve;
 
     /**
-     * @type{(value:any) => void|undefined}
+     * @type{((value:any) => void)|undefined }
      */
     #currentReject;
 
@@ -172,7 +172,7 @@ export default class HandleSpring {
     #fastestStagger;
 
     /**
-     * @param {import('./type.js').springTweenProps} [ data = {} ]
+     * @param {import('./type.js').springTweenProps} [ data ]
      *
      * @example
      * ```javascript
@@ -224,12 +224,10 @@ export default class HandleSpring {
      * ```
      */
     constructor(data) {
-        this.#stagger = getStaggerFromProps(data);
+        this.#stagger = getStaggerFromProps(data ?? {});
         this.#relative = relativeIsValid(data?.relative, 'spring');
         this.#configProps = springConfigIsValidAndGetNew(data?.config);
-
-        this.updateConfigProp(data?.configProp);
-
+        this.updateConfigProp(data?.configProp ?? {});
         this.#uniqueId = mobCore.getUnivoqueId();
         this.#isActive = false;
         this.#currentResolve = undefined;
@@ -458,7 +456,7 @@ export default class HandleSpring {
      * @param {(value:any) => void} res
      * @param {(value:any) => void} reject
      *
-     * @returns {Promise}
+     * @returns {Promise<any>}
      */
     async #startRaf(res, reject) {
         if (this.#fpsInLoading) return;
@@ -624,7 +622,8 @@ export default class HandleSpring {
      * @type {import('../../utils/type.js').GoTo<import('./type.js').springActions>} obj to Values
      */
     goTo(obj, props) {
-        if (this.#pauseStatus) return;
+        if (this.#pauseStatus) return new Promise((resolve) => resolve);
+
         this.#useStagger = true;
         const data = goToUtils(obj);
         return this.#doAction(data, props, obj);
@@ -634,7 +633,8 @@ export default class HandleSpring {
      * @type {import('../../utils/type.js').GoFrom<import('./type.js').springActions>} obj to Values
      */
     goFrom(obj, props) {
-        if (this.#pauseStatus) return;
+        if (this.#pauseStatus) return new Promise((resolve) => resolve);
+
         this.#useStagger = true;
         const data = goFromUtils(obj);
         return this.#doAction(data, props, obj);
@@ -644,11 +644,12 @@ export default class HandleSpring {
      * @type {import('../../utils/type.js').GoFromTo<import('./type.js').springActions>} obj to Values
      */
     goFromTo(fromObj, toObj, props) {
-        if (this.#pauseStatus) return;
+        if (this.#pauseStatus) return new Promise((resolve) => resolve);
+
         this.#useStagger = true;
         if (!compareKeys(fromObj, toObj)) {
             compareKeysWarning('spring goFromTo:', fromObj, toObj);
-            return this.#promise;
+            return new Promise((resolve) => resolve);
         }
 
         const data = goFromToUtils(fromObj, toObj);
@@ -659,7 +660,8 @@ export default class HandleSpring {
      * @type {import('../../utils/type.js').Set<import('./type.js').springActions>} obj to Values
      */
     set(obj, props) {
-        if (this.#pauseStatus) return;
+        if (this.#pauseStatus) return new Promise((resolve) => resolve);
+
         this.#useStagger = false;
         const data = setUtils(obj);
         return this.#doAction(data, props, obj);
@@ -675,7 +677,7 @@ export default class HandleSpring {
         const data = setUtils(obj);
         this.#values = mergeArray(data, this.#values);
 
-        const { reverse } = this.#mergeProps(props);
+        const { reverse } = this.#mergeProps(props ?? {});
         if (valueIsBooleanAndTrue(reverse, 'reverse'))
             this.#values = setReverseValues(obj, this.#values);
 

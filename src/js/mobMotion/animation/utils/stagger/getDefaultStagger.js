@@ -25,7 +25,8 @@ const isOdd = (num) => num % 2;
 const getRandomInt = (max) => Math.floor(Math.random() * max);
 
 /**
- * @param {array} arrayChunk
+ * @template {any[]} T
+ * @param {T} arrayChunk
  * @param {number} each
  * @param {number} index
  * @returns number
@@ -218,11 +219,12 @@ const getStaggerIndex = (index, arraylenght, stagger, randomChoice = []) => {
 };
 
 /**
- * @param {any[]} arrayDefault
+ * @template {any[]} T
+ * @param {T} arrayDefault
  * @param {import('./type.js').staggerObject} stagger
  * @param {number} chunckSizeCol
  *
- * @returns {Array} arr
+ * @returns {T} arr
  *
  * @description
  * Default grid direction is COL
@@ -249,8 +251,8 @@ const getItemsByRow = (arrayDefault, stagger, chunckSizeCol) => {
 
 /**
  * @param {object} obj
- * @param {Array} obj.arrayDefault
- * @param {Array} obj.arrayOnStop
+ * @param {import('../callbacks/type.js').callbackObject<(arg0: Record<string, number>) => void>[]} obj.arrayDefault
+ * @param {import('../callbacks/type.js').callbackObject<(arg0: Record<string, number>) => void>[]} obj.arrayOnStop
  * @param {import('./type.js').staggerObject} obj.stagger
  * @param {import('./type.js').staggerDefaultIndex} obj.slowlestStagger
  * @param {import('./type.js').staggerDefaultIndex} obj.fastestStagger

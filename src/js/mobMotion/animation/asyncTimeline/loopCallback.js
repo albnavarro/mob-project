@@ -13,7 +13,7 @@ import { NOOP } from '../../utils/functionsUtils';
  * @param {number} param.previousSessionId
  * @param {number} param.currentSessionId
  * @param {any} param.tween
- * @param {Object} param.fn
+ * @param {Record<string, any>} param.fn
  * @param {string} param.action
  */
 export const resolveTweenPromise = ({

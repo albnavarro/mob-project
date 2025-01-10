@@ -7,12 +7,12 @@ import { handleNextTick } from '../rafutils/handleNextTick.js';
 import { getUnivoqueId } from '../../utils/index.js';
 
 /**
- * @type {Function}
+ * @type {() => void}
  */
 let unsubscribeScrollStart = () => {};
 
 /**
- * @type {Function}
+ * @type {() => void}
  */
 let unsubscribeScrollEnd = () => {};
 
@@ -31,7 +31,7 @@ function handleScrollUtils(type) {
     let initialized = false;
 
     /**
-     * @type {Map<string,function>}
+     * @type {Map<string,import('./type.js').HandleScrollCallback<import('./type.js').HandleScrollUtils>>}
      */
     const callbacks = new Map();
 
@@ -113,14 +113,14 @@ function handleScrollUtils(type) {
     }
 
     /**
-     * @param {import('./type.js').handleScrollUtilsCallback} cb - callback function
-     * @return {Function} unsubscribe callback
+     * @param {import('./type.js').HandleScrollCallback<import('./type.js').HandleScrollUtils>} cb - callback function
+     * @return {() => void} unsubscribe callback
      */
     const addCb = (cb) => {
         const id = getUnivoqueId();
         callbacks.set(id, cb);
 
-        if (typeof window !== 'undefined') {
+        if (typeof globalThis !== 'undefined') {
             init();
         }
 

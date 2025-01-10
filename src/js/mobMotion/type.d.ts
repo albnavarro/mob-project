@@ -240,6 +240,7 @@ export interface ParallaxTween {
     subscribeCache: parallaxTweenSubscribeCache;
     getDuration: parallaxTweenGetDuration;
     getType: parallaxTweenGetType;
+    inzializeStagger: () => void;
 }
 
 export interface SyncTimeline {

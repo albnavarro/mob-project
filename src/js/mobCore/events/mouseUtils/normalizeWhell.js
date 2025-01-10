@@ -3,7 +3,10 @@ const PIXEL_STEP = 10;
 const LINE_HEIGHT = 40;
 const PAGE_HEIGHT = 800;
 
-export function normalizeWheel(/*object*/ event) /*object*/ {
+/**
+ * @param {any} event
+ */
+export function normalizeWheel(event) {
     let sX = 0,
         sY = 0, // spinX, spinY
         pX = 0,

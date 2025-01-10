@@ -51,9 +51,9 @@ export type lerpGetType = () => string;
 export type lerpGetId = () => string;
 export type lerpUpdateVelocity = (number) => void;
 export type lerpUpdatePrecision = (number) => void;
-export type lerpSubscribe = (cb: () => void) => () => void;
+export type lerpSubscribe = (cb: (arg0: any) => void) => () => void;
 export type lerpSubscribeCache = (
     item: object | HTMLElement,
     cb: (arg0: Record<string, number>) => void
 ) => () => void;
-export type lerpOnComplete = (cb: () => void) => () => void;
+export type lerpOnComplete = (cb: (arg0: any) => void) => () => void;

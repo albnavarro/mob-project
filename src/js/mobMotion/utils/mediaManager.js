@@ -42,6 +42,7 @@ const getBreackpoint = (breakpoint = 'desktop') => {
  *   const desktopBreackPoint = mobbu.getBreackpoint('desktop'); // 992
  *
  * ```
+ * @type {Record<string, (arg0: any) => any>}
  */
 export const mq = (() => {
     return { max, min, getBreackpoint };

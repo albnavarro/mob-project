@@ -9,12 +9,12 @@ import { debounceFuncion } from '../debounce.js';
 let initialized = false;
 
 /**
- * @type {Map<String,Function>}
+ * @type {Map<String,import('./type.js').handleResizeCallback>}
  */
 const callbacks = new Map();
 
 /**
- * @type {Function}
+ * @type {() => void}
  */
 let debouceFunctionReference = () => {};
 
@@ -101,6 +101,7 @@ function init() {
     initialized = true;
 
     // Add debunce function to detect scroll end
+    // @ts-ignore
     debouceFunctionReference = debounceFuncion(() => handler());
     // @ts-ignore
     window.addEventListener('resize', debouceFunctionReference, {
@@ -110,6 +111,7 @@ function init() {
 
 /**
  * @param {import('./type.js').handleResizeCallback} cb - callback function fired on resize.
+ * @returns {() => void}
  *
  * @description
  * Add callback on resize using a debounce function.
@@ -135,7 +137,7 @@ const addCb = (cb) => {
     const id = getUnivoqueId();
     callbacks.set(id, cb);
 
-    if (typeof window !== 'undefined') {
+    if (typeof globalThis !== 'undefined') {
         init();
     }
 

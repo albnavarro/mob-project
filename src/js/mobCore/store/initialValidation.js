@@ -1,5 +1,6 @@
 // @ts-check
 
+import { STORE_SET } from './constant';
 import { getStateFromMainMap, updateMainMap } from './storeMap';
 import { storeSetAction } from './storeSet';
 import { storeType } from './storeType';
@@ -47,6 +48,8 @@ export const inizializeAllProps = (instanceId, initialState) => {
          * Get last updated state.
          */
         const state = getStateFromMainMap(instanceId);
+        if (!state) return;
+
         const newState = storeSetAction({
             instanceId,
             state,
@@ -54,6 +57,7 @@ export const inizializeAllProps = (instanceId, initialState) => {
             value,
             fireCallback: false,
             useStrict: false,
+            action: STORE_SET,
         });
 
         if (!newState) return;

@@ -85,9 +85,9 @@ export type springGetType = () => string;
 export type springGetId = () => string;
 export type springUdateConfigProp = (arg0: springPropsOptional) => void;
 export type springUdateConfig = (arg0: springChoiceConfig) => void;
-export type springSubscribe = (cb: () => void) => () => void;
+export type springSubscribe = (cb: (arg0: any) => void) => () => void;
 export type springSubscribeCache = (
     item: object | HTMLElement,
     cb: (arg0: Record<string, number>) => void
 ) => () => void;
-export type springOnComplete = (cb: () => void) => () => void;
+export type springOnComplete = (cb: (arg0: any) => void) => () => void;

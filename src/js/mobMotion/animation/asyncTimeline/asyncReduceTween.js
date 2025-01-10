@@ -4,7 +4,7 @@ import { asyncReduceData } from './asyncReduceData';
 
 /**
  * @param {Array<import('./type').asyncTimelineTweenItem[]>} tweenList
- * @param {object} tween
+ * @param {import('./type').asyncTimelineTween} tween
  * @param {number} index
  * @returns {Record<string, number|(() => number)>}
  *

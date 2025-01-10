@@ -3,7 +3,7 @@
 import { eventStore } from '../eventStore.js';
 
 /**
- * @type {Map<number, Function[]>}
+ * @type {Map<number, import('./type.js').handleFrameCallbakType[]>}
  */
 const indexCallbackMap = new Map();
 
@@ -40,9 +40,6 @@ const updateKeys = (currentFrameLimit) => {
  */
 const fire = ({ currentFrame, time, fps }) => {
     /**
-     * @type {Array.<Function>}
-     *
-     * @description
      * Get arrays of callBack related to the current currentFrame
      * indexCb is a 'global' variables instead constant to reduce garbage collector
      */

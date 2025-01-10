@@ -45,7 +45,7 @@ export const setPropFromAncestor = ({ timeline, activeProp }) => {
             );
 
             // If we doesn't found a value skip
-            if (!previousValidValue) {
+            if (!previousValidValue && previousValidValue !== 0) {
                 return valueItem;
             }
 

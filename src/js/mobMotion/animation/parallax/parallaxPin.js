@@ -55,13 +55,13 @@ export class ParallaxPin {
 
     /**
      * @description
-     * @type {HTMLElement|undefined}
+     * @type {HTMLElement|null|undefined}
      */
     #item;
 
     /**
      * @description
-     * @type {Object|undefined}
+     * @type {HandleSpring|undefined|null}
      */
     #spring;
 
@@ -73,7 +73,7 @@ export class ParallaxPin {
 
     /**
      * @description
-     * @type {String}
+     * @type {String|undefined}
      */
     #marker;
 
@@ -290,6 +290,12 @@ export class ParallaxPin {
         this.#unsubscribeScrollStart = () => {};
         this.#unsubscribeSpring = () => {};
         this.#firstTime = true;
+        this.#marker = undefined;
+        // eslint-disable-next-line unicorn/prefer-global-this
+        this.#screen = window;
+        this.#collisionStyleProp = 'left';
+        this.#anticipatePinOnLoad = true;
+        this.#shoulTranspond = false;
 
         this.#itemRequireStyleToWrapper = [
             'flex',
@@ -344,7 +350,7 @@ export class ParallaxPin {
     }
 
     /**
-     * @param {Object} data
+     * @param {import('./type.js').PinParams} data
      */
     init(data) {
         this.#item = data.item;
@@ -405,7 +411,7 @@ export class ParallaxPin {
                 const gap = scrollY - this.#prevscrollY;
                 this.#prevscrollY = scrollY;
 
-                if (this.#isInner && this.#pin) {
+                if (this.#isInner && this.#pin && this.#spring) {
                     const { verticalGap } = this.#spring.get();
                     const translateValue = verticalGap - gap;
 
@@ -452,7 +458,7 @@ export class ParallaxPin {
     }
 
     #resetSpring() {
-        if (this.#pin)
+        if (this.#pin && this.#spring)
             this.#spring.set({ collision: 0, verticalGap: 0 }).catch(() => {});
     }
 
@@ -559,15 +565,15 @@ export class ParallaxPin {
      * @param {HTMLElement} target
      * @param {string} rule
      *
-     * @returns {object|undefined}
+     * @returns {Record<string, any>|undefined}
      */
     #findStyle(target, rule) {
         let node = target.parentNode;
         if (!node) return;
 
         while (node !== null && node !== document) {
-            // @ts-ignore
-            const style = getComputedStyle(node);
+            /** @type {Record<string, any>} */
+            const style = getComputedStyle(/** @type{Element} */ (node));
 
             if (style[rule] && !this.#nonRelevantRule.includes(style[rule])) {
                 return { [rule]: style[rule] };
@@ -579,12 +585,12 @@ export class ParallaxPin {
     }
 
     /**
-     * @returns {object}
+     * @returns {Record<string, string>|{}}
      */
     #addRquiredStyle() {
         if (!this.#pin) return {};
 
-        return this.#parentRequireStyle
+        const stylesObject = this.#parentRequireStyle
             .map((item) => {
                 // @ts-ignore
                 return this.#findStyle(this.#pin, item);
@@ -593,6 +599,8 @@ export class ParallaxPin {
             .reduce((p, c) => {
                 return { ...p, ...c };
             }, {});
+
+        return stylesObject ?? {};
     }
 
     /**
@@ -669,11 +677,11 @@ export class ParallaxPin {
     destroy() {
         if (!this.#isInizialized) return;
 
-        this.#spring.stop();
+        this.#spring?.stop?.();
         this.#unsubscribeSpring();
         this.#unsubscribeScroll();
         this.#unsubscribeScrollStart();
-        this.#spring.destroy();
+        this.#spring?.destroy?.();
         this.#spring = null;
         this.#afterPinCounter = 0;
         this.#justPinned = false;
@@ -729,11 +737,12 @@ export class ParallaxPin {
         mobCore.useFrame(() => {
             if (!this.#pin || !this.#collisionStyleProp) return;
 
-            this.#pin.style[this.#collisionStyleProp] =
-                `${this.#startFromTop}px`;
+            /** @type{Record<string, any>} */
+            const style = this.#pin?.style ?? {};
+            style[this.#collisionStyleProp] = `${this.#startFromTop}px`;
         });
 
-        if (this.#animatePin && !this.#firstTime && this.#pin) {
+        if (this.#animatePin && !this.#firstTime && this.#pin && this.#spring) {
             this.#spring
                 .goFrom({ collision: gap })
                 .then(() => {

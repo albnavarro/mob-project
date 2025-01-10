@@ -1,7 +1,8 @@
 // @ts-check
 
 import { useNextLoop } from '../utils/nextTick';
-import { checkEquality } from './classVersion/checkEquality';
+import { checkEquality } from './checkEquality';
+import { STORE_SET, STORE_UPDATE } from './constant';
 import { runCallbackQueqe } from './fireQueque';
 import { getLogStyle } from './logStyle';
 import { getStateFromMainMap, updateMainMap } from './storeMap';
@@ -47,6 +48,7 @@ const setProp = ({
 }) => {
     const {
         type,
+        fnTransformation,
         store,
         fnValidate,
         strict,
@@ -74,23 +76,34 @@ const setProp = ({
         return;
     }
 
-    const isValidType = checkType(type[prop], val);
-    if (!isValidType) {
-        storeSetPropTypeWarning(prop, val, type[prop], logStyle);
-        return;
-    }
-
     /**
-     * Update value and fire callback associated
+     * Get old value
      */
     const oldVal = store[prop];
+
+    /**
+     * Transform value
+     */
+    const valueTransformed =
+        /** @type{{[key:string]: ((current: any, previous: any) => any)}} */ (
+            fnTransformation
+        )[prop]?.(val, oldVal) ?? val;
+
+    /**
+     * Validation
+     */
+    const isValidType = checkType(type[prop], valueTransformed);
+    if (!isValidType) {
+        storeSetPropTypeWarning(prop, valueTransformed, type[prop], logStyle);
+        return;
+    }
 
     /**
      * Get validate status
      */
     const isValidated = /** @type {Object<string,function>} */ (fnValidate)[
         prop
-    ]?.(val, oldVal);
+    ]?.(valueTransformed, oldVal);
 
     /**
      * In strict mode return is prop is not valid
@@ -107,22 +120,23 @@ const setProp = ({
      * if true and skipEqual is true for this prop return.
      */
     const isEqual = skipEqual[prop]
-        ? checkEquality(type[prop], oldVal, val)
+        ? checkEquality(type[prop], oldVal, valueTransformed)
         : false;
     if (isEqual) return;
 
     /**
      * Finally set new value
      */
-    store[prop] = val;
+    store[prop] = valueTransformed;
 
     if (fireCallback) {
         runCallbackQueqe({
             callBackWatcher,
             prop,
-            newValue: val,
+            newValue: valueTransformed,
             oldValue: oldVal,
             validationValue: validationStatusObject[prop],
+            instanceId,
         });
 
         addToComputedWaitLsit({ instanceId, prop });
@@ -157,6 +171,7 @@ const setObj = ({
         store,
         type,
         strict,
+        fnTransformation,
         fnValidate,
         validationStatusObject,
         skipEqual,
@@ -191,8 +206,26 @@ const setObj = ({
         return;
     }
 
-    // Check type of each propierties
-    const isValidType = Object.entries(val)
+    /**
+     * Transform value
+     */
+    const valueTransformed = Object.entries(val)
+        .map((item) => {
+            const [subProp, subVal] = item;
+            const subValOld = store[prop][subProp];
+
+            return {
+                [subProp]:
+                    fnTransformation[prop][subProp]?.(subVal, subValOld) ??
+                    subVal,
+            };
+        })
+        .reduce((previous, current) => ({ ...previous, ...current }));
+
+    /**
+     * Check type of each propierties
+     */
+    const isValidType = Object.entries(valueTransformed)
         .map((item) => {
             const [subProp, subVal] = item;
             const typeResponse = checkType(type[prop][subProp], subVal);
@@ -218,7 +251,7 @@ const setObj = ({
     /**
      * Filter all props that pass the strict check.
      */
-    const strictObjectResult = Object.entries(val)
+    const strictObjectResult = Object.entries(valueTransformed)
         .map((item) => {
             const [subProp, subVal] = item;
             const subValOld = store[prop][subProp];
@@ -300,7 +333,7 @@ const setObj = ({
                */
               const dataDepth = maxDepth(value);
               if (dataDepth > 1 && !isCustomObject) {
-                  storeSetObjDepthWarning(prop, val, logStyle);
+                  storeSetObjDepthWarning(prop, valueTransformed, logStyle);
                   return;
               }
 
@@ -331,6 +364,7 @@ const setObj = ({
             newValue: store[prop],
             oldValue: oldObjectValues,
             validationValue: validationStatusObject[prop],
+            instanceId,
         });
 
         addToComputedWaitLsit({ instanceId, prop });
@@ -355,6 +389,7 @@ export const storeSetAction = ({
     fireCallback = true,
     clone = false,
     useStrict = true,
+    action,
 }) => {
     const { store, type } = state;
     if (!store) return;
@@ -381,13 +416,7 @@ export const storeSetAction = ({
      * Check if newValue is a param or function.
      * Id prop type is a function or last value is a function skip.
      */
-    const valueParsed =
-        checkType(Function, value) &&
-        !checkType(Function, previousValue) &&
-        type[prop] !== Function &&
-        type[prop] !== 'Function'
-            ? value(previousValue)
-            : value;
+    const valueParsed = action === STORE_UPDATE ? value(previousValue) : value;
 
     /**
      * Check if is an Object to stringyFy ( default is max depth === 2 )
@@ -423,6 +452,7 @@ export const storeSetEntryPoint = ({
     value,
     fireCallback,
     clone,
+    action,
 }) => {
     const state = getStateFromMainMap(instanceId);
     if (!state) return;
@@ -434,6 +464,7 @@ export const storeSetEntryPoint = ({
         value,
         fireCallback,
         clone,
+        action,
     });
 
     if (!newState) return;
@@ -466,6 +497,7 @@ export const storeQuickSetEntrypoint = ({ instanceId, prop, value }) => {
         newValue: value,
         oldValue: oldVal,
         validationValue: true,
+        instanceId,
     });
 
     updateMainMap(instanceId, { ...state, store });
@@ -485,56 +517,61 @@ const fireComputed = (instanceId) => {
      * Get fresh data.
      */
     const state = getStateFromMainMap(instanceId);
-    const { lastestPropsChanged, callBackComputed, store } = state;
+    if (!state) return;
+
+    const { computedPropsQueque, callBackComputed, store } = state;
 
     /**
      * Filter computed callback that has some prop changed as dependencies.
      */
-    const computedFiltered = [...callBackComputed].filter(({ keys }) => {
-        return [...lastestPropsChanged].find((current) => {
-            return keys.includes(current);
-        });
-    });
+    const computedFiltered = [...(callBackComputed ?? [])].filter(
+        ({ keys }) => {
+            return [...computedPropsQueque].find((current) => {
+                return keys.includes(current);
+            });
+        }
+    );
 
     /**
      * Loop and fire computed with changed value
      */
-    computedFiltered.forEach(({ prop, keys, fn }) => {
+    const computedValues = computedFiltered.map(({ prop, keys, fn }) => {
         /**
          * Get dependencies current state;
          */
-        const propValues = keys.map((item) => {
-            return store[item];
-        });
+        const valuesToObject = keys
+            .map((item) => {
+                return { [item]: store[item] };
+            })
+            .reduce((previous, current) => {
+                return { ...previous, ...current };
+            }, {});
 
-        /**
-         * Fire callback computed
-         */
-        // @ts-ignore
-        const computedValue = fn(...propValues);
-
-        /**
-         * Set the result value to computed prop
-         */
-        storeSetEntryPoint({
-            instanceId,
+        return {
             prop,
-            value: computedValue,
-        });
+            value: fn(valuesToObject),
+        };
     });
 
     /**
-     * Get last state after new value is settled from computed.
-     */
-    const stateAfterComputed = getStateFromMainMap(instanceId);
-
-    /**
-     * Update all
+     * Reset running mode.
      */
     updateMainMap(instanceId, {
-        ...stateAfterComputed,
-        lastestPropsChanged: new Set(),
+        ...state,
+        computedPropsQueque: new Set(),
         computedRunning: false,
+    });
+
+    /**
+     * Update computed value after computedRunning is ended.
+     */
+    computedValues.forEach(({ prop, value }) => {
+        storeSetEntryPoint({
+            instanceId,
+            prop,
+            value,
+            action: STORE_SET,
+        });
     });
 };
 
@@ -546,21 +583,25 @@ const fireComputed = (instanceId) => {
  */
 export const addToComputedWaitLsit = ({ instanceId, prop }) => {
     const state = getStateFromMainMap(instanceId);
-    const { callBackComputed, lastestPropsChanged, computedRunning } = state;
+    if (!state) return;
+
+    const { callBackComputed, computedPropsQueque, computedRunning } = state;
 
     if (!callBackComputed || callBackComputed.size === 0) return;
 
     /**
-     * Update lastestPropsChanged.
+     * Update computedPropsQueque.
      */
-    lastestPropsChanged.add(prop);
+    computedPropsQueque.add(prop);
     updateMainMap(instanceId, {
         ...state,
-        lastestPropsChanged,
+        computedPropsQueque,
     });
 
     if (!computedRunning) {
         const state = getStateFromMainMap(instanceId);
+        if (!state) return;
+
         updateMainMap(instanceId, { ...state, computedRunning: true });
         useNextLoop(() => fireComputed(instanceId));
     }
@@ -573,24 +614,18 @@ export const addToComputedWaitLsit = ({ instanceId, prop }) => {
 export const storeComputedAction = ({ state, prop, keys, fn }) => {
     const { callBackComputed } = state;
 
-    // Create a temp array with the future computed added to check
-    const tempComputedArray = [...callBackComputed, { prop, keys, fn }];
-
-    // Get all prop stored in tempComputedArray
-    const propList = tempComputedArray.flatMap((item) => item.prop);
-
-    //  Keys can't be a prop used in some computed
-    const keysIsusedInSomeComputed = propList.some((item) =>
-        keys.includes(item)
+    const hasCircularDependecies = [...callBackComputed].reduce(
+        (previous, { prop: currentProp, keys: currentKeys }) => {
+            return (
+                currentKeys.includes(prop) &&
+                keys.includes(currentProp) &&
+                !previous
+            );
+        },
+        false
     );
 
-    /**
-     * if - Key to watch can't be a prop used in some computed to avoid infinite loop
-     *
-     * @param  {boolean} keysIsusedInSomeComputed
-     * @return {void}
-     */
-    if (keysIsusedInSomeComputed) {
+    if (keys.includes(prop) || hasCircularDependecies) {
         storeComputedKeyUsedWarning(keys, getLogStyle());
         return;
     }
@@ -612,7 +647,7 @@ export const storeComputedAction = ({ state, prop, keys, fn }) => {
  * @param {string} param.instanceId
  * @param {string[]} param.keys
  * @param {string} param.prop
- * @param {() => void} param.callback
+ * @param {(arg0: { [key: string]: any }) => void} param.callback
  * @returns {void}
  */
 export const storeComputedEntryPoint = ({

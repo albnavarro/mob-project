@@ -33,14 +33,15 @@ export interface sequencerValue {
     toValue: number;
 }
 
-export type propToFind = 'toValue' | 'fromValue' | '';
+export type PropToFind = 'toValue' | 'fromValue' | '';
+export type PropToFindPartial = 'toValue' | 'fromValue';
 
 export interface sequencerRow {
     start: number;
     end: number;
     priority: number;
     values: sequencerValue[];
-    propToFind: propToFind;
+    propToFind: PropToFind;
 }
 
 export interface createStagger {

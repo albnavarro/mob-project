@@ -99,9 +99,9 @@ export type tweenGetValueNative = () => Record<string, number | (() => number)>;
 export type tweenGetType = () => string;
 export type tweenGetId = () => string;
 export type tweenUpdateEase = (arg0: easeTypes) => void;
-export type tweenSubscribe = (cb: () => void) => () => void;
+export type tweenSubscribe = (cb: (arg0: any) => void) => () => void;
 export type tweenSubscribeCache = (
     item: object | HTMLElement,
     cb: (arg0: Record<string, number>) => void
 ) => () => void;
-export type tweenOnComplete = (cb: () => void) => () => void;
+export type tweenOnComplete = (cb: (arg0: any) => void) => () => void;

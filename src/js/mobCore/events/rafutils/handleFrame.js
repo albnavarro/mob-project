@@ -354,7 +354,7 @@ const render = (timestamp) => {
 const initFrame = () => {
     if (frameIsRuning) return;
 
-    if (typeof window === 'undefined') {
+    if (typeof globalThis === 'undefined') {
         setTimeout(() => render(getTime()), defaultTimestep);
     } else {
         requestAnimationFrame(render);

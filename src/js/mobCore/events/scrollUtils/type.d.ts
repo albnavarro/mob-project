@@ -1,14 +1,12 @@
-export type scrollDirection = 'UP' | 'DOWN';
+export type ScrollDirection = 'UP' | 'DOWN';
 
-export interface handleScrollTypes {
+export interface HandleScroll {
     scrollY: number;
-    direction: scrollDirection;
+    direction: ScrollDirection;
 }
 
-export interface handleScrollUtils {
+export interface HandleScrollUtils {
     scrollY: number;
 }
 
-export type handleScrollCallback = (arg0: handleScrollTypes) => void;
-
-export type handleScrollUtilsCallback = (arg0: handleScrollUtils) => void;
+export type HandleScrollCallback<T> = (arg0: T) => void;

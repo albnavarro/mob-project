@@ -1,11 +1,24 @@
 // @ts-check
 
+/** @type{Set<() => any>} */
+const setTimeOutQueque = new Set();
+
 /**
- * @param {Function} fn
+ * @param {() => void} fn
  * @returns {void}
  */
 export const useNextLoop = (fn) => {
-    setTimeout(() => fn());
+    setTimeOutQueque.add(fn);
+
+    if (setTimeOutQueque.size === 1) {
+        setTimeout(() => {
+            setTimeOutQueque.forEach((fn) => {
+                fn();
+            });
+
+            setTimeOutQueque.clear();
+        });
+    }
 };
 
 // https://macarthur.me/posts/navigating-the-event-loop

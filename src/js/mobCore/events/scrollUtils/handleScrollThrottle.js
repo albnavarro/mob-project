@@ -13,12 +13,12 @@ import { getUnivoqueId } from '../../utils/index.js';
 let initialized = false;
 
 /**
- * @type {Map<string,function>}
+ * @type {Map<string,import('./type.js').HandleScrollCallback<import('./type.js').HandleScroll>>}
  */
 const callbacks = new Map();
 
 /**
- * @type {Function}
+ * @type {() => void}
  */
 let throttleFunctionReference;
 
@@ -28,7 +28,7 @@ let throttleFunctionReference;
 let unsubscribe = () => {};
 
 /**
- * @param {Object} scrollData
+ * @param {import('./type.js').HandleScroll} scrollData
  */
 function handler(scrollData) {
     /**
@@ -59,8 +59,9 @@ function init() {
     if (initialized) return;
     initialized = true;
 
+    // @ts-ignore
     throttleFunctionReference = throttle(
-        (/** @type{Object} */ scrollData) => handler(scrollData),
+        (/** @type{any} */ scrollData) => handler(scrollData),
         eventStore.getProp('throttle')
     );
 
@@ -72,8 +73,8 @@ function init() {
  * @description
  * Performs a scroll callback using a throttle function
  *
- * @param {import('./type.js').handleScrollCallback} cb - callback function
- * @return {Function} unsubscribe callback
+ * @param {import('./type.js').HandleScrollCallback<import('./type.js').HandleScroll>} cb - callback function
+ * @return {() => void} unsubscribe callback
  *
  * @example
  * ```javascript
@@ -92,7 +93,7 @@ const addCb = (cb) => {
     const id = getUnivoqueId();
     callbacks.set(id, cb);
 
-    if (typeof window !== 'undefined') {
+    if (typeof globalThis !== 'undefined') {
         init();
     }
 

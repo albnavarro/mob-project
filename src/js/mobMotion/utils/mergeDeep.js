@@ -1,5 +1,11 @@
 /* eslint-disable unicorn/prefer-spread */
 /* eslint-disable unicorn/consistent-function-scoping */
+
+/**
+ * @param {any} target
+ * @param {any} source
+ * @param {boolean} isMergingArrays
+ */
 export const mergeDeep = (target, source, isMergingArrays = true) => {
     target = ((obj) => {
         let cloneObj;
@@ -15,7 +21,7 @@ export const mergeDeep = (target, source, isMergingArrays = true) => {
         return cloneObj;
     })(target);
 
-    const isObject = (obj) => obj && typeof obj === 'object';
+    const isObject = (/** @type {any} */ obj) => obj && typeof obj === 'object';
 
     if (!isObject(target) || !isObject(source)) return source;
 

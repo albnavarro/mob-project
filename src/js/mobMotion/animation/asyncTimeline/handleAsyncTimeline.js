@@ -202,21 +202,22 @@ export default class HandleAsyncTimeline {
     #id;
 
     /**
+     * @type {{cb: (arg0: import('../utils/timeline/type.js').directionTypeObjectLoop) => void, id: number}[]}
      */
     #callbackLoop;
 
     /**
-     * @type {Array}
+     * @type {{cb: () => void, id: number}[]}
      */
     #callbackComplete;
 
     /**
-     * @type{(value:any) => void|undefined}
+     * @type{((value:any) => void)|undefined}
      */
     #currentResolve;
 
     /**
-     * @type{(value:any) => void|undefined}
+     * @type{((value:any) => void)|undefined}
      */
     #currentReject;
 
@@ -811,6 +812,18 @@ export default class HandleAsyncTimeline {
             });
     }
 
+    /**
+     * @param {Object} param0
+     * @param {number} param0.start
+     * @param {number} param0.deltaTimeOnpause
+     * @param {number} param0.delay
+     * @param {(value: any) => void} param0.reject
+     * @param {(value: any) => void} param0.res
+     * @param {number} param0.previousSessionId
+     * @param {any} param0.tween
+     * @param {Record<string, () => void>} param0.fn
+     * @param {string} param0.action
+     */
     #loopOnDelay({
         start,
         deltaTimeOnpause,
@@ -1820,7 +1833,7 @@ export default class HandleAsyncTimeline {
     }
 
     /**
-     * @return {Array} - Returns an array with all tweens active at the time the method is called
+     * @return {import('./type').asyncTimelineCurrentTween[]} - Returns an array with all tweens active at the time the method is called
      * @example
      * ```javascript
      * const tweens = myTimeline.get()

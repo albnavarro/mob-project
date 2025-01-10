@@ -84,12 +84,12 @@ export default class HandleLerp {
     #isActive;
 
     /**
-     * @type{(value:any) => void|undefined }
+     * @type{((value:any) => void)|undefined }
      */
     #currentResolve;
 
     /**
-     * @type{(value:any) => void|undefined}
+     * @type{((value:any) => void)|undefined}
      */
     #currentReject;
 
@@ -173,7 +173,7 @@ export default class HandleLerp {
     #fastestStagger;
 
     /**
-     * @param {import('./type.js').lerpTweenProps} [ data  = {}]
+     * @param {import('./type.js').lerpTweenProps} [ data ]
      *
      * @example
      * ```javascript
@@ -219,7 +219,7 @@ export default class HandleLerp {
      * ```
      */
     constructor(data) {
-        this.#stagger = getStaggerFromProps(data);
+        this.#stagger = getStaggerFromProps(data ?? {});
         this.#relative = relativeIsValid(data?.relative, 'lerp');
         this.#velocity = lerpVelocityIsValid(data?.velocity);
         this.#precision = lerpPrecisionIsValid(data?.precision);
@@ -304,7 +304,7 @@ export default class HandleLerp {
 
                 // On complete
                 if (!this.#pauseStatus) {
-                    res();
+                    res(true);
 
                     // Set promise reference to null once resolved
                     this.#promise = undefined;
@@ -413,7 +413,7 @@ export default class HandleLerp {
      * @param {(arg0: any) => void} res
      * @param {(value: any) => void} reject
      *
-     * @returns {Promise}
+     * @returns {Promise<any>}
      */
     async #startRaf(res, reject) {
         if (this.#fpsInLoading) return;
@@ -538,7 +538,8 @@ export default class HandleLerp {
      * @type {import('../../utils/type.js').GoTo<import('./type.js').lerpActions>} obj to Values
      */
     goTo(obj, props) {
-        if (this.#pauseStatus) return;
+        if (this.#pauseStatus) return new Promise((resolve) => resolve);
+
         this.#useStagger = true;
         const data = goToUtils(obj);
         return this.#doAction(data, props, obj);
@@ -548,7 +549,8 @@ export default class HandleLerp {
      * @type {import('../../utils/type.js').GoFrom<import('./type.js').lerpActions>} obj to Values
      */
     goFrom(obj, props) {
-        if (this.#pauseStatus) return;
+        if (this.#pauseStatus) return new Promise((resolve) => resolve);
+
         this.#useStagger = true;
         const data = goFromUtils(obj);
         return this.#doAction(data, props, obj);
@@ -558,13 +560,14 @@ export default class HandleLerp {
      * @type {import('../../utils/type.js').GoFromTo<import('./type.js').lerpActions>} obj to Values
      */
     goFromTo(fromObj, toObj, props) {
-        if (this.#pauseStatus) return;
+        if (this.#pauseStatus) return new Promise((resolve) => resolve);
+
         this.#useStagger = true;
 
         // Check if fromObj has the same keys of toObj
         if (!compareKeys(fromObj, toObj)) {
             compareKeysWarning('lerp goFromTo:', fromObj, toObj);
-            return this.#promise;
+            return new Promise((resolve) => resolve);
         }
 
         const data = goFromToUtils(fromObj, toObj);
@@ -576,7 +579,7 @@ export default class HandleLerp {
      * @type {import('../../utils/type.js').Set<import('./type.js').lerpActions>} obj to Values
      */
     set(obj, props) {
-        if (this.#pauseStatus) return;
+        if (this.#pauseStatus) return new Promise((resolve) => resolve);
         this.#useStagger = false;
         const data = setUtils(obj);
         return this.#doAction(data, props, obj);
@@ -592,7 +595,7 @@ export default class HandleLerp {
         const data = setUtils(obj);
         this.#values = mergeArray(data, this.#values);
 
-        const { reverse } = this.#mergeProps(props);
+        const { reverse } = this.#mergeProps(props ?? {});
         if (valueIsBooleanAndTrue(reverse, 'reverse'))
             this.#values = setReverseValues(obj, this.#values);
 
@@ -608,7 +611,7 @@ export default class HandleLerp {
      */
     #doAction(data, props, obj) {
         this.#values = mergeArray(data, this.#values);
-        const { reverse, immediate } = this.#mergeProps(props);
+        const { reverse, immediate } = this.#mergeProps(props ?? {});
 
         if (valueIsBooleanAndTrue(reverse, 'reverse'))
             this.#values = setReverseValues(obj, this.#values);

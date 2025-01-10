@@ -27,3 +27,11 @@ export interface loadFpsTypes {
 }
 
 export type loadFpsCallback = (arg0: loadFpsTypes) => void;
+
+export interface HandleCacheSubscriberValue {
+    el: object | HTMLElement;
+    fn: (arg0: any, arg1: object | HTMLElement) => void;
+    data: Map<number, object>;
+}
+
+export type HandleCacheSubscriberMap = Map<string, HandleCacheSubscriberValue>;

@@ -3,6 +3,7 @@ import { handleSetUp } from '../../setup.js';
 import { easeReference } from '../utils/setUp/setUpValidation.js';
 import { tweenEaseWarning } from '../utils/warning.js';
 
+/** @type{Record<string, any>} */
 export const tweenConfig = {
     [easeReference.easeLinear]: (
         /** @type {number} */ elapsed,

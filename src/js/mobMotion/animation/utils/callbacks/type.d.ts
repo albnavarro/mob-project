@@ -55,7 +55,7 @@ export type syncCallback = (arg0: {
 }) => void;
 
 export type setCallBack = (
-    currentCallback: () => void,
+    currentCallback: (arg0: any) => void,
     arrayOfCallback: callbackObject<(arg0: Record<string, number>) => void>[]
 ) => setCallbackReturnObject;
 

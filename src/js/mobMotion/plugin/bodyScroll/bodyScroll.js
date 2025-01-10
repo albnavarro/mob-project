@@ -10,7 +10,7 @@ import {
 import { offset, isNode } from '../../../mobCore/utils/index.js';
 import {
     freezePageScroll,
-    unFreezePageScroll,
+    unFreezeAndUPdatePageScroll,
     updatePageScroll,
 } from '../pageScroll/pageScroller.js';
 
@@ -44,7 +44,7 @@ tween.subscribe(({ val }) => {
 const onComplete = () => {
     if (overflow) document.body.style.overflow = '';
     tween?.updateEase?.(defaultPreset);
-    unFreezePageScroll();
+    unFreezeAndUPdatePageScroll();
 };
 
 /** @type{() => void} */

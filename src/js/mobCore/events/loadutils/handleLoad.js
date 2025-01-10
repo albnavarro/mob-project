@@ -8,7 +8,7 @@ import { getUnivoqueId } from '../../utils';
 let initialized = false;
 
 /**
- * @type {Map<string,function>}
+ * @type {Map<string,() => void>}
  */
 const callbacks = new Map();
 
@@ -20,7 +20,7 @@ function handler() {
      * if - if there is no subscritor remove handler
      */
     if (callbacks.size === 0) {
-        window.removeEventListener('DOMContentLoaded', handler);
+        globalThis.removeEventListener('DOMContentLoaded', handler);
 
         initialized = false;
         return;
@@ -44,7 +44,7 @@ function init() {
     initialized = true;
 
     // Add debunce function to detect scroll end
-    window.addEventListener('DOMContentLoaded', handler, {
+    globalThis.addEventListener('DOMContentLoaded', handler, {
         passive: false,
     });
 }
@@ -53,8 +53,8 @@ function init() {
  * @description
  * Add callback on page load
  *
- * @param {Function} cb - Callback function executed on page load
- * @returns {function():void}
+ * @param {() => void} cb - Callback function executed on page load
+ * @returns {() => void}
  *
  * @example
  * ```javascript
@@ -69,7 +69,7 @@ const addCallback = (cb) => {
     const id = getUnivoqueId();
     callbacks.set(id, cb);
 
-    if (typeof window !== 'undefined') {
+    if (typeof globalThis !== 'undefined') {
         init();
     }
 

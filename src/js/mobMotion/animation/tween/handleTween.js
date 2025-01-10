@@ -84,7 +84,7 @@ export default class HandleTween {
     #isActive;
 
     /**
-     * @type{(value:any) => void|undefined}
+     * @type{((value:any) => void)|undefined }
      */
     #currentReject;
 
@@ -241,7 +241,7 @@ export default class HandleTween {
         this.#ease = easeTweenIsValidGetFunction(data?.ease);
         this.#duration = durationIsNumberOrFunctionIsValid(data?.duration);
         this.#relative = relativeIsValid(data?.relative, 'tween');
-        this.#stagger = getStaggerFromProps(data);
+        this.#stagger = getStaggerFromProps(data ?? {});
         this.#uniqueId = mobCore.getUnivoqueId();
         this.#isActive = false;
         this.#currentReject = undefined;
@@ -374,12 +374,12 @@ export default class HandleTween {
 
     /**
      * @param {number} time current global time
-     * @param {boolean} _fps current FPS
+     * @param {number} fps current FPS
      * @param {Function} res current promise resolve
      *
      * @returns {void}
      **/
-    #onReuqestAnim(time, _fps, res) {
+    #onReuqestAnim(time, fps, res) {
         this.#startTime = time;
         this.#draw(time, res);
     }
@@ -446,7 +446,7 @@ export default class HandleTween {
      * @param {(value:any) => void} res
      * @param {(value:any) => void} reject
      *
-     * @returns {Promise}
+     * @returns {Promise<any>}
      */
     async #startRaf(res, reject) {
         if (this.#fpsInLoading) return;
@@ -624,7 +624,7 @@ export default class HandleTween {
 
         if (!compareKeys(fromObj, toObj)) {
             compareKeysWarning('tween goFromTo:', fromObj, toObj);
-            return this.#promise;
+            return new Promise((resolve) => resolve);
         }
 
         const data = goFromToUtils(fromObj, toObj);

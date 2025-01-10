@@ -2,7 +2,7 @@
 
 /**
  * @param {Object} param
- * @param {Array} param.data
+ * @param {any[]} param.data
  * @param {import("./type").sequencerValue[]} param.values
  * @return {import("./type").sequencerValue[]}
  */

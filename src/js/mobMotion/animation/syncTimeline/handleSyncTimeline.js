@@ -193,7 +193,7 @@ export default class HandleSyncTimeline {
 
         /**
          * @private
-         * @type {import('./type.js').syncTimelineEventType<{cb:() => void, id:string}>[]}
+         * @type {import('./type.js').syncTimelineEventType<void>[]}
          */
         this.callbackComplete = [];
 
@@ -205,13 +205,13 @@ export default class HandleSyncTimeline {
 
         /**
          * @private
-         * @type{(value:any) => void|null}
+         * @type{((value:any) => void)|undefined}
          */
         this.currentResolve = undefined;
 
         /**
          * @private
-         * @type{(value:any) => void|null}
+         * @type{((value:any) => void)|undefined}
          */
         this.currentReject = undefined;
     }
@@ -365,7 +365,7 @@ export default class HandleSyncTimeline {
 
             // Fire last callback on Complete
             this.callbackComplete.forEach(({ cb }) => cb());
-            if (this.currentResolve) this.currentResolve();
+            if (this.currentResolve) this.currentResolve(true);
             return;
         }
 
@@ -665,7 +665,7 @@ export default class HandleSyncTimeline {
      * Find label than match the occurrency and return the time
      *
      * @param {number} partial
-     * @returns {Promise}
+     * @returns {Promise<any>}
      */
     async #startAnimation(partial) {
         if (this.repeat === 0) return;
@@ -736,6 +736,7 @@ export default class HandleSyncTimeline {
 
     /**
      * @type {import('./type.js').syncTimelineStop}
+     * @returns {void}
      */
     stop({ clearCache = true } = {}) {
         this.isStopped = true;

@@ -57,8 +57,8 @@ export const getPropiertiesValueFromConstant = (value) => {
  * @description
  * Return unit misure for parallax form lower/upper mix case typing
  *
- * @param {string} pattern
- * @returns string
+ * @param {string|undefined} pattern
+ * @returns {string}
  */
 export const getStartEndUnitMisure = (pattern) => {
     if (pattern) {

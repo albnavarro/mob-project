@@ -5,7 +5,10 @@ import { getStateFromMainMap } from './storeMap';
  * @param {string} param.instanceId
  */
 export const storeGetValidationEntryPoint = ({ instanceId }) => {
-    const { validationStatusObject } = getStateFromMainMap(instanceId);
+    const state = getStateFromMainMap(instanceId);
+    if (!state) return;
+
+    const { validationStatusObject } = state;
     return validationStatusObject;
 };
 
@@ -14,7 +17,10 @@ export const storeGetValidationEntryPoint = ({ instanceId }) => {
  * @param {string} param.instanceId
  */
 export const storeDebugStoreEntryPoint = ({ instanceId }) => {
-    const { store } = getStateFromMainMap(instanceId);
+    const state = getStateFromMainMap(instanceId);
+    if (!state) return;
+
+    const { store } = state;
     console.log(store);
 };
 
@@ -23,7 +29,10 @@ export const storeDebugStoreEntryPoint = ({ instanceId }) => {
  * @param {string} param.instanceId
  */
 export const storeDebugValidateEntryPoint = ({ instanceId }) => {
-    const { validationStatusObject } = getStateFromMainMap(instanceId);
+    const state = getStateFromMainMap(instanceId);
+    if (!state) return;
+
+    const { validationStatusObject } = state;
     console.log(validationStatusObject);
 };
 

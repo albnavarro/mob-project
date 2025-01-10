@@ -29,16 +29,19 @@ const getRadialY = (arr, x, y) => {
  * @description
  * Get radial in x direction
  *
- * @param {any[][]} arr
+ * @template {any[]}T
+ * @param {T} arr
  * @param {number} x
  * @param {number} y
- * @param {any[][]} chunk
+ * @param {T} chunk
  *
- * @returns Array<Array>
+ * @returns {T}
  */
 const getRadialX = (arr, x, y, chunk) => {
     return arr.reduce((total, _row, i) => {
         const offset = Math.abs(i - y);
+
+        /** @type{any[][]} */
         const newRow = [];
 
         // Avoid duplicate form before and after y
@@ -125,8 +128,8 @@ export const getRadialArray = (arr, stagger) => {
         mergeDirection === MERGE_FROM_DOWN
             ? radialXY.reduce(
                   (
-                      /** @type{Array<Array>} */ previous,
-                      /** @type{Array} */ _current,
+                      /** @type{any[][]} */ previous,
+                      /** @type{[]} */ _current,
                       /** @type{number} */ index
                   ) => {
                       if (index < y) {
@@ -147,8 +150,8 @@ export const getRadialArray = (arr, stagger) => {
             : radialXY
                   .reduce(
                       (
-                          /** @type{Array<Array>} */ previous,
-                          /** @type{Array} */ _current,
+                          /** @type{any[][]} */ previous,
+                          /** @type{[]} */ _current,
                           /** @type{number} */ index
                       ) => {
                           if (index > y) {
@@ -170,7 +173,7 @@ export const getRadialArray = (arr, stagger) => {
 
     // Remove empty row added at start
     const cleanArray = finalArray.reduce(
-        (/** @type{Array<Array>} */ previous, /** @type{Array} */ current) => {
+        (/** @type{any[][]} */ previous, /** @type{[]} */ current) => {
             return current.length === 0 ? previous : [...previous, current];
         },
         []

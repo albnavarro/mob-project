@@ -168,15 +168,15 @@ export const motionCore = {
     mq(action, breakpoint) {
         switch (action) {
             case 'min': {
-                return mq.min(breakpoint);
+                return mq['min'](breakpoint);
             }
 
             case 'max': {
-                return mq.max(breakpoint);
+                return mq['max'](breakpoint);
             }
 
             case 'get': {
-                return mq.getBreackpoint(breakpoint);
+                return mq['getBreackpoint'](breakpoint);
             }
         }
     },

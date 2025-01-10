@@ -202,7 +202,7 @@ export const handleSetUp = (() => {
      * Returns the value of a specific property
      *
      * @param {handleSetUpGetType} prop
-     * @returns {Object}
+     * @returns {any}
      *
      * @example
      * ```javascript

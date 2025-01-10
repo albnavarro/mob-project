@@ -6,7 +6,7 @@ import {
     storeQuickSetEntrypoint,
     storeSetEntryPoint,
 } from './storeSet';
-import { removeStateFromMainMap, updateMainMap } from './storeMap';
+import { updateMainMap } from './storeMap';
 import { inizializeAllProps, inizializeValidation } from './initialValidation';
 import { watchEntryPoint } from './watch';
 import { inizializeInstance } from './inizializeInstance';
@@ -18,10 +18,14 @@ import {
     storeDebugValidateEntryPoint,
     storeGetValidationEntryPoint,
 } from './storeDebug';
+import { STORE_SET, STORE_UPDATE } from './constant';
+import { getProxiEntryPoint } from './proxi';
+import { bindStoreEntryPoint } from './bindStore';
+import { destroyStoreEntryPoint } from './destroy';
 
 /**
  * @param {import('./type').mobStoreBaseData} data
- * @returns {import('./type').storePublicMethods}
+ * @returns {import('./type').MobStore<any>}
  */
 export const mobStore = (data = {}) => {
     /**
@@ -51,26 +55,45 @@ export const mobStore = (data = {}) => {
      * Methods
      */
     return {
+        getId: () => instanceId,
+        bindStore: (value) => {
+            bindStoreEntryPoint({ value, instanceId });
+        },
         get: () => {
             return storeGetEntryPoint(instanceId);
         },
         getProp: (prop) => {
             return storeGetPropEntryPoint({ instanceId, prop });
         },
-        set: (prop, value, fireCallback = true, clone = false) => {
+        set: (prop, value, { emit = true } = {}) => {
             storeSetEntryPoint({
                 instanceId,
                 prop,
                 value,
-                fireCallback,
-                clone,
+                fireCallback: emit ?? true,
+                clone: false,
+                action: STORE_SET,
             });
+        },
+        update: (prop, value, { emit = true, clone = false } = {}) => {
+            storeSetEntryPoint({
+                instanceId,
+                prop,
+                value,
+                fireCallback: emit ?? true,
+                clone,
+                action: STORE_UPDATE,
+            });
+        },
+        // Use getProxi after add a proxi.
+        getProxi: () => {
+            return getProxiEntryPoint({ instanceId });
         },
         quickSetProp: (prop, value) => {
             storeQuickSetEntrypoint({ instanceId, prop, value });
         },
-        watch: (prop, callback) => {
-            return watchEntryPoint({ instanceId, prop, callback });
+        watch: (prop, callback, { wait = false } = {}) => {
+            return watchEntryPoint({ instanceId, prop, callback, wait });
         },
         computed: (prop, keys, callback) => {
             storeComputedEntryPoint({
@@ -81,7 +104,7 @@ export const mobStore = (data = {}) => {
             });
         },
         emit: (prop) => {
-            storeEmitEntryPoint({ instanceId, prop });
+            return storeEmitEntryPoint({ instanceId, prop });
         },
         emitAsync: async (prop) => {
             return storeEmitAsyncEntryPoint({ instanceId, prop });
@@ -99,7 +122,7 @@ export const mobStore = (data = {}) => {
             storeDebugValidateEntryPoint({ instanceId });
         },
         destroy: () => {
-            removeStateFromMainMap(instanceId);
+            destroyStoreEntryPoint(instanceId);
         },
     };
 };

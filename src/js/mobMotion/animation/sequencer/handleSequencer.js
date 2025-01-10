@@ -656,7 +656,7 @@ export default class HandleSequencer {
 
         if (!compareKeys(fromObj, toObj)) {
             compareKeysWarning('sequencer goFromTo:', fromObj, toObj);
-            return;
+            return this;
         }
 
         const data = goFromToSyncUtils(fromObj, toObj, ease);

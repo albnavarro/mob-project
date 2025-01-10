@@ -1,7 +1,7 @@
 //@ts-check
 
 /**
- * @param {Record<'prop', any>[]} arr
+ * @param {Record<string, any>[]} arr
  * @param {string} key
  * @returns {Record<string, number>}
  *
@@ -11,7 +11,7 @@
  */
 export const getValueObj = (arr, key) => {
     return arr
-        .map((item) => ({ [item.prop]: Number.parseFloat(item[key]) }))
+        .map((item) => ({ [item['prop']]: Number.parseFloat(item[key]) }))
         .reduce((p, c) => ({ ...p, ...c }), {});
 };
 

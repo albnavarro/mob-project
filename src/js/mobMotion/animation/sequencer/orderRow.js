@@ -1,9 +1,8 @@
 /**
- * @private
- *
- * @param {import('./type.js').sequencerRow[]} arr
- * @param {string} prop
- * @returns {import('./type.js').sequencerRow[]} arr
+ * @template {any[]}T
+ * @param {T} arr
+ * @param {any} prop
+ * @returns {T} arr
  *
  * @description
  * Sorts the array by the lowest start value

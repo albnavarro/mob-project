@@ -5,7 +5,7 @@ import { parallaxConstant } from './parallaxConstant';
 
 /**
  * @param {Object} param
- * @param {string} param.marker
+ * @param {string} [ param.marker ]
  * @param {string} param.direction
  * @param {boolean|undefined} param.invertSide
  * @return {Object}

@@ -179,13 +179,13 @@ export const storeEmitWarning = (prop, style) => {
 };
 
 /**
- * @param {Array.<String>} keys
+ * @param {string[]} keys
  * @param {string} style
  * @returns void
  */
 export const storeComputedKeyUsedWarning = (keys, style) => {
     console.warn(
-        `%c one of the keys [${keys}] is already used as a computed target, or one of the keys coincides with the prop to be changed.`,
+        `%c one of the keys [${keys}] is already used as a computed target, or there is a circular dependencies`,
         style
     );
 };
@@ -210,6 +210,18 @@ export const storeWatchWarning = (prop, style) => {
 export const storeObjectIsNotAnyWarning = (style, CUSTOM_OBJECT) => {
     console.warn(
         `%c Validation Object error: validation function return undefined or have you used Object instead '${CUSTOM_OBJECT}' ?`,
+        style
+    );
+};
+
+/**
+ * @param {string} prop
+ * @param {string} style
+ * @returns void
+ */
+export const storePropInProxiWarning = (prop, style) => {
+    console.warn(
+        `%c SimpleStore error: the property ${prop} does not exist in proxi`,
         style
     );
 };

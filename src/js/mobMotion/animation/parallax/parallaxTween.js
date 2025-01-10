@@ -163,7 +163,8 @@ export default class ParallaxTween {
      * @param {object} obj
      * @param {number} obj.partial - render at specific partial between 0 and duration
      * @param {boolean} obj.isLastDraw - use the callback defined by the onStop method
-     *
+     * @param {boolean} obj.isLastDraw - compatibiliey with sequencer for Parallxx
+     * @param {boolean} obj.useFrame - compatibiliey with sequencer for Parallxx
      * @example
      * ```js
      * myParallaxTween.draw(

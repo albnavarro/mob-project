@@ -122,7 +122,7 @@ export const detectViewPortInterception = ({
 };
 
 /**
- * @param  {array}  values spitted input value es: 100px +h => ['100px','+height', 'top']
+ * @param  {string[]}  values spitted input value es: 100px +h => ['100px','+height', 'top']
  * @param  {string}  direction
  * @return {import('./utilsType.js').scrollTriggerLimitValues} return object with values or default
  *

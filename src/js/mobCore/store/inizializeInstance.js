@@ -1,6 +1,6 @@
 // @ts-check
 
-import { UNTYPED } from './classVersion/storeType';
+import { UNTYPED } from './storeType';
 import { getLogStyle } from './logStyle';
 import {
     inizializeSpecificProp,
@@ -21,7 +21,7 @@ export const inizializeInstance = (data) => {
     return {
         callBackWatcher: new Map(),
         callBackComputed: new Set(),
-        lastestPropsChanged: new Set(),
+        computedPropsQueque: new Set(),
         validationStatusObject: {},
         dataDepth,
         computedRunning: false,
@@ -36,6 +36,13 @@ export const inizializeInstance = (data) => {
             depth: dataDepth,
             logStyle: getLogStyle(),
             fallback: UNTYPED,
+        }),
+        fnTransformation: inizializeSpecificProp({
+            data,
+            prop: 'transform',
+            depth: dataDepth,
+            logStyle: getLogStyle(),
+            fallback: (/** @type {any} */ value) => value,
         }),
         fnValidate: inizializeSpecificProp({
             data,
@@ -58,5 +65,8 @@ export const inizializeInstance = (data) => {
             logStyle: getLogStyle(),
             fallback: true,
         }),
+        proxiObject: undefined,
+        bindInstance: [],
+        unsubscribeBindInstance: [],
     };
 };

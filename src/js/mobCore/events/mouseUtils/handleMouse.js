@@ -6,45 +6,60 @@ import { normalizeWheel } from './normalizeWhell.js';
 
 /**
  * @param {Object} obj
- * @param {import('./type.js').mouseEvent} obj.type
- * @param {Object} obj.e
- *
- * @returns { Object }
+ * @param {import('./type.js').MouseEventType} obj.type
+ * @param {Object} obj.event
+ * @returns {any}
  */
-function getPageData({ type, e }) {
-    // 'touchend'
-    if (type === 'touchend' && e.changedTouches) return e.changedTouches[0];
+function getPageData({ type, event }) {
+    const touchEvent = /** @type{TouchEvent} */ (event);
 
-    // 'mousedown', 'touchstart', 'mousemove', 'touchmove', 'mouseup'
-    return e.touches ? e.touches[0] : e;
+    /**
+     * 'touchend'
+     */
+    if (type === 'touchend' && 'changedTouches' in event) {
+        return touchEvent.changedTouches[0];
+    }
+
+    /**
+     * 'mousedown', 'touchstart', 'mousemove', 'touchmove', 'mouseup'
+     */
+    return 'touches' in touchEvent ? touchEvent.touches[0] : event;
 }
 
 /**
  * @param {Object} obj
- * @param {import('./type.js').mouseEvent} obj.type
- * @param {Object} obj.e
- * @returns Object
+ * @param {import('./type.js').MouseEventType} obj.type
+ * @param {Object} obj.event
+ * @returns {any}
  * @description
  */
-function getClientData({ type, e }) {
-    // 'touchend'
-    if (type === 'touchend' && e.changedTouches) return e.changedTouches[0];
+function getClientData({ type, event }) {
+    const touchEvent = /** @type{TouchEvent} */ (event);
 
-    // 'mousedown', 'touchstart', 'mousemove', 'touchmove', 'mouseup'
-    return e.touches ? e.touches[0] : e;
+    /**
+     * 'touchend'
+     */
+    if (type === 'touchend' && 'changedTouches' in event) {
+        return touchEvent.changedTouches[0];
+    }
+
+    /**
+     * 'mousedown', 'touchstart', 'mousemove', 'touchmove', 'mouseup'
+     */
+    return 'touches' in touchEvent ? touchEvent.touches[0] : event;
 }
 
 /**
- * @param {import('./type.js').mouseEvent} event
+ * @param {import('./type.js').MouseEventType} eventType
  */
-function handleMouse(event) {
+function handleMouse(eventType) {
     /**
      * @type {boolean}
      */
     let initialized = false;
 
     /**
-     * @type {Map<string,function>}
+     * @type {Map<string,import('./type.js').mouseEventCallback>}
      */
     const callbacks = new Map();
 
@@ -58,45 +73,42 @@ function handleMouse(event) {
      * Switch passive event on setUp change.
      */
     eventStore.watch('usePassive', () => {
-        window.removeEventListener(event, handler);
+        globalThis.removeEventListener(eventType, handler);
         initialized = false;
 
         init();
     });
 
     /**
-     * @param {Object} e
+     * @param {MouseEvent|TouchEvent} event
      */
-    function handler(e) {
+    function handler(event) {
         /**
          * if - if there is no subscritor remove handler
          */
         if (callbacks.size === 0) {
-            window.removeEventListener(event, handler);
+            globalThis.removeEventListener(eventType, handler);
 
             initialized = false;
             return;
         }
 
-        /**
-         * @type {import('./type.js').mouseEvent} event
-         */
-        const type = e.type;
+        const type = /** @type{import('./type.js').MouseEventType} */ (
+            event.type
+        );
 
         /**
          * @type {{ pageX:number, pageY:number }}
          */
-        const { pageX, pageY } = getPageData({ type, e });
+        const { pageX, pageY } = getPageData({ type, event });
 
         /**
          * @type {{ clientX:number, clientY:number }}
          */
-        const { clientX, clientY } = getClientData({ type, e });
+        const { clientX, clientY } = getClientData({ type, event });
 
-        /**
-         * @type {HTMLElement}
-         */
-        const target = e.target;
+        /** @type {EventTarget|null} */
+        const target = event.target;
 
         // Prepare data to callback
         const mouseData = {
@@ -110,12 +122,13 @@ function handleMouse(event) {
             },
             target,
             type,
-            preventDefault: () => (usePassive ? () => {} : e.preventDefault()),
+            preventDefault: () =>
+                usePassive ? () => {} : event.preventDefault(),
         };
 
         // Add spin value if is wheel event
         if (type === 'wheel') {
-            const { spinX, spinY, pixelX, pixelY } = normalizeWheel(e);
+            const { spinX, spinY, pixelX, pixelY } = normalizeWheel(event);
             Object.assign(mouseData, { spinX, spinY, pixelX, pixelY });
         }
 
@@ -135,7 +148,7 @@ function handleMouse(event) {
         initialized = true;
         usePassive = eventStore.getProp('usePassive');
 
-        window.addEventListener(event, handler, {
+        globalThis.addEventListener(eventType, handler, {
             passive: usePassive,
         });
     }
@@ -143,19 +156,15 @@ function handleMouse(event) {
     /**
      * @description
      * add callback on mouse action
-     *
      * @param {import('./type.js').mouseEventCallback} cb - callback function fired on mouse action.
+     * @returns {() => void}
      *
-     * @example
-     * ```javascript
-     *
-     * ```
      */
     const addCb = (cb) => {
         const id = getUnivoqueId();
         callbacks.set(id, cb);
 
-        if (typeof window !== 'undefined') {
+        if (typeof globalThis !== 'undefined') {
             init();
         }
 

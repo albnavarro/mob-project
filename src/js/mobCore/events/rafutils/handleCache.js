@@ -14,14 +14,14 @@ import { eventStore } from '../eventStore';
 let cacheCoutner = 0;
 
 /**
- * @type {Map.<string, { el: (Object|HTMLElement), fn: Function, data: Map.<number, Object> }>}
+ * @type {import('./type').HandleCacheSubscriberMap}
  */
 const subscriberMap = new Map();
 
 /**
  * @param {Object|HTMLElement} el
- * @param {Function} fn
- * @returns {{id:string,unsubscribe:function():void}}
+ * @param {(arg0: any, arg1: Object|HTMLElement) => void} fn
+ * @returns {{id:string,unsubscribe:() => void}}
  *
  * @description
  * Add new item to cache.
@@ -59,7 +59,7 @@ const add = (el = {}, fn = () => {}) => {
 /**
  * @param {Object} obj
  * @param {string} obj.id
- * @param {Object} obj.callBackObject
+ * @param {Record<string, number>} obj.callBackObject
  * @param {number} obj.frame
  * @returns void
  *
@@ -121,7 +121,7 @@ const clean = (id) => {
 /**
  * @memberof module:handleCache
  * @param {string} id
- * @returns {Object.<number, { el: (Object|HTMLElement), fn: Function, data: Object.<number, Object> }>}
+ * @returns {import('./type').HandleCacheSubscriberValue|{}}
  *
  * @description
  * Get item object
@@ -154,7 +154,7 @@ const fire = (frameCounter) => {
 /**
  * @param {Object} obj
  * @param {string} obj.id
- * @param {Object} obj.obj
+ * @param {Record<string, number>} obj.obj
  * @returns void
  *
  * @description

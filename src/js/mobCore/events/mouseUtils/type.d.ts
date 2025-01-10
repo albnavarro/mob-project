@@ -1,4 +1,4 @@
-export type mouseEvent =
+export type MouseEventType =
     | 'click'
     | 'mousedown'
     | 'mousemove'
@@ -8,7 +8,7 @@ export type mouseEvent =
     | 'touchend'
     | 'wheel';
 
-export interface mouseEventTypes {
+export interface MouseEventParsed {
     page: {
         x: number;
         y: number;
@@ -17,8 +17,8 @@ export interface mouseEventTypes {
         x: number;
         y: number;
     };
-    target: Element;
-    type: mouseEvent;
+    target: EventTarget | null;
+    type: MouseEventType;
     preventDefault: () => void;
 
     /**
@@ -46,4 +46,4 @@ export interface mouseEventTypes {
     pixelY?: number;
 }
 
-export type mouseEventCallback = (arg0: mouseEventTypes) => void;
+export type mouseEventCallback = (arg0: MouseEventParsed) => void;

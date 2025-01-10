@@ -107,9 +107,7 @@ export const loadFps = (duration = 30) => {
             if (frameCounter >= duration) {
                 eventStore.quickSetProp('instantFps', averageFPS);
                 loadFpsIsReady = true;
-                resolve({
-                    averageFPS: averageFPS,
-                });
+                resolve({ averageFPS });
                 return;
             }
 

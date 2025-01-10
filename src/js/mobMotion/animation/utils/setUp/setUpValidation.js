@@ -88,7 +88,7 @@ export const setupValidation = (obj) => {
         type: Number,
     });
 
-    const mq = checkSetUpMq(obj?.mq);
+    const mq = checkSetUpMq(obj?.mq ?? {});
 
     const defaultMqValue = checkSetUpType({
         prop: 'defaultMq.value',
@@ -301,7 +301,7 @@ const checkSetUpType = ({ prop, value, defaultValue, type }) => {
 };
 
 /**
- * @param {Object} obj
+ * @param {Record<string, any>} obj
  *
  * @returns any
  */

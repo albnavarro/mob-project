@@ -1,7 +1,7 @@
 // @ts-check
 
 /**
- * @type {Array}
+ * @type {import('./type.js').handleFrameCallbakType[]}
  */
 const callbacks = [];
 

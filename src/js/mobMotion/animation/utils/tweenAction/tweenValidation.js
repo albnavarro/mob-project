@@ -287,7 +287,7 @@ export const validateStaggerWaitComplete = (waitComplete) => {
 };
 
 /**
- * @param {array|undefined} arr
+ * @param {[] | (object | HTMLElement)[]} arr
  * @returns {boolean}
  *
  * @description
@@ -301,8 +301,8 @@ export const validateStaggerItems = (arr = []) => {
 };
 
 /**
- * @param {array|undefined} arr
- * @returns {Array}
+ * @param {(object | HTMLElement)[]} arr
+ * @returns {( object | HTMLElement )[]|[]}
  *
  * @description
  * Return the array fallback
@@ -403,7 +403,7 @@ export const easeTweenIsValid = (ease) => {
 /**
  *
  * @param {string|undefined} config
- * @returns {Object}
+ * @returns {import('../../spring/type').springProps}
  *
  * @description
  * Check if spring config is valid and return new config
@@ -575,7 +575,9 @@ export const valueIsNumberAndReturnDefault = (value, label, defaultValue) => {
 
 /**
  *
- * @param {Function|undefined} value
+ * @param {(() => void)|undefined} value
+ * @param {string} label
+ * @param {() => void} defaultValue
  * @returns {() => void}
  *
  * @description
@@ -585,6 +587,7 @@ export const valueIsFunctionAndReturnDefault = (value, label, defaultValue) => {
     const isValid = mobCore.checkType(Function, value);
     if (!isValid && value) functionWarning(value, label);
 
+    // @ts-ignore
     return isValid ? value : defaultValue;
 };
 
@@ -652,7 +655,7 @@ export const asyncTimelineDelayIsValid = (value) => {
 
 /**
  *
- * @param {Object|undefined} instance
+ * @param {any} instance
  * @returns {boolean}
  *
  * @description
@@ -700,7 +703,8 @@ export const functionIsValidAndReturnDefault = (fn, defaultValue, label) => {
 
 /**
  *
- * @param {Function|undefined} fn
+ * @param {(arg0: import('../timeline/type').directionTypeAsync) => void} fn
+ * @returns {(arg0: import('../timeline/type').directionTypeAsync) => void}
  *
  * @description
  * Check if value is A function
@@ -718,7 +722,7 @@ export const addAsyncFunctionIsValid = (fn) => {
 
 /**
  *
- * @param {Array|undefined} arr
+ * @param {any[]|undefined} arr
  *
  * @description
  * Check if value is an Array
@@ -814,9 +818,9 @@ export const directionIsValid = (direction, component) => {
 
 /**
  *
- * @param {Object|undefined} obj
+ * @param {any|undefined} obj
  * @param {string} label
- * @returns {Object} dynamicStart|dynamicEnd|null Object
+ * @returns {any} dynamicStart|dynamicEnd|null Object
  *
  * @description
  * Check if dynamicStart|dynamicEnd is a valid direction
@@ -870,8 +874,8 @@ export const parallaxDynamicRangeIsValid = (fn) => {
 
 /**
  *
- * @param {Object|undefined} instance
- * @returns {Object} parallaxTween|HandleSequencer|{}
+ * @param {any|undefined} instance
+ * @returns {any} parallaxTween|HandleSequencer|{}
  *
  * @description
  * Check if tween is parallaxTween|HandleSequencer
@@ -1075,8 +1079,8 @@ export const breakpointTypeIsValid = (type, label, component) => {
  *
  * @param {string|undefined} value
  * @param {string} type
- * @param {boolean} tweenIsParallaxTween
- * @param {boolean} tweenIsSequencer
+ * @param {boolean|undefined} tweenIsParallaxTween
+ * @param {boolean|undefined} tweenIsSequencer
  * @returns {{ propierties:string, shouldTrackOnlyEvents:boolean }}
  */
 export const parallaxPropiertiesIsValid = (
@@ -1195,6 +1199,11 @@ export const parallaxEaseTypeIsValid = (value) => {
     return isValid ? value : fallback;
 };
 
+/**
+ * @param {string} value
+ * @param {string} component
+ * @returns {string}
+ */
 export const genericEaseTypeIsValid = (value, component) => {
     const choice = [parallaxConstant.EASE_SPRING, parallaxConstant.EASE_LERP];
 
@@ -1208,7 +1217,7 @@ export const genericEaseTypeIsValid = (value, component) => {
  *
  * @param {string|undefined} config
  * @param {string} type
- * @returns {string}
+ * @returns {import('../../spring/type').springChoiceConfig}
  *
  * @description
  * Check if springConfig is valid

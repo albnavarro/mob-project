@@ -25,7 +25,7 @@ export interface syncTimelineSequencers {
 
 export interface syncTimelineEventType<T> {
     id: number;
-    cb: (arg0?: T) => void;
+    cb: (arg0: T) => void;
 }
 
 export type syncTimelinePlay = (arg0?: {
