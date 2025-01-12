@@ -3,7 +3,7 @@
 import { mobCore } from '../../../../mobCore/index.js';
 
 /**
- * @type {import('./type.js').defaultCallback}
+ * @type {import('./type.js').DefaultCallback}
  *
  * @description
  * Fire callback while Running
@@ -56,7 +56,7 @@ export const defaultCallback = ({
 };
 
 /**
- * @type {import('./type.js').defaultCallbackOnComplete}
+ * @type {import('./type.js').DefaultCallbackOnComplete}
  *
  * @description
  *Callback on complete

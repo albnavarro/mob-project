@@ -3,7 +3,7 @@
 import { mobCore } from '../../../../mobCore';
 
 /**
- * @type {import('./type').syncCallback}
+ * @type {import('./type').SyncCallback}
  *
  * @description
  * Fire callback while Running

@@ -30,7 +30,7 @@ export const getEachByFps = (each) => {
 
 /**
  * @param {any} props
- * @returns {import('./type.js').staggerObject}
+ * @returns {import('./type.js').StaggerObject}
  */
 export const getStaggerFromProps = (props) => {
     return {
@@ -67,7 +67,7 @@ export const getStaggerFromProps = (props) => {
 };
 
 /**
- * @type {import('./type.js').getStaggerArray}
+ * @type {import('./type.js').GetStaggerArray}
  */
 export const getStaggerArray = (callbackCache, callbackDefault) => {
     return callbackCache.length > callbackDefault.length

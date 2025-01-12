@@ -4,7 +4,7 @@ import { mobCore } from '../../../../mobCore';
 import { staggerEachWarning } from '../warning';
 
 /**
- * @type {import('./type').shouldInizializzeStagger}
+ * @type {import('./type').ShouldInizializzeStagger}
  */
 export const shouldInizializzeStagger = (
     each,

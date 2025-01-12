@@ -4,6 +4,10 @@
 import { mq } from '../../../utils/mediaManager.js';
 import { horizontalScrollerContstant } from './horizontalScrollerConstant.js';
 
+/**
+ * @param {string} columnAlign
+ * @returns {string}
+ */
 const getAlign = (columnAlign) => {
     switch (columnAlign) {
         case horizontalScrollerContstant.END: {
@@ -20,6 +24,21 @@ const getAlign = (columnAlign) => {
     }
 };
 
+/**
+ * @param {object} params
+ * @param {HTMLElement} params.mainContainer
+ * @param {import('../../../utils/type.js').mqAction} params.queryType
+ * @param {import('../../../utils/type.js').mqValues} params.breakpoint
+ * @param {string} params.container
+ * @param {string} params.trigger
+ * @param {string} params.row
+ * @param {string} params.column
+ * @param {string} params.shadow
+ * @param {boolean} params.useSticky
+ * @param {number} params.columnHeight
+ * @param {number} params.columnWidth
+ * @param {string} params.columnAlign
+ */
 export const horizontalScrollerCss = ({
     mainContainer,
     queryType,
@@ -36,7 +55,7 @@ export const horizontalScrollerCss = ({
 }) => {
     // if (horizontalCustomCssIsAlive) return;
     // horizontalCustomCssIsAlive = true;
-    const media = mq.getBreackpoint(breakpoint);
+    const media = mq['getBreackpoint'](breakpoint);
 
     /**
      * Add if

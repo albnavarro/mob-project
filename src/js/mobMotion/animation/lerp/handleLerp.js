@@ -54,7 +54,7 @@ import { lerpGetValuesOnDraw } from './getValuesOnDraw.js';
 
 export default class HandleLerp {
     /**
-     * @type {import('../utils/stagger/type.js').staggerObject}
+     * @type {import('../utils/stagger/type.js').StaggerObject}
      */
     #stagger;
 
@@ -109,17 +109,17 @@ export default class HandleLerp {
     #initialData;
 
     /**
-     * @type {import('../utils/callbacks/type.js').callbackObject<(arg0:Record<string, number>) => void>[]}
+     * @type {import('../utils/callbacks/type.js').CallbackObject<(arg0:Record<string, number>) => void>[]}
      */
     #callback;
 
     /**
-     * @type {import('../utils/callbacks/type.js').callbackObject<string>[]}
+     * @type {import('../utils/callbacks/type.js').CallbackObject<string>[]}
      */
     #callbackCache;
 
     /**
-     * @type {import('../utils/callbacks/type.js').callbackObject<(arg0:Record<string, number>) => void>[]}
+     * @type {import('../utils/callbacks/type.js').CallbackObject<(arg0:Record<string, number>) => void>[]}
      */
     #callbackOnComplete;
 
@@ -163,12 +163,12 @@ export default class HandleLerp {
     #defaultProps;
 
     /**
-     * @type {import('../utils/stagger/type.js').staggerDefaultIndex}
+     * @type {import('../utils/stagger/type.js').StaggerFrameIndexObject}
      **/
     #slowlestStagger;
 
     /**
-     * @type {import('../utils/stagger/type.js').staggerDefaultIndex}
+     * @type {import('../utils/stagger/type.js').StaggerFrameIndexObject}
      */
     #fastestStagger;
 
@@ -396,10 +396,17 @@ export default class HandleLerp {
             });
 
             if (this.#callbackCache.length > this.#callback.length) {
-                this.#callbackCache = staggerArray;
+                this.#callbackCache =
+                    /** @type{import('../utils/callbacks/type.js').CallbackObject<string>[]} */ (
+                        staggerArray
+                    );
             } else {
-                this.#callback = staggerArray;
+                this.#callback =
+                    /** @type {import('../utils/callbacks/type.js').CallbackObject<(arg0: Record<string, number>) => void>[]} */ (
+                        staggerArray
+                    );
             }
+
             this.#callbackOnComplete = staggerArrayOnComplete;
             this.#slowlestStagger = slowlestStagger;
             this.#fastestStagger = fastestStagger;

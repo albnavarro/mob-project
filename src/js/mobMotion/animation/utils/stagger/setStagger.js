@@ -15,7 +15,7 @@ import { staggerColRowWarning } from '../warning.js';
 import { mobCore } from '../../../../mobCore/index.js';
 
 /**
- * @type {import('./type.js').getStagger}
+ * @type {import('./type.js').setStagger}
  */
 const getRadial = ({
     arrayDefault,
@@ -54,41 +54,33 @@ const getRadial = ({
 
     // Get stagger index the minumn and the fastest and the slowest
     let counter = 0;
-    cleanCb.forEach(
-        (
-            /** @type{Array<import('./type.js').setStagger>} */ chunk,
-            /** @type{number} */ i
-        ) => {
-            chunk.forEach((item) => {
-                /*
-                 * Get stagger each by fps
-                 */
-                const eachByFps = getEachByFps(stagger.each);
-                const frame = i * eachByFps;
-                item.index = counter;
-                item.frame = frame;
+    cleanCb.forEach((chunk, i) => {
+        chunk.forEach((item) => {
+            /*
+             * Get stagger each by fps
+             */
+            const eachByFps = getEachByFps(stagger.each);
+            const frame = i * eachByFps;
+            item.index = counter;
+            item.frame = frame;
 
-                if (frame >= slowlestStagger.frame)
-                    slowlestStagger = {
-                        index: counter,
-                        frame,
-                    };
+            if (frame >= slowlestStagger.frame)
+                slowlestStagger = {
+                    index: counter,
+                    frame,
+                };
 
-                if (frame <= fastestStagger.frame)
-                    fastestStagger = {
-                        index: counter,
-                        frame,
-                    };
+            if (frame <= fastestStagger.frame)
+                fastestStagger = {
+                    index: counter,
+                    frame,
+                };
 
-                counter++;
-            });
-        }
-    );
+            counter++;
+        });
+    });
 
     // Get on Complete Callback
-    /**
-     * @type {Array<Array<import('./type.js').setStagger>>}
-     */
     const cleanEndCb = (() => {
         if (arrayOnStop.length > 0) {
             const { cleanArray } = getRadialArray(arrayOnStop, stagger);
@@ -102,18 +94,13 @@ const getRadial = ({
     const endstaggerArray = cleanEndCb.flat();
 
     // Update onComplete cb with right stagger
-    staggerArray.forEach(
-        (
-            /** @type{import('./type.js').setStagger} */ item,
-            /** @type{number} */ i
-        ) => {
-            // If there an OnCompelte callback
-            if (endstaggerArray.length > 0) {
-                endstaggerArray[i].index = item.index;
-                endstaggerArray[i].frame = item.frame;
-            }
+    staggerArray.forEach((item, i) => {
+        // If there an OnCompelte callback
+        if (endstaggerArray.length > 0) {
+            endstaggerArray[i].index = item.index;
+            endstaggerArray[i].frame = item.frame;
         }
-    );
+    });
 
     return {
         staggerArray,
@@ -124,7 +111,7 @@ const getRadial = ({
 };
 
 /**
- * @type {import('./type.js').getStagger}
+ * @type {import('./type.js').setStagger}
  */
 const getDefault = ({
     arrayDefault,
@@ -169,7 +156,7 @@ const getDefault = ({
 };
 
 /**
- * @type {import('./type.js').setSatgger}
+ * @type {import('./type.js').setStagger}
  */
 export const setStagger = ({
     arrayDefault,

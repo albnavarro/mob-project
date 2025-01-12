@@ -1,12 +1,12 @@
 import { easeTypes } from '../tween/type';
-import { staggerObjectOptional } from '../utils/stagger/type';
+import { StaggerObjectOptional } from '../utils/stagger/type';
 import { directionType } from '../utils/timeline/type';
 import HandleSequencer from './handleSequencer';
 
 export interface sequencerProps {
     data: Record<string, number>;
     duration?: number;
-    stagger?: staggerObjectOptional;
+    stagger?: StaggerObjectOptional;
     ease?: easeTypes;
 }
 
@@ -70,12 +70,13 @@ export interface masterSequencerItem {
         partial: number;
         isLastDraw: boolean;
         useFrame: boolean;
+        direction?: directionType;
     }) => void;
     inzializeStagger: () => void;
     setDuration: (arg0: number) => void;
     getDuration: () => number;
     setStretchFactor: (arg0: number) => void;
-    getLabels: () => string;
+    getLabels: sequencerGetLabels;
     disableStagger: () => void;
     resetLastValue: () => void;
     cleanCachedId: () => void;

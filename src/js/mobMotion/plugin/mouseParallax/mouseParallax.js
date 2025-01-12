@@ -181,9 +181,9 @@ export class MouseParallax {
      * @type {() => void}
      */
     #getDimension() {
-        const { x, y } = getTranslateValues(this.#item);
+        const x = getTranslateValues(this.#item)?.x;
+        const y = getTranslateValues(this.#item)?.y;
         this.#item.style.transform = '';
-
         this.#height = outerHeight(this.#item);
         this.#width = outerWidth(this.#item);
         this.#offSetTop = offset(this.#item).top;
@@ -232,6 +232,7 @@ export class MouseParallax {
         this.#unsubscribeResize();
         this.#unsubscribeSpring();
         this.#unsubscribeOnComplete();
+        // @ts-ignore
         this.#spring = null;
     }
 }

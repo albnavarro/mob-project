@@ -62,17 +62,17 @@ export default class HandleSequencer {
     #labels;
 
     /**
-     * @type {import('../utils/callbacks/type.js').callbackObject<(arg0:Record<string, number>) => void>[]}
+     * @type {import('../utils/callbacks/type.js').CallbackObject<(arg0:Record<string, number>) => void>[]}
      */
     #callback;
 
     /**
-     * @type {import('../utils/callbacks/type.js').callbackObject<string>[]}
+     * @type {import('../utils/callbacks/type.js').CallbackObject<string>[]}
      */
     #callbackCache;
 
     /**
-     * @type {import('../utils/callbacks/type.js').callbackObject<(arg0:Record<string, number>) => void>[]}
+     * @type {import('../utils/callbacks/type.js').CallbackObject<(arg0:Record<string, number>) => void>[]}
      */
     #callbackOnStop;
 
@@ -122,7 +122,7 @@ export default class HandleSequencer {
     #lastPartial;
 
     /**
-     * @type {import('../utils/stagger/type.js').staggerObject}
+     * @type {import('../utils/stagger/type.js').StaggerObject}
      */
     #stagger;
 
@@ -232,10 +232,17 @@ export default class HandleSequencer {
             });
 
             if (this.#callbackCache.length > this.#callback.length) {
-                this.#callbackCache = staggerArray;
+                this.#callbackCache =
+                    /** @type{import('../utils/callbacks/type.js').CallbackObject<string>[]} */ (
+                        staggerArray
+                    );
             } else {
-                this.#callback = staggerArray;
+                this.#callback =
+                    /** @type {import('../utils/callbacks/type.js').CallbackObject<(arg0: Record<string, number>) => void>[]} */ (
+                        staggerArray
+                    );
             }
+
             this.#callbackOnStop = staggerArrayOnComplete;
         }
 
@@ -247,7 +254,7 @@ export default class HandleSequencer {
      * @param {number} obj.partial
      * @param {boolean} obj.isLastDraw
      * @param {boolean} obj.useFrame
-     * @param {import('../utils/timeline/type.js').directionType} obj.direction
+     * @param {import('../utils/timeline/type.js').directionType} [ obj.direction ]
      *
      * @example
      * ```javascript
@@ -290,7 +297,7 @@ export default class HandleSequencer {
      * @param {object} obj
      * @param {number} obj.partial
      * @param {boolean} obj.isLastDraw
-     * @param {import('../utils/timeline/type.js').directionType} obj.direction
+     * @param {import('../utils/timeline/type.js').directionType} [ obj.direction ]
      *
      */
     #onDraw({

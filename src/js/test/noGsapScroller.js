@@ -1,5 +1,5 @@
 import { mobCore } from '../mobCore';
-import { scroller, tween } from '../mobMotion';
+import { scroller } from '../mobMotion';
 import { HorizontalScroller } from '../mobMotion/plugin';
 
 const createScroller = ({ bottomScroller }) => {

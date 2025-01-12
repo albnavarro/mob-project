@@ -575,10 +575,11 @@ export const valueIsNumberAndReturnDefault = (value, label, defaultValue) => {
 
 /**
  *
- * @param {(() => void)|undefined} value
+ * @template T
+ * @param {T|undefined} value
  * @param {string} label
- * @param {() => void} defaultValue
- * @returns {() => void}
+ * @param {(() => void)|undefined} defaultValue
+ * @returns {T}
  *
  * @description
  * Check if value is Function and return default

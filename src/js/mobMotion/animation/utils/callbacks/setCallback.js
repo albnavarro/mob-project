@@ -4,7 +4,7 @@ import { mobCore } from '../../../../mobCore';
 import { callBackStore } from './callBackStore';
 
 /**
- * @type {import('./type').setCallBack}
+ * @type {import('./type').SetCallBack}
  *
  * @description
  * Add callback to Stack.
@@ -41,7 +41,7 @@ export const updateSubScribers = (currentCallback, arrayOfCallback) => {
 };
 
 /**
- * @type {import('./type').setCallBackCache}
+ * @type {import('./type').SetCallBackCache}
  */
 export const updateSubscribersCache = (
     item,

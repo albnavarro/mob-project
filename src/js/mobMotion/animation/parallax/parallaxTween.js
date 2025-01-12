@@ -33,7 +33,7 @@ export default class ParallaxTween {
     #duration;
 
     /**
-     * @type {import('../utils/stagger/type.js').staggerObject}
+     * @type {import('../utils/stagger/type.js').StaggerObject}
      */
     #stagger;
 
@@ -43,17 +43,17 @@ export default class ParallaxTween {
     #values;
 
     /**
-     * @type {import('../utils/callbacks/type.js').callbackObject<(arg0:Record<string, number>) => void>[]}
+     * @type {import('../utils/callbacks/type.js').CallbackObject<(arg0:Record<string, number>) => void>[]}
      */
     #callbackOnStop;
 
     /**
-     * @type {import('../utils/callbacks/type.js').callbackObject<(arg0:Record<string, number>) => void>[]}
+     * @type {import('../utils/callbacks/type.js').CallbackObject<(arg0:Record<string, number>) => void>[]}
      */
     #callback;
 
     /**
-     * @type{import('../utils/callbacks/type.js').callbackObject<string>[]}
+     * @type{import('../utils/callbacks/type.js').CallbackObject<string>[]}
      */
     #callbackCache;
 
@@ -151,10 +151,17 @@ export default class ParallaxTween {
             });
 
             if (this.#callbackCache.length > this.#callback.length) {
-                this.#callbackCache = staggerArray;
+                this.#callbackCache =
+                    /** @type{import('../utils/callbacks/type.js').CallbackObject<string>[]} */ (
+                        staggerArray
+                    );
             } else {
-                this.#callback = staggerArray;
+                this.#callback =
+                    /** @type {import('../utils/callbacks/type.js').CallbackObject<(arg0: Record<string, number>) => void>[]} */ (
+                        staggerArray
+                    );
             }
+
             this.#callbackOnStop = staggerArrayOnComplete;
         }
     }

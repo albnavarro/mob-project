@@ -123,7 +123,7 @@ export const slide = (() => {
      * ```
      *
      * @param {HTMLElement} target - Dom node.
-     * @returns {Promise} Promise fired on animation ends.
+     * @returns {Promise<any>} Promise fired on animation ends.
      */
     const up = async (target) => {
         // @ts-ignore
@@ -164,7 +164,7 @@ export const slide = (() => {
      * ```
      *
      * @param {HTMLElement} target - Dom node.
-     * @returns {Promise} Promise fired on animation ends.
+     * @returns {Promise<any>} Promise fired on animation ends.
      */
     const down = async (target) => {
         if (!isNode(target)) {

@@ -109,7 +109,7 @@ const getStaggerSpecial = ({
 };
 
 /**
- * @param { import('./type.js').createSequencerType & import('../utils/stagger/type.js').staggerPropiertiesObject } data
+ * @param { import('./type.js').createSequencerType & import('../utils/stagger/type.js').StaggerPropiertiesObject } data
  * @returns {import('./type.js').createStagger[]} Stagger array
  *
  * @example

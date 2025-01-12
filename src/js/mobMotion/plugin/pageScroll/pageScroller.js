@@ -24,9 +24,13 @@ let stop = () => {};
 /** @type{() => void} */
 let update = () => {};
 
+/** @type{HTMLElement|undefined} */
+let rootElementToObserve;
+
 /** @type{import('./type').PageScroller} */
 const PageScroller = ({ velocity, rootElement }) => {
     let lerp = tween.createLerp({ data: { scrollValue: window.scrollY } });
+    rootElementToObserve = rootElement;
 
     const unsubscribe = lerp.subscribe(({ scrollValue }) => {
         if (isFreezed) return;
@@ -103,12 +107,21 @@ const PageScroller = ({ velocity, rootElement }) => {
             lastScrollValue = 0;
             smoothIsActive = false;
             isFreezed = true;
-            resizeObserver.unobserve(document.querySelector('#root'));
-            resizeObserver.disconnect();
+
+            // Disconnect resizeObserver.
+            if (rootElementToObserve) {
+                resizeObserver.unobserve(rootElementToObserve);
+                resizeObserver.disconnect();
+            }
+
             lerp?.stop();
             lerp?.destroy();
+
             // @ts-ignore
             lerp = null;
+
+            // @ts-ignore
+            rootElementToObserve = null;
             unsubscribe();
             unsubscribeScroll();
             unsubscribeMouseWheel();

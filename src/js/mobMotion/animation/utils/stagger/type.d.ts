@@ -1,6 +1,6 @@
-import { callbackObject } from '../callbacks/type.js';
+import { CallbackObject } from '../callbacks/type.js';
 
-export interface staggerObject {
+export interface StaggerObject {
     /**
      * @description
      * Stagger type for createStagger
@@ -43,7 +43,7 @@ export interface staggerObject {
     };
 }
 
-export interface staggerObjectOptional {
+export interface StaggerObjectOptional {
     /**
      * @description
      * Stagger type for createStagger
@@ -86,55 +86,46 @@ export interface staggerObjectOptional {
     };
 }
 
-export interface staggerPropiertiesObject {
-    stagger: staggerObject;
+export interface StaggerPropiertiesObject {
+    stagger: StaggerObject;
 }
 
-export interface staggerDefaultIndex {
+export interface StaggerFrameIndexObject {
     index: number;
     frame: number;
 }
 
-export interface setStagger {
-    frame: number;
-    index: number;
-    item: Record<string, number>;
-}
-
-export type getStagger = (arg0: {
-    arrayDefault: callbackObject<(arg0: Record<string, number>) => void>[];
-    arrayOnStop: callbackObject<(arg0: Record<string, number>) => void>[];
-    stagger: staggerObject;
-    slowlestStagger: staggerDefaultIndex;
-    fastestStagger: staggerDefaultIndex;
+export type setStagger = <T extends any[], S extends any[]>(arg0: {
+    arrayDefault: T;
+    arrayOnStop: S;
+    stagger: StaggerObject;
+    slowlestStagger: StaggerFrameIndexObject;
+    fastestStagger: StaggerFrameIndexObject;
 }) => {
-    staggerArray: any[];
-    staggerArrayOnComplete: any[];
-    fastestStagger: staggerDefaultIndex;
-    slowlestStagger: staggerDefaultIndex;
+    staggerArray: CallbackArrayStagger<T> | [];
+    staggerArrayOnComplete: CallbackArrayStagger<S> | [];
+    fastestStagger: StaggerFrameIndexObject;
+    slowlestStagger: StaggerFrameIndexObject;
 };
 
-export type setSatgger = (arg0: {
-    arrayDefault: any[];
-    arrayOnStop: any[];
-    stagger: staggerObject;
-    slowlestStagger: staggerDefaultIndex;
-    fastestStagger: staggerDefaultIndex;
-}) => {
-    staggerArray: any[];
-    staggerArrayOnComplete: any[];
-    fastestStagger: staggerDefaultIndex;
-    slowlestStagger: staggerDefaultIndex;
+/**
+ * Map type.
+ * Merge original callBackObject with stagger props: index && frame.
+ * Set stagger return callbackObject updated
+ * ( arrayDefault | arrayOnStop | createStagger )
+ */
+type CallbackArrayStagger<Type> = {
+    [Property in keyof Type]: Type[Property] & StaggerFrameIndexObject;
 };
 
-export type shouldInizializzeStagger = (
+export type ShouldInizializzeStagger = (
     each: number,
     firstRun: boolean,
-    arrayToCompare1: callbackObject<any>[],
-    arrayToCompare2: callbackObject<any>[]
+    arrayToCompare1: CallbackObject<any>[],
+    arrayToCompare2: CallbackObject<any>[]
 ) => boolean | undefined;
 
-export type getStaggerArray = (
-    callbackCache: callbackObject<string>[],
-    callbackDefault: callbackObject<(arg0: Record<string, number>) => void>[]
-) => callbackObject<string | ((arg0: Record<string, number>) => void)>[];
+export type GetStaggerArray = <C extends any[], D extends any[]>(
+    callbackCache: C,
+    callbackDefault: D
+) => C | D;

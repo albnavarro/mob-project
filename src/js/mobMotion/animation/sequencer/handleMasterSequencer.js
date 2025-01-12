@@ -98,7 +98,7 @@ export default class HandleMasterSequencer {
     }
 
     /**
-     * @returns {Array<string>}
+     * @returns {import("./type").labelType[]}
      */
     getLabels() {
         return this.#children.flatMap((item) => item.getLabels());
