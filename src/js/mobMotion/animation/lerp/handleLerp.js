@@ -544,7 +544,7 @@ export default class HandleLerp {
     /**
      * @type {import('../../utils/type.js').GoTo<import('./type.js').lerpActions>} obj to Values
      */
-    goTo(obj, props) {
+    goTo(obj, props = {}) {
         if (this.#pauseStatus) return new Promise((resolve) => resolve);
 
         this.#useStagger = true;
@@ -555,7 +555,7 @@ export default class HandleLerp {
     /**
      * @type {import('../../utils/type.js').GoFrom<import('./type.js').lerpActions>} obj to Values
      */
-    goFrom(obj, props) {
+    goFrom(obj, props = {}) {
         if (this.#pauseStatus) return new Promise((resolve) => resolve);
 
         this.#useStagger = true;
@@ -566,7 +566,7 @@ export default class HandleLerp {
     /**
      * @type {import('../../utils/type.js').GoFromTo<import('./type.js').lerpActions>} obj to Values
      */
-    goFromTo(fromObj, toObj, props) {
+    goFromTo(fromObj, toObj, props = {}) {
         if (this.#pauseStatus) return new Promise((resolve) => resolve);
 
         this.#useStagger = true;
@@ -585,7 +585,7 @@ export default class HandleLerp {
     /**
      * @type {import('../../utils/type.js').Set<import('./type.js').lerpActions>} obj to Values
      */
-    set(obj, props) {
+    set(obj, props = {}) {
         if (this.#pauseStatus) return new Promise((resolve) => resolve);
         this.#useStagger = false;
         const data = setUtils(obj);
@@ -595,7 +595,7 @@ export default class HandleLerp {
     /**
      * @type {import('../../utils/type.js').SetImmediate<import('./type.js').lerpActions>} obj to Values
      */
-    setImmediate(obj, props) {
+    setImmediate(obj, props = {}) {
         if (this.#pauseStatus) return;
         this.#useStagger = false;
 

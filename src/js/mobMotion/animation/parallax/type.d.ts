@@ -408,7 +408,7 @@ export interface parallaxTweenValue {
     fromIsFn?: boolean;
     toFn: () => number;
     toIsFn?: boolean;
-    toValProcessed: number | (() => number);
+    toValProcessed: number;
     toValue: number;
     fromValue: number;
 }

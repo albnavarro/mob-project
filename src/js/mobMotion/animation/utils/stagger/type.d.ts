@@ -95,6 +95,14 @@ export interface StaggerFrameIndexObject {
     frame: number;
 }
 
+/**
+ * arrayDefault && arrayOnStop inside tween,lerp,spring come with index: -1, frame: -1
+ * This only for type consistency.
+ * Create stagger come without index && frame type.
+ * So T && S extend any[].
+ *
+ * The return array staggerArray && staggerArrayOnComplete has index and frame created/updated.
+ */
 export type setStagger = <T extends any[], S extends any[]>(arg0: {
     arrayDefault: T;
     arrayOnStop: S;

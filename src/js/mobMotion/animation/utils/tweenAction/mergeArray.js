@@ -1,7 +1,5 @@
 /**
- * @param {import("./type").allActionType[]} newData
- * @param {Record<'prop', any>[]} data
- * @returns {any[]}
+ * @type {import("./type").MergeTweenData}
  *
  * @description
  * Merge animation store of specific lerp/spring .. with new data from goTo etc..

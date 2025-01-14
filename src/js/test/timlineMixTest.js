@@ -79,7 +79,7 @@ export function timlineMixTest() {
             springBox1,
             { x: -200 },
             { x: 400 },
-            { configProp: { mass: 2, precision: 0.5 }, delay: 500 }
+            { configProps: { mass: 2, precision: 0.5 }, delay: 500 }
         )
         .sync({ from: springBox1, to: tweenBox1 })
         .createGroup({ waitComplete: false })
@@ -95,7 +95,7 @@ export function timlineMixTest() {
         .goTo(
             springBox1,
             { x: 0, y: 0, rotate: 0 },
-            { configProp: { precision: 0.5 } }
+            { configProps: { precision: 0.5 } }
         )
         .goTo(tweenBox2, { rotate: -180 }, { duration: 5000 })
         .closeGroup()

@@ -53,6 +53,7 @@ import {
 } from '../utils/tweenAction/getValues.js';
 import { mergeArray } from '../utils/tweenAction/mergeArray.js';
 import { springGetValuesOndraw } from './getValuesOndraw.js';
+import { springPresetConfig } from './springConfig.js';
 
 export default class HandleSpring {
     /**
@@ -179,7 +180,7 @@ export default class HandleSpring {
      * const mySpring = new HandleSpring({
      *   data: Object.<string, number>,
      *   config: String,
-     *   configProp: {
+     *   configProps: {
      *      tension: Number,
      *      mass: Number,
      *      friction: Number,
@@ -227,7 +228,7 @@ export default class HandleSpring {
         this.#stagger = getStaggerFromProps(data ?? {});
         this.#relative = relativeIsValid(data?.relative, 'spring');
         this.#configProps = springConfigIsValidAndGetNew(data?.config);
-        this.updateConfigProp(data?.configProp ?? {});
+        this.updateConfigProp(data?.configProps ?? {});
         this.#uniqueId = mobCore.getUnivoqueId();
         this.#isActive = false;
         this.#currentResolve = undefined;
@@ -593,32 +594,45 @@ export default class HandleSpring {
 
         /**
          * @description
-         * Get new config preset single values.
+         * Step 1
+         * Get news confic props ( mass, friction etc... )
+         * Get props from new config ( wobble etc.. ) or get each default prop.
          *
          * @type {import('./type.js').springPresentConfigType}
          */
         const allPresetConfig = springParams.config;
-        const newConfigPreset = springConfigIsValid(props?.config)
-            ? // @ts-ignore
-              allPresetConfig[props.config]
+        const configPreset = springConfigIsValid(props?.config)
+            ? (allPresetConfig?.[props?.config ?? 'default'] ??
+              springPresetConfig.default)
             : this.#defaultProps.configProps;
 
         /*
-         * Modify single propierties of newConfigPreset
+         * Step 2
+         * Modify previuos confic ( newConfigPreset ) single value ( mass ... )
+         * Merge single prop or {}
          */
-        const configPropsToMerge = springConfigPropIsValid(props?.configProp);
-        const newConfigProps = { ...newConfigPreset, ...configPropsToMerge };
-
-        /*
-         * Merge all
-         */
-        const newProps = {
-            ...this.#defaultProps,
-            ...props,
-            configProps: newConfigProps,
+        const configPropsToMerge = springConfigPropIsValid(props?.configProps);
+        const configProps = {
+            ...configPreset,
+            ...configPropsToMerge,
         };
 
-        const { configProps, relative } = newProps;
+        /*
+         * Current config for spring for current cycle.
+         */
+        const newProps = {
+            reverse: props?.reverse ?? this.#defaultProps.reverse,
+            relative: props?.relative ?? this.#defaultProps.relative,
+            immediate: props?.immediate ?? this.#defaultProps.immediate,
+            configProps,
+        };
+
+        const { relative } = newProps;
+
+        /**
+         * Current spring config used in current cycle.
+         * Current relative value used in current cycle.
+         */
         this.#configProps = configProps;
         this.#relative = relative;
 
@@ -628,7 +642,7 @@ export default class HandleSpring {
     /**
      * @type {import('../../utils/type.js').GoTo<import('./type.js').springActions>} obj to Values
      */
-    goTo(obj, props) {
+    goTo(obj, props = {}) {
         if (this.#pauseStatus) return new Promise((resolve) => resolve);
 
         this.#useStagger = true;
@@ -639,7 +653,7 @@ export default class HandleSpring {
     /**
      * @type {import('../../utils/type.js').GoFrom<import('./type.js').springActions>} obj to Values
      */
-    goFrom(obj, props) {
+    goFrom(obj, props = {}) {
         if (this.#pauseStatus) return new Promise((resolve) => resolve);
 
         this.#useStagger = true;
@@ -650,7 +664,7 @@ export default class HandleSpring {
     /**
      * @type {import('../../utils/type.js').GoFromTo<import('./type.js').springActions>} obj to Values
      */
-    goFromTo(fromObj, toObj, props) {
+    goFromTo(fromObj, toObj, props = {}) {
         if (this.#pauseStatus) return new Promise((resolve) => resolve);
 
         this.#useStagger = true;
@@ -666,7 +680,7 @@ export default class HandleSpring {
     /**
      * @type {import('../../utils/type.js').Set<import('./type.js').springActions>} obj to Values
      */
-    set(obj, props) {
+    set(obj, props = {}) {
         if (this.#pauseStatus) return new Promise((resolve) => resolve);
 
         this.#useStagger = false;
@@ -677,7 +691,7 @@ export default class HandleSpring {
     /**
      * @type {import('../../utils/type.js').SetImmediate<import('./type.js').springActions>} obj to Values
      */
-    setImmediate(obj, props) {
+    setImmediate(obj, props = {}) {
         if (this.#pauseStatus) return;
         this.#useStagger = false;
 
@@ -878,8 +892,8 @@ export default class HandleSpring {
      * Update config object, every || some properties
      * The change will be persistent
      */
-    updateConfigProp(configProp = {}) {
-        const configToMerge = springConfigPropIsValid(configProp);
+    updateConfigProp(configProps = {}) {
+        const configToMerge = springConfigPropIsValid(configProps);
         this.#configProps = { ...this.#configProps, ...configToMerge };
 
         this.#defaultProps = mergeDeep(this.#defaultProps, {

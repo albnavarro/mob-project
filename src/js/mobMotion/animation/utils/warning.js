@@ -181,7 +181,7 @@ export const springPresetWarning = (preset) => {
  * @returns void
  */
 export const springConfigPropWarning = () => {
-    console.warn(`Spring configProp: all prop must be a positive Number`);
+    console.warn(`Spring configProps: all prop must be a positive Number`);
 };
 
 /**

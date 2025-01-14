@@ -605,7 +605,7 @@ export default class HandleTween {
     /**
      * @type {import('../../utils/type.js').GoTo<import('./type.js').tweenAction>} obj to Values
      */
-    goTo(obj, props) {
+    goTo(obj, props = {}) {
         if (this.#pauseStatus || this.#comeFromResume) this.stop();
         this.#useStagger = true;
         const data = goToUtils(obj);
@@ -615,7 +615,7 @@ export default class HandleTween {
     /**
      * @type {import('../../utils/type.js').GoFrom<import('./type.js').tweenAction>} obj to Values
      */
-    goFrom(obj, props) {
+    goFrom(obj, props = {}) {
         if (this.#pauseStatus || this.#comeFromResume) this.stop();
         this.#useStagger = true;
         const data = goFromUtils(obj);
@@ -625,7 +625,7 @@ export default class HandleTween {
     /**
      * @type {import('../../utils/type.js').GoFromTo<import('./type.js').tweenAction>} obj to Values
      */
-    goFromTo(fromObj, toObj, props) {
+    goFromTo(fromObj, toObj, props = {}) {
         if (this.#pauseStatus || this.#comeFromResume) this.stop();
         this.#useStagger = true;
 
@@ -641,7 +641,7 @@ export default class HandleTween {
     /**
      * @type {import('../../utils/type.js').Set<import('./type.js').tweenAction>} obj to Values
      */
-    set(obj, props) {
+    set(obj, props = {}) {
         if (this.#pauseStatus || this.#comeFromResume) this.stop();
         this.#useStagger = false;
         const data = setUtils(obj);
@@ -654,7 +654,7 @@ export default class HandleTween {
     /**
      * @type {import('../../utils/type.js').SetImmediate<import('./type.js').tweenAction>} obj to Values
      */
-    setImmediate(obj, props) {
+    setImmediate(obj, props = {}) {
         if (this.#pauseStatus || this.#comeFromResume) this.stop();
         this.#useStagger = false;
 

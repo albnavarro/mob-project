@@ -8,20 +8,12 @@ export interface springProps {
     velocity: number;
 }
 
-export interface springPropsOptional {
-    friction?: number;
-    mass?: number;
-    precision?: number;
-    tension?: number;
-    velocity?: number;
-}
-
 export interface springPresentConfigType {
-    gentle?: springProps;
-    wobbly?: springProps;
-    bounce?: springProps;
-    scroller?: springProps;
-    default?: springProps;
+    gentle: springProps;
+    wobbly: springProps;
+    bounce: springProps;
+    scroller: springProps;
+    default: springProps;
     [key: string]: springProps;
 }
 
@@ -37,7 +29,7 @@ export interface springTweenProps {
     relative?: boolean;
     stagger?: StaggerObjectOptional;
     config?: springChoiceConfig;
-    configProp?: springPropsOptional;
+    configProps?: Partial<springProps>;
 }
 
 export interface springActions {
@@ -45,7 +37,7 @@ export interface springActions {
     relative?: boolean;
     immediate?: boolean;
     config?: springChoiceConfig;
-    configProp?: springPropsOptional;
+    configProps?: Partial<springProps>;
 }
 
 export interface springDefault {
@@ -83,7 +75,7 @@ export type springGetValueNative = () => Record<
 >;
 export type springGetType = () => string;
 export type springGetId = () => string;
-export type springUdateConfigProp = (arg0: springPropsOptional) => void;
+export type springUdateConfigProp = (arg0: Partial<springProps>) => void;
 export type springUdateConfig = (arg0: springChoiceConfig) => void;
 export type springSubscribe = (cb: (arg0: any) => void) => () => void;
 export type springSubscribeCache = (

@@ -85,8 +85,8 @@ export interface tweenInitialData {
 }
 
 export interface tweenStoreData extends tweenInitialData {
-    toValueOnPause: number | (() => number);
-    toValProcessed: number | (() => number);
+    toValueOnPause: number;
+    toValProcessed: number;
 }
 
 export type tweenMergeProps = (props: tweenAction) => tweenDefault;

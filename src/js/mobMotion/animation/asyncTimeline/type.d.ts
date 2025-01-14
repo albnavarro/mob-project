@@ -43,7 +43,7 @@ export interface asyncTimelineTypeSpecialProps {
     ease?: easeTypes;
     duration?: number;
     config?: springChoiceConfig;
-    configProp?: springProps;
+    configProps?: springProps;
     precision?: number;
     velocity?: number;
     reverse?: boolean;

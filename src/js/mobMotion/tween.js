@@ -231,7 +231,7 @@ export const tween = {
      * const mySpring = tween.createSpring({
      *   data: Object.<string, number>,
      *   config: [ String ],
-     *   configProp: {
+     *   configProps: {
      *      tension: [ Number ],
      *      mass: [ Number ],
      *      friction: [ Number ],

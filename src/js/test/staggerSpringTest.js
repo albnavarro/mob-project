@@ -38,13 +38,13 @@ export function staggerSpringTest() {
     // DEFINE TIMELINE
     const timeline1 = timeline
         .createAsyncTimeline({ repeat: -1, yoyo: true, autoSet: false })
-        .goTo(myTween, { x: 500 }, { configProp: { precision: 1 } })
-        .goTo(myTween, { y: 500 }, { configProp: { precision: 1 } })
+        .goTo(myTween, { x: 500 }, { configProps: { precision: 1 } })
+        .goTo(myTween, { y: 500 }, { configProps: { precision: 1 } })
         .createGroup({ waitComplete: false })
-        .goTo(myTween, { x: 0 }, { configProp: { precision: 1 } })
+        .goTo(myTween, { x: 0 }, { configProps: { precision: 1 } })
         .goTo(myStagger, { x: 500 })
         .closeGroup()
-        .goTo(myTween, { y: 0 }, { configProp: { precision: 1 } });
+        .goTo(myTween, { y: 0 }, { configProps: { precision: 1 } });
 
     // LISTNER
     btnStart.addEventListener('click', () => {

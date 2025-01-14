@@ -85,7 +85,7 @@ export function timlineReverseImmediateTest() {
             tweenBox1,
             { x: -200 },
             { x: 400 },
-            { configProp: { mass: 2, precision: 0.5 }, delay: 500 }
+            { configProps: { mass: 2, precision: 0.5 }, delay: 500 }
         )
         .createGroup({ waitComplete: false })
         .goTo(tweenBox1, { y: 400 }, { duration: () => durationTest })
@@ -99,7 +99,7 @@ export function timlineReverseImmediateTest() {
         .goTo(
             tweenBox1,
             { x: 0, y: 0, rotate: 0 },
-            { configProp: { precision: 0.5 } }
+            { configProps: { precision: 0.5 } }
         )
         .goTo(tweenBox2, { rotate: -180 }, { duration: 5000 })
         .closeGroup()

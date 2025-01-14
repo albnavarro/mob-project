@@ -15,7 +15,7 @@ export function springTest() {
     // DEFINE SPRING
     const mySpring = tween.createSpring({
         data: { x: 0, y: 0, rotate: 0 },
-        configProp: { mass: 0.2 },
+        configProps: { mass: 0.2 },
         config: 'wobbly',
     });
 
@@ -34,28 +34,28 @@ export function springTest() {
     const timeline1 = timeline
         .createAsyncTimeline({ repeat: 2, yoyo: true, freeMode: true })
         .set(mySpring, { x: 0, y: 0, rotate: 0 })
-        .goTo(mySpring, { x: -200 }, { configProp: { precision: 0.5 } })
+        .goTo(mySpring, { x: -200 }, { configProps: { precision: 0.5 } })
         .goFromTo(
             mySpring,
             { x: -200 },
             { x: 400 },
-            { configProp: { mass: 1, precision: 0.5 } }
+            { configProps: { mass: 1, precision: 0.5 } }
         )
         .goTo(
             mySpring,
             { y: 400 },
-            { config: 'bounce', configProp: { mass: 2, precision: 0.5 } }
+            { config: 'bounce', configProps: { mass: 2, precision: 0.5 } }
         )
         .label({ name: 'label1' })
         .goTo(
             mySpring,
             { x: -100, rotate: 90 },
-            { configProp: { precision: 0.5 } }
+            { configProps: { precision: 0.5 } }
         )
         .goTo(
             mySpring,
             { x: 0, y: 0, rotate: 0 },
-            { config: 'gentle', configProp: { precision: 0.5 } }
+            { config: 'gentle', configProps: { precision: 0.5 } }
         );
 
     // LISTNER

@@ -918,7 +918,11 @@ export default class ParallaxClass {
 
         this.#motionParameters =
             this.#easeType === parallaxConstant.EASE_SPRING
-                ? { configProp: { precision: parallaxConstant.EASE_PRECISION } }
+                ? {
+                      configProps: {
+                          precision: parallaxConstant.EASE_PRECISION,
+                      },
+                  }
                 : { precision: parallaxConstant.EASE_PRECISION };
 
         this.#motion =
