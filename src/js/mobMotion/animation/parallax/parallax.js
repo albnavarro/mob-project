@@ -1117,7 +1117,7 @@ export default class ParallaxClass {
     /**
      * @description
      *
-     * @param {string} breakpoint
+     * @param {import('../../utils/type.js').mqValues} breakpoint
      */
     setBreakPoint(breakpoint) {
         this.#breakpoint = breakpointIsValid(
@@ -1130,7 +1130,7 @@ export default class ParallaxClass {
     /**
      * @description
      *
-     * @param {string} queryType
+     * @param {import('../../utils/type.js').mqAction} queryType
      */
     setQueryType(queryType) {
         this.#queryType = breakpointTypeIsValid(

@@ -21,7 +21,7 @@ import {
 import { mergeDeep } from './utils/mergeDeep.js';
 
 /**
- * @returns {import('./animation/utils/setUp/type.js').setUpType}
+ * @type {import('./animation/utils/setUp/type.js').SetUpGetData}
  */
 function getData() {
     return {
@@ -71,10 +71,6 @@ function getData() {
     };
 }
 
-/**
- * @typedef {('deferredNextTick'|'throttle'|'usePassive'|'mq'|'defaultMq'|'sequencer'|'scrollTrigger'|'parallax'|'parallaxTween'|'tween'|'spring'|'lerp')} handleSetUpGetType
- */
-
 export const handleSetUp = (() => {
     let data = getData();
 
@@ -82,7 +78,7 @@ export const handleSetUp = (() => {
      * @description
      * - Here it is possible to modify the default values of the various modules of the library
      *
-     * @param {import('./animation/utils/setUp/type.js').setUpType} obj
+     * @type {import('./animation/utils/setUp/type.js').SetSetUp}
      *
      *
      * @example
@@ -201,8 +197,7 @@ export const handleSetUp = (() => {
      * @description
      * Returns the value of a specific property
      *
-     * @param {handleSetUpGetType} prop
-     * @returns {any}
+     * @type {import('./animation/utils/setUp/type.js').GetSetUp}
      *
      * @example
      * ```javascript
@@ -210,11 +205,11 @@ export const handleSetUp = (() => {
      * ```
      */
     const get = (prop) => {
-        if (prop in data) {
-            return data[prop];
-        } else {
+        if (!(prop in data)) {
             console.warn(`handleSetUp: ${prop} is not a setup propierties`);
         }
+
+        return data[prop];
     };
 
     /**

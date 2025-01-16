@@ -1,4 +1,4 @@
-import { StaggerObjectOptional } from '../utils/stagger/type';
+import { StaggerObject } from '../utils/stagger/type';
 
 export interface springProps {
     friction: number;
@@ -27,7 +27,7 @@ export type springChoiceConfig =
 export interface springTweenProps {
     data: Record<string, number>;
     relative?: boolean;
-    stagger?: StaggerObjectOptional;
+    stagger?: Partial<StaggerObject>;
     config?: springChoiceConfig;
     configProps?: Partial<springProps>;
 }

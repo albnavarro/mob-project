@@ -1,10 +1,10 @@
 import { tweenStopProps } from '../tween/type';
-import { StaggerObjectOptional } from '../utils/stagger/type';
+import { StaggerObject } from '../utils/stagger/type';
 
 export interface lerpTweenProps {
     data: Record<string, number>;
     relative?: boolean;
-    stagger?: StaggerObjectOptional;
+    stagger?: Partial<StaggerObject>;
     precision?: number;
     velocity?: number;
 }

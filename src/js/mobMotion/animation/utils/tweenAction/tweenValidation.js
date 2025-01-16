@@ -128,7 +128,9 @@ export const durationIsValid = (duration) => {
     const isValid = mobCore.checkType(Number, duration);
     if (!isValid && duration) durationWarining(duration);
 
-    return isValid ? duration : handleSetUp.get('sequencer').duration;
+    return isValid
+        ? /** @type{number} */ (duration)
+        : handleSetUp.get('sequencer').duration;
 };
 
 /**
@@ -148,7 +150,7 @@ export const repeatIsValid = (repeat) => {
 
 /**
  *
- * @param {string|undefined} ease
+ * @param {import('../../tween/type').easeTypes|undefined} ease
  * @returns {import('../../tween/type').easeTypes}
  *
  * @description
@@ -349,7 +351,9 @@ export const durationTweenIsValid = (duration) => {
     const isValid = mobCore.checkType(Number, duration);
     if (!isValid && duration) durationWarining(duration);
 
-    return isValid ? duration : handleSetUp.get('tween').duration;
+    return isValid
+        ? /** @type{number} */ (duration)
+        : handleSetUp.get('tween').duration;
 };
 
 /**
@@ -365,7 +369,9 @@ export const relativeIsValid = (val, tweenType) => {
     const isValid = mobCore.checkType(Boolean, val);
     if (!isValid && val) relativeWarining(val, tweenType);
 
-    return isValid ? val : handleSetUp.get(tweenType).relative;
+    return isValid
+        ? /** @type {boolean} */ (val)
+        : handleSetUp.get(tweenType).relative;
 };
 
 /**
@@ -387,7 +393,7 @@ export const easeTweenIsValidGetFunction = (ease) => {
 
 /**
  *
- * @param {string|undefined} ease
+ * @param {import('../../tween/type').easeTypes|undefined} ease
  * @returns {import('../../tween/type').easeTypes}
  *
  * @description
@@ -605,7 +611,9 @@ export const lerpVelocityIsValid = (value) => {
     const isValid = mobCore.checkType(Number, value) && value > 0 && value <= 1;
     if (!isValid && value) lerpVelocityWarining();
 
-    return isValid ? value : handleSetUp.get('lerp').velocity;
+    return isValid
+        ? /** @type{number} */ (value)
+        : handleSetUp.get('lerp').velocity;
 };
 
 /**
@@ -620,7 +628,9 @@ export const lerpPrecisionIsValid = (value) => {
     const isValid = mobCore.checkType(Number, value);
     if (!isValid && value) lerpPrecisionWarining();
 
-    return isValid ? value : handleSetUp.get('lerp').precision;
+    return isValid
+        ? /** @type{number} */ (value)
+        : handleSetUp.get('lerp').precision;
 };
 
 /**
@@ -1031,7 +1041,7 @@ export const parallaxRangeIsValid = (value, type) => {
 
 /**
  *
- * @param {string|undefined} mq
+ * @param {import('../../../utils/type').mqValues|undefined} mq
  * @param {string} label
  * @param {string} component
  * @returns {import('../../../utils/type').mqValues}
@@ -1054,7 +1064,7 @@ export const breakpointIsValid = (mq, label, component) => {
 
 /**
  *
- * @param {string|undefined} type
+ * @param {import('../../../utils/type').mqAction|undefined} type
  * @param {string} label
  * @param {string} component
  * @returns {import('../../../utils/type').mqAction}
@@ -1216,7 +1226,7 @@ export const genericEaseTypeIsValid = (value, component) => {
 
 /**
  *
- * @param {string|undefined} config
+ * @param {import('../../spring/type').springChoiceConfig|undefined} config
  * @param {string} type
  * @returns {import('../../spring/type').springChoiceConfig}
  *
@@ -1261,7 +1271,7 @@ export const parallaxLerpConfigIsValid = (value, type) => {
             ? handleSetUp.get('parallax').lerpConfig
             : handleSetUp.get('scrollTrigger').lerpConfig;
 
-    return isValid ? value : defaultConfig;
+    return isValid ? /** @type{number} */ (value) : defaultConfig;
 };
 
 /**

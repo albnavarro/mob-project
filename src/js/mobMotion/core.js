@@ -9,7 +9,7 @@ export const motionCore = {
      * @description
      * - Here it is possible to modify the default values of the various modules of the library
      *
-     * @param {import('./animation/utils/setUp/type.js').setUpType} props
+     * @type {import('./animation/utils/setUp/type.js').SetSetUp} props
      *
      *
      * @example
@@ -118,8 +118,7 @@ export const motionCore = {
      * @description
      * Returns the value of a specific property
      *
-     * @param {import('./setup.js').handleSetUpGetType} prop
-     * @returns {Object}
+     * @type {import('./animation/utils/setUp/type.js').GetSetUp} prop
      *
      * @example
      * ```javascript

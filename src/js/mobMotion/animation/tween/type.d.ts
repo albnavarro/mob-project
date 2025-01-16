@@ -1,4 +1,4 @@
-import { StaggerObjectOptional } from '../utils/stagger/type';
+import { StaggerObject } from '../utils/stagger/type';
 
 export type easeTypes =
     | 'easeLinear'
@@ -37,7 +37,7 @@ export interface tweenProps {
     data: Record<string, number>;
     duration?: number;
     relative?: boolean;
-    stagger?: StaggerObjectOptional;
+    stagger?: Partial<StaggerObject>;
     ease?: easeTypes;
 }
 
