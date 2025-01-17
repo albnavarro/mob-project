@@ -1425,23 +1425,26 @@ export default class ParallaxClass {
             this.#offset =
                 this.#scroller === globalThis
                     ? Math.trunc(offset(el).top)
-                    : // @ts-ignore
-                      Math.trunc(offset(el).top) - offset(this.#scroller).top;
+                    : Math.trunc(offset(el).top) -
+                      offset(/** @type{HTMLElement} */ (this.#scroller)).top;
         } else {
             this.#offset =
                 this.#scroller === globalThis
                     ? Math.trunc(offset(el).left)
-                    : // @ts-ignore
-                      Math.trunc(offset(el).left) - offset(this.#scroller).left;
+                    : Math.trunc(offset(el).left) -
+                      offset(/** @type{HTMLElement} */ (this.#scroller)).left;
         }
 
         if (this.#screen && this.#screen !== globalThis) {
             this.#offset -=
                 this.#direction === parallaxConstant.DIRECTION_VERTICAL
-                    ? // @ts-ignore
-                      Math.trunc(offset(this.#screen).top)
-                    : // @ts-ignore
-                      Math.trunc(position(this.#screen).left);
+                    ? Math.trunc(
+                          offset(/** @type{HTMLElement} */ (this.#screen)).top
+                      )
+                    : Math.trunc(
+                          position(/** @type{HTMLElement} */ (this.#screen))
+                              .left
+                      );
         }
 
         if (this.#trigger && (x !== 0 || y !== 0 || z !== 0)) {
@@ -1460,10 +1463,12 @@ export default class ParallaxClass {
          */
         this.#screenPosition =
             this.#direction === parallaxConstant.DIRECTION_VERTICAL
-                ? // @ts-ignore
-                  Number.parseInt(offset(this.#screen).top)
-                : // @ts-ignore
-                  Number.parseInt(position(this.#screen).left);
+                ? Math.trunc(
+                      offset(/** @type{HTMLElement} */ (this.#screen)).top
+                  )
+                : Math.trunc(
+                      position(/** @type{HTMLElement} */ (this.#screen)).left
+                  );
     }
 
     /**
@@ -1508,10 +1513,8 @@ export default class ParallaxClass {
         } else {
             this.#scrollerScroll =
                 this.#direction === parallaxConstant.DIRECTION_VERTICAL
-                    ? // @ts-ignore
-                      -offset(this.#scroller).top
-                    : // @ts-ignore
-                      -offset(this.#scroller).left;
+                    ? -offset(/** @type{HTMLElement} */ (this.#scroller)).top
+                    : -offset(/** @type{HTMLElement} */ (this.#scroller)).left;
         }
     }
 

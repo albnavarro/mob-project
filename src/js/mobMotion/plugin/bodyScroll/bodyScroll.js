@@ -112,7 +112,6 @@ export const bodyScroll = (() => {
                 return 0;
             }
 
-            // @ts-ignore
             return isNode(target)
                 ? offset(/** @type{HTMLElement} */ (target)).top
                 : /** @type{number} */ (target);
