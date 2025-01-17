@@ -761,7 +761,7 @@ export const timelineSetTweenLabelIsValid = (label) => {
 
 /**
  *
- * @param {(string|HTMLElement|Window|undefined)} element
+ * @param {(string|HTMLElement|globalThis|undefined)} element
  * @param {(boolean)} returnWindow
  * @returns {HTMLElement}
  *
@@ -778,8 +778,7 @@ export const domNodeIsValidAndReturnElOrWin = (
 
     // @ts-ignore
     return returnWindow
-        ? // eslint-disable-next-line unicorn/prefer-global-this
-          (realEl ?? window)
+        ? (realEl ?? globalThis)
         : (realEl ?? document.createElement('div'));
 };
 

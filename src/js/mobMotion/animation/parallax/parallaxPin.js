@@ -79,7 +79,7 @@ export class ParallaxPin {
 
     /**
      * @description
-     * @type {Window & globalThis|HTMLElement}
+     * @type {globalThis|HTMLElement}
      */
     #screen;
 
@@ -291,8 +291,7 @@ export class ParallaxPin {
         this.#unsubscribeSpring = () => {};
         this.#firstTime = true;
         this.#marker = undefined;
-        // eslint-disable-next-line unicorn/prefer-global-this
-        this.#screen = window;
+        this.#screen = globalThis;
         this.#collisionStyleProp = 'left';
         this.#anticipatePinOnLoad = true;
         this.#shoulTranspond = false;
@@ -387,8 +386,7 @@ export class ParallaxPin {
         this.#unsubscribeScrollStart = mobCore.useScrollStart(() => {
             if (!this.#isInizialized) return;
 
-            // eslint-disable-next-line unicorn/prefer-global-this
-            if (this.#screen !== window && this.#isInner && this.#pin) {
+            if (this.#screen !== globalThis && this.#isInner && this.#pin) {
                 mobCore.useFrame(() => {
                     if (this.#pin)
                         this.#pin.style.transition = `transform .85s cubic-bezier(0, 0.68, 0.45, 1.1)`;
@@ -400,8 +398,7 @@ export class ParallaxPin {
             if (!this.#isInizialized) return;
 
             if (
-                // eslint-disable-next-line unicorn/prefer-global-this
-                this.#screen !== window &&
+                this.#screen !== globalThis &&
                 this.#screen !== document.documentElement
             ) {
                 if (this.#direction === parallaxConstant.DIRECTION_VERTICAL) {
@@ -549,8 +546,7 @@ export class ParallaxPin {
     #addStyleFromPinToWrapper() {
         if (!this.#item) return;
 
-        // eslint-disable-next-line unicorn/prefer-global-this
-        const compStyles = window.getComputedStyle(this.#item);
+        const compStyles = globalThis.getComputedStyle(this.#item);
         const style = this.#itemRequireStyleToWrapper.reduce((p, c) => {
             return { ...p, [c]: compStyles.getPropertyValue(c) };
         }, {});
@@ -652,8 +648,7 @@ export class ParallaxPin {
         /**
          * Update start position when use custom screen ad scroll outside on window
          */
-        // eslint-disable-next-line unicorn/prefer-global-this
-        if (this.#screen !== window) {
+        if (this.#screen !== globalThis) {
             this.#start -=
                 this.#direction === parallaxConstant.DIRECTION_VERTICAL
                     ? // @ts-ignore
@@ -839,8 +834,7 @@ export class ParallaxPin {
     #addPinStyleFromItem() {
         if (!this.#item) return {};
 
-        // eslint-disable-next-line unicorn/prefer-global-this
-        const compStyles = window.getComputedStyle(this.#item);
+        const compStyles = globalThis.getComputedStyle(this.#item);
         return this.#itemRequireStyleToPin.reduce((p, c) => {
             return { ...p, [c]: compStyles.getPropertyValue(c) };
         }, {});
@@ -852,8 +846,7 @@ export class ParallaxPin {
     #addStyleToItem() {
         if (!this.#item) return {};
 
-        // eslint-disable-next-line unicorn/prefer-global-this
-        const compStyles = window.getComputedStyle(this.#item);
+        const compStyles = globalThis.getComputedStyle(this.#item);
         return this.#itemRequireStyleWhenTraspond.reduce((p, c) => {
             return { ...p, [c]: compStyles.getPropertyValue(c) };
         }, {});

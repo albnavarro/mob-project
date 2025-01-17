@@ -402,13 +402,13 @@ export default class ParallaxClass {
 
     /**
      * @description
-     * @type {HTMLElement|Window|null}
+     * @type {HTMLElement|globalThis|null}
      */
     #scroller;
 
     /**
      * @description
-     * @type {HTMLElement|Window|null}
+     * @type {HTMLElement|globalThis|null}
      */
     #screen;
 
@@ -990,8 +990,7 @@ export default class ParallaxClass {
                 });
             });
 
-            // eslint-disable-next-line unicorn/prefer-global-this
-            if (this.#scroller === window) {
+            if (this.#scroller === globalThis) {
                 this.#unsubscribeScroll = getScrollFunction({
                     pin: this.#pin,
                     ease: this.#ease,
@@ -1007,8 +1006,7 @@ export default class ParallaxClass {
              */
             this.#smoothParallaxJs();
         } else {
-            // eslint-disable-next-line unicorn/prefer-global-this
-            if (this.#scroller === window) {
+            if (this.#scroller === globalThis) {
                 this.#unsubscribeScroll = getScrollFunction({
                     pin: this.#pin,
                     ease: this.#ease,
@@ -1040,8 +1038,7 @@ export default class ParallaxClass {
         /**
          * Initialize marker
          */
-        // eslint-disable-next-line unicorn/prefer-global-this
-        if (this.#scroller !== window && this.#marker) {
+        if (this.#scroller !== globalThis && this.#marker) {
             this.#unsubscribeMarker = mobCore.useScroll(() => {
                 // Refresh marker
                 this.#calcFixedLimit();
@@ -1090,7 +1087,7 @@ export default class ParallaxClass {
     /**
      * @description
      *
-     * @param {HTMLElement|Window} scroller
+     * @param {HTMLElement|globalThis} scroller
      */
     setScroller(scroller) {
         this.#scroller = domNodeIsValidAndReturnElOrWin(scroller, true);
@@ -1099,7 +1096,7 @@ export default class ParallaxClass {
     /**
      * @description
      *
-     * @param {HTMLElement|Window} screen
+     * @param {HTMLElement|globalThis} screen
      */
     setScreen(screen) {
         this.#screen = domNodeIsValidAndReturnElOrWin(screen, true);
@@ -1426,22 +1423,19 @@ export default class ParallaxClass {
 
         if (this.#direction === parallaxConstant.DIRECTION_VERTICAL) {
             this.#offset =
-                // eslint-disable-next-line unicorn/prefer-global-this
-                this.#scroller === window
+                this.#scroller === globalThis
                     ? Math.trunc(offset(el).top)
                     : // @ts-ignore
                       Math.trunc(offset(el).top) - offset(this.#scroller).top;
         } else {
             this.#offset =
-                // eslint-disable-next-line unicorn/prefer-global-this
-                this.#scroller === window
+                this.#scroller === globalThis
                     ? Math.trunc(offset(el).left)
                     : // @ts-ignore
                       Math.trunc(offset(el).left) - offset(this.#scroller).left;
         }
 
-        // eslint-disable-next-line unicorn/prefer-global-this
-        if (this.#screen && this.#screen !== window) {
+        if (this.#screen && this.#screen !== globalThis) {
             this.#offset -=
                 this.#direction === parallaxConstant.DIRECTION_VERTICAL
                     ? // @ts-ignore
@@ -1459,8 +1453,7 @@ export default class ParallaxClass {
      *
      */
     #calcScreenPosition() {
-        // eslint-disable-next-line unicorn/prefer-global-this
-        if (this.#screen === window || !this.#screen) return;
+        if (this.#screen === globalThis || !this.#screen) return;
 
         /**
          * @ts-ignore all element is not window ( check the if statement ).
@@ -1507,8 +1500,7 @@ export default class ParallaxClass {
     #getScrollerOffset() {
         if (!this.#scroller) return;
 
-        // eslint-disable-next-line unicorn/prefer-global-this
-        if (this.#scroller === window) {
+        if (this.#scroller === globalThis) {
             this.#scrollerScroll =
                 this.#direction === parallaxConstant.DIRECTION_VERTICAL
                     ? this.#scroller.scrollY
@@ -1535,8 +1527,7 @@ export default class ParallaxClass {
         /**
          * @ts-ignore all element is not window ( check the if statement ).
          */
-        // eslint-disable-next-line unicorn/prefer-global-this
-        if (this.#screen === window) {
+        if (this.#screen === globalThis) {
             this.#scrollerHeight =
                 this.#direction === parallaxConstant.DIRECTION_VERTICAL
                     ? window.innerHeight
@@ -1682,8 +1673,7 @@ export default class ParallaxClass {
      */
     #getScrollValueOnMove(value) {
         if (value === undefined) return;
-        // eslint-disable-next-line unicorn/prefer-global-this
-        if (this.#screen !== window) return value + this.#screenPosition;
+        if (this.#screen !== globalThis) return value + this.#screenPosition;
 
         return value;
     }

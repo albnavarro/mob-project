@@ -51,13 +51,12 @@ const getMarker = ({ startMarker, endMarker, label }) => {
 
 /**
  * @param {object} obj
- * @param {HTMLElement|Window|null} obj.screen
+ * @param {HTMLElement|globalThis|null} obj.screen
  *
  * @returns {{top:number,right:number,bottom:number,left:number}}
  */
 const getPosition = ({ screen }) => {
-    // eslint-disable-next-line unicorn/prefer-global-this
-    if (screen === window) {
+    if (screen === globalThis) {
         return {
             top: 0,
             right: 0,
@@ -208,7 +207,7 @@ const getEndStyle = ({
  * @param {Element|undefined} obj.endMarker
  * @param {number} obj.startPoint
  * @param {number} obj.endPoint
- * @param {HTMLElement|Window|null} obj.screen
+ * @param {HTMLElement|globalThis|null} obj.screen
  * @param {string} obj.direction
  * @param {boolean} obj.invertSide
  * @param {string} obj.label

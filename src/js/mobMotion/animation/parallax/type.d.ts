@@ -44,14 +44,14 @@ export interface parallaxCommonType {
      * The scrollable node in which the target is contained.
      * The default is window.
      */
-    scroller?: string | HTMLElement | Window;
+    scroller?: string | HTMLElement | globalThis;
 
     /**
      * @description
      * A node that contains the scrollable element.
      * The default is window.
      */
-    screen?: string | HTMLElement | Window;
+    screen?: string | HTMLElement | globalThis;
 
     /**
      * @description
