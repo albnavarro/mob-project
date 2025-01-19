@@ -102,13 +102,14 @@ export const defaultCallbackOnComplete = ({
     /**
      * Fire callback with default stagger.
      */
-    callback.forEach(({ cb, frame }, /** @type {number} */ index) => {
+    callback.forEach(({ cb, frame }, index) => {
         mobCore.useFrameIndex(() => {
             if (stagger.waitComplete) {
                 if (index === slowlestStagger.index) {
                     cb(callBackObject);
                     onComplete();
                 }
+
                 return;
             }
 
@@ -122,7 +123,7 @@ export const defaultCallbackOnComplete = ({
     /**
      * Fire callback with cache stagger.
      */
-    callbackCache.forEach(({ cb, frame }, /** @type {number} */ index) => {
+    callbackCache.forEach(({ cb, frame }, index) => {
         mobCore.useFrameIndex(() => {
             if (stagger.waitComplete) {
                 if (index === slowlestStagger.index) {
@@ -132,6 +133,7 @@ export const defaultCallbackOnComplete = ({
                     });
                     onComplete();
                 }
+
                 return;
             }
 

@@ -43,17 +43,17 @@ export default class ParallaxTween {
     #values;
 
     /**
-     * @type {import('../utils/callbacks/type.js').CallbackObject<(arg0:Record<string, number>) => void>[]}
+     * @type {import('../utils/callbacks/type.js').CallbackDefault}
      */
     #callbackOnStop;
 
     /**
-     * @type {import('../utils/callbacks/type.js').CallbackObject<(arg0:Record<string, number>) => void>[]}
+     * @type {import('../utils/callbacks/type.js').CallbackDefault}
      */
     #callback;
 
     /**
-     * @type{import('../utils/callbacks/type.js').CallbackObject<string>[]}
+     * @type{import('../utils/callbacks/type.js').CallbackCache}
      */
     #callbackCache;
 
@@ -152,12 +152,12 @@ export default class ParallaxTween {
 
             if (this.#callbackCache.length > this.#callback.length) {
                 this.#callbackCache =
-                    /** @type{import('../utils/callbacks/type.js').CallbackObject<string>[]} */ (
+                    /** @type{import('../utils/callbacks/type.js').CallbackCache} */ (
                         staggerArray
                     );
             } else {
                 this.#callback =
-                    /** @type {import('../utils/callbacks/type.js').CallbackObject<(arg0: Record<string, number>) => void>[]} */ (
+                    /** @type {import('../utils/callbacks/type.js').CallbackDefault} */ (
                         staggerArray
                     );
             }

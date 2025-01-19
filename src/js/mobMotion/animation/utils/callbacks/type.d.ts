@@ -7,25 +7,27 @@ export interface CallbackObject<T> {
     frame: number;
 }
 
+export type CallbackDefault = CallbackObject<
+    (arg0: Record<string, number>) => void
+>[];
+
+export type CallbackCache = CallbackObject<string>[];
+
 export interface SetCallbackReturnObject {
-    arrayOfCallbackUpdated: CallbackObject<
-        (arg0: Record<string, number>) => void
-    >[];
-    unsubscribeCb: (
-        arg0: CallbackObject<(arg0: Record<string, number>) => void>[]
-    ) => CallbackObject<(arg0: Record<string, number>) => void>[];
+    arrayOfCallbackUpdated: CallbackDefault;
+    unsubscribeCb: (arg0: CallbackDefault) => CallbackDefault;
 }
 
 export interface SetCallbackCacheReturnObject {
-    arrayOfCallbackUpdated: CallbackObject<string>[];
+    arrayOfCallbackUpdated: CallbackCache;
     unsubscribeCache: (() => void)[];
-    unsubscribeCb: (arg0: CallbackObject<string>[]) => CallbackObject<string>[];
+    unsubscribeCb: (arg0: CallbackCache) => CallbackCache;
 }
 
 export type DefaultCallback = (arg0: {
     stagger: StaggerObject;
-    callback: CallbackObject<(arg0: Record<string, number>) => void>[];
-    callbackCache: CallbackObject<string>[];
+    callback: CallbackDefault;
+    callbackCache: CallbackCache;
     callBackObject: Record<string, number>;
     useStagger: boolean;
 }) => void;
@@ -33,11 +35,9 @@ export type DefaultCallback = (arg0: {
 export type DefaultCallbackOnComplete = (arg0: {
     onComplete: () => void;
     stagger: StaggerObject;
-    callback: CallbackObject<(arg0: Record<string, number>) => void>[];
-    callbackCache: CallbackObject<string>[];
-    callbackOnComplete: CallbackObject<
-        (arg0: Record<string, number>) => void
-    >[];
+    callback: CallbackDefault;
+    callbackCache: CallbackCache;
+    callbackOnComplete: CallbackDefault;
     callBackObject: Record<string, number>;
     slowlestStagger: StaggerFrameIndexObject;
     fastestStagger: StaggerFrameIndexObject;
@@ -49,19 +49,19 @@ export type SyncCallback = (arg0: {
     useStagger: boolean;
     isLastDraw: boolean;
     callBackObject: Record<string, number>;
-    callback: CallbackObject<(arg0: Record<string, number>) => void>[];
-    callbackCache: CallbackObject<string>[];
-    callbackOnStop: CallbackObject<(arg0: Record<string, number>) => void>[];
+    callback: CallbackDefault;
+    callbackCache: CallbackCache;
+    callbackOnStop: CallbackDefault;
 }) => void;
 
 export type SetCallBack = (
     currentCallback: (arg0: any) => void,
-    arrayOfCallback: CallbackObject<(arg0: Record<string, number>) => void>[]
+    arrayOfCallback: CallbackDefault
 ) => SetCallbackReturnObject;
 
 export type SetCallBackCache = (
     item: object | HTMLElement,
     currentCallback: (arg0: any, arg1: object | HTMLElement) => void,
-    arrayOfCallback: CallbackObject<string>[],
+    arrayOfCallback: CallbackCache,
     unsubscribeCacheArray: (() => void)[]
 ) => SetCallbackCacheReturnObject;

@@ -109,17 +109,17 @@ export default class HandleLerp {
     #initialData;
 
     /**
-     * @type {import('../utils/callbacks/type.js').CallbackObject<(arg0:Record<string, number>) => void>[]}
+     * @type {import('../utils/callbacks/type.js').CallbackDefault}
      */
     #callback;
 
     /**
-     * @type {import('../utils/callbacks/type.js').CallbackObject<string>[]}
+     * @type {import('../utils/callbacks/type.js').CallbackCache}
      */
     #callbackCache;
 
     /**
-     * @type {import('../utils/callbacks/type.js').CallbackObject<(arg0:Record<string, number>) => void>[]}
+     * @type {import('../utils/callbacks/type.js').CallbackDefault}
      */
     #callbackOnComplete;
 
@@ -397,12 +397,12 @@ export default class HandleLerp {
 
             if (this.#callbackCache.length > this.#callback.length) {
                 this.#callbackCache =
-                    /** @type{import('../utils/callbacks/type.js').CallbackObject<string>[]} */ (
+                    /** @type{import('../utils/callbacks/type.js').CallbackCache} */ (
                         staggerArray
                     );
             } else {
                 this.#callback =
-                    /** @type {import('../utils/callbacks/type.js').CallbackObject<(arg0: Record<string, number>) => void>[]} */ (
+                    /** @type {import('../utils/callbacks/type.js').CallbackDefault} */ (
                         staggerArray
                     );
             }
