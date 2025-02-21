@@ -115,7 +115,7 @@ export interface HorizontalScroller {
      * Accept only a unique class in the form of a string (dot included)
      * It is necessary to provide a string in order to create the necessary css.
      */
-    root: string;
+    root: HTMLElement | string;
 
     /**
      * Container element.

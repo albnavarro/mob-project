@@ -306,7 +306,7 @@ export default class HandleSequencer {
         direction = directionConstant.NONE,
     }) {
         /*
-         * First time run or atfer reset lasValue
+         * First time run or after reset lasValue
          * all the last value is null so get the current value
          */
         if (this.#firstRun) {

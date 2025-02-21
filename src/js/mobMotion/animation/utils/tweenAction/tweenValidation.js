@@ -304,7 +304,7 @@ export const validateStaggerItems = (arr = []) => {
 
 /**
  * @param {(object | HTMLElement)[]} arr
- * @returns {( object | HTMLElement )[]|[]}
+ * @returns {any[]|[]}
  *
  * @description
  * Return the array fallback

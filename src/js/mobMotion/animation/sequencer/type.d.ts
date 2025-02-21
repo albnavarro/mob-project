@@ -1,6 +1,9 @@
 import { easeTypes } from '../tween/type';
 import { StaggerObject } from '../utils/stagger/type';
-import { directionType } from '../utils/timeline/type';
+import {
+    directionType,
+    directionTypeObjectSequencer,
+} from '../utils/timeline/type';
 import HandleSequencer from './handleSequencer';
 
 export interface sequencerProps {
@@ -44,11 +47,11 @@ export interface sequencerRow {
     propToFind: PropToFind;
 }
 
-export interface createStagger {
+export interface createStagger<T> {
     start: number;
     end: number;
     index: number;
-    item: HTMLElement | object;
+    item: T;
 }
 
 export interface labelType {
@@ -83,8 +86,8 @@ export interface masterSequencerItem {
     destroy: () => void;
 }
 
-export interface createSequencerType {
-    items: (HTMLElement | object)[];
+export interface createSequencerType<T> {
+    items: T[];
     duration?: number;
 }
 
@@ -115,12 +118,12 @@ export type sequencerLabel = (arg0: string, arg0?: number) => HandleSequencer;
 export type sequencerGetLabels = () => labelType[];
 
 export type sequencerAdd = (
-    arg0: (directionTypeObjectSequencer) => void,
+    arg0: (arg0: directionTypeObjectSequencer) => void,
     arg1: number
 ) => HandleSequencer;
 
-export type sequencerSubscribe = (arg0: () => void) => () => void;
-export type sequencerOnStop = (arg0: () => void) => () => void;
+export type sequencerSubscribe = (arg0: (arg0: any) => void) => () => void;
+export type sequencerOnStop = (arg0: (arg0: any) => void) => () => void;
 
 export type sequencerSubscribeCache = (
     item: object | HTMLElement,

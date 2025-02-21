@@ -584,7 +584,8 @@ export class HorizontalScroller {
 
         // @ts-ignore
         this.#mainContainer = mobCore.checkType(String, data.root)
-            ? document.querySelector(data.root)
+            ? // @ts-ignore
+              document.querySelector(data.root)
             : data.root;
 
         if (!this.#mainContainer) {

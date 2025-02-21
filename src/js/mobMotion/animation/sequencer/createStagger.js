@@ -109,8 +109,9 @@ const getStaggerSpecial = ({
 };
 
 /**
- * @param { import('./type.js').createSequencerType & import('../utils/stagger/type.js').StaggerPropiertiesObject } data
- * @returns {import('./type.js').createStagger[]} Stagger array
+ * @template T
+ * @param { import('./type.js').createSequencerType<T> & import('../utils/stagger/type.js').StaggerPropiertiesObject } data
+ * @returns {import('./type.js').createStagger<T>[]} Stagger array
  *
  * @example
  * ```javascript
@@ -146,6 +147,7 @@ const getStaggerSpecial = ({
  * ```
  */
 export const createStaggers = (data) => {
+    // @ts-ignore
     const items = staggerItemsIsValid(data?.items);
     const stagger = getStaggerFromProps(data);
     const duration = durationIsValid(data?.duration);
