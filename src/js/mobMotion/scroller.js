@@ -1,12 +1,12 @@
 // @ts-check
 
-import { parallaxConstant } from './animation/parallax/parallaxConstant.js';
-import ParallaxClass from './animation/parallax/parallax.js';
+import { HandleScrollerConstant } from './animation/scroller/HandleScrollerConstant.js';
+import HandleScroller from './animation/scroller/HandleScroller.js';
 
 export const scroller = {
     /**
-     * @param {import('./animation/parallax/type.js').parallaxCommonType & import('./animation/parallax/type.js').parallaxType} data
-     * @returns {ParallaxClass}
+     * @param {import('./animation/scroller/type.js').HandleScrollerCommonType & import('./animation/scroller/type.js').ParallaxType} data
+     * @returns {HandleScroller}
      *
      * @example
      * ```javascript
@@ -58,16 +58,16 @@ export const scroller = {
      *
      */
     createParallax(data) {
-        return new ParallaxClass({
+        return new HandleScroller({
             ...data,
             // @ts-ignore
-            type: parallaxConstant.TYPE_PARALLAX,
+            type: HandleScrollerConstant.TYPE_PARALLAX,
         });
     },
 
     /**
-     * @param {import('./animation/parallax/type.js').parallaxCommonType & import('./animation/parallax/type.js').scrollTriggerType } data
-     * @returns {ParallaxClass}
+     * @param {import('./animation/scroller/type.js').HandleScrollerCommonType & import('./animation/scroller/type.js').ScrollTriggerType } data
+     * @returns {HandleScroller}
      *
      * @example
      *
@@ -137,10 +137,10 @@ export const scroller = {
      * ```
      */
     createScrollTrigger(data) {
-        return new ParallaxClass({
+        return new HandleScroller({
             ...data,
             // @ts-ignore
-            type: parallaxConstant.TYPE_SCROLLTRIGGER,
+            type: HandleScrollerConstant.TYPE_SCROLLTRIGGER,
         });
     },
 };

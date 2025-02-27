@@ -1,6 +1,6 @@
 // @ts-check
 
-export const parallaxConstant = {
+export const HandleScrollerConstant = {
     // Constant misure units
     /**
      * @type {string}

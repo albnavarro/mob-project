@@ -5,7 +5,7 @@ import HandleSpring from '../../animation/spring/handleSpring.js';
 import { clamp } from '../../animation/utils/animationUtils.js';
 import { mq } from '../../utils/mediaManager.js';
 import { NOOP } from '../../utils/functionsUtils.js';
-import { parallaxConstant } from '../../animation/parallax/parallaxConstant.js';
+import { HandleScrollerConstant } from '../../animation/scroller/HandleScrollerConstant.js';
 import {
     breakpointIsValid,
     breakpointTypeIsValid,
@@ -174,12 +174,12 @@ export default class SmoothScroller {
     #easeType;
 
     /**
-     * @type {import('../../utils/type.js').mqValues}
+     * @type {import('../../utils/type.js').MqValues}
      */
     #breakpoint;
 
     /**
-     * @type {import('../../utils/type.js').mqAction}
+     * @type {import('../../utils/type.js').MqAction}
      */
     #queryType;
 
@@ -444,7 +444,7 @@ export default class SmoothScroller {
         if (!this.#propsIsValid) return;
 
         switch (this.#easeType) {
-            case parallaxConstant.EASE_SPRING: {
+            case HandleScrollerConstant.EASE_SPRING: {
                 this.#motion = new HandleSpring();
                 break;
             }
@@ -607,7 +607,7 @@ export default class SmoothScroller {
         this.#motion.setData({ val: 0 });
         this.#unsubscribeMotion = this.#motion.subscribe(({ val }) => {
             /** @type{HTMLElement} */ (this.#scroller).style.transform =
-                this.#direction == parallaxConstant.DIRECTION_VERTICAL
+                this.#direction == HandleScrollerConstant.DIRECTION_VERTICAL
                     ? `translate3d(0px, 0px, 0px) translateY(${-val}px)`
                     : `translate3d(0px, 0px, 0px) translateX(${-val}px)`;
 
@@ -637,7 +637,7 @@ export default class SmoothScroller {
 
         this.#unsubscribeOnComplete = this.#motion.onComplete(({ val }) => {
             /** @type{HTMLElement} */ (this.#scroller).style.transform =
-                this.#direction == parallaxConstant.DIRECTION_VERTICAL
+                this.#direction == HandleScrollerConstant.DIRECTION_VERTICAL
                     ? `translateY(${-val}px)`
                     : `translateX(${-val}px)`;
 
@@ -676,7 +676,7 @@ export default class SmoothScroller {
                 : outerHeight(/** @type{HTMLElement} */ (this.#screen));
 
         this.#maxValue =
-            this.#direction === parallaxConstant.DIRECTION_VERTICAL
+            this.#direction === HandleScrollerConstant.DIRECTION_VERTICAL
                 ? /** @type{HTMLElement} */ (this.#scroller).offsetHeight -
                   this.#screenHeight
                 : /** @type{HTMLElement} */ (this.#scroller).offsetWidth -
@@ -901,7 +901,9 @@ export default class SmoothScroller {
     #getMousePos({ x, y }) {
         if (!x || !y) return 0;
 
-        return this.#direction === parallaxConstant.DIRECTION_VERTICAL ? y : x;
+        return this.#direction === HandleScrollerConstant.DIRECTION_VERTICAL
+            ? y
+            : x;
     }
 
     /**

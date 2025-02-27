@@ -1,8 +1,8 @@
-import { allActionType } from '../animation/utils/tweenAction/type';
+import { AllActionType } from '../animation/utils/tweenAction/type';
 
-export type mqAction = 'min' | 'max';
-export type mqActionMethods = 'min' | 'max' | 'get';
-export type mqValues =
+export type MqAction = 'min' | 'max';
+export type MqActionMethods = 'min' | 'max' | 'get';
+export type MqValues =
     | 'xSmall'
     | 'small'
     | 'medium'
@@ -37,7 +37,7 @@ export type Set<K> = <T extends K>(
 ) => ReturnType<DoAction<T>>;
 
 export type DoAction<K> = (
-    data: allActionType[],
+    data: AllActionType[],
     props?: K,
     obj: Record<string, number | (() => number)>
 ) => Promise<void>;

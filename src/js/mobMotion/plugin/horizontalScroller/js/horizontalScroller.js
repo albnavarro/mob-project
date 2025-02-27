@@ -1,6 +1,6 @@
 //@ts-check
 
-import ParallaxClass from '../../../animation/parallax/parallax';
+import HandleScroller from '../../../animation/scroller/HandleScroller';
 import {
     getTranslateValues,
     offset,
@@ -87,12 +87,12 @@ export class HorizontalScroller {
     #useWillChange;
 
     /**
-     * @type {import('../../../utils/type').mqValues}
+     * @type {import('../../../utils/type').MqValues}
      */
     #breakpoint;
 
     /**
-     * @type {import('../../../utils/type').mqAction}
+     * @type {import('../../../utils/type').MqAction}
      */
     #queryType;
 
@@ -250,7 +250,7 @@ export class HorizontalScroller {
     #horizontalWidth;
 
     /**
-     * @type {ParallaxClass}
+     * @type {HandleScroller}
      */
     #scrollTriggerInstance;
 
@@ -263,7 +263,7 @@ export class HorizontalScroller {
      * @description
      * Initialize children.
      *
-     * @type {ParallaxClass[]}
+     * @type {HandleScroller[]}
      */
     #children;
 
@@ -1147,7 +1147,7 @@ export class HorizontalScroller {
     #initScroller() {
         if (!this.#trigger || !mq[this.#queryType](this.#breakpoint)) return;
 
-        const scrollTriggerInstance = new ParallaxClass({
+        const scrollTriggerInstance = new HandleScroller({
             type: 'scrolltrigger',
             item: this.#row,
             useWillChange: this.#useWillChange,

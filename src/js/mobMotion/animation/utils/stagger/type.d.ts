@@ -44,7 +44,7 @@ export interface StaggerObject {
 }
 
 export interface StaggerPropiertiesObject {
-    stagger: StaggerObject;
+    stagger: Partial<StaggerObject>;
 }
 
 export interface StaggerFrameIndexObject {

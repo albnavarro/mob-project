@@ -16,9 +16,9 @@ export const mergeArray = (newData, data) => {
 };
 
 /**
- * @param {import("./type").allActionType[]} newData
- * @param {import("../../tween/type").tweenStoreData[]} data
- * @returns {import("../../tween/type").tweenStoreData[]}
+ * @param {import("./type").AllActionType[]} newData
+ * @param {import("../../tween/type").TweenStoreData[]} data
+ * @returns {import("../../tween/type").TweenStoreData[]}
  *
  * @description
  * Merge animation store of specific tween .. with new data from goTo etc..

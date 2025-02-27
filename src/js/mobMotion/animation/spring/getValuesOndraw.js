@@ -4,13 +4,13 @@ import { getRoundedValue } from '../utils/animationUtils';
 
 /**
  * @param {Object} param
- * @param {import('./type').springValues[]} param.values
+ * @param {import('./type').SpringValues[]} param.values
  * @param {number} param.tension
  * @param {number} param.friction
  * @param {number} param.mass
  * @param {number} param.precision
  * @param {number} param.fps
- * @return {import('./type').springValues[]}
+ * @return {import('./type').SpringValues[]}
  */
 export const springGetValuesOndraw = ({
     values,

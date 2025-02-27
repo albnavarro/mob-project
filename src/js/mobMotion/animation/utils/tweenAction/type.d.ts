@@ -1,4 +1,4 @@
-export interface goToParamsType {
+export interface GoToParamsType {
     prop: string;
     toValue: number;
     toFn: () => number;
@@ -6,7 +6,7 @@ export interface goToParamsType {
     settled: boolean;
 }
 
-export interface goFromType {
+export interface GoFromType {
     prop: string;
     fromValue: number;
     currentValue: number;
@@ -15,7 +15,7 @@ export interface goFromType {
     settled: boolean;
 }
 
-export interface goFromToType {
+export interface GoFromToType {
     prop: string;
     fromValue: number;
     fromFn: () => number;
@@ -27,9 +27,9 @@ export interface goFromToType {
     settled: boolean;
 }
 
-export type allActionType = goToParamsType | goFromType | goFromToType;
+export type AllActionType = GoToParamsType | GoFromType | GoFromToType;
 
-export interface tweenParam {
+export interface TweenParam {
     currentValue: number;
     fromFn: () => number;
     fromIsFn: boolean;
@@ -54,9 +54,9 @@ type MergetTweenReturnType<Type, TargetType> = {
 };
 
 export type MergeTweenData = <T extends Record<'prop', any>[]>(
-    newData: allActionType[],
+    newData: AllActionType[],
     data: T
-) => MergetTweenReturnType<allActionType[], T>;
+) => MergetTweenReturnType<AllActionType[], T>;
 
 /**
  * Set Relative Spring & Lerp

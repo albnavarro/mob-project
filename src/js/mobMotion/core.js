@@ -143,8 +143,8 @@ export const motionCore = {
     },
 
     /**
-     * @param {import('./utils/type.js').mqActionMethods} action
-     * @param {import('./utils/type.js').mqValues} breakpoint
+     * @param {import('./utils/type.js').MqActionMethods} action
+     * @param {import('./utils/type.js').MqValues} breakpoint
      *
      * @return {(boolean|number)} Returns a boolean value if the action value is equal to 'min' or 'max', returns a numeric value if it is equal to 'get'
      *

@@ -1,6 +1,6 @@
 // @ts-check
 
-import { parallaxConstant } from './parallaxConstant.js';
+import { HandleScrollerConstant } from './HandleScrollerConstant.js';
 import { handleSetUp } from '../../setup.js';
 import { mobCore } from '../../../mobCore/index.js';
 
@@ -101,7 +101,7 @@ const getStartStyle = ({
     left,
     right,
 }) => {
-    if (direction === parallaxConstant.DIRECTION_VERTICAL) {
+    if (direction === HandleScrollerConstant.DIRECTION_VERTICAL) {
         return invertSide
             ? {
                   right: 0,
@@ -163,7 +163,7 @@ const getEndStyle = ({
     left,
     right,
 }) => {
-    if (direction === parallaxConstant.DIRECTION_VERTICAL) {
+    if (direction === HandleScrollerConstant.DIRECTION_VERTICAL) {
         return invertSide
             ? {
                   right: 0,
@@ -214,7 +214,7 @@ const getEndStyle = ({
  *
  * @returns {{startMarker:(Element|undefined), endMarker:(Element|undefined)}}
  */
-export const parallaxMarker = ({
+export const handleScrollerMarker = ({
     startMarker,
     endMarker,
     startPoint,

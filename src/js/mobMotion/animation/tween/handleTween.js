@@ -94,12 +94,12 @@ export default class HandleTween {
     #promise;
 
     /**
-     * @type {import('./type.js').tweenStoreData[]}
+     * @type {import('./type.js').TweenStoreData[]}
      */
     #values;
 
     /**
-     * @type {import('./type.js').tweenInitialData[]}
+     * @type {import('./type.js').TweenInitialData[]}
      */
     #initialData;
 
@@ -178,7 +178,7 @@ export default class HandleTween {
      * This value is the base value merged with new value in custom prop
      * passed form user in goTo etc..
      *
-     * @type{import('./type.js').tweenDefault}
+     * @type{import('./type.js').TweenDefault}
      */
     #defaultProps;
 
@@ -193,7 +193,7 @@ export default class HandleTween {
     #fastestStagger;
 
     /**
-     * @param {import('./type.js').tweenProps} [ data ]
+     * @param {import('./type.js').TweenProps} [ data ]
      *
      * @example
      * ```javascript
@@ -474,7 +474,7 @@ export default class HandleTween {
     }
 
     /**
-     * @type {import('./type.js').tweenStop}
+     * @type {import('./type.js').TweenStop}
      */
     stop({ clearCache = true } = {}) {
         this.#pauseTime = 0;
@@ -500,7 +500,7 @@ export default class HandleTween {
     }
 
     /**
-     * @type {import('./type.js').tweenPause}
+     * @type {import('./type.js').TweenPause}
      */
     pause() {
         if (this.#pauseStatus) return;
@@ -508,7 +508,7 @@ export default class HandleTween {
     }
 
     /**
-     * @type {import('./type.js').tweenResume}
+     * @type {import('./type.js').TweenResume}
      */
     resume() {
         if (!this.#pauseStatus) return;
@@ -555,7 +555,7 @@ export default class HandleTween {
     }
 
     /**
-     * @type {import('./type.js').tweenResetData}
+     * @type {import('./type.js').TweenResetData}
      */
     resetData() {
         this.#values = mergeDeep(this.#values, this.#initialData);
@@ -587,7 +587,7 @@ export default class HandleTween {
     }
 
     /**
-     * @type  {import('./type.js').tweenMergeProps}
+     * @type  {import('./type.js').TweenMergeProps}
      *
      * @description
      * Merge special props with default props
@@ -603,7 +603,7 @@ export default class HandleTween {
     }
 
     /**
-     * @type {import('../../utils/type.js').GoTo<import('./type.js').tweenAction>} obj to Values
+     * @type {import('../../utils/type.js').GoTo<import('./type.js').TweenAction>} obj to Values
      */
     goTo(obj, props = {}) {
         if (this.#pauseStatus || this.#comeFromResume) this.stop();
@@ -613,7 +613,7 @@ export default class HandleTween {
     }
 
     /**
-     * @type {import('../../utils/type.js').GoFrom<import('./type.js').tweenAction>} obj to Values
+     * @type {import('../../utils/type.js').GoFrom<import('./type.js').TweenAction>} obj to Values
      */
     goFrom(obj, props = {}) {
         if (this.#pauseStatus || this.#comeFromResume) this.stop();
@@ -623,7 +623,7 @@ export default class HandleTween {
     }
 
     /**
-     * @type {import('../../utils/type.js').GoFromTo<import('./type.js').tweenAction>} obj to Values
+     * @type {import('../../utils/type.js').GoFromTo<import('./type.js').TweenAction>} obj to Values
      */
     goFromTo(fromObj, toObj, props = {}) {
         if (this.#pauseStatus || this.#comeFromResume) this.stop();
@@ -639,7 +639,7 @@ export default class HandleTween {
     }
 
     /**
-     * @type {import('../../utils/type.js').Set<import('./type.js').tweenAction>} obj to Values
+     * @type {import('../../utils/type.js').Set<import('./type.js').TweenAction>} obj to Values
      */
     set(obj, props = {}) {
         if (this.#pauseStatus || this.#comeFromResume) this.stop();
@@ -652,7 +652,7 @@ export default class HandleTween {
     }
 
     /**
-     * @type {import('../../utils/type.js').SetImmediate<import('./type.js').tweenAction>} obj to Values
+     * @type {import('../../utils/type.js').SetImmediate<import('./type.js').TweenAction>} obj to Values
      */
     setImmediate(obj, props = {}) {
         if (this.#pauseStatus || this.#comeFromResume) this.stop();
@@ -676,7 +676,7 @@ export default class HandleTween {
     }
 
     /**
-     * @type {import('../../utils/type.js').DoAction<import('./type.js').tweenAction>} obj to Values
+     * @type {import('../../utils/type.js').DoAction<import('./type.js').TweenAction>} obj to Values
      */
     #doAction(data, props = {}, obj) {
         this.#values = mergeArrayTween(data, this.#values);
@@ -710,7 +710,7 @@ export default class HandleTween {
      * @description
      * Get current values, If the single value is a function it returns the result of the function.
      *
-     * @type {import('./type.js').tweenGetValue}
+     * @type {import('./type.js').TweenGetValue}
      *
      * @example
      * ```javascript
@@ -727,7 +727,7 @@ export default class HandleTween {
      * @description
      * Get initial values, If the single value is a function it returns the result of the function.
      *
-     * @type {import('./type.js').tweenGetValue}
+     * @type {import('./type.js').TweenGetValue}
      *
      * @example
      * ```javascript
@@ -744,7 +744,7 @@ export default class HandleTween {
      * @description
      * Get from values, If the single value is a function it returns the result of the function.
      *
-     * @type {import('./type.js').tweenGetValue}
+     * @type {import('./type.js').TweenGetValue}
      *
      * @example
      * ```javascript
@@ -761,7 +761,7 @@ export default class HandleTween {
      * @description
      * Get to values, If the single value is a function it returns the result of the function.
      *
-     * @type {import('./type.js').tweenGetValue}
+     * @type {import('./type.js').TweenGetValue}
      *
      * @example
      * ```javascript
@@ -778,7 +778,7 @@ export default class HandleTween {
      * @description
      * Get From values, if the single value is a function it returns the same function.
      *
-     * @type {import('./type.js').tweenGetValueNative}
+     * @type {import('./type.js').TweenGetValueNative}
      *
      * @example
      * ```javascript
@@ -795,7 +795,7 @@ export default class HandleTween {
      * @description
      * Get To values, if the single value is a function it returns the same function.
      *
-     * @type {import('./type.js').tweenGetValueNative}
+     * @type {import('./type.js').TweenGetValueNative}
      *
      * @example
      * ```javascript
@@ -812,7 +812,7 @@ export default class HandleTween {
      * @description
      * Get tween type
      *
-     * @type {import('./type.js').tweenGetType} tween type
+     * @type {import('./type.js').TweenGetType} tween type
      *
      * @example
      * ```javascript
@@ -829,7 +829,7 @@ export default class HandleTween {
      * @description
      * Get univoque Id
      *
-     * @type {import('./type.js').tweenGetId}
+     * @type {import('./type.js').TweenGetId}
      *
      * @example
      * ```javascript
@@ -845,7 +845,7 @@ export default class HandleTween {
     /**
      * Update ease with new preset
      *
-     * @type {import('./type.js').tweenUpdateEase}
+     * @type {import('./type.js').TweenUpdateEase}
      *
      */
     updateEase(ease) {
@@ -856,7 +856,7 @@ export default class HandleTween {
     }
 
     /**
-     * @type {import('./type.js').tweenSubscribe}
+     * @type {import('./type.js').TweenSubscribe}
      *
      * ```
      * @description
@@ -873,7 +873,7 @@ export default class HandleTween {
     }
 
     /**
-     * @type {import('./type.js').tweenSubscribeCache}
+     * @type {import('./type.js').TweenSubscribeCache}
      *
      * @description
      * Callback that returns updated values ready to be usable, specific to manage large staggers.
@@ -909,7 +909,7 @@ export default class HandleTween {
     }
 
     /**
-     * @type {import('./type.js').tweenOnComplete}
+     * @type {import('./type.js').TweenOnComplete}
      *
      *
      * @description

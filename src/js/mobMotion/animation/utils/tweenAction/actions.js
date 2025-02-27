@@ -6,7 +6,7 @@ import { dataTweenValueIsNotValidWarning } from '../warning.js';
 
 /**
  * @param {Record<string, number | (() => number)>} obj
- * @returns {import('./type.js').goToParamsType[]}
+ * @returns {import('./type.js').GoToParamsType[]}
  *
  * @description
  * Set goTo value, used by spring and lerp
@@ -42,7 +42,7 @@ export const goToUtils = (obj) => {
 
 /**
  * @param {Record<string, number | (() => number)>} obj
- * @return {import('./type.js').goFromType[]}
+ * @return {import('./type.js').GoFromType[]}
  *
  * @description
  * Set goFrom value, used by spring and lerp
@@ -81,7 +81,7 @@ export const goFromUtils = (obj) => {
  *
  * @param {Record<string, number | (() => number)>} fromObj
  * @param {Record<string, number | (() => number)>} toObj
- * @return {import('./type.js').goFromToType[]}
+ * @return {import('./type.js').GoFromToType[]}
  *
  * @description
  * Set goFromTo value, used by spring and lerp
@@ -135,7 +135,7 @@ export const goFromToUtils = (fromObj, toObj) => {
 
 /**
  * @param {Record<string, number | (() => number)>} obj
- * @returns {import('./type.js').goFromToType[]}
+ * @returns {import('./type.js').GoFromToType[]}
  *
  * @description
  * Set set value, used by spring and lerp

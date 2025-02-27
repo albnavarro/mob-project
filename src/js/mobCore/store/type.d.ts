@@ -39,7 +39,9 @@ export interface storeMapValue {
  */
 type StoreDefaultMap = Record<string, any>;
 
-export interface MobStore<T extends StoreDefaultMap> {
+export type MobStore = <T>(arg0: MobStoreParams<T>) => MobStoreReturnType<T>;
+
+export interface MobStoreReturnType<T extends StoreDefaultMap> {
     getId: getIdType;
     bindStore: bindStoreType;
     get: getType<T>;
@@ -59,7 +61,9 @@ export interface MobStore<T extends StoreDefaultMap> {
     destroy: () => void;
 }
 
-export type bindStoreValueType = MobStore<any> | MobStore<any>[];
+export type bindStoreValueType =
+    | MobStoreReturnType<any>
+    | MobStoreReturnType<any>[];
 
 export type bindStoreType = (value: bindStoreValueType) => void;
 
@@ -96,13 +100,14 @@ export type quickSetPropType<T> = <K extends keyof T>(
 export type watchType<T> = <K extends keyof T>(
     prop: Extract<K, string>,
     callback: (current: T[K], previous: T[K], validate: validateState) => void,
-    options?: { wait?: boolean }
+    options?: { wait?: boolean; immediate?: boolean }
 ) => () => void;
 
 export type computedType<T> = <K extends keyof T>(
     prop: Extract<K, string>,
     keys: Extract<keyof T, string>[],
-    callback: (arg0: T) => T[K]
+    callback: (arg0: T) => T[K],
+    options?: { immediate?: boolean }
 ) => void;
 
 export type emitType<T> = (props: Extract<keyof T, string>) => void;
@@ -126,7 +131,7 @@ export type mobStoreTypeAlias =
     | 'NodeList'
     | 'Any';
 
-export type mobStoreTypeNative =
+export type MobStoreTypeNative =
     | string
     | number
     | object
@@ -189,7 +194,7 @@ export interface storeComputed {
 }
 
 export interface storeComputedAction extends storeComputed {
-    state: storeMapValue;
+    instanceId: string;
 }
 
 export interface callbackQueue {
@@ -212,12 +217,12 @@ export interface callbackQueue {
     instanceId?: string;
 }
 
-export type simpleStoreCustomValue = () => {
+export type MobStoreFunctionValue<T, K> = () => {
     /**
      * @description
      * Initial value
      */
-    value: any;
+    value: T[K];
 
     /**
      * @description
@@ -235,7 +240,7 @@ export type simpleStoreCustomValue = () => {
      * Function to transform value.
      * This function will have the current value and old value as input parameter.
      */
-    transform?: (value: any, previousValue: any) => boolean;
+    transform?: (value: T[K], previousValue: T[K]) => T[K];
 
     /**
      * @description
@@ -243,7 +248,7 @@ export type simpleStoreCustomValue = () => {
      * This function will have the current value and old value as input parameter and will return a boolean value.
      * The validation status of each property will be displayed in the watchers and will be retrievable using the getValidation() method.
      */
-    validate?: (value: any, previousValue: any) => boolean;
+    validate?: (value: T[K], previousValue: T[K]) => boolean;
 
     /**
      * @description
@@ -260,11 +265,13 @@ export type simpleStoreCustomValue = () => {
     skipEqual?: boolean;
 };
 
-export interface mobStoreBaseData {
-    [key: string]:
-        | simpleStoreCustomValue
-        | mobStoreTypeNative
-        | mobStoreBaseData;
-}
+type MobStoreStateType<T> = {
+    [K in keyof T]:
+        | MobStoreFunctionValue<T, K>
+        | T[K]
+        | MobStoreStateType<T[K]>;
+};
+
+export type MobStoreParams<T = any> = MobStoreStateType<T>;
 
 export type WatchWaintList = Map<string, Map<string, any>>;

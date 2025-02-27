@@ -1,6 +1,6 @@
-import { mqAction, mqValues } from '../../../utils/type';
-import { springChoiceConfig, springPresentConfigType } from '../../spring/type';
-import { easeTypes } from '../../tween/type';
+import { MqAction, MqValues } from '../../../utils/type';
+import { SpringChoiceConfig, SpringPresentConfigType } from '../../spring/type';
+import { EaseTypes } from '../../tween/type';
 
 export interface setUpType {
     /**
@@ -41,14 +41,14 @@ export interface setUpType {
          * Parallax/scrollTrigger breakpoint default value, choice: `xSmall, small, medium, tablet, desktop, large, xLarge`
          * Default:  `{ value: 'desktop' }`
          */
-        value: mqValues;
+        value: MqValues;
 
         /**
          * @description
          * Parallax/scrollTrigger mediaQuery type default value, choice is `min , max`,
          * Default:  `{ type: 'min' }`
          */
-        type: mqAction;
+        type: MqAction;
     };
 
     sequencer: {
@@ -62,7 +62,7 @@ export interface setUpType {
          * Default essing function used by the sequencer.
          * Default: `{ ease: easeLinear }`
          */
-        ease: easeTypes;
+        ease: EaseTypes;
     };
 
     scrollTrigger: {
@@ -78,7 +78,7 @@ export interface setUpType {
          * Spring config, choice: `default, gentle, wobbly, bounce, scroller`.
          * Default: `{ springConfig: 'default' }`
          */
-        springConfig: springChoiceConfig;
+        springConfig: SpringChoiceConfig;
 
         markerColor: {
             /**
@@ -110,7 +110,7 @@ export interface setUpType {
          * Default spring config, choice: `default, gentle, wobbly, bounce, scroller`,
          * Default: `{ springConfig: 'default' }`.
          */
-        springConfig: springChoiceConfig;
+        springConfig: SpringChoiceConfig;
 
         /**
          * @description
@@ -133,7 +133,7 @@ export interface setUpType {
          * Default essing function used by the parallaxTween,
          * Default: `{ ease: 'easeLinear' }`.
          */
-        ease: easeTypes;
+        ease: EaseTypes;
     };
 
     tween: {
@@ -149,7 +149,7 @@ export interface setUpType {
          * Default essing function used by the tween,
          * Default: `{ ease: 'easeLinear' }`.
          */
-        ease: easeTypes;
+        ease: EaseTypes;
 
         /**
          * @description
@@ -172,7 +172,7 @@ export interface setUpType {
          * Default spring config, choice: `default, gentle, wobbly, bounce, scroller`,
          * Default: `{ springConfig: 'default' }`.
          */
-        config: springPresentConfigType;
+        config: SpringPresentConfigType;
     };
 
     lerp: {

@@ -1,58 +1,84 @@
 // import { SimpleStore } from '../store/simpleStore';
 import { mobStore } from '../store';
 
-export const eventStore = mobStore({
-    /**
-     * @description
-     * Use passive event.
-     */
-    usePassive: () => ({
-        value: true,
-        type: Boolean,
-    }),
+/**
+ * @import { MobStoreParams, MobStoreReturnType} from "../../mobCore/store/type".MobStore;
+ **/
 
-    /**
-     * @description
-     * Frame Event
-     */
-    currentFrame: () => ({
-        value: 0,
-        type: Number,
-    }),
+/** @type{MobStoreReturnType<import('./type').EventStore>} */
+export const eventStore = mobStore(
+    /** @type{MobStoreParams<import('./type').EventStore>} */
+    ({
+        /**
+         * @description
+         * Use passive event.
+         */
+        usePassive: () => ({
+            value: true,
+            type: Boolean,
+        }),
 
-    /**
-     * @description
-     * Initial fps value
-     */
-    instantFps: () => ({
-        value: 60,
-        type: Number,
-    }),
+        /**
+         * @description
+         * Frame Event
+         */
+        currentFrame: () => ({
+            value: 0,
+            type: Number,
+        }),
 
-    /**
-     * @description
-     * Trigger nexFrame
-     */
-    requestFrame: () => ({
-        value: () => {},
-        type: Function,
-    }),
+        /**
+         * @description
+         * Initial fps value
+         */
+        instantFps: () => ({
+            value: 60,
+            type: Number,
+        }),
 
-    /**
-     * @description
-     * Send nextTick on next loop
-     */
-    deferredNextTick: () => ({
-        value: true,
-        type: Boolean,
-    }),
+        /**
+         * @description
+         * Trigger nexFrame
+         */
+        requestFrame: () => ({
+            value: () => {},
+            type: Function,
+        }),
 
-    /**
-     * @description
-     * Throttle scroll value
-     */
-    throttle: () => ({
-        value: 60,
-        type: Number,
-    }),
-});
+        /**
+         * @description
+         * Send nextTick on next loop
+         */
+        deferredNextTick: () => ({
+            value: true,
+            type: Boolean,
+        }),
+
+        /**
+         * @description
+         * Throttle scroll value
+         */
+        throttle: () => ({
+            value: 60,
+            type: Number,
+        }),
+
+        /**
+         * @description
+         * Mouse wheell spinY max value ( 3 | -3 )
+         */
+        spinYMaxValue: () => ({
+            value: 3,
+            type: Number,
+        }),
+
+        /**
+         * @description
+         * Mouse wheell spinX max value ( 3 | -3 )
+         */
+        spinXMaxValue: () => ({
+            value: 3,
+            type: Number,
+        }),
+    })
+);

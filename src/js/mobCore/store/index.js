@@ -22,10 +22,12 @@ import { STORE_SET, STORE_UPDATE } from './constant';
 import { getProxiEntryPoint } from './proxi';
 import { bindStoreEntryPoint } from './bindStore';
 import { destroyStoreEntryPoint } from './destroy';
+import { checkIfPropIsComputed } from './storeUtils';
+import { useNextLoop } from '../utils/nextTick';
 
 /**
- * @param {import('./type').mobStoreBaseData} data
- * @returns {import('./type').MobStore<any>}
+ * @param {import('./type').MobStoreParams} data
+ * @returns {import('./type').MobStoreReturnType<any>}
  */
 export const mobStore = (data = {}) => {
     /**
@@ -66,6 +68,9 @@ export const mobStore = (data = {}) => {
             return storeGetPropEntryPoint({ instanceId, prop });
         },
         set: (prop, value, { emit = true } = {}) => {
+            const isComputed = checkIfPropIsComputed({ instanceId, prop });
+            if (isComputed) return;
+
             storeSetEntryPoint({
                 instanceId,
                 prop,
@@ -76,6 +81,9 @@ export const mobStore = (data = {}) => {
             });
         },
         update: (prop, value, { emit = true, clone = false } = {}) => {
+            const isComputed = checkIfPropIsComputed({ instanceId, prop });
+            if (isComputed) return;
+
             storeSetEntryPoint({
                 instanceId,
                 prop,
@@ -85,26 +93,47 @@ export const mobStore = (data = {}) => {
                 action: STORE_UPDATE,
             });
         },
-        // Use getProxi after add a proxi.
         getProxi: () => {
             return getProxiEntryPoint({ instanceId });
         },
         quickSetProp: (prop, value) => {
+            const isComputed = checkIfPropIsComputed({ instanceId, prop });
+            if (isComputed) return;
+
             storeQuickSetEntrypoint({ instanceId, prop, value });
         },
-        watch: (prop, callback, { wait = false } = {}) => {
-            return watchEntryPoint({ instanceId, prop, callback, wait });
+        watch: (prop, callback, { wait = false, immediate = false } = {}) => {
+            const unwatch = watchEntryPoint({
+                instanceId,
+                prop,
+                callback,
+                wait,
+            });
+
+            if (immediate) {
+                useNextLoop(() => {
+                    storeEmitEntryPoint({ instanceId, prop });
+                });
+            }
+
+            return unwatch;
         },
-        computed: (prop, keys, callback) => {
+        computed: (prop, keys, callback, { immediate = false } = {}) => {
             storeComputedEntryPoint({
                 instanceId,
                 prop,
                 keys,
                 callback,
             });
+
+            if (immediate) {
+                useNextLoop(() => {
+                    storeEmitEntryPoint({ instanceId, prop });
+                });
+            }
         },
         emit: (prop) => {
-            return storeEmitEntryPoint({ instanceId, prop });
+            storeEmitEntryPoint({ instanceId, prop });
         },
         emitAsync: async (prop) => {
             return storeEmitAsyncEntryPoint({ instanceId, prop });

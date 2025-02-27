@@ -1,7 +1,7 @@
-import { easeTypes } from '../../animation/tween/type';
+import { EaseTypes } from '../../animation/tween/type';
 
 export interface bodyScrollType {
     duration?: number;
     overflow?: boolean;
-    ease?: easeTypes;
+    ease?: EaseTypes;
 }

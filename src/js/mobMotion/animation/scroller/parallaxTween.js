@@ -1,6 +1,6 @@
 // @ts-check
 
-import { getRoundedValue } from '../../animation/utils/animationUtils.js';
+import { getRoundedValue } from '../utils/animationUtils.js';
 import { setStagger } from '../utils/stagger/setStagger.js';
 import {
     getStaggerFromProps,
@@ -15,7 +15,7 @@ import { goToUtils } from '../utils/tweenAction/actions.js';
 import { staggerIsOutOfRangeWarning } from '../utils/warning.js';
 import {
     durationIsValid,
-    easeParallaxTweenIsValid,
+    easeScrollerTweenIsValid,
 } from '../utils/tweenAction/tweenValidation.js';
 import { mobCore } from '../../../mobCore/index.js';
 import { getValueObj } from '../utils/tweenAction/getValues.js';
@@ -38,7 +38,7 @@ export default class ParallaxTween {
     #stagger;
 
     /**
-     * @type {import('./type.js').parallaxTweenValue[]}
+     * @type {import('./type.js').ParallaxTweenValue[]}
      */
     #values;
 
@@ -68,7 +68,7 @@ export default class ParallaxTween {
     #type;
 
     /**
-     * @param {import('./type.js').parallaxTweenType} data
+     * @param {import('./type.js').ParallaxTweenType} data
      *
      * @example
      * ```js
@@ -102,7 +102,7 @@ export default class ParallaxTween {
      * ```
      */
     constructor(data) {
-        this.#ease = easeParallaxTweenIsValid(data?.ease);
+        this.#ease = easeScrollerTweenIsValid(data?.ease);
         this.#duration = durationIsValid(data?.duration);
         this.#stagger = getStaggerFromProps(data);
         this.#values = [];
@@ -223,7 +223,7 @@ export default class ParallaxTween {
 
     /**
      *
-     * @type {import('./type.js').parallaxTweenSetData}
+     * @type {import('./type.js').ParallaxTweenSetData}
      */
     setData(obj) {
         const valToArray = Object.entries(obj);
@@ -252,7 +252,7 @@ export default class ParallaxTween {
     /**
      * Return the new array maeged with main array created in setData
      *
-     * @param  {import('../utils/tweenAction/type.js').goToParamsType[]} newData new datato merge
+     * @param  {import('../utils/tweenAction/type.js').GoToParamsType[]} newData new datato merge
      * @return {void}
      */
     #mergeData(newData) {
@@ -267,7 +267,7 @@ export default class ParallaxTween {
     }
 
     /**
-     * @type {import('./type.js').parallaxTweenGoTo}
+     * @type {import('./type.js').ParallaxTweenGoTo}
      *
      * ```
      * @description
@@ -281,7 +281,7 @@ export default class ParallaxTween {
     }
 
     /**
-     * @type {import('./type.js').parallaxTweenSubscribe}
+     * @type {import('./type.js').ParallaxTweenSubscribe}
      *
      * @description
      * Callback that returns updated values ready to be usable, it is advisable to use it for single elements, although it works well on a not too large number of elements (approximately 100-200 elements) for large staggers it is advisable to use the subscribeCache method .
@@ -297,7 +297,7 @@ export default class ParallaxTween {
     }
 
     /**
-     * @type {import('./type.js').parallaxTweenOnStop}
+     * @type {import('./type.js').ParallaxTweenOnStop}
      *
      * @description
      * Similar to subscribe this callBack is launched when the data calculation stops (when the timeline ends or the scroll trigger is inactive).
@@ -316,7 +316,7 @@ export default class ParallaxTween {
     }
 
     /**
-     * @type {import('./type.js').parallaxTweenSubscribeCache}
+     * @type {import('./type.js').ParallaxTweenSubscribeCache}
      */
     subscribeCache(item, fn) {
         const { arrayOfCallbackUpdated, unsubscribeCb, unsubscribeCache } =
@@ -335,7 +335,7 @@ export default class ParallaxTween {
     /**
      * @description
      * Get duration
-     * @type {import('./type.js').parallaxTweenGetDuration}
+     * @type {import('./type.js').ParallaxTweenGetDuration}
      */
     getDuration() {
         return this.#duration;
@@ -344,7 +344,7 @@ export default class ParallaxTween {
     /**
      * @description
      * Get tween type - 'parallaxTween'
-     * @type {import('./type.js').parallaxTweenGetType}
+     * @type {import('./type.js').ParallaxTweenGetType}
      */
     getType() {
         return this.#type;

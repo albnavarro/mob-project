@@ -1,20 +1,20 @@
-import { mqAction, mqValues } from '../../utils/type';
-import { springChoiceConfig } from '../spring/type';
-import { easeTypes } from '../tween/type';
+import { MqAction, MqValues } from '../../utils/type';
+import { SpringChoiceConfig } from '../spring/type';
+import { EaseTypes } from '../tween/type';
 import { StaggerObject } from '../utils/stagger/type';
 import ParallaxTween from './parallaxTween';
 
-export interface dynamicStartType {
+export interface DynamicStartType {
     position: 'bottom' | 'top' | 'left' | 'right';
     value: () => number;
 }
 
-export interface dynamicEndType {
+export interface DynamicEndType {
     position: 'bottom' | 'top' | 'left' | 'right';
     value: () => number;
 }
 
-export interface parallaxCommonType {
+export interface HandleScrollerCommonType {
     type?: 'parallax' | 'scrolltrigger';
 
     /**
@@ -26,12 +26,12 @@ export interface parallaxCommonType {
     /**
      * @description
      */
-    breakpoint?: mqValues;
+    breakpoint?: MqValues;
 
     /**
      * @description
      */
-    queryType?: mqAction;
+    queryType?: MqAction;
 
     /**
      * @description
@@ -130,7 +130,7 @@ export interface parallaxCommonType {
     /**
      * @description
      */
-    springConfig?: springChoiceConfig;
+    springConfig?: SpringChoiceConfig;
 
     /**
      * @description
@@ -175,7 +175,7 @@ export interface parallaxCommonType {
     invertSide?: boolean;
 }
 
-export interface parallaxType {
+export interface ParallaxType {
     /**
      * @description
      *  Defines when the calculation reaches the value 0 ( neutral position ).
@@ -235,7 +235,7 @@ export interface parallaxType {
     limiterOff?: boolean;
 }
 
-export interface scrollTriggerType {
+export interface ScrollTriggerType {
     /**
      * @description
      * Activate the pin.
@@ -333,7 +333,7 @@ export interface scrollTriggerType {
      * the resulting value of the function will be calculated starting from the specified position towards the center of the viewport.
      * if the property is used it will take precedence over start.
      */
-    dynamicStart?: dynamicStartType;
+    dynamicStart?: DynamicStartType;
 
     /**
      * @description
@@ -341,7 +341,7 @@ export interface scrollTriggerType {
      * The resulting value of the function will be calculated starting from the specified position towards the center of the viewport.
      * If the property is used it will take precedence over end.
      */
-    dynamicEnd?: dynamicEndType;
+    dynamicEnd?: DynamicEndType;
 
     /**
      * @description
@@ -384,23 +384,23 @@ export interface scrollTriggerType {
      * Function that is launched at each tick.
      * The function will have the current value as input parameter.
      */
-    onTick?: (arg0: parallaxMoveType) => void;
+    onTick?: (arg0: HandleScrollerMoveType) => void;
 }
 
-export interface parallaxMoveType {
+export interface HandleScrollerMoveType {
     value: number | undefined;
     parentIsMoving: boolean;
 }
 
-export interface parallaxTweenType {
+export interface ParallaxTweenType {
     from: Record<string, number>;
     to: Record<string, number>;
     stagger?: Partial<StaggerObject>;
-    ease?: easeTypes;
+    ease?: EaseTypes;
     duration?: number;
 }
 
-export interface parallaxTweenValue {
+export interface ParallaxTweenValue {
     currentValue: number | (() => number);
     prop: string;
     settled: boolean;
@@ -413,24 +413,24 @@ export interface parallaxTweenValue {
     fromValue: number;
 }
 
-export type parallaxTweenSetData = (
+export type ParallaxTweenSetData = (
     arg0: Record<string, number>
 ) => ParallaxTween;
 
-export type parallaxTweenGoTo = (
+export type ParallaxTweenGoTo = (
     arg0: Record<string, number | (() => number)>
 ) => ParallaxTween;
 
-export type parallaxTweenSubscribe = (arg0: () => void) => () => void;
-export type parallaxTweenOnStop = (arg0: () => void) => () => void;
+export type ParallaxTweenSubscribe = (arg0: (any) => void) => () => void;
+export type ParallaxTweenOnStop = (arg0: (any) => void) => () => void;
 
-export type parallaxTweenSubscribeCache = (
+export type ParallaxTweenSubscribeCache = (
     item: object | HTMLElement,
     cb: (arg0: Record<string, number>) => void
 ) => () => void;
 
-export type parallaxTweenGetDuration = () => number;
-export type parallaxTweenGetType = () => string;
+export type ParallaxTweenGetDuration = () => number;
+export type ParallaxTweenGetType = () => string;
 
 export interface ParallaxMotion {
     stop: () => void;

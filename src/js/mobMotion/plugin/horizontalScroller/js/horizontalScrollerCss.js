@@ -27,8 +27,8 @@ const getAlign = (columnAlign) => {
 /**
  * @param {object} params
  * @param {HTMLElement} params.mainContainer
- * @param {import('../../../utils/type.js').mqAction} params.queryType
- * @param {import('../../../utils/type.js').mqValues} params.breakpoint
+ * @param {import('../../../utils/type.js').MqAction} params.queryType
+ * @param {import('../../../utils/type.js').MqValues} params.breakpoint
  * @param {string} params.container
  * @param {string} params.trigger
  * @param {string} params.row

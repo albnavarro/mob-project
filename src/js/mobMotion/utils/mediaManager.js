@@ -3,7 +3,7 @@
 import { handleSetUp } from '../setup.js';
 
 /**
- * @param { import('./type.js').mqValues } breakpoint
+ * @param { import('./type.js').MqValues } breakpoint
  * @return {boolean}
  */
 const max = (breakpoint = 'desktop') => {
@@ -11,7 +11,7 @@ const max = (breakpoint = 'desktop') => {
 };
 
 /**
- * @param { import('./type.js').mqValues } breakpoint
+ * @param { import('./type.js').MqValues } breakpoint
  * @return {boolean}
  */
 const min = (breakpoint = 'desktop') => {
@@ -19,7 +19,7 @@ const min = (breakpoint = 'desktop') => {
 };
 
 /**
- * @param { import('./type.js').mqValues } breakpoint
+ * @param { import('./type.js').MqValues } breakpoint
  * @return {number}
  */
 const getBreackpoint = (breakpoint = 'desktop') => {

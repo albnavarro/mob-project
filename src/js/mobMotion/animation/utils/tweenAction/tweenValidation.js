@@ -2,7 +2,7 @@
 
 import { handleSetUp } from '../../../setup';
 import { MQ_MAX, MQ_MIN } from '../setUp/setUpValidation.js';
-import { parallaxConstant } from '../../parallax/parallaxConstant.js';
+import { HandleScrollerConstant } from '../../scroller/HandleScrollerConstant.js';
 import { getTweenFn, tweenConfig } from '../../tween/tweenConfig';
 import {
     DIRECTION_COL,
@@ -36,23 +36,23 @@ import {
     lerpPrecisionWarining,
     lerpVelocityWarining,
     naumberWarning,
-    parallaxAlignWarining,
-    parallaxDirectionWarining,
-    parallaxDynmicRangeValueWarining,
-    parallaxDynmicValueWarining,
-    parallaxEaseTypeWarining,
-    parallaxLerpConfigWarning,
-    parallaxNoTweenDefinedWarning,
-    parallaxOnSwitchWarining,
-    parallaxOpacityWarning,
-    parallaxPropiertiesWarining,
-    parallaxRangeNumberWarning,
-    parallaxRangeStringWarning,
-    parallaxSpringCongifWarining,
-    parallaxTweenWarning,
-    parallaxTypeWarining,
-    parallaxUseSequencerWarining,
-    parallaxUseTweenButNotProsDefinedWarning,
+    scrollerAlignWarining,
+    scrollerDirectionWarining,
+    scrollerDynmicRangeValueWarining,
+    scrollerDynmicValueWarining,
+    scrollerEaseTypeWarining,
+    scrollerLerpConfigWarning,
+    scrollerNoTweenDefinedWarning,
+    scrollerOnSwitchWarining,
+    scrollerOpacityWarning,
+    scrollerPropiertiesWarining,
+    scrollerRangeNumberWarning,
+    scrollerRangeStringWarning,
+    scrollerSpringCongifWarining,
+    scrollerTweenWarning,
+    scrollerTypeWarining,
+    scrollerUseSequencerWarining,
+    scrollerUseTweenButNotProsDefinedWarning,
     playLabelWarining,
     relativeWarining,
     repeatWarining,
@@ -80,7 +80,7 @@ import {
     checkIfIsOnlyNumberPositiveNegative,
     exactMatchInsesitiveNumberPropArray,
 } from '../regexValidation';
-import { getPropiertiesValueFromConstant } from '../../parallax/getConstantFromRegex.js';
+import { getPropiertiesValueFromConstant } from '../../scroller/getConstantFromRegex.js';
 import { mobCore } from '../../../../mobCore';
 
 /**
@@ -150,8 +150,8 @@ export const repeatIsValid = (repeat) => {
 
 /**
  *
- * @param {import('../../tween/type').easeTypes|undefined} ease
- * @returns {import('../../tween/type').easeTypes}
+ * @param {import('../../tween/type').EaseTypes|undefined} ease
+ * @returns {import('../../tween/type').EaseTypes}
  *
  * @description
  * Check if ease definition is valid
@@ -165,13 +165,13 @@ export const easeIsValid = (ease) => {
 
 /**
  *
- * @param {import('../../tween/type').easeTypes|undefined} ease
+ * @param {import('../../tween/type').EaseTypes|undefined} ease
  * @returns {Function}
  *
  * @description
  * Check if ease definition is valid
  **/
-export const easeParallaxTweenIsValid = (ease) => {
+export const easeScrollerTweenIsValid = (ease) => {
     const isValid = ease && ease in tweenConfig;
     if (!isValid && ease) tweenEaseWarning(ease);
 
@@ -393,8 +393,8 @@ export const easeTweenIsValidGetFunction = (ease) => {
 
 /**
  *
- * @param {import('../../tween/type').easeTypes|undefined} ease
- * @returns {import('../../tween/type').easeTypes}
+ * @param {import('../../tween/type').EaseTypes|undefined} ease
+ * @returns {import('../../tween/type').EaseTypes}
  *
  * @description
  * Check if ease definition is valid
@@ -409,7 +409,7 @@ export const easeTweenIsValid = (ease) => {
 /**
  *
  * @param {string|undefined} config
- * @returns {import('../../spring/type').springProps}
+ * @returns {import('../../spring/type').SpringProps}
  *
  * @description
  * Check if spring config is valid and return new config
@@ -473,8 +473,8 @@ export const springConfigIsValid = (config) => {
 
 /**
  *
- * @param {Partial<import('../../spring/type').springProps>|undefined} obj
- * @returns {Partial<import('../../spring/type').springProps>|{}}
+ * @param {Partial<import('../../spring/type').SpringProps>|undefined} obj
+ * @returns {Partial<import('../../spring/type').SpringProps>|{}}
  *
  * @description
  * Check if every spring config prop is valid
@@ -813,17 +813,17 @@ export const domNodeIsValidAndReturnNull = (element) => {
  * Check if value is a valid direction
  **/
 export const directionIsValid = (direction, component) => {
-    if (!direction) return parallaxConstant.DIRECTION_VERTICAL;
+    if (!direction) return HandleScrollerConstant.DIRECTION_VERTICAL;
 
     const choice = [
-        parallaxConstant.DIRECTION_VERTICAL,
-        parallaxConstant.DIRECTION_HORIZONTAL,
+        HandleScrollerConstant.DIRECTION_VERTICAL,
+        HandleScrollerConstant.DIRECTION_HORIZONTAL,
     ];
 
     const isValid = choice.includes(direction);
-    if (!isValid && direction) parallaxDirectionWarining(direction, component);
+    if (!isValid && direction) scrollerDirectionWarining(direction, component);
 
-    return isValid ? direction : parallaxConstant.DIRECTION_VERTICAL;
+    return isValid ? direction : HandleScrollerConstant.DIRECTION_VERTICAL;
 };
 
 /**
@@ -835,12 +835,12 @@ export const directionIsValid = (direction, component) => {
  * @description
  * Check if dynamicStart|dynamicEnd is a valid direction
  **/
-export const parallaxDynamicValueIsValid = (obj, label) => {
+export const scrollerDynamicValueIsValid = (obj, label) => {
     const positionChoice = [
-        parallaxConstant.POSITION_TOP,
-        parallaxConstant.POSITION_LEFT,
-        parallaxConstant.POSITION_RIGHT,
-        parallaxConstant.POSITION_BOTTOM,
+        HandleScrollerConstant.POSITION_TOP,
+        HandleScrollerConstant.POSITION_LEFT,
+        HandleScrollerConstant.POSITION_RIGHT,
+        HandleScrollerConstant.POSITION_BOTTOM,
     ];
 
     // obj is an Object
@@ -860,7 +860,7 @@ export const parallaxDynamicValueIsValid = (obj, label) => {
 
     // Validate all
     const isValid = valueIsObject && positionIsValid && valueIsValid;
-    if (!isValid) parallaxDynmicValueWarining(label);
+    if (!isValid) scrollerDynmicValueWarining(label);
 
     return isValid ? obj : null;
 };
@@ -873,11 +873,11 @@ export const parallaxDynamicValueIsValid = (obj, label) => {
  * @description
  * Check if dynamicRange is a functiom that return a Number
  **/
-export const parallaxDynamicRangeIsValid = (fn) => {
+export const scrollerDynamicRangeIsValid = (fn) => {
     const isValid =
         mobCore.checkType(Function, fn) && mobCore.checkType(Number, fn?.());
 
-    if (!isValid && fn) parallaxDynmicRangeValueWarining();
+    if (!isValid && fn) scrollerDynmicRangeValueWarining();
 
     return isValid ? fn : undefined;
 };
@@ -890,13 +890,13 @@ export const parallaxDynamicRangeIsValid = (fn) => {
  * @description
  * Check if tween is parallaxTween|HandleSequencer
  **/
-export const parallaxTweenIsValid = (instance) => {
+export const scrollerTweenIsValid = (instance) => {
     const isValid =
         instance?.getType?.() &&
-        (instance.getType() === parallaxConstant.TWEEN_TWEEN ||
-            instance.getType() === parallaxConstant.TWEEN_TIMELINE);
+        (instance.getType() === HandleScrollerConstant.TWEEN_TWEEN ||
+            instance.getType() === HandleScrollerConstant.TWEEN_TIMELINE);
 
-    if (!isValid && instance) parallaxTweenWarning();
+    if (!isValid && instance) scrollerTweenWarning();
 
     return isValid ? instance : {};
 };
@@ -909,25 +909,25 @@ export const parallaxTweenIsValid = (instance) => {
  * @description
  * Check if Align value is valid
  **/
-export const parallaxAlignIsValid = (value) => {
-    if (!value) return parallaxConstant.ALIGN_CENTER;
+export const scrollerAlignIsValid = (value) => {
+    if (!value) return HandleScrollerConstant.ALIGN_CENTER;
 
     const choice = [
-        parallaxConstant.ALIGN_START,
-        parallaxConstant.ALIGN_TOP,
-        parallaxConstant.ALIGN_RIGHT,
-        parallaxConstant.ALIGN_CENTER,
-        parallaxConstant.ALIGN_BOTTOM,
-        parallaxConstant.ALIGN_LEFT,
-        parallaxConstant.ALIGN_END,
+        HandleScrollerConstant.ALIGN_START,
+        HandleScrollerConstant.ALIGN_TOP,
+        HandleScrollerConstant.ALIGN_RIGHT,
+        HandleScrollerConstant.ALIGN_CENTER,
+        HandleScrollerConstant.ALIGN_BOTTOM,
+        HandleScrollerConstant.ALIGN_LEFT,
+        HandleScrollerConstant.ALIGN_END,
     ];
 
     // @ts-ignore
     const isValid = choice.includes(value) || mobCore.checkType(Number, value);
 
-    if (!isValid && value) parallaxAlignWarining(value, choice);
+    if (!isValid && value) scrollerAlignWarining(value, choice);
 
-    return isValid ? value : parallaxConstant.ALIGN_CENTER;
+    return isValid ? value : HandleScrollerConstant.ALIGN_CENTER;
 };
 
 /**
@@ -938,19 +938,19 @@ export const parallaxAlignIsValid = (value) => {
  * @description
  * Check if unSwitch value is valid
  **/
-export const parallaxOnSwitchIsValid = (value) => {
+export const scrollerOnSwitchIsValid = (value) => {
     if (!value) return false;
 
     const choice = [
-        parallaxConstant.IN_BACK,
-        parallaxConstant.IN_STOP,
-        parallaxConstant.OUT_BACK,
-        parallaxConstant.OUT_STOP,
+        HandleScrollerConstant.IN_BACK,
+        HandleScrollerConstant.IN_STOP,
+        HandleScrollerConstant.OUT_BACK,
+        HandleScrollerConstant.OUT_STOP,
     ];
 
     const isValid = choice.includes(value);
 
-    if (!isValid && value) parallaxOnSwitchWarining(value, choice);
+    if (!isValid && value) scrollerOnSwitchWarining(value, choice);
 
     return isValid ? value : false;
 };
@@ -965,11 +965,11 @@ export const parallaxOnSwitchIsValid = (value) => {
  * @description
  * Check if value is Number and return default
  **/
-export const parallaxOpacityIsValid = (value, label, defaultValue) => {
+export const scrollerOpacityIsValid = (value, label, defaultValue) => {
     if (!value) return defaultValue;
 
     const isValid = mobCore.checkType(Number, value);
-    if (!isValid && value) parallaxOpacityWarning(value, label);
+    if (!isValid && value) scrollerOpacityWarning(value, label);
 
     return isValid ? value : defaultValue;
 };
@@ -982,20 +982,20 @@ export const parallaxOpacityIsValid = (value, label, defaultValue) => {
  * @description
  * Check if type propierties is valid
  **/
-export const parallaxTypeIsValid = (value) => {
-    if (!value) return parallaxConstant.TYPE_PARALLAX;
+export const scrollerTypeIsValid = (value) => {
+    if (!value) return HandleScrollerConstant.TYPE_PARALLAX;
 
     const valueLowerCase = value?.toLowerCase();
     const choice = [
-        parallaxConstant.TYPE_PARALLAX,
-        parallaxConstant.TYPE_SCROLLTRIGGER,
+        HandleScrollerConstant.TYPE_PARALLAX,
+        HandleScrollerConstant.TYPE_SCROLLTRIGGER,
     ];
 
     const isValid = choice.includes(valueLowerCase);
     if (!isValid && valueLowerCase)
-        parallaxTypeWarining(valueLowerCase, choice);
+        scrollerTypeWarining(valueLowerCase, choice);
 
-    return isValid ? valueLowerCase : parallaxConstant.TYPE_PARALLAX;
+    return isValid ? valueLowerCase : HandleScrollerConstant.TYPE_PARALLAX;
 };
 
 /**
@@ -1007,9 +1007,9 @@ export const parallaxTypeIsValid = (value) => {
  * @description
  * Check if range propierties is valid
  **/
-export const parallaxRangeIsValid = (value, type) => {
+export const scrollerRangeIsValid = (value, type) => {
     const parsedValue = () => {
-        if (type === parallaxConstant.TYPE_PARALLAX) {
+        if (type === HandleScrollerConstant.TYPE_PARALLAX) {
             // @ts-ignore
             const isOnlyNumber = checkIfIsOnlyNumber(value);
             const isValid =
@@ -1020,7 +1020,7 @@ export const parallaxRangeIsValid = (value, type) => {
                 // @ts-ignore
                 value < 10;
 
-            if (!isValid && value) parallaxRangeNumberWarning(value);
+            if (!isValid && value) scrollerRangeNumberWarning(value);
 
             return isValid
                 ? // @ts-ignore
@@ -1028,7 +1028,7 @@ export const parallaxRangeIsValid = (value, type) => {
                 : 10 - handleSetUp.get('parallax').defaultRange;
         } else {
             const isValid = mobCore.checkType(String, value);
-            if (!isValid && value) parallaxRangeStringWarning(value);
+            if (!isValid && value) scrollerRangeStringWarning(value);
 
             return isValid ? value : '0px';
         }
@@ -1040,10 +1040,10 @@ export const parallaxRangeIsValid = (value, type) => {
 
 /**
  *
- * @param {import('../../../utils/type').mqValues|undefined} mq
+ * @param {import('../../../utils/type').MqValues|undefined} mq
  * @param {string} label
  * @param {string} component
- * @returns {import('../../../utils/type').mqValues}
+ * @returns {import('../../../utils/type').MqValues}
  *
  * @description
  * Check if breakpoint prop is valid
@@ -1063,10 +1063,10 @@ export const breakpointIsValid = (mq, label, component) => {
 
 /**
  *
- * @param {import('../../../utils/type').mqAction|undefined} type
+ * @param {import('../../../utils/type').MqAction|undefined} type
  * @param {string} label
  * @param {string} component
- * @returns {import('../../../utils/type').mqAction}
+ * @returns {import('../../../utils/type').MqAction}
  *
  * @description
  * Check if queryType prop is valid
@@ -1093,7 +1093,7 @@ export const breakpointTypeIsValid = (type, label, component) => {
  * @param {boolean|undefined} tweenIsSequencer
  * @returns {{ propierties:string, shouldTrackOnlyEvents:boolean }}
  */
-export const parallaxPropiertiesIsValid = (
+export const scrollerPropiertiesIsValid = (
     value,
     type,
     tweenIsParallaxTween,
@@ -1101,13 +1101,13 @@ export const parallaxPropiertiesIsValid = (
 ) => {
     if (!value && tweenIsSequencer)
         return {
-            propierties: parallaxConstant.PROP_VERTICAL,
+            propierties: HandleScrollerConstant.PROP_VERTICAL,
             shouldTrackOnlyEvents: true,
         };
 
     if (!value && tweenIsParallaxTween)
         return {
-            propierties: parallaxConstant.PROP_VERTICAL,
+            propierties: HandleScrollerConstant.PROP_VERTICAL,
             shouldTrackOnlyEvents: false,
         };
 
@@ -1116,38 +1116,38 @@ export const parallaxPropiertiesIsValid = (
      * Use scrollTrigger only for track events.
      */
     const shouldTrackOnlyEvents =
-        type === parallaxConstant.TYPE_SCROLLTRIGGER && !value;
+        type === HandleScrollerConstant.TYPE_SCROLLTRIGGER && !value;
 
     /**
      * Support suggestion for console.warn();
      */
     const choice = [
-        parallaxConstant.PROP_VERTICAL,
-        parallaxConstant.PROP_HORIZONTAL,
-        parallaxConstant.PROP_ROTATE,
-        parallaxConstant.PROP_ROTATEY,
-        parallaxConstant.PROP_ROTATEX,
-        parallaxConstant.PROP_ROTATEZ,
-        parallaxConstant.PROP_OPACITY,
-        parallaxConstant.PROP_SCALE,
-        parallaxConstant.PROP_SCALE_X,
-        parallaxConstant.PROP_SCALE_Y,
-        parallaxConstant.PROP_TWEEN,
+        HandleScrollerConstant.PROP_VERTICAL,
+        HandleScrollerConstant.PROP_HORIZONTAL,
+        HandleScrollerConstant.PROP_ROTATE,
+        HandleScrollerConstant.PROP_ROTATEY,
+        HandleScrollerConstant.PROP_ROTATEX,
+        HandleScrollerConstant.PROP_ROTATEZ,
+        HandleScrollerConstant.PROP_OPACITY,
+        HandleScrollerConstant.PROP_SCALE,
+        HandleScrollerConstant.PROP_SCALE_X,
+        HandleScrollerConstant.PROP_SCALE_Y,
+        HandleScrollerConstant.PROP_TWEEN,
     ];
 
     /**
      * Check if is a string, custom css propierties is allowed
      */
     const isValid = mobCore.checkType(String, value);
-    if (!isValid && value) parallaxPropiertiesWarining(value, choice);
+    if (!isValid && value) scrollerPropiertiesWarining(value, choice);
 
     /**
      * Inside Parallax sequencer is not allowed
      * So return verticasl props
      */
     const notParallaxTweenInsideParallax =
-        type === parallaxConstant.TYPE_PARALLAX &&
-        value === parallaxConstant.PROP_TWEEN &&
+        type === HandleScrollerConstant.TYPE_PARALLAX &&
+        value === HandleScrollerConstant.PROP_TWEEN &&
         !tweenIsParallaxTween;
 
     /**
@@ -1156,22 +1156,22 @@ export const parallaxPropiertiesIsValid = (
     if (
         !tweenIsParallaxTween &&
         !tweenIsSequencer &&
-        value === parallaxConstant.PROP_TWEEN
+        value === HandleScrollerConstant.PROP_TWEEN
     )
-        parallaxNoTweenDefinedWarning();
+        scrollerNoTweenDefinedWarning();
 
     /**
      * Check if there a tween but propierties is not settled to tween
      */
     if (
         (tweenIsParallaxTween || tweenIsSequencer) &&
-        value !== parallaxConstant.PROP_TWEEN
+        value !== HandleScrollerConstant.PROP_TWEEN
     )
-        parallaxUseTweenButNotProsDefinedWarning();
+        scrollerUseTweenButNotProsDefinedWarning();
 
-    if (notParallaxTweenInsideParallax) parallaxUseSequencerWarining();
+    if (notParallaxTweenInsideParallax) scrollerUseSequencerWarining();
     const valueParsed = notParallaxTweenInsideParallax
-        ? parallaxConstant.PROP_VERTICAL
+        ? HandleScrollerConstant.PROP_VERTICAL
         : value;
 
     /**
@@ -1181,8 +1181,8 @@ export const parallaxPropiertiesIsValid = (
 
     return {
         propierties: isValid
-            ? (valueFromConstant ?? parallaxConstant.PROP_VERTICAL)
-            : parallaxConstant.PROP_VERTICAL,
+            ? (valueFromConstant ?? HandleScrollerConstant.PROP_VERTICAL)
+            : HandleScrollerConstant.PROP_VERTICAL,
         shouldTrackOnlyEvents,
     };
 };
@@ -1195,17 +1195,20 @@ export const parallaxPropiertiesIsValid = (
  * @description
  * Check if easeType is valid
  **/
-export const parallaxEaseTypeIsValid = (value) => {
-    if (!value) return parallaxConstant.EASE_LERP;
+export const scrollerEaseTypeIsValid = (value) => {
+    if (!value) return HandleScrollerConstant.EASE_LERP;
 
-    const choice = [parallaxConstant.EASE_SPRING, parallaxConstant.EASE_LERP];
+    const choice = [
+        HandleScrollerConstant.EASE_SPRING,
+        HandleScrollerConstant.EASE_LERP,
+    ];
     const isValid = choice.includes(value);
-    if (!isValid) parallaxEaseTypeWarining(value, choice);
+    if (!isValid) scrollerEaseTypeWarining(value, choice);
 
     /**
      * Sequencer can not use spring
      */
-    const fallback = isValid ? value : parallaxConstant.EASE_LERP;
+    const fallback = isValid ? value : HandleScrollerConstant.EASE_LERP;
     return isValid ? value : fallback;
 };
 
@@ -1215,26 +1218,29 @@ export const parallaxEaseTypeIsValid = (value) => {
  * @returns {string}
  */
 export const genericEaseTypeIsValid = (value, component) => {
-    const choice = [parallaxConstant.EASE_SPRING, parallaxConstant.EASE_LERP];
+    const choice = [
+        HandleScrollerConstant.EASE_SPRING,
+        HandleScrollerConstant.EASE_LERP,
+    ];
 
     const isValid = choice.includes(value);
     if (!isValid && value) genericEaseTypeWarining(value, choice, component);
 
-    return isValid ? value : parallaxConstant.EASE_LERP;
+    return isValid ? value : HandleScrollerConstant.EASE_LERP;
 };
 
 /**
  *
- * @param {import('../../spring/type').springChoiceConfig|undefined} config
+ * @param {import('../../spring/type').SpringChoiceConfig|undefined} config
  * @param {string} type
- * @returns {import('../../spring/type').springChoiceConfig}
+ * @returns {import('../../spring/type').SpringChoiceConfig}
  *
  * @description
  * Check if springConfig is valid
  **/
-export const parallaxSpringConfigIsValid = (config, type) => {
+export const scrollerSpringConfigIsValid = (config, type) => {
     const defaultConfig =
-        type === parallaxConstant.TYPE_PARALLAX
+        type === HandleScrollerConstant.TYPE_PARALLAX
             ? handleSetUp.get('parallax').springConfig
             : handleSetUp.get('scrollTrigger').springConfig;
 
@@ -1244,7 +1250,7 @@ export const parallaxSpringConfigIsValid = (config, type) => {
     const choice = Object.keys(springDefaultConfig);
 
     const isValid = choice.includes(config);
-    if (!isValid && config) parallaxSpringCongifWarining(config, choice);
+    if (!isValid && config) scrollerSpringCongifWarining(config, choice);
 
     return isValid ? config : defaultConfig;
 };
@@ -1258,15 +1264,15 @@ export const parallaxSpringConfigIsValid = (config, type) => {
  * @description
  * Check if lerpConfig is valid
  **/
-export const parallaxLerpConfigIsValid = (value, type) => {
+export const scrollerLerpConfigIsValid = (value, type) => {
     const isValid =
         // @ts-ignore
         mobCore.checkType(Number, Number(value)) && value > 0 && value <= 1;
 
-    if (!isValid && value) parallaxLerpConfigWarning();
+    if (!isValid && value) scrollerLerpConfigWarning();
 
     const defaultConfig =
-        type === parallaxConstant.TYPE_PARALLAX
+        type === HandleScrollerConstant.TYPE_PARALLAX
             ? handleSetUp.get('parallax').lerpConfig
             : handleSetUp.get('scrollTrigger').lerpConfig;
 
@@ -1284,18 +1290,18 @@ export const parallaxLerpConfigIsValid = (value, type) => {
  **/
 export const checkStringRangeOnPropierties = (value, properties) => {
     const parallalxXYRangeChoice = [
-        parallaxConstant.PX,
-        parallaxConstant.VW,
-        parallaxConstant.VH,
-        parallaxConstant.WPERCENT,
-        parallaxConstant.HPERCENT,
+        HandleScrollerConstant.PX,
+        HandleScrollerConstant.VW,
+        HandleScrollerConstant.VH,
+        HandleScrollerConstant.WPERCENT,
+        HandleScrollerConstant.HPERCENT,
     ];
     /**
      * Check X,Y prop
      */
     if (
-        properties === parallaxConstant.PROP_VERTICAL ||
-        properties === parallaxConstant.PROP_HORIZONTAL
+        properties === HandleScrollerConstant.PROP_VERTICAL ||
+        properties === HandleScrollerConstant.PROP_HORIZONTAL
     ) {
         const isValid = exactMatchInsesitiveNumberPropArray(
             parallalxXYRangeChoice,
@@ -1314,18 +1320,18 @@ export const checkStringRangeOnPropierties = (value, properties) => {
      * Check ROTATE PROP
      */
     if (
-        properties === parallaxConstant.PROP_ROTATE ||
-        properties === parallaxConstant.PROP_ROTATEX ||
-        properties === parallaxConstant.PROP_ROTATEY ||
-        properties === parallaxConstant.PROP_ROTATEZ
+        properties === HandleScrollerConstant.PROP_ROTATE ||
+        properties === HandleScrollerConstant.PROP_ROTATEX ||
+        properties === HandleScrollerConstant.PROP_ROTATEY ||
+        properties === HandleScrollerConstant.PROP_ROTATEZ
     ) {
         const isValid = exactMatchInsesitiveNumberPropArray(
-            [parallaxConstant.DEGREE],
+            [HandleScrollerConstant.DEGREE],
             value
         );
         if (!isValid)
             scrollTriggerRangeWarning(value, properties, [
-                parallaxConstant.DEGREE,
+                HandleScrollerConstant.DEGREE,
             ]);
 
         return isValid ? value : '0';
@@ -1335,9 +1341,9 @@ export const checkStringRangeOnPropierties = (value, properties) => {
      * Check SCALE PROP
      */
     if (
-        properties === parallaxConstant.PROP_SCALE ||
-        properties === parallaxConstant.PROP_SCALE_X ||
-        properties === parallaxConstant.PROP_SCALE_Y
+        properties === HandleScrollerConstant.PROP_SCALE ||
+        properties === HandleScrollerConstant.PROP_SCALE_X ||
+        properties === HandleScrollerConstant.PROP_SCALE_Y
     ) {
         const isValid = checkIfIsOnlyNumberPositiveNegative(value);
         if (!isValid) scrollTriggerRangeScaleWarning(value, properties);

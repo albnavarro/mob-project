@@ -1,4 +1,4 @@
-import { easeTypes } from '../tween/type';
+import { EaseTypes } from '../tween/type';
 import { StaggerObject } from '../utils/stagger/type';
 import {
     directionType,
@@ -10,18 +10,18 @@ export interface sequencerProps {
     data: Record<string, number>;
     duration?: number;
     stagger?: Partial<StaggerObject>;
-    ease?: easeTypes;
+    ease?: EaseTypes;
 }
 
 export interface sequencerDefault {
-    ease: easeTypes;
+    ease: EaseTypes;
     start: number;
     end: number;
 }
 
 export interface sequencerAction {
     duration?: number;
-    ease?: easeTypes;
+    ease?: EaseTypes;
     start?: number;
     end?: number;
 }

@@ -1,6 +1,6 @@
 // @ts-check
 
-import { getUnivoqueId } from '../../utils/index.js';
+import { clamp, getUnivoqueId } from '../../utils/index.js';
 import { eventStore } from '../eventStore.js';
 import { normalizeWheel } from './normalizeWhell.js';
 
@@ -63,10 +63,6 @@ function handleMouse(eventType) {
      */
     const callbacks = new Map();
 
-    /**
-     * @type {{usePassive:( boolean )}}
-     */
-    // @ts-ignore
     let { usePassive } = eventStore.get();
 
     /**
@@ -128,8 +124,16 @@ function handleMouse(eventType) {
 
         // Add spin value if is wheel event
         if (type === 'wheel') {
+            const spinYMaxValue = eventStore.getProp('spinYMaxValue');
+            const spinXMaxValue = eventStore.getProp('spinXMaxValue');
             const { spinX, spinY, pixelX, pixelY } = normalizeWheel(event);
-            Object.assign(mouseData, { spinX, spinY, pixelX, pixelY });
+
+            Object.assign(mouseData, {
+                spinX: clamp(spinX, -spinXMaxValue, spinXMaxValue),
+                spinY: clamp(spinY, -spinYMaxValue, spinYMaxValue),
+                pixelX,
+                pixelY,
+            });
         }
 
         for (const value of callbacks.values()) {

@@ -1,6 +1,6 @@
 import { StaggerObject } from '../utils/stagger/type';
 
-export interface springProps {
+export interface SpringProps {
     friction: number;
     mass: number;
     precision: number;
@@ -8,53 +8,53 @@ export interface springProps {
     velocity: number;
 }
 
-export interface springPresentConfigType {
-    gentle: springProps;
-    wobbly: springProps;
-    bounce: springProps;
-    scroller: springProps;
-    default: springProps;
-    [key: string]: springProps;
+export interface SpringPresentConfigType {
+    gentle: SpringProps;
+    wobbly: SpringProps;
+    bounce: SpringProps;
+    scroller: SpringProps;
+    default: SpringProps;
+    [key: string]: SpringProps;
 }
 
-export type springChoiceConfig =
+export type SpringChoiceConfig =
     | 'default'
     | 'gentle'
     | 'wobbly'
     | 'bounce'
     | 'scroller';
 
-export interface springTweenProps {
+export interface SpringTweenProps {
     data: Record<string, number>;
     relative?: boolean;
     stagger?: Partial<StaggerObject>;
-    config?: springChoiceConfig;
-    configProps?: Partial<springProps>;
+    config?: SpringChoiceConfig;
+    configProps?: Partial<SpringProps>;
 }
 
-export interface springActions {
+export interface SpringActions {
     reverse?: boolean;
     relative?: boolean;
     immediate?: boolean;
-    config?: springChoiceConfig;
-    configProps?: Partial<springProps>;
+    config?: SpringChoiceConfig;
+    configProps?: Partial<SpringProps>;
 }
 
-export interface springDefault {
+export interface SpringDefault {
     reverse: boolean;
-    configProps: springProps;
+    configProps: SpringProps;
     relative: boolean;
     immediate: boolean;
 }
 
-export interface springInitialData {
+export interface SpringInitialData {
     prop: string;
     toValue: number;
     fromValue: number;
     currentValue: number;
 }
 
-export interface springValues extends springInitialData {
+export interface SpringValues extends SpringInitialData {
     velocity: number;
     fromFn: () => number;
     fromIsFn: boolean;
@@ -63,23 +63,23 @@ export interface springValues extends springInitialData {
     settled: boolean;
 }
 
-export type springMergeProps = (props: springActions) => springDefault;
-export type springStop = (arg0?: tweenStopProps) => void;
-export type springPause = () => void;
-export type springResume = () => void;
-export type springResetData = () => void;
-export type springGetValue = () => Record<string, number>;
-export type springGetValueNative = () => Record<
+export type SpringMergeProps = (props: SpringActions) => SpringDefault;
+export type SpringStop = (arg0?: tweenStopProps) => void;
+export type SpringPause = () => void;
+export type SpringResume = () => void;
+export type SpringResetData = () => void;
+export type SpringGetValue = () => Record<string, number>;
+export type SpringGetValueNative = () => Record<
     string,
     number | (() => number)
 >;
-export type springGetType = () => string;
-export type springGetId = () => string;
-export type springUdateConfigProp = (arg0: Partial<springProps>) => void;
-export type springUdateConfig = (arg0: springChoiceConfig) => void;
-export type springSubscribe = (cb: (arg0: any) => void) => () => void;
-export type springSubscribeCache = (
+export type SpringGetType = () => string;
+export type SpringGetId = () => string;
+export type SpringUdateConfigProp = (arg0: Partial<SpringProps>) => void;
+export type SpringUdateConfig = (arg0: SpringChoiceConfig) => void;
+export type SpringSubscribe = (cb: (arg0: any) => void) => () => void;
+export type SpringSubscribeCache = (
     item: object | HTMLElement,
     cb: (arg0: Record<string, number>) => void
 ) => () => void;
-export type springOnComplete = (cb: (arg0: any) => void) => () => void;
+export type SpringOnComplete = (cb: (arg0: any) => void) => () => void;

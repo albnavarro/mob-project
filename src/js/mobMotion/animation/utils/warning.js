@@ -1,6 +1,6 @@
 // @ts-check
 
-import { parallaxConstant } from '../parallax/parallaxConstant';
+import { HandleScrollerConstant } from '../scroller/HandleScrollerConstant';
 import {
     STAGGER_START,
     STAGGER_TYPE_CENTER,
@@ -506,9 +506,9 @@ export const addAsyncFunctionWarining = (value) => {
  *
  * @returns void
  */
-export const parallaxDirectionWarining = (value, component) => {
+export const scrollerDirectionWarining = (value, component) => {
     console.warn(
-        `${component} direction: ${value} is not valid value: must be ${parallaxConstant.DIRECTION_VERTICAL} | ${parallaxConstant.DIRECTION_HORIZONTAL}`
+        `${component} direction: ${value} is not valid value: must be ${HandleScrollerConstant.DIRECTION_VERTICAL} | ${HandleScrollerConstant.DIRECTION_HORIZONTAL}`
     );
 };
 
@@ -517,7 +517,7 @@ export const parallaxDirectionWarining = (value, component) => {
  *
  * @returns void
  */
-export const parallaxDynmicValueWarining = (label) => {
+export const scrollerDynmicValueWarining = (label) => {
     console.warn(
         `scrollTrigger error; ${label} propierties: value must be a Object like { position: top|bottom|left|right, value: () => { return Number} } `
     );
@@ -526,7 +526,7 @@ export const parallaxDynmicValueWarining = (label) => {
 /**
  * @returns void
  */
-export const parallaxDynmicRangeValueWarining = () => {
+export const scrollerDynmicRangeValueWarining = () => {
     console.warn(
         `scrollTrigger error; dynamicRange propierties: value must be a Function that return a Number`
     );
@@ -535,7 +535,7 @@ export const parallaxDynmicRangeValueWarining = () => {
 /**
  * @returns void
  */
-export const parallaxTweenWarning = () => {
+export const scrollerTweenWarning = () => {
     console.warn(
         'parallax|scrolTrigger error: tween is not valid, must be an instance of HandleSequencer || ParallaxTween'
     );
@@ -547,7 +547,7 @@ export const parallaxTweenWarning = () => {
  *
  * @returns void
  */
-export const parallaxAlignWarining = (value, choice) => {
+export const scrollerAlignWarining = (value, choice) => {
     console.warn(
         `parallax error align propierties: ${value} is not valid must be one of ${possibleChoice(
             choice
@@ -561,7 +561,7 @@ export const parallaxAlignWarining = (value, choice) => {
  *
  * @returns void
  */
-export const parallaxOnSwitchWarining = (value, choice) => {
+export const scrollerOnSwitchWarining = (value, choice) => {
     console.warn(
         `parallax error align propierties: ${value} is not valid must be one of ${possibleChoice(
             choice
@@ -575,7 +575,7 @@ export const parallaxOnSwitchWarining = (value, choice) => {
  *
  * @returns void
  */
-export const parallaxOpacityWarning = (val, label) => {
+export const scrollerOpacityWarning = (val, label) => {
     console.warn(
         `${label}: '${val}' is not Number, must be a number between 0 and 100`
     );
@@ -587,7 +587,7 @@ export const parallaxOpacityWarning = (val, label) => {
  *
  * @returns void
  */
-export const parallaxTypeWarining = (value, choice) => {
+export const scrollerTypeWarining = (value, choice) => {
     console.warn(
         `parallax error type propierties: ${value} is not valid must be one of ${possibleChoice(
             choice
@@ -601,7 +601,7 @@ export const parallaxTypeWarining = (value, choice) => {
  *
  * @returns void
  */
-export const parallaxPropiertiesWarining = (value, choice) => {
+export const scrollerPropiertiesWarining = (value, choice) => {
     console.warn(
         `parallax/scrollTrigger error propierties props: ${value} is not valid must be one of ${possibleChoice(
             choice
@@ -615,7 +615,7 @@ export const parallaxPropiertiesWarining = (value, choice) => {
  *
  * @returns void
  */
-export const parallaxEaseTypeWarining = (value, choice) => {
+export const scrollerEaseTypeWarining = (value, choice) => {
     console.warn(
         `parallax error easeType props: ${value} is not valid must be one of ${possibleChoice(
             choice
@@ -641,7 +641,7 @@ export const genericEaseTypeWarining = (value, choice, component) => {
 /**
  * @returns void
  */
-export const parallaxEaseTypeSpringWarining = () => {
+export const scrollerEaseTypeSpringWarining = () => {
     console.warn(
         'Scrolltrigger warning: spring animation is only available for native properties and scrollerTween, Check that with the "propierties" property set to "tween" no HandleSequencer is associated with the "tween" property'
     );
@@ -653,7 +653,7 @@ export const parallaxEaseTypeSpringWarining = () => {
  *
  * @returns void
  */
-export const parallaxSpringCongifWarining = (value, choice) => {
+export const scrollerSpringCongifWarining = (value, choice) => {
     console.warn(
         `parallax/scrollTrigger error springConfig props: ${value} is not valid must be one of ${possibleChoice(
             choice
@@ -666,7 +666,7 @@ export const parallaxSpringCongifWarining = (value, choice) => {
  *
  * @returns void
  */
-export const parallaxRangeNumberWarning = (value) => {
+export const scrollerRangeNumberWarning = (value) => {
     console.warn(
         `parallax error range propierties, current value: ${value}, the value must be a number between 0 and 9.99`
     );
@@ -677,7 +677,7 @@ export const parallaxRangeNumberWarning = (value) => {
  *
  * @returns void
  */
-export const parallaxRangeStringWarning = (value) => {
+export const scrollerRangeStringWarning = (value) => {
     console.warn(
         `scrollTrigger error range propierties: ${value} is not a String`
     );
@@ -702,7 +702,7 @@ export const breakpointWarning = (mq, choice, label, component) => {
 /**
  * @returns void
  */
-export const parallaxUseSequencerWarining = () => {
+export const scrollerUseSequencerWarining = () => {
     console.warn(
         'Parallax warning: if propierties is a tween the only choice is ParallaxTween, HandleSequencer or empty tween propierites is not allowed inside a parallax'
     );
@@ -711,7 +711,7 @@ export const parallaxUseSequencerWarining = () => {
 /**
  * @returns void
  */
-export const parallaxLerpConfigWarning = () => {
+export const scrollerLerpConfigWarning = () => {
     console.warn(
         'parallax/ScrollTrrigger error: velocity is not valid, must be a Number greater than 0 and less than 1'
     );
@@ -720,7 +720,7 @@ export const parallaxLerpConfigWarning = () => {
 /**
  * @returns void
  */
-export const parallaxNoTweenDefinedWarning = () => {
+export const scrollerNoTweenDefinedWarning = () => {
     console.warn(
         'parallax/ScrollTrrigger warning:  The property is "tween" but no tween has been associated, associate a tween with the "tween" property'
     );
@@ -729,7 +729,7 @@ export const parallaxNoTweenDefinedWarning = () => {
 /**
  * @returns void
  */
-export const parallaxUseTweenButNotProsDefinedWarning = () => {
+export const scrollerUseTweenButNotProsDefinedWarning = () => {
     console.warn(
         'parallax/ScrollTrrigger: there is tween associated but pros "propierties" is not set to "tween"'
     );

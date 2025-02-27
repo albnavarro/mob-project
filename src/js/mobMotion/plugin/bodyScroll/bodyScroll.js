@@ -14,7 +14,7 @@ import {
     updatePageScroll,
 } from '../pageScroll/pageScroller.js';
 
-/** @type {import('../../animation/tween/type.js').easeTypes} */
+/** @type {import('../../animation/tween/type.js').EaseTypes} */
 const defaultPreset = 'easeOutQuad';
 
 /** @type {HandleTween} */
@@ -134,7 +134,7 @@ export const bodyScroll = (() => {
 
         if (easeTweenIsValid(data?.ease)) {
             tween?.updateEase?.(
-                /** @type{import('../../animation/tween/type.js').easeTypes} */ (
+                /** @type{import('../../animation/tween/type.js').EaseTypes} */ (
                     data?.ease
                 )
             );

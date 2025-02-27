@@ -66,7 +66,7 @@ export const runCallbackQueqe = ({
                 const propsPerIdNow = waitMap.get(instanceId);
                 const valueNow = propsPerIdNow?.get(prop);
 
-                if (valueNow) {
+                if (valueNow !== undefined || valueNow !== null) {
                     fn(valueNow, oldValue, validationValue);
                 }
 

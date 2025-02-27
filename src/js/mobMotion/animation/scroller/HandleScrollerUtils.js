@@ -1,18 +1,18 @@
 // @ts-check
 
 import {
-    getParallaxPositionFromContanst,
+    getScrollerPositionFromContanst,
     getStartEndUnitMisure,
 } from './getConstantFromRegex.js';
 import {
     exactMatchInsensitive,
     exactMatchInsesitivePropArray,
 } from '../utils/regexValidation.js';
-import { parallaxConstant } from './parallaxConstant.js';
+import { HandleScrollerConstant } from './HandleScrollerConstant.js';
 import {
-    parallaxWarningNoUnitMiusure,
-    parallaxWarningVhIsNotAllowed,
-    parallaxWarningVwIsNotAllowed,
+    scrollerWarningNoUnitMiusure,
+    scrollerWarningVhIsNotAllowed,
+    scrollerWarningVwIsNotAllowed,
 } from './warning.js';
 import { mobCore } from '../../../mobCore/index.js';
 
@@ -144,40 +144,40 @@ export const getStartEndValue = (values, direction) => {
 
     // Number without unit misure is not allowed
     if (numberInString && !unitMisure) {
-        parallaxWarningNoUnitMiusure();
+        scrollerWarningNoUnitMiusure();
         return returnWhenFail();
     }
 
     // Number in vh is not allowed in horizontal mode
     if (
         numberInString &&
-        unitMisure === parallaxConstant.VH &&
-        direction === parallaxConstant.DIRECTION_HORIZONTAL
+        unitMisure === HandleScrollerConstant.VH &&
+        direction === HandleScrollerConstant.DIRECTION_HORIZONTAL
     ) {
-        parallaxWarningVhIsNotAllowed();
+        scrollerWarningVhIsNotAllowed();
         return returnWhenFail();
     }
 
     // Number in vw is not allowed in vertical mode
     if (
         numberInString &&
-        unitMisure === parallaxConstant.VW &&
-        direction === parallaxConstant.DIRECTION_VERTICAL
+        unitMisure === HandleScrollerConstant.VW &&
+        direction === HandleScrollerConstant.DIRECTION_VERTICAL
     ) {
-        parallaxWarningVwIsNotAllowed();
+        scrollerWarningVwIsNotAllowed();
         return returnWhenFail();
     }
 
     // Get aditonal value +height +halfHeight -height -etc... if exist
     const additionaChoice = [
-        parallaxConstant.PLUS_HEIGHT,
-        parallaxConstant.PLUS_HEIGHT_HALF,
-        parallaxConstant.PLUS_WIDTH,
-        parallaxConstant.PLUS_WIDTH_HALF,
-        parallaxConstant.MINUS_HEIGHT,
-        parallaxConstant.MINUS_HEIGHT_HALF,
-        parallaxConstant.MINUS_WIDTH,
-        parallaxConstant.MINUS_WIDTH_HALF,
+        HandleScrollerConstant.PLUS_HEIGHT,
+        HandleScrollerConstant.PLUS_HEIGHT_HALF,
+        HandleScrollerConstant.PLUS_WIDTH,
+        HandleScrollerConstant.PLUS_WIDTH_HALF,
+        HandleScrollerConstant.MINUS_HEIGHT,
+        HandleScrollerConstant.MINUS_HEIGHT_HALF,
+        HandleScrollerConstant.MINUS_WIDTH,
+        HandleScrollerConstant.MINUS_WIDTH_HALF,
     ];
     const getAdditionalVal = values.find((item) => {
         return exactMatchInsesitivePropArray(additionaChoice, item);
@@ -185,10 +185,10 @@ export const getStartEndValue = (values, direction) => {
 
     // Get position top || bottom || left || right
     const positionMap = [
-        parallaxConstant.POSITION_BOTTOM,
-        parallaxConstant.POSITION_TOP,
-        parallaxConstant.POSITION_LEFT,
-        parallaxConstant.POSITION_RIGHT,
+        HandleScrollerConstant.POSITION_BOTTOM,
+        HandleScrollerConstant.POSITION_TOP,
+        HandleScrollerConstant.POSITION_LEFT,
+        HandleScrollerConstant.POSITION_RIGHT,
     ];
     const getPosition = values.find((item) => {
         return exactMatchInsesitivePropArray(positionMap, item);
@@ -198,7 +198,7 @@ export const getStartEndValue = (values, direction) => {
         numberVal: numberInString || 0,
         unitMisure,
         additionalVal: getAdditionalVal ?? '',
-        position: getPosition ?? parallaxConstant.POSITION_BOTTOM,
+        position: getPosition ?? HandleScrollerConstant.POSITION_BOTTOM,
     };
 };
 
@@ -246,16 +246,16 @@ export const getStartPoint = (screenUnit, data, direction) => {
     /**
      * Get final value without height/halfHeight etc..
      */
-    return unitMisure === parallaxConstant.PX
+    return unitMisure === HandleScrollerConstant.PX
         ? {
               value: startValInNumber * isNegative,
               additionalVal,
-              position: getParallaxPositionFromContanst(position),
+              position: getScrollerPositionFromContanst(position),
           }
         : {
               value: screenUnit * startValInNumber * isNegative,
               additionalVal,
-              position: getParallaxPositionFromContanst(position),
+              position: getScrollerPositionFromContanst(position),
           };
 };
 
@@ -313,19 +313,19 @@ export const getEndPoint = (
     /**
      * Get position constant from prallax constant
      */
-    const positionFromConstant = getParallaxPositionFromContanst(position);
+    const positionFromConstant = getScrollerPositionFromContanst(position);
 
     /**
      * Check direction
      */
     const isFromTopLeft =
-        positionFromConstant === parallaxConstant.POSITION_TOP ||
-        positionFromConstant === parallaxConstant.POSITION_LEFT;
+        positionFromConstant === HandleScrollerConstant.POSITION_TOP ||
+        positionFromConstant === HandleScrollerConstant.POSITION_LEFT;
 
     /**
      * Get final value without height/halfHeight etc..
      */
-    return unitMisure === parallaxConstant.PX
+    return unitMisure === HandleScrollerConstant.PX
         ? {
               value: invertSide
                   ? getValueInPx({
@@ -385,36 +385,36 @@ export const processFixedLimit = (value, stringValue, height, width) => {
     const str = String(stringValue);
 
     // plus
-    if (exactMatchInsensitive(str, parallaxConstant.PLUS_HEIGHT_HALF)) {
+    if (exactMatchInsensitive(str, HandleScrollerConstant.PLUS_HEIGHT_HALF)) {
         return value + height / 2;
     }
 
-    if (exactMatchInsensitive(str, parallaxConstant.PLUS_HEIGHT)) {
+    if (exactMatchInsensitive(str, HandleScrollerConstant.PLUS_HEIGHT)) {
         return value + height;
     }
 
-    if (exactMatchInsensitive(str, parallaxConstant.PLUS_WIDTH_HALF)) {
+    if (exactMatchInsensitive(str, HandleScrollerConstant.PLUS_WIDTH_HALF)) {
         return value + width / 2;
     }
 
-    if (exactMatchInsensitive(str, parallaxConstant.PLUS_WIDTH)) {
+    if (exactMatchInsensitive(str, HandleScrollerConstant.PLUS_WIDTH)) {
         return value + width;
     }
 
     // minus
-    if (exactMatchInsensitive(str, parallaxConstant.MINUS_HEIGHT_HALF)) {
+    if (exactMatchInsensitive(str, HandleScrollerConstant.MINUS_HEIGHT_HALF)) {
         return value - height / 2;
     }
 
-    if (exactMatchInsensitive(str, parallaxConstant.MINUS_HEIGHT)) {
+    if (exactMatchInsensitive(str, HandleScrollerConstant.MINUS_HEIGHT)) {
         return value - height;
     }
 
-    if (exactMatchInsensitive(str, parallaxConstant.MINUS_WIDTH_HALF)) {
+    if (exactMatchInsensitive(str, HandleScrollerConstant.MINUS_WIDTH_HALF)) {
         return value - width / 2;
     }
 
-    if (exactMatchInsensitive(str, parallaxConstant.MINUS_WIDTH)) {
+    if (exactMatchInsensitive(str, HandleScrollerConstant.MINUS_WIDTH)) {
         return value - width;
     }
 
@@ -432,25 +432,25 @@ export const processFixedLimit = (value, stringValue, height, width) => {
  */
 export const getValueOnSwitch = ({ switchPropierties, isReverse, value }) => {
     switch (switchPropierties) {
-        case parallaxConstant.IN_STOP: {
+        case HandleScrollerConstant.IN_STOP: {
             return (!isReverse && value > 0) || (isReverse && value < 0)
                 ? 0
                 : value;
         }
 
-        case parallaxConstant.IN_BACK: {
+        case HandleScrollerConstant.IN_BACK: {
             return (!isReverse && value > 0) || (isReverse && value < 0)
                 ? -value
                 : value;
         }
 
-        case parallaxConstant.OUT_STOP: {
+        case HandleScrollerConstant.OUT_STOP: {
             return (!isReverse && value < 0) || (isReverse && value > 0)
                 ? 0
                 : value;
         }
 
-        case parallaxConstant.OUT_BACK: {
+        case HandleScrollerConstant.OUT_BACK: {
             return (!isReverse && value < 0) || (isReverse && value > 0)
                 ? -value
                 : value;
@@ -471,7 +471,7 @@ export const getValueOnSwitch = ({ switchPropierties, isReverse, value }) => {
  */
 export const getRetReverseValue = (propierties, val) => {
     switch (propierties) {
-        case parallaxConstant.PROP_OPACITY: {
+        case HandleScrollerConstant.PROP_OPACITY: {
             return 1 - val;
         }
 

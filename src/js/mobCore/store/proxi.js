@@ -1,6 +1,7 @@
 import { STORE_SET } from './constant';
 import { storeMap, updateMainMap } from './storeMap';
 import { storeSetEntryPoint } from './storeSet';
+import { checkIfPropIsComputed } from './storeUtils';
 
 /**
  * @description
@@ -31,6 +32,9 @@ export const getProxiEntryPoint = ({ instanceId }) => {
     const selfProxi = new Proxy(store, {
         set(target, /** @type{string} */ prop, value) {
             if (prop in target) {
+                const isComputed = checkIfPropIsComputed({ instanceId, prop });
+                if (isComputed) return false;
+
                 storeSetEntryPoint({
                     instanceId,
                     prop,

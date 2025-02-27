@@ -33,13 +33,13 @@ import {
     lerpUpdateVelocity,
 } from './animation/lerp/type';
 import {
-    parallaxTweenGetDuration,
-    parallaxTweenGetType,
-    parallaxTweenOnStop,
-    parallaxTweenSetData,
-    parallaxTweenSubscribe,
-    parallaxTweenSubscribeCache,
-} from './animation/parallax/type';
+    ParallaxTweenGetDuration,
+    ParallaxTweenGetType,
+    ParallaxTweenOnStop,
+    ParallaxTweenSetData,
+    ParallaxTweenSubscribe,
+    ParallaxTweenSubscribeCache,
+} from './animation/scroller/type';
 import {
     sequencerAdd,
     sequencerGetDuration,
@@ -57,17 +57,17 @@ import {
     sequencerSubscribeCache,
 } from './animation/sequencer/type';
 import {
-    springGetId,
-    springGetType,
-    springGetValue,
-    springGetValueNative,
-    springOnComplete,
-    springPause,
-    springStop,
-    springSubscribe,
-    springSubscribeCache,
-    springUdateConfig,
-    springUdateConfigProp,
+    SpringGetId,
+    SpringGetType,
+    SpringGetValue,
+    SpringGetValueNative,
+    SpringOnComplete,
+    SpringPause,
+    SpringStop,
+    SpringSubscribe,
+    SpringSubscribeCache,
+    SpringUdateConfig,
+    SpringUdateConfigProp,
 } from './animation/spring/type';
 import {
     syncTimelineAdd,
@@ -89,16 +89,16 @@ import {
     syncTimelineTime,
 } from './animation/syncTimeline/type';
 import {
-    tweenGetId,
-    tweenGetType,
-    tweenGetValue,
-    tweenGetValueNative,
-    tweenOnComplete,
-    tweenPause,
-    tweenStop,
-    tweenSubscribe,
-    tweenSubscribeCache,
-    tweenUpdateEase,
+    TweenGetId,
+    TweenGetType,
+    TweenGetValue,
+    TweenGetValueNative,
+    TweenOnComplete,
+    TweenPause,
+    TweenStop,
+    TweenSubscribe,
+    TweenSubscribeCache,
+    TweenUpdateEase,
 } from './animation/tween/type';
 import { directionType } from './animation/utils/timeline/type';
 import {
@@ -136,51 +136,51 @@ export interface Lerp {
 }
 
 export interface Spring {
-    stop: springStop;
-    pause: springPause;
+    stop: SpringStop;
+    pause: SpringPause;
     setData: SetData;
     goTo: GoTo;
     goFrom: GoFrom;
     goFromTo: GoFromTo;
     set: Set;
     setImmediate: SetImmediate;
-    get: springGetValue;
-    getInitialData: springGetValue;
-    getFrom: springGetValue;
-    getTo: springGetValue;
-    getFromNativeType: springGetValueNative;
-    getToNativeType: springGetValueNative;
-    getType: springGetType;
-    getId: springGetId;
-    updateConfigProp: springUdateConfigProp;
-    updateConfig: springUdateConfig;
-    subscribe: springSubscribe;
-    subscribeCache: springSubscribeCache;
-    onComplete: springOnComplete;
+    get: SpringGetValue;
+    getInitialData: SpringGetValue;
+    getFrom: SpringGetValue;
+    getTo: SpringGetValue;
+    getFromNativeType: SpringGetValueNative;
+    getToNativeType: SpringGetValueNative;
+    getType: SpringGetType;
+    getId: SpringGetId;
+    updateConfigProp: SpringUdateConfigProp;
+    updateConfig: SpringUdateConfig;
+    subscribe: SpringSubscribe;
+    subscribeCache: SpringSubscribeCache;
+    onComplete: SpringOnComplete;
     destroy: () => void;
 }
 
 export interface Tween {
-    stop: tweenStop;
-    pause: tweenPause;
+    stop: TweenStop;
+    pause: TweenPause;
     setData: SetData;
     goTo: GoTo;
     goFrom: GoFrom;
     goFromTo: GoFromTo;
     set: Set;
     setImmediate: SetImmediate;
-    get: tweenGetValue;
-    getInitialData: tweenGetValue;
-    getFrom: tweenGetValue;
-    getTo: tweenGetValue;
-    getFromNativeType: tweenGetValueNative;
-    getToNativeType: tweenGetValueNative;
-    getType: tweenGetType;
-    getId: tweenGetId;
-    updateEase: tweenUpdateEase;
-    subscribe: tweenSubscribe;
-    subscribeCache: tweenSubscribeCache;
-    onComplete: tweenOnComplete;
+    get: TweenGetValue;
+    getInitialData: TweenGetValue;
+    getFrom: TweenGetValue;
+    getTo: TweenGetValue;
+    getFromNativeType: TweenGetValueNative;
+    getToNativeType: TweenGetValueNative;
+    getType: TweenGetType;
+    getId: TweenGetId;
+    updateEase: TweenUpdateEase;
+    subscribe: TweenSubscribe;
+    subscribeCache: TweenSubscribeCache;
+    onComplete: TweenOnComplete;
     destroy: () => void;
 }
 
@@ -233,13 +233,13 @@ export interface Sequencer {
 }
 
 export interface ParallaxTween {
-    setData: parallaxTweenSetData;
+    setData: ParallaxTweenSetData;
     goTo: parallaxTweenGoTo;
-    subscribe: parallaxTweenSubscribe;
-    onStop: parallaxTweenOnStop;
-    subscribeCache: parallaxTweenSubscribeCache;
-    getDuration: parallaxTweenGetDuration;
-    getType: parallaxTweenGetType;
+    subscribe: ParallaxTweenSubscribe;
+    onStop: ParallaxTweenOnStop;
+    subscribeCache: ParallaxTweenSubscribeCache;
+    getDuration: ParallaxTweenGetDuration;
+    getType: ParallaxTweenGetType;
     inzializeStagger: () => void;
 }
 

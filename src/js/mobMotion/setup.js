@@ -10,8 +10,8 @@ import {
     markerStartDefault,
     mqDefault,
     MQ_MIN,
-    parallaxRangeDefault,
-    parallaxTweenDurationDefault,
+    scrollerRangeDefault,
+    scrollerTweenDurationDefault,
     sequencerDurationDefault,
     setupValidation,
     springConfigDefault,
@@ -46,12 +46,12 @@ function getData() {
             },
         },
         parallax: {
-            defaultRange: parallaxRangeDefault,
+            defaultRange: scrollerRangeDefault,
             springConfig: springConfigDefault,
             lerpConfig: lerpConfigDefault,
         },
         parallaxTween: {
-            duration: parallaxTweenDurationDefault,
+            duration: scrollerTweenDurationDefault,
             ease: easeDefault,
         },
         tween: {

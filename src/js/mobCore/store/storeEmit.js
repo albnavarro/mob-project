@@ -47,17 +47,24 @@ export const storeEmitEntryPoint = ({ instanceId, prop }) => {
 
     const { bindInstance } = state;
 
+    /**
+     * Emit prop from itSelf and exit
+     */
     if (!bindInstance || bindInstance.length === 0) {
         storeEmit({ instanceId, prop });
+        return;
     }
 
+    /**
+     * Emit prop from binded store
+     */
     const currentBindId =
         [instanceId, ...bindInstance].find((id) => {
             const store = storeMap.get(id)?.store;
             return store && prop in store;
         }) ?? '';
 
-    return storeEmit({ instanceId: currentBindId, prop });
+    storeEmit({ instanceId: currentBindId, prop });
 };
 
 /**

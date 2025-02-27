@@ -1,5 +1,5 @@
 import { MouseEventParsed } from '../../../mobCore/events/mouseUtils/type';
-import { mqAction, mqValues } from '../../utils/type';
+import { MqAction, MqValues } from '../../utils/type';
 
 type onTick = (arg0: {
     value: number;
@@ -117,12 +117,12 @@ export interface SmoothScroller {
      * @description
      * Defines whether the defined breakpoint will be a max-with or a min-width. The default is 'min-width'.
      */
-    queryType?: mqAction;
+    queryType?: MqAction;
 
     /**
      * @description
      */
-    breakpoint?: mqValues;
+    breakpoint?: MqValues;
 }
 
 export type onMouseEvent = (arg0: Partial<MouseEventParsed>) => void;

@@ -67,7 +67,7 @@ export default class HandleSpring {
     #relative;
 
     /**
-     * @type {import('./type.js').springProps}
+     * @type {import('./type.js').SpringProps}
      *
      * This value lives from user call ( goTo etc..) until next call
      **/
@@ -99,12 +99,12 @@ export default class HandleSpring {
     #promise;
 
     /**
-     * @type {import('./type.js').springValues[]|[]}
+     * @type {import('./type.js').SpringValues[]|[]}
      */
     #values;
 
     /**
-     * @type {import('./type.js').springInitialData[]}
+     * @type {import('./type.js').SpringInitialData[]}
      */
     #initialData;
 
@@ -158,7 +158,7 @@ export default class HandleSpring {
      * This value is the base value merged with new value in custom prop
      * passed form user in goTo etc..
      *
-     * @type {import('./type.js').springDefault}
+     * @type {import('./type.js').SpringDefault}
      **/
     #defaultProps;
 
@@ -173,7 +173,7 @@ export default class HandleSpring {
     #fastestStagger;
 
     /**
-     * @param {import('./type.js').springTweenProps} [ data ]
+     * @param {import('./type.js').SpringTweenProps} [ data ]
      *
      * @example
      * ```javascript
@@ -486,7 +486,7 @@ export default class HandleSpring {
     }
 
     /**
-     * @type {import('./type.js').springStop}
+     * @type {import('./type.js').SpringStop}
      */
     stop({ clearCache = true } = {}) {
         if (this.#pauseStatus) this.#pauseStatus = false;
@@ -514,7 +514,7 @@ export default class HandleSpring {
     }
 
     /**
-     * @type {import('./type.js').springPause}
+     * @type {import('./type.js').SpringPause}
      */
     pause() {
         if (this.#pauseStatus) return;
@@ -524,7 +524,7 @@ export default class HandleSpring {
     }
 
     /**
-     * @type {import('./type.js').springResume}
+     * @type {import('./type.js').SpringResume}
      */
     resume() {
         if (!this.#pauseStatus) return;
@@ -577,14 +577,14 @@ export default class HandleSpring {
     }
 
     /**
-     * @type {import('./type.js').springResetData}
+     * @type {import('./type.js').SpringResetData}
      */
     resetData() {
         this.#values = mergeDeep(this.#values, this.#initialData);
     }
 
     /**
-     * @type  {import('./type.js').springMergeProps}
+     * @type  {import('./type.js').SpringMergeProps}
      *
      * @description
      * Merge special props with default props
@@ -598,7 +598,7 @@ export default class HandleSpring {
          * Get news confic props ( mass, friction etc... )
          * Get props from new config ( wobble etc.. ) or get each default prop.
          *
-         * @type {import('./type.js').springPresentConfigType}
+         * @type {import('./type.js').SpringPresentConfigType}
          */
         const allPresetConfig = springParams.config;
         const configPreset = springConfigIsValid(props?.config)
@@ -640,7 +640,7 @@ export default class HandleSpring {
     }
 
     /**
-     * @type {import('../../utils/type.js').GoTo<import('./type.js').springActions>} obj to Values
+     * @type {import('../../utils/type.js').GoTo<import('./type.js').SpringActions>} obj to Values
      */
     goTo(obj, props = {}) {
         if (this.#pauseStatus) return new Promise((resolve) => resolve);
@@ -651,7 +651,7 @@ export default class HandleSpring {
     }
 
     /**
-     * @type {import('../../utils/type.js').GoFrom<import('./type.js').springActions>} obj to Values
+     * @type {import('../../utils/type.js').GoFrom<import('./type.js').SpringActions>} obj to Values
      */
     goFrom(obj, props = {}) {
         if (this.#pauseStatus) return new Promise((resolve) => resolve);
@@ -662,7 +662,7 @@ export default class HandleSpring {
     }
 
     /**
-     * @type {import('../../utils/type.js').GoFromTo<import('./type.js').springActions>} obj to Values
+     * @type {import('../../utils/type.js').GoFromTo<import('./type.js').SpringActions>} obj to Values
      */
     goFromTo(fromObj, toObj, props = {}) {
         if (this.#pauseStatus) return new Promise((resolve) => resolve);
@@ -678,7 +678,7 @@ export default class HandleSpring {
     }
 
     /**
-     * @type {import('../../utils/type.js').Set<import('./type.js').springActions>} obj to Values
+     * @type {import('../../utils/type.js').Set<import('./type.js').SpringActions>} obj to Values
      */
     set(obj, props = {}) {
         if (this.#pauseStatus) return new Promise((resolve) => resolve);
@@ -689,7 +689,7 @@ export default class HandleSpring {
     }
 
     /**
-     * @type {import('../../utils/type.js').SetImmediate<import('./type.js').springActions>} obj to Values
+     * @type {import('../../utils/type.js').SetImmediate<import('./type.js').SpringActions>} obj to Values
      */
     setImmediate(obj, props = {}) {
         if (this.#pauseStatus) return;
@@ -710,7 +710,7 @@ export default class HandleSpring {
     }
 
     /**
-     * @type {import('../../utils/type.js').DoAction<import('./type.js').springActions>} obj to Values
+     * @type {import('../../utils/type.js').DoAction<import('./type.js').SpringActions>} obj to Values
      */
     #doAction(data, props = {}, obj) {
         this.#values = mergeArray(data, this.#values);
@@ -743,7 +743,7 @@ export default class HandleSpring {
      * @description
      * Get current values, If the single value is a function it returns the result of the function.
      *
-     * @type {import('./type.js').springGetValue}
+     * @type {import('./type.js').SpringGetValue}
      *
      * @example
      * ```javascript
@@ -760,7 +760,7 @@ export default class HandleSpring {
      * @description
      * Get initial values, If the single value is a function it returns the result of the function.
      *
-     * @type {import('./type.js').springGetValue}
+     * @type {import('./type.js').SpringGetValue}
      *
      * @example
      * ```javascript
@@ -777,7 +777,7 @@ export default class HandleSpring {
      * @description
      * Get from values, If the single value is a function it returns the result of the function.
      *
-     * @type {import('./type.js').springGetValue}
+     * @type {import('./type.js').SpringGetValue}
      *
      * @example
      * ```javascript
@@ -794,7 +794,7 @@ export default class HandleSpring {
      * @description
      * Get to values, If the single value is a function it returns the result of the function.
      *
-     * @type {import('./type.js').springGetValue}
+     * @type {import('./type.js').SpringGetValue}
      *
      * @example
      * ```javascript
@@ -811,7 +811,7 @@ export default class HandleSpring {
      * @description
      * Get From values, if the single value is a function it returns the same function.
      *
-     * @type {import('./type.js').springGetValueNative}
+     * @type {import('./type.js').SpringGetValueNative}
      *
      * @example
      * ```javascript
@@ -828,7 +828,7 @@ export default class HandleSpring {
      * @description
      * Get To values, if the single value is a function it returns the same function.
      *
-     * @type {import('./type.js').springGetValueNative}
+     * @type {import('./type.js').SpringGetValueNative}
      *
      * @example
      * ```javascript
@@ -845,7 +845,7 @@ export default class HandleSpring {
      * @description
      * Get tween type
      *
-     * @type {import('./type.js').springGetType} tween type
+     * @type {import('./type.js').SpringGetType} tween type
      *
      * @example
      * ```javascript
@@ -862,7 +862,7 @@ export default class HandleSpring {
      * @description
      * Get univoque Id
      *
-     * @type {import('./type.js').springGetId}
+     * @type {import('./type.js').SpringGetId}
      *
      * @example
      * ```javascript
@@ -876,7 +876,7 @@ export default class HandleSpring {
     }
 
     /**
-     * @type {import('./type.js').springUdateConfigProp}
+     * @type {import('./type.js').SpringUdateConfigProp}
      *
      *  @example
      *  ```javascript
@@ -906,7 +906,7 @@ export default class HandleSpring {
      * @description
      * updateConfig - Update config object with new preset
      *
-     * @type {import('./type.js').springUdateConfig}
+     * @type {import('./type.js').SpringUdateConfig}
      *
      */
     updateConfig(config) {
@@ -917,7 +917,7 @@ export default class HandleSpring {
     }
 
     /**
-     * @type {import('./type.js').springSubscribe}
+     * @type {import('./type.js').SpringSubscribe}
      *
      * ```
      * @description
@@ -934,7 +934,7 @@ export default class HandleSpring {
     }
 
     /**
-     * @type {import('./type.js').springSubscribeCache}
+     * @type {import('./type.js').SpringSubscribeCache}
      *
      * @description
      * Callback that returns updated values ready to be usable, specific to manage large staggers.
@@ -970,7 +970,7 @@ export default class HandleSpring {
     }
 
     /**
-     * @type {import('./type.js').springOnComplete}
+     * @type {import('./type.js').SpringOnComplete}
      *
      *
      * @description

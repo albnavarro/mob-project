@@ -54,8 +54,8 @@ export const sequencerDurationDefault = 10;
 export const lerpConfigDefault = 0.06;
 export const markerStartDefault = '#ff0000';
 export const markerItemDefault = '#14df3b';
-export const parallaxRangeDefault = 8;
-export const parallaxTweenDurationDefault = 10;
+export const scrollerRangeDefault = 8;
+export const scrollerTweenDurationDefault = 10;
 export const tweenDurationDefault = 1000;
 export const tweenRealtiveDefault = false;
 export const springRealtiveDefault = false;
@@ -141,35 +141,35 @@ export const setupValidation = (obj) => {
         type: String,
     });
 
-    const parallaxRange = checkSetUpType({
+    const scrollerRange = checkSetUpType({
         prop: 'parallax.defaultRange',
         value: obj?.parallax?.defaultRange,
-        defaultValue: parallaxRangeDefault,
+        defaultValue: scrollerRangeDefault,
         type: Number,
     });
 
-    const parallaxSpringConfig = checkSetUpType({
+    const scrollerSpringConfig = checkSetUpType({
         prop: 'parallax.springConfig',
         value: obj?.parallax?.springConfig,
         defaultValue: springConfigDefault,
         type: String,
     });
 
-    const parallaxLerpConfig = checkSetUpType({
+    const scrollerLerpConfig = checkSetUpType({
         prop: 'parallax.lerpConfig',
         value: obj?.parallax?.lerpConfig,
         defaultValue: lerpConfigDefault,
         type: Number,
     });
 
-    const parallaxTweenDuration = checkSetUpType({
+    const scrollerTweenDuration = checkSetUpType({
         prop: 'parallaxTween.duration',
         value: obj?.parallaxTween?.duration,
-        defaultValue: parallaxTweenDurationDefault,
+        defaultValue: scrollerTweenDurationDefault,
         type: Number,
     });
 
-    const parallaxTweenEase = checkSetUpEase(
+    const scrollerTweenEase = checkSetUpEase(
         obj?.parallaxTween?.ease,
         'parallaxTween'
     );
@@ -245,14 +245,14 @@ export const setupValidation = (obj) => {
             },
         },
         parallax: {
-            defaultRange: parallaxRange,
-            springConfig: parallaxSpringConfig,
-            lerpConfig: parallaxLerpConfig,
+            defaultRange: scrollerRange,
+            springConfig: scrollerSpringConfig,
+            lerpConfig: scrollerLerpConfig,
         },
         parallaxTween: {
-            duration: parallaxTweenDuration,
+            duration: scrollerTweenDuration,
             // @ts-ignore
-            ease: parallaxTweenEase,
+            ease: scrollerTweenEase,
         },
         tween: {
             duration: tweenDuration,

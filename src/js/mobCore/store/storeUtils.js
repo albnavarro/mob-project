@@ -1,5 +1,6 @@
 // @ts-check
 
+import { getStateFromMainMap } from './storeMap.js';
 import { checkType, storeType } from './storeType.js';
 import { storeDepthWarning } from './storeWarining.js';
 
@@ -19,7 +20,7 @@ export const maxDepth = (object) => {
 };
 
 /**
- * @param {import('./type.js').mobStoreBaseData} data
+ * @param {import('./type.js').MobStoreParams} data
  * @param {boolean} shouldRecursive - max 1 level of recurisivity.
  * @returns {Object<string,(Object<string,any>|any)>}
  *
@@ -50,7 +51,7 @@ export const getDataRecursive = (data, shouldRecursive = true) => {
                 ...p,
 
                 [key]: getDataRecursive(
-                    /** @type {import('./type.js').mobStoreBaseData} */ (value),
+                    /** @type {import('./type.js').MobStoreParams} */ (value),
                     false
                 ),
             };
@@ -78,7 +79,7 @@ export const getDataRecursive = (data, shouldRecursive = true) => {
 };
 
 /**
- * @param {import('./type.js').mobStoreBaseData} data
+ * @param {import('./type.js').MobStoreParams} data
  * @param {string} prop
  * @param {any} fallback
  * @param {boolean} shouldRecursive - max 1 level of recursivity
@@ -108,7 +109,7 @@ export const getPropRecursive = (
                 ...p,
 
                 [key]: getPropRecursive(
-                    /** @type{import('./type.js').mobStoreBaseData} */ (value),
+                    /** @type{import('./type.js').MobStoreParams} */ (value),
                     prop,
                     fallback,
                     false
@@ -141,7 +142,7 @@ export const getPropRecursive = (
 
 /**
  * @param {Object} obj
- * @param {import('./type.js').mobStoreBaseData} obj.data
+ * @param {import('./type.js').MobStoreParams} obj.data
  * @param {number} obj.depth
  * @param {string} obj.logStyle
  * @returns {Object<string,(Object<string,any>|any)>}
@@ -157,7 +158,7 @@ export const inizializeStoreData = ({ data, depth, logStyle }) => {
 
 /**
  * @param {Object} obj
- * @param {import('./type.js').mobStoreBaseData} obj.data
+ * @param {import('./type.js').MobStoreParams} obj.data
  * @param {string} obj.prop
  * @param {number} obj.depth
  * @param {string} obj.logStyle
@@ -202,4 +203,29 @@ export const cloneValueOrGet = ({ value }) => {
     }
 
     return value;
+};
+
+/**
+ * @param {Object} param
+ * @param {string} param.instanceId
+ * @param {string} param.prop
+ * @returns {boolean}
+ */
+export const checkIfPropIsComputed = ({ instanceId, prop }) => {
+    const state = getStateFromMainMap(instanceId);
+    if (!state) return false;
+
+    const { callBackComputed } = state;
+
+    const isComputed = [...callBackComputed].some(
+        ({ prop: currentProp }) => prop === currentProp
+    );
+
+    if (isComputed) {
+        console.warn(
+            `${prop} is used as computed, explicit set is disallowed.`
+        );
+    }
+
+    return isComputed;
 };

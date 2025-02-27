@@ -1,5 +1,5 @@
 /**
- * @type {import("./type").springPresentConfigType} springConfigStringTypes
+ * @type {import("./type").SpringPresentConfigType} springConfigStringTypes
  **/
 export const springPresetConfig = {
     default: {
