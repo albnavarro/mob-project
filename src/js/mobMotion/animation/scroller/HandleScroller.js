@@ -51,7 +51,7 @@ import {
 import { scrollerEaseTypeSpringWarining } from '../utils/warning.js';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import ParallaxTween from './parallaxTween.js';
+import HandleScrollerTween from './HandleTweenTween.js';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import HandleSequencer from '../sequencer/handleSequencer.js';
 
@@ -386,7 +386,7 @@ export default class HandleScroller {
 
     /**
      * @description
-     * @type {HandleLerp & HandleSpring & ParallaxTween & HandleSequencer}
+     * @type {HandleLerp & HandleSpring & HandleScrollerTween & HandleSequencer}
      */
     #tween;
 
@@ -535,7 +535,7 @@ export default class HandleScroller {
      * @description
      * Add more precision to motion spring/lerp to trigger better force3D
      *
-     * @type {import('./type.js').ParallaxMotion}
+     * @type {import('./type.js').HandleScrollerMotion}
      */
     #motion;
 

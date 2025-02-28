@@ -1,7 +1,7 @@
 // @ts-check
 
 import HandleLerp from './animation/lerp/handleLerp.js';
-import ParallaxTween from './animation/scroller/parallaxTween.js';
+import HandleScrollerTween from './animation/scroller/HandleTweenTween.js';
 import HandleMasterSequencer from './animation/sequencer/handleMasterSequencer.js';
 import HandleSequencer from './animation/sequencer/handleSequencer.js';
 import HandleSpring from './animation/spring/handleSpring.js';
@@ -10,8 +10,8 @@ import { createStaggers } from './animation/sequencer/createStagger.js';
 
 export const tween = {
     /**
-     * @param {import('./animation/scroller/type.js').ParallaxTweenType} data
-     * @return {ParallaxTween}
+     * @param {import('./animation/scroller/type.js').HandleScrollerTweenType} data
+     * @return {HandleScrollerTween}
      *
      * @example
      * ```javascript
@@ -48,7 +48,7 @@ export const tween = {
      * ```
      */
     createScrollerTween(data) {
-        return new ParallaxTween(data);
+        return new HandleScrollerTween(data);
     },
 
     /**

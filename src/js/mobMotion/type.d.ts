@@ -33,12 +33,12 @@ import {
     lerpUpdateVelocity,
 } from './animation/lerp/type';
 import {
-    ParallaxTweenGetDuration,
-    ParallaxTweenGetType,
-    ParallaxTweenOnStop,
-    ParallaxTweenSetData,
-    ParallaxTweenSubscribe,
-    ParallaxTweenSubscribeCache,
+    HandleScrollerTweenGetDuration,
+    HandleScrollerTweenGetType,
+    HandleScrollerTweenOnStop,
+    HandleScrollerTweenSetData,
+    HandleScrollerTweenSubscribe,
+    HandleScrollerTweenSubscribeCache,
 } from './animation/scroller/type';
 import {
     sequencerAdd,
@@ -233,13 +233,13 @@ export interface Sequencer {
 }
 
 export interface ParallaxTween {
-    setData: ParallaxTweenSetData;
+    setData: HandleScrollerTweenSetData;
     goTo: parallaxTweenGoTo;
-    subscribe: ParallaxTweenSubscribe;
-    onStop: ParallaxTweenOnStop;
-    subscribeCache: ParallaxTweenSubscribeCache;
-    getDuration: ParallaxTweenGetDuration;
-    getType: ParallaxTweenGetType;
+    subscribe: HandleScrollerTweenSubscribe;
+    onStop: HandleScrollerTweenOnStop;
+    subscribeCache: HandleScrollerTweenSubscribeCache;
+    getDuration: HandleScrollerTweenGetDuration;
+    getType: HandleScrollerTweenGetType;
     inzializeStagger: () => void;
 }
 

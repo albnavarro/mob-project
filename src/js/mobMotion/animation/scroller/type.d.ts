@@ -2,7 +2,7 @@ import { MqAction, MqValues } from '../../utils/type';
 import { SpringChoiceConfig } from '../spring/type';
 import { EaseTypes } from '../tween/type';
 import { StaggerObject } from '../utils/stagger/type';
-import ParallaxTween from './parallaxTween';
+import HandleScrollerTween from './HandleTweenTween';
 
 export interface DynamicStartType {
     position: 'bottom' | 'top' | 'left' | 'right';
@@ -392,7 +392,7 @@ export interface HandleScrollerMoveType {
     parentIsMoving: boolean;
 }
 
-export interface ParallaxTweenType {
+export interface HandleScrollerTweenType {
     from: Record<string, number>;
     to: Record<string, number>;
     stagger?: Partial<StaggerObject>;
@@ -400,7 +400,7 @@ export interface ParallaxTweenType {
     duration?: number;
 }
 
-export interface ParallaxTweenValue {
+export interface HandleScrollerTweenValue {
     currentValue: number | (() => number);
     prop: string;
     settled: boolean;
@@ -413,26 +413,26 @@ export interface ParallaxTweenValue {
     fromValue: number;
 }
 
-export type ParallaxTweenSetData = (
+export type HandleScrollerTweenSetData = (
     arg0: Record<string, number>
-) => ParallaxTween;
+) => HandleScrollerTween;
 
-export type ParallaxTweenGoTo = (
+export type HandleScrollerTweenGoTo = (
     arg0: Record<string, number | (() => number)>
-) => ParallaxTween;
+) => HandleScrollerTween;
 
-export type ParallaxTweenSubscribe = (arg0: (any) => void) => () => void;
-export type ParallaxTweenOnStop = (arg0: (any) => void) => () => void;
+export type HandleScrollerTweenSubscribe = (arg0: (any) => void) => () => void;
+export type HandleScrollerTweenOnStop = (arg0: (any) => void) => () => void;
 
-export type ParallaxTweenSubscribeCache = (
+export type HandleScrollerTweenSubscribeCache = (
     item: object | HTMLElement,
     cb: (arg0: Record<string, number>) => void
 ) => () => void;
 
-export type ParallaxTweenGetDuration = () => number;
-export type ParallaxTweenGetType = () => string;
+export type HandleScrollerTweenGetDuration = () => number;
+export type HandleScrollerTweenGetType = () => string;
 
-export interface ParallaxMotion {
+export interface HandleScrollerMotion {
     stop: () => void;
     setData: (arg0: any) => void;
     goTo: (arg0: any, ar1: any) => Promise<any>;

@@ -21,7 +21,7 @@ import { mobCore } from '../../../mobCore/index.js';
 import { getValueObj } from '../utils/tweenAction/getValues.js';
 import { STAGGER_DEFAULT_INDEX_OBJ } from '../utils/stagger/staggerCostant.js';
 
-export default class ParallaxTween {
+export default class HandleScrollerTween {
     /**
      * @type {Function}
      */
@@ -38,7 +38,7 @@ export default class ParallaxTween {
     #stagger;
 
     /**
-     * @type {import('./type.js').ParallaxTweenValue[]}
+     * @type {import('./type.js').HandleScrollerTweenValue[]}
      */
     #values;
 
@@ -68,7 +68,7 @@ export default class ParallaxTween {
     #type;
 
     /**
-     * @param {import('./type.js').ParallaxTweenType} data
+     * @param {import('./type.js').HandleScrollerTweenType} data
      *
      * @example
      * ```js
@@ -223,7 +223,7 @@ export default class ParallaxTween {
 
     /**
      *
-     * @type {import('./type.js').ParallaxTweenSetData}
+     * @type {import('./type.js').HandleScrollerTweenSetData}
      */
     setData(obj) {
         const valToArray = Object.entries(obj);
@@ -267,7 +267,7 @@ export default class ParallaxTween {
     }
 
     /**
-     * @type {import('./type.js').ParallaxTweenGoTo}
+     * @type {import('./type.js').HandleScrollerTweenGoTo}
      *
      * ```
      * @description
@@ -281,7 +281,7 @@ export default class ParallaxTween {
     }
 
     /**
-     * @type {import('./type.js').ParallaxTweenSubscribe}
+     * @type {import('./type.js').HandleScrollerTweenSubscribe}
      *
      * @description
      * Callback that returns updated values ready to be usable, it is advisable to use it for single elements, although it works well on a not too large number of elements (approximately 100-200 elements) for large staggers it is advisable to use the subscribeCache method .
@@ -297,7 +297,7 @@ export default class ParallaxTween {
     }
 
     /**
-     * @type {import('./type.js').ParallaxTweenOnStop}
+     * @type {import('./type.js').HandleScrollerTweenOnStop}
      *
      * @description
      * Similar to subscribe this callBack is launched when the data calculation stops (when the timeline ends or the scroll trigger is inactive).
@@ -316,7 +316,7 @@ export default class ParallaxTween {
     }
 
     /**
-     * @type {import('./type.js').ParallaxTweenSubscribeCache}
+     * @type {import('./type.js').HandleScrollerTweenSubscribeCache}
      */
     subscribeCache(item, fn) {
         const { arrayOfCallbackUpdated, unsubscribeCb, unsubscribeCache } =
@@ -335,7 +335,7 @@ export default class ParallaxTween {
     /**
      * @description
      * Get duration
-     * @type {import('./type.js').ParallaxTweenGetDuration}
+     * @type {import('./type.js').HandleScrollerTweenGetDuration}
      */
     getDuration() {
         return this.#duration;
@@ -344,7 +344,7 @@ export default class ParallaxTween {
     /**
      * @description
      * Get tween type - 'parallaxTween'
-     * @type {import('./type.js').ParallaxTweenGetType}
+     * @type {import('./type.js').HandleScrollerTweenGetType}
      */
     getType() {
         return this.#type;
