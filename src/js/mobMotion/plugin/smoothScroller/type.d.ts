@@ -87,13 +87,13 @@ export interface SmoothScroller {
      * @description
      * Function that is launched after refresh
      */
-    afterRefresh?: () => void;
+    afterRefresh?: (arg0: { shouldScroll: boolean }) => void;
 
     /**
      * @description
      * Function that is launched after init
      */
-    afterInit?: () => void;
+    afterInit?: (arg0: { shouldScroll: boolean }) => void;
 
     /**
      * @description

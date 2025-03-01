@@ -548,7 +548,7 @@ export default class HandleScroller {
      *  Parallax property schema:
      *
      *
-     *  const myParallax = new ParallaxClass({
+     *  const myParallax = new HandleScroller({
      *      type: 'parallax',
      *      item: String | Element,
      *      applyTo: [ String | Element ],
@@ -581,7 +581,7 @@ export default class HandleScroller {
      *  Scrolltrigger property schema:
      *
      *
-     *  const myScrollTrigger = new ParallaxClass({
+     *  const myScrollTrigger = new HandleScroller({
      *      item: String | Element,
      *      applyTo: [ String | Element ],
      *      trigger: [ String | Element ],
@@ -1806,7 +1806,10 @@ export default class HandleScroller {
     }
 
     /**
-     *
+     * @param {object} params
+     * @param {boolean} [ params.forceRender ]
+     * @param {boolean} [ params.parentIsMoving ]
+     * @returns {void}
      */
     #noEasingRender({ forceRender = false, parentIsMoving = false } = {}) {
         if (!mq[this.#queryType](this.#breakpoint)) return;

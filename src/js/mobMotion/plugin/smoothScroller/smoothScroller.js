@@ -217,12 +217,12 @@ export default class SmoothScroller {
     #onUpdateCallback;
 
     /**
-     * @type {() => void}
+     * @type {(arg0: { shouldScroll: boolean }) => void}
      */
     #onAfterRefresh;
 
     /**
-     * @type {() => void}
+     * @type {(arg0: { shouldScroll: boolean }) => void}
      */
     #afterInit;
 
@@ -433,6 +433,16 @@ export default class SmoothScroller {
 
     /**
      * @description
+     * Check if is scrollable
+     *
+     * @type {() => boolean}
+     */
+    #getScrollableStatus() {
+        return this.#maxValue > 0;
+    }
+
+    /**
+     * @description
      * Initialize insatance
      *
      * @example
@@ -553,7 +563,10 @@ export default class SmoothScroller {
             mobCore.useNextTick(() => {
                 if (this.#isDestroyed) return;
 
-                this.#afterInit?.();
+                this.#afterInit?.({
+                    shouldScroll: this.#getScrollableStatus(),
+                });
+
                 this.#children.forEach((element) => {
                     element.refresh();
                 });
@@ -934,7 +947,9 @@ export default class SmoothScroller {
 
         mobCore.useFrameIndex(() => {
             mobCore.useNextTick(() => {
-                this.#onAfterRefresh?.();
+                this.#onAfterRefresh?.({
+                    shouldScroll: this.#getScrollableStatus(),
+                });
 
                 this.#children.forEach((element) => {
                     element.refresh();

@@ -72,7 +72,7 @@ export default class HandleScrollerTween {
      *
      * @example
      * ```js
-     * const myParallaxTween = new ParallaxTween({
+     * const myParallaxTween = new HandleScrollerTween({
      *   from: Object.<string, number>,
      *   to: Object.<string, number>,
      *   ease: [ String ],
