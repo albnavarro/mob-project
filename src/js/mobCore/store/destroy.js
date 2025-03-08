@@ -1,3 +1,4 @@
+import { removeSelfIdToBindInstanceBy } from './bindStore';
 import { getStateFromMainMap, removeStateFromMainMap } from './storeMap';
 
 /**
@@ -14,10 +15,20 @@ export const destroyStoreEntryPoint = (instanceId) => {
     state.store = {};
     state.proxiObject = null;
 
-    const { unsubscribeBindInstance } = state;
+    const { unsubscribeBindInstance, bindInstance } = state;
 
+    /**
+     * Unsubscribe binded watcher
+     */
     unsubscribeBindInstance.forEach((unsubscribe) => {
         unsubscribe?.();
+    });
+
+    /**
+     * Remove itself from bindInstanceBy of binded store.
+     */
+    bindInstance.forEach((id) => {
+        removeSelfIdToBindInstanceBy({ selfId: instanceId, bindId: id });
     });
 
     removeStateFromMainMap(instanceId);

@@ -1,19 +1,19 @@
 import { MouseEventParsed } from '../../../mobCore/events/mouseUtils/type';
 import { MqAction, MqValues } from '../../utils/type';
 
-type onTick = (arg0: {
+export type OnTick = (arg0: {
     value: number;
     percent: number;
     parentIsMoving: boolean;
 }) => void;
 
-type onUpdate = (arg0: {
+export type OnUpdate = (arg0: {
     value: number;
     percent: number;
     parentIsMoving: boolean;
 }) => void;
 
-export interface SmoothScroller {
+export interface MobSmoothScroller {
     /**
      * @description
      * Defines the scroll direction
@@ -72,7 +72,7 @@ export interface SmoothScroller {
      * `percent`: scroll value in percent
      * `parentIsMoving`: A boolean value indicating whether the scroller has stopped ( last tick )
      */
-    onTick?: onTick;
+    onTick?: OnTick;
 
     /**
      * @description
@@ -81,7 +81,7 @@ export interface SmoothScroller {
      * `value`: scroll value
      * `percent`: scroll value in percent
      */
-    onUpdate?: onUpdate;
+    onUpdate?: OnUpdate;
 
     /**
      * @description
@@ -125,4 +125,6 @@ export interface SmoothScroller {
     breakpoint?: MqValues;
 }
 
-export type onMouseEvent = (arg0: Partial<MouseEventParsed>) => void;
+export type MobSmoothScrollerOnMouseEvent = (
+    arg0: Partial<MouseEventParsed>
+) => void;

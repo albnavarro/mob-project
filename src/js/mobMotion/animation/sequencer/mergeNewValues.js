@@ -3,8 +3,8 @@
 /**
  * @param {Object} param
  * @param {any[]} param.data
- * @param {import("./type").sequencerValue[]} param.values
- * @return {import("./type").sequencerValue[]}
+ * @param {import("./type").SequencerValue[]} param.values
+ * @return {import("./type").SequencerValue[]}
  */
 export const mergeNewValues = ({ data, values }) => {
     return values.map((item) => {

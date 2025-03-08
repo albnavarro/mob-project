@@ -1,6 +1,6 @@
 // @ts-check
 
-import { HandleScrollerConstant } from './HandleScrollerConstant.js';
+import { MobScrollerConstant } from './MobScrollerConstant.js';
 
 /**
  * @param {object} obj
@@ -19,7 +19,7 @@ const action = ({ prevValue, value, maxVal }) => {
         (value >= maxVal && prevValue <= maxVal && maxVal >= 0) ||
         (value <= maxVal && prevValue >= maxVal && maxVal <= 0)
     )
-        return HandleScrollerConstant.ON_LEAVE;
+        return MobScrollerConstant.ON_LEAVE;
 
     /**
      * ON_ENTER_BACK
@@ -28,7 +28,7 @@ const action = ({ prevValue, value, maxVal }) => {
         (value > maxVal && prevValue <= maxVal && maxVal <= 0) ||
         (value < maxVal && prevValue >= maxVal && maxVal >= 0)
     )
-        return HandleScrollerConstant.ON_ENTER_BACK;
+        return MobScrollerConstant.ON_ENTER_BACK;
 
     /**
      * ON_LEAVE_BACK
@@ -37,7 +37,7 @@ const action = ({ prevValue, value, maxVal }) => {
         (value >= 0 && prevValue <= 0 && maxVal <= 0) ||
         (value <= 0 && prevValue >= 0 && maxVal >= 0)
     )
-        return HandleScrollerConstant.ON_LEAVE_BACK;
+        return MobScrollerConstant.ON_LEAVE_BACK;
 
     /**
      * ON_ENTER
@@ -46,9 +46,9 @@ const action = ({ prevValue, value, maxVal }) => {
         (value > 0 && value < maxVal && prevValue <= 0 && maxVal >= 0) ||
         (value < 0 && prevValue >= 0 && maxVal <= 0)
     )
-        return HandleScrollerConstant.ON_ENTER;
+        return MobScrollerConstant.ON_ENTER;
 
-    return HandleScrollerConstant.ON_NOOP;
+    return MobScrollerConstant.ON_NOOP;
 };
 
 /**
@@ -64,7 +64,7 @@ const action = ({ prevValue, value, maxVal }) => {
  * @returns void
  *
  */
-export function handleScrollerEmitter({
+export function MobScrollerEmitter({
     prevValue,
     value,
     maxVal,
@@ -74,19 +74,19 @@ export function handleScrollerEmitter({
     onLeaveBack,
 }) {
     const fn = {
-        [HandleScrollerConstant.ON_LEAVE]: () => {
+        [MobScrollerConstant.ON_LEAVE]: () => {
             if (onLeave) onLeave();
         },
-        [HandleScrollerConstant.ON_ENTER_BACK]: () => {
+        [MobScrollerConstant.ON_ENTER_BACK]: () => {
             if (onEnterBack) onEnterBack();
         },
-        [HandleScrollerConstant.ON_LEAVE_BACK]: () => {
+        [MobScrollerConstant.ON_LEAVE_BACK]: () => {
             if (onLeaveBack) onLeaveBack();
         },
-        [HandleScrollerConstant.ON_ENTER]: () => {
+        [MobScrollerConstant.ON_ENTER]: () => {
             if (onEnter) onEnter();
         },
-        [HandleScrollerConstant.ON_NOOP]: () => {},
+        [MobScrollerConstant.ON_NOOP]: () => {},
     };
 
     fn[action({ prevValue, value, maxVal })]();

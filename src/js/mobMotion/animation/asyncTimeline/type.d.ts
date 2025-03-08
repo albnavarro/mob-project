@@ -1,12 +1,12 @@
 import { SpringChoiceConfig, SpringProps } from '../spring/type';
 import { EaseTypes, TweenCommonProps } from '../tween/type';
 import {
-    directionTypeAsync,
-    directionTypeObjectLoop,
+    DirectionTypeAsync,
+    DirectionTypeObjectLoop,
 } from '../utils/timeline/type';
-import HandleAsyncTimeline from './handleAsyncTimeline';
+import MobAsyncTimeline from './AsyncTimeline';
 
-export interface asyncTimelineType {
+export interface AsyncTimeline {
     /**
      * @description
      * Reverse the direction each time the animation ends.
@@ -39,7 +39,7 @@ export interface asyncTimelineType {
     autoSet?: boolean;
 }
 
-export interface asyncTimelineTypeSpecialProps {
+export interface AsyncTimelineTypeSpecialProps {
     ease?: EaseTypes;
     duration?: number;
     config?: SpringChoiceConfig;
@@ -52,7 +52,7 @@ export interface asyncTimelineTypeSpecialProps {
     immediate?: boolean;
 }
 
-export interface asyncTimelineTween {
+export interface AsyncTimelineTween {
     getId: () => string;
     set: (
         arg0: Record<string, number | (() => number)>,
@@ -70,7 +70,7 @@ export interface asyncTimelineTween {
     resume?: () => void;
 }
 
-export interface asyncTimelineRowData {
+export interface AsyncTimelineRowData {
     action: string;
     groupProps: {
         waitComplete?: boolean;
@@ -80,121 +80,123 @@ export interface asyncTimelineRowData {
     prevValueSettled: boolean;
     prevValueTo: Record<string, number | (() => number)>;
     syncProp: {
-        from: asyncTimelineTween;
-        to: asyncTimelineTween;
+        from: AsyncTimelineTween;
+        to: AsyncTimelineTween;
     };
     tween: any;
-    tweenProps: asyncTimelineTypeSpecialProps;
+    tweenProps: AsyncTimelineTypeSpecialProps;
     valuesFrom: Record<string, number | (() => number)>;
     valuesTo: Record<string, number | (() => number)>;
 }
 
-export interface asyncTimelineTweenItem {
-    data: asyncTimelineRowData;
+export interface AsyncTimelineTweenItem {
+    data: AsyncTimelineRowData;
     group: number | undefined;
 }
 
-export interface asyncTimelineCurrentTween {
+export interface AsyncTimelineCurrentTween {
     uniqueId: string;
     id: number;
-    tween: asyncTimelineTween;
+    tween: AsyncTimelineTween;
 }
 
-export interface syncTimelineTweenStore {
+export interface AsyncTimelineTweenStore {
     id: string;
-    tween: asyncTimelineTween;
+    tween: AsyncTimelineTween;
 }
 
-export interface asyncTimelineLabelState {
+export interface AsyncTimelineLabelState {
     active: boolean;
     index: string | number | null;
     isReverse: boolean;
 }
 
-export interface asyncTimelineStarterFunction {
+export interface AsyncTimelineStarterFunction {
     fn: () => any;
     active: boolean;
 }
 
-export interface asyncTimelineAfterReject {
+export interface AsyncTimelineAfterReject {
     fn: () => any;
     active: boolean;
 }
 
-export interface asyncTimelineCurrentAction {
+export interface AsyncTimelineCurrentAction {
     action: string;
     id: number;
 }
 
-export type addToActiveTween = (tween: asyncTimelineTween) => () => void;
-export type addToMainArray = (obj: asyncTimelineRowData) => void;
-export type addTweenToStore = (tween: asyncTimelineTween) => void;
+export type AsyncTimelineAddToActiveTween = (
+    tween: AsyncTimelineTween
+) => () => void;
+export type AsyncTimelineAddToMainArray = (obj: AsyncTimelineRowData) => void;
+export type AsyncTimelineAddTweenToStore = (tween: AsyncTimelineTween) => void;
 
-export type asyncTimelineSet = (
+export type AsyncTimelineSet = (
     tween: any,
     valuesSet: Record<string, number>,
-    tweenProps: asyncTimelineTypeSpecialProps
-) => HandleAsyncTimeline;
+    tweenProps: AsyncTimelineTypeSpecialProps
+) => MobAsyncTimeline;
 
-export type asyncTimelineGoTo = (
+export type AsyncTimelineGoTo = (
     tween: any,
     valuesTo: Record<string, number | (() => number)>,
-    tweenProps?: asyncTimelineTypeSpecialProps
-) => HandleAsyncTimeline;
+    tweenProps?: AsyncTimelineTypeSpecialProps
+) => MobAsyncTimeline;
 
-export type asyncTimelineGoFrom = (
+export type AsyncTimelineGoFrom = (
     tween: any,
     valuesFrom: Record<string, number | (() => number)>,
-    tweenProps: asyncTimelineTypeSpecialProps
-) => HandleAsyncTimeline;
+    tweenProps: AsyncTimelineTypeSpecialProps
+) => MobAsyncTimeline;
 
-export type asyncTimelineGoFromTo = (
+export type AsyncTimelineGoFromTo = (
     tween: any,
     valuesFrom: Record<string, number | (() => number)>,
     valuesTo: Record<string, number | (() => number)>,
-    tweenProps: asyncTimelineTypeSpecialProps
-) => HandleAsyncTimeline;
+    tweenProps: AsyncTimelineTypeSpecialProps
+) => MobAsyncTimeline;
 
-export type asyncTimelineAdd = (arg0: () => void) => globalThis;
-export type asyncTimelineAddAsync = (
-    fn: (arg0: directionTypeAsync) => void
-) => HandleAsyncTimeline;
+export type AsyncTimelineAdd = (arg0: () => void) => globalThis;
+export type AsyncTimelineAddAsync = (
+    fn: (arg0: DirectionTypeAsync) => void
+) => MobAsyncTimeline;
 
-export type asyncTimelineSync = ({ from: any, to: any }) => HandleAsyncTimeline;
+export type AsyncTimelineSync = ({ from: any, to: any }) => MobAsyncTimeline;
 
-export type asyncTimelineCreateGroup = (groupProps?: {
+export type AsyncTimelineCreateGroup = (groupProps?: {
     waitComplete?: boolean;
-}) => HandleAsyncTimeline;
+}) => MobAsyncTimeline;
 
-export type asyncTimelineCloseGroup = () => HandleAsyncTimeline;
-export type asyncTimelineSuspend = (fn: () => boolean) => HandleAsyncTimeline;
-export type asyncTimelineLabel = (labelProps?: any) => HandleAsyncTimeline;
+export type AsyncTimelineCloseGroup = () => MobAsyncTimeline;
+export type AsyncTimelineSuspend = (fn: () => boolean) => MobAsyncTimeline;
+export type AsyncTimelineLabel = (labelProps?: any) => MobAsyncTimeline;
 
-export type asyncTimelineSetTween = (
+export type AsyncTimelineSetTween = (
     label: string,
     items: any[]
 ) => Promise<any>;
 
-export type asyncTimelinePlayFromLabel = (arg0: {
+export type AsyncTimelinePlayFromLabel = (arg0: {
     isReverse?: boolean;
     label?: string;
 }) => void;
 
-export type asyncTimelinePlayFrom = (label: string) => Promise<any>;
-export type asyncTimelinePlayFromReverse = (label: string) => Promise<any>;
+export type AsyncTimelinePlayFrom = (label: string) => Promise<any>;
+export type AsyncTimelinePlayFromReverse = (label: string) => Promise<any>;
 
-export type asyncTimelinePlayReverse = (arg0: {
+export type AsyncTimelinePlayReverse = (arg0: {
     forceYoYo?: boolean;
     resolve?: (value: any) => void | null;
     reject?: (value: any) => void | null;
 }) => Promise<any>;
 
-export type asyncTimelineStop = (arg0?: { clearCache?: boolean }) => void;
-export type asyncTimelinePause = () => void;
-export type asyncTimelineResume = () => void;
+export type AsyncTimelineStop = (arg0?: { clearCache?: boolean }) => void;
+export type AsyncTimelinePause = () => void;
+export type AsyncTimelineResume = () => void;
 
-export type asyncTimelineOnLoopEnd = (
-    arg0: (arg0: directionTypeObjectLoop) => void
+export type AsyncTimelineOnLoopEnd = (
+    arg0: (arg0: DirectionTypeObjectLoop) => void
 ) => () => void;
 
-export type asyncTimelineOnComplete = (arg0: () => void) => () => void;
+export type AsyncTimelineOnComplete = (arg0: () => void) => () => void;

@@ -1,12 +1,12 @@
 // @ts-check
 
-import HandleAsyncTimeline from './animation/asyncTimeline/handleAsyncTimeline.js';
-import HandleSyncTimeline from './animation/syncTimeline/handleSyncTimeline.js';
+import MobAsyncTimeline from './animation/asyncTimeline/AsyncTimeline.js';
+import MobSyncTimeline from './animation/syncTimeline/MobSyncTimeline.js';
 
 export const timeline = {
     /**
-     * @param {import('./animation/syncTimeline/type.js').syncTimelineType} data
-     * @return {HandleSyncTimeline}
+     * @param {import('./animation/syncTimeline/type.js').SyncTimeline} data
+     * @return {MobSyncTimeline}
      *
      * @example
      * ```javascript
@@ -45,12 +45,12 @@ export const timeline = {
      * ```
      */
     createSyncTimeline(data) {
-        return new HandleSyncTimeline(data);
+        return new MobSyncTimeline(data);
     },
 
     /**
-     * @param {import('./animation/asyncTimeline/type.js').asyncTimelineType} data
-     * @return {HandleAsyncTimeline}
+     * @param {import('./animation/asyncTimeline/type.js').AsyncTimeline} data
+     * @return {MobAsyncTimeline}
      *
      * @example
      * ```javascript
@@ -108,6 +108,6 @@ export const timeline = {
      * ```
      */
     createAsyncTimeline(data) {
-        return new HandleAsyncTimeline(data);
+        return new MobAsyncTimeline(data);
     },
 };

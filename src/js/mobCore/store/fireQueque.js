@@ -2,11 +2,11 @@
 
 import { useNextLoop } from '../utils/nextTick';
 
-/** @type {import('./type').WatchWaintList} */
+/** @type {import('./type').MobStoreWatchWaintList} */
 const waitMap = new Map();
 
 /**
- * @param {import("./type").callbackQueue} param
+ * @param {import("./type").MobStoreCallbackQueue} param
  * @returns {void}
  */
 export const runCallbackQueqe = ({
@@ -87,7 +87,7 @@ export const runCallbackQueqe = ({
 };
 
 /**
- * @param {import("./type").callbackQueue} param
+ * @param {import("./type").MobStoreCallbackQueue} param
  * @returns {Promise<any>}
  */
 export const runCallbackQueqeAsync = async ({

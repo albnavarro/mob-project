@@ -12,7 +12,7 @@ export const propToSet = {
 };
 
 /**
- * @param {import("./type").sequencerRow[]} arr
+ * @param {import("./type").SequencerRow[]} arr
  * @param {number} index
  * @param {string} prop
  * @param {import("./type").PropToFindPartial} propToFind
@@ -48,7 +48,7 @@ export const getFirstValidValueBack = (arr, index, prop, propToFind) => {
 };
 
 /**
- * @param {import("./type").sequencerRow[]} arr
+ * @param {import("./type").SequencerRow[]} arr
  * @param {number} index
  * @param {string} prop
  * @param {number} partial

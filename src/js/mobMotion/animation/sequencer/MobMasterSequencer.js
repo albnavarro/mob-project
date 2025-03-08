@@ -11,7 +11,7 @@
  * @example
  *
  * ```javascript
- * cont masterSequencer = new HandleMasterSequencer();
+ * cont masterSequencer = new MobMasterSequencer();
  * const staggers = mobbu.createStaggers({})
  * staggers.forEach(({ item, start, end, index }) => {
  *     const sequencer = mobbu
@@ -23,14 +23,14 @@
  * const timeline = mobbu.createSyncTimeline({}).add(masterSequencer)
  * ```
  */
-export default class HandleMasterSequencer {
+export default class MobMasterSequencer {
     /**
      * @trype {string}
      */
     #type;
 
     /**
-     * @type {import("./type").masterSequencerItem[]}
+     * @type {import("./type").MasterSequencerItem[]}
      */
     #children;
 
@@ -54,7 +54,7 @@ export default class HandleMasterSequencer {
     }
 
     /**
-     * @param {import("./type").masterSequencerItem} item
+     * @param {import("./type").MasterSequencerItem} item
      * @returns {void}
      */
     add(item) {
@@ -98,7 +98,7 @@ export default class HandleMasterSequencer {
     }
 
     /**
-     * @returns {import("./type").labelType[]}
+     * @returns {import("./type").LabelType[]}
      */
     getLabels() {
         return this.#children.flatMap((item) => item.getLabels());

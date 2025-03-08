@@ -1,6 +1,6 @@
 //@ts-check
 
-import HandleScroller from '../../../animation/scroller/HandleScroller';
+import MobScroller from '../../../animation/scroller/MobScroller';
 import {
     getTranslateValues,
     offset,
@@ -21,11 +21,11 @@ import {
 } from '../../../animation/utils/tweenAction/tweenValidation';
 import { mobCore } from '../../../../mobCore';
 import {
-    freezePageScroll,
-    unFreezePageScroll,
+    FreezeMobPageScroll,
+    UnFreezeMobPageScroll,
 } from '../../pageScroll/pageScroller';
 
-export class HorizontalScroller {
+export class MobHorizontalScroller {
     /**
      * @type {boolean}
      */
@@ -192,7 +192,7 @@ export class HorizontalScroller {
     #afterDestroy;
 
     /**
-     * @type {import('./type.d.ts').horizontalScrollerOnTick|undefined}
+     * @type {import('./type.d.ts').HorizontalScrollerOnTick|undefined}
      */
     #onTick;
     /**
@@ -250,7 +250,7 @@ export class HorizontalScroller {
     #horizontalWidth;
 
     /**
-     * @type {HandleScroller}
+     * @type {MobScroller}
      */
     #scrollTriggerInstance;
 
@@ -263,7 +263,7 @@ export class HorizontalScroller {
      * @description
      * Initialize children.
      *
-     * @type {HandleScroller[]}
+     * @type {MobScroller[]}
      */
     #children;
 
@@ -322,7 +322,7 @@ export class HorizontalScroller {
     #firstTouchValue;
 
     /**
-     * @param  { import('./type.d.ts').HorizontalScroller } data
+     * @param  { import('./type.d.ts').MobHorizontalScroller } data
      *
      * @description
      *
@@ -662,7 +662,7 @@ export class HorizontalScroller {
         this.#onMouseDown = () => {
             if (!mq[this.#queryType](this.#breakpoint)) return;
 
-            freezePageScroll();
+            FreezeMobPageScroll();
             if (this.#shouldDragValue && this.#row)
                 this.#row.style.cursor = 'move';
             this.#touchActive = true;
@@ -670,7 +670,7 @@ export class HorizontalScroller {
         };
 
         this.#onMouseUp = () => {
-            unFreezePageScroll();
+            UnFreezeMobPageScroll();
             this.#touchActive = false;
             mobCore.useFrame(() => {
                 if (this.#row) this.#row.style.cursor = '';
@@ -678,7 +678,7 @@ export class HorizontalScroller {
         };
 
         this.#onMouseLeave = () => {
-            unFreezePageScroll();
+            UnFreezeMobPageScroll();
             this.#touchActive = false;
             mobCore.useFrame(() => {
                 if (this.#row) this.#row.style.cursor = '';
@@ -688,14 +688,14 @@ export class HorizontalScroller {
         this.#onTouchStart = (event) => {
             if (!mq[this.#queryType](this.#breakpoint)) return;
 
-            freezePageScroll();
+            FreezeMobPageScroll();
             this.#lastTouchValueX = -event.touches[0].clientX;
             this.#touchActive = true;
             this.#firstTouchValue = this.#scrollValue;
         };
 
         this.#onTouchEnd = () => {
-            unFreezePageScroll();
+            UnFreezeMobPageScroll();
             this.#touchActive = false;
         };
 
@@ -1147,7 +1147,7 @@ export class HorizontalScroller {
     #initScroller() {
         if (!this.#trigger || !mq[this.#queryType](this.#breakpoint)) return;
 
-        const scrollTriggerInstance = new HandleScroller({
+        const scrollTriggerInstance = new MobScroller({
             type: 'scrolltrigger',
             item: this.#row,
             useWillChange: this.#useWillChange,

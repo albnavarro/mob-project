@@ -1,11 +1,11 @@
 // @ts-check
 
-import HandleLerp from '../../animation/lerp/handleLerp.js';
-import HandleSpring from '../../animation/spring/handleSpring.js';
+import MobLerp from '../../animation/lerp/MobLerp.js';
+import MobSpring from '../../animation/spring/MobSpring.js';
 import { clamp } from '../../animation/utils/animationUtils.js';
 import { mq } from '../../utils/mediaManager.js';
 import { NOOP } from '../../utils/functionsUtils.js';
-import { HandleScrollerConstant } from '../../animation/scroller/HandleScrollerConstant.js';
+import { MobScrollerConstant } from '../../animation/scroller/MobScrollerConstant.js';
 import {
     breakpointIsValid,
     breakpointTypeIsValid,
@@ -22,11 +22,11 @@ import {
     outerWidth,
 } from '../../../mobCore/utils/index.js';
 import {
-    freezePageScroll,
-    unFreezePageScroll,
+    FreezeMobPageScroll,
+    UnFreezeMobPageScroll,
 } from '../pageScroll/pageScroller.js';
 
-export default class SmoothScroller {
+export class MobSmoothScroller {
     /**
      * @type {boolean}
      */
@@ -144,7 +144,7 @@ export default class SmoothScroller {
     #subscribeMouseClick;
 
     /**
-     * @type {HandleLerp|HandleSpring}
+     * @type {MobLerp|MobSpring}
      */
     #motion;
 
@@ -207,12 +207,12 @@ export default class SmoothScroller {
     #drag;
 
     /**
-     * @type {import('./type.d.ts').onTick}
+     * @type {import('./type').OnTick}
      */
     #onTickCallback;
 
     /**
-     * @type {import('./type.d.ts').onUpdate}
+     * @type {import('./type').OnUpdate}
      */
     #onUpdateCallback;
 
@@ -242,7 +242,7 @@ export default class SmoothScroller {
     #scopedTouchMove;
 
     /**
-     * @param { import('./type.d.ts').SmoothScroller } data
+     * @param { import('./type.ts').MobSmoothScroller } data
      *
      * @description
      *
@@ -454,13 +454,13 @@ export default class SmoothScroller {
         if (!this.#propsIsValid) return;
 
         switch (this.#easeType) {
-            case HandleScrollerConstant.EASE_SPRING: {
-                this.#motion = new HandleSpring();
+            case MobScrollerConstant.EASE_SPRING: {
+                this.#motion = new MobSpring();
                 break;
             }
 
             default: {
-                this.#motion = new HandleLerp();
+                this.#motion = new MobLerp();
                 break;
             }
         }
@@ -540,7 +540,7 @@ export default class SmoothScroller {
         /** @type{HTMLElement} */ (this.#scroller).addEventListener(
             'mouseleave',
             () => {
-                unFreezePageScroll();
+                UnFreezeMobPageScroll();
             }
         );
 
@@ -620,7 +620,7 @@ export default class SmoothScroller {
         this.#motion.setData({ val: 0 });
         this.#unsubscribeMotion = this.#motion.subscribe(({ val }) => {
             /** @type{HTMLElement} */ (this.#scroller).style.transform =
-                this.#direction == HandleScrollerConstant.DIRECTION_VERTICAL
+                this.#direction == MobScrollerConstant.DIRECTION_VERTICAL
                     ? `translate3d(0px, 0px, 0px) translateY(${-val}px)`
                     : `translate3d(0px, 0px, 0px) translateX(${-val}px)`;
 
@@ -650,7 +650,7 @@ export default class SmoothScroller {
 
         this.#unsubscribeOnComplete = this.#motion.onComplete(({ val }) => {
             /** @type{HTMLElement} */ (this.#scroller).style.transform =
-                this.#direction == HandleScrollerConstant.DIRECTION_VERTICAL
+                this.#direction == MobScrollerConstant.DIRECTION_VERTICAL
                     ? `translateY(${-val}px)`
                     : `translateX(${-val}px)`;
 
@@ -689,7 +689,7 @@ export default class SmoothScroller {
                 : outerHeight(/** @type{HTMLElement} */ (this.#screen));
 
         this.#maxValue =
-            this.#direction === HandleScrollerConstant.DIRECTION_VERTICAL
+            this.#direction === MobScrollerConstant.DIRECTION_VERTICAL
                 ? /** @type{HTMLElement} */ (this.#scroller).offsetHeight -
                   this.#screenHeight
                 : /** @type{HTMLElement} */ (this.#scroller).offsetWidth -
@@ -699,7 +699,7 @@ export default class SmoothScroller {
     }
 
     /**
-     * @type {import('./type.d.ts').onMouseEvent}
+     * @type {import('./type').MobSmoothScrollerOnMouseEvent}
      */
     #onScopedTouchMove({ client }) {
         if (!this.#dragEnable || !this.#drag) return;
@@ -730,7 +730,7 @@ export default class SmoothScroller {
      */
 
     /**
-     * @type {import('./type.d.ts').onMouseEvent}
+     * @type {import('./type').MobSmoothScrollerOnMouseEvent}
      */
     #onMouseDown({ target, client }) {
         if (!mq[this.#queryType](this.#breakpoint)) return;
@@ -756,14 +756,14 @@ export default class SmoothScroller {
     }
 
     /**
-     * @type {import('./type.d.ts').onMouseEvent}
+     * @type {import('./type').MobSmoothScrollerOnMouseEvent}
      */
     #onMouseUp() {
         this.#dragEnable = false;
     }
 
     /**
-     * @type {import('./type.d.ts').onMouseEvent}
+     * @type {import('./type').MobSmoothScrollerOnMouseEvent}
      */
     #onTouchMove({ target, client, preventDefault }) {
         if (
@@ -792,7 +792,7 @@ export default class SmoothScroller {
     }
 
     /**
-     * @type {import('./type.d.ts').onMouseEvent}
+     * @type {import('./type').MobSmoothScrollerOnMouseEvent}
      */
     #onWhell({ target, spinY, preventDefault }) {
         if (!mq[this.#queryType](this.#breakpoint) || !spinY) return;
@@ -808,7 +808,7 @@ export default class SmoothScroller {
             preventDefault?.();
             this.#endValue += spinY * this.#speed;
             this.#calculateValue();
-            freezePageScroll();
+            FreezeMobPageScroll();
         }
     }
 
@@ -891,7 +891,7 @@ export default class SmoothScroller {
     }
 
     /**
-     * @type {import('./type.d.ts').onMouseEvent}
+     * @type {import('./type').MobSmoothScrollerOnMouseEvent}
      */
     #preventChecker({ target, preventDefault }) {
         if (
@@ -914,7 +914,7 @@ export default class SmoothScroller {
     #getMousePos({ x, y }) {
         if (!x || !y) return 0;
 
-        return this.#direction === HandleScrollerConstant.DIRECTION_VERTICAL
+        return this.#direction === MobScrollerConstant.DIRECTION_VERTICAL
             ? y
             : x;
     }

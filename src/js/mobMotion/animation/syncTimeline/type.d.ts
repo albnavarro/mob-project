@@ -1,18 +1,18 @@
-import { directionType, directionTypeObjectLoop } from '../utils/timeline/type';
-import HandleSyncTimeline from './handleSyncTimeline';
+import { DirectionType, DirectionTypeObjectLoop } from '../utils/timeline/type';
+import MobSyncTimeline from './MobSyncTimeline';
 
-export interface syncTimelineType {
+export interface SyncTimeline {
     duration?: number;
     yoyo?: boolean;
     repeat?: number;
 }
 
-export interface syncTimelineSequencers {
+export interface SyncTimelineSequencers {
     draw: (arg0: {
         partial: number;
         isLastDraw: boolean;
         useFrame: boolean;
-        direction: directionType;
+        direction: DirectionType;
     }) => void;
     getLabels: () => { name: string; time: number }[];
     inzializeStagger: () => void;
@@ -23,47 +23,45 @@ export interface syncTimelineSequencers {
     setStretchFactor: (arg0: number) => void;
 }
 
-export interface syncTimelineEventType<T> {
+export interface SyncTimelineEvent<T> {
     id: number;
     cb: (arg0: T) => void;
 }
 
-export type syncTimelinePlay = (arg0?: {
+export type SyncTimelinePlay = (arg0?: {
     useCurrent?: boolean;
 }) => Promise<any>;
 
-export type syncTimelinePlayReverse = (arg0?: {
+export type SyncTimelinePlayReverse = (arg0?: {
     useCurrent?: boolean;
 }) => Promise<any>;
 
-export type syncTimelinePlayFrom = (value?: number | string) => Promise<any>;
+export type SyncTimelinePlayFrom = (value?: number | string) => Promise<any>;
 export type syncTimelinePlayFromReverse = (
     value?: number | string
 ) => Promise<any>;
 
-export type syncTimelinePause = () => void;
-export type syncTimelineResume = () => void;
-export type syncTimelineReverse = () => void;
+export type SyncTimelinePause = () => void;
+export type SyncTimelineResume = () => void;
+export type SyncTimelineReverse = () => void;
 
-export type syncTimelineStop = (arg0?: {
+export type SyncTimelineStop = (arg0?: {
     clearCache?: boolean;
-}) => HandleSyncTimeline;
+}) => MobSyncTimeline;
 
-export type syncTimelineAdd = (
-    arg0: syncTimelineSequencers
-) => HandleSyncTimeline;
+export type SyncTimelineAdd = (arg0: SyncTimelineSequencers) => MobSyncTimeline;
 
-export type syncTimelineSetDuration = (arg0: number) => HandleSyncTimeline;
+export type SyncTimelineSetDuration = (arg0: number) => MobSyncTimeline;
 
-export type syncTimelineIsActive = () => boolean;
-export type syncTimelineIsPaused = () => boolean;
-export type syncTimelineGetDirection = () => directionType;
-export type syncTimelineTime = () => number;
+export type SyncTimelineIsActive = () => boolean;
+export type SyncTimelineIsPaused = () => boolean;
+export type SyncTimelineGetDirection = () => DirectionType;
+export type SyncTimelineTime = () => number;
 
-export type syncTimelineOnLoopEnd = (
-    arg0: (arg0: directionTypeObjectLoop) => void
+export type SyncTimelineOnLoopEnd = (
+    arg0: (arg0: DirectionTypeObjectLoop) => void
 ) => () => void;
 
-export type syncTimelineOnUpdate = (arg0: () => void) => () => void;
+export type SyncTimelineOnUpdate = (arg0: () => void) => () => void;
 
-export type syncTimelineOnComplete = (arg0: () => void) => () => void;
+export type SyncTimelineOnComplete = (arg0: () => void) => () => void;

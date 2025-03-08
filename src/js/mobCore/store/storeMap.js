@@ -1,11 +1,11 @@
 /**
- * @type {import("./type").storeMap}
+ * @type {import("./type").StoreMap}
  */
 export const storeMap = new Map();
 
 /**
  * @param {string} id
- * @returns {import("./type").storeMapValue|undefined}
+ * @returns {import("./type").StoreMapValue|undefined}
  */
 export const getStateFromMainMap = (id) => {
     const valueNow = storeMap.get(id);
@@ -14,7 +14,7 @@ export const getStateFromMainMap = (id) => {
 
 /**
  * @param {string} id
- * @param {import("./type").storeMapValue} state
+ * @param {import("./type").StoreMapValue} state
  * @returns {void}
  */
 export const updateMainMap = (id, state) => {

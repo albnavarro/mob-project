@@ -5,7 +5,7 @@ import {
     offset,
 } from '../../../js/mobCore/utils/index.js';
 import { mobCore } from '../../../js/mobCore/index.js';
-import { bodyScroll } from '../../../js/mobMotion/plugin/index.js';
+import { MobBodyScroll } from '../../../js/mobMotion/plugin/index.js';
 
 export class tBlocksItemClass {
     constructor(container) {
@@ -338,7 +338,7 @@ export class tBlocksItemClass {
         );
 
         setTimeout(() => {
-            bodyScroll.to(this.container);
+            MobBodyScroll.to(this.container);
         }, 500);
     }
 }

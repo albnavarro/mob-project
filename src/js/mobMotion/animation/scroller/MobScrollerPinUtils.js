@@ -1,7 +1,7 @@
 // @ts-check
 
 import { handleSetUp } from '../../setup';
-import { HandleScrollerConstant } from './HandleScrollerConstant';
+import { MobScrollerConstant } from './MobScrollerConstant';
 
 /**
  * @param {Object} param
@@ -17,7 +17,7 @@ export const getMarkerWrapperStyle = ({ marker, direction, invertSide }) => {
         handleSetUp.get('scrollTrigger')?.markerColor?.item || '#14df3b';
     const borderStyle = `3px ${borderColor} solid`;
 
-    if (direction === HandleScrollerConstant.DIRECTION_VERTICAL) {
+    if (direction === MobScrollerConstant.DIRECTION_VERTICAL) {
         return invertSide
             ? { borderBottom: borderStyle }
             : { borderTop: borderStyle };

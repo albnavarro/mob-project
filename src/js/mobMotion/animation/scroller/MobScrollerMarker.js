@@ -1,6 +1,6 @@
 // @ts-check
 
-import { HandleScrollerConstant } from './HandleScrollerConstant.js';
+import { MobScrollerConstant } from './MobScrollerConstant.js';
 import { handleSetUp } from '../../setup.js';
 import { mobCore } from '../../../mobCore/index.js';
 
@@ -101,7 +101,7 @@ const getStartStyle = ({
     left,
     right,
 }) => {
-    if (direction === HandleScrollerConstant.DIRECTION_VERTICAL) {
+    if (direction === MobScrollerConstant.DIRECTION_VERTICAL) {
         return invertSide
             ? {
                   right: 0,
@@ -163,7 +163,7 @@ const getEndStyle = ({
     left,
     right,
 }) => {
-    if (direction === HandleScrollerConstant.DIRECTION_VERTICAL) {
+    if (direction === MobScrollerConstant.DIRECTION_VERTICAL) {
         return invertSide
             ? {
                   right: 0,
@@ -214,7 +214,7 @@ const getEndStyle = ({
  *
  * @returns {{startMarker:(Element|undefined), endMarker:(Element|undefined)}}
  */
-export const handleScrollerMarker = ({
+export const MobScrollerMarker = ({
     startMarker,
     endMarker,
     startPoint,

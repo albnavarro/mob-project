@@ -1,5 +1,5 @@
 import { mobCore } from '../../../js/mobCore';
-import { bodyScroll } from '../../../js/mobMotion/plugin';
+import { MobBodyScroll } from '../../../js/mobMotion/plugin';
 
 class totopClass {
     constructor() {
@@ -19,7 +19,7 @@ class totopClass {
 
     onClick(event) {
         event.preventDefault();
-        bodyScroll.to(0, {
+        MobBodyScroll.to(0, {
             duration: 1000,
             overflow: true,
         });

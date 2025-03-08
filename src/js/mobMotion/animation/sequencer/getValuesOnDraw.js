@@ -6,14 +6,14 @@ import { checkIsLastUsableProp } from './reduceFunction';
 
 /**
  * @param {Object} param
- * @param {import("./type").sequencerRow[]} param.timeline
- * @param {import("./type").sequencerValue[]} param.valuesState
+ * @param {import("./type").SequencerRow[]} param.timeline
+ * @param {import("./type").SequencerValue[]} param.valuesState
  * @param {number} param.partial
- * @return {import("./type").sequencerValue[]}
+ * @return {import("./type").SequencerValue[]}
  */
 export const sequencerGetValusOnDraw = ({ timeline, valuesState, partial }) => {
     /**
-     * @type {import('./type').sequencerValue[]}
+     * @type {import('./type').SequencerValue[]}
      */
     return valuesState.map((valueItem) => {
         /**

@@ -1,4 +1,4 @@
-export type PageScroller = (arg0: {
+export type MobPageScroller = (arg0: {
     velocity: number;
     rootElement: HTMLElement;
 }) => {

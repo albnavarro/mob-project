@@ -36,11 +36,13 @@ import {
 } from '../utils/warning.js';
 import { fpsLoadedLog } from '../utils/fpsLogInizialization.js';
 import {
-    lerpPrecisionIsValid,
-    lerpVelocityIsValid,
     relativeIsValid,
+    springConfigIsValid,
+    springConfigIsValidAndGetNew,
+    springConfigPropIsValid,
     valueIsBooleanAndTrue,
 } from '../utils/tweenAction/tweenValidation.js';
+import { handleSetUp } from '../../setup.js';
 import { mobCore } from '../../../mobCore/index.js';
 import { shouldInizializzeStagger } from '../utils/stagger/shouldInizialize.js';
 import { resume } from '../utils/resumeTween.js';
@@ -50,9 +52,10 @@ import {
     getValueObjToNative,
 } from '../utils/tweenAction/getValues.js';
 import { mergeArray } from '../utils/tweenAction/mergeArray.js';
-import { lerpGetValuesOnDraw } from './getValuesOnDraw.js';
+import { springGetValuesOndraw } from './getValuesOndraw.js';
+import { springPresetConfig } from './springConfig.js';
 
-export default class HandleLerp {
+export default class MobSpring {
     /**
      * @type {import('../utils/stagger/type.js').StaggerObject}
      */
@@ -64,14 +67,11 @@ export default class HandleLerp {
     #relative;
 
     /**
-     * @type {number}
-     */
-    #velocity;
-
-    /**
-     * @type {number}
-     */
-    #precision;
+     * @type {import('./type.js').SpringProps}
+     *
+     * This value lives from user call ( goTo etc..) until next call
+     **/
+    #configProps;
 
     /**
      * @type {string}
@@ -89,7 +89,7 @@ export default class HandleLerp {
     #currentResolve;
 
     /**
-     * @type{((value:any) => void)|undefined}
+     * @type{((value:any) => void)|undefined }
      */
     #currentReject;
 
@@ -99,12 +99,12 @@ export default class HandleLerp {
     #promise;
 
     /**
-     * @type {import('./type.js').lerpValues[]|[]}
+     * @type {import('./type.js').SpringValues[]|[]}
      */
     #values;
 
     /**
-     * @type {import('./type.js').lerpInitialData[]}
+     * @type {import('./type.js').SpringInitialData[]}
      */
     #initialData;
 
@@ -158,13 +158,13 @@ export default class HandleLerp {
      * This value is the base value merged with new value in custom prop
      * passed form user in goTo etc..
      *
-     * @type {import('./type.js').lerpDefault}
+     * @type {import('./type.js').SpringDefault}
      **/
     #defaultProps;
 
     /**
      * @type {import('../utils/stagger/type.js').StaggerFrameIndexObject}
-     **/
+     */
     #slowlestStagger;
 
     /**
@@ -173,14 +173,20 @@ export default class HandleLerp {
     #fastestStagger;
 
     /**
-     * @param {import('./type.js').lerpTweenProps} [ data ]
+     * @param {import('./type.js').SpringTweenProps} [ data ]
      *
      * @example
      * ```javascript
-     * const myLerp = new HandleLerp({
+     * const mySpring = new HandleSpring({
      *   data: Object.<string, number>,
-     *   precision: Number,
-     *   velocity: Number,
+     *   config: String,
+     *   configProps: {
+     *      tension: Number,
+     *      mass: Number,
+     *      friction: Number,
+     *      velocity: Number,
+     *      precision: Number,
+     *   },
      *   relative: Boolean
      *   stagger:{
      *      each: Number,
@@ -200,29 +206,29 @@ export default class HandleLerp {
      * @description
      * Available methods:
      * ```javascript
-     * myLerp.set()
-     * myLerp.goTo()
-     * myLerp.goFrom()
-     * myLerp.goFromTo()
-     * myLerp.subscribe()
-     * myLerp.subscribeCache()
-     * myLerp.onComplete()
-     * myLerp.updateVelocity()
-     * myLerp.updatePrecision()
-     * myLerp.getId()
-     * myLerp.get()
-     * myLerp.getTo()
-     * myLerp.getFrom()
-     * myLerp.getToNativeType()
-     * myLerp.getFromNativeType()
+     * mySpring.set()
+     * mySpring.goTo()
+     * mySpring.goFrom()
+     * mySpring.goFromTo()
+     * mySpring.subscribe()
+     * mySpring.subscribeCache()
+     * mySpring.onComplete()
+     * mySpring.updateConfigProp()
+     * mySpring.updateConfig()
+     * mySpring.getId()
+     * mySpring.get()
+     * mySpring.getTo()
+     * mySpring.getFrom()
+     * mySpring.getToNativeType()
+     * mySpring.getFromNativeType()
      *
      * ```
      */
     constructor(data) {
         this.#stagger = getStaggerFromProps(data ?? {});
-        this.#relative = relativeIsValid(data?.relative, 'lerp');
-        this.#velocity = lerpVelocityIsValid(data?.velocity);
-        this.#precision = lerpPrecisionIsValid(data?.precision);
+        this.#relative = relativeIsValid(data?.relative, 'spring');
+        this.#configProps = springConfigIsValidAndGetNew(data?.config);
+        this.updateConfigProp(data?.configProps ?? {});
         this.#uniqueId = mobCore.getUnivoqueId();
         this.#isActive = false;
         this.#currentResolve = undefined;
@@ -241,8 +247,7 @@ export default class HandleLerp {
         this.#fpsInLoading = false;
         this.#defaultProps = {
             reverse: false,
-            velocity: this.#velocity,
-            precision: this.#precision,
+            configProps: this.#configProps,
             relative: this.#relative,
             immediate: false,
         };
@@ -250,6 +255,7 @@ export default class HandleLerp {
         this.#fastestStagger = STAGGER_DEFAULT_INDEX_OBJ;
 
         /**
+         * @private
          * Set initial store data if defined in constructor props
          * If not use setData methods
          */
@@ -260,22 +266,29 @@ export default class HandleLerp {
     /**
      * @param {number} _time
      * @param {number} fps
-     * @param {(value:any) => void} res
+     * @param {Function} res
+     * @param {number} tension
+     * @param {number} friction
+     * @param {number} mass
+     * @param {number} precision
      *
      * @returns {void}
      */
-    #draw(_time, fps, res = () => {}) {
+    #draw(_time, fps, res = () => {}, tension, friction, mass, precision) {
         this.#isActive = true;
 
-        // Update values.
-        this.#values = lerpGetValuesOnDraw({
+        this.#values = springGetValuesOndraw({
             values: this.#values,
+            tension,
+            friction,
+            mass,
+            precision,
             fps,
-            velocity: this.#velocity,
-            precision: this.#precision,
         });
 
-        // Prepare an obj to pass to the callback.
+        /**
+         * Prepare an obj to pass to the callback
+         */
         const callBackObject = getValueObj(this.#values, 'currentValue');
 
         defaultCallback({
@@ -286,7 +299,9 @@ export default class HandleLerp {
             useStagger: this.#useStagger,
         });
 
-        // Check if all values is completed.
+        /**
+         * Check if all values is completed
+         */
         const allSettled = this.#values.every((item) => item.settled === true);
 
         if (allSettled) {
@@ -299,21 +314,30 @@ export default class HandleLerp {
                  * At the next call fromValue become the start value
                  */
                 this.#values = [...this.#values].map((item) => {
-                    return { ...item, fromValue: item.toValue };
+                    return {
+                        ...item,
+                        fromValue: item.toValue,
+                    };
                 });
 
-                // On complete
+                /**
+                 * On complete
+                 */
                 if (!this.#pauseStatus) {
-                    res(true);
+                    res();
 
-                    // Set promise reference to null once resolved
+                    /**
+                     * Set promise reference to null once resolved
+                     */
                     this.#promise = undefined;
                     this.#currentReject = undefined;
                     this.#currentResolve = undefined;
                 }
             };
 
-            // Prepare an obj to pass to the callback with rounded value ( end user value)
+            /**
+             * Prepare an obj to pass to the callback with rounded value ( end user value)
+             */
             const cbObjectSettled = getValueObj(this.#values, 'toValue');
 
             defaultCallbackOnComplete({
@@ -333,7 +357,16 @@ export default class HandleLerp {
 
         mobCore.useFrame(() => {
             mobCore.useNextTick(({ time, fps }) => {
-                if (this.#isActive) this.#draw(time, fps, res);
+                if (this.#isActive)
+                    this.#draw(
+                        time,
+                        fps,
+                        res,
+                        tension,
+                        friction,
+                        mass,
+                        precision
+                    );
             });
         });
     }
@@ -341,14 +374,25 @@ export default class HandleLerp {
     /**
      * @param {number} time current global time
      * @param {number} fps current FPS
-     * @param {(value:any) => void} res current promise resolve
+     * @param {Function} res current promise resolve
      **/
     #onReuqestAnim(time, fps, res) {
         this.#values = [...this.#values].map((item) => {
-            return { ...item, currentValue: item.fromValue };
+            return {
+                ...item,
+                velocity: Math.trunc(this.#configProps.velocity),
+            };
         });
 
-        this.#draw(time, fps, res);
+        /**
+         * Normalize spring config props
+         */
+        const tension = this.#configProps.tension;
+        const friction = this.#configProps.friction;
+        const mass = Math.max(1, this.#configProps.mass);
+        const precision = this.#configProps.precision;
+
+        this.#draw(time, fps, res, tension, friction, mass, precision);
     }
 
     /**
@@ -360,7 +404,7 @@ export default class HandleLerp {
     async #inzializeStagger() {
         /**
          * First time il there is a stagger load fps then go next step
-         * next time no need to calcaulte stagger and jump directly next step
+         * next time no need to calculate stagger and jump directly next step
          *
          **/
         if (
@@ -373,7 +417,7 @@ export default class HandleLerp {
         ) {
             const { averageFPS } = await mobCore.useFps();
 
-            fpsLoadedLog('lerp', averageFPS);
+            fpsLoadedLog('spring', averageFPS);
             const cb = getStaggerArray(this.#callbackCache, this.#callback);
 
             if (this.#stagger.grid.col > cb.length) {
@@ -417,8 +461,8 @@ export default class HandleLerp {
     }
 
     /**
-     * @param {(arg0: any) => void} res
-     * @param {(value: any) => void} reject
+     * @param {(value:any) => void} res
+     * @param {(value:any) => void} reject
      *
      * @returns {Promise<any>}
      */
@@ -442,7 +486,7 @@ export default class HandleLerp {
     }
 
     /**
-     * @type {import('./type.js').lerpStop}
+     * @type {import('./type.js').SpringStop}
      */
     stop({ clearCache = true } = {}) {
         if (this.#pauseStatus) this.#pauseStatus = false;
@@ -464,11 +508,13 @@ export default class HandleLerp {
         }
 
         // Reset RAF
-        if (this.#isActive) this.#isActive = false;
+        if (this.#isActive) {
+            this.#isActive = false;
+        }
     }
 
     /**
-     * @type {import('./type.js').lerpPause}
+     * @type {import('./type.js').SpringPause}
      */
     pause() {
         if (this.#pauseStatus) return;
@@ -478,7 +524,7 @@ export default class HandleLerp {
     }
 
     /**
-     * @type {import('./type.js').lerpResume}
+     * @type {import('./type.js').SpringResume}
      */
     resume() {
         if (!this.#pauseStatus) return;
@@ -490,10 +536,18 @@ export default class HandleLerp {
     }
 
     /**
-     * @type {import('../../utils/type.js').SetData}
+     * @type {import('../../utils/type.js').SetData} obj Initial data structure
      *
      * @description
      * Set initial data structure, the method is call by data prop in constructor. In case of need it can be called after creating the instance
+     *
+     *
+     * @example
+     * ```javascript
+     *
+     *
+     * mySpring.setData({ val: 100 });
+     * ```
      */
     setData(obj) {
         this.#values = Object.entries(obj).map((item) => {
@@ -502,6 +556,7 @@ export default class HandleLerp {
                 prop: prop,
                 toValue: value,
                 fromValue: value,
+                velocity: this.#configProps.velocity,
                 currentValue: value,
                 fromFn: () => 0,
                 fromIsFn: false,
@@ -522,27 +577,70 @@ export default class HandleLerp {
     }
 
     /**
-     * @type {import('./type.js').lerpResetData}
+     * @type {import('./type.js').SpringResetData}
      */
     resetData() {
         this.#values = mergeDeep(this.#values, this.#initialData);
     }
 
     /**
-     * @type  {import('./type.js').lerpMergeProps}
+     * @type  {import('./type.js').SpringMergeProps}
+     *
+     * @description
+     * Merge special props with default props
      */
     #mergeProps(props) {
-        const newProps = { ...this.#defaultProps, ...props };
-        const { velocity, precision, relative } = newProps;
-        this.#relative = relativeIsValid(relative, 'lerp');
-        this.#velocity = lerpVelocityIsValid(velocity);
-        this.#precision = lerpPrecisionIsValid(precision);
+        const springParams = handleSetUp.get('spring');
+
+        /**
+         * @description
+         * Step 1
+         * Get news confic props ( mass, friction etc... )
+         * Get props from new config ( wobble etc.. ) or get each default prop.
+         *
+         * @type {import('./type.js').SpringPresentConfigType}
+         */
+        const allPresetConfig = springParams.config;
+        const configPreset = springConfigIsValid(props?.config)
+            ? (allPresetConfig?.[props?.config ?? 'default'] ??
+              springPresetConfig.default)
+            : this.#defaultProps.configProps;
+
+        /*
+         * Step 2
+         * Modify previuos confic ( newConfigPreset ) single value ( mass ... )
+         * Merge single prop or {}
+         */
+        const configPropsToMerge = springConfigPropIsValid(props?.configProps);
+        const configProps = {
+            ...configPreset,
+            ...configPropsToMerge,
+        };
+
+        /*
+         * Current config for spring for current cycle.
+         */
+        const newProps = {
+            reverse: props?.reverse ?? this.#defaultProps.reverse,
+            relative: props?.relative ?? this.#defaultProps.relative,
+            immediate: props?.immediate ?? this.#defaultProps.immediate,
+            configProps,
+        };
+
+        const { relative } = newProps;
+
+        /**
+         * Current spring config used in current cycle.
+         * Current relative value used in current cycle.
+         */
+        this.#configProps = configProps;
+        this.#relative = relative;
 
         return newProps;
     }
 
     /**
-     * @type {import('../../utils/type.js').GoTo<import('./type.js').lerpActions>} obj to Values
+     * @type {import('../../utils/type.js').GoTo<import('./type.js').SpringActions>} obj to Values
      */
     goTo(obj, props = {}) {
         if (this.#pauseStatus) return new Promise((resolve) => resolve);
@@ -553,7 +651,7 @@ export default class HandleLerp {
     }
 
     /**
-     * @type {import('../../utils/type.js').GoFrom<import('./type.js').lerpActions>} obj to Values
+     * @type {import('../../utils/type.js').GoFrom<import('./type.js').SpringActions>} obj to Values
      */
     goFrom(obj, props = {}) {
         if (this.#pauseStatus) return new Promise((resolve) => resolve);
@@ -564,36 +662,34 @@ export default class HandleLerp {
     }
 
     /**
-     * @type {import('../../utils/type.js').GoFromTo<import('./type.js').lerpActions>} obj to Values
+     * @type {import('../../utils/type.js').GoFromTo<import('./type.js').SpringActions>} obj to Values
      */
     goFromTo(fromObj, toObj, props = {}) {
         if (this.#pauseStatus) return new Promise((resolve) => resolve);
 
         this.#useStagger = true;
-
-        // Check if fromObj has the same keys of toObj
         if (!compareKeys(fromObj, toObj)) {
-            compareKeysWarning('lerp goFromTo:', fromObj, toObj);
+            compareKeysWarning('spring goFromTo:', fromObj, toObj);
             return new Promise((resolve) => resolve);
         }
 
         const data = goFromToUtils(fromObj, toObj);
-
         return this.#doAction(data, props, fromObj);
     }
 
     /**
-     * @type {import('../../utils/type.js').Set<import('./type.js').lerpActions>} obj to Values
+     * @type {import('../../utils/type.js').Set<import('./type.js').SpringActions>} obj to Values
      */
     set(obj, props = {}) {
         if (this.#pauseStatus) return new Promise((resolve) => resolve);
+
         this.#useStagger = false;
         const data = setUtils(obj);
         return this.#doAction(data, props, obj);
     }
 
     /**
-     * @type {import('../../utils/type.js').SetImmediate<import('./type.js').lerpActions>} obj to Values
+     * @type {import('../../utils/type.js').SetImmediate<import('./type.js').SpringActions>} obj to Values
      */
     setImmediate(obj, props = {}) {
         if (this.#pauseStatus) return;
@@ -614,11 +710,11 @@ export default class HandleLerp {
     }
 
     /**
-     * @type {import('../../utils/type.js').DoAction<import('./type.js').lerpActions>} obj to Values
+     * @type {import('../../utils/type.js').DoAction<import('./type.js').SpringActions>} obj to Values
      */
-    #doAction(data, props, obj) {
+    #doAction(data, props = {}, obj) {
         this.#values = mergeArray(data, this.#values);
-        const { reverse, immediate } = this.#mergeProps(props ?? {});
+        const { reverse, immediate } = this.#mergeProps(props);
 
         if (valueIsBooleanAndTrue(reverse, 'reverse'))
             this.#values = setReverseValues(obj, this.#values);
@@ -647,13 +743,13 @@ export default class HandleLerp {
      * @description
      * Get current values, If the single value is a function it returns the result of the function.
      *
-     * @type {import('./type.js').lerpGetValue}
+     * @type {import('./type.js').SpringGetValue}
      *
      * @example
      * ```javascript
      *
      *
-     * const { prop } = myLerp.get();
+     * const { prop } = mySpring.get();
      * ```
      */
     get() {
@@ -664,13 +760,13 @@ export default class HandleLerp {
      * @description
      * Get initial values, If the single value is a function it returns the result of the function.
      *
-     * @type {import('./type.js').lerpGetValue}
+     * @type {import('./type.js').SpringGetValue}
      *
      * @example
      * ```javascript
      *
      *
-     * const { prop } = myLerp.getIntialData();
+     * const { prop } = mySpring.getIntialData();
      * ```
      */
     getInitialData() {
@@ -681,13 +777,13 @@ export default class HandleLerp {
      * @description
      * Get from values, If the single value is a function it returns the result of the function.
      *
-     * @type {import('./type.js').lerpGetValue}
+     * @type {import('./type.js').SpringGetValue}
      *
      * @example
      * ```javascript
      *
      *
-     * const { prop } = myLerp.getFrom();
+     * const { prop } = mySpring.getFrom();
      * ```
      */
     getFrom() {
@@ -698,13 +794,13 @@ export default class HandleLerp {
      * @description
      * Get to values, If the single value is a function it returns the result of the function.
      *
-     * @type {import('./type.js').lerpGetValue}
+     * @type {import('./type.js').SpringGetValue}
      *
      * @example
      * ```javascript
      *
      *
-     * const { prop } = myLerp.getTo();
+     * const { prop } = mySpring.getTo();
      * ```
      */
     getTo() {
@@ -715,13 +811,13 @@ export default class HandleLerp {
      * @description
      * Get From values, if the single value is a function it returns the same function.
      *
-     * @type {import('./type.js').lerpGetValueNative}
+     * @type {import('./type.js').SpringGetValueNative}
      *
      * @example
      * ```javascript
      *
      *
-     * const { prop } = myLerp.getFromNativeType();
+     * const { prop } = mySpring.getFromNativeType();
      * ```
      */
     getFromNativeType() {
@@ -732,13 +828,13 @@ export default class HandleLerp {
      * @description
      * Get To values, if the single value is a function it returns the same function.
      *
-     * @type {import('./type.js').lerpGetValueNative}
+     * @type {import('./type.js').SpringGetValueNative}
      *
      * @example
      * ```javascript
      *
      *
-     * const { prop } = myLerp.getToNativeType();
+     * const { prop } = mySpring.getToNativeType();
      * ```
      */
     getToNativeType() {
@@ -749,30 +845,30 @@ export default class HandleLerp {
      * @description
      * Get tween type
      *
-     * @type {import('./type.js').lerpGetType} tween type
+     * @type {import('./type.js').SpringGetType} tween type
      *
      * @example
      * ```javascript
      *
      *
-     * const type = myLerp.getType();
+     * const type = mySpring.getType();
      * ```
      */
     getType() {
-        return 'LERP';
+        return 'SPRING';
     }
 
     /**
      * @description
      * Get univoque Id
      *
-     * @type {import('./type.js').lerpGetId}
+     * @type {import('./type.js').SpringGetId}
      *
      * @example
      * ```javascript
      *
      *
-     * const type = myLerp.getId();
+     * const type = mySpring.getId();
      * ```
      */
     getId() {
@@ -780,51 +876,48 @@ export default class HandleLerp {
     }
 
     /**
-     * @type  {import('./type.js').lerpUpdateVelocity} 
+     * @type {import('./type.js').SpringUdateConfigProp}
      *
-     * @example
-     * ```javascript
-     * myLerp.updateVelocity(0.1)
+     *  @example
+     *  ```javascript
+     *  mySpring.updateConfigProp({
+     *      mass: 2,
+     *      friction: 5
+     *  })
      *
      *
-     * ```
+     *  ```
      *
      * @description
-     * Update velocity value.
-       `default value is 0.06`,the closer the value is to 1, the faster the transition will be.
-        The change will be persistent
+     * Update config object, every || some properties
+     * The change will be persistent
      */
-    updateVelocity(velocity) {
-        this.#velocity = lerpVelocityIsValid(velocity);
+    updateConfigProp(configProps = {}) {
+        const configToMerge = springConfigPropIsValid(configProps);
+        this.#configProps = { ...this.#configProps, ...configToMerge };
+
         this.#defaultProps = mergeDeep(this.#defaultProps, {
-            velocity: this.#velocity,
+            configProps: configToMerge,
         });
     }
 
     /**
-     * @type  {import('./type.js').lerpUpdatePrecision} 
-     *
-     * @example
-     * ```javascript
-     * myLerp.updatePrecision(0.5)
-     *
-     *
-     * ```
      *
      * @description
-     * Update precision value.
-       When the calculated value is less than this number, the transition will be considered completed, the smaller the value, the greater the precision of the calculation, the `default value is 0.01`.
-       The change will be persistent
+     * updateConfig - Update config object with new preset
+     *
+     * @type {import('./type.js').SpringUdateConfig}
+     *
      */
-    updatePrecision(precision) {
-        this.#velocity = lerpPrecisionIsValid(precision);
+    updateConfig(config) {
+        this.#configProps = springConfigIsValidAndGetNew(config);
         this.#defaultProps = mergeDeep(this.#defaultProps, {
-            precision: this.#precision,
+            configProps: this.#configProps,
         });
     }
 
     /**
-     * @type {import('./type.js').lerpSubscribe}
+     * @type {import('./type.js').SpringSubscribe}
      *
      * ```
      * @description
@@ -836,11 +929,12 @@ export default class HandleLerp {
             this.#callback
         );
         this.#callback = arrayOfCallbackUpdated;
+
         return () => (this.#callback = unsubscribeCb(this.#callback));
     }
 
     /**
-     * @type {import('./type.js').lerpSubscribeCache}
+     * @type {import('./type.js').SpringSubscribeCache}
      *
      * @description
      * Callback that returns updated values ready to be usable, specific to manage large staggers.
@@ -876,7 +970,7 @@ export default class HandleLerp {
     }
 
     /**
-     * @type {import('./type.js').lerpOnComplete}
+     * @type {import('./type.js').SpringOnComplete}
      *
      *
      * @description

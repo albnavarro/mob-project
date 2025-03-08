@@ -2,10 +2,11 @@
 
 import { compareKeys } from '../utils/animationUtils.js';
 import {
+    setFromByCurrent,
     setFromCurrentByTo,
     setFromToByCurrent,
     setReverseValues,
-    setRelativeTween,
+    setRelative,
 } from '../utils/tweenAction/setValues.js';
 import { mergeDeep } from '../../utils/mergeDeep.js';
 import { setStagger } from '../utils/stagger/setStagger.js';
@@ -35,33 +36,27 @@ import {
 } from '../utils/warning.js';
 import { fpsLoadedLog } from '../utils/fpsLogInizialization.js';
 import {
-    durationIsNumberOrFunctionIsValid,
-    easeTweenIsValid,
-    easeTweenIsValidGetFunction,
+    lerpPrecisionIsValid,
+    lerpVelocityIsValid,
     relativeIsValid,
     valueIsBooleanAndTrue,
 } from '../utils/tweenAction/tweenValidation.js';
 import { mobCore } from '../../../mobCore/index.js';
 import { shouldInizializzeStagger } from '../utils/stagger/shouldInizialize.js';
-import { mergeArrayTween } from '../utils/tweenAction/mergeArray.js';
+import { resume } from '../utils/resumeTween.js';
 import {
     getValueObj,
     getValueObjFromNative,
     getValueObjToNative,
 } from '../utils/tweenAction/getValues.js';
-import { tweenGetValueOnDraw } from './getValuesOnDraw.js';
+import { mergeArray } from '../utils/tweenAction/mergeArray.js';
+import { lerpGetValuesOnDraw } from './getValuesOnDraw.js';
 
-export default class HandleTween {
+export default class MobLerp {
     /**
-     * @type {Function}
-     *  This value lives from user call ( goTo etc..) until next call
+     * @type {import('../utils/stagger/type.js').StaggerObject}
      */
-    #ease;
-
-    /**
-     * @type {number}
-     */
-    #duration;
+    #stagger;
 
     /**
      * @type {boolean}
@@ -69,9 +64,14 @@ export default class HandleTween {
     #relative;
 
     /**
-     * @type {import('../utils/stagger/type.js').StaggerObject}
+     * @type {number}
      */
-    #stagger;
+    #velocity;
+
+    /**
+     * @type {number}
+     */
+    #precision;
 
     /**
      * @type {string}
@@ -86,6 +86,11 @@ export default class HandleTween {
     /**
      * @type{((value:any) => void)|undefined }
      */
+    #currentResolve;
+
+    /**
+     * @type{((value:any) => void)|undefined}
+     */
     #currentReject;
 
     /**
@@ -94,12 +99,12 @@ export default class HandleTween {
     #promise;
 
     /**
-     * @type {import('./type.js').TweenStoreData[]}
+     * @type {import('./type.js').lerpValues[]|[]}
      */
     #values;
 
     /**
-     * @type {import('./type.js').TweenInitialData[]}
+     * @type {import('./type.js').lerpInitialData[]}
      */
     #initialData;
 
@@ -136,31 +141,6 @@ export default class HandleTween {
     /**
      * @type {boolean}
      */
-    #comeFromResume;
-
-    /**
-     * @type {number}
-     */
-    #startTime;
-
-    /**
-     * @type {boolean}
-     */
-    #isRunning;
-
-    /**
-     * @type {number}
-     */
-    #timeElapsed;
-
-    /**
-     * @type {number}
-     */
-    #pauseTime;
-
-    /**
-     * @type {boolean}
-     */
     #firstRun;
 
     /**
@@ -178,13 +158,13 @@ export default class HandleTween {
      * This value is the base value merged with new value in custom prop
      * passed form user in goTo etc..
      *
-     * @type{import('./type.js').TweenDefault}
-     */
+     * @type {import('./type.js').lerpDefault}
+     **/
     #defaultProps;
 
     /**
      * @type {import('../utils/stagger/type.js').StaggerFrameIndexObject}
-     */
+     **/
     #slowlestStagger;
 
     /**
@@ -193,14 +173,14 @@ export default class HandleTween {
     #fastestStagger;
 
     /**
-     * @param {import('./type.js').TweenProps} [ data ]
+     * @param {import('./type.js').lerpTweenProps} [ data ]
      *
      * @example
      * ```javascript
-     * const myTween = new HandleTween({
+     * const myLerp = new MobLerp({
      *   data: Object.<string, number>,
-     *   duration: Number,
-     *   ease: String,
+     *   precision: Number,
+     *   velocity: Number,
      *   relative: Boolean
      *   stagger:{
      *      each: Number,
@@ -208,7 +188,7 @@ export default class HandleTween {
      *      grid: {
      *          col: Number,
      *          row: Number,
-     *          direction: String
+     *          direction: String,
      *      },
      *      waitComplete: Boolean,
      *   },
@@ -220,30 +200,32 @@ export default class HandleTween {
      * @description
      * Available methods:
      * ```javascript
-     * myTween.set()
-     * myTween.goTo()
-     * myTween.goFrom()
-     * myTween.goFromTo()
-     * myTween.subscribe()
-     * myTween.subscribeCache()
-     * myTween.onComplete()
-     * myTween.updateEase()
-     * myTween.getId()
-     * myTween.get()
-     * myTween.getTo()
-     * myTween.getFrom()
-     * myTween.getToNativeType()
-     * myTween.getFromNativeType()
+     * myLerp.set()
+     * myLerp.goTo()
+     * myLerp.goFrom()
+     * myLerp.goFromTo()
+     * myLerp.subscribe()
+     * myLerp.subscribeCache()
+     * myLerp.onComplete()
+     * myLerp.updateVelocity()
+     * myLerp.updatePrecision()
+     * myLerp.getId()
+     * myLerp.get()
+     * myLerp.getTo()
+     * myLerp.getFrom()
+     * myLerp.getToNativeType()
+     * myLerp.getFromNativeType()
      *
      * ```
      */
     constructor(data) {
-        this.#ease = easeTweenIsValidGetFunction(data?.ease);
-        this.#duration = durationIsNumberOrFunctionIsValid(data?.duration);
-        this.#relative = relativeIsValid(data?.relative, 'tween');
         this.#stagger = getStaggerFromProps(data ?? {});
+        this.#relative = relativeIsValid(data?.relative, 'lerp');
+        this.#velocity = lerpVelocityIsValid(data?.velocity);
+        this.#precision = lerpPrecisionIsValid(data?.precision);
         this.#uniqueId = mobCore.getUnivoqueId();
         this.#isActive = false;
+        this.#currentResolve = undefined;
         this.#currentReject = undefined;
         this.#promise = undefined;
         this.#values = [];
@@ -254,59 +236,46 @@ export default class HandleTween {
         this.#callbackStartInPause = [];
         this.#unsubscribeCache = [];
         this.#pauseStatus = false;
-        this.#comeFromResume = false;
-        this.#startTime = 0;
-        this.#isRunning = false;
-        this.#timeElapsed = 0;
-        this.#pauseTime = 0;
         this.#firstRun = true;
         this.#useStagger = true;
         this.#fpsInLoading = false;
         this.#defaultProps = {
-            duration: this.#duration,
-            ease: easeTweenIsValid(data?.ease),
-            relative: this.#relative,
             reverse: false,
+            velocity: this.#velocity,
+            precision: this.#precision,
+            relative: this.#relative,
             immediate: false,
         };
         this.#slowlestStagger = STAGGER_DEFAULT_INDEX_OBJ;
         this.#fastestStagger = STAGGER_DEFAULT_INDEX_OBJ;
 
+        /**
+         * Set initial store data if defined in constructor props
+         * If not use setData methods
+         */
         const props = data?.data;
         if (props) this.setData(props);
     }
 
     /**
-     * @param {number} time
-     * @param {Function} res
+     * @param {number} _time
+     * @param {number} fps
+     * @param {(value:any) => void} res
      *
      * @returns {void}
      */
-    #draw(time, res = () => {}) {
+    #draw(_time, fps, res = () => {}) {
         this.#isActive = true;
 
-        if (this.#pauseStatus) {
-            this.#pauseTime = time - this.#startTime - this.#timeElapsed;
-        }
-        this.#timeElapsed = time - this.#startTime - this.#pauseTime;
-
-        if (
-            this.#isRunning &&
-            Math.round(this.#timeElapsed) >= this.#duration
-        ) {
-            this.#timeElapsed = this.#duration;
-        }
-
-        this.#values = tweenGetValueOnDraw({
+        // Update values.
+        this.#values = lerpGetValuesOnDraw({
             values: this.#values,
-            timeElapsed: this.#timeElapsed,
-            duration: this.#duration,
-            ease: this.#ease,
+            fps,
+            velocity: this.#velocity,
+            precision: this.#precision,
         });
 
-        const isSettled = Math.round(this.#timeElapsed) === this.#duration;
-
-        // Prepare an obj to pass to the callback
+        // Prepare an obj to pass to the callback.
         const callBackObject = getValueObj(this.#values, 'currentValue');
 
         defaultCallback({
@@ -317,13 +286,12 @@ export default class HandleTween {
             useStagger: this.#useStagger,
         });
 
-        this.#isRunning = true;
+        // Check if all values is completed.
+        const allSettled = this.#values.every((item) => item.settled === true);
 
-        if (isSettled) {
+        if (allSettled) {
             const onComplete = () => {
                 this.#isActive = false;
-                this.#isRunning = false;
-                this.#pauseTime = 0;
 
                 /**
                  * End of animation
@@ -331,31 +299,29 @@ export default class HandleTween {
                  * At the next call fromValue become the start value
                  */
                 this.#values = [...this.#values].map((item) => {
-                    if (!item.shouldUpdate) return item;
-
-                    return {
-                        ...item,
-                        toValue: item.currentValue,
-                        fromValue: item.currentValue,
-                    };
+                    return { ...item, fromValue: item.toValue };
                 });
 
                 // On complete
                 if (!this.#pauseStatus) {
-                    res();
+                    res(true);
 
                     // Set promise reference to null once resolved
                     this.#promise = undefined;
                     this.#currentReject = undefined;
+                    this.#currentResolve = undefined;
                 }
             };
+
+            // Prepare an obj to pass to the callback with rounded value ( end user value)
+            const cbObjectSettled = getValueObj(this.#values, 'toValue');
 
             defaultCallbackOnComplete({
                 onComplete,
                 callback: this.#callback,
                 callbackCache: this.#callbackCache,
                 callbackOnComplete: this.#callbackOnComplete,
-                callBackObject: callBackObject,
+                callBackObject: cbObjectSettled,
                 stagger: this.#stagger,
                 slowlestStagger: this.#slowlestStagger,
                 fastestStagger: this.#fastestStagger,
@@ -366,8 +332,8 @@ export default class HandleTween {
         }
 
         mobCore.useFrame(() => {
-            mobCore.useNextTick(({ time }) => {
-                if (this.#isActive) this.#draw(time, res);
+            mobCore.useNextTick(({ time, fps }) => {
+                if (this.#isActive) this.#draw(time, fps, res);
             });
         });
     }
@@ -375,13 +341,14 @@ export default class HandleTween {
     /**
      * @param {number} time current global time
      * @param {number} fps current FPS
-     * @param {Function} res current promise resolve
-     *
-     * @returns {void}
+     * @param {(value:any) => void} res current promise resolve
      **/
     #onReuqestAnim(time, fps, res) {
-        this.#startTime = time;
-        this.#draw(time, res);
+        this.#values = [...this.#values].map((item) => {
+            return { ...item, currentValue: item.fromValue };
+        });
+
+        this.#draw(time, fps, res);
     }
 
     /**
@@ -393,7 +360,7 @@ export default class HandleTween {
     async #inzializeStagger() {
         /**
          * First time il there is a stagger load fps then go next step
-         * next time no need to calcaulte stagger and jump directly next step
+         * next time no need to calculate stagger and jump directly next step
          *
          **/
         if (
@@ -406,7 +373,7 @@ export default class HandleTween {
         ) {
             const { averageFPS } = await mobCore.useFps();
 
-            fpsLoadedLog('tween', averageFPS);
+            fpsLoadedLog('lerp', averageFPS);
             const cb = getStaggerArray(this.#callbackCache, this.#callback);
 
             if (this.#stagger.grid.col > cb.length) {
@@ -450,13 +417,14 @@ export default class HandleTween {
     }
 
     /**
-     * @param {(value:any) => void} res
-     * @param {(value:any) => void} reject
+     * @param {(arg0: any) => void} res
+     * @param {(value: any) => void} reject
      *
      * @returns {Promise<any>}
      */
     async #startRaf(res, reject) {
         if (this.#fpsInLoading) return;
+        this.#currentResolve = res;
         this.#currentReject = reject;
 
         if (this.#firstRun) {
@@ -474,12 +442,10 @@ export default class HandleTween {
     }
 
     /**
-     * @type {import('./type.js').TweenStop}
+     * @type {import('./type.js').lerpStop}
      */
     stop({ clearCache = true } = {}) {
-        this.#pauseTime = 0;
-        this.#pauseStatus = false;
-        this.#comeFromResume = false;
+        if (this.#pauseStatus) this.#pauseStatus = false;
         this.#values = setFromToByCurrent(this.#values);
 
         /**
@@ -489,35 +455,45 @@ export default class HandleTween {
         if (this.#isActive && clearCache)
             this.#callbackCache.forEach(({ cb }) => mobCore.useCache.clean(cb));
 
-        // Abort promise
+        // Reject promise
         if (this.#currentReject) {
             this.#currentReject(mobCore.ANIMATION_STOP_REJECT);
             this.#promise = undefined;
             this.#currentReject = undefined;
+            this.#currentResolve = undefined;
         }
 
-        this.#isActive = false;
+        // Reset RAF
+        if (this.#isActive) this.#isActive = false;
     }
 
     /**
-     * @type {import('./type.js').TweenPause}
+     * @type {import('./type.js').lerpPause}
      */
     pause() {
         if (this.#pauseStatus) return;
         this.#pauseStatus = true;
+        if (this.#isActive) this.#isActive = false;
+        this.#values = setFromByCurrent(this.#values);
     }
 
     /**
-     * @type {import('./type.js').TweenResume}
+     * @type {import('./type.js').lerpResume}
      */
     resume() {
         if (!this.#pauseStatus) return;
         this.#pauseStatus = false;
-        this.#comeFromResume = true;
+
+        if (!this.#isActive && this.#currentResolve) {
+            resume(this.#onReuqestAnim.bind(this), this.#currentResolve);
+        }
     }
 
     /**
      * @type {import('../../utils/type.js').SetData}
+     *
+     * @description
+     * Set initial data structure, the method is call by data prop in constructor. In case of need it can be called after creating the instance
      */
     setData(obj) {
         this.#values = Object.entries(obj).map((item) => {
@@ -525,16 +501,13 @@ export default class HandleTween {
             return {
                 prop: prop,
                 toValue: value,
-                toValueOnPause: value,
-                toValProcessed: value,
                 fromValue: value,
                 currentValue: value,
-                shouldUpdate: false,
                 fromFn: () => 0,
                 fromIsFn: false,
                 toFn: () => 0,
                 toIsFn: false,
-                settled: false, // not used, only for uniformity with lerp and spring
+                settled: false,
             };
         });
 
@@ -544,131 +517,96 @@ export default class HandleTween {
                 toValue: item.toValue,
                 fromValue: item.fromValue,
                 currentValue: item.currentValue,
-                shouldUpdate: false,
-                fromFn: () => 0,
-                fromIsFn: false,
-                toFn: () => 0,
-                toIsFn: false,
-                settled: false, // not used, only for uniformity with lerp and spring
             };
         });
     }
 
     /**
-     * @type {import('./type.js').TweenResetData}
+     * @type {import('./type.js').lerpResetData}
      */
     resetData() {
         this.#values = mergeDeep(this.#values, this.#initialData);
     }
 
     /**
-     * @description
-     * Reject promise and update form value with current
-     *
-     * @returns {void}
-     */
-    #updateDataWhileRunning() {
-        this.#isActive = false;
-
-        // Reject promise
-        if (this.#currentReject) {
-            this.#currentReject(mobCore.ANIMATION_STOP_REJECT);
-            this.#promise = undefined;
-        }
-
-        this.#values = [...this.#values].map((item) => {
-            if (!item.shouldUpdate) return item;
-
-            return {
-                ...item,
-                fromValue: item.currentValue,
-            };
-        });
-    }
-
-    /**
-     * @type  {import('./type.js').TweenMergeProps}
-     *
-     * @description
-     * Merge special props with default props
-     *
+     * @type  {import('./type.js').lerpMergeProps}
      */
     #mergeProps(props) {
         const newProps = { ...this.#defaultProps, ...props };
-        const { ease, duration, relative } = newProps;
-        this.#ease = easeTweenIsValidGetFunction(ease);
-        this.#relative = relativeIsValid(relative, 'tween');
-        this.#duration = durationIsNumberOrFunctionIsValid(duration);
+        const { velocity, precision, relative } = newProps;
+        this.#relative = relativeIsValid(relative, 'lerp');
+        this.#velocity = lerpVelocityIsValid(velocity);
+        this.#precision = lerpPrecisionIsValid(precision);
+
         return newProps;
     }
 
     /**
-     * @type {import('../../utils/type.js').GoTo<import('./type.js').TweenAction>} obj to Values
+     * @type {import('../../utils/type.js').GoTo<import('./type.js').lerpActions>} obj to Values
      */
     goTo(obj, props = {}) {
-        if (this.#pauseStatus || this.#comeFromResume) this.stop();
+        if (this.#pauseStatus) return new Promise((resolve) => resolve);
+
         this.#useStagger = true;
         const data = goToUtils(obj);
         return this.#doAction(data, props, obj);
     }
 
     /**
-     * @type {import('../../utils/type.js').GoFrom<import('./type.js').TweenAction>} obj to Values
+     * @type {import('../../utils/type.js').GoFrom<import('./type.js').lerpActions>} obj to Values
      */
     goFrom(obj, props = {}) {
-        if (this.#pauseStatus || this.#comeFromResume) this.stop();
+        if (this.#pauseStatus) return new Promise((resolve) => resolve);
+
         this.#useStagger = true;
         const data = goFromUtils(obj);
         return this.#doAction(data, props, obj);
     }
 
     /**
-     * @type {import('../../utils/type.js').GoFromTo<import('./type.js').TweenAction>} obj to Values
+     * @type {import('../../utils/type.js').GoFromTo<import('./type.js').lerpActions>} obj to Values
      */
     goFromTo(fromObj, toObj, props = {}) {
-        if (this.#pauseStatus || this.#comeFromResume) this.stop();
+        if (this.#pauseStatus) return new Promise((resolve) => resolve);
+
         this.#useStagger = true;
 
+        // Check if fromObj has the same keys of toObj
         if (!compareKeys(fromObj, toObj)) {
-            compareKeysWarning('tween goFromTo:', fromObj, toObj);
+            compareKeysWarning('lerp goFromTo:', fromObj, toObj);
             return new Promise((resolve) => resolve);
         }
 
         const data = goFromToUtils(fromObj, toObj);
+
         return this.#doAction(data, props, fromObj);
     }
 
     /**
-     * @type {import('../../utils/type.js').Set<import('./type.js').TweenAction>} obj to Values
+     * @type {import('../../utils/type.js').Set<import('./type.js').lerpActions>} obj to Values
      */
     set(obj, props = {}) {
-        if (this.#pauseStatus || this.#comeFromResume) this.stop();
+        if (this.#pauseStatus) return new Promise((resolve) => resolve);
         this.#useStagger = false;
         const data = setUtils(obj);
-
-        // In set mode duration is small as possible
-        const propsParsed = props ? { ...props, duration: 1 } : { duration: 1 };
-        return this.#doAction(data, propsParsed, obj);
+        return this.#doAction(data, props, obj);
     }
 
     /**
-     * @type {import('../../utils/type.js').SetImmediate<import('./type.js').TweenAction>} obj to Values
+     * @type {import('../../utils/type.js').SetImmediate<import('./type.js').lerpActions>} obj to Values
      */
     setImmediate(obj, props = {}) {
-        if (this.#pauseStatus || this.#comeFromResume) this.stop();
+        if (this.#pauseStatus) return;
         this.#useStagger = false;
 
         const data = setUtils(obj);
-        const propsParsed = props ? { ...props, duration: 1 } : { duration: 1 };
-        this.#values = mergeArrayTween(data, this.#values);
+        this.#values = mergeArray(data, this.#values);
 
-        if (this.#isActive) this.#updateDataWhileRunning();
-
-        const { reverse } = this.#mergeProps(propsParsed);
+        const { reverse } = this.#mergeProps(props ?? {});
         if (valueIsBooleanAndTrue(reverse, 'reverse'))
             this.#values = setReverseValues(obj, this.#values);
 
-        this.#values = setRelativeTween(this.#values, this.#relative);
+        this.#values = setRelative(this.#values, this.#relative);
         this.#values = setFromCurrentByTo(this.#values);
 
         this.#isActive = false;
@@ -676,17 +614,16 @@ export default class HandleTween {
     }
 
     /**
-     * @type {import('../../utils/type.js').DoAction<import('./type.js').TweenAction>} obj to Values
+     * @type {import('../../utils/type.js').DoAction<import('./type.js').lerpActions>} obj to Values
      */
-    #doAction(data, props = {}, obj) {
-        this.#values = mergeArrayTween(data, this.#values);
-        if (this.#isActive) this.#updateDataWhileRunning();
+    #doAction(data, props, obj) {
+        this.#values = mergeArray(data, this.#values);
+        const { reverse, immediate } = this.#mergeProps(props ?? {});
 
-        const { reverse, immediate } = this.#mergeProps(props);
         if (valueIsBooleanAndTrue(reverse, 'reverse'))
             this.#values = setReverseValues(obj, this.#values);
 
-        this.#values = setRelativeTween(this.#values, this.#relative);
+        this.#values = setRelative(this.#values, this.#relative);
 
         if (valueIsBooleanAndTrue(immediate, 'immediate ')) {
             this.#isActive = false;
@@ -710,13 +647,13 @@ export default class HandleTween {
      * @description
      * Get current values, If the single value is a function it returns the result of the function.
      *
-     * @type {import('./type.js').TweenGetValue}
+     * @type {import('./type.js').lerpGetValue}
      *
      * @example
      * ```javascript
      *
      *
-     * const { prop } = myTween.get();
+     * const { prop } = myLerp.get();
      * ```
      */
     get() {
@@ -727,13 +664,13 @@ export default class HandleTween {
      * @description
      * Get initial values, If the single value is a function it returns the result of the function.
      *
-     * @type {import('./type.js').TweenGetValue}
+     * @type {import('./type.js').lerpGetValue}
      *
      * @example
      * ```javascript
      *
      *
-     * const { prop } = myTween.getIntialData();
+     * const { prop } = myLerp.getIntialData();
      * ```
      */
     getInitialData() {
@@ -744,13 +681,13 @@ export default class HandleTween {
      * @description
      * Get from values, If the single value is a function it returns the result of the function.
      *
-     * @type {import('./type.js').TweenGetValue}
+     * @type {import('./type.js').lerpGetValue}
      *
      * @example
      * ```javascript
      *
      *
-     * const { prop } = myTween.getFrom();
+     * const { prop } = myLerp.getFrom();
      * ```
      */
     getFrom() {
@@ -761,13 +698,13 @@ export default class HandleTween {
      * @description
      * Get to values, If the single value is a function it returns the result of the function.
      *
-     * @type {import('./type.js').TweenGetValue}
+     * @type {import('./type.js').lerpGetValue}
      *
      * @example
      * ```javascript
      *
      *
-     * const { prop } = myTween.getTo();
+     * const { prop } = myLerp.getTo();
      * ```
      */
     getTo() {
@@ -778,13 +715,13 @@ export default class HandleTween {
      * @description
      * Get From values, if the single value is a function it returns the same function.
      *
-     * @type {import('./type.js').TweenGetValueNative}
+     * @type {import('./type.js').lerpGetValueNative}
      *
      * @example
      * ```javascript
      *
      *
-     * const { prop } = myTween.getFromNativeType();
+     * const { prop } = myLerp.getFromNativeType();
      * ```
      */
     getFromNativeType() {
@@ -795,13 +732,13 @@ export default class HandleTween {
      * @description
      * Get To values, if the single value is a function it returns the same function.
      *
-     * @type {import('./type.js').TweenGetValueNative}
+     * @type {import('./type.js').lerpGetValueNative}
      *
      * @example
      * ```javascript
      *
      *
-     * const { prop } = myTween.getToNativeType();
+     * const { prop } = myLerp.getToNativeType();
      * ```
      */
     getToNativeType() {
@@ -812,30 +749,30 @@ export default class HandleTween {
      * @description
      * Get tween type
      *
-     * @type {import('./type.js').TweenGetType} tween type
+     * @type {import('./type.js').lerpGetType} tween type
      *
      * @example
      * ```javascript
      *
      *
-     * const type = myTween.getType();
+     * const type = myLerp.getType();
      * ```
      */
     getType() {
-        return 'TWEEN';
+        return 'LERP';
     }
 
     /**
      * @description
      * Get univoque Id
      *
-     * @type {import('./type.js').TweenGetId}
+     * @type {import('./type.js').lerpGetId}
      *
      * @example
      * ```javascript
      *
      *
-     * const type = myTween.getId();
+     * const type = myLerp.getId();
      * ```
      */
     getId() {
@@ -843,20 +780,51 @@ export default class HandleTween {
     }
 
     /**
-     * Update ease with new preset
+     * @type  {import('./type.js').lerpUpdateVelocity} 
      *
-     * @type {import('./type.js').TweenUpdateEase}
+     * @example
+     * ```javascript
+     * myLerp.updateVelocity(0.1)
      *
+     *
+     * ```
+     *
+     * @description
+     * Update velocity value.
+       `default value is 0.06`,the closer the value is to 1, the faster the transition will be.
+        The change will be persistent
      */
-    updateEase(ease) {
-        this.#ease = easeTweenIsValidGetFunction(ease);
+    updateVelocity(velocity) {
+        this.#velocity = lerpVelocityIsValid(velocity);
         this.#defaultProps = mergeDeep(this.#defaultProps, {
-            ease,
+            velocity: this.#velocity,
         });
     }
 
     /**
-     * @type {import('./type.js').TweenSubscribe}
+     * @type  {import('./type.js').lerpUpdatePrecision} 
+     *
+     * @example
+     * ```javascript
+     * myLerp.updatePrecision(0.5)
+     *
+     *
+     * ```
+     *
+     * @description
+     * Update precision value.
+       When the calculated value is less than this number, the transition will be considered completed, the smaller the value, the greater the precision of the calculation, the `default value is 0.01`.
+       The change will be persistent
+     */
+    updatePrecision(precision) {
+        this.#velocity = lerpPrecisionIsValid(precision);
+        this.#defaultProps = mergeDeep(this.#defaultProps, {
+            precision: this.#precision,
+        });
+    }
+
+    /**
+     * @type {import('./type.js').lerpSubscribe}
      *
      * ```
      * @description
@@ -868,12 +836,11 @@ export default class HandleTween {
             this.#callback
         );
         this.#callback = arrayOfCallbackUpdated;
-
         return () => (this.#callback = unsubscribeCb(this.#callback));
     }
 
     /**
-     * @type {import('./type.js').TweenSubscribeCache}
+     * @type {import('./type.js').lerpSubscribeCache}
      *
      * @description
      * Callback that returns updated values ready to be usable, specific to manage large staggers.
@@ -909,7 +876,7 @@ export default class HandleTween {
     }
 
     /**
-     * @type {import('./type.js').TweenOnComplete}
+     * @type {import('./type.js').lerpOnComplete}
      *
      *
      * @description
@@ -933,8 +900,6 @@ export default class HandleTween {
     /**
      * @description
      * Destroy tween
-     *
-     * @returns {void}
      */
     destroy() {
         if (this.#promise) this.stop();

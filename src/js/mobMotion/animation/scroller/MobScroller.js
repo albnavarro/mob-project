@@ -6,8 +6,8 @@ import {
     offset,
     position,
 } from '../../../mobCore/utils/index.js';
-import HandleLerp from '../lerp/handleLerp.js';
-import HandleSpring from '../spring/handleSpring.js';
+import MobLerp from '../lerp/MobLerp.js';
+import MobSpring from '../spring/MobSpring.js';
 import { clamp, getRoundedValue } from '../utils/animationUtils.js';
 import { getRangeUnitMisure } from './getConstantFromRegex.js';
 import {
@@ -34,10 +34,10 @@ import {
     valueIsNumberAndReturnDefault,
     valueIsStringAndReturnDefault,
 } from '../utils/tweenAction/tweenValidation.js';
-import { HandleScrollerConstant } from './HandleScrollerConstant.js';
-import { handleScrollerEmitter } from './HandleScrollerEmitter.js';
-import { handleScrollerMarker } from './HandleScrollerMarker.js';
-import { HandleScrollerPin } from './HandleScrollerPin.js';
+import { MobScrollerConstant } from './MobScrollerConstant.js';
+import { MobScrollerEmitter } from './MobScrollerEmitter.js';
+import { MobScrollerMarker } from './MobScrollerMarker.js';
+import { MobScrollerPin } from './MobScrollerPin.js';
 import { mobCore } from '../../../mobCore/index.js';
 import {
     getEndPoint,
@@ -47,15 +47,15 @@ import {
     detectViewPortInterception,
     processFixedLimit,
     getScrollFunction,
-} from './HandleScrollerUtils.js';
+} from './MobScrollerUtils.js';
 import { scrollerEaseTypeSpringWarining } from '../utils/warning.js';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import HandleScrollerTween from './HandleTweenTween.js';
+import MobScrollerTween from './MobScrollerTween.js';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import HandleSequencer from '../sequencer/handleSequencer.js';
+import MobSequencer from '../sequencer/MobSequencer.js';
 
-export default class HandleScroller {
+export default class MobScroller {
     /**
      * @type {boolean}
      */
@@ -197,7 +197,7 @@ export default class HandleScroller {
     #force3D;
 
     /**
-     * @type {HandleScrollerPin|undefined}
+     * @type {MobScrollerPin|undefined}
      */
     #pinInstance;
 
@@ -286,13 +286,13 @@ export default class HandleScroller {
 
     /**
      * @description
-     * @type {import('./type.js').DynamicStartType}
+     * @type {import('./type.js').DynamicStart}
      */
     #dynamicStart;
 
     /**
      * @description
-     * @type {import('./type.js').DynamicEndType}
+     * @type {import('./type.js').DynamicEnd}
      */
     #dynamicEnd;
 
@@ -386,7 +386,7 @@ export default class HandleScroller {
 
     /**
      * @description
-     * @type {HandleLerp & HandleSpring & HandleScrollerTween & HandleSequencer}
+     * @type {MobLerp & MobSpring & MobScrollerTween & MobSequencer}
      */
     #tween;
 
@@ -535,12 +535,12 @@ export default class HandleScroller {
      * @description
      * Add more precision to motion spring/lerp to trigger better force3D
      *
-     * @type {import('./type.js').HandleScrollerMotion}
+     * @type {import('./type.js').MobScrollerMotion}
      */
     #motion;
 
     /**
-     * @param  { import('./type.js').HandleScrollerCommonType & import('./type.js').ParallaxType &  import('./type.js').ScrollTriggerType} data
+     * @param  { import('./type.js').MobScrollerCommon & import('./type.js').Parallax &  import('./type.js').ScrollTrigger} data
      *
      * @example
      *
@@ -548,7 +548,7 @@ export default class HandleScroller {
      *  Parallax property schema:
      *
      *
-     *  const myParallax = new HandleScroller({
+     *  const myParallax = new MobScroller({
      *      type: 'parallax',
      *      item: String | Element,
      *      applyTo: [ String | Element ],
@@ -559,7 +559,7 @@ export default class HandleScroller {
      *      queryType: [ String ],
      *      direction: [ String ],
      *      propierties: [ String ],
-     *      tween: [ HandleSequencer | ParallaxTween ],
+     *      tween: [ MobSequencer | MobScrollerTween ],
      *      range: [ String | Number ],
      *      align: [ String ],
      *      onSwitch: [ String ],
@@ -581,7 +581,7 @@ export default class HandleScroller {
      *  Scrolltrigger property schema:
      *
      *
-     *  const myScrollTrigger = new HandleScroller({
+     *  const myScrollTrigger = new MobScroller({
      *      item: String | Element,
      *      applyTo: [ String | Element ],
      *      trigger: [ String | Element ],
@@ -591,7 +591,7 @@ export default class HandleScroller {
      *      queryType: [ String ],
      *      direction: [ String ],
      *      propierties: [ String ],
-     *      tween: [ HandleSequencer | ParallaxTween ],
+     *      tween: [ MobSequencer | MobScrollerTween ],
      *      range: [ String ],
      *      dynamicRange: [ Function ],
      *      fromTo: [ Boolean ],
@@ -818,11 +818,11 @@ export default class HandleScroller {
 
         const tweenIsSequencer =
             this.#tween?.getType &&
-            this.#tween.getType() === HandleScrollerConstant.TWEEN_TIMELINE;
+            this.#tween.getType() === MobScrollerConstant.TWEEN_TIMELINE;
 
         const tweenIsParallaxTween =
             this.#tween?.getType &&
-            this.#tween.getType() === HandleScrollerConstant.TWEEN_TWEEN;
+            this.#tween.getType() === MobScrollerConstant.TWEEN_TWEEN;
 
         this.#item = domNodeIsValidAndReturnElOrWin(data?.item, false);
         this.#scroller = domNodeIsValidAndReturnElOrWin(data?.scroller, true);
@@ -901,12 +901,12 @@ export default class HandleScroller {
          */
         if (
             tweenIsSequencer &&
-            data?.easeType === HandleScrollerConstant.EASE_SPRING
+            data?.easeType === MobScrollerConstant.EASE_SPRING
         )
             scrollerEaseTypeSpringWarining();
 
         this.#easeType = tweenIsSequencer
-            ? HandleScrollerConstant.EASE_LERP
+            ? MobScrollerConstant.EASE_LERP
             : scrollerEaseTypeIsValid(data?.easeType);
 
         this.#springConfig = scrollerSpringConfigIsValid(
@@ -920,18 +920,18 @@ export default class HandleScroller {
         );
 
         this.#motionParameters =
-            this.#easeType === HandleScrollerConstant.EASE_SPRING
+            this.#easeType === MobScrollerConstant.EASE_SPRING
                 ? {
                       configProps: {
-                          precision: HandleScrollerConstant.EASE_PRECISION,
+                          precision: MobScrollerConstant.EASE_PRECISION,
                       },
                   }
-                : { precision: HandleScrollerConstant.EASE_PRECISION };
+                : { precision: MobScrollerConstant.EASE_PRECISION };
 
         this.#motion =
-            this.#easeType === HandleScrollerConstant.EASE_SPRING
-                ? new HandleSpring()
-                : new HandleLerp();
+            this.#easeType === MobScrollerConstant.EASE_SPRING
+                ? new MobSpring()
+                : new MobLerp();
     }
 
     /**
@@ -955,7 +955,7 @@ export default class HandleScroller {
         this.#getScreenHeight();
         this.setPerspective();
 
-        if (this.#propierties === HandleScrollerConstant.PROP_TWEEN) {
+        if (this.#propierties === MobScrollerConstant.PROP_TWEEN) {
             this.#range = this.#tween?.getDuration
                 ? this.#tween.getDuration()
                 : 0;
@@ -963,7 +963,7 @@ export default class HandleScroller {
             this.#tween?.inzializeStagger?.();
         }
 
-        if (this.#type == HandleScrollerConstant.TYPE_SCROLLTRIGGER) {
+        if (this.#type == MobScrollerConstant.TYPE_SCROLLTRIGGER) {
             this.#limiterOff = true;
             this.#calcRangeAndUnitMiusure();
             this.#calcFixedLimit();
@@ -1059,7 +1059,7 @@ export default class HandleScroller {
          * Initialize pin
          */
         if (this.#pin) {
-            this.#pinInstance = new HandleScrollerPin();
+            this.#pinInstance = new MobScrollerPin();
 
             if (mq[this.#queryType](this.#breakpoint)) {
                 mobCore.useNextTick(() => {
@@ -1160,10 +1160,10 @@ export default class HandleScroller {
      */
     #setMotion() {
         const initialValue =
-            HandleScrollerConstant.PROP_SCALE ||
-            HandleScrollerConstant.PROP_SCALE_X ||
-            HandleScrollerConstant.PROP_SCALE_Y ||
-            HandleScrollerConstant.PROP_OPACITY
+            MobScrollerConstant.PROP_SCALE ||
+            MobScrollerConstant.PROP_SCALE_X ||
+            MobScrollerConstant.PROP_SCALE_Y ||
+            MobScrollerConstant.PROP_OPACITY
                 ? 1
                 : 0;
 
@@ -1172,7 +1172,7 @@ export default class HandleScroller {
             if (val === this.#lastValue) return;
 
             if (
-                this.#propierties === HandleScrollerConstant.PROP_TWEEN &&
+                this.#propierties === MobScrollerConstant.PROP_TWEEN &&
                 this.#tween?.draw
             ) {
                 this.#tween.draw({
@@ -1196,7 +1196,7 @@ export default class HandleScroller {
             this.#force3D = false;
 
             if (
-                this.#propierties === HandleScrollerConstant.PROP_TWEEN &&
+                this.#propierties === MobScrollerConstant.PROP_TWEEN &&
                 this.#tween?.draw
             ) {
                 this.#tween.draw({
@@ -1215,14 +1215,14 @@ export default class HandleScroller {
         });
 
         switch (this.#easeType) {
-            case HandleScrollerConstant.EASE_LERP: {
+            case MobScrollerConstant.EASE_LERP: {
                 if (this.#lerpConfig && 'updateVelocity' in this.#motion) {
                     this.#motion?.updateVelocity?.(this.#lerpConfig);
                 }
                 break;
             }
 
-            case HandleScrollerConstant.EASE_SPRING: {
+            case MobScrollerConstant.EASE_SPRING: {
                 if (this.#springConfig && 'updateConfig' in this.#motion) {
                     this.#motion?.updateConfig?.(this.#springConfig);
                 }
@@ -1240,7 +1240,7 @@ export default class HandleScroller {
             this.#numericRange = Number.isNaN(range)
                 ? 0
                 : Number.parseFloat(range);
-            this.#unitMisure = HandleScrollerConstant.PX;
+            this.#unitMisure = MobScrollerConstant.PX;
         } else {
             const str = String(this.#range);
             const firstChar = str.charAt(0);
@@ -1300,17 +1300,17 @@ export default class HandleScroller {
 
         // Check if come from top or left
         this.#invertSide =
-            startPosition === HandleScrollerConstant.POSITION_TOP ||
-            startPosition === HandleScrollerConstant.POSITION_LEFT;
+            startPosition === MobScrollerConstant.POSITION_TOP ||
+            startPosition === MobScrollerConstant.POSITION_LEFT;
 
         // Add/subtract with height or half value
         this.#startPoint = processFixedLimit(
             startPoint,
             additionalStartVal,
-            this.#direction === HandleScrollerConstant.DIRECTION_VERTICAL
+            this.#direction === MobScrollerConstant.DIRECTION_VERTICAL
                 ? this.#height
                 : this.#width,
-            this.#direction === HandleScrollerConstant.DIRECTION_VERTICAL
+            this.#direction === MobScrollerConstant.DIRECTION_VERTICAL
                 ? this.#width
                 : this.#height
         );
@@ -1347,13 +1347,13 @@ export default class HandleScroller {
         // Get positive or negative multiplier to add or subtract value basedto the position
         const multiplier = (() => {
             if (this.#invertSide) {
-                return endPosition === HandleScrollerConstant.POSITION_BOTTOM ||
-                    endPosition === HandleScrollerConstant.POSITION_RIGHT
+                return endPosition === MobScrollerConstant.POSITION_BOTTOM ||
+                    endPosition === MobScrollerConstant.POSITION_RIGHT
                     ? -1
                     : 1;
             } else {
-                return endPosition === HandleScrollerConstant.POSITION_BOTTOM ||
-                    endPosition === HandleScrollerConstant.POSITION_RIGHT
+                return endPosition === MobScrollerConstant.POSITION_BOTTOM ||
+                    endPosition === MobScrollerConstant.POSITION_RIGHT
                     ? 1
                     : -1;
             }
@@ -1363,10 +1363,10 @@ export default class HandleScroller {
         this.#endPoint = processFixedLimit(
             endPoint,
             additionalEndVal,
-            this.#direction === HandleScrollerConstant.DIRECTION_VERTICAL
+            this.#direction === MobScrollerConstant.DIRECTION_VERTICAL
                 ? this.#height * multiplier
                 : this.#width * multiplier,
-            this.#direction === HandleScrollerConstant.DIRECTION_VERTICAL
+            this.#direction === MobScrollerConstant.DIRECTION_VERTICAL
                 ? this.#width * multiplier
                 : this.#height * multiplier
         );
@@ -1384,7 +1384,7 @@ export default class HandleScroller {
     #setMarker() {
         if (this.#marker) {
             // Add Marker
-            const { startMarker, endMarker } = handleScrollerMarker({
+            const { startMarker, endMarker } = MobScrollerMarker({
                 startMarker: this.#startMarker,
                 endMarker: this.#endMarker,
                 startPoint: this.#startPoint,
@@ -1424,7 +1424,7 @@ export default class HandleScroller {
          */
         el.style.transform = '';
 
-        if (this.#direction === HandleScrollerConstant.DIRECTION_VERTICAL) {
+        if (this.#direction === MobScrollerConstant.DIRECTION_VERTICAL) {
             this.#offset =
                 this.#scroller === globalThis
                     ? Math.trunc(offset(el).top)
@@ -1440,7 +1440,7 @@ export default class HandleScroller {
 
         if (this.#screen && this.#screen !== globalThis) {
             this.#offset -=
-                this.#direction === HandleScrollerConstant.DIRECTION_VERTICAL
+                this.#direction === MobScrollerConstant.DIRECTION_VERTICAL
                     ? Math.trunc(
                           offset(/** @type{HTMLElement} */ (this.#screen)).top
                       )
@@ -1465,7 +1465,7 @@ export default class HandleScroller {
          * @ts-ignore all element is not window ( check the if statement ).
          */
         this.#screenPosition =
-            this.#direction === HandleScrollerConstant.DIRECTION_VERTICAL
+            this.#direction === MobScrollerConstant.DIRECTION_VERTICAL
                 ? Math.trunc(
                       offset(/** @type{HTMLElement} */ (this.#screen)).top
                   )
@@ -1483,7 +1483,7 @@ export default class HandleScroller {
         if (!el) return;
 
         this.#height =
-            this.#direction === HandleScrollerConstant.DIRECTION_VERTICAL
+            this.#direction === MobScrollerConstant.DIRECTION_VERTICAL
                 ? Math.trunc(el.offsetHeight)
                 : Math.trunc(el.offsetWidth);
     }
@@ -1497,7 +1497,7 @@ export default class HandleScroller {
         if (!el) return;
 
         this.#width =
-            this.#direction === HandleScrollerConstant.DIRECTION_VERTICAL
+            this.#direction === MobScrollerConstant.DIRECTION_VERTICAL
                 ? Math.trunc(el.offsetWidth)
                 : Math.trunc(el.offsetHeight);
     }
@@ -1510,12 +1510,12 @@ export default class HandleScroller {
 
         if (this.#scroller === globalThis) {
             this.#scrollerScroll =
-                this.#direction === HandleScrollerConstant.DIRECTION_VERTICAL
+                this.#direction === MobScrollerConstant.DIRECTION_VERTICAL
                     ? this.#scroller.scrollY
                     : this.#scroller.scrollX;
         } else {
             this.#scrollerScroll =
-                this.#direction === HandleScrollerConstant.DIRECTION_VERTICAL
+                this.#direction === MobScrollerConstant.DIRECTION_VERTICAL
                     ? -offset(/** @type{HTMLElement} */ (this.#scroller)).top
                     : -offset(/** @type{HTMLElement} */ (this.#scroller)).left;
         }
@@ -1535,12 +1535,12 @@ export default class HandleScroller {
          */
         if (this.#screen === globalThis) {
             this.#scrollerHeight =
-                this.#direction === HandleScrollerConstant.DIRECTION_VERTICAL
+                this.#direction === MobScrollerConstant.DIRECTION_VERTICAL
                     ? window.innerHeight
                     : window.innerWidth;
         } else {
             this.#scrollerHeight =
-                this.#direction === HandleScrollerConstant.DIRECTION_VERTICAL
+                this.#direction === MobScrollerConstant.DIRECTION_VERTICAL
                     ? // @ts-ignore
                       Math.trunc(this.#screen.offsetHeight)
                     : // @ts-ignore
@@ -1561,7 +1561,7 @@ export default class HandleScroller {
         this.#calcWidth();
         this.#getScreenHeight();
 
-        if (this.#type == HandleScrollerConstant.TYPE_SCROLLTRIGGER) {
+        if (this.#type == MobScrollerConstant.TYPE_SCROLLTRIGGER) {
             this.#calcFixedLimit();
             if (this.#dynamicRange) this.#calcRangeAndUnitMiusure();
 
@@ -1634,7 +1634,7 @@ export default class HandleScroller {
      * });
      * ```
      *
-     * @param {import('./type.js').HandleScrollerMoveType} obj
+     * @param {import('./type.js').MobScrollerMove} obj
      *
      */
     move({ value, parentIsMoving = false }) {
@@ -1715,7 +1715,7 @@ export default class HandleScroller {
         if (
             !this.#isInViewport &&
             !this.#limiterOff &&
-            this.#type === HandleScrollerConstant.TYPE_PARALLAX
+            this.#type === MobScrollerConstant.TYPE_PARALLAX
         )
             return;
 
@@ -1724,14 +1724,14 @@ export default class HandleScroller {
         }
 
         switch (this.#type) {
-            case HandleScrollerConstant.TYPE_SCROLLTRIGGER: {
+            case MobScrollerConstant.TYPE_SCROLLTRIGGER: {
                 this.#endValue = getRoundedValue(this.#getFixedValue());
                 break;
             }
 
             default: {
                 switch (this.#propierties) {
-                    case HandleScrollerConstant.PROP_OPACITY: {
+                    case MobScrollerConstant.PROP_OPACITY: {
                         this.#endValue = getRoundedValue(
                             this.#getOpacityValue()
                         );
@@ -1756,7 +1756,7 @@ export default class HandleScroller {
          */
         const reverseValue =
             this.#reverse &&
-            this.#type !== HandleScrollerConstant.TYPE_SCROLLTRIGGER
+            this.#type !== MobScrollerConstant.TYPE_SCROLLTRIGGER
                 ? getRetReverseValue(this.#propierties, this.#endValue)
                 : this.#endValue;
 
@@ -1764,7 +1764,7 @@ export default class HandleScroller {
          * Get switch after 0 value for non scrolTrigger
          */
         this.#endValue =
-            this.#type === HandleScrollerConstant.TYPE_SCROLLTRIGGER
+            this.#type === MobScrollerConstant.TYPE_SCROLLTRIGGER
                 ? reverseValue
                 : this.#getSwitchAfterZeroValue(reverseValue);
     }
@@ -1781,7 +1781,7 @@ export default class HandleScroller {
         if (
             !this.#fixedShouldRender &&
             !this.#firstTime &&
-            this.#type === HandleScrollerConstant.TYPE_SCROLLTRIGGER
+            this.#type === MobScrollerConstant.TYPE_SCROLLTRIGGER
         )
             return;
 
@@ -1789,7 +1789,7 @@ export default class HandleScroller {
         if (
             !this.#isInViewport &&
             !this.#firstTime &&
-            this.#type === HandleScrollerConstant.TYPE_PARALLAX
+            this.#type === MobScrollerConstant.TYPE_PARALLAX
         )
             return;
 
@@ -1839,7 +1839,7 @@ export default class HandleScroller {
             /**
              * Draw
              */
-            if (this.#propierties === HandleScrollerConstant.PROP_TWEEN) {
+            if (this.#propierties === MobScrollerConstant.PROP_TWEEN) {
                 this.#tween.draw({
                     partial: this.#endValue,
                     isLastDraw: !this.#force3D,
@@ -1911,7 +1911,7 @@ export default class HandleScroller {
             this.#onLeave ||
             this.#onLeaveBack
         ) {
-            handleScrollerEmitter({
+            MobScrollerEmitter({
                 prevValue: this.#prevFixedRawValue,
                 value: valePerDirections,
                 maxVal: maxVal,
@@ -1925,15 +1925,15 @@ export default class HandleScroller {
         this.#prevFixedRawValue = valePerDirections;
 
         switch (this.#propierties) {
-            case HandleScrollerConstant.PROP_HORIZONTAL:
-            case HandleScrollerConstant.PROP_VERTICAL: {
+            case MobScrollerConstant.PROP_HORIZONTAL:
+            case MobScrollerConstant.PROP_VERTICAL: {
                 return this.#getHVval(percentValue);
             }
 
-            case HandleScrollerConstant.PROP_SCALE:
-            case HandleScrollerConstant.PROP_SCALE_X:
-            case HandleScrollerConstant.PROP_SCALE_Y:
-            case HandleScrollerConstant.PROP_OPACITY: {
+            case MobScrollerConstant.PROP_SCALE:
+            case MobScrollerConstant.PROP_SCALE_X:
+            case MobScrollerConstant.PROP_SCALE_Y:
+            case MobScrollerConstant.PROP_OPACITY: {
                 return 1 - percentValue;
             }
 
@@ -1948,24 +1948,24 @@ export default class HandleScroller {
      */
     #getHVval(percent) {
         switch (this.#unitMisure) {
-            case HandleScrollerConstant.VW: {
+            case MobScrollerConstant.VW: {
                 return (this.#windowInnerWidth / 100) * -percent;
             }
 
-            case HandleScrollerConstant.VH: {
+            case MobScrollerConstant.VH: {
                 return (this.#windowInnerHeight / 100) * -percent;
             }
 
-            case HandleScrollerConstant.WPERCENT: {
+            case MobScrollerConstant.WPERCENT: {
                 return this.#direction ===
-                    HandleScrollerConstant.DIRECTION_VERTICAL
+                    MobScrollerConstant.DIRECTION_VERTICAL
                     ? (this.#width / 100) * -percent
                     : (this.#height / 100) * -percent;
             }
 
-            case HandleScrollerConstant.HPERCENT: {
+            case MobScrollerConstant.HPERCENT: {
                 return this.#direction ===
-                    HandleScrollerConstant.DIRECTION_VERTICAL
+                    MobScrollerConstant.DIRECTION_VERTICAL
                     ? (this.#height / 100) * -percent
                     : (this.#width / 100) * -percent;
             }
@@ -1986,12 +1986,12 @@ export default class HandleScroller {
             (this.#scrollerHeight / 100) * this.#opacityStart;
 
         const value =
-            this.#align == HandleScrollerConstant.ALIGN_START
+            this.#align == MobScrollerConstant.ALIGN_START
                 ? -this.#scrollerScroll * -1
                 : (this.#scrollerScroll + vhLimit - this.#offset) * -1;
 
         const valClamped =
-            this.#align == HandleScrollerConstant.ALIGN_START
+            this.#align == MobScrollerConstant.ALIGN_START
                 ? 1 - value / this.#offset
                 : 1 - value / (this.#scrollerHeight - vhStart - vhLimit);
 
@@ -2006,22 +2006,22 @@ export default class HandleScroller {
         const rangeNumber = Number.isNaN(valuetoNumber) ? 0 : valuetoNumber;
 
         const documentHeight =
-            this.#direction === HandleScrollerConstant.DIRECTION_VERTICAL
+            this.#direction === MobScrollerConstant.DIRECTION_VERTICAL
                 ? document.documentElement.scrollHeight
                 : document.documentElement.scrollWidth;
 
         // Prefixed align
         switch (this.#align) {
-            case HandleScrollerConstant.ALIGN_START: {
+            case MobScrollerConstant.ALIGN_START: {
                 return this.#scrollerScroll / rangeNumber;
             }
 
-            case HandleScrollerConstant.ALIGN_TOP:
-            case HandleScrollerConstant.ALIGN_LEFT: {
+            case MobScrollerConstant.ALIGN_TOP:
+            case MobScrollerConstant.ALIGN_LEFT: {
                 return (this.#scrollerScroll - this.#offset) / rangeNumber;
             }
 
-            case HandleScrollerConstant.ALIGN_CENTER: {
+            case MobScrollerConstant.ALIGN_CENTER: {
                 return (
                     (this.#scrollerScroll +
                         (this.#scrollerHeight / 2 - this.#height / 2) -
@@ -2030,8 +2030,8 @@ export default class HandleScroller {
                 );
             }
 
-            case HandleScrollerConstant.ALIGN_BOTTOM:
-            case HandleScrollerConstant.ALIGN_RIGHT: {
+            case MobScrollerConstant.ALIGN_BOTTOM:
+            case MobScrollerConstant.ALIGN_RIGHT: {
                 return (
                     (this.#scrollerScroll +
                         (this.#scrollerHeight - this.#height) -
@@ -2040,7 +2040,7 @@ export default class HandleScroller {
                 );
             }
 
-            case HandleScrollerConstant.ALIGN_END: {
+            case MobScrollerConstant.ALIGN_END: {
                 return (
                     -(
                         documentHeight -
@@ -2122,7 +2122,7 @@ export default class HandleScroller {
             : value;
 
         switch (this.#propierties) {
-            case HandleScrollerConstant.PROP_VERTICAL: {
+            case MobScrollerConstant.PROP_VERTICAL: {
                 return {
                     // translate: `0 ${val}px`,
                     // transform: `${force3DStyle}`,
@@ -2131,48 +2131,48 @@ export default class HandleScroller {
                 };
             }
 
-            case HandleScrollerConstant.PROP_HORIZONTAL: {
+            case MobScrollerConstant.PROP_HORIZONTAL: {
                 return {
                     transform: `${force3DStyle} translateX(${valueParsed}px)`,
                     willChange: shouldWill,
                 };
             }
 
-            case HandleScrollerConstant.PROP_ROTATE: {
+            case MobScrollerConstant.PROP_ROTATE: {
                 return {
                     transform: `${force3DStyle} rotate(${valueParsed}deg)`,
                     willChange: shouldWill,
                 };
             }
 
-            case HandleScrollerConstant.PROP_ROTATEY: {
+            case MobScrollerConstant.PROP_ROTATEY: {
                 return {
                     transform: `${force3DStyle} rotateY(${valueParsed}deg)`,
                     willChange: shouldWill,
                 };
             }
 
-            case HandleScrollerConstant.PROP_ROTATEX: {
+            case MobScrollerConstant.PROP_ROTATEX: {
                 return {
                     transform: `${force3DStyle} rotateX(${valueParsed}deg)`,
                     willChange: shouldWill,
                 };
             }
 
-            case HandleScrollerConstant.PROP_ROTATEZ: {
+            case MobScrollerConstant.PROP_ROTATEZ: {
                 return {
                     transform: `${force3DStyle} rotateZ(${valueParsed}deg)`,
                     willChange: shouldWill,
                 };
             }
 
-            case HandleScrollerConstant.PROP_OPACITY: {
+            case MobScrollerConstant.PROP_OPACITY: {
                 return { opacity: `${value}` };
             }
 
-            case HandleScrollerConstant.PROP_SCALE: {
+            case MobScrollerConstant.PROP_SCALE: {
                 const scaleVal =
-                    this.#type === HandleScrollerConstant.TYPE_SCROLLTRIGGER
+                    this.#type === MobScrollerConstant.TYPE_SCROLLTRIGGER
                         ? value
                         : 1 + value / 1000;
                 return {
@@ -2181,9 +2181,9 @@ export default class HandleScroller {
                 };
             }
 
-            case HandleScrollerConstant.PROP_SCALE_X: {
+            case MobScrollerConstant.PROP_SCALE_X: {
                 const scaleVal =
-                    this.#type === HandleScrollerConstant.TYPE_SCROLLTRIGGER
+                    this.#type === MobScrollerConstant.TYPE_SCROLLTRIGGER
                         ? value
                         : 1 + value / 1000;
                 return {
@@ -2192,9 +2192,9 @@ export default class HandleScroller {
                 };
             }
 
-            case HandleScrollerConstant.PROP_SCALE_Y: {
+            case MobScrollerConstant.PROP_SCALE_Y: {
                 const scaleVal =
-                    this.#type === HandleScrollerConstant.TYPE_SCROLLTRIGGER
+                    this.#type === MobScrollerConstant.TYPE_SCROLLTRIGGER
                         ? value
                         : 1 + value / 1000;
                 return {
@@ -2230,19 +2230,19 @@ export default class HandleScroller {
         if (this.#shouldTrackOnlyEvents) return;
 
         switch (this.#propierties) {
-            case HandleScrollerConstant.PROP_VERTICAL:
-            case HandleScrollerConstant.PROP_HORIZONTAL:
-            case HandleScrollerConstant.PROP_ROTATE:
-            case HandleScrollerConstant.PROP_ROTATEY:
-            case HandleScrollerConstant.PROP_ROTATEX:
-            case HandleScrollerConstant.PROP_ROTATEZ:
-            case HandleScrollerConstant.PROP_SCALE: {
+            case MobScrollerConstant.PROP_VERTICAL:
+            case MobScrollerConstant.PROP_HORIZONTAL:
+            case MobScrollerConstant.PROP_ROTATE:
+            case MobScrollerConstant.PROP_ROTATEY:
+            case MobScrollerConstant.PROP_ROTATEX:
+            case MobScrollerConstant.PROP_ROTATEZ:
+            case MobScrollerConstant.PROP_SCALE: {
                 return {
                     transform: ``,
                 };
             }
 
-            case HandleScrollerConstant.PROP_OPACITY: {
+            case MobScrollerConstant.PROP_OPACITY: {
                 return { opacity: `` };
             }
 

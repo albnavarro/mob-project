@@ -10,7 +10,7 @@ import { getFirstValidValueBack, propToSet } from './reduceFunction';
  * goFromTo has both toValue and fromValue, so skip
  *
  * @param  {Object} param
- * @param  {import("./type").sequencerRow[]} param.timeline
+ * @param  {import("./type").SequencerRow[]} param.timeline
  * @param  {string[]} param.activeProp current props to update
  */
 export const setPropFromAncestor = ({ timeline, activeProp }) => {

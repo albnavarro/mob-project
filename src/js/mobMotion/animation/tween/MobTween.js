@@ -2,11 +2,10 @@
 
 import { compareKeys } from '../utils/animationUtils.js';
 import {
-    setFromByCurrent,
     setFromCurrentByTo,
     setFromToByCurrent,
     setReverseValues,
-    setRelative,
+    setRelativeTween,
 } from '../utils/tweenAction/setValues.js';
 import { mergeDeep } from '../../utils/mergeDeep.js';
 import { setStagger } from '../utils/stagger/setStagger.js';
@@ -36,30 +35,33 @@ import {
 } from '../utils/warning.js';
 import { fpsLoadedLog } from '../utils/fpsLogInizialization.js';
 import {
+    durationIsNumberOrFunctionIsValid,
+    easeTweenIsValid,
+    easeTweenIsValidGetFunction,
     relativeIsValid,
-    springConfigIsValid,
-    springConfigIsValidAndGetNew,
-    springConfigPropIsValid,
     valueIsBooleanAndTrue,
 } from '../utils/tweenAction/tweenValidation.js';
-import { handleSetUp } from '../../setup.js';
 import { mobCore } from '../../../mobCore/index.js';
 import { shouldInizializzeStagger } from '../utils/stagger/shouldInizialize.js';
-import { resume } from '../utils/resumeTween.js';
+import { mergeArrayTween } from '../utils/tweenAction/mergeArray.js';
 import {
     getValueObj,
     getValueObjFromNative,
     getValueObjToNative,
 } from '../utils/tweenAction/getValues.js';
-import { mergeArray } from '../utils/tweenAction/mergeArray.js';
-import { springGetValuesOndraw } from './getValuesOndraw.js';
-import { springPresetConfig } from './springConfig.js';
+import { tweenGetValueOnDraw } from './getValuesOnDraw.js';
 
-export default class HandleSpring {
+export default class MobTween {
     /**
-     * @type {import('../utils/stagger/type.js').StaggerObject}
+     * @type {Function}
+     *  This value lives from user call ( goTo etc..) until next call
      */
-    #stagger;
+    #ease;
+
+    /**
+     * @type {number}
+     */
+    #duration;
 
     /**
      * @type {boolean}
@@ -67,11 +69,9 @@ export default class HandleSpring {
     #relative;
 
     /**
-     * @type {import('./type.js').SpringProps}
-     *
-     * This value lives from user call ( goTo etc..) until next call
-     **/
-    #configProps;
+     * @type {import('../utils/stagger/type').StaggerObject}
+     */
+    #stagger;
 
     /**
      * @type {string}
@@ -86,11 +86,6 @@ export default class HandleSpring {
     /**
      * @type{((value:any) => void)|undefined }
      */
-    #currentResolve;
-
-    /**
-     * @type{((value:any) => void)|undefined }
-     */
     #currentReject;
 
     /**
@@ -99,27 +94,27 @@ export default class HandleSpring {
     #promise;
 
     /**
-     * @type {import('./type.js').SpringValues[]|[]}
+     * @type {import('./type').TweenStoreData[]}
      */
     #values;
 
     /**
-     * @type {import('./type.js').SpringInitialData[]}
+     * @type {import('./type').TweenInitialData[]}
      */
     #initialData;
 
     /**
-     * @type {import('../utils/callbacks/type.js').CallbackDefault}
+     * @type {import('../utils/callbacks/type').CallbackDefault}
      */
     #callback;
 
     /**
-     * @type {import('../utils/callbacks/type.js').CallbackCache}
+     * @type {import('../utils/callbacks/type').CallbackCache}
      */
     #callbackCache;
 
     /**
-     * @type {import('../utils/callbacks/type.js').CallbackDefault}
+     * @type {import('../utils/callbacks/type').CallbackDefault}
      */
     #callbackOnComplete;
 
@@ -141,6 +136,31 @@ export default class HandleSpring {
     /**
      * @type {boolean}
      */
+    #comeFromResume;
+
+    /**
+     * @type {number}
+     */
+    #startTime;
+
+    /**
+     * @type {boolean}
+     */
+    #isRunning;
+
+    /**
+     * @type {number}
+     */
+    #timeElapsed;
+
+    /**
+     * @type {number}
+     */
+    #pauseTime;
+
+    /**
+     * @type {boolean}
+     */
     #firstRun;
 
     /**
@@ -158,35 +178,29 @@ export default class HandleSpring {
      * This value is the base value merged with new value in custom prop
      * passed form user in goTo etc..
      *
-     * @type {import('./type.js').SpringDefault}
-     **/
+     * @type{import('./type').TweenDefault}
+     */
     #defaultProps;
 
     /**
-     * @type {import('../utils/stagger/type.js').StaggerFrameIndexObject}
+     * @type {import('../utils/stagger/type').StaggerFrameIndexObject}
      */
     #slowlestStagger;
 
     /**
-     * @type {import('../utils/stagger/type.js').StaggerFrameIndexObject}
+     * @type {import('../utils/stagger/type').StaggerFrameIndexObject}
      */
     #fastestStagger;
 
     /**
-     * @param {import('./type.js').SpringTweenProps} [ data ]
+     * @param {import('./type').TweenProps} [ data ]
      *
      * @example
      * ```javascript
-     * const mySpring = new HandleSpring({
+     * const myTween = new HandleTween({
      *   data: Object.<string, number>,
-     *   config: String,
-     *   configProps: {
-     *      tension: Number,
-     *      mass: Number,
-     *      friction: Number,
-     *      velocity: Number,
-     *      precision: Number,
-     *   },
+     *   duration: Number,
+     *   ease: String,
      *   relative: Boolean
      *   stagger:{
      *      each: Number,
@@ -194,7 +208,7 @@ export default class HandleSpring {
      *      grid: {
      *          col: Number,
      *          row: Number,
-     *          direction: String,
+     *          direction: String
      *      },
      *      waitComplete: Boolean,
      *   },
@@ -206,32 +220,30 @@ export default class HandleSpring {
      * @description
      * Available methods:
      * ```javascript
-     * mySpring.set()
-     * mySpring.goTo()
-     * mySpring.goFrom()
-     * mySpring.goFromTo()
-     * mySpring.subscribe()
-     * mySpring.subscribeCache()
-     * mySpring.onComplete()
-     * mySpring.updateConfigProp()
-     * mySpring.updateConfig()
-     * mySpring.getId()
-     * mySpring.get()
-     * mySpring.getTo()
-     * mySpring.getFrom()
-     * mySpring.getToNativeType()
-     * mySpring.getFromNativeType()
+     * myTween.set()
+     * myTween.goTo()
+     * myTween.goFrom()
+     * myTween.goFromTo()
+     * myTween.subscribe()
+     * myTween.subscribeCache()
+     * myTween.onComplete()
+     * myTween.updateEase()
+     * myTween.getId()
+     * myTween.get()
+     * myTween.getTo()
+     * myTween.getFrom()
+     * myTween.getToNativeType()
+     * myTween.getFromNativeType()
      *
      * ```
      */
     constructor(data) {
+        this.#ease = easeTweenIsValidGetFunction(data?.ease);
+        this.#duration = durationIsNumberOrFunctionIsValid(data?.duration);
+        this.#relative = relativeIsValid(data?.relative, 'tween');
         this.#stagger = getStaggerFromProps(data ?? {});
-        this.#relative = relativeIsValid(data?.relative, 'spring');
-        this.#configProps = springConfigIsValidAndGetNew(data?.config);
-        this.updateConfigProp(data?.configProps ?? {});
         this.#uniqueId = mobCore.getUnivoqueId();
         this.#isActive = false;
-        this.#currentResolve = undefined;
         this.#currentReject = undefined;
         this.#promise = undefined;
         this.#values = [];
@@ -242,53 +254,59 @@ export default class HandleSpring {
         this.#callbackStartInPause = [];
         this.#unsubscribeCache = [];
         this.#pauseStatus = false;
+        this.#comeFromResume = false;
+        this.#startTime = 0;
+        this.#isRunning = false;
+        this.#timeElapsed = 0;
+        this.#pauseTime = 0;
         this.#firstRun = true;
         this.#useStagger = true;
         this.#fpsInLoading = false;
         this.#defaultProps = {
-            reverse: false,
-            configProps: this.#configProps,
+            duration: this.#duration,
+            ease: easeTweenIsValid(data?.ease),
             relative: this.#relative,
+            reverse: false,
             immediate: false,
         };
         this.#slowlestStagger = STAGGER_DEFAULT_INDEX_OBJ;
         this.#fastestStagger = STAGGER_DEFAULT_INDEX_OBJ;
 
-        /**
-         * @private
-         * Set initial store data if defined in constructor props
-         * If not use setData methods
-         */
         const props = data?.data;
         if (props) this.setData(props);
     }
 
     /**
-     * @param {number} _time
-     * @param {number} fps
+     * @param {number} time
      * @param {Function} res
-     * @param {number} tension
-     * @param {number} friction
-     * @param {number} mass
-     * @param {number} precision
      *
      * @returns {void}
      */
-    #draw(_time, fps, res = () => {}, tension, friction, mass, precision) {
+    #draw(time, res = () => {}) {
         this.#isActive = true;
 
-        this.#values = springGetValuesOndraw({
+        if (this.#pauseStatus) {
+            this.#pauseTime = time - this.#startTime - this.#timeElapsed;
+        }
+        this.#timeElapsed = time - this.#startTime - this.#pauseTime;
+
+        if (
+            this.#isRunning &&
+            Math.round(this.#timeElapsed) >= this.#duration
+        ) {
+            this.#timeElapsed = this.#duration;
+        }
+
+        this.#values = tweenGetValueOnDraw({
             values: this.#values,
-            tension,
-            friction,
-            mass,
-            precision,
-            fps,
+            timeElapsed: this.#timeElapsed,
+            duration: this.#duration,
+            ease: this.#ease,
         });
 
-        /**
-         * Prepare an obj to pass to the callback
-         */
+        const isSettled = Math.round(this.#timeElapsed) === this.#duration;
+
+        // Prepare an obj to pass to the callback
         const callBackObject = getValueObj(this.#values, 'currentValue');
 
         defaultCallback({
@@ -299,14 +317,13 @@ export default class HandleSpring {
             useStagger: this.#useStagger,
         });
 
-        /**
-         * Check if all values is completed
-         */
-        const allSettled = this.#values.every((item) => item.settled === true);
+        this.#isRunning = true;
 
-        if (allSettled) {
+        if (isSettled) {
             const onComplete = () => {
                 this.#isActive = false;
+                this.#isRunning = false;
+                this.#pauseTime = 0;
 
                 /**
                  * End of animation
@@ -314,38 +331,31 @@ export default class HandleSpring {
                  * At the next call fromValue become the start value
                  */
                 this.#values = [...this.#values].map((item) => {
+                    if (!item.shouldUpdate) return item;
+
                     return {
                         ...item,
-                        fromValue: item.toValue,
+                        toValue: item.currentValue,
+                        fromValue: item.currentValue,
                     };
                 });
 
-                /**
-                 * On complete
-                 */
+                // On complete
                 if (!this.#pauseStatus) {
                     res();
 
-                    /**
-                     * Set promise reference to null once resolved
-                     */
+                    // Set promise reference to null once resolved
                     this.#promise = undefined;
                     this.#currentReject = undefined;
-                    this.#currentResolve = undefined;
                 }
             };
-
-            /**
-             * Prepare an obj to pass to the callback with rounded value ( end user value)
-             */
-            const cbObjectSettled = getValueObj(this.#values, 'toValue');
 
             defaultCallbackOnComplete({
                 onComplete,
                 callback: this.#callback,
                 callbackCache: this.#callbackCache,
                 callbackOnComplete: this.#callbackOnComplete,
-                callBackObject: cbObjectSettled,
+                callBackObject: callBackObject,
                 stagger: this.#stagger,
                 slowlestStagger: this.#slowlestStagger,
                 fastestStagger: this.#fastestStagger,
@@ -356,17 +366,8 @@ export default class HandleSpring {
         }
 
         mobCore.useFrame(() => {
-            mobCore.useNextTick(({ time, fps }) => {
-                if (this.#isActive)
-                    this.#draw(
-                        time,
-                        fps,
-                        res,
-                        tension,
-                        friction,
-                        mass,
-                        precision
-                    );
+            mobCore.useNextTick(({ time }) => {
+                if (this.#isActive) this.#draw(time, res);
             });
         });
     }
@@ -375,24 +376,12 @@ export default class HandleSpring {
      * @param {number} time current global time
      * @param {number} fps current FPS
      * @param {Function} res current promise resolve
+     *
+     * @returns {void}
      **/
     #onReuqestAnim(time, fps, res) {
-        this.#values = [...this.#values].map((item) => {
-            return {
-                ...item,
-                velocity: Math.trunc(this.#configProps.velocity),
-            };
-        });
-
-        /**
-         * Normalize spring config props
-         */
-        const tension = this.#configProps.tension;
-        const friction = this.#configProps.friction;
-        const mass = Math.max(1, this.#configProps.mass);
-        const precision = this.#configProps.precision;
-
-        this.#draw(time, fps, res, tension, friction, mass, precision);
+        this.#startTime = time;
+        this.#draw(time, res);
     }
 
     /**
@@ -404,7 +393,7 @@ export default class HandleSpring {
     async #inzializeStagger() {
         /**
          * First time il there is a stagger load fps then go next step
-         * next time no need to calcaulte stagger and jump directly next step
+         * next time no need to calculate stagger and jump directly next step
          *
          **/
         if (
@@ -417,7 +406,7 @@ export default class HandleSpring {
         ) {
             const { averageFPS } = await mobCore.useFps();
 
-            fpsLoadedLog('spring', averageFPS);
+            fpsLoadedLog('tween', averageFPS);
             const cb = getStaggerArray(this.#callbackCache, this.#callback);
 
             if (this.#stagger.grid.col > cb.length) {
@@ -441,12 +430,12 @@ export default class HandleSpring {
 
             if (this.#callbackCache.length > this.#callback.length) {
                 this.#callbackCache =
-                    /** @type{import('../utils/callbacks/type.js').CallbackCache} */ (
+                    /** @type{import('../utils/callbacks/type').CallbackCache} */ (
                         staggerArray
                     );
             } else {
                 this.#callback =
-                    /** @type {import('../utils/callbacks/type.js').CallbackDefault} */ (
+                    /** @type {import('../utils/callbacks/type').CallbackDefault} */ (
                         staggerArray
                     );
             }
@@ -468,7 +457,6 @@ export default class HandleSpring {
      */
     async #startRaf(res, reject) {
         if (this.#fpsInLoading) return;
-        this.#currentResolve = res;
         this.#currentReject = reject;
 
         if (this.#firstRun) {
@@ -486,10 +474,12 @@ export default class HandleSpring {
     }
 
     /**
-     * @type {import('./type.js').SpringStop}
+     * @type {import('./type').TweenStop}
      */
     stop({ clearCache = true } = {}) {
-        if (this.#pauseStatus) this.#pauseStatus = false;
+        this.#pauseTime = 0;
+        this.#pauseStatus = false;
+        this.#comeFromResume = false;
         this.#values = setFromToByCurrent(this.#values);
 
         /**
@@ -499,55 +489,35 @@ export default class HandleSpring {
         if (this.#isActive && clearCache)
             this.#callbackCache.forEach(({ cb }) => mobCore.useCache.clean(cb));
 
-        // Reject promise
+        // Abort promise
         if (this.#currentReject) {
             this.#currentReject(mobCore.ANIMATION_STOP_REJECT);
             this.#promise = undefined;
             this.#currentReject = undefined;
-            this.#currentResolve = undefined;
         }
 
-        // Reset RAF
-        if (this.#isActive) {
-            this.#isActive = false;
-        }
+        this.#isActive = false;
     }
 
     /**
-     * @type {import('./type.js').SpringPause}
+     * @type {import('./type').TweenPause}
      */
     pause() {
         if (this.#pauseStatus) return;
         this.#pauseStatus = true;
-        if (this.#isActive) this.#isActive = false;
-        this.#values = setFromByCurrent(this.#values);
     }
 
     /**
-     * @type {import('./type.js').SpringResume}
+     * @type {import('./type').TweenResume}
      */
     resume() {
         if (!this.#pauseStatus) return;
         this.#pauseStatus = false;
-
-        if (!this.#isActive && this.#currentResolve) {
-            resume(this.#onReuqestAnim.bind(this), this.#currentResolve);
-        }
+        this.#comeFromResume = true;
     }
 
     /**
-     * @type {import('../../utils/type.js').SetData} obj Initial data structure
-     *
-     * @description
-     * Set initial data structure, the method is call by data prop in constructor. In case of need it can be called after creating the instance
-     *
-     *
-     * @example
-     * ```javascript
-     *
-     *
-     * mySpring.setData({ val: 100 });
-     * ```
+     * @type {import('../../utils/type').SetData}
      */
     setData(obj) {
         this.#values = Object.entries(obj).map((item) => {
@@ -555,14 +525,16 @@ export default class HandleSpring {
             return {
                 prop: prop,
                 toValue: value,
+                toValueOnPause: value,
+                toValProcessed: value,
                 fromValue: value,
-                velocity: this.#configProps.velocity,
                 currentValue: value,
+                shouldUpdate: false,
                 fromFn: () => 0,
                 fromIsFn: false,
                 toFn: () => 0,
                 toIsFn: false,
-                settled: false,
+                settled: false, // not used, only for uniformity with lerp and spring
             };
         });
 
@@ -572,104 +544,93 @@ export default class HandleSpring {
                 toValue: item.toValue,
                 fromValue: item.fromValue,
                 currentValue: item.currentValue,
+                shouldUpdate: false,
+                fromFn: () => 0,
+                fromIsFn: false,
+                toFn: () => 0,
+                toIsFn: false,
+                settled: false, // not used, only for uniformity with lerp and spring
             };
         });
     }
 
     /**
-     * @type {import('./type.js').SpringResetData}
+     * @type {import('./type').TweenResetData}
      */
     resetData() {
         this.#values = mergeDeep(this.#values, this.#initialData);
     }
 
     /**
-     * @type  {import('./type.js').SpringMergeProps}
+     * @description
+     * Reject promise and update form value with current
+     *
+     * @returns {void}
+     */
+    #updateDataWhileRunning() {
+        this.#isActive = false;
+
+        // Reject promise
+        if (this.#currentReject) {
+            this.#currentReject(mobCore.ANIMATION_STOP_REJECT);
+            this.#promise = undefined;
+        }
+
+        this.#values = [...this.#values].map((item) => {
+            if (!item.shouldUpdate) return item;
+
+            return {
+                ...item,
+                fromValue: item.currentValue,
+            };
+        });
+    }
+
+    /**
+     * @type  {import('./type').TweenMergeProps}
      *
      * @description
      * Merge special props with default props
+     *
      */
     #mergeProps(props) {
-        const springParams = handleSetUp.get('spring');
-
-        /**
-         * @description
-         * Step 1
-         * Get news confic props ( mass, friction etc... )
-         * Get props from new config ( wobble etc.. ) or get each default prop.
-         *
-         * @type {import('./type.js').SpringPresentConfigType}
-         */
-        const allPresetConfig = springParams.config;
-        const configPreset = springConfigIsValid(props?.config)
-            ? (allPresetConfig?.[props?.config ?? 'default'] ??
-              springPresetConfig.default)
-            : this.#defaultProps.configProps;
-
-        /*
-         * Step 2
-         * Modify previuos confic ( newConfigPreset ) single value ( mass ... )
-         * Merge single prop or {}
-         */
-        const configPropsToMerge = springConfigPropIsValid(props?.configProps);
-        const configProps = {
-            ...configPreset,
-            ...configPropsToMerge,
-        };
-
-        /*
-         * Current config for spring for current cycle.
-         */
-        const newProps = {
-            reverse: props?.reverse ?? this.#defaultProps.reverse,
-            relative: props?.relative ?? this.#defaultProps.relative,
-            immediate: props?.immediate ?? this.#defaultProps.immediate,
-            configProps,
-        };
-
-        const { relative } = newProps;
-
-        /**
-         * Current spring config used in current cycle.
-         * Current relative value used in current cycle.
-         */
-        this.#configProps = configProps;
-        this.#relative = relative;
-
+        const newProps = { ...this.#defaultProps, ...props };
+        const { ease, duration, relative } = newProps;
+        this.#ease = easeTweenIsValidGetFunction(ease);
+        this.#relative = relativeIsValid(relative, 'tween');
+        this.#duration = durationIsNumberOrFunctionIsValid(duration);
         return newProps;
     }
 
     /**
-     * @type {import('../../utils/type.js').GoTo<import('./type.js').SpringActions>} obj to Values
+     * @type {import('../../utils/type').GoTo<import('./type').TweenAction>} obj to Values
      */
     goTo(obj, props = {}) {
-        if (this.#pauseStatus) return new Promise((resolve) => resolve);
-
+        if (this.#pauseStatus || this.#comeFromResume) this.stop();
         this.#useStagger = true;
         const data = goToUtils(obj);
         return this.#doAction(data, props, obj);
     }
 
     /**
-     * @type {import('../../utils/type.js').GoFrom<import('./type.js').SpringActions>} obj to Values
+     * @type {import('../../utils/type').GoFrom<import('./type').TweenAction>} obj to Values
      */
     goFrom(obj, props = {}) {
-        if (this.#pauseStatus) return new Promise((resolve) => resolve);
-
+        if (this.#pauseStatus || this.#comeFromResume) this.stop();
         this.#useStagger = true;
         const data = goFromUtils(obj);
         return this.#doAction(data, props, obj);
     }
 
     /**
-     * @type {import('../../utils/type.js').GoFromTo<import('./type.js').SpringActions>} obj to Values
+     * @type {import('../../utils/type').GoFromTo<import('./type').TweenAction>} obj to Values
      */
     goFromTo(fromObj, toObj, props = {}) {
-        if (this.#pauseStatus) return new Promise((resolve) => resolve);
-
+        if (this.#pauseStatus || this.#comeFromResume) this.stop();
         this.#useStagger = true;
+
         if (!compareKeys(fromObj, toObj)) {
-            compareKeysWarning('spring goFromTo:', fromObj, toObj);
+            compareKeysWarning('tween goFromTo:', fromObj, toObj);
             return new Promise((resolve) => resolve);
         }
 
@@ -678,31 +639,36 @@ export default class HandleSpring {
     }
 
     /**
-     * @type {import('../../utils/type.js').Set<import('./type.js').SpringActions>} obj to Values
+     * @type {import('../../utils/type').Set<import('./type').TweenAction>} obj to Values
      */
     set(obj, props = {}) {
-        if (this.#pauseStatus) return new Promise((resolve) => resolve);
-
+        if (this.#pauseStatus || this.#comeFromResume) this.stop();
         this.#useStagger = false;
         const data = setUtils(obj);
-        return this.#doAction(data, props, obj);
+
+        // In set mode duration is small as possible
+        const propsParsed = props ? { ...props, duration: 1 } : { duration: 1 };
+        return this.#doAction(data, propsParsed, obj);
     }
 
     /**
-     * @type {import('../../utils/type.js').SetImmediate<import('./type.js').SpringActions>} obj to Values
+     * @type {import('../../utils/type').SetImmediate<import('./type').TweenAction>} obj to Values
      */
     setImmediate(obj, props = {}) {
-        if (this.#pauseStatus) return;
+        if (this.#pauseStatus || this.#comeFromResume) this.stop();
         this.#useStagger = false;
 
         const data = setUtils(obj);
-        this.#values = mergeArray(data, this.#values);
+        const propsParsed = props ? { ...props, duration: 1 } : { duration: 1 };
+        this.#values = mergeArrayTween(data, this.#values);
 
-        const { reverse } = this.#mergeProps(props ?? {});
+        if (this.#isActive) this.#updateDataWhileRunning();
+
+        const { reverse } = this.#mergeProps(propsParsed);
         if (valueIsBooleanAndTrue(reverse, 'reverse'))
             this.#values = setReverseValues(obj, this.#values);
 
-        this.#values = setRelative(this.#values, this.#relative);
+        this.#values = setRelativeTween(this.#values, this.#relative);
         this.#values = setFromCurrentByTo(this.#values);
 
         this.#isActive = false;
@@ -710,16 +676,17 @@ export default class HandleSpring {
     }
 
     /**
-     * @type {import('../../utils/type.js').DoAction<import('./type.js').SpringActions>} obj to Values
+     * @type {import('../../utils/type').DoAction<import('./type').TweenAction>} obj to Values
      */
     #doAction(data, props = {}, obj) {
-        this.#values = mergeArray(data, this.#values);
-        const { reverse, immediate } = this.#mergeProps(props);
+        this.#values = mergeArrayTween(data, this.#values);
+        if (this.#isActive) this.#updateDataWhileRunning();
 
+        const { reverse, immediate } = this.#mergeProps(props);
         if (valueIsBooleanAndTrue(reverse, 'reverse'))
             this.#values = setReverseValues(obj, this.#values);
 
-        this.#values = setRelative(this.#values, this.#relative);
+        this.#values = setRelativeTween(this.#values, this.#relative);
 
         if (valueIsBooleanAndTrue(immediate, 'immediate ')) {
             this.#isActive = false;
@@ -743,13 +710,13 @@ export default class HandleSpring {
      * @description
      * Get current values, If the single value is a function it returns the result of the function.
      *
-     * @type {import('./type.js').SpringGetValue}
+     * @type {import('./type').TweenGetValue}
      *
      * @example
      * ```javascript
      *
      *
-     * const { prop } = mySpring.get();
+     * const { prop } = myTween.get();
      * ```
      */
     get() {
@@ -760,13 +727,13 @@ export default class HandleSpring {
      * @description
      * Get initial values, If the single value is a function it returns the result of the function.
      *
-     * @type {import('./type.js').SpringGetValue}
+     * @type {import('./type').TweenGetValue}
      *
      * @example
      * ```javascript
      *
      *
-     * const { prop } = mySpring.getIntialData();
+     * const { prop } = myTween.getIntialData();
      * ```
      */
     getInitialData() {
@@ -777,13 +744,13 @@ export default class HandleSpring {
      * @description
      * Get from values, If the single value is a function it returns the result of the function.
      *
-     * @type {import('./type.js').SpringGetValue}
+     * @type {import('./type').TweenGetValue}
      *
      * @example
      * ```javascript
      *
      *
-     * const { prop } = mySpring.getFrom();
+     * const { prop } = myTween.getFrom();
      * ```
      */
     getFrom() {
@@ -794,13 +761,13 @@ export default class HandleSpring {
      * @description
      * Get to values, If the single value is a function it returns the result of the function.
      *
-     * @type {import('./type.js').SpringGetValue}
+     * @type {import('./type').TweenGetValue}
      *
      * @example
      * ```javascript
      *
      *
-     * const { prop } = mySpring.getTo();
+     * const { prop } = myTween.getTo();
      * ```
      */
     getTo() {
@@ -811,13 +778,13 @@ export default class HandleSpring {
      * @description
      * Get From values, if the single value is a function it returns the same function.
      *
-     * @type {import('./type.js').SpringGetValueNative}
+     * @type {import('./type').TweenGetValueNative}
      *
      * @example
      * ```javascript
      *
      *
-     * const { prop } = mySpring.getFromNativeType();
+     * const { prop } = myTween.getFromNativeType();
      * ```
      */
     getFromNativeType() {
@@ -828,13 +795,13 @@ export default class HandleSpring {
      * @description
      * Get To values, if the single value is a function it returns the same function.
      *
-     * @type {import('./type.js').SpringGetValueNative}
+     * @type {import('./type').TweenGetValueNative}
      *
      * @example
      * ```javascript
      *
      *
-     * const { prop } = mySpring.getToNativeType();
+     * const { prop } = myTween.getToNativeType();
      * ```
      */
     getToNativeType() {
@@ -845,30 +812,30 @@ export default class HandleSpring {
      * @description
      * Get tween type
      *
-     * @type {import('./type.js').SpringGetType} tween type
+     * @type {import('./type').TweenGetType} tween type
      *
      * @example
      * ```javascript
      *
      *
-     * const type = mySpring.getType();
+     * const type = myTween.getType();
      * ```
      */
     getType() {
-        return 'SPRING';
+        return 'TWEEN';
     }
 
     /**
      * @description
      * Get univoque Id
      *
-     * @type {import('./type.js').SpringGetId}
+     * @type {import('./type').TweenGetId}
      *
      * @example
      * ```javascript
      *
      *
-     * const type = mySpring.getId();
+     * const type = myTween.getId();
      * ```
      */
     getId() {
@@ -876,48 +843,20 @@ export default class HandleSpring {
     }
 
     /**
-     * @type {import('./type.js').SpringUdateConfigProp}
+     * Update ease with new preset
      *
-     *  @example
-     *  ```javascript
-     *  mySpring.updateConfigProp({
-     *      mass: 2,
-     *      friction: 5
-     *  })
+     * @type {import('./type').TweenUpdateEase}
      *
-     *
-     *  ```
-     *
-     * @description
-     * Update config object, every || some properties
-     * The change will be persistent
      */
-    updateConfigProp(configProps = {}) {
-        const configToMerge = springConfigPropIsValid(configProps);
-        this.#configProps = { ...this.#configProps, ...configToMerge };
-
+    updateEase(ease) {
+        this.#ease = easeTweenIsValidGetFunction(ease);
         this.#defaultProps = mergeDeep(this.#defaultProps, {
-            configProps: configToMerge,
+            ease,
         });
     }
 
     /**
-     *
-     * @description
-     * updateConfig - Update config object with new preset
-     *
-     * @type {import('./type.js').SpringUdateConfig}
-     *
-     */
-    updateConfig(config) {
-        this.#configProps = springConfigIsValidAndGetNew(config);
-        this.#defaultProps = mergeDeep(this.#defaultProps, {
-            configProps: this.#configProps,
-        });
-    }
-
-    /**
-     * @type {import('./type.js').SpringSubscribe}
+     * @type {import('./type').TweenSubscribe}
      *
      * ```
      * @description
@@ -934,7 +873,7 @@ export default class HandleSpring {
     }
 
     /**
-     * @type {import('./type.js').SpringSubscribeCache}
+     * @type {import('./type').TweenSubscribeCache}
      *
      * @description
      * Callback that returns updated values ready to be usable, specific to manage large staggers.
@@ -970,7 +909,7 @@ export default class HandleSpring {
     }
 
     /**
-     * @type {import('./type.js').SpringOnComplete}
+     * @type {import('./type').TweenOnComplete}
      *
      *
      * @description
@@ -994,6 +933,8 @@ export default class HandleSpring {
     /**
      * @description
      * Destroy tween
+     *
+     * @returns {void}
      */
     destroy() {
         if (this.#promise) this.stop();

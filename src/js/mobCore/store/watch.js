@@ -6,8 +6,8 @@ import { getStateFromMainMap, storeMap, updateMainMap } from './storeMap';
 import { storeWatchWarning } from './storeWarining';
 
 /**
- * @param {import("./type").storeWatchAction} param
- * @returns {import('./type').storeWatchReturnObject}
+ * @param {import("./type").MobStoreWatchAction} param
+ * @returns {import('./type').MobStoreWatchReturnObject}
  */
 export const storeWatchAction = ({ state, prop, callback, wait }) => {
     const { store, callBackWatcher } = state;

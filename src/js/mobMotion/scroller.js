@@ -1,12 +1,12 @@
 // @ts-check
 
-import { HandleScrollerConstant } from './animation/scroller/HandleScrollerConstant.js';
-import HandleScroller from './animation/scroller/HandleScroller.js';
+import { MobScrollerConstant } from './animation/scroller/MobScrollerConstant.js';
+import MobScroller from './animation/scroller/MobScroller.js';
 
 export const scroller = {
     /**
-     * @param {import('./animation/scroller/type.js').HandleScrollerCommonType & import('./animation/scroller/type.js').ParallaxType} data
-     * @returns {HandleScroller}
+     * @param {import('./animation/scroller/type').MobScrollerCommon & import('./animation/scroller/type').Parallax} data
+     * @returns {MobScroller}
      *
      * @example
      * ```javascript
@@ -23,7 +23,7 @@ export const scroller = {
      *      queryType: [ String ],
      *      direction: [ String ],
      *      propierties: [ String ],
-     *      tween: [ HandleSequencer | ParallaxTween ],
+     *      tween: [ MobSequencer | MobScrollerTween ],
      *      range: [ String | Number ],
      *      align: [ String ],
      *      onSwitch: [ String ],
@@ -58,16 +58,16 @@ export const scroller = {
      *
      */
     createParallax(data) {
-        return new HandleScroller({
+        return new MobScroller({
             ...data,
             // @ts-ignore
-            type: HandleScrollerConstant.TYPE_PARALLAX,
+            type: MobScrollerConstant.TYPE_PARALLAX,
         });
     },
 
     /**
-     * @param {import('./animation/scroller/type.js').HandleScrollerCommonType & import('./animation/scroller/type.js').ScrollTriggerType } data
-     * @returns {HandleScroller}
+     * @param {import('./animation/scroller/type').MobScrollerCommon & import('./animation/scroller/type').ScrollTrigger } data
+     * @returns {MobScroller}
      *
      * @example
      *
@@ -85,7 +85,7 @@ export const scroller = {
      *       queryType: [ String ],
      *       direction: [ String ],
      *       propierties: [ String ],
-     *       tween: [ HandleSequencer | ParallaxTween ],
+     *       tween: [ MobSequencer | MobScrollerTween ],
      *       range: [ String ],
      *       dynamicRange: [ Function ],
      *       fromTo: [ Boolean ],
@@ -137,10 +137,10 @@ export const scroller = {
      * ```
      */
     createScrollTrigger(data) {
-        return new HandleScroller({
+        return new MobScroller({
             ...data,
             // @ts-ignore
-            type: HandleScrollerConstant.TYPE_SCROLLTRIGGER,
+            type: MobScrollerConstant.TYPE_SCROLLTRIGGER,
         });
     },
 };

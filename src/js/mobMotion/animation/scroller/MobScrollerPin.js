@@ -1,13 +1,13 @@
 // @ts-check
 
-import HandleSpring from '../spring/handleSpring.js';
-import { HandleScrollerConstant } from './HandleScrollerConstant.js';
+import MobSpring from '../spring/MobSpring.js';
+import { MobScrollerConstant } from './MobScrollerConstant.js';
 import { position } from '../../../mobCore/utils/index.js';
 import { clamp } from '../utils/animationUtils.js';
 import { mobCore } from '../../../mobCore/index.js';
-import { getMarkerWrapperStyle } from './HandleScrollerPinUtils.js';
+import { getMarkerWrapperStyle } from './MobScrollerPinUtils.js';
 
-export class HandleScrollerPin {
+export class MobScrollerPin {
     /**
      * @type{number}
      */
@@ -61,7 +61,7 @@ export class HandleScrollerPin {
 
     /**
      * @description
-     * @type {HandleSpring|undefined|null}
+     * @type {MobSpring|undefined|null}
      */
     #spring;
 
@@ -277,7 +277,7 @@ export class HandleScrollerPin {
         this.#end = 0;
         this.#getStart = () => 0;
         this.#getEnd = () => 0;
-        this.#direction = HandleScrollerConstant.DIRECTION_VERTICAL;
+        this.#direction = MobScrollerConstant.DIRECTION_VERTICAL;
         this.#compesateValue = 0;
         this.#item = undefined;
         this.#spring = undefined;
@@ -369,7 +369,7 @@ export class HandleScrollerPin {
         this.#refreshCollisionPoint();
 
         this.#collisionStyleProp =
-            this.#direction === HandleScrollerConstant.DIRECTION_VERTICAL
+            this.#direction === MobScrollerConstant.DIRECTION_VERTICAL
                 ? 'top'
                 : 'left';
         this.#isInizialized = true;
@@ -402,8 +402,7 @@ export class HandleScrollerPin {
                 this.#screen !== document.documentElement
             ) {
                 if (
-                    this.#direction ===
-                    HandleScrollerConstant.DIRECTION_VERTICAL
+                    this.#direction === MobScrollerConstant.DIRECTION_VERTICAL
                 ) {
                     this.#refreshCollisionPoint();
                 }
@@ -433,7 +432,7 @@ export class HandleScrollerPin {
     }
 
     #setUpMotion() {
-        this.#spring = new HandleSpring({
+        this.#spring = new MobSpring({
             data: { collision: 0, verticalGap: 0 },
             config: 'wobbly',
         });
@@ -442,7 +441,7 @@ export class HandleScrollerPin {
             ({ collision, verticalGap }) => {
                 if (
                     this.#direction ===
-                        HandleScrollerConstant.DIRECTION_VERTICAL &&
+                        MobScrollerConstant.DIRECTION_VERTICAL &&
                     this.#pin
                 ) {
                     /**
@@ -654,7 +653,7 @@ export class HandleScrollerPin {
          */
         if (this.#screen !== globalThis) {
             this.#start -=
-                this.#direction === HandleScrollerConstant.DIRECTION_VERTICAL
+                this.#direction === MobScrollerConstant.DIRECTION_VERTICAL
                     ? // @ts-ignore
                       position(this.#screen).top
                     : // @ts-ignore
@@ -705,7 +704,7 @@ export class HandleScrollerPin {
     #getGap() {
         if (!this.#wrapper) return 0;
 
-        return this.#direction === HandleScrollerConstant.DIRECTION_VERTICAL
+        return this.#direction === MobScrollerConstant.DIRECTION_VERTICAL
             ? position(this.#wrapper).top - this.#startFromTop
             : position(this.#wrapper).left - this.#startFromTop;
     }
@@ -790,7 +789,7 @@ export class HandleScrollerPin {
             this.#pin.style.transition = '';
             this.#pin.style.position = 'relative';
 
-            if (this.#direction === HandleScrollerConstant.DIRECTION_VERTICAL) {
+            if (this.#direction === MobScrollerConstant.DIRECTION_VERTICAL) {
                 this.#pin.style.left = ``;
                 this.#pin.style.top = `${this.#compesateValue}px`;
             } else {
@@ -807,12 +806,12 @@ export class HandleScrollerPin {
         if (!this.#pin) return;
 
         const left =
-            this.#direction === HandleScrollerConstant.DIRECTION_VERTICAL
+            this.#direction === MobScrollerConstant.DIRECTION_VERTICAL
                 ? position(this.#pin).left
                 : position(this.#pin).top;
 
         const style =
-            this.#direction === HandleScrollerConstant.DIRECTION_VERTICAL
+            this.#direction === MobScrollerConstant.DIRECTION_VERTICAL
                 ? 'left'
                 : 'top';
 
@@ -962,17 +961,13 @@ export class HandleScrollerPin {
 
         const anticipate = this.#getAnticipate(scrollTop);
         const anticipateBottom =
-            scrollDirection === HandleScrollerConstant.SCROLL_UP
-                ? 0
-                : anticipate;
+            scrollDirection === MobScrollerConstant.SCROLL_UP ? 0 : anticipate;
         const anticipateInnerIn =
-            scrollDirection === HandleScrollerConstant.SCROLL_UP
+            scrollDirection === MobScrollerConstant.SCROLL_UP
                 ? 0
                 : anticipate * 2;
         const anticipateInnerOut =
-            scrollDirection === HandleScrollerConstant.SCROLL_UP
-                ? anticipate
-                : 0;
+            scrollDirection === MobScrollerConstant.SCROLL_UP ? anticipate : 0;
 
         return {
             anticipateBottom: anticipateBottom,
@@ -1001,17 +996,13 @@ export class HandleScrollerPin {
 
         const anticipate = this.#getAnticipate(scrollTop);
         const anticipateBottom =
-            scrollDirection === HandleScrollerConstant.SCROLL_UP
-                ? anticipate
-                : 0;
+            scrollDirection === MobScrollerConstant.SCROLL_UP ? anticipate : 0;
         const anticipateInnerIn =
-            scrollDirection === HandleScrollerConstant.SCROLL_UP
+            scrollDirection === MobScrollerConstant.SCROLL_UP
                 ? anticipate * 2
                 : 0;
         const anticipateInnerOut =
-            scrollDirection === HandleScrollerConstant.SCROLL_UP
-                ? 0
-                : anticipate;
+            scrollDirection === MobScrollerConstant.SCROLL_UP ? 0 : anticipate;
 
         return {
             anticipateBottom: anticipateBottom,
@@ -1043,14 +1034,14 @@ export class HandleScrollerPin {
 
         const scrollDirection =
             this.#prevScroll > scrollTop
-                ? HandleScrollerConstant.SCROLL_UP
-                : HandleScrollerConstant.SCROLL_DOWN;
+                ? MobScrollerConstant.SCROLL_UP
+                : MobScrollerConstant.SCROLL_DOWN;
 
         /**
          * Set up scroll condition
          */
         const offsetTop =
-            this.#direction === HandleScrollerConstant.DIRECTION_VERTICAL
+            this.#direction === MobScrollerConstant.DIRECTION_VERTICAL
                 ? position(this.#wrapper).top
                 : position(this.#wrapper).left;
 
@@ -1091,9 +1082,9 @@ export class HandleScrollerPin {
                 this.#setFixedPosition();
 
                 const fireSpring =
-                    (scrollDirection === HandleScrollerConstant.SCROLL_DOWN &&
+                    (scrollDirection === MobScrollerConstant.SCROLL_DOWN &&
                         !this.#invertSide) ||
-                    (scrollDirection === HandleScrollerConstant.SCROLL_UP &&
+                    (scrollDirection === MobScrollerConstant.SCROLL_UP &&
                         this.#invertSide);
 
                 this.#activateTrasponder();

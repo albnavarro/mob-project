@@ -1,17 +1,17 @@
 // @ts-check
 
-import HandleLerp from './animation/lerp/handleLerp.js';
-import HandleScrollerTween from './animation/scroller/HandleTweenTween.js';
-import HandleMasterSequencer from './animation/sequencer/handleMasterSequencer.js';
-import HandleSequencer from './animation/sequencer/handleSequencer.js';
-import HandleSpring from './animation/spring/handleSpring.js';
-import HandleTween from './animation/tween/handleTween.js';
-import { createStaggers } from './animation/sequencer/createStagger.js';
+import MobLerp from './animation/lerp/MobLerp.js';
+import MobScrollerTween from './animation/scroller/MobScrollerTween.js';
+import MobMasterSequencer from './animation/sequencer/MobMasterSequencer.js';
+import MobSequencer from './animation/sequencer/MobSequencer.js';
+import MobSpring from './animation/spring/MobSpring.js';
+import MobTween from './animation/tween/MobTween.js';
+import { MobCreateStaggers } from './animation/sequencer/MobCreateStagger.js';
 
 export const tween = {
     /**
-     * @param {import('./animation/scroller/type.js').HandleScrollerTweenType} data
-     * @return {HandleScrollerTween}
+     * @param {import('./animation/scroller/type').MobScrollerTween} data
+     * @return {MobScrollerTween}
      *
      * @example
      * ```javascript
@@ -48,12 +48,12 @@ export const tween = {
      * ```
      */
     createScrollerTween(data) {
-        return new HandleScrollerTween(data);
+        return new MobScrollerTween(data);
     },
 
     /**
-     * @param {import('./animation/sequencer/type.js').sequencerProps} data
-     * @returns {HandleSequencer}
+     * @param {import('./animation/sequencer/type').SequencerProps} data
+     * @returns {MobSequencer}
      *
      * @example
      * ```javascript
@@ -93,7 +93,7 @@ export const tween = {
      * ```
      */
     createSequencer(data) {
-        return new HandleSequencer(data);
+        return new MobSequencer(data);
     },
 
     /**
@@ -120,12 +120,12 @@ export const tween = {
      * ```
      */
     createMasterSequencer() {
-        return new HandleMasterSequencer();
+        return new MobMasterSequencer();
     },
 
     /**
      * @template T
-     * @param { import('./animation/sequencer/type.js').createSequencerType<T> & import('./animation/utils/stagger/type.js').StaggerPropiertiesObject } data
+     * @param { import('./animation/sequencer/type').CreateSequencerType<T> & import('./animation/utils/stagger/type').StaggerPropiertiesObject } data
      * @returns {Array<{ start: Number, end: Number,index: Number, item: (T) }>} Stagger array
      *
      * @example
@@ -163,12 +163,12 @@ export const tween = {
      * ```
      */
     createStaggers(data) {
-        return createStaggers(data);
+        return MobCreateStaggers(data);
     },
 
     /**
-     * @param {import('./animation/tween/type.js').TweenProps} data
-     * @returns {HandleTween}
+     * @param {import('./animation/tween/type').TweenProps} data
+     * @returns {MobTween}
      *
      * @example
      * ```javascript
@@ -216,12 +216,12 @@ export const tween = {
      * ```
      */
     createTween(data) {
-        return new HandleTween(data);
+        return new MobTween(data);
     },
 
     /**
-     * @param {import('./animation/spring/type.js').SpringTweenProps} data
-     * @returns {HandleSpring}
+     * @param {import('./animation/spring/type').SpringTweenProps} data
+     * @returns {MobSpring}
      *
      *
      * @example
@@ -277,12 +277,12 @@ export const tween = {
      * ```
      */
     createSpring(data) {
-        return new HandleSpring(data);
+        return new MobSpring(data);
     },
 
     /**
-     * @param {import('./animation/lerp/type.js').lerpTweenProps} data
-     * @returns {HandleLerp}
+     * @param {import('./animation/lerp/type').lerpTweenProps} data
+     * @returns {MobLerp}
      *
      * @example
      * ```javascript
@@ -331,6 +331,6 @@ export const tween = {
      * ```
      */
     createLerp(data) {
-        return new HandleLerp(data);
+        return new MobLerp(data);
     },
 };

@@ -21,7 +21,7 @@ import { mobCore } from '../../../mobCore/index.js';
 import { getValueObj } from '../utils/tweenAction/getValues.js';
 import { STAGGER_DEFAULT_INDEX_OBJ } from '../utils/stagger/staggerCostant.js';
 
-export default class HandleScrollerTween {
+export default class MobScrollerTween {
     /**
      * @type {Function}
      */
@@ -38,7 +38,7 @@ export default class HandleScrollerTween {
     #stagger;
 
     /**
-     * @type {import('./type.js').HandleScrollerTweenValue[]}
+     * @type {import('./type.js').MobScrollerTweenValue[]}
      */
     #values;
 
@@ -68,11 +68,11 @@ export default class HandleScrollerTween {
     #type;
 
     /**
-     * @param {import('./type.js').HandleScrollerTweenType} data
+     * @param {import('./type.js').MobScrollerTween} data
      *
      * @example
      * ```js
-     * const myParallaxTween = new HandleScrollerTween({
+     * const myParallaxTween = new MobScrollerTween({
      *   from: Object.<string, number>,
      *   to: Object.<string, number>,
      *   ease: [ String ],
@@ -223,7 +223,7 @@ export default class HandleScrollerTween {
 
     /**
      *
-     * @type {import('./type.js').HandleScrollerTweenSetData}
+     * @type {import('./type.js').MobScrollerTweenSetData}
      */
     setData(obj) {
         const valToArray = Object.entries(obj);
@@ -267,7 +267,7 @@ export default class HandleScrollerTween {
     }
 
     /**
-     * @type {import('./type.js').HandleScrollerTweenGoTo}
+     * @type {import('./type.js').MobScrollerTweenGoTo}
      *
      * ```
      * @description
@@ -281,7 +281,7 @@ export default class HandleScrollerTween {
     }
 
     /**
-     * @type {import('./type.js').HandleScrollerTweenSubscribe}
+     * @type {import('./type.js').MobScrollerTweenSubscribe}
      *
      * @description
      * Callback that returns updated values ready to be usable, it is advisable to use it for single elements, although it works well on a not too large number of elements (approximately 100-200 elements) for large staggers it is advisable to use the subscribeCache method .
@@ -297,7 +297,7 @@ export default class HandleScrollerTween {
     }
 
     /**
-     * @type {import('./type.js').HandleScrollerTweenOnStop}
+     * @type {import('./type.js').MobScrollerTweenOnStop}
      *
      * @description
      * Similar to subscribe this callBack is launched when the data calculation stops (when the timeline ends or the scroll trigger is inactive).
@@ -316,7 +316,7 @@ export default class HandleScrollerTween {
     }
 
     /**
-     * @type {import('./type.js').HandleScrollerTweenSubscribeCache}
+     * @type {import('./type.js').MobScrollerTweenSubscribeCache}
      */
     subscribeCache(item, fn) {
         const { arrayOfCallbackUpdated, unsubscribeCb, unsubscribeCache } =
@@ -335,7 +335,7 @@ export default class HandleScrollerTween {
     /**
      * @description
      * Get duration
-     * @type {import('./type.js').HandleScrollerTweenGetDuration}
+     * @type {import('./type.js').MobScrollerTweenGetDuration}
      */
     getDuration() {
         return this.#duration;
@@ -344,7 +344,7 @@ export default class HandleScrollerTween {
     /**
      * @description
      * Get tween type - 'parallaxTween'
-     * @type {import('./type.js').HandleScrollerTweenGetType}
+     * @type {import('./type.js').MobScrollerTweenGet}
      */
     getType() {
         return this.#type;

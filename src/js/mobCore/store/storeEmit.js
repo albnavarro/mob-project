@@ -15,7 +15,8 @@ import { storeEmitWarning } from './storeWarining';
 export const storeEmit = ({ instanceId, prop }) => {
     const state = getStateFromMainMap(instanceId);
     if (!state) return;
-    const { store, callBackWatcher, validationStatusObject } = state;
+    const { store, callBackWatcher, validationStatusObject, bindInstanceBy } =
+        state;
 
     if (!store) return;
 
@@ -30,6 +31,9 @@ export const storeEmit = ({ instanceId, prop }) => {
         });
 
         addToComputedWaitLsit({ instanceId, prop });
+        bindInstanceBy.forEach((id) => {
+            addToComputedWaitLsit({ instanceId: id, prop });
+        });
     } else {
         storeEmitWarning(prop, getLogStyle());
     }
@@ -76,7 +80,8 @@ export const storeEmitEntryPoint = ({ instanceId, prop }) => {
 export const storeEmitAsync = async ({ instanceId, prop }) => {
     const state = getStateFromMainMap(instanceId);
     if (!state) return new Promise((resolve) => resolve(''));
-    const { store, callBackWatcher, validationStatusObject } = state;
+    const { store, callBackWatcher, validationStatusObject, bindInstanceBy } =
+        state;
 
     if (!store) return { success: false };
 
@@ -91,6 +96,9 @@ export const storeEmitAsync = async ({ instanceId, prop }) => {
         });
 
         addToComputedWaitLsit({ instanceId, prop });
+        bindInstanceBy.forEach((id) => {
+            addToComputedWaitLsit({ instanceId: id, prop });
+        });
 
         return { success: true };
     } else {

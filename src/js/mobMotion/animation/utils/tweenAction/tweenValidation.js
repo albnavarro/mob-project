@@ -2,7 +2,7 @@
 
 import { handleSetUp } from '../../../setup';
 import { MQ_MAX, MQ_MIN } from '../setUp/setUpValidation.js';
-import { HandleScrollerConstant } from '../../scroller/HandleScrollerConstant.js';
+import { MobScrollerConstant } from '../../scroller/MobScrollerConstant.js';
 import { getTweenFn, tweenConfig } from '../../tween/tweenConfig';
 import {
     DIRECTION_COL,
@@ -714,8 +714,8 @@ export const functionIsValidAndReturnDefault = (fn, defaultValue, label) => {
 
 /**
  *
- * @param {(arg0: import('../timeline/type').directionTypeAsync) => void} fn
- * @returns {(arg0: import('../timeline/type').directionTypeAsync) => void}
+ * @param {(arg0: import('../timeline/type').DirectionTypeAsync) => void} fn
+ * @returns {(arg0: import('../timeline/type').DirectionTypeAsync) => void}
  *
  * @description
  * Check if value is A function
@@ -813,17 +813,17 @@ export const domNodeIsValidAndReturnNull = (element) => {
  * Check if value is a valid direction
  **/
 export const directionIsValid = (direction, component) => {
-    if (!direction) return HandleScrollerConstant.DIRECTION_VERTICAL;
+    if (!direction) return MobScrollerConstant.DIRECTION_VERTICAL;
 
     const choice = [
-        HandleScrollerConstant.DIRECTION_VERTICAL,
-        HandleScrollerConstant.DIRECTION_HORIZONTAL,
+        MobScrollerConstant.DIRECTION_VERTICAL,
+        MobScrollerConstant.DIRECTION_HORIZONTAL,
     ];
 
     const isValid = choice.includes(direction);
     if (!isValid && direction) scrollerDirectionWarining(direction, component);
 
-    return isValid ? direction : HandleScrollerConstant.DIRECTION_VERTICAL;
+    return isValid ? direction : MobScrollerConstant.DIRECTION_VERTICAL;
 };
 
 /**
@@ -837,10 +837,10 @@ export const directionIsValid = (direction, component) => {
  **/
 export const scrollerDynamicValueIsValid = (obj, label) => {
     const positionChoice = [
-        HandleScrollerConstant.POSITION_TOP,
-        HandleScrollerConstant.POSITION_LEFT,
-        HandleScrollerConstant.POSITION_RIGHT,
-        HandleScrollerConstant.POSITION_BOTTOM,
+        MobScrollerConstant.POSITION_TOP,
+        MobScrollerConstant.POSITION_LEFT,
+        MobScrollerConstant.POSITION_RIGHT,
+        MobScrollerConstant.POSITION_BOTTOM,
     ];
 
     // obj is an Object
@@ -893,8 +893,8 @@ export const scrollerDynamicRangeIsValid = (fn) => {
 export const scrollerTweenIsValid = (instance) => {
     const isValid =
         instance?.getType?.() &&
-        (instance.getType() === HandleScrollerConstant.TWEEN_TWEEN ||
-            instance.getType() === HandleScrollerConstant.TWEEN_TIMELINE);
+        (instance.getType() === MobScrollerConstant.TWEEN_TWEEN ||
+            instance.getType() === MobScrollerConstant.TWEEN_TIMELINE);
 
     if (!isValid && instance) scrollerTweenWarning();
 
@@ -910,16 +910,16 @@ export const scrollerTweenIsValid = (instance) => {
  * Check if Align value is valid
  **/
 export const scrollerAlignIsValid = (value) => {
-    if (!value) return HandleScrollerConstant.ALIGN_CENTER;
+    if (!value) return MobScrollerConstant.ALIGN_CENTER;
 
     const choice = [
-        HandleScrollerConstant.ALIGN_START,
-        HandleScrollerConstant.ALIGN_TOP,
-        HandleScrollerConstant.ALIGN_RIGHT,
-        HandleScrollerConstant.ALIGN_CENTER,
-        HandleScrollerConstant.ALIGN_BOTTOM,
-        HandleScrollerConstant.ALIGN_LEFT,
-        HandleScrollerConstant.ALIGN_END,
+        MobScrollerConstant.ALIGN_START,
+        MobScrollerConstant.ALIGN_TOP,
+        MobScrollerConstant.ALIGN_RIGHT,
+        MobScrollerConstant.ALIGN_CENTER,
+        MobScrollerConstant.ALIGN_BOTTOM,
+        MobScrollerConstant.ALIGN_LEFT,
+        MobScrollerConstant.ALIGN_END,
     ];
 
     // @ts-ignore
@@ -927,7 +927,7 @@ export const scrollerAlignIsValid = (value) => {
 
     if (!isValid && value) scrollerAlignWarining(value, choice);
 
-    return isValid ? value : HandleScrollerConstant.ALIGN_CENTER;
+    return isValid ? value : MobScrollerConstant.ALIGN_CENTER;
 };
 
 /**
@@ -942,10 +942,10 @@ export const scrollerOnSwitchIsValid = (value) => {
     if (!value) return false;
 
     const choice = [
-        HandleScrollerConstant.IN_BACK,
-        HandleScrollerConstant.IN_STOP,
-        HandleScrollerConstant.OUT_BACK,
-        HandleScrollerConstant.OUT_STOP,
+        MobScrollerConstant.IN_BACK,
+        MobScrollerConstant.IN_STOP,
+        MobScrollerConstant.OUT_BACK,
+        MobScrollerConstant.OUT_STOP,
     ];
 
     const isValid = choice.includes(value);
@@ -983,19 +983,19 @@ export const scrollerOpacityIsValid = (value, label, defaultValue) => {
  * Check if type propierties is valid
  **/
 export const scrollerTypeIsValid = (value) => {
-    if (!value) return HandleScrollerConstant.TYPE_PARALLAX;
+    if (!value) return MobScrollerConstant.TYPE_PARALLAX;
 
     const valueLowerCase = value?.toLowerCase();
     const choice = [
-        HandleScrollerConstant.TYPE_PARALLAX,
-        HandleScrollerConstant.TYPE_SCROLLTRIGGER,
+        MobScrollerConstant.TYPE_PARALLAX,
+        MobScrollerConstant.TYPE_SCROLLTRIGGER,
     ];
 
     const isValid = choice.includes(valueLowerCase);
     if (!isValid && valueLowerCase)
         scrollerTypeWarining(valueLowerCase, choice);
 
-    return isValid ? valueLowerCase : HandleScrollerConstant.TYPE_PARALLAX;
+    return isValid ? valueLowerCase : MobScrollerConstant.TYPE_PARALLAX;
 };
 
 /**
@@ -1009,7 +1009,7 @@ export const scrollerTypeIsValid = (value) => {
  **/
 export const scrollerRangeIsValid = (value, type) => {
     const parsedValue = () => {
-        if (type === HandleScrollerConstant.TYPE_PARALLAX) {
+        if (type === MobScrollerConstant.TYPE_PARALLAX) {
             // @ts-ignore
             const isOnlyNumber = checkIfIsOnlyNumber(value);
             const isValid =
@@ -1101,13 +1101,13 @@ export const scrollerPropiertiesIsValid = (
 ) => {
     if (!value && tweenIsSequencer)
         return {
-            propierties: HandleScrollerConstant.PROP_VERTICAL,
+            propierties: MobScrollerConstant.PROP_VERTICAL,
             shouldTrackOnlyEvents: true,
         };
 
     if (!value && tweenIsParallaxTween)
         return {
-            propierties: HandleScrollerConstant.PROP_VERTICAL,
+            propierties: MobScrollerConstant.PROP_VERTICAL,
             shouldTrackOnlyEvents: false,
         };
 
@@ -1116,23 +1116,23 @@ export const scrollerPropiertiesIsValid = (
      * Use scrollTrigger only for track events.
      */
     const shouldTrackOnlyEvents =
-        type === HandleScrollerConstant.TYPE_SCROLLTRIGGER && !value;
+        type === MobScrollerConstant.TYPE_SCROLLTRIGGER && !value;
 
     /**
      * Support suggestion for console.warn();
      */
     const choice = [
-        HandleScrollerConstant.PROP_VERTICAL,
-        HandleScrollerConstant.PROP_HORIZONTAL,
-        HandleScrollerConstant.PROP_ROTATE,
-        HandleScrollerConstant.PROP_ROTATEY,
-        HandleScrollerConstant.PROP_ROTATEX,
-        HandleScrollerConstant.PROP_ROTATEZ,
-        HandleScrollerConstant.PROP_OPACITY,
-        HandleScrollerConstant.PROP_SCALE,
-        HandleScrollerConstant.PROP_SCALE_X,
-        HandleScrollerConstant.PROP_SCALE_Y,
-        HandleScrollerConstant.PROP_TWEEN,
+        MobScrollerConstant.PROP_VERTICAL,
+        MobScrollerConstant.PROP_HORIZONTAL,
+        MobScrollerConstant.PROP_ROTATE,
+        MobScrollerConstant.PROP_ROTATEY,
+        MobScrollerConstant.PROP_ROTATEX,
+        MobScrollerConstant.PROP_ROTATEZ,
+        MobScrollerConstant.PROP_OPACITY,
+        MobScrollerConstant.PROP_SCALE,
+        MobScrollerConstant.PROP_SCALE_X,
+        MobScrollerConstant.PROP_SCALE_Y,
+        MobScrollerConstant.PROP_TWEEN,
     ];
 
     /**
@@ -1146,8 +1146,8 @@ export const scrollerPropiertiesIsValid = (
      * So return verticasl props
      */
     const notParallaxTweenInsideParallax =
-        type === HandleScrollerConstant.TYPE_PARALLAX &&
-        value === HandleScrollerConstant.PROP_TWEEN &&
+        type === MobScrollerConstant.TYPE_PARALLAX &&
+        value === MobScrollerConstant.PROP_TWEEN &&
         !tweenIsParallaxTween;
 
     /**
@@ -1156,7 +1156,7 @@ export const scrollerPropiertiesIsValid = (
     if (
         !tweenIsParallaxTween &&
         !tweenIsSequencer &&
-        value === HandleScrollerConstant.PROP_TWEEN
+        value === MobScrollerConstant.PROP_TWEEN
     )
         scrollerNoTweenDefinedWarning();
 
@@ -1165,13 +1165,13 @@ export const scrollerPropiertiesIsValid = (
      */
     if (
         (tweenIsParallaxTween || tweenIsSequencer) &&
-        value !== HandleScrollerConstant.PROP_TWEEN
+        value !== MobScrollerConstant.PROP_TWEEN
     )
         scrollerUseTweenButNotProsDefinedWarning();
 
     if (notParallaxTweenInsideParallax) scrollerUseSequencerWarining();
     const valueParsed = notParallaxTweenInsideParallax
-        ? HandleScrollerConstant.PROP_VERTICAL
+        ? MobScrollerConstant.PROP_VERTICAL
         : value;
 
     /**
@@ -1181,8 +1181,8 @@ export const scrollerPropiertiesIsValid = (
 
     return {
         propierties: isValid
-            ? (valueFromConstant ?? HandleScrollerConstant.PROP_VERTICAL)
-            : HandleScrollerConstant.PROP_VERTICAL,
+            ? (valueFromConstant ?? MobScrollerConstant.PROP_VERTICAL)
+            : MobScrollerConstant.PROP_VERTICAL,
         shouldTrackOnlyEvents,
     };
 };
@@ -1196,11 +1196,11 @@ export const scrollerPropiertiesIsValid = (
  * Check if easeType is valid
  **/
 export const scrollerEaseTypeIsValid = (value) => {
-    if (!value) return HandleScrollerConstant.EASE_LERP;
+    if (!value) return MobScrollerConstant.EASE_LERP;
 
     const choice = [
-        HandleScrollerConstant.EASE_SPRING,
-        HandleScrollerConstant.EASE_LERP,
+        MobScrollerConstant.EASE_SPRING,
+        MobScrollerConstant.EASE_LERP,
     ];
     const isValid = choice.includes(value);
     if (!isValid) scrollerEaseTypeWarining(value, choice);
@@ -1208,7 +1208,7 @@ export const scrollerEaseTypeIsValid = (value) => {
     /**
      * Sequencer can not use spring
      */
-    const fallback = isValid ? value : HandleScrollerConstant.EASE_LERP;
+    const fallback = isValid ? value : MobScrollerConstant.EASE_LERP;
     return isValid ? value : fallback;
 };
 
@@ -1219,14 +1219,14 @@ export const scrollerEaseTypeIsValid = (value) => {
  */
 export const genericEaseTypeIsValid = (value, component) => {
     const choice = [
-        HandleScrollerConstant.EASE_SPRING,
-        HandleScrollerConstant.EASE_LERP,
+        MobScrollerConstant.EASE_SPRING,
+        MobScrollerConstant.EASE_LERP,
     ];
 
     const isValid = choice.includes(value);
     if (!isValid && value) genericEaseTypeWarining(value, choice, component);
 
-    return isValid ? value : HandleScrollerConstant.EASE_LERP;
+    return isValid ? value : MobScrollerConstant.EASE_LERP;
 };
 
 /**
@@ -1240,7 +1240,7 @@ export const genericEaseTypeIsValid = (value, component) => {
  **/
 export const scrollerSpringConfigIsValid = (config, type) => {
     const defaultConfig =
-        type === HandleScrollerConstant.TYPE_PARALLAX
+        type === MobScrollerConstant.TYPE_PARALLAX
             ? handleSetUp.get('parallax').springConfig
             : handleSetUp.get('scrollTrigger').springConfig;
 
@@ -1272,7 +1272,7 @@ export const scrollerLerpConfigIsValid = (value, type) => {
     if (!isValid && value) scrollerLerpConfigWarning();
 
     const defaultConfig =
-        type === HandleScrollerConstant.TYPE_PARALLAX
+        type === MobScrollerConstant.TYPE_PARALLAX
             ? handleSetUp.get('parallax').lerpConfig
             : handleSetUp.get('scrollTrigger').lerpConfig;
 
@@ -1290,18 +1290,18 @@ export const scrollerLerpConfigIsValid = (value, type) => {
  **/
 export const checkStringRangeOnPropierties = (value, properties) => {
     const parallalxXYRangeChoice = [
-        HandleScrollerConstant.PX,
-        HandleScrollerConstant.VW,
-        HandleScrollerConstant.VH,
-        HandleScrollerConstant.WPERCENT,
-        HandleScrollerConstant.HPERCENT,
+        MobScrollerConstant.PX,
+        MobScrollerConstant.VW,
+        MobScrollerConstant.VH,
+        MobScrollerConstant.WPERCENT,
+        MobScrollerConstant.HPERCENT,
     ];
     /**
      * Check X,Y prop
      */
     if (
-        properties === HandleScrollerConstant.PROP_VERTICAL ||
-        properties === HandleScrollerConstant.PROP_HORIZONTAL
+        properties === MobScrollerConstant.PROP_VERTICAL ||
+        properties === MobScrollerConstant.PROP_HORIZONTAL
     ) {
         const isValid = exactMatchInsesitiveNumberPropArray(
             parallalxXYRangeChoice,
@@ -1320,18 +1320,18 @@ export const checkStringRangeOnPropierties = (value, properties) => {
      * Check ROTATE PROP
      */
     if (
-        properties === HandleScrollerConstant.PROP_ROTATE ||
-        properties === HandleScrollerConstant.PROP_ROTATEX ||
-        properties === HandleScrollerConstant.PROP_ROTATEY ||
-        properties === HandleScrollerConstant.PROP_ROTATEZ
+        properties === MobScrollerConstant.PROP_ROTATE ||
+        properties === MobScrollerConstant.PROP_ROTATEX ||
+        properties === MobScrollerConstant.PROP_ROTATEY ||
+        properties === MobScrollerConstant.PROP_ROTATEZ
     ) {
         const isValid = exactMatchInsesitiveNumberPropArray(
-            [HandleScrollerConstant.DEGREE],
+            [MobScrollerConstant.DEGREE],
             value
         );
         if (!isValid)
             scrollTriggerRangeWarning(value, properties, [
-                HandleScrollerConstant.DEGREE,
+                MobScrollerConstant.DEGREE,
             ]);
 
         return isValid ? value : '0';
@@ -1341,9 +1341,9 @@ export const checkStringRangeOnPropierties = (value, properties) => {
      * Check SCALE PROP
      */
     if (
-        properties === HandleScrollerConstant.PROP_SCALE ||
-        properties === HandleScrollerConstant.PROP_SCALE_X ||
-        properties === HandleScrollerConstant.PROP_SCALE_Y
+        properties === MobScrollerConstant.PROP_SCALE ||
+        properties === MobScrollerConstant.PROP_SCALE_X ||
+        properties === MobScrollerConstant.PROP_SCALE_Y
     ) {
         const isValid = checkIfIsOnlyNumberPositiveNegative(value);
         if (!isValid) scrollTriggerRangeScaleWarning(value, properties);

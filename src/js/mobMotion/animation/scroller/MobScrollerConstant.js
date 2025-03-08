@@ -1,6 +1,6 @@
 // @ts-check
 
-export const HandleScrollerConstant = {
+export const MobScrollerConstant = {
     // Constant misure units
     /**
      * @type {string}

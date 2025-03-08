@@ -29,7 +29,7 @@ import { asyncReduceData } from './asyncReduceData.js';
 import { asyncReduceTween } from './asyncReduceTween.js';
 import { resolveTweenPromise } from './loopCallback.js';
 
-export default class HandleAsyncTimeline {
+export default class MobAsyncTimeline {
     /**
      * @type {number}
      */
@@ -51,17 +51,17 @@ export default class HandleAsyncTimeline {
     #autoSet;
 
     /**
-     * @type {Array<import('./type').asyncTimelineTweenItem[]>}
+     * @type {Array<import('./type').AsyncTimelineTweenItem[]>}
      */
     #tweenList;
 
     /**
-     * @type {Array<import('./type').asyncTimelineCurrentTween>}
+     * @type {Array<import('./type').AsyncTimelineCurrentTween>}
      */
     #currentTween;
 
     /**
-     * @type {Array<import('./type').syncTimelineTweenStore>}
+     * @type {Array<import('./type').AsyncTimelineTweenStore>}
      */
     #tweenStore;
 
@@ -71,7 +71,7 @@ export default class HandleAsyncTimeline {
     #waitComplete;
 
     /**
-     * @type {import('./type').asyncTimelineRowData}
+     * @type {import('./type').AsyncTimelineRowData}
      */
     #defaultObj;
 
@@ -79,12 +79,12 @@ export default class HandleAsyncTimeline {
      * @description
      * Timeline state
      *
-     * @type {import('./type').asyncTimelineLabelState}
+     * @type {import('./type').AsyncTimelineLabelState}
      */
     #labelState;
 
     /**
-     * @type {import('./type').asyncTimelineStarterFunction}
+     * @type {import('./type').AsyncTimelineStarterFunction}
      */
     #starterFunction;
 
@@ -162,7 +162,7 @@ export default class HandleAsyncTimeline {
     #startOnDelay;
 
     /**
-     * @type {import('./type').asyncTimelineAfterReject}
+     * @type {import('./type').AsyncTimelineAfterReject}
      */
     #actionAfterReject;
 
@@ -187,7 +187,7 @@ export default class HandleAsyncTimeline {
     #autoSetIsJustCreated;
 
     /**
-     * @type {import('./type').asyncTimelineCurrentAction[]}
+     * @type {import('./type').AsyncTimelineCurrentAction[]}
      */
     #currentAction;
 
@@ -202,7 +202,7 @@ export default class HandleAsyncTimeline {
     #id;
 
     /**
-     * @type {{cb: (arg0: import('../utils/timeline/type.js').directionTypeObjectLoop) => void, id: number}[]}
+     * @type {{cb: (arg0: import('../utils/timeline/type').DirectionTypeObjectLoop) => void, id: number}[]}
      */
     #callbackLoop;
 
@@ -222,11 +222,11 @@ export default class HandleAsyncTimeline {
     #currentReject;
 
     /**
-     * @param {import('./type').asyncTimelineType} data
+     * @param {import('./type').AsyncTimeline} data
      *
      * @example
      * ```javascript
-     * const myTimeline = new HandleAsyncTimeline({
+     * const myTimeline = new MobAsyncTimeline({
      *   yoyo: [ Boolean ],
      *   repeat: [ Number ],
      *   freeMode: [ Number ],
@@ -794,7 +794,7 @@ export default class HandleAsyncTimeline {
             })
             .catch(() => {
                 // If play or reverse or playFromLabel is fired diring delay tween fail
-                // Afte fail we can fire the action
+                // After fail we can fire the action
                 if (this.#actionAfterReject.active) {
                     console.log('actionAfterReject fired');
                     this.#actionAfterReject.fn();
@@ -925,7 +925,7 @@ export default class HandleAsyncTimeline {
     }
 
     /**
-     * @type {import('./type').addToActiveTween}
+     * @type {import('./type').AsyncTimelineAddToActiveTween}
      */
     #addToActiveTween(tween) {
         const tweenId = tween?.getId && tween.getId();
@@ -1010,7 +1010,7 @@ export default class HandleAsyncTimeline {
     }
 
     /**
-     * @type {import('./type').addToMainArray}
+     * @type {import('./type').AsyncTimelineAddToMainArray}
      */
     #addToMainArray(obj) {
         /**
@@ -1032,7 +1032,7 @@ export default class HandleAsyncTimeline {
     }
 
     /**
-     * @type {import('./type').addTweenToStore} tween
+     * @type {import('./type').AsyncTimelineAddTweenToStore} tween
      */
     #addTweenToStore(tween) {
         const uniqueId = tween?.getId?.();
@@ -1053,7 +1053,7 @@ export default class HandleAsyncTimeline {
     }
 
     /**
-     * @type {import('./type').asyncTimelineSet}
+     * @type {import('./type').AsyncTimelineSet}
      */
     set(tween, valuesSet = {}, tweenProps = {}) {
         if (!asyncTimelineTweenIsValid(tween)) return this;
@@ -1077,7 +1077,7 @@ export default class HandleAsyncTimeline {
     }
 
     /**
-     * @type {import('./type').asyncTimelineGoTo}
+     * @type {import('./type').AsyncTimelineGoTo}
      */
     goTo(tween, valuesTo = {}, tweenProps = {}) {
         if (!asyncTimelineTweenIsValid(tween)) return this;
@@ -1100,7 +1100,7 @@ export default class HandleAsyncTimeline {
     }
 
     /**
-     * @type {import('./type').asyncTimelineGoFrom}
+     * @type {import('./type').AsyncTimelineGoFrom}
      */
     goFrom(tween, valuesFrom = {}, tweenProps = {}) {
         if (!asyncTimelineTweenIsValid(tween)) return this;
@@ -1123,7 +1123,7 @@ export default class HandleAsyncTimeline {
     }
 
     /**
-     * @type {import('./type').asyncTimelineGoFromTo}
+     * @type {import('./type').AsyncTimelineGoFromTo}
      */
     goFromTo(tween, valuesFrom = {}, valuesTo = {}, tweenProps = {}) {
         if (!asyncTimelineTweenIsValid(tween)) return this;
@@ -1147,7 +1147,7 @@ export default class HandleAsyncTimeline {
     }
 
     /**
-     * @type {import('./type').asyncTimelineAdd}
+     * @type {import('./type').AsyncTimelineAdd}
      */
     add(fn = NOOP) {
         const cb = functionIsValidAndReturnDefault(
@@ -1178,7 +1178,7 @@ export default class HandleAsyncTimeline {
     }
 
     /**
-     * @type {import('./type').asyncTimelineAddAsync}
+     * @type {import('./type').AsyncTimelineAddAsync}
      */
     addAsync(fn) {
         const cb = addAsyncFunctionIsValid(fn);
@@ -1206,7 +1206,7 @@ export default class HandleAsyncTimeline {
     }
 
     /**
-     * @type {import('./type').asyncTimelineSync}
+     * @type {import('./type').AsyncTimelineSync}
      */
     sync(syncProp) {
         /**
@@ -1239,7 +1239,7 @@ export default class HandleAsyncTimeline {
     }
 
     /**
-     * @type {import('./type').asyncTimelineCreateGroup}
+     * @type {import('./type').AsyncTimelineCreateGroup}
      */
     createGroup(groupProps = {}) {
         /**
@@ -1267,7 +1267,7 @@ export default class HandleAsyncTimeline {
     }
 
     /**
-     * @type {import('./type').asyncTimelineCloseGroup}
+     * @type {import('./type').AsyncTimelineCloseGroup}
      */
     closeGroup() {
         this.#groupId = undefined;
@@ -1286,7 +1286,7 @@ export default class HandleAsyncTimeline {
     }
 
     /**
-     * @type {import('./type').asyncTimelineSuspend}
+     * @type {import('./type').AsyncTimelineSuspend}
      */
     suspend(fn = () => true) {
         /**
@@ -1312,7 +1312,7 @@ export default class HandleAsyncTimeline {
     }
 
     /**
-     * @type {import('./type').asyncTimelineLabel}
+     * @type {import('./type').AsyncTimelineLabel}
      */
     label(labelProps = {}) {
         /**
@@ -1402,7 +1402,7 @@ export default class HandleAsyncTimeline {
     }
 
     /**
-     * @type {import('./type').asyncTimelineSetTween}
+     * @type {import('./type').AsyncTimelineSetTween}
      */
     setTween(label = '', items = []) {
         this.stop();
@@ -1569,7 +1569,7 @@ export default class HandleAsyncTimeline {
 
     /**
      * @private
-     * @type {import('./type').asyncTimelinePlayFromLabel}
+     * @type {import('./type').AsyncTimelinePlayFromLabel}
      */
     playFromLabel({ isReverse = false, label = null }) {
         // Skip of there is nothing to run
@@ -1597,7 +1597,7 @@ export default class HandleAsyncTimeline {
     }
 
     /**
-     * @type {import('./type').asyncTimelinePlayFrom}
+     * @type {import('./type').AsyncTimelinePlayFrom}
      */
     playFrom(label) {
         return new Promise((resolve, reject) => {
@@ -1630,7 +1630,7 @@ export default class HandleAsyncTimeline {
     }
 
     /**
-     * @type {import('./type').asyncTimelinePlayFromReverse}
+     * @type {import('./type').AsyncTimelinePlayFromReverse}
      */
     playFromReverse(label) {
         return new Promise((resolve, reject) => {
@@ -1658,7 +1658,7 @@ export default class HandleAsyncTimeline {
     }
 
     /**
-     * @type {import('./type').asyncTimelinePlayReverse}
+     * @type {import('./type').AsyncTimelinePlayReverse}
      */
     playReverse({ forceYoYo = true, resolve = null, reject = null } = {}) {
         return new Promise((resolveFromReverse, rejectFromReverse) => {
@@ -1737,7 +1737,7 @@ export default class HandleAsyncTimeline {
     }
 
     /**
-     * @type {import('./type').asyncTimelineStop}
+     * @type {import('./type').AsyncTimelineStop}
      */
     stop({ clearCache = true } = {}) {
         this.#isStopped = true;
@@ -1777,7 +1777,7 @@ export default class HandleAsyncTimeline {
     }
 
     /**
-     * @type {import('./type').asyncTimelinePause}
+     * @type {import('./type').AsyncTimelinePause}
      */
     pause() {
         this.#isInPause = true;
@@ -1788,7 +1788,7 @@ export default class HandleAsyncTimeline {
     }
 
     /**
-     * @type {import('./type').asyncTimelineResume}
+     * @type {import('./type').AsyncTimelineResume}
      */
     resume() {
         if (this.#isInPause) {
@@ -1833,7 +1833,7 @@ export default class HandleAsyncTimeline {
     }
 
     /**
-     * @return {import('./type').asyncTimelineCurrentTween[]} - Returns an array with all tweens active at the time the method is called
+     * @return {import('./type').AsyncTimelineCurrentTween[]} - Returns an array with all tweens active at the time the method is called
      * @example
      * ```javascript
      * const tweens = myTimeline.get()
@@ -1893,7 +1893,7 @@ export default class HandleAsyncTimeline {
     }
 
     /**
-     * @return {import('../utils/timeline/type.js').directionType} Returns a boolean value indicating whether the timeline is suspended
+     * @return {import('../utils/timeline/type').DirectionType} Returns a boolean value indicating whether the timeline is suspended
      * @example
      * ```javascript
      * const direction = myTimeline.getDirection();
@@ -1915,7 +1915,7 @@ export default class HandleAsyncTimeline {
     }
 
     /**
-     * @type {import('./type').asyncTimelineOnLoopEnd}
+     * @type {import('./type').AsyncTimelineOnLoopEnd}
      */
     onLoopEnd(cb) {
         this.#callbackLoop.push({ cb, id: this.#id });
@@ -1930,7 +1930,7 @@ export default class HandleAsyncTimeline {
     }
 
     /**
-     * @type {import('./type').asyncTimelineOnComplete}
+     * @type {import('./type').AsyncTimelineOnComplete}
      */
     onComplete(cb) {
         this.#callbackComplete.push({ cb, id: this.#id });

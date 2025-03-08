@@ -10,7 +10,7 @@ import {
 
 /**
  * @param {import('./type').MobStoreParams} data
- * @returns {import('./type').storeMapValue}
+ * @returns {import('./type').StoreMapValue}
  */
 export const inizializeInstance = (data) => {
     /**
@@ -67,6 +67,7 @@ export const inizializeInstance = (data) => {
         }),
         proxiObject: undefined,
         bindInstance: [],
+        bindInstanceBy: [],
         unsubscribeBindInstance: [],
     };
 };

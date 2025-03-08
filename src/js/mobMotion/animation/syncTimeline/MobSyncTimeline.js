@@ -11,9 +11,9 @@ import { mobCore } from '../../../mobCore/index.js';
 import { directionConstant } from '../utils/timeline/timelineConstant.js';
 import { fpsLoadedLog } from '../utils/fpsLogInizialization.js';
 
-export default class HandleSyncTimeline {
+export default class MobSyncTimeline {
     /**
-     * @param {import('./type.js').syncTimelineType} data
+     * @param {import('./type').SyncTimeline} data
      *
      * @example
      * ```javascript
@@ -73,7 +73,7 @@ export default class HandleSyncTimeline {
 
         /**
          * @private
-         * @type {import('./type.js').syncTimelineSequencers[]}
+         * @type {import('./type').SyncTimelineSequencers[]}
          */
         this.sequencers = [];
 
@@ -187,19 +187,19 @@ export default class HandleSyncTimeline {
 
         /**
          * @private
-         * @type {import('./type.js').syncTimelineEventType<{direction: import('../utils/timeline/type.js').directionType, loop:number}>[]}
+         * @type {import('./type').SyncTimelineEvent<{direction: import('../utils/timeline/type').DirectionType, loop:number}>[]}
          */
         this.callbackLoop = [];
 
         /**
          * @private
-         * @type {import('./type.js').syncTimelineEventType<void>[]}
+         * @type {import('./type').SyncTimelineEvent<void>[]}
          */
         this.callbackComplete = [];
 
         /**
          * @private
-         * @type {import('./type.js').syncTimelineEventType<{time:number,direction:import('../utils/timeline/type.js').directionType }>[]}
+         * @type {import('./type').SyncTimelineEvent<{time:number,direction:import('../utils/timeline/type').DirectionType }>[]}
          */
         this.callbackOnUpdate = [];
 
@@ -457,7 +457,7 @@ export default class HandleSyncTimeline {
     }
 
     /**
-     * @type {import('./type.js').syncTimelinePlay}
+     * @type {import('./type').SyncTimelinePlay}
      *
      * @description
      * Plays the timeline starting from the initial value
@@ -487,7 +487,7 @@ export default class HandleSyncTimeline {
     }
 
     /**
-     * @type {import('./type.js').syncTimelinePlayFrom} value
+     * @type {import('./type').SyncTimelinePlayFrom} value
      *
      * @example
      * ```javascript
@@ -550,7 +550,7 @@ export default class HandleSyncTimeline {
     }
 
     /**
-     * @type {import('./type.js').syncTimelinePlayFromReverse} value
+     * @type {import('./type').syncTimelinePlayFromReverse} value
      *
      * @example
      * ```javascript
@@ -586,7 +586,7 @@ export default class HandleSyncTimeline {
     }
 
     /**
-     * @type {import('./type.js').syncTimelinePlayReverse} 
+     * @type {import('./type').SyncTimelinePlayReverse} 
      *
      * @example
      * ```javascript
@@ -699,7 +699,7 @@ export default class HandleSyncTimeline {
     }
 
     /**
-     * @type {import('./type.js').syncTimelinePause}
+     * @type {import('./type').SyncTimelinePause}
      */
     pause() {
         if (this.isStopped || this.isInPause || this.fpsIsInLoading) return;
@@ -709,7 +709,7 @@ export default class HandleSyncTimeline {
     }
 
     /**
-     * @type {import('./type.js').syncTimelineResume}
+     * @type {import('./type').SyncTimelineResume}
      */
     resume() {
         if (this.isStopped || !this.isInPause || this.fpsIsInLoading) return;
@@ -719,7 +719,7 @@ export default class HandleSyncTimeline {
     }
 
     /**
-     * @type {import('./type.js').syncTimelineReverse}
+     * @type {import('./type').SyncTimelineReverse}
      */
     reverse() {
         if (this.isStopped || this.isInPause || this.fpsIsInLoading) return;
@@ -735,7 +735,7 @@ export default class HandleSyncTimeline {
     }
 
     /**
-     * @type {import('./type.js').syncTimelineStop}
+     * @type {import('./type').SyncTimelineStop}
      * @returns {void}
      */
     stop({ clearCache = true } = {}) {
@@ -770,7 +770,7 @@ export default class HandleSyncTimeline {
     }
 
     /**
-     * @type {import('./type.js').syncTimelineAdd}
+     * @type {import('./type').SyncTimelineAdd}
      *
      * @example
      * ```javascript
@@ -791,7 +791,7 @@ export default class HandleSyncTimeline {
     }
 
     /**
-     * @type {import('./type.js').syncTimelineSetDuration}
+     * @type {import('./type').SyncTimelineSetDuration}
      */
     setDuration(duration) {
         this.duration = duration;
@@ -807,7 +807,7 @@ export default class HandleSyncTimeline {
     }
 
     /**
-     * @type {import('./type.js').syncTimelineIsActive}
+     * @type {import('./type').SyncTimelineIsActive}
      *
      * @example
      * ```javascript
@@ -824,7 +824,7 @@ export default class HandleSyncTimeline {
     }
 
     /**
-     * @type {import('./type.js').syncTimelineIsPaused}
+     * @type {import('./type').SyncTimelineIsPaused}
      *
      * @example
      * ```javascript
@@ -841,7 +841,7 @@ export default class HandleSyncTimeline {
     }
 
     /**
-     * @type {import('./type.js').syncTimelineGetDirection}
+     * @type {import('./type').SyncTimelineGetDirection}
      *
      * @example
      * ```javascript
@@ -862,7 +862,7 @@ export default class HandleSyncTimeline {
     }
 
     /**
-     * @type {import('./type.js').syncTimelineTime}
+     * @type {import('./type').SyncTimelineTime}
      *
      * @example
      * ```javascript
@@ -879,7 +879,7 @@ export default class HandleSyncTimeline {
     }
 
     /**
-     * @type {import('./type.js').syncTimelineOnLoopEnd}
+     * @type {import('./type').SyncTimelineOnLoopEnd}
      *
      * @example
      *```javascript
@@ -906,7 +906,7 @@ export default class HandleSyncTimeline {
     }
 
     /**
-     * @type {import('./type.js').syncTimelineOnComplete}
+     * @type {import('./type').SyncTimelineOnComplete}
      *
      * @example
      *```javascript
@@ -933,7 +933,7 @@ export default class HandleSyncTimeline {
     }
 
     /**
-     * @type {import('./type.js').syncTimelineOnUpdate}
+     * @type {import('./type').SyncTimelineOnUpdate}
      *
      * @example
      *```javascript

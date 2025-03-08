@@ -6,8 +6,8 @@ import { storeSetAction } from './storeSet';
 import { storeType } from './storeType';
 
 /**
- * @param {import('./type').storeMapValue} initialState
- * @returns {import('./type').storeMapValue}
+ * @param {import('./type').StoreMapValue} initialState
+ * @returns {import('./type').StoreMapValue}
  */
 export const inizializeValidation = (initialState) => {
     const { store } = initialState;
@@ -32,7 +32,7 @@ export const inizializeValidation = (initialState) => {
 
 /**
  * @param {string} instanceId
- * @param {import('./type').storeMapValue} initialState
+ * @param {import('./type').StoreMapValue} initialState
  * @returns {void}
  */
 export const inizializeAllProps = (instanceId, initialState) => {

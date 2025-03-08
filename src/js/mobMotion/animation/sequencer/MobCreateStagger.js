@@ -110,14 +110,14 @@ const getStaggerSpecial = ({
 
 /**
  * @template T
- * @param { import('./type.js').createSequencerType<T> & import('../utils/stagger/type.js').StaggerPropiertiesObject } data
- * @returns {import('./type.js').createStagger<T>[]} Stagger array
+ * @param { import('./type').CreateSequencerType<T> & import('../utils/stagger/type').StaggerPropiertiesObject } data
+ * @returns {import('./type').CreateStagger<T>[]} Stagger array
  *
  * @example
  * ```javascript
  *
  *
- * const staggers = createStagger({
+ * const staggers = MobCreateStaggers({
  *     items: Array.<Element|Object>,
  *     stagger: {
  *         stagger.type: [ String ],
@@ -146,7 +146,7 @@ const getStaggerSpecial = ({
  *
  * ```
  */
-export const createStaggers = (data) => {
+export const MobCreateStaggers = (data) => {
     // @ts-ignore
     const items = staggerItemsIsValid(data?.items);
     const stagger = getStaggerFromProps(data);

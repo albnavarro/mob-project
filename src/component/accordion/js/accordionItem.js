@@ -1,5 +1,5 @@
 import { motionCore } from '../../../js/mobMotion';
-import { slide } from '../../../js/mobMotion/plugin';
+import { MobSlide } from '../../../js/mobMotion/plugin';
 
 export class AccordionItemClass {
     constructor(data) {
@@ -28,8 +28,8 @@ export class AccordionItemClass {
 
         const targetArray = Array.from(this.target);
         for (const el of targetArray) {
-            slide.subscribe(el);
-            slide.reset(el);
+            MobSlide.subscribe(el);
+            MobSlide.reset(el);
         }
     }
 
@@ -49,8 +49,7 @@ export class AccordionItemClass {
             const targetArray = Array.from(this.target);
             for (const el of targetArray) {
                 if (el !== target) {
-                    slide
-                        .up(el)
+                    MobSlide.up(el)
                         .then(() => {
                             window.dispatchEvent(new Event('resize'));
                         })
@@ -63,8 +62,7 @@ export class AccordionItemClass {
 
         if (!btn.classList.contains('active')) {
             btn.classList.add('active');
-            slide
-                .down(target)
+            MobSlide.down(target)
                 .then(() => {
                     window.dispatchEvent(new Event('resize'));
                     this.dispatch();
@@ -74,8 +72,7 @@ export class AccordionItemClass {
                 });
         } else if (!this.notAllClose && btn.classList.contains('active')) {
             btn.classList.remove('active');
-            slide
-                .up(target)
+            MobSlide.up(target)
                 .then(() => {
                     window.dispatchEvent(new Event('resize'));
                     this.dispatch();

@@ -1,32 +1,32 @@
 import { EaseTypes } from '../tween/type';
 import { StaggerObject } from '../utils/stagger/type';
 import {
-    directionType,
-    directionTypeObjectSequencer,
+    DirectionType,
+    DirectionTypeObjectSequencer,
 } from '../utils/timeline/type';
-import HandleSequencer from './handleSequencer';
+import MobSequencer from './MobSequencer';
 
-export interface sequencerProps {
+export interface SequencerProps {
     data: Record<string, number>;
     duration?: number;
     stagger?: Partial<StaggerObject>;
     ease?: EaseTypes;
 }
 
-export interface sequencerDefault {
+export interface SequencerDefault {
     ease: EaseTypes;
     start: number;
     end: number;
 }
 
-export interface sequencerAction {
+export interface SequencerAction {
     duration?: number;
     ease?: EaseTypes;
     start?: number;
     end?: number;
 }
 
-export interface sequencerValue {
+export interface SequencerValue {
     active: boolean;
     currentValue: number;
     ease: () => void;
@@ -39,97 +39,95 @@ export interface sequencerValue {
 export type PropToFind = 'toValue' | 'fromValue' | '';
 export type PropToFindPartial = 'toValue' | 'fromValue';
 
-export interface sequencerRow {
+export interface SequencerRow {
     start: number;
     end: number;
     priority: number;
-    values: sequencerValue[];
+    values: SequencerValue[];
     propToFind: PropToFind;
 }
 
-export interface createStagger<T> {
+export interface CreateStagger<T> {
     start: number;
     end: number;
     index: number;
     item: T;
 }
 
-export interface labelType {
+export interface LabelType {
     name: string;
     time: number;
 }
 
-export interface addType {
+export interface AddType {
     fn: (arg0: {
-        direction: directionType;
+        direction: DirectionType;
         value: number;
         isForced: boolean;
     }) => void;
     time: number;
 }
 
-export interface masterSequencerItem {
+export interface MasterSequencerItem {
     draw: (arg0: {
         partial: number;
         isLastDraw: boolean;
         useFrame: boolean;
-        direction?: directionType;
+        direction?: DirectionType;
     }) => void;
     inzializeStagger: () => void;
     setDuration: (arg0: number) => void;
     getDuration: () => number;
     setStretchFactor: (arg0: number) => void;
-    getLabels: sequencerGetLabels;
+    getLabels: SequencerGetLabels;
     disableStagger: () => void;
     resetLastValue: () => void;
     cleanCachedId: () => void;
     destroy: () => void;
 }
 
-export interface createSequencerType<T> {
+export interface CreateSequencerType<T> {
     items: T[];
     duration?: number;
 }
 
-export type sequencerSetStretchFacor = (arg0: number) => void;
+export type CequencerSetStretchFacor = (arg0: number) => void;
 
-export type sequencerSetData = (
-    arg0: Record<string, number>
-) => HandleSequencer;
+export type SequencerSetData = (arg0: Record<string, number>) => MobSequencer;
 
-export type sequencerGoTo = (
+export type SequencerGoTo = (
     arg0: Record<string, number | (() => number)>,
-    arg1: sequencerAction
-) => HandleSequencer;
+    arg1: SequencerAction
+) => MobSequencer;
 
-export type sequencerGoFrom = (
+export type SequencerGoFrom = (
     arg0: Record<string, number | (() => number)>,
-    arg1: sequencerAction
-) => HandleSequencer;
+    arg1: SequencerAction
+) => MobSequencer;
 
-export type sequencerGoFromTo = (
+export type SequencerGoFromTo = (
     arg0: Record<string, number | (() => number)>,
     arg1: Record<string, number | (() => number)>,
-    arg2: sequencerAction
-) => HandleSequencer;
+    arg2: SequencerAction
+) => MobSequencer;
 
-export type sequencerLabel = (arg0: string, arg0?: number) => HandleSequencer;
+export type SequencerLabel = (arg0: string, arg0?: number) => MobSequencer;
 
-export type sequencerGetLabels = () => labelType[];
+export type SequencerGetLabels = () => LabelType[];
 
-export type sequencerAdd = (
-    arg0: (arg0: directionTypeObjectSequencer) => void,
+export type SequencerAdd = (
+    arg0: (arg0: DirectionTypeObjectSequencer) => void,
     arg1: number
-) => HandleSequencer;
+) => MobSequencer;
 
-export type sequencerSubscribe = (arg0: (arg0: any) => void) => () => void;
-export type sequencerOnStop = (arg0: (arg0: any) => void) => () => void;
+export type SequencerSubscribe = (arg0: (arg0: any) => void) => () => void;
+export type SequencerOnStop = (arg0: (arg0: any) => void) => () => void;
 
-export type sequencerSubscribeCache = (
+export type SequencerSubscribeCache = (
     item: object | HTMLElement,
     cb: (arg0: Record<string, number>) => void
 ) => () => void;
 
-export type sequencerGetDuration = () => number;
-export type sequencerSetDuration = (arg0: number) => void;
-export type sequencerGetType = () => string;
+export type SequencerGetDuration = () => number;
+export type SequencerSetDuration = (arg0: number) => void;
+export type SequencerGetType = () => string;

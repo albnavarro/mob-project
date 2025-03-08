@@ -1,16 +1,20 @@
 export type OnlyStringKey<T> = Extract<keyof T, string>;
 export type NotValue<T, K> = T extends K ? never : T;
 
-export type storeMap = Map<string, storeMapValue>;
+export type StoreMap = Map<string, StoreMapValue>;
 
-export type validateState = boolean | Record<string, boolean>;
+export type MobStoreValidateState = boolean | Record<string, boolean>;
 
-export interface storeMapValue {
+export interface StoreMapValue {
     callBackWatcher: Map<
         string,
         {
             prop: string;
-            fn: (current: any, previous: any, validate: validateState) => void;
+            fn: (
+                current: any,
+                previous: any,
+                validate: MobStoreValidateState
+            ) => void;
             wait: boolean;
         }
     >;
@@ -31,6 +35,7 @@ export interface storeMapValue {
     skipEqual: Record<string, any>;
     proxiObject?: Record<string, any> | null | undefined;
     bindInstance: string[];
+    bindInstanceBy: string[];
     unsubscribeBindInstance: (() => void)[];
 }
 
@@ -42,18 +47,18 @@ type StoreDefaultMap = Record<string, any>;
 export type MobStore = <T>(arg0: MobStoreParams<T>) => MobStoreReturnType<T>;
 
 export interface MobStoreReturnType<T extends StoreDefaultMap> {
-    getId: getIdType;
-    bindStore: bindStoreType;
-    get: getType<T>;
-    getProp: getPropType<T>;
-    set: setType<T>;
-    update: updateType<T>;
-    quickSetProp: quickSetPropType<T>;
-    watch: watchType<T>;
-    computed: computedType<T>;
-    emit: emitType<T>;
-    emitAsync: emitAsyncType<T>;
-    getProxi: storeProxiType<T>;
+    getId: MobStoregetId;
+    bindStore: BindStore;
+    get: MobStoreGet<T>;
+    getProp: MobStoregetProp<T>;
+    set: MobStoreSet<T>;
+    update: MobStoreUpdate<T>;
+    quickSetProp: MobStorequickSetProp<T>;
+    watch: MobStoreWatch<T>;
+    computed: MobStoreComputed<T>;
+    emit: MobStoreEmit<T>;
+    emitAsync: MobStoreEmitAsync<T>;
+    getProxi: MobStoreStoreProxi<T>;
     getValidation: () => object | undefined;
     debug: () => void;
     debugStore: () => void;
@@ -61,21 +66,21 @@ export interface MobStoreReturnType<T extends StoreDefaultMap> {
     destroy: () => void;
 }
 
-export type bindStoreValueType =
+export type BindStoreValueType =
     | MobStoreReturnType<any>
     | MobStoreReturnType<any>[];
 
-export type bindStoreType = (value: bindStoreValueType) => void;
+export type BindStore = (value: BindStoreValueType) => void;
 
-export type getType<T> = () => T;
+export type MobStoreGet<T> = () => T;
 
-export type getIdType = () => string;
+export type MobStoregetId = () => string;
 
-export type getPropType<T> = <K extends keyof T>(
+export type MobStoregetProp<T> = <K extends keyof T>(
     arg0: Extract<K, string>
 ) => T[K];
 
-export type setType<T> = <K extends keyof T>(
+export type MobStoreSet<T> = <K extends keyof T>(
     prop: Extract<K, string>,
     value: T[K],
     options?: {
@@ -83,7 +88,7 @@ export type setType<T> = <K extends keyof T>(
     }
 ) => void;
 
-export type updateType<T> = <K extends keyof T>(
+export type MobStoreUpdate<T> = <K extends keyof T>(
     prop: Extract<K, string>,
     value: (arg0: T[K]) => T[K],
     options?: {
@@ -92,33 +97,37 @@ export type updateType<T> = <K extends keyof T>(
     }
 ) => void;
 
-export type quickSetPropType<T> = <K extends keyof T>(
+export type MobStorequickSetProp<T> = <K extends keyof T>(
     prop: Extract<K, string>,
     value: T[K]
 ) => void;
 
-export type watchType<T> = <K extends keyof T>(
+export type MobStoreWatch<T> = <K extends keyof T>(
     prop: Extract<K, string>,
-    callback: (current: T[K], previous: T[K], validate: validateState) => void,
+    callback: (
+        current: T[K],
+        previous: T[K],
+        validate: MobStoreValidateState
+    ) => void,
     options?: { wait?: boolean; immediate?: boolean }
 ) => () => void;
 
-export type computedType<T> = <K extends keyof T>(
+export type MobStoreComputed<T> = <K extends keyof T>(
     prop: Extract<K, string>,
     keys: Extract<keyof T, string>[],
     callback: (arg0: T) => T[K],
     options?: { immediate?: boolean }
 ) => void;
 
-export type emitType<T> = (props: Extract<keyof T, string>) => void;
+export type MobStoreEmit<T> = (props: Extract<keyof T, string>) => void;
 
-export type emitAsyncType<T> = (
+export type MobStoreEmitAsync<T> = (
     props: Extract<keyof T, string>
 ) => Promise<{ success: boolean }>;
 
-export type storeProxiType<T> = () => T;
+export type MobStoreStoreProxi<T> = () => T;
 
-export type mobStoreTypeAlias =
+export type MobStoreAlias =
     | 'String'
     | 'Number'
     | 'Object'
@@ -131,7 +140,7 @@ export type mobStoreTypeAlias =
     | 'NodeList'
     | 'Any';
 
-export type MobStoreTypeNative =
+export type MobStoreNative =
     | string
     | number
     | object
@@ -143,14 +152,7 @@ export type MobStoreTypeNative =
     | Set<any>
     | NodeList;
 
-export interface storeSet {
-    prop: string;
-    value: any | ((arg0: any) => any);
-    fireCallback?: boolean;
-    clone?: boolean;
-}
-
-export interface storeSetEntryPoint {
+export interface MobStoreSetEntryPoint {
     instanceId: string;
     prop: string;
     value: any | ((arg0: any) => any);
@@ -159,45 +161,47 @@ export interface storeSetEntryPoint {
     action: 'SET' | 'UPDATE';
 }
 
-export interface storeSetAction extends storeSet {
+export interface storeSetAction {
+    prop: string;
+    value: any | ((arg0: any) => any);
+    fireCallback?: boolean;
+    clone?: boolean;
     instanceId: string;
     useStrict?: boolean;
-    state: storeMapValue;
+    state: StoreMapValue;
     action: 'SET' | 'UPDATE';
 }
 
-export interface storeQuickSetEntryPoint {
+export interface MobStoreQuickSetEntryPoint {
     instanceId: string;
     prop: string;
     value: any | ((arg0: any) => any);
 }
 
-export interface storeWatch {
+export interface MobStoreWatchAction {
     prop: string;
-    callback: (current: any, previous: any, validate: validateState) => void;
+    callback: (
+        current: any,
+        previous: any,
+        validate: MobStoreValidateState
+    ) => void;
     wait: boolean;
+    state: StoreMapValue;
 }
 
-export interface storeWatchAction extends storeWatch {
-    state: storeMapValue;
-}
-
-export interface storeWatchReturnObject {
-    state: storeMapValue | undefined;
+export interface MobStoreWatchReturnObject {
+    state: StoreMapValue | undefined;
     unsubscribeId: string;
 }
 
-export interface storeComputed {
+export interface MobStoreComputedAction {
     prop: string;
     keys: string[];
     fn: (arg0: Record<string, any>) => void;
-}
-
-export interface storeComputedAction extends storeComputed {
     instanceId: string;
 }
 
-export interface callbackQueue {
+export interface MobStoreCallbackQueue {
     callBackWatcher: Map<
         string,
         {
@@ -265,13 +269,10 @@ export type MobStoreFunctionValue<T, K> = () => {
     skipEqual?: boolean;
 };
 
-type MobStoreStateType<T> = {
-    [K in keyof T]:
-        | MobStoreFunctionValue<T, K>
-        | T[K]
-        | MobStoreStateType<T[K]>;
+type MobStoreState<T> = {
+    [K in keyof T]: MobStoreFunctionValue<T, K> | T[K] | MobStoreState<T[K]>;
 };
 
-export type MobStoreParams<T = any> = MobStoreStateType<T>;
+export type MobStoreParams<T = any> = MobStoreState<T>;
 
-export type WatchWaintList = Map<string, Map<string, any>>;
+export type MobStoreWatchWaintList = Map<string, Map<string, any>>;

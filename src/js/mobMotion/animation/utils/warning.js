@@ -1,6 +1,6 @@
 // @ts-check
 
-import { HandleScrollerConstant } from '../scroller/HandleScrollerConstant';
+import { MobScrollerConstant } from '../scroller/MobScrollerConstant';
 import {
     STAGGER_START,
     STAGGER_TYPE_CENTER,
@@ -9,7 +9,7 @@ import {
 } from './stagger/staggerCostant';
 
 /**
- * @param {Array<string>} choice
+ * @param {string[]} choice
  *
  * @returns string
  */
@@ -508,7 +508,7 @@ export const addAsyncFunctionWarining = (value) => {
  */
 export const scrollerDirectionWarining = (value, component) => {
     console.warn(
-        `${component} direction: ${value} is not valid value: must be ${HandleScrollerConstant.DIRECTION_VERTICAL} | ${HandleScrollerConstant.DIRECTION_HORIZONTAL}`
+        `${component} direction: ${value} is not valid value: must be ${MobScrollerConstant.DIRECTION_VERTICAL} | ${MobScrollerConstant.DIRECTION_HORIZONTAL}`
     );
 };
 

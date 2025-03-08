@@ -39,25 +39,25 @@ import { setPropFromAncestor } from './setPropFromAncestor.js';
 import { insertNewRow } from './insertNewRow.js';
 import { mergeNewValues } from './mergeNewValues.js';
 
-export default class HandleSequencer {
+export default class MobSequencer {
     /**
      * Basic array with all the propierties, is created in setData methods
      * in draw methods currentValue and settled will be updated for each prop
      *
      * it is used as a mock to create the array to add to the timeline
-     * @type {import('./type.js').sequencerValue[]}
+     * @type {import('./type.js').SequencerValue[]}
      */
     #values;
 
     /**
      * Timeline array
      *
-     * @type {import('./type.js').sequencerRow[]}
+     * @type {import('./type.js').SequencerRow[]}
      */
     #timeline;
 
     /**
-     * @type {import('./type.js').labelType[]}
+     * @type {import('./type.js').LabelType[]}
      */
     #labels;
 
@@ -77,7 +77,7 @@ export default class HandleSequencer {
     #callbackOnStop;
 
     /**
-     * @type {import('./type.js').addType[]}
+     * @type {import('./type.js').AddType[]}
      */
     #callbackAdd;
 
@@ -97,7 +97,7 @@ export default class HandleSequencer {
     #type;
 
     /**
-     * @type {import('./type.js').sequencerDefault}
+     * @type {import('./type.js').SequencerDefault}
      */
     #defaultProp;
 
@@ -112,7 +112,7 @@ export default class HandleSequencer {
     #forceAddFnAtFirstRun;
 
     /**
-     * @type {import('../utils/timeline/type.js').directionType}
+     * @type {import('../utils/timeline/type.js').DirectionType}
      */
     #direction;
 
@@ -137,11 +137,11 @@ export default class HandleSequencer {
     #staggerIsReady;
 
     /**
-     * @param {import('./type.js').sequencerProps} data
+     * @param {import('./type.js').SequencerProps} data
      *
      * @example
      * ```javascript
-     * const mySequencer = new HandleSequencer({
+     * const mySequencer = new MobSequencer({
      *   data: Object.<string, number>,
      *   duration: [ Number ],
      *   ease: [ String ],
@@ -254,7 +254,7 @@ export default class HandleSequencer {
      * @param {number} obj.partial
      * @param {boolean} obj.isLastDraw
      * @param {boolean} obj.useFrame
-     * @param {import('../utils/timeline/type.js').directionType} [ obj.direction ]
+     * @param {import('../utils/timeline/type.js').DirectionType} [ obj.direction ]
      *
      * @example
      * ```javascript
@@ -297,7 +297,7 @@ export default class HandleSequencer {
      * @param {object} obj
      * @param {number} obj.partial
      * @param {boolean} obj.isLastDraw
-     * @param {import('../utils/timeline/type.js').directionType} [ obj.direction ]
+     * @param {import('../utils/timeline/type.js').DirectionType} [ obj.direction ]
      *
      */
     #onDraw({
@@ -468,7 +468,7 @@ export default class HandleSequencer {
     }
 
     /**
-     * @type {import('./type.js').sequencerSetStretchFacor}
+     * @type {import('./type.js').CequencerSetStretchFacor}
      *
      * @description
      * Set factor between timeline duration and sequencer getDuration
@@ -508,7 +508,7 @@ export default class HandleSequencer {
     }
 
     /**
-     * @type {import('./type.js').sequencerSetData}
+     * @type {import('./type.js').SequencerSetData}
      */
     setData(obj = {}) {
         this.#values = Object.entries(obj).map((item) => {
@@ -537,7 +537,7 @@ export default class HandleSequencer {
     }
 
     /**
-     * @type {import('./type.js').sequencerGoTo}
+     * @type {import('./type.js').SequencerGoTo}
      *
      * @example
      * ```javascript
@@ -587,7 +587,7 @@ export default class HandleSequencer {
     }
 
     /**
-     * @type {import('./type.js').sequencerGoFrom} obj  to values
+     * @type {import('./type.js').SequencerGoFrom} obj  to values
      *
      * @example
      * ```javascript
@@ -637,7 +637,7 @@ export default class HandleSequencer {
     }
 
     /**
-     * @type {import('./type.js').sequencerGoFromTo}
+     * @type {import('./type.js').SequencerGoFromTo}
      *
      * @example
      * ```javascript
@@ -685,7 +685,7 @@ export default class HandleSequencer {
     }
 
     /**
-     * @type {import('./type.js').sequencerLabel}
+     * @type {import('./type.js').SequencerLabel}
      *
      * @example
      * ```javascript
@@ -704,14 +704,14 @@ export default class HandleSequencer {
 
     /**
      * Return the array of entered labels
-     * @type {import('./type.js').sequencerGetLabels}
+     * @type {import('./type.js').SequencerGetLabels}
      */
     getLabels() {
         return this.#labels;
     }
 
     /**
-     * @type {import('./type.js').sequencerAdd}
+     * @type {import('./type.js').SequencerAdd}
      *
      * @description
      * Fire a function at a step in a range greater the 0 and minor duration.
@@ -734,7 +734,7 @@ export default class HandleSequencer {
     }
 
     /**
-     * @type {import('./type.js').sequencerSubscribe}
+     * @type {import('./type.js').SequencerSubscribe}
      *
      * @description
      * Callback that returns updated values ready to be usable, it is advisable to use it for single elements, although it works well on a not too large number of elements (approximately 100-200 elements) for large staggers it is advisable to use the subscribeCache method.
@@ -750,7 +750,7 @@ export default class HandleSequencer {
     }
 
     /**
-     * @type {import('./type.js').sequencerOnStop}
+     * @type {import('./type.js').SequencerOnStop}
      *
      * @description
      *  Similar to subscribe this callBack is launched when the data calculation stops (when the timeline ends or the scroll trigger is inactive).
@@ -769,7 +769,7 @@ export default class HandleSequencer {
     }
 
     /**
-     * @type {import('./type.js').sequencerSubscribeCache}
+     * @type {import('./type.js').SequencerSubscribeCache}
      *
      * @description
      * Callback that returns updated values ready to be usable, specific to manage large staggers.
@@ -791,7 +791,7 @@ export default class HandleSequencer {
     /**
      * @description
      * Get duration
-     * @type {import('./type.js').sequencerGetDuration}
+     * @type {import('./type.js').SequencerGetDuration}
      */
     getDuration() {
         return this.#duration;
@@ -800,14 +800,14 @@ export default class HandleSequencer {
     /**
      * @description
      * Set duration
-     * @type {import('./type.js').sequencerSetDuration}
+     * @type {import('./type.js').SequencerSetDuration}
      */
     setDuration(val = 0) {
         this.#duration = val;
     }
 
     /**
-     * @type {import('./type.js').sequencerGetType}
+     * @type {import('./type.js').SequencerGetType}
      * @description
      * Get tween type - 'sequencer'
      */

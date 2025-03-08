@@ -8,7 +8,7 @@ import {
     exactMatchInsensitive,
     exactMatchInsesitivePropArray,
 } from '../utils/regexValidation.js';
-import { HandleScrollerConstant } from './HandleScrollerConstant.js';
+import { MobScrollerConstant } from './MobScrollerConstant.js';
 import {
     scrollerWarningNoUnitMiusure,
     scrollerWarningVhIsNotAllowed,
@@ -151,8 +151,8 @@ export const getStartEndValue = (values, direction) => {
     // Number in vh is not allowed in horizontal mode
     if (
         numberInString &&
-        unitMisure === HandleScrollerConstant.VH &&
-        direction === HandleScrollerConstant.DIRECTION_HORIZONTAL
+        unitMisure === MobScrollerConstant.VH &&
+        direction === MobScrollerConstant.DIRECTION_HORIZONTAL
     ) {
         scrollerWarningVhIsNotAllowed();
         return returnWhenFail();
@@ -161,8 +161,8 @@ export const getStartEndValue = (values, direction) => {
     // Number in vw is not allowed in vertical mode
     if (
         numberInString &&
-        unitMisure === HandleScrollerConstant.VW &&
-        direction === HandleScrollerConstant.DIRECTION_VERTICAL
+        unitMisure === MobScrollerConstant.VW &&
+        direction === MobScrollerConstant.DIRECTION_VERTICAL
     ) {
         scrollerWarningVwIsNotAllowed();
         return returnWhenFail();
@@ -170,14 +170,14 @@ export const getStartEndValue = (values, direction) => {
 
     // Get aditonal value +height +halfHeight -height -etc... if exist
     const additionaChoice = [
-        HandleScrollerConstant.PLUS_HEIGHT,
-        HandleScrollerConstant.PLUS_HEIGHT_HALF,
-        HandleScrollerConstant.PLUS_WIDTH,
-        HandleScrollerConstant.PLUS_WIDTH_HALF,
-        HandleScrollerConstant.MINUS_HEIGHT,
-        HandleScrollerConstant.MINUS_HEIGHT_HALF,
-        HandleScrollerConstant.MINUS_WIDTH,
-        HandleScrollerConstant.MINUS_WIDTH_HALF,
+        MobScrollerConstant.PLUS_HEIGHT,
+        MobScrollerConstant.PLUS_HEIGHT_HALF,
+        MobScrollerConstant.PLUS_WIDTH,
+        MobScrollerConstant.PLUS_WIDTH_HALF,
+        MobScrollerConstant.MINUS_HEIGHT,
+        MobScrollerConstant.MINUS_HEIGHT_HALF,
+        MobScrollerConstant.MINUS_WIDTH,
+        MobScrollerConstant.MINUS_WIDTH_HALF,
     ];
     const getAdditionalVal = values.find((item) => {
         return exactMatchInsesitivePropArray(additionaChoice, item);
@@ -185,10 +185,10 @@ export const getStartEndValue = (values, direction) => {
 
     // Get position top || bottom || left || right
     const positionMap = [
-        HandleScrollerConstant.POSITION_BOTTOM,
-        HandleScrollerConstant.POSITION_TOP,
-        HandleScrollerConstant.POSITION_LEFT,
-        HandleScrollerConstant.POSITION_RIGHT,
+        MobScrollerConstant.POSITION_BOTTOM,
+        MobScrollerConstant.POSITION_TOP,
+        MobScrollerConstant.POSITION_LEFT,
+        MobScrollerConstant.POSITION_RIGHT,
     ];
     const getPosition = values.find((item) => {
         return exactMatchInsesitivePropArray(positionMap, item);
@@ -198,7 +198,7 @@ export const getStartEndValue = (values, direction) => {
         numberVal: numberInString || 0,
         unitMisure,
         additionalVal: getAdditionalVal ?? '',
-        position: getPosition ?? HandleScrollerConstant.POSITION_BOTTOM,
+        position: getPosition ?? MobScrollerConstant.POSITION_BOTTOM,
     };
 };
 
@@ -246,7 +246,7 @@ export const getStartPoint = (screenUnit, data, direction) => {
     /**
      * Get final value without height/halfHeight etc..
      */
-    return unitMisure === HandleScrollerConstant.PX
+    return unitMisure === MobScrollerConstant.PX
         ? {
               value: startValInNumber * isNegative,
               additionalVal,
@@ -319,13 +319,13 @@ export const getEndPoint = (
      * Check direction
      */
     const isFromTopLeft =
-        positionFromConstant === HandleScrollerConstant.POSITION_TOP ||
-        positionFromConstant === HandleScrollerConstant.POSITION_LEFT;
+        positionFromConstant === MobScrollerConstant.POSITION_TOP ||
+        positionFromConstant === MobScrollerConstant.POSITION_LEFT;
 
     /**
      * Get final value without height/halfHeight etc..
      */
-    return unitMisure === HandleScrollerConstant.PX
+    return unitMisure === MobScrollerConstant.PX
         ? {
               value: invertSide
                   ? getValueInPx({
@@ -385,36 +385,36 @@ export const processFixedLimit = (value, stringValue, height, width) => {
     const str = String(stringValue);
 
     // plus
-    if (exactMatchInsensitive(str, HandleScrollerConstant.PLUS_HEIGHT_HALF)) {
+    if (exactMatchInsensitive(str, MobScrollerConstant.PLUS_HEIGHT_HALF)) {
         return value + height / 2;
     }
 
-    if (exactMatchInsensitive(str, HandleScrollerConstant.PLUS_HEIGHT)) {
+    if (exactMatchInsensitive(str, MobScrollerConstant.PLUS_HEIGHT)) {
         return value + height;
     }
 
-    if (exactMatchInsensitive(str, HandleScrollerConstant.PLUS_WIDTH_HALF)) {
+    if (exactMatchInsensitive(str, MobScrollerConstant.PLUS_WIDTH_HALF)) {
         return value + width / 2;
     }
 
-    if (exactMatchInsensitive(str, HandleScrollerConstant.PLUS_WIDTH)) {
+    if (exactMatchInsensitive(str, MobScrollerConstant.PLUS_WIDTH)) {
         return value + width;
     }
 
     // minus
-    if (exactMatchInsensitive(str, HandleScrollerConstant.MINUS_HEIGHT_HALF)) {
+    if (exactMatchInsensitive(str, MobScrollerConstant.MINUS_HEIGHT_HALF)) {
         return value - height / 2;
     }
 
-    if (exactMatchInsensitive(str, HandleScrollerConstant.MINUS_HEIGHT)) {
+    if (exactMatchInsensitive(str, MobScrollerConstant.MINUS_HEIGHT)) {
         return value - height;
     }
 
-    if (exactMatchInsensitive(str, HandleScrollerConstant.MINUS_WIDTH_HALF)) {
+    if (exactMatchInsensitive(str, MobScrollerConstant.MINUS_WIDTH_HALF)) {
         return value - width / 2;
     }
 
-    if (exactMatchInsensitive(str, HandleScrollerConstant.MINUS_WIDTH)) {
+    if (exactMatchInsensitive(str, MobScrollerConstant.MINUS_WIDTH)) {
         return value - width;
     }
 
@@ -432,25 +432,25 @@ export const processFixedLimit = (value, stringValue, height, width) => {
  */
 export const getValueOnSwitch = ({ switchPropierties, isReverse, value }) => {
     switch (switchPropierties) {
-        case HandleScrollerConstant.IN_STOP: {
+        case MobScrollerConstant.IN_STOP: {
             return (!isReverse && value > 0) || (isReverse && value < 0)
                 ? 0
                 : value;
         }
 
-        case HandleScrollerConstant.IN_BACK: {
+        case MobScrollerConstant.IN_BACK: {
             return (!isReverse && value > 0) || (isReverse && value < 0)
                 ? -value
                 : value;
         }
 
-        case HandleScrollerConstant.OUT_STOP: {
+        case MobScrollerConstant.OUT_STOP: {
             return (!isReverse && value < 0) || (isReverse && value > 0)
                 ? 0
                 : value;
         }
 
-        case HandleScrollerConstant.OUT_BACK: {
+        case MobScrollerConstant.OUT_BACK: {
             return (!isReverse && value < 0) || (isReverse && value > 0)
                 ? -value
                 : value;
@@ -471,7 +471,7 @@ export const getValueOnSwitch = ({ switchPropierties, isReverse, value }) => {
  */
 export const getRetReverseValue = (propierties, val) => {
     switch (propierties) {
-        case HandleScrollerConstant.PROP_OPACITY: {
+        case MobScrollerConstant.PROP_OPACITY: {
             return 1 - val;
         }
 

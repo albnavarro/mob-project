@@ -1,4 +1,4 @@
-import { SmoothScroller } from '../mobMotion/plugin';
+import { MobSmoothScroller } from '../mobMotion/plugin';
 import { scroller, tween, motionCore } from '../mobMotion';
 
 export const hScroller = () => {
@@ -195,7 +195,7 @@ export const hScroller = () => {
      *
      */
     const inputRange = document.querySelector('.scrollerInput');
-    const smoothScrollFull = new SmoothScroller({
+    const smoothScrollFull = new MobSmoothScroller({
         scopedEvent: true,
         scroller: '.scrollerH',
         direction: 'horizontal',
@@ -260,7 +260,7 @@ export const hScroller = () => {
     /**
      *
      */
-    const smoothScrollContiner = new SmoothScroller({
+    const smoothScrollContiner = new MobSmoothScroller({
         scroller: '.scrollerH2',
         screen: '.scrollerH-container2',
         direction: 'horizontal',
@@ -321,7 +321,7 @@ export const hScroller = () => {
     /**
      *
      */
-    const smoothScrollContiner2 = new SmoothScroller({
+    const smoothScrollContiner2 = new MobSmoothScroller({
         scroller: '.scrollerH3',
         screen: '.scrollerH-container3',
         direction: 'vertical',

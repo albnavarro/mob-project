@@ -1,4 +1,4 @@
-export interface MouseParallax {
+export interface MobMouseParallax {
     item: HTMLElement;
     centerToViewoport?: boolean;
     rangeX?: number;

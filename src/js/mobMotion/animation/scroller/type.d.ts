@@ -2,19 +2,19 @@ import { MqAction, MqValues } from '../../utils/type';
 import { SpringChoiceConfig } from '../spring/type';
 import { EaseTypes } from '../tween/type';
 import { StaggerObject } from '../utils/stagger/type';
-import HandleScrollerTween from './HandleTweenTween';
+import MobScrollerTween from './MobScrollerTween';
 
-export interface DynamicStartType {
+export interface DynamicStart {
     position: 'bottom' | 'top' | 'left' | 'right';
     value: () => number;
 }
 
-export interface DynamicEndType {
+export interface DynamicEnd {
     position: 'bottom' | 'top' | 'left' | 'right';
     value: () => number;
 }
 
-export interface HandleScrollerCommonType {
+export interface MobScrollerCommon {
     type?: 'parallax' | 'scrolltrigger';
 
     /**
@@ -35,7 +35,7 @@ export interface HandleScrollerCommonType {
 
     /**
      * @description
-     * Instance of ParallaxTween | HandleSequencer
+     * Instance of MobScrollerTween | MobSequncer
      */
     tween?: object;
 
@@ -135,7 +135,7 @@ export interface HandleScrollerCommonType {
     /**
      * @description
      * Defines the applied property, you can apply a custom css property ( ex: 'margin-left' ).
-     * if you choose 'tween' you will need to specify a HandleSequencer or ParallaxTween instance in the tween property.
+     * if you choose 'tween' you will need to specify a MobSequncer or MobScrollerTween instance in the tween property.
      * The default value is 'x'.
      */
     propierties?:
@@ -175,7 +175,7 @@ export interface HandleScrollerCommonType {
     invertSide?: boolean;
 }
 
-export interface ParallaxType {
+export interface Parallax {
     /**
      * @description
      *  Defines when the calculation reaches the value 0 ( neutral position ).
@@ -235,7 +235,7 @@ export interface ParallaxType {
     limiterOff?: boolean;
 }
 
-export interface ScrollTriggerType {
+export interface ScrollTrigger {
     /**
      * @description
      * Activate the pin.
@@ -333,7 +333,7 @@ export interface ScrollTriggerType {
      * the resulting value of the function will be calculated starting from the specified position towards the center of the viewport.
      * if the property is used it will take precedence over start.
      */
-    dynamicStart?: DynamicStartType;
+    dynamicStart?: DynamicStart;
 
     /**
      * @description
@@ -341,7 +341,7 @@ export interface ScrollTriggerType {
      * The resulting value of the function will be calculated starting from the specified position towards the center of the viewport.
      * If the property is used it will take precedence over end.
      */
-    dynamicEnd?: DynamicEndType;
+    dynamicEnd?: DynamicEnd;
 
     /**
      * @description
@@ -384,15 +384,15 @@ export interface ScrollTriggerType {
      * Function that is launched at each tick.
      * The function will have the current value as input parameter.
      */
-    onTick?: (arg0: HandleScrollerMoveType) => void;
+    onTick?: (arg0: MobScrollerMove) => void;
 }
 
-export interface HandleScrollerMoveType {
+export interface MobScrollerMove {
     value: number | undefined;
     parentIsMoving: boolean;
 }
 
-export interface HandleScrollerTweenType {
+export interface MobScrollerTween {
     from: Record<string, number>;
     to: Record<string, number>;
     stagger?: Partial<StaggerObject>;
@@ -400,7 +400,7 @@ export interface HandleScrollerTweenType {
     duration?: number;
 }
 
-export interface HandleScrollerTweenValue {
+export interface MobScrollerTweenValue {
     currentValue: number | (() => number);
     prop: string;
     settled: boolean;
@@ -413,26 +413,26 @@ export interface HandleScrollerTweenValue {
     fromValue: number;
 }
 
-export type HandleScrollerTweenSetData = (
+export type MobScrollerTweenSetData = (
     arg0: Record<string, number>
-) => HandleScrollerTween;
+) => MobScrollerTween;
 
-export type HandleScrollerTweenGoTo = (
+export type MobScrollerTweenGoTo = (
     arg0: Record<string, number | (() => number)>
-) => HandleScrollerTween;
+) => MobScrollerTween;
 
-export type HandleScrollerTweenSubscribe = (arg0: (any) => void) => () => void;
-export type HandleScrollerTweenOnStop = (arg0: (any) => void) => () => void;
+export type MobScrollerTweenSubscribe = (arg0: (any) => void) => () => void;
+export type MobScrollerTweenOnStop = (arg0: (any) => void) => () => void;
 
-export type HandleScrollerTweenSubscribeCache = (
+export type MobScrollerTweenSubscribeCache = (
     item: object | HTMLElement,
     cb: (arg0: Record<string, number>) => void
 ) => () => void;
 
-export type HandleScrollerTweenGetDuration = () => number;
-export type HandleScrollerTweenGetType = () => string;
+export type MobScrollerTweenGetDuration = () => number;
+export type MobScrollerTweenGet = () => string;
 
-export interface HandleScrollerMotion {
+export interface MobScrollerMotion {
     stop: () => void;
     setData: (arg0: any) => void;
     goTo: (arg0: any, ar1: any) => Promise<any>;

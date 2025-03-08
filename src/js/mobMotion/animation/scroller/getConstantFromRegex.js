@@ -1,6 +1,6 @@
 // @ts-check
 
-import { HandleScrollerConstant } from './HandleScrollerConstant';
+import { MobScrollerConstant } from './MobScrollerConstant';
 import {
     exactMatchInsensitive,
     exactMatchInsesitiveNumberProp,
@@ -20,35 +20,35 @@ export const getPropiertiesValueFromConstant = (value) => {
      */
     if (!value) return value;
 
-    if (exactMatchInsensitive(value, HandleScrollerConstant.PROP_VERTICAL))
-        return HandleScrollerConstant.PROP_VERTICAL;
+    if (exactMatchInsensitive(value, MobScrollerConstant.PROP_VERTICAL))
+        return MobScrollerConstant.PROP_VERTICAL;
 
-    if (exactMatchInsensitive(value, HandleScrollerConstant.PROP_HORIZONTAL))
-        return HandleScrollerConstant.PROP_HORIZONTAL;
+    if (exactMatchInsensitive(value, MobScrollerConstant.PROP_HORIZONTAL))
+        return MobScrollerConstant.PROP_HORIZONTAL;
 
-    if (exactMatchInsensitive(value, HandleScrollerConstant.PROP_ROTATE))
-        return HandleScrollerConstant.PROP_ROTATE;
+    if (exactMatchInsensitive(value, MobScrollerConstant.PROP_ROTATE))
+        return MobScrollerConstant.PROP_ROTATE;
 
-    if (exactMatchInsensitive(value, HandleScrollerConstant.PROP_ROTATEY))
-        return HandleScrollerConstant.PROP_ROTATEY;
+    if (exactMatchInsensitive(value, MobScrollerConstant.PROP_ROTATEY))
+        return MobScrollerConstant.PROP_ROTATEY;
 
-    if (exactMatchInsensitive(value, HandleScrollerConstant.PROP_ROTATEX))
-        return HandleScrollerConstant.PROP_ROTATEX;
+    if (exactMatchInsensitive(value, MobScrollerConstant.PROP_ROTATEX))
+        return MobScrollerConstant.PROP_ROTATEX;
 
-    if (exactMatchInsensitive(value, HandleScrollerConstant.PROP_OPACITY))
-        return HandleScrollerConstant.PROP_OPACITY;
+    if (exactMatchInsensitive(value, MobScrollerConstant.PROP_OPACITY))
+        return MobScrollerConstant.PROP_OPACITY;
 
-    if (exactMatchInsensitive(value, HandleScrollerConstant.PROP_SCALE))
-        return HandleScrollerConstant.PROP_SCALE;
+    if (exactMatchInsensitive(value, MobScrollerConstant.PROP_SCALE))
+        return MobScrollerConstant.PROP_SCALE;
 
-    if (exactMatchInsensitive(value, HandleScrollerConstant.PROP_SCALE_X))
-        return HandleScrollerConstant.PROP_SCALE_X;
+    if (exactMatchInsensitive(value, MobScrollerConstant.PROP_SCALE_X))
+        return MobScrollerConstant.PROP_SCALE_X;
 
-    if (exactMatchInsensitive(value, HandleScrollerConstant.PROP_SCALE_Y))
-        return HandleScrollerConstant.PROP_SCALE_Y;
+    if (exactMatchInsensitive(value, MobScrollerConstant.PROP_SCALE_Y))
+        return MobScrollerConstant.PROP_SCALE_Y;
 
-    if (exactMatchInsensitive(value, HandleScrollerConstant.PROP_TWEEN))
-        return HandleScrollerConstant.PROP_TWEEN;
+    if (exactMatchInsensitive(value, MobScrollerConstant.PROP_TWEEN))
+        return MobScrollerConstant.PROP_TWEEN;
 
     return value;
 };
@@ -62,14 +62,14 @@ export const getPropiertiesValueFromConstant = (value) => {
  */
 export const getStartEndUnitMisure = (pattern) => {
     if (pattern) {
-        if (exactMatchInsesitiveNumberProp(pattern, HandleScrollerConstant.PX))
-            return HandleScrollerConstant.PX;
+        if (exactMatchInsesitiveNumberProp(pattern, MobScrollerConstant.PX))
+            return MobScrollerConstant.PX;
 
-        if (exactMatchInsesitiveNumberProp(pattern, HandleScrollerConstant.VH))
-            return HandleScrollerConstant.VH;
+        if (exactMatchInsesitiveNumberProp(pattern, MobScrollerConstant.VH))
+            return MobScrollerConstant.VH;
 
-        if (exactMatchInsesitiveNumberProp(pattern, HandleScrollerConstant.VW))
-            return HandleScrollerConstant.VW;
+        if (exactMatchInsesitiveNumberProp(pattern, MobScrollerConstant.VW))
+            return MobScrollerConstant.VW;
     }
 
     return '';
@@ -83,17 +83,17 @@ export const getStartEndUnitMisure = (pattern) => {
  * @returns string
  */
 export const getScrollerPositionFromContanst = (position) => {
-    if (exactMatchInsensitive(position, HandleScrollerConstant.POSITION_TOP))
-        return HandleScrollerConstant.POSITION_TOP;
+    if (exactMatchInsensitive(position, MobScrollerConstant.POSITION_TOP))
+        return MobScrollerConstant.POSITION_TOP;
 
-    if (exactMatchInsensitive(position, HandleScrollerConstant.POSITION_BOTTOM))
-        return HandleScrollerConstant.POSITION_BOTTOM;
+    if (exactMatchInsensitive(position, MobScrollerConstant.POSITION_BOTTOM))
+        return MobScrollerConstant.POSITION_BOTTOM;
 
-    if (exactMatchInsensitive(position, HandleScrollerConstant.POSITION_LEFT))
-        return HandleScrollerConstant.POSITION_LEFT;
+    if (exactMatchInsensitive(position, MobScrollerConstant.POSITION_LEFT))
+        return MobScrollerConstant.POSITION_LEFT;
 
-    if (exactMatchInsensitive(position, HandleScrollerConstant.POSITION_RIGHT))
-        return HandleScrollerConstant.POSITION_RIGHT;
+    if (exactMatchInsensitive(position, MobScrollerConstant.POSITION_RIGHT))
+        return MobScrollerConstant.POSITION_RIGHT;
 
     return '';
 };
@@ -106,18 +106,18 @@ export const getScrollerPositionFromContanst = (position) => {
  * @returns string
  */
 export const getRangeUnitMisure = (string) => {
-    if (exactMatchInsesitiveNumberProp(string, HandleScrollerConstant.PX))
-        return HandleScrollerConstant.PX;
-    if (exactMatchInsesitiveNumberProp(string, HandleScrollerConstant.VH))
-        return HandleScrollerConstant.VH;
-    if (exactMatchInsesitiveNumberProp(string, HandleScrollerConstant.VW))
-        return HandleScrollerConstant.VW;
-    if (exactMatchInsesitiveNumberProp(string, HandleScrollerConstant.WPERCENT))
-        return HandleScrollerConstant.WPERCENT;
-    if (exactMatchInsesitiveNumberProp(string, HandleScrollerConstant.HPERCENT))
-        return HandleScrollerConstant.HPERCENT;
-    if (exactMatchInsesitiveNumberProp(string, HandleScrollerConstant.DEGREE))
-        return HandleScrollerConstant.DEGREE;
+    if (exactMatchInsesitiveNumberProp(string, MobScrollerConstant.PX))
+        return MobScrollerConstant.PX;
+    if (exactMatchInsesitiveNumberProp(string, MobScrollerConstant.VH))
+        return MobScrollerConstant.VH;
+    if (exactMatchInsesitiveNumberProp(string, MobScrollerConstant.VW))
+        return MobScrollerConstant.VW;
+    if (exactMatchInsesitiveNumberProp(string, MobScrollerConstant.WPERCENT))
+        return MobScrollerConstant.WPERCENT;
+    if (exactMatchInsesitiveNumberProp(string, MobScrollerConstant.HPERCENT))
+        return MobScrollerConstant.HPERCENT;
+    if (exactMatchInsesitiveNumberProp(string, MobScrollerConstant.DEGREE))
+        return MobScrollerConstant.DEGREE;
 
-    return HandleScrollerConstant.PX;
+    return MobScrollerConstant.PX;
 };

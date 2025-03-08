@@ -1,6 +1,6 @@
 import { mobCore } from '../mobCore';
 import { scroller } from '../mobMotion';
-import { HorizontalScroller } from '../mobMotion/plugin';
+import { MobHorizontalScroller } from '../mobMotion/plugin';
 
 const createScroller = ({ bottomScroller }) => {
     const title = document.querySelector('.js-scroll-item');
@@ -61,7 +61,7 @@ const createScroller = ({ bottomScroller }) => {
         });
     });
 
-    const horizontalCustom = new HorizontalScroller({
+    const horizontalCustom = new MobHorizontalScroller({
         root: '.test-custom-scroller',
         container: '.scroller',
         row: '.scroller__row',
@@ -119,7 +119,7 @@ const createScroller = ({ bottomScroller }) => {
 };
 
 export const noGsap = () => {
-    const horizontalCustom2 = new HorizontalScroller({
+    const horizontalCustom2 = new MobHorizontalScroller({
         root: '.test-custom-scroller2',
         container: '.scroller',
         row: '.scroller__row2',

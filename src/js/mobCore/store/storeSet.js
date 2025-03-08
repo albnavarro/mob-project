@@ -31,12 +31,12 @@ import {
 /**
  * @param {Object} param
  * @param {string} param.instanceId
- * @param {import("./type").storeMapValue} param.state
+ * @param {import("./type").StoreMapValue} param.state
  * @param {string} param.prop
  * @param {any} param.val
  * @param {boolean} param.fireCallback
  * @param {boolean} param.useStrict
- * @returns {import("./type").storeMapValue|undefined}
+ * @returns {import("./type").StoreMapValue|undefined}
  */
 const setProp = ({
     instanceId,
@@ -55,6 +55,7 @@ const setProp = ({
         validationStatusObject,
         skipEqual,
         callBackWatcher,
+        bindInstanceBy,
     } = state;
     const logStyle = getLogStyle();
 
@@ -140,6 +141,9 @@ const setProp = ({
         });
 
         addToComputedWaitLsit({ instanceId, prop });
+        bindInstanceBy.forEach((id) => {
+            addToComputedWaitLsit({ instanceId: id, prop });
+        });
     }
 
     return {
@@ -152,12 +156,12 @@ const setProp = ({
 /**
  * @param {Object} param
  * @param {string} param.instanceId
- * @param {import("./type").storeMapValue} param.state
+ * @param {import("./type").StoreMapValue} param.state
  * @param {string} param.prop
  * @param {any} param.val
  * @param {boolean} param.fireCallback
  * @param {boolean} param.useStrict
- * @returns {import("./type").storeMapValue|undefined}
+ * @returns {import("./type").StoreMapValue|undefined}
  */
 const setObj = ({
     instanceId,
@@ -176,6 +180,7 @@ const setObj = ({
         validationStatusObject,
         skipEqual,
         callBackWatcher,
+        bindInstanceBy,
     } = state;
     const logStyle = getLogStyle();
 
@@ -368,6 +373,9 @@ const setObj = ({
         });
 
         addToComputedWaitLsit({ instanceId, prop });
+        bindInstanceBy.forEach((id) => {
+            addToComputedWaitLsit({ instanceId: id, prop });
+        });
     }
 
     return {
@@ -379,7 +387,7 @@ const setObj = ({
 
 /**
  * @param {import("./type").storeSetAction} params
- * @returns {import("./type").storeMapValue|undefined}
+ * @returns {import("./type").StoreMapValue|undefined}
  */
 export const storeSetAction = ({
     instanceId,
@@ -443,7 +451,7 @@ export const storeSetAction = ({
 };
 
 /**
- * @param {import('./type').storeSetEntryPoint} param
+ * @param {import('./type').MobStoreSetEntryPoint} param
  * @returns {void}
  */
 export const storeSetEntryPoint = ({
@@ -472,7 +480,7 @@ export const storeSetEntryPoint = ({
 };
 
 /**
- * @param {import('./type').storeQuickSetEntryPoint} param
+ * @param {import('./type').MobStoreQuickSetEntryPoint} param
  * @returns {void}
  */
 export const storeQuickSetEntrypoint = ({ instanceId, prop, value }) => {
@@ -510,6 +518,22 @@ export const storeQuickSetEntrypoint = ({ instanceId, prop, value }) => {
  */
 
 /**
+ * @param {object} params
+ * @param {Record<string, any>} params.store
+ * @param {string[]} params.bindInstance
+ * @returns {Record<string, any>}
+ */
+const mergeStoreFromBindInstance = ({ store, bindInstance }) => {
+    return bindInstance.reduce((previous, current) => {
+        const currentState = getStateFromMainMap(current);
+        if (!currentState) return previous;
+        const { store: currentStore } = currentState;
+
+        return { ...previous, ...currentStore };
+    }, store);
+};
+
+/**
  * @param {string} instanceId
  */
 const fireComputed = (instanceId) => {
@@ -519,7 +543,8 @@ const fireComputed = (instanceId) => {
     const state = getStateFromMainMap(instanceId);
     if (!state) return;
 
-    const { computedPropsQueque, callBackComputed, store } = state;
+    const { computedPropsQueque, callBackComputed, store, bindInstance } =
+        state;
 
     /**
      * Filter computed callback that has some prop changed as dependencies.
@@ -533,6 +558,11 @@ const fireComputed = (instanceId) => {
     );
 
     /**
+     * Merge current store with bindInstance.
+     */
+    const storeMerged = mergeStoreFromBindInstance({ store, bindInstance });
+
+    /**
      * Loop and fire computed with changed value
      */
     const computedValues = computedFiltered.map(({ prop, keys, fn }) => {
@@ -541,7 +571,7 @@ const fireComputed = (instanceId) => {
          */
         const valuesToObject = keys
             .map((item) => {
-                return { [item]: store[item] };
+                return { [item]: storeMerged[item] };
             })
             .reduce((previous, current) => {
                 return { ...previous, ...current };
@@ -608,7 +638,7 @@ export const addToComputedWaitLsit = ({ instanceId, prop }) => {
 };
 
 /**
- * @param {import("./type").storeComputedAction} params
+ * @param {import("./type").MobStoreComputedAction} params
  * @returns {void}
  */
 export const storeComputedAction = ({ instanceId, prop, keys, fn }) => {
@@ -665,14 +695,19 @@ export const initializeCompuntedProp = ({
     const state = getStateFromMainMap(instanceId);
     if (!state) return;
 
-    const { store } = state;
+    const { store, bindInstance } = state;
+
+    /**
+     * Merge current store with bindInstance.
+     */
+    const storeMerged = mergeStoreFromBindInstance({ store, bindInstance });
 
     /**
      * Create onject with values for computed function.
      */
     const valuesObject = keys
         .map((key) => {
-            if (key in store) return { [key]: store[key] };
+            if (key in storeMerged) return { [key]: storeMerged[key] };
             return;
         })
         .filter((item) => item !== undefined)
