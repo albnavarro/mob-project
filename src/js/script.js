@@ -69,11 +69,11 @@ import { testCanvas } from './test/testCanvas.js';
 import { freeMode } from './test/freemode.js';
 import { mouseParallaxTest } from './test/mouseParallaxTest.js';
 import { timlineReverseImmediateTest } from './test/timlineReverseImmediateTest.js';
-import { mobCore } from './mobCore/index.js';
-import { motionCore } from './mobMotion/core.js';
+import { MobCore } from './mobCore/index.js';
+import { MobMotionCore } from './mobMotion/core.js';
 
-mobCore.useLoad(() => {
-    motionCore.setDefault({
+MobCore.useLoad(() => {
+    MobMotionCore.setDefault({
         deferredNextTick: true,
         // fpsScalePercent: { 0: 1, 30: 2, 50: 3 },
         useScaleFps: true,
@@ -94,7 +94,7 @@ mobCore.useLoad(() => {
         },
     });
 
-    motionCore.printDefault();
+    MobMotionCore.printDefault();
 
     // motionCore.useFps(({ averageFPS }) => {
     //     console.log('fps ready at:', averageFPS);
@@ -203,7 +203,7 @@ mobCore.useLoad(() => {
     });
 
     if (body.classList.contains('page-index')) {
-        motionCore.setDefault({
+        MobMotionCore.setDefault({
             usePassive: false,
         });
         indexParallax();
@@ -257,10 +257,10 @@ mobCore.useLoad(() => {
     }
 
     if (body.classList.contains('template-scrollerH')) {
-        motionCore.setDefault({
+        MobMotionCore.setDefault({
             usePassive: false,
         });
-        motionCore.printDefault();
+        MobMotionCore.printDefault();
         hScroller();
     }
 

@@ -1,4 +1,4 @@
-import { timeline, tween } from '../mobMotion';
+import { MobTimeline, MobTween } from '../mobMotion';
 
 export const sinAnimation = () => {
     const stagger = document.querySelectorAll('.sin .shape__target');
@@ -7,7 +7,7 @@ export const sinAnimation = () => {
     const pause = document.querySelector('.sin .anim-pause');
     const resume = document.querySelector('.sin .anim-resume');
 
-    const tween1 = tween.createTween({
+    const tween1 = MobTween.createTimeTween({
         ease: 'easeInOutQuad',
         stagger: { each: 3 },
         data: { x: 0 },
@@ -26,7 +26,10 @@ export const sinAnimation = () => {
         });
     });
 
-    const timeline1 = timeline.createAsyncTimeline({ repeat: -1, yoyo: true });
+    const timeline1 = MobTimeline.createAsyncTimeline({
+        repeat: -1,
+        yoyo: true,
+    });
     timeline1.goFromTo(
         tween1,
         { x: 0 },

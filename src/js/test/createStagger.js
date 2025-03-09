@@ -1,14 +1,14 @@
 import { outerHeight } from '../mobCore/utils';
-import { scroller, tween } from '../mobMotion';
+import { MobScroll, MobTween } from '../mobMotion';
 
 export const createStagger = () => {
     const items = document.querySelectorAll('.create-stagger__item');
     const trigger = document.querySelector('.scrollStagger');
 
-    let masterSequencer = tween.createMasterSequencer();
+    let masterSequencer = MobTween.createMasterSequencer();
     const duration = 2000;
 
-    const staggers = tween.createStaggers({
+    const staggers = MobTween.createStaggers({
         items,
         stagger: {
             type: 'equal',
@@ -22,11 +22,10 @@ export const createStagger = () => {
     // Create sequencer
     const createSequencer = () => {
         return staggers.map(({ item, start, end }) => {
-            const sequencer = tween
-                .createSequencer({
-                    duration,
-                    data: { scale: 0.5 },
-                })
+            const sequencer = MobTween.createSequencer({
+                duration,
+                data: { scale: 0.5 },
+            })
                 .goTo({ scale: 1 }, { start, end })
                 .add(({ direction, isForced }) => {
                     console.log('add function', direction, isForced);
@@ -53,7 +52,7 @@ export const createStagger = () => {
     const sequencers = createSequencer();
     console.log(sequencers);
 
-    const parallaxIn = scroller.createScrollTrigger({
+    const parallaxIn = MobScroll.createScrollTrigger({
         trigger,
         propierties: 'tween',
         tween: masterSequencer,

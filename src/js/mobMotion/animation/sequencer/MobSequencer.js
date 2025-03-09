@@ -30,7 +30,7 @@ import {
     sequencerRangeValidate,
 } from '../utils/tweenAction/tweenValidation.js';
 import { handleSetUp } from '../../setup.js';
-import { mobCore } from '../../../mobCore/index.js';
+import { MobCore } from '../../../mobCore/index.js';
 import { directionConstant } from '../utils/timeline/timelineConstant.js';
 import { getValueObj } from '../utils/tweenAction/getValues.js';
 import { STAGGER_DEFAULT_INDEX_OBJ } from '../utils/stagger/staggerCostant.js';
@@ -284,7 +284,7 @@ export default class MobSequencer {
             return;
         }
 
-        mobCore.useNextTick(() =>
+        MobCore.useNextTick(() =>
             this.#onDraw({
                 partial,
                 isLastDraw,
@@ -721,8 +721,8 @@ export default class MobSequencer {
      * use the syncTimeline/scrollTrigger built in function:
      */
     add(fn = () => {}, time = 0) {
-        const fnIsValid = mobCore.checkType(Function, fn);
-        const timeIsValid = mobCore.checkType(Number, time);
+        const fnIsValid = MobCore.checkType(Function, fn);
+        const timeIsValid = MobCore.checkType(Number, time);
         const addIsValid = fnIsValid && timeIsValid;
 
         if (!fnIsValid) syncTimelineAddFnWarning(fn);
@@ -820,7 +820,7 @@ export default class MobSequencer {
      * Removes all references of staggers not yet started by the handleCache function, method used by HandleSyncTimeline when it is stopped
      */
     cleanCachedId() {
-        this.#callbackCache.forEach(({ cb }) => mobCore.useCache.clean(cb));
+        this.#callbackCache.forEach(({ cb }) => MobCore.useCache.clean(cb));
     }
 
     /**

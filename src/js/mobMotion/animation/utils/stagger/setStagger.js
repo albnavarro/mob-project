@@ -12,7 +12,7 @@ import {
 } from './staggerCostant.js';
 import { getEachByFps } from './staggerUtils.js';
 import { staggerColRowWarning } from '../warning.js';
-import { mobCore } from '../../../../mobCore/index.js';
+import { MobCore } from '../../../../mobCore/index.js';
 
 /**
  * @type {import('./type.js').setStagger}
@@ -27,7 +27,7 @@ const getRadial = ({
     /**
      * Check if from is an Object
      **/
-    if (!mobCore.checkType(Object, stagger?.from)) {
+    if (!MobCore.checkType(Object, stagger?.from)) {
         // @ts-ignore
         stagger.from = {};
     }
@@ -36,7 +36,7 @@ const getRadial = ({
      * Check x value if is not set use 0 as default
      */
     // @ts-ignore
-    if (!mobCore.checkType(Number, stagger?.from?.x)) {
+    if (!MobCore.checkType(Number, stagger?.from?.x)) {
         // @ts-ignore
         stagger.from = { ...stagger.from, x: 0 };
     }
@@ -45,7 +45,7 @@ const getRadial = ({
      * Check y value if is not set use 0 as default
      */
     // @ts-ignore
-    if (!mobCore.checkType(Number, stagger?.from?.y)) {
+    if (!MobCore.checkType(Number, stagger?.from?.y)) {
         // @ts-ignore
         stagger.from = { ...stagger.from, y: 0 };
     }
@@ -133,9 +133,9 @@ const getDefault = ({
     ];
 
     if (
-        (!mobCore.checkType(String, stagger?.from) &&
-            !mobCore.checkType(Number, stagger?.from)) ||
-        (mobCore.checkType(String, stagger?.from) &&
+        (!MobCore.checkType(String, stagger?.from) &&
+            !MobCore.checkType(Number, stagger?.from)) ||
+        (MobCore.checkType(String, stagger?.from) &&
             // @ts-ignore
             !fromList.includes(stagger?.from))
     ) {

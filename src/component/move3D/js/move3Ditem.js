@@ -1,4 +1,4 @@
-import { tween } from '../../../js/mobMotion';
+import { MobTween } from '../../../js/mobMotion';
 import { move3DUtils } from './move3Dutils.js';
 
 export class move3DitemClass {
@@ -10,7 +10,7 @@ export class move3DitemClass {
         this.range = data.range;
         this.initialRotate = data.initialRotate;
         this.animate = data.animate;
-        this.lerp = tween.createLerp();
+        this.lerp = MobTween.createLerp();
         this.unsubscribelerp = () => {};
         this.unsubscribeOnComplete = () => {};
     }

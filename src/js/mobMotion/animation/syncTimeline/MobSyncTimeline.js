@@ -7,7 +7,7 @@ import {
     repeatIsValid,
     valueIsBooleanAndReturnDefault,
 } from '../utils/tweenAction/tweenValidation.js';
-import { mobCore } from '../../../mobCore/index.js';
+import { MobCore } from '../../../mobCore/index.js';
 import { directionConstant } from '../utils/timeline/timelineConstant.js';
 import { fpsLoadedLog } from '../utils/fpsLogInizialization.js';
 
@@ -309,7 +309,7 @@ export default class MobSyncTimeline {
          * Store direction value before chengee during nextFrame
          **/
         const direction = this.getDirection();
-        mobCore.useNextFrame(() => {
+        MobCore.useNextFrame(() => {
             /*
              *
              * Prevent multiple fire of complete event
@@ -405,8 +405,8 @@ export default class MobSyncTimeline {
      * @returns {void}
      */
     #goToNextFrame() {
-        mobCore.useFrame(() => {
-            mobCore.useNextTick(({ time, fps }) => {
+        MobCore.useFrame(() => {
+            MobCore.useNextTick(({ time, fps }) => {
                 // Prevent fire too many raf
                 if (!this.fpsIsInLoading) this.#updateTime(time, fps);
             });
@@ -451,7 +451,7 @@ export default class MobSyncTimeline {
      */
     #rejectPromise() {
         if (this.currentReject) {
-            this.currentReject(mobCore.ANIMATION_STOP_REJECT);
+            this.currentReject(MobCore.ANIMATION_STOP_REJECT);
             this.currentReject = undefined;
         }
     }
@@ -510,7 +510,7 @@ export default class MobSyncTimeline {
         return new Promise((resolve, reject) => {
             if (this.fpsIsInLoading) return;
 
-            const isNumber = mobCore.checkType(Number, value);
+            const isNumber = MobCore.checkType(Number, value);
             // @ts-ignore
             const labelTime = isNumber ? value : this.#getTimeFromLabel(value);
 
@@ -573,7 +573,7 @@ export default class MobSyncTimeline {
         return new Promise((resolve, reject) => {
             if (this.fpsIsInLoading) return;
 
-            const isNumber = mobCore.checkType(Number, value);
+            const isNumber = MobCore.checkType(Number, value);
             // @ts-ignore
             const labelTime = isNumber ? value : this.#getTimeFromLabel(value);
 
@@ -670,7 +670,7 @@ export default class MobSyncTimeline {
     async #startAnimation(partial) {
         if (this.repeat === 0) return;
 
-        const { averageFPS } = await mobCore.useFps();
+        const { averageFPS } = await MobCore.useFps();
 
         fpsLoadedLog('sequencer', averageFPS);
         this.isReverse = false;
@@ -686,8 +686,8 @@ export default class MobSyncTimeline {
             });
         });
 
-        mobCore.useFrame(() => {
-            mobCore.useNextTick(({ time, fps }) => {
+        MobCore.useFrame(() => {
+            MobCore.useNextTick(({ time, fps }) => {
                 this.startTime = time;
                 this.fpsIsInLoading = false;
                 this.isStopped = false;

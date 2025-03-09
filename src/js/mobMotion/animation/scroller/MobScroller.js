@@ -38,7 +38,7 @@ import { MobScrollerConstant } from './MobScrollerConstant.js';
 import { MobScrollerEmitter } from './MobScrollerEmitter.js';
 import { MobScrollerMarker } from './MobScrollerMarker.js';
 import { MobScrollerPin } from './MobScrollerPin.js';
-import { mobCore } from '../../../mobCore/index.js';
+import { MobCore } from '../../../mobCore/index.js';
 import {
     getEndPoint,
     getRetReverseValue,
@@ -977,7 +977,7 @@ export default class MobScroller {
             /**
              *  Force transform3D onscroll start
              */
-            this.#unsubscribeScrollStart = mobCore.useScrollStart(() => {
+            this.#unsubscribeScrollStart = MobCore.useScrollStart(() => {
                 if (!this.#disableForce3D) this.#force3D = true;
             });
 
@@ -985,9 +985,9 @@ export default class MobScroller {
              * Avoid error with scroll module operation
              * Clean render at the end of the scroll
              */
-            this.#unsubscribeScrollEnd = mobCore.useScrollEnd(() => {
-                mobCore.useFrame(() => {
-                    mobCore.useNextTick(() => {
+            this.#unsubscribeScrollEnd = MobCore.useScrollEnd(() => {
+                MobCore.useFrame(() => {
+                    MobCore.useNextTick(() => {
                         this.#easeRender();
                     });
                 });
@@ -1030,7 +1030,7 @@ export default class MobScroller {
             /**
              * Execute render on scrollEnd to remove 3Dtransform
              */
-            this.#unsubscribeScrollEnd = mobCore.useScrollEnd(() => {
+            this.#unsubscribeScrollEnd = MobCore.useScrollEnd(() => {
                 /**
                  * Force draw no 3d on scroll end with no ease.
                  */
@@ -1042,7 +1042,7 @@ export default class MobScroller {
          * Initialize marker
          */
         if (this.#scroller !== globalThis && this.#marker) {
-            this.#unsubscribeMarker = mobCore.useScroll(() => {
+            this.#unsubscribeMarker = MobCore.useScroll(() => {
                 // Refresh marker
                 this.#calcFixedLimit();
             });
@@ -1051,7 +1051,7 @@ export default class MobScroller {
         /**
          * Initialize refresh
          */
-        this.#unsubscribeResize = mobCore.useResize(({ horizontalResize }) => {
+        this.#unsubscribeResize = MobCore.useResize(({ horizontalResize }) => {
             if (horizontalResize) this.refresh();
         });
 
@@ -1062,7 +1062,7 @@ export default class MobScroller {
             this.#pinInstance = new MobScrollerPin();
 
             if (mq[this.#queryType](this.#breakpoint)) {
-                mobCore.useNextTick(() => {
+                MobCore.useNextTick(() => {
                     this.#getScrollerOffset();
                     this.#pinInstance?.init(this.#getPinParams());
                     this.#pinInstance?.onScroll(this.#scrollerScroll);
@@ -1186,7 +1186,7 @@ export default class MobScroller {
                 this.#updateStyle(val);
             }
 
-            mobCore.useNextTick(() => {
+            MobCore.useNextTick(() => {
                 if (this.#onTickCallback)
                     this.#onTickCallback({ value: val, parentIsMoving: true });
             });
@@ -1208,7 +1208,7 @@ export default class MobScroller {
                 this.#updateStyle(val);
             }
 
-            mobCore.useNextTick(() => {
+            MobCore.useNextTick(() => {
                 if (this.#onTickCallback)
                     this.#onTickCallback({ value: val, parentIsMoving: false });
             });
@@ -1593,7 +1593,7 @@ export default class MobScroller {
 
             // Reset Style
             // For tween is necessary reset inside tween callback
-            mobCore.useFrameIndex(() => {
+            MobCore.useFrameIndex(() => {
                 if (this.#applyTo) {
                     this.#resetTweenStyle(this.#applyTo);
                     Object.assign(this.#applyTo.style, this.#getResetStyle());
@@ -1814,7 +1814,7 @@ export default class MobScroller {
     #noEasingRender({ forceRender = false, parentIsMoving = false } = {}) {
         if (!mq[this.#queryType](this.#breakpoint)) return;
 
-        mobCore.useFrame(() => {
+        MobCore.useFrame(() => {
             /**
              * Skip unnecessary rendering ( no control from outside )
              */
@@ -1854,7 +1854,7 @@ export default class MobScroller {
             /**
              * Children
              */
-            mobCore.useNextTick(() => {
+            MobCore.useNextTick(() => {
                 if (this.#onTickCallback)
                     this.#onTickCallback({
                         value: this.#endValue,
@@ -2108,7 +2108,7 @@ export default class MobScroller {
          * If frame drop ia lot (2/5) activate 'will-change: transform;'
          */
         this.#willChangeIsActive = this.#useWillChange
-            ? mobCore.mustMakeSomething()
+            ? MobCore.mustMakeSomething()
             : false;
         const shouldWill =
             this.#willChangeIsActive && this.#force3D ? 'transform' : '';
@@ -2117,7 +2117,7 @@ export default class MobScroller {
          * If frame drop a little (1/5) remove decimal.
          * Used by transform ( not scale ).
          */
-        const valueParsed = mobCore.shouldMakeSomething()
+        const valueParsed = MobCore.shouldMakeSomething()
             ? Math.round(value)
             : value;
 

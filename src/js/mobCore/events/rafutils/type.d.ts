@@ -1,4 +1,4 @@
-export interface handleFrameType {
+export interface HandleFrame {
     /**
      * @description
      * The total activity time of the request animation frame
@@ -14,11 +14,11 @@ export interface handleFrameType {
     fps: number;
 }
 
-export type handleFrameCallbakType = (arg0: handleFrameType) => void;
+export type HandleFrameCallbak = (arg0: HandleFrame) => void;
 
-export type handleFrameArrayType = handleFrameCallbakType[];
+export type HandleFrameArray = HandleFrameCallbak[];
 
-export interface loadFpsTypes {
+export interface LoadFps {
     /**
      * @description
      * Detected fps value
@@ -26,7 +26,7 @@ export interface loadFpsTypes {
     averageFPS: number;
 }
 
-export type loadFpsCallback = (arg0: loadFpsTypes) => void;
+export type LoadFpsCall = (arg0: LoadFps) => void;
 
 export interface HandleCacheSubscriberValue {
     el: object | HTMLElement;

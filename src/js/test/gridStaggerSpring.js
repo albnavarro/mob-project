@@ -1,11 +1,11 @@
-import { timeline, tween } from '../mobMotion';
+import { MobTimeline, MobTween } from '../mobMotion';
 
 export const gridStaggerSpring = () => {
     const items = document.querySelectorAll(
         '.grid-stagger-spring .grid-stagger__item'
     );
 
-    const tween1 = tween.createSpring({
+    const tween1 = MobTween.createSpring({
         config: 'bounce',
         stagger: {
             each: 15,
@@ -28,7 +28,10 @@ export const gridStaggerSpring = () => {
         });
     });
 
-    const timeline1 = timeline.createAsyncTimeline({ repeat: -1, yoyo: true });
+    const timeline1 = MobTimeline.createAsyncTimeline({
+        repeat: -1,
+        yoyo: true,
+    });
     timeline1.goTo(tween1, { scale: 0.5 });
     timeline1.play();
 };

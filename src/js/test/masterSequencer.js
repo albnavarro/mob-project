@@ -1,15 +1,15 @@
-import { scroller, tween } from '../mobMotion';
-import { mobCore } from '../mobCore';
+import { MobScroll, MobTween } from '../mobMotion';
+import { MobCore } from '../mobCore';
 import { outerHeight } from '../mobCore/utils';
 
 export const masterSequencer = () => {
     const items = document.querySelectorAll('.master-stagger__item');
     const trigger = document.querySelector('.scrollStagger');
 
-    let masterSequencer = tween.createMasterSequencer();
+    let masterSequencer = MobTween.createMasterSequencer();
     let sequencers = [];
 
-    const staggers = tween.createStaggers({
+    const staggers = MobTween.createStaggers({
         items,
         stagger: {
             type: 'equal',
@@ -22,9 +22,10 @@ export const masterSequencer = () => {
     // Create sequencer
     const createSequencer = () => {
         sequencers = staggers.map(({ item, start, end }) => {
-            const sequencer = tween
-                .createSequencer({ data: { y: 0 } })
-                .goTo({ y: 300 }, { start, end, ease: 'easeInOutBack' });
+            const sequencer = MobTween.createSequencer({ data: { y: 0 } }).goTo(
+                { y: 300 },
+                { start, end, ease: 'easeInOutBack' }
+            );
 
             const unsubscribe = sequencer.subscribe(({ y }) => {
                 item.style.transform = `translate(0, ${y}px)`;
@@ -38,13 +39,13 @@ export const masterSequencer = () => {
     createSequencer();
 
     // Test destroy and create sequencer on resize
-    mobCore.useResize(() => {
+    MobCore.useResize(() => {
         sequencers.forEach(({ unsubscribe }) => unsubscribe());
         masterSequencer.destroy();
         createSequencer();
     });
 
-    const parallaxIn = scroller.createScrollTrigger({
+    const parallaxIn = MobScroll.createScrollTrigger({
         trigger,
         propierties: 'tween',
         tween: masterSequencer,

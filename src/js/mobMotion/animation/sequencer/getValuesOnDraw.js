@@ -1,6 +1,6 @@
 // @ts-check
 
-import { mobCore } from '../../../mobCore';
+import { MobCore } from '../../../mobCore';
 import { getRoundedValue } from '../utils/animationUtils';
 import { checkIsLastUsableProp } from './reduceFunction';
 
@@ -76,12 +76,12 @@ export const sequencerGetValusOnDraw = ({ timeline, valuesState, partial }) => {
         // @ts-ignore
         const { start, end, toValue, fromValue, ease } = item;
 
-        const newToValue = mobCore.checkType(Number, toValue)
+        const newToValue = MobCore.checkType(Number, toValue)
             ? toValue
             : // @ts-ignore
               toValue();
 
-        const newFromValue = mobCore.checkType(Number, fromValue)
+        const newFromValue = MobCore.checkType(Number, fromValue)
             ? fromValue
             : // @ts-ignore
               fromValue();

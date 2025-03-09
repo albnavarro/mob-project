@@ -1,6 +1,6 @@
-import { mobCore } from '../../../js/mobCore';
+import { MobCore } from '../../../js/mobCore';
 import { isDescendant } from '../../../js/mobCore/utils';
-import { tween } from '../../../js/mobMotion';
+import { MobTween } from '../../../js/mobMotion';
 
 export class DraggerItemClass {
     constructor(data) {
@@ -40,7 +40,7 @@ export class DraggerItemClass {
 
         // Animation
         this.endValue = { xValue: 0, yValue: 0 };
-        this.spring = tween.createSpring();
+        this.spring = MobTween.createSpring();
         this.unsubscribeSpring = () => {};
         this.unsubscribeOnComplete = () => {};
 
@@ -55,33 +55,33 @@ export class DraggerItemClass {
     }
 
     init() {
-        this.unsubscribeTouchStart = mobCore.useTouchStart(
+        this.unsubscribeTouchStart = MobCore.useTouchStart(
             ({ page, target }) => {
                 this.onMouseDown({ page, target });
             }
         );
 
-        this.unsubscribeMouseDown = mobCore.useMouseDown(({ page, target }) => {
+        this.unsubscribeMouseDown = MobCore.useMouseDown(({ page, target }) => {
             this.onMouseDown({ page, target });
         });
 
-        this.unsubscribeTouchEnd = mobCore.useTouchEnd(() => {
+        this.unsubscribeTouchEnd = MobCore.useTouchEnd(() => {
             this.onMouseUp();
         });
 
-        this.unsubscribeMouseUp = mobCore.useMouseUp(() => {
+        this.unsubscribeMouseUp = MobCore.useMouseUp(() => {
             this.onMouseUp();
         });
 
-        this.unsubscribeMouseMove = mobCore.useMouseMove(({ page }) => {
+        this.unsubscribeMouseMove = MobCore.useMouseMove(({ page }) => {
             this.onMove({ page });
         });
 
-        this.unsubscribeTouchMove = mobCore.useTouchMove(({ page }) => {
+        this.unsubscribeTouchMove = MobCore.useTouchMove(({ page }) => {
             this.onMove({ page });
         });
 
-        this.unsubscribeResize = mobCore.useResize(() => {
+        this.unsubscribeResize = MobCore.useResize(() => {
             this.onResize();
         });
 

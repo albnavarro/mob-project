@@ -1,12 +1,12 @@
-import { mobCore } from '../mobCore';
-import { tween } from '../mobMotion';
+import { MobCore } from '../mobCore';
+import { MobTween } from '../mobMotion';
 
 export const infiniteAnimation = () => {
     const stagger = document.querySelectorAll('.infinite-tween .shape__target');
     const play = document.querySelector('.infinite-tween .anim-play');
     const stop = document.querySelector('.infinite-tween .anim-stop');
 
-    const tween1 = tween.createSpring({
+    const tween1 = MobTween.createSpring({
         stagger: { each: 3 },
         data: { x: 0 },
     });
@@ -32,7 +32,7 @@ export const infiniteAnimation = () => {
     const loop = () => {
         counter++;
         tween1.goTo({ x: counter });
-        if (isRunning) mobCore.useNextFrame(() => loop());
+        if (isRunning) MobCore.useNextFrame(() => loop());
     };
 
     play.addEventListener('click', () => {

@@ -1,6 +1,6 @@
 // @ts-check
 
-import { mobCore } from '../../../../mobCore';
+import { MobCore } from '../../../../mobCore';
 
 /**
  * @type {import('./type').SyncCallback}
@@ -18,36 +18,36 @@ export const syncCallback = ({
     callbackOnStop,
 }) => {
     if (each === 0 || useStagger === false) {
-        mobCore.useFrame(() => {
+        MobCore.useFrame(() => {
             callback.forEach(({ cb }) => cb(callBackObject));
         });
 
-        mobCore.useFrame(() => {
+        MobCore.useFrame(() => {
             callbackCache.forEach(({ cb }) => {
-                mobCore.useCache.fireObject({ id: cb, obj: callBackObject });
+                MobCore.useCache.fireObject({ id: cb, obj: callBackObject });
             });
         });
     } else {
         // Stagger
         callback.forEach(({ cb, frame }) => {
-            mobCore.useFrameIndex(() => cb(callBackObject), frame);
+            MobCore.useFrameIndex(() => cb(callBackObject), frame);
         });
 
         callbackCache.forEach(({ cb, frame }) => {
-            mobCore.useCache.update({ id: cb, callBackObject, frame });
+            MobCore.useCache.update({ id: cb, callBackObject, frame });
         });
     }
 
     if (isLastDraw) {
         if (each === 0 || useStagger === false) {
             // No stagger, run immediately
-            mobCore.useFrame(() => {
+            MobCore.useFrame(() => {
                 callbackOnStop.forEach(({ cb }) => cb(callBackObject));
             });
         } else {
             // Stagger
             callbackOnStop.forEach(({ cb, frame }) => {
-                mobCore.useFrameIndex(() => cb(callBackObject), frame + 1);
+                MobCore.useFrameIndex(() => cb(callBackObject), frame + 1);
             });
         }
     }

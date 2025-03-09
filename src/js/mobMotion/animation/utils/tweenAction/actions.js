@@ -1,6 +1,6 @@
 // @ts-check
 
-import { mobCore } from '../../../../mobCore/index.js';
+import { MobCore } from '../../../../mobCore/index.js';
 import { dataTweenValueIsValid } from './tweenValidation.js';
 import { dataTweenValueIsNotValidWarning } from '../warning.js';
 
@@ -25,7 +25,7 @@ export const goToUtils = (obj) => {
             };
         }
 
-        const toValue = mobCore.checkType(Number, obj[item])
+        const toValue = MobCore.checkType(Number, obj[item])
             ? obj[item]
             : // @ts-ignore
               (obj[item]?.() ?? 0);
@@ -34,7 +34,7 @@ export const goToUtils = (obj) => {
             prop: item,
             toValue,
             toFn: /** @type{() => number} */ (obj[item]),
-            toIsFn: mobCore.checkType(Function, obj[item]),
+            toIsFn: MobCore.checkType(Function, obj[item]),
             settled: false,
         };
     });
@@ -61,7 +61,7 @@ export const goFromUtils = (obj) => {
                 settled: false,
             };
         }
-        const value = mobCore.checkType(Number, obj[item])
+        const value = MobCore.checkType(Number, obj[item])
             ? obj[item]
             : // @ts-ignore
               (obj[item]?.() ?? 0);
@@ -71,7 +71,7 @@ export const goFromUtils = (obj) => {
             fromValue: value,
             currentValue: value,
             fromFn: /** @type{() => number} */ (obj[item]),
-            fromIsFn: mobCore.checkType(Function, obj[item]),
+            fromIsFn: MobCore.checkType(Function, obj[item]),
             settled: false,
         };
     });
@@ -109,12 +109,12 @@ export const goFromToUtils = (fromObj, toObj) => {
             };
         }
 
-        const fromValue = mobCore.checkType(Number, fromObj[item])
+        const fromValue = MobCore.checkType(Number, fromObj[item])
             ? fromObj[item]
             : // @ts-ignore
               (fromObj[item]?.() ?? 0);
 
-        const toValue = mobCore.checkType(Number, toObj[item])
+        const toValue = MobCore.checkType(Number, toObj[item])
             ? toObj[item]
             : // @ts-ignore
               (toObj[item]?.() ?? 0);
@@ -123,11 +123,11 @@ export const goFromToUtils = (fromObj, toObj) => {
             prop: item,
             fromValue,
             fromFn: /** @type{() => number} */ (fromObj[item]),
-            fromIsFn: mobCore.checkType(Function, fromObj[item]),
+            fromIsFn: MobCore.checkType(Function, fromObj[item]),
             currentValue: fromValue,
             toValue,
             toFn: /** @type{() => number} */ (toObj[item]),
-            toIsFn: mobCore.checkType(Function, toObj[item]),
+            toIsFn: MobCore.checkType(Function, toObj[item]),
             settled: false,
         };
     });
@@ -157,7 +157,7 @@ export const setUtils = (obj) => {
                 settled: false,
             };
         }
-        const value = mobCore.checkType(Number, obj[item])
+        const value = MobCore.checkType(Number, obj[item])
             ? obj[item]
             : // @ts-ignore
               (obj[item]?.() ?? 0);
@@ -166,11 +166,11 @@ export const setUtils = (obj) => {
             prop: item,
             fromValue: value,
             fromFn: /** @type{() => number} */ (obj[item]),
-            fromIsFn: mobCore.checkType(Function, obj[item]),
+            fromIsFn: MobCore.checkType(Function, obj[item]),
             currentValue: value,
             toValue: value,
             toFn: /** @type{() => number} */ (obj[item]),
-            toIsFn: mobCore.checkType(Function, obj[item]),
+            toIsFn: MobCore.checkType(Function, obj[item]),
             settled: false,
         };
     });

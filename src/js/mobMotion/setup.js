@@ -1,6 +1,6 @@
 // @ts-check
 
-import { mobCore } from '../mobCore/index.js';
+import { MobCore } from '../mobCore/index.js';
 import { springPresetConfig } from './animation/spring/springConfig.js';
 import {
     defaultMqValueDefault,
@@ -25,9 +25,9 @@ import { mergeDeep } from './utils/mergeDeep.js';
  */
 function getData() {
     return {
-        deferredNextTick: mobCore.store.getProp('deferredNextTick'),
-        throttle: mobCore.store.getProp('throttle'),
-        usePassive: mobCore.store.getProp('usePassive'),
+        deferredNextTick: MobCore.store.getProp('deferredNextTick'),
+        throttle: MobCore.store.getProp('throttle'),
+        usePassive: MobCore.store.getProp('usePassive'),
         mq: mqDefault,
         defaultMq: {
             value: defaultMqValueDefault,
@@ -185,12 +185,12 @@ export const handleSetUp = (() => {
          * Update event default.
          */
         if ('usePassive' in obj)
-            mobCore.store.set('usePassive', data.usePassive);
+            MobCore.store.set('usePassive', data.usePassive);
 
         if ('deferredNextTick' in obj)
-            mobCore.store.set('deferredNextTick', data.deferredNextTick);
+            MobCore.store.set('deferredNextTick', data.deferredNextTick);
 
-        if ('throttle' in obj) mobCore.store.set('throttle', data.throttle);
+        if ('throttle' in obj) MobCore.store.set('throttle', data.throttle);
     };
 
     /**

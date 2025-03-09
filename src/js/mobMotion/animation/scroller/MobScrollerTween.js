@@ -17,7 +17,7 @@ import {
     durationIsValid,
     easeScrollerTweenIsValid,
 } from '../utils/tweenAction/tweenValidation.js';
-import { mobCore } from '../../../mobCore/index.js';
+import { MobCore } from '../../../mobCore/index.js';
 import { getValueObj } from '../utils/tweenAction/getValues.js';
 import { STAGGER_DEFAULT_INDEX_OBJ } from '../utils/stagger/staggerCostant.js';
 
@@ -207,7 +207,7 @@ export default class MobScrollerTween {
         // Prepare an obj to pass to the callback
         const callBackObject = getValueObj(this.#values, 'currentValue');
 
-        mobCore.useNextTick(() => {
+        MobCore.useNextTick(() => {
             // Fire callback
             syncCallback({
                 each: this.#stagger.each,

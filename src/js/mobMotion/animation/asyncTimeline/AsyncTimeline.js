@@ -2,7 +2,7 @@
 
 import { handleNextFrame } from '../../../mobCore/events/rafutils/handleNextFrame.js';
 import { handleNextTick } from '../../../mobCore/events/rafutils/handleNextTick.js';
-import { mobCore } from '../../../mobCore/index.js';
+import { MobCore } from '../../../mobCore/index.js';
 import { NOOP } from '../../utils/functionsUtils.js';
 import { directionConstant } from '../utils/timeline/timelineConstant.js';
 import {
@@ -586,7 +586,7 @@ export default class MobAsyncTimeline {
                     /*
                      * Check callback that return a bollean to fire supend
                      */
-                    const valueIsValid = mobCore.checkType(Boolean, tween());
+                    const valueIsValid = MobCore.checkType(Boolean, tween());
                     if (!valueIsValid) timelineSuspendWarning(tween);
                     const sholudSuspend = valueIsValid ? tween() : true;
                     return new Promise((res) => {
@@ -604,7 +604,7 @@ export default class MobAsyncTimeline {
                 const previousSessionId = this.#sessionId;
 
                 if (delay) {
-                    const start = mobCore.getTime();
+                    const start = MobCore.getTime();
                     this.#delayIsRunning = true;
 
                     requestAnimationFrame(() => {
@@ -835,7 +835,7 @@ export default class MobAsyncTimeline {
         fn,
         action,
     }) {
-        const current = mobCore.getTime();
+        const current = MobCore.getTime();
         let delta = current - start;
 
         /*
@@ -1468,7 +1468,7 @@ export default class MobAsyncTimeline {
      */
     #rejectPromise() {
         if (this.#currentReject) {
-            this.#currentReject(mobCore.ANIMATION_STOP_REJECT);
+            this.#currentReject(MobCore.ANIMATION_STOP_REJECT);
             this.#currentReject = undefined;
         }
     }
@@ -1481,7 +1481,7 @@ export default class MobAsyncTimeline {
             if (this.#fpsIsInLoading) return;
             this.#fpsIsInLoading = true;
 
-            mobCore.useFps(() => {
+            MobCore.useFps(() => {
                 this.#fpsIsInLoading = false;
 
                 if (this.#autoSet) this.#addSetBlocks();
@@ -1514,7 +1514,7 @@ export default class MobAsyncTimeline {
                      */
 
                     this.#sessionId++;
-                    mobCore.useFrameIndex(() => {
+                    MobCore.useFrameIndex(() => {
                         // Set current promise action after stop so is not fired in stop method
                         this.#currentReject = reject;
                         this.#currentResolve = resolve;
@@ -1582,7 +1582,7 @@ export default class MobAsyncTimeline {
         this.#currentIndex = 0;
         this.#labelState.isReverse = isReverse;
         this.#labelState.active = true;
-        this.#labelState.index = mobCore.checkType(String, label)
+        this.#labelState.index = MobCore.checkType(String, label)
             ? this.#tweenList.findIndex((item) => {
                   const [firstItem] = item;
                   const labelCheck = firstItem.data.labelProps?.name;
@@ -1590,7 +1590,7 @@ export default class MobAsyncTimeline {
               })
             : label;
 
-        if (mobCore.checkType(String, label))
+        if (MobCore.checkType(String, label))
             playLabelIsValid(this.#labelState.index, label);
 
         this.#run();
@@ -1604,7 +1604,7 @@ export default class MobAsyncTimeline {
             if (this.#fpsIsInLoading) return;
             this.#fpsIsInLoading = true;
 
-            mobCore.useFps(() => {
+            MobCore.useFps(() => {
                 this.#fpsIsInLoading = false;
 
                 this.#starterFunction.fn = () =>
@@ -1637,7 +1637,7 @@ export default class MobAsyncTimeline {
             if (this.#fpsIsInLoading) return;
             this.#fpsIsInLoading = true;
 
-            mobCore.useFps(() => {
+            MobCore.useFps(() => {
                 this.#fpsIsInLoading = false;
 
                 this.#starterFunction.fn = () =>
@@ -1668,7 +1668,7 @@ export default class MobAsyncTimeline {
             if (this.#fpsIsInLoading) return;
             this.#fpsIsInLoading = true;
 
-            mobCore.useFps(() => {
+            MobCore.useFps(() => {
                 this.#fpsIsInLoading = false;
 
                 if (this.#autoSet) this.#addSetBlocks();
@@ -1719,7 +1719,7 @@ export default class MobAsyncTimeline {
                 /*
                  * Run one frame after stop to avoid overlap with promise resolve/reject
                  */
-                mobCore.useFrameIndex(() => {
+                MobCore.useFrameIndex(() => {
                     // Set current promise action after stop so is not fired in stop method
                     this.#currentResolve = resolveInUse;
                     this.#currentReject = rejectInUse;
@@ -1781,7 +1781,7 @@ export default class MobAsyncTimeline {
      */
     pause() {
         this.#isInPause = true;
-        this.#timeOnPause = mobCore.getTime();
+        this.#timeOnPause = MobCore.getTime();
         this.#currentTween.forEach(({ tween }) => {
             tween?.pause?.();
         });

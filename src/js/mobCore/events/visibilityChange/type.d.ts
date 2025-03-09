@@ -1,5 +1,5 @@
-export interface visibilityChangeTypes {
+export interface VisibilityChange {
     visibilityState: 'hidden' | 'visible';
 }
 
-export type visibilityChangeCallback = (arg0: visibilityChangeTypes) => void;
+export type VisibilityChangeCallback = (arg0: VisibilityChange) => void;

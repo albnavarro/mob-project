@@ -1,11 +1,11 @@
 import { move3DitemClass } from './move3Ditem.js';
-import { tween } from '../../../js/mobMotion';
+import { MobTween } from '../../../js/mobMotion';
 import {
     outerHeight,
     outerWidth,
     offset,
 } from '../../../js/mobCore/utils/index.js';
-import { mobCore } from '../../../js/mobCore/index.js';
+import { MobCore } from '../../../js/mobCore/index.js';
 
 export class move3DContainerClass {
     constructor(data) {
@@ -35,7 +35,7 @@ export class move3DContainerClass {
         this.pageY = false;
         this.childrenInstances = [];
 
-        this.spring = tween.createSpring();
+        this.spring = MobTween.createSpring();
         this.unsubscribeSpring = () => {};
 
         // MOUSE COORD
@@ -81,17 +81,17 @@ export class move3DContainerClass {
         this.setDepth();
         this.getDimension();
 
-        this.unsubscribeMouseMove = mobCore.useMouseMove(({ page }) => {
+        this.unsubscribeMouseMove = MobCore.useMouseMove(({ page }) => {
             this.setGlobalCoord({ page });
             this.onMove();
         });
 
-        this.unsubscribeResize = mobCore.useResize(() => {
+        this.unsubscribeResize = MobCore.useResize(() => {
             this.getDimension();
         });
 
         if (this.pageY) {
-            this.unsubscribeScroll = mobCore.useScroll(({ scrollY }) => {
+            this.unsubscribeScroll = MobCore.useScroll(({ scrollY }) => {
                 this.onScroll(scrollY);
             });
         }
@@ -101,23 +101,23 @@ export class move3DContainerClass {
             this.dragY = window.innerHeight / 2;
             this.item.classList.add('move3D--drag');
 
-            this.unsubscribeTouchMove = mobCore.useTouchStart(({ page }) => {
+            this.unsubscribeTouchMove = MobCore.useTouchStart(({ page }) => {
                 this.onMouseDown({ page });
             });
 
-            this.unsubscribeTouchMove = mobCore.useTouchEnd(() => {
+            this.unsubscribeTouchMove = MobCore.useTouchEnd(() => {
                 this.onMouseUp();
             });
 
-            this.unsubscribeTouchMove = mobCore.useMouseDown(({ page }) => {
+            this.unsubscribeTouchMove = MobCore.useMouseDown(({ page }) => {
                 this.onMouseDown({ page });
             });
 
-            this.unsubscribeTouchMove = mobCore.useMouseUp(() => {
+            this.unsubscribeTouchMove = MobCore.useMouseUp(() => {
                 this.onMouseUp();
             });
 
-            this.unsubscribeTouchMove = mobCore.useTouchMove(({ page }) => {
+            this.unsubscribeTouchMove = MobCore.useTouchMove(({ page }) => {
                 this.setGlobalCoord({ page });
                 this.onMove();
             });

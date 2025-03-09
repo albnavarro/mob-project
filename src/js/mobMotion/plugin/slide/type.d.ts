@@ -1,6 +1,6 @@
-import MobTween from '../../animation/tween/MobTween';
+import MobTimeTween from '../../animation/tween/MobTimeTween';
 
 export interface MobSlide {
-    tween: MobTween;
+    tween: MobTimeTween;
     unsubscribe: () => void;
 }

@@ -15,7 +15,7 @@ import {
     valueIsFunctionAndReturnDefault,
     valueIsNumberAndReturnDefault,
 } from '../../animation/utils/tweenAction/tweenValidation.js';
-import { mobCore } from '../../../mobCore/index.js';
+import { MobCore } from '../../../mobCore/index.js';
 import {
     isDescendant,
     outerHeight,
@@ -332,7 +332,7 @@ export class MobSmoothScroller {
             'SmoothScroller'
         );
 
-        this.#scroller = mobCore.checkType(String, data?.scroller)
+        this.#scroller = MobCore.checkType(String, data?.scroller)
             ? document.querySelector(/** @type{string} */ (data.scroller))
             : data.scroller;
 
@@ -343,7 +343,7 @@ export class MobSmoothScroller {
 
         this.#screen = data?.screen
             ? (() => {
-                  return mobCore.checkType(String, data.screen)
+                  return MobCore.checkType(String, data.screen)
                       ? document.querySelector(
                             /** @type{string} */ (data.screen)
                         )
@@ -409,7 +409,7 @@ export class MobSmoothScroller {
         });
 
         this.#scopedWhell = (event) => {
-            const { spinY } = mobCore.normalizeWheel(event);
+            const { spinY } = MobCore.normalizeWheel(event);
             this.#onScopedWhell({
                 spinY,
             });
@@ -493,14 +493,14 @@ export class MobSmoothScroller {
                 }
             );
         } else {
-            this.#subscribeMouseWheel = mobCore.useMouseWheel((data) =>
+            this.#subscribeMouseWheel = MobCore.useMouseWheel((data) =>
                 this.#onWhell(data)
             );
 
-            this.#subscribeMouseMove = mobCore.useMouseMove((data) =>
+            this.#subscribeMouseMove = MobCore.useMouseMove((data) =>
                 this.#onTouchMove(data)
             );
-            this.#subscribeTouchMove = mobCore.useTouchMove((data) =>
+            this.#subscribeTouchMove = MobCore.useTouchMove((data) =>
                 this.#onTouchMove(data)
             );
         }
@@ -508,29 +508,29 @@ export class MobSmoothScroller {
         /**
          * Common event
          */
-        this.#subscribeResize = mobCore.useResize(() => this.refresh());
+        this.#subscribeResize = MobCore.useResize(() => this.refresh());
 
-        this.#subscribeScrollStart = mobCore.useScrollStart(() =>
+        this.#subscribeScrollStart = MobCore.useScrollStart(() =>
             this.#refreshScroller()
         );
 
-        this.#subscribeScrollEnd = mobCore.useScrollEnd(() =>
+        this.#subscribeScrollEnd = MobCore.useScrollEnd(() =>
             this.#refreshScroller()
         );
 
-        this.#subscribeTouchStart = mobCore.useTouchStart((data) =>
+        this.#subscribeTouchStart = MobCore.useTouchStart((data) =>
             this.#onMouseDown(data)
         );
 
-        this.#subscribeTouchEnd = mobCore.useTouchEnd((data) =>
+        this.#subscribeTouchEnd = MobCore.useTouchEnd((data) =>
             this.#onMouseUp(data)
         );
 
-        this.#subscribeMouseDown = mobCore.useMouseDown((data) =>
+        this.#subscribeMouseDown = MobCore.useMouseDown((data) =>
             this.#onMouseDown(data)
         );
 
-        this.#subscribeMouseUp = mobCore.useMouseUp((data) =>
+        this.#subscribeMouseUp = MobCore.useMouseUp((data) =>
             this.#onMouseUp(data)
         );
 
@@ -545,7 +545,7 @@ export class MobSmoothScroller {
         );
 
         if (this.#drag) {
-            this.#subscribeMouseClick = mobCore.useMouseClick(
+            this.#subscribeMouseClick = MobCore.useMouseClick(
                 ({ target, preventDefault }) => {
                     this.#preventChecker({ target, preventDefault });
                 }
@@ -559,8 +559,8 @@ export class MobSmoothScroller {
             this.#refreshScroller();
         }
 
-        mobCore.useFrameIndex(() => {
-            mobCore.useNextTick(() => {
+        MobCore.useFrameIndex(() => {
+            MobCore.useNextTick(() => {
                 if (this.#isDestroyed) return;
 
                 this.#afterInit?.({
@@ -632,7 +632,7 @@ export class MobSmoothScroller {
                 element.triggerScrollStart();
             });
 
-            mobCore.useNextTick(() => {
+            MobCore.useNextTick(() => {
                 this.#onTickCallback({
                     value: -val,
                     percent: this.#percent,
@@ -654,7 +654,7 @@ export class MobSmoothScroller {
                     ? `translateY(${-val}px)`
                     : `translateX(${-val}px)`;
 
-            mobCore.useNextTick(() => {
+            MobCore.useNextTick(() => {
                 this.#onTickCallback({
                     value: -val,
                     percent: this.#percent,
@@ -933,8 +933,8 @@ export class MobSmoothScroller {
             this.#removeScrolerStyle();
             this.#motion?.stop?.();
 
-            mobCore.useFrame(() => {
-                mobCore.useNextTick(() => {
+            MobCore.useFrame(() => {
+                MobCore.useNextTick(() => {
                     /** @type{HTMLElement} */ (this.#scroller).style.transform =
                         '';
                 });
@@ -945,8 +945,8 @@ export class MobSmoothScroller {
         this.#refreshScroller();
         this.#setScrolerStyle();
 
-        mobCore.useFrameIndex(() => {
-            mobCore.useNextTick(() => {
+        MobCore.useFrameIndex(() => {
+            MobCore.useNextTick(() => {
                 this.#onAfterRefresh?.({
                     shouldScroll: this.#getScrollableStatus(),
                 });
@@ -1010,8 +1010,8 @@ export class MobSmoothScroller {
             );
         }
 
-        mobCore.useFrameIndex(() => {
-            mobCore.useNextTick(() => {
+        MobCore.useFrameIndex(() => {
+            MobCore.useNextTick(() => {
                 this.#scroller = null;
                 this.#screen = null;
             });

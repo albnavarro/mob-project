@@ -1,4 +1,4 @@
-import { mobCore } from '../../../js/mobCore';
+import { MobCore } from '../../../js/mobCore';
 
 export class AnimateItemClass {
     constructor(data) {
@@ -21,12 +21,12 @@ export class AnimateItemClass {
             if (this.noRepeat && this.firstTime) return;
             entries.forEach((entry) => {
                 if (entry.isIntersecting) {
-                    mobCore.useFrame(() => {
+                    MobCore.useFrame(() => {
                         this.compRoot.classList.add('animate');
                         this.firstTime = true;
                     });
                 } else if (!entry.isIntersecting) {
-                    mobCore.useFrame(() => {
+                    MobCore.useFrame(() => {
                         this.compRoot.classList.remove('animate');
                     });
                 }

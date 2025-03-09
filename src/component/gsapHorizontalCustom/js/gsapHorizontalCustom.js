@@ -6,8 +6,8 @@ import {
     outerWidth,
     getTranslateValues,
 } from '../../../js/mobCore/utils';
-import { mobCore } from '../../../js/mobCore';
-import { motionCore } from '../../../js/mobMotion';
+import { MobCore } from '../../../js/mobCore';
+import { MobMotionCore } from '../../../js/mobMotion';
 
 export class GsapHorizontalCustomClass {
     constructor(data = {}) {
@@ -28,7 +28,7 @@ export class GsapHorizontalCustomClass {
         this.callback = [];
 
         // GSAP store
-        this.store = mobCore.createStore({
+        this.store = MobCore.createStore({
             gsapisActive: false,
             horizontalWidth: 0,
             tl: [],
@@ -44,7 +44,7 @@ export class GsapHorizontalCustomClass {
         this.getWidth();
         this.createShadow();
         this.initGsap();
-        mobCore.useResize(() => this.onResize());
+        MobCore.useResize(() => this.onResize());
     }
 
     onTick(fn) {
@@ -63,7 +63,7 @@ export class GsapHorizontalCustomClass {
     }
 
     getWidth() {
-        if (!motionCore.mq(this.queryType, this.breackpoint)) return;
+        if (!MobMotionCore.mq(this.queryType, this.breackpoint)) return;
 
         const horizontalWidth = [...this.cards]
             .map((item) => {
@@ -75,7 +75,7 @@ export class GsapHorizontalCustomClass {
     }
 
     createShadow() {
-        if (!motionCore.mq(this.queryType, this.breackpoint)) return;
+        if (!MobMotionCore.mq(this.queryType, this.breackpoint)) return;
 
         const shadowsTransition = `
             ${[...this.shadow]
@@ -123,7 +123,7 @@ export class GsapHorizontalCustomClass {
     }
 
     updateShadow() {
-        if (!motionCore.mq(this.queryType, this.breackpoint)) return;
+        if (!MobMotionCore.mq(this.queryType, this.breackpoint)) return;
 
         const shadowEl = this.mainContainer.querySelectorAll(
             `.${this.shadowMainClass}`
@@ -221,7 +221,7 @@ export class GsapHorizontalCustomClass {
     initGsap() {
         if (
             !this.triggerContainer ||
-            !motionCore.mq(this.queryType, this.breackpoint)
+            !MobMotionCore.mq(this.queryType, this.breackpoint)
         )
             return;
         this.setDimension();
@@ -265,7 +265,10 @@ export class GsapHorizontalCustomClass {
     onResize() {
         const gsapisActive = this.store.getProp('gsapisActive');
 
-        if (gsapisActive && motionCore.mq(this.queryType, this.breackpoint)) {
+        if (
+            gsapisActive &&
+            MobMotionCore.mq(this.queryType, this.breackpoint)
+        ) {
             this.getWidth();
             this.setDimension();
             this.updateShadow();
@@ -273,13 +276,16 @@ export class GsapHorizontalCustomClass {
             this.initGsap();
         } else if (
             !gsapisActive &&
-            motionCore.mq(this.queryType, this.breackpoint)
+            MobMotionCore.mq(this.queryType, this.breackpoint)
         ) {
             this.getWidth();
             this.createShadow();
             this.updateShadow();
             this.initGsap();
-        } else if (gsapisActive && !core.mq(this.queryType, this.breackpoint)) {
+        } else if (
+            gsapisActive &&
+            !MobMotionCore.mq(this.queryType, this.breackpoint)
+        ) {
             gsap.set('.gsap-scroller__row', {
                 xPercent: 0,
             });

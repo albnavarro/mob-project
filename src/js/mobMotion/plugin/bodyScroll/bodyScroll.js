@@ -1,7 +1,7 @@
 //@ts-check
 
-import { mobCore } from '../../../mobCore/index.js';
-import MobTween from '../../animation/tween/MobTween.js';
+import { MobCore } from '../../../mobCore/index.js';
+import MobTimeTween from '../../animation/tween/MobTimeTween.js';
 import {
     easeTweenIsValid,
     valueIsBooleanAndReturnDefault,
@@ -17,8 +17,8 @@ import {
 /** @type {import('../../animation/tween/type').EaseTypes} */
 const defaultPreset = 'easeOutQuad';
 
-/** @type {MobTween} */
-const tween = new MobTween({ ease: defaultPreset, data: { val: 0 } });
+/** @type {MobTimeTween} */
+const tween = new MobTimeTween({ ease: defaultPreset, data: { val: 0 } });
 
 /** @type{boolean} */
 let isRunning = false;
@@ -58,15 +58,15 @@ const stopTween = () => {
 /**
  * Stop scrolling on mouseWheel, MouseDown, TouchStart.
  */
-mobCore.useMouseWheel(() => {
+MobCore.useMouseWheel(() => {
     stopTween();
 });
 
-mobCore.useMouseDown(() => {
+MobCore.useMouseDown(() => {
     stopTween();
 });
 
-mobCore.useTouchStart(() => {
+MobCore.useTouchStart(() => {
     stopTween();
 });
 
@@ -103,7 +103,7 @@ export const MobBodyScroll = (() => {
             if (!target) return 0;
 
             // @ts-ignore
-            const isValid = isNode(target) || mobCore.checkType(Number, target);
+            const isValid = isNode(target) || MobCore.checkType(Number, target);
 
             if (!isValid) {
                 console.warn(

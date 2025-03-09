@@ -14,7 +14,7 @@ import {
     scrollerWarningVhIsNotAllowed,
     scrollerWarningVwIsNotAllowed,
 } from './warning.js';
-import { mobCore } from '../../../mobCore/index.js';
+import { MobCore } from '../../../mobCore/index.js';
 
 /**
  * @description
@@ -494,15 +494,15 @@ export const getScrollFunction = ({ callback, pin, ease, useThrottle }) => {
      * If use pin we have to get fresh value on scroll
      * Otherwise we can optimize and fire scroll callback after requerst animationFrame
      */
-    if (pin) return mobCore.useScrollImmediate(callback);
+    if (pin) return MobCore.useScrollImmediate(callback);
 
     /**
      * Use throttle if needed and there is a ease;
      */
-    if (ease && useThrottle) return mobCore.useScrollThrottle(callback);
+    if (ease && useThrottle) return MobCore.useScrollThrottle(callback);
 
     /**
      * Default scroll
      */
-    return mobCore.useScroll(callback);
+    return MobCore.useScroll(callback);
 };

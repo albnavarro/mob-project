@@ -1,6 +1,6 @@
 // @ts-check
 
-import { mobCore } from '../../../../mobCore';
+import { MobCore } from '../../../../mobCore';
 import { staggerEachWarning } from '../warning';
 
 /**
@@ -12,7 +12,7 @@ export const shouldInizializzeStagger = (
     arrayToCompare1,
     arrayToCompare2
 ) => {
-    if (!mobCore.checkType(Number, each)) {
+    if (!MobCore.checkType(Number, each)) {
         staggerEachWarning();
     }
 

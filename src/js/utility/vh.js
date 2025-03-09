@@ -1,4 +1,4 @@
-import { mobCore } from '../mobCore';
+import { MobCore } from '../mobCore';
 
 class vhClass {
     constructor(images, callback) {
@@ -7,16 +7,16 @@ class vhClass {
 
     init() {
         this.calcVh();
-        mobCore.useScroll(({ scrollY }) => this.onScroll(scrollY));
-        mobCore.useResize(() => this.calcVh());
+        MobCore.useScroll(({ scrollY }) => this.onScroll(scrollY));
+        MobCore.useResize(() => this.calcVh());
     }
 
     calcVh() {
-        mobCore.useFrame(() => {
-            mobCore.useNextTick(() => {
+        MobCore.useFrame(() => {
+            MobCore.useNextTick(() => {
                 const vh = window.innerHeight * 0.01;
 
-                mobCore.useFrame(() => {
+                MobCore.useFrame(() => {
                     document.documentElement.style.setProperty(
                         '--vh',
                         `${vh}px`

@@ -4,7 +4,7 @@ import MobSpring from '../spring/MobSpring.js';
 import { MobScrollerConstant } from './MobScrollerConstant.js';
 import { position } from '../../../mobCore/utils/index.js';
 import { clamp } from '../utils/animationUtils.js';
-import { mobCore } from '../../../mobCore/index.js';
+import { MobCore } from '../../../mobCore/index.js';
 import { getMarkerWrapperStyle } from './MobScrollerPinUtils.js';
 
 export class MobScrollerPin {
@@ -383,18 +383,18 @@ export class MobScrollerPin {
         /**
          * Update pix top position when use custom screen ad scroll outside on window
          */
-        this.#unsubscribeScrollStart = mobCore.useScrollStart(() => {
+        this.#unsubscribeScrollStart = MobCore.useScrollStart(() => {
             if (!this.#isInizialized) return;
 
             if (this.#screen !== globalThis && this.#isInner && this.#pin) {
-                mobCore.useFrame(() => {
+                MobCore.useFrame(() => {
                     if (this.#pin)
                         this.#pin.style.transition = `transform .85s cubic-bezier(0, 0.68, 0.45, 1.1)`;
                 });
             }
         });
 
-        this.#unsubscribeScroll = mobCore.useScroll(({ scrollY }) => {
+        this.#unsubscribeScroll = MobCore.useScroll(({ scrollY }) => {
             if (!this.#isInizialized) return;
 
             if (
@@ -422,7 +422,7 @@ export class MobScrollerPin {
                         verticalGap: translateValue,
                     });
 
-                    mobCore.useFrame(() => {
+                    MobCore.useFrame(() => {
                         if (this.#pin)
                             this.#pin.style.transform = `translate(0px,${translateValue}px)`;
                     });
@@ -512,7 +512,7 @@ export class MobScrollerPin {
          */
         const display = { display: 'table' };
 
-        mobCore.useFrame(() => {
+        MobCore.useFrame(() => {
             if (!this.#pin || !this.#wrapper) return;
 
             Object.assign(this.#wrapper.style, { ...markerWrapperStyle });
@@ -554,7 +554,7 @@ export class MobScrollerPin {
             return { ...p, [c]: compStyles.getPropertyValue(c) };
         }, {});
 
-        mobCore.useFrame(() => {
+        MobCore.useFrame(() => {
             if (!this.#wrapper) return;
             Object.assign(this.#wrapper.style, style);
         });
@@ -732,7 +732,7 @@ export class MobScrollerPin {
      * @param {number} gap
      */
     #tween(gap) {
-        mobCore.useFrame(() => {
+        MobCore.useFrame(() => {
             if (!this.#pin || !this.#collisionStyleProp) return;
 
             /** @type{Record<string, any>} */
@@ -754,7 +754,7 @@ export class MobScrollerPin {
      * @returns {void}
      */
     #resetPinTransform() {
-        mobCore.useFrame(() => {
+        MobCore.useFrame(() => {
             if (!this.#pin) return;
 
             this.#pin.style.transform = `translate(0px, 0px)`;
@@ -767,7 +767,7 @@ export class MobScrollerPin {
     #resetStyleWhenUnder() {
         this.#resetSpring();
 
-        mobCore.useFrame(() => {
+        MobCore.useFrame(() => {
             if (!this.#pin) return;
 
             this.#pin.style.transition = '';
@@ -783,7 +783,7 @@ export class MobScrollerPin {
     #resetStyleWhenOver() {
         this.#resetSpring();
 
-        mobCore.useFrame(() => {
+        MobCore.useFrame(() => {
             if (!this.#pin) return;
 
             this.#pin.style.transition = '';
@@ -815,7 +815,7 @@ export class MobScrollerPin {
                 ? 'left'
                 : 'top';
 
-        mobCore.useFrame(() => {
+        MobCore.useFrame(() => {
             if (!this.#pin) return;
 
             this.#pin.style.position = 'fixed';
@@ -876,7 +876,7 @@ export class MobScrollerPin {
             const pinStyleFromItem = this.#addPinStyleFromItem();
             const styleToAdd = this.#addStyleToItem();
 
-            mobCore.useFrame(() => {
+            MobCore.useFrame(() => {
                 if (!this.#pin) return;
 
                 Object.assign(this.#pin.style, {
@@ -897,7 +897,7 @@ export class MobScrollerPin {
     #deactivateTrasponder() {
         if (!this.#shoulTranspond || !this.#item || !this.#wrapper) return;
 
-        mobCore.useFrame(() => {
+        MobCore.useFrame(() => {
             if (!this.#pin) return;
 
             // @ts-ignore

@@ -1,5 +1,5 @@
-import { mobCore } from '../mobCore';
-import { timeline, tween } from '../mobMotion';
+import { MobCore } from '../mobCore';
+import { MobTimeline, MobTween } from '../mobMotion';
 
 export const testCanvas = () => {
     const canvas = document.querySelector('#test-canvas');
@@ -34,13 +34,13 @@ export const testCanvas = () => {
         };
     });
 
-    mobCore.useResize(() => {
+    MobCore.useResize(() => {
         canvas.width = canvas.clientWidth;
         canvas.height = canvas.clientHeight;
         draw();
     });
 
-    const tween1 = tween.createTween({
+    const tween1 = MobTween.createTimeTween({
         ease: 'easeInOutQuad',
         stagger: {
             each: 15,
@@ -91,8 +91,10 @@ export const testCanvas = () => {
         );
     };
 
-    const timeline1 = timeline
-        .createAsyncTimeline({ repeat: -1, yoyo: true })
+    const timeline1 = MobTimeline.createAsyncTimeline({
+        repeat: -1,
+        yoyo: true,
+    })
         .goTo(tween1, { scale: 1.5 }, { duration: 1000 })
         .goTo(tween1, { scale: 0.5 }, { duration: 500 })
         .goTo(tween1, { rotate: 180, scale: 1.2 }, { duration: 500 })
@@ -103,8 +105,8 @@ export const testCanvas = () => {
 
     const loop = () => {
         draw();
-        mobCore.useNextFrame(() => loop());
+        MobCore.useNextFrame(() => loop());
     };
 
-    mobCore.useFrame(() => loop());
+    MobCore.useFrame(() => loop());
 };

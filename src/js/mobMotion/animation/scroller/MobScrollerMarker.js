@@ -2,7 +2,7 @@
 
 import { MobScrollerConstant } from './MobScrollerConstant.js';
 import { handleSetUp } from '../../setup.js';
-import { mobCore } from '../../../mobCore/index.js';
+import { MobCore } from '../../../mobCore/index.js';
 
 /**
  * @param {object} obj
@@ -265,7 +265,7 @@ export const MobScrollerMarker = ({
         textTransform: 'uppercase',
     };
 
-    mobCore.useFrame(() => {
+    MobCore.useFrame(() => {
         // @ts-ignore
         Object.assign(lastStartMarker?.style, { ...style, ...startStyle });
         // @ts-ignore

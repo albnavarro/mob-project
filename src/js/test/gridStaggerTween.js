@@ -1,11 +1,11 @@
-import { timeline, tween } from '../mobMotion';
+import { MobTimeline, MobTween } from '../mobMotion';
 
 export const gridStaggerTween = () => {
     const items = document.querySelectorAll(
         '.grid-stagger-tween .grid-stagger__item'
     );
 
-    const tween1 = tween.createTween({
+    const tween1 = MobTween.createTimeTween({
         ease: 'easeInOutQuad',
         stagger: {
             each: 15,
@@ -28,7 +28,10 @@ export const gridStaggerTween = () => {
         });
     });
 
-    const timeline1 = timeline.createAsyncTimeline({ repeat: -1, yoyo: true });
+    const timeline1 = MobTimeline.createAsyncTimeline({
+        repeat: -1,
+        yoyo: true,
+    });
     timeline1.goTo(
         tween1,
         { scale: 0.5 },

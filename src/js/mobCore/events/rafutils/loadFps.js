@@ -13,7 +13,7 @@ let loadFpsIsReady = false;
  *   The method is launched the first time automatically at the first loading.
  *
  * @param {number} [ duration = 30 ] - loop duration in frame, the default value is 30.
- * @return {Promise.<import('./type').loadFpsTypes>} The promise launched after the loop
+ * @return {Promise.<import('./type').LoadFps>} The promise launched after the loop
  *
  * @example
  * ```javascript

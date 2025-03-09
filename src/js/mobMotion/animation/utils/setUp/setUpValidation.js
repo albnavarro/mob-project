@@ -1,6 +1,6 @@
 // @ts-check
 
-import { mobCore } from '../../../../mobCore/index.js';
+import { MobCore } from '../../../../mobCore/index.js';
 import { springPresetConfig } from '../../spring/springConfig.js';
 
 export const easeReference = {
@@ -70,21 +70,21 @@ export const setupValidation = (obj) => {
     const deferredNextTick = checkSetUpType({
         prop: 'deferredNextTick',
         value: obj?.deferredNextTick,
-        defaultValue: mobCore.store.getProp('deferredNextTick'),
+        defaultValue: MobCore.store.getProp('deferredNextTick'),
         type: Boolean,
     });
 
     const usePassive = checkSetUpType({
         prop: 'usePassive',
         value: obj?.usePassive,
-        defaultValue: mobCore.store.getProp('usePassive'),
+        defaultValue: MobCore.store.getProp('usePassive'),
         type: Boolean,
     });
 
     const throttle = checkSetUpType({
         prop: 'throttle',
         value: obj?.throttle,
-        defaultValue: mobCore.store.getProp('throttle'),
+        defaultValue: MobCore.store.getProp('throttle'),
         type: Number,
     });
 
@@ -289,10 +289,10 @@ export const setupValidation = (obj) => {
  * Check if prop valid
  */
 const checkSetUpType = ({ prop, value, defaultValue, type }) => {
-    const isValid = mobCore.checkType(type, value);
+    const isValid = MobCore.checkType(type, value);
     if (!isValid)
         console.warn(
-            `handleSetUp error: ${prop}: ${value}, is not valid must be a ${mobCore.getTypeName(
+            `handleSetUp error: ${prop}: ${value}, is not valid must be a ${MobCore.getTypeName(
                 type
             )}`
         );
@@ -307,9 +307,9 @@ const checkSetUpType = ({ prop, value, defaultValue, type }) => {
  */
 const checkSetUpMq = (obj) => {
     const isValid =
-        mobCore.checkType(Object, obj) &&
+        MobCore.checkType(Object, obj) &&
         Object.values(obj).every((value) => {
-            return mobCore.checkType(Number, value);
+            return MobCore.checkType(Number, value);
         });
 
     if (!isValid)

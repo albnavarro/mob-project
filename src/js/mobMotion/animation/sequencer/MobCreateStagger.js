@@ -20,7 +20,7 @@ import {
     validateStaggerItems,
 } from '../utils/tweenAction/tweenValidation.js';
 import { getStaggerFromProps } from '../utils/stagger/staggerUtils.js';
-import { mobCore } from '../../../mobCore/index.js';
+import { MobCore } from '../../../mobCore/index.js';
 
 /**
  * @param {object} obj
@@ -190,7 +190,7 @@ export const MobCreateStaggers = (data) => {
      * In classic mode each must be between 1 and eachProportion
      */
     if (
-        mobCore.checkType(Number, each) &&
+        MobCore.checkType(Number, each) &&
         (each > eachProportion || each < 1)
     ) {
         createStaggerEachWarning(eachProportion);
@@ -215,7 +215,7 @@ export const MobCreateStaggers = (data) => {
      * */
     const staggerArrayFiltered = staggerArray.filter(
         ({ item }) =>
-            mobCore.checkType(Element, item) || mobCore.checkType(Object, item)
+            MobCore.checkType(Element, item) || MobCore.checkType(Object, item)
     );
 
     if (staggerArrayFiltered.length === 0) {

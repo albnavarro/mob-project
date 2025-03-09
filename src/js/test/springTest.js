@@ -1,4 +1,4 @@
-import { timeline, tween } from '../mobMotion';
+import { MobTimeline, MobTween } from '../mobMotion';
 
 export function springTest() {
     const btnStart = document.querySelector('.spring-btn-start');
@@ -13,7 +13,7 @@ export function springTest() {
     const target = document.querySelector('.spring-target');
 
     // DEFINE SPRING
-    const mySpring = tween.createSpring({
+    const mySpring = MobTween.createSpring({
         data: { x: 0, y: 0, rotate: 0 },
         configProps: { mass: 0.2 },
         config: 'wobbly',
@@ -31,8 +31,11 @@ export function springTest() {
     }
 
     // DEFINE TIMELINE
-    const timeline1 = timeline
-        .createAsyncTimeline({ repeat: 2, yoyo: true, freeMode: true })
+    const timeline1 = MobTimeline.createAsyncTimeline({
+        repeat: 2,
+        yoyo: true,
+        freeMode: true,
+    })
         .set(mySpring, { x: 0, y: 0, rotate: 0 })
         .goTo(mySpring, { x: -200 }, { configProps: { precision: 0.5 } })
         .goFromTo(

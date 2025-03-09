@@ -1,5 +1,5 @@
-import { mobCore } from '../mobCore';
-import { timeline, tween } from '../mobMotion';
+import { MobCore } from '../mobCore';
+import { MobTimeline, MobTween } from '../mobMotion';
 
 export function timlineReverseImmediateTest() {
     const btnStart = document.querySelector('.reverse-immediate-btn-start');
@@ -50,7 +50,7 @@ export function timlineReverseImmediateTest() {
     });
 
     // DEFINE TWEEN
-    const tweenBox1 = tween.createTween({
+    const tweenBox1 = MobTween.createTimeTween({
         data: { x: 0, y: 0, rotate: 0 },
     });
 
@@ -59,13 +59,13 @@ export function timlineReverseImmediateTest() {
     });
 
     // DEFINE TWEEN 2
-    const tweenBox2 = tween.createTween({ data: { rotate: 0 } });
+    const tweenBox2 = MobTween.createTimeTween({ data: { rotate: 0 } });
     tweenBox2.subscribe(({ rotate }) => {
         target2.style.transform = `rotate(${rotate}deg)`;
     });
 
     // DEFINE TIMELINE
-    const timeline1 = timeline.createAsyncTimeline({
+    const timeline1 = MobTimeline.createAsyncTimeline({
         repeat: 1,
         yoyo: false,
         autoSet: true,
@@ -164,7 +164,7 @@ export function timlineReverseImmediateTest() {
         btnSuspensionStatus.innerHTML = `is in suspension: ${timeline1.isSuspended()}`;
         btnPauseStatus.innerHTML = `is paused: ${timeline1.isPaused()}`;
         btnActiveStatus.innerHTML = `is running: ${timeline1.isActive()}`;
-        mobCore.useNextFrame(() => loop());
+        MobCore.useNextFrame(() => loop());
     };
 
     loop();

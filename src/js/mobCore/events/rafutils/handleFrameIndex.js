@@ -3,7 +3,7 @@
 import { eventStore } from '../eventStore.js';
 
 /**
- * @type {Map<number, import('./type.js').handleFrameCallbakType[]>}
+ * @type {Map<number, import('./type.js').HandleFrameCallbak[]>}
  */
 const indexCallbackMap = new Map();
 
@@ -55,7 +55,7 @@ const fire = ({ currentFrame, time, fps }) => {
  * Add callback to a specific frame.
  *
  * @memberof module:handleFrameIndex
- * @param {import('./type.js').handleFrameCallbakType} callback - callback function
+ * @param {import('./type.js').HandleFrameCallbak} callback - callback function
  * @param {number} index
  *
  * @example

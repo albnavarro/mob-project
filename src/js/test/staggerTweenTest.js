@@ -1,4 +1,4 @@
-import { timeline, tween } from '../mobMotion';
+import { MobTimeline, MobTween } from '../mobMotion';
 
 export function staggerTweenTest() {
     const btnStart = document.querySelector('.tween .start');
@@ -17,7 +17,7 @@ export function staggerTweenTest() {
     const stagger = document.querySelectorAll('.tween .target-stagger');
 
     // DEFINE SPRING
-    const myTween = tween.createTween({
+    const myTween = MobTween.createTimeTween({
         ease: 'easeOutSine',
         data: { x: 0, y: 0 },
     });
@@ -26,7 +26,7 @@ export function staggerTweenTest() {
         target.style.transform = `translate3D(0px,0px,0px) translate(${x}px, ${y}px)`;
     });
 
-    const myStagger = tween.createTween({
+    const myStagger = MobTween.createTimeTween({
         stagger: { each: 4, from: 'start' },
         ease: 'easeOutSine',
         data: { x: 0 },
@@ -52,8 +52,11 @@ export function staggerTweenTest() {
 
     // When use waitComplete: false all the stagger of same tween must have the same each value to syncronize
     // DEFINE TIMELINE
-    const timeline1 = timeline
-        .createAsyncTimeline({ repeat: -1, yoyo: false, autoSet: false })
+    const timeline1 = MobTimeline.createAsyncTimeline({
+        repeat: -1,
+        yoyo: false,
+        autoSet: false,
+    })
         .goTo(myTween, { x: 500 })
         .goTo(myTween, { y: 500 })
         .createGroup({ waitComplete: false })

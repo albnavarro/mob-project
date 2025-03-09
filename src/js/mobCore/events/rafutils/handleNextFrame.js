@@ -1,7 +1,7 @@
 // @ts-check
 
 /**
- * @type {import('./type.js').handleFrameCallbakType[]}
+ * @type {import('./type.js').HandleFrameCallbak[]}
  */
 const callbacks = [];
 
@@ -10,7 +10,7 @@ const callbacks = [];
  * @description
  * Add callback
  *
- * @param {import('./type.js').handleFrameCallbakType} callBack - callback function
+ * @param {import('./type.js').HandleFrameCallbak} callBack - callback function
  *
  * @example
  * ```javascript
@@ -33,7 +33,7 @@ const add = (callBack) => {
  * @description
  * Reset callback
  *
- * @returns {import('./type.js').handleFrameArrayType}
+ * @returns {import('./type.js').HandleFrameArray}
  *
  */
 const get = () => {

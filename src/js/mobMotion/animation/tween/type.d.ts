@@ -33,7 +33,7 @@ export type EaseTypes =
     | 'easeOutBounce'
     | 'easeInOutBounce';
 
-export interface TweenProps {
+export interface TimeTweenProps {
     data: Record<string, number>;
     duration?: number;
     relative?: boolean;
@@ -41,17 +41,17 @@ export interface TweenProps {
     ease?: EaseTypes;
 }
 
-export interface TweenCommonProps {
+export interface TimeTweenCommonProps {
     reverse?: boolean;
     relative?: boolean;
     immediate?: boolean;
 }
 
-export interface TweenCommonPropsTween extends TweenCommonProps {
+export interface TimeTweenCommonPropsTween extends TimeTweenCommonProps {
     duration?: number;
 }
 
-export interface TweenAction {
+export interface TimeTweenAction {
     duration?: number;
     reverse?: boolean;
     relative?: boolean;
@@ -59,7 +59,7 @@ export interface TweenAction {
     ease?: EaseTypes;
 }
 
-export interface TweenDefault {
+export interface TimeTweenDefault {
     duration: number;
     ease: string;
     relative: boolean;
@@ -67,11 +67,11 @@ export interface TweenDefault {
     immediate: boolean;
 }
 
-export interface TweenStopProps {
+export interface TimeTweenStopProps {
     clearCache?: boolean;
 }
 
-export interface TweenInitialData {
+export interface TimeTweenInitialData {
     prop: string;
     toValue: number;
     fromValue: number;
@@ -84,24 +84,27 @@ export interface TweenInitialData {
     settled: boolean;
 }
 
-export interface TweenStoreData extends TweenInitialData {
+export interface TimeTweenStoreData extends TimeTweenInitialData {
     toValueOnPause: number;
     toValProcessed: number;
 }
 
-export type TweenMergeProps = (props: TweenAction) => TweenDefault;
-export type TweenStop = (arg0?: TweenStopProps) => void;
-export type TweenPause = () => void;
-export type TweenResume = () => void;
-export type TweenResetData = () => void;
-export type TweenGetValue = () => Record<string, number>;
-export type TweenGetValueNative = () => Record<string, number | (() => number)>;
-export type TweenGetType = () => string;
-export type TweenGetId = () => string;
-export type TweenUpdateEase = (arg0: EaseTypes) => void;
-export type TweenSubscribe = (cb: (arg0: any) => void) => () => void;
-export type TweenSubscribeCache = (
+export type TimeTweenMergeProps = (props: TimeTweenAction) => TimeTweenDefault;
+export type TimeTweenStop = (arg0?: TimeTweenStopProps) => void;
+export type TimeTweenPause = () => void;
+export type TimeTweenResume = () => void;
+export type TimeTweenResetData = () => void;
+export type TimeTweenGetValue = () => Record<string, number>;
+export type TimeTweenGetValueNative = () => Record<
+    string,
+    number | (() => number)
+>;
+export type TimeTweenGetType = () => string;
+export type TimeTweenGetId = () => string;
+export type TimeTweenUpdateEase = (arg0: EaseTypes) => void;
+export type TimeTweenSubscribe = (cb: (arg0: any) => void) => () => void;
+export type TimeTweenSubscribeCache = (
     item: object | HTMLElement,
     cb: (arg0: Record<string, number>) => void
 ) => () => void;
-export type TweenOnComplete = (cb: (arg0: any) => void) => () => void;
+export type TimeTweenOnComplete = (cb: (arg0: any) => void) => () => void;

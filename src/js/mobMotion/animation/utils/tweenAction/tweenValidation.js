@@ -81,7 +81,7 @@ import {
     exactMatchInsesitiveNumberPropArray,
 } from '../regexValidation';
 import { getPropiertiesValueFromConstant } from '../../scroller/getConstantFromRegex.js';
-import { mobCore } from '../../../../mobCore';
+import { MobCore } from '../../../../mobCore';
 
 /**
  *
@@ -93,9 +93,9 @@ import { mobCore } from '../../../../mobCore';
  **/
 export const dataTweenValueIsValid = (val) => {
     return (
-        mobCore.checkType(Number, val) ||
+        MobCore.checkType(Number, val) ||
         // @ts-ignore
-        (mobCore.checkType(Function, val) && mobCore.checkType(Number, val()))
+        (MobCore.checkType(Function, val) && MobCore.checkType(Number, val()))
     );
 };
 
@@ -109,8 +109,8 @@ export const dataTweenValueIsValid = (val) => {
  * Check if sequencer start && end value is valid
  */
 export const sequencerRangeValidate = ({ start, end }) => {
-    const startIsValid = mobCore.checkType(Number, start);
-    const endIsValid = mobCore.checkType(Number, end);
+    const startIsValid = MobCore.checkType(Number, start);
+    const endIsValid = MobCore.checkType(Number, end);
     if (!startIsValid) sequencerRangeStartWarning(start);
     if (!endIsValid) sequencerRangeEndWarning(end);
     return startIsValid && endIsValid;
@@ -125,7 +125,7 @@ export const sequencerRangeValidate = ({ start, end }) => {
  * Check if new duration value is Valid
  **/
 export const durationIsValid = (duration) => {
-    const isValid = mobCore.checkType(Number, duration);
+    const isValid = MobCore.checkType(Number, duration);
     if (!isValid && duration) durationWarining(duration);
 
     return isValid
@@ -142,7 +142,7 @@ export const durationIsValid = (duration) => {
  * Check if repeat definition is valid
  **/
 export const repeatIsValid = (repeat) => {
-    const isValid = mobCore.checkType(Number, repeat);
+    const isValid = MobCore.checkType(Number, repeat);
     if (!isValid && repeat) repeatWarining(repeat);
 
     return isValid && repeat ? repeat : 1;
@@ -189,8 +189,8 @@ export const easeScrollerTweenIsValid = (ease) => {
  * Check if new tween prop is valid
  **/
 export const initialDataPropValidate = (prop, value) => {
-    const propIsValid = mobCore.checkType(String, prop);
-    const valueIsValid = mobCore.checkType(Number, value);
+    const propIsValid = MobCore.checkType(String, prop);
+    const valueIsValid = MobCore.checkType(Number, value);
 
     if (!propIsValid) initialDataPropWarining(prop);
     if (!valueIsValid) initialDataValueWarining(value);
@@ -207,7 +207,7 @@ export const initialDataPropValidate = (prop, value) => {
 export const validateStaggerEach = (each) => {
     if (!each) return;
 
-    const eachIsValid = mobCore.checkType(Number, each);
+    const eachIsValid = MobCore.checkType(Number, each);
     if (!eachIsValid) staggerEachWarning();
 
     return eachIsValid;
@@ -232,8 +232,8 @@ export const validateStaggerFrom = (from) => {
 
     // @ts-ignore
     const fromIsAValidString = fromList.includes(from);
-    const fromIsANumber = mobCore.checkType(Number, from);
-    const fromIsAValidObject = mobCore.checkType(Object, from);
+    const fromIsANumber = MobCore.checkType(Number, from);
+    const fromIsAValidObject = MobCore.checkType(Object, from);
     const fromIsValid =
         fromIsAValidString || fromIsANumber || fromIsAValidObject;
     if (!fromIsValid) staggerFromGenericWarning(from);
@@ -250,7 +250,7 @@ export const validateStaggerFrom = (from) => {
 export const validateStaggerColRow = (val) => {
     if (!val) return;
 
-    const valIsValid = mobCore.checkType(Number, val);
+    const valIsValid = MobCore.checkType(Number, val);
     if (!valIsValid) staggerRowColGenericWarining(val);
 
     return valIsValid;
@@ -282,7 +282,7 @@ export const validateStaggerDirection = (direction) => {
 export const validateStaggerWaitComplete = (waitComplete) => {
     if (!waitComplete) return;
 
-    const valIsValid = mobCore.checkType(Boolean, waitComplete);
+    const valIsValid = MobCore.checkType(Boolean, waitComplete);
     if (!valIsValid) staggerWaitCompleteWarning();
 
     return valIsValid;
@@ -296,7 +296,7 @@ export const validateStaggerWaitComplete = (waitComplete) => {
  * Return only the boolean value
  **/
 export const validateStaggerItems = (arr = []) => {
-    const isValid = mobCore.checkType(Array, [...arr]) && arr.length > 0;
+    const isValid = MobCore.checkType(Array, [...arr]) && arr.length > 0;
     if (!isValid) createStaggerItemsWarning();
 
     return isValid;
@@ -310,7 +310,7 @@ export const validateStaggerItems = (arr = []) => {
  * Return the array fallback
  **/
 export const staggerItemsIsValid = (arr = []) => {
-    const isValid = mobCore.checkType(Array, [...arr]) && arr.length > 0;
+    const isValid = MobCore.checkType(Array, [...arr]) && arr.length > 0;
     return isValid ? arr : [];
 };
 
@@ -348,7 +348,7 @@ export const validateStaggerType = (type) => {
  * Check if new tween duration value is Valid
  **/
 export const durationTweenIsValid = (duration) => {
-    const isValid = mobCore.checkType(Number, duration);
+    const isValid = MobCore.checkType(Number, duration);
     if (!isValid && duration) durationWarining(duration);
 
     return isValid
@@ -366,7 +366,7 @@ export const durationTweenIsValid = (duration) => {
  * Check if new relative value is Valid
  **/
 export const relativeIsValid = (val, tweenType) => {
-    const isValid = mobCore.checkType(Boolean, val);
+    const isValid = MobCore.checkType(Boolean, val);
     if (!isValid && val) relativeWarining(val, tweenType);
 
     return isValid
@@ -427,7 +427,7 @@ export const springConfigIsValidAndGetNew = (config) => {
     const isValidPropsKey = isInConfig
         ? (() => {
               return (
-                  mobCore.checkType(Object, obj) &&
+                  MobCore.checkType(Object, obj) &&
                   'tension' in obj &&
                   'mass' in obj &&
                   'friction' in obj &&
@@ -440,7 +440,7 @@ export const springConfigIsValidAndGetNew = (config) => {
     // Check if all key is a positive number
     const isValidPropsValue = isValidPropsKey
         ? Object.values(obj).every((prop) => {
-              return mobCore.checkType(Number, prop) && prop >= 0;
+              return MobCore.checkType(Number, prop) && prop >= 0;
           })
         : null;
 
@@ -481,10 +481,10 @@ export const springConfigIsValid = (config) => {
  **/
 export const springConfigPropIsValid = (obj) => {
     const isValid =
-        mobCore.checkType(Object, obj) &&
+        MobCore.checkType(Object, obj) &&
         // @ts-ignore
         Object.values(obj).every((prop) => {
-            return mobCore.checkType(Number, prop) && prop >= 0;
+            return MobCore.checkType(Number, prop) && prop >= 0;
         });
 
     if (!isValid && obj) springConfigPropWarning();
@@ -502,10 +502,10 @@ export const springConfigPropIsValid = (obj) => {
  * Check if duration definition is valid
  **/
 export const durationIsNumberOrFunctionIsValid = (duration) => {
-    const durationIsFn = mobCore.checkType(Function, duration);
+    const durationIsFn = MobCore.checkType(Function, duration);
     // @ts-ignore
     const durationResult = durationIsFn ? duration() : duration;
-    const isValid = mobCore.checkType(Number, durationResult);
+    const isValid = MobCore.checkType(Number, durationResult);
     if (!isValid && duration) durationNumberOrFunctionWarining(duration);
 
     return isValid ? durationResult : handleSetUp.get('tween').duration;
@@ -520,7 +520,7 @@ export const durationIsNumberOrFunctionIsValid = (duration) => {
  * Check if value is Boolan and true
  **/
 export const valueIsBooleanAndTrue = (value, label) => {
-    const isValid = mobCore.checkType(Boolean, value);
+    const isValid = MobCore.checkType(Boolean, value);
     if (!isValid && value) booleanWarning(value, label);
 
     return isValid && value === true;
@@ -537,7 +537,7 @@ export const valueIsBooleanAndTrue = (value, label) => {
  * Check if value is Boolan and reteurn Default
  **/
 export const valueIsBooleanAndReturnDefault = (value, label, defaultValue) => {
-    const isValid = mobCore.checkType(Boolean, value);
+    const isValid = MobCore.checkType(Boolean, value);
     if (!isValid && value) booleanWarning(value, label);
 
     // @ts-ignore
@@ -555,7 +555,7 @@ export const valueIsBooleanAndReturnDefault = (value, label, defaultValue) => {
  * Check if value is String and return default
  **/
 export const valueIsStringAndReturnDefault = (value, label, defaultValue) => {
-    const isValid = mobCore.checkType(String, value);
+    const isValid = MobCore.checkType(String, value);
     if (!isValid && value) stringWarning(value, label);
 
     // @ts-ignore
@@ -573,7 +573,7 @@ export const valueIsStringAndReturnDefault = (value, label, defaultValue) => {
  * Check if value is Number and return default
  **/
 export const valueIsNumberAndReturnDefault = (value, label, defaultValue) => {
-    const isValid = mobCore.checkType(Number, value);
+    const isValid = MobCore.checkType(Number, value);
     if (!isValid && value) naumberWarning(value, label);
 
     return isValid ? value : defaultValue;
@@ -591,7 +591,7 @@ export const valueIsNumberAndReturnDefault = (value, label, defaultValue) => {
  * Check if value is Function and return default
  **/
 export const valueIsFunctionAndReturnDefault = (value, label, defaultValue) => {
-    const isValid = mobCore.checkType(Function, value);
+    const isValid = MobCore.checkType(Function, value);
     if (!isValid && value) functionWarning(value, label);
 
     // @ts-ignore
@@ -608,7 +608,7 @@ export const valueIsFunctionAndReturnDefault = (value, label, defaultValue) => {
  **/
 export const lerpVelocityIsValid = (value) => {
     // @ts-ignore
-    const isValid = mobCore.checkType(Number, value) && value > 0 && value <= 1;
+    const isValid = MobCore.checkType(Number, value) && value > 0 && value <= 1;
     if (!isValid && value) lerpVelocityWarining();
 
     return isValid
@@ -625,7 +625,7 @@ export const lerpVelocityIsValid = (value) => {
  * Check if precision is valid
  **/
 export const lerpPrecisionIsValid = (value) => {
-    const isValid = mobCore.checkType(Number, value);
+    const isValid = MobCore.checkType(Number, value);
     if (!isValid && value) lerpPrecisionWarining();
 
     return isValid
@@ -643,7 +643,7 @@ export const lerpPrecisionIsValid = (value) => {
  * Check if value is a string.
  **/
 export const valueStringIsValid = (value, label) => {
-    const isValid = mobCore.checkType(String, value);
+    const isValid = MobCore.checkType(String, value);
     if (!isValid && value) valueStringWarning(label);
 
     return isValid;
@@ -658,7 +658,7 @@ export const valueStringIsValid = (value, label) => {
  * Check if Delay is a Number and return Number || null.
  **/
 export const asyncTimelineDelayIsValid = (value) => {
-    const isValid = mobCore.checkType(Number, value);
+    const isValid = MobCore.checkType(Number, value);
     if (!isValid && value) asyncTimelineDelayWarning();
 
     return isValid ? value : undefined;
@@ -706,7 +706,7 @@ export const playLabelIsValid = (index, label) => {
  * Check if value is A function and return default
  **/
 export const functionIsValidAndReturnDefault = (fn, defaultValue, label) => {
-    const isValid = mobCore.checkType(Function, fn);
+    const isValid = MobCore.checkType(Function, fn);
     if (!isValid && fn) functionIsValidAndReturnDefaultWarining(label, fn);
 
     return isValid ? fn : defaultValue;
@@ -721,7 +721,7 @@ export const functionIsValidAndReturnDefault = (fn, defaultValue, label) => {
  * Check if value is A function
  **/
 export const addAsyncFunctionIsValid = (fn) => {
-    const isValid = mobCore.checkType(Function, fn);
+    const isValid = MobCore.checkType(Function, fn);
     if (!isValid && fn) addAsyncFunctionWarining(fn);
 
     return isValid
@@ -739,7 +739,7 @@ export const addAsyncFunctionIsValid = (fn) => {
  * Check if value is an Array
  **/
 export const timelineSetTweenArrayIsValid = (arr) => {
-    const isValid = mobCore.checkType(Array, arr);
+    const isValid = MobCore.checkType(Array, arr);
     if (!isValid && arr) timelineSetTweenArrayWarining(arr);
 
     return isValid;
@@ -753,7 +753,7 @@ export const timelineSetTweenArrayIsValid = (arr) => {
  * Check if value is an string
  **/
 export const timelineSetTweenLabelIsValid = (label) => {
-    const isValid = mobCore.checkType(String, label);
+    const isValid = MobCore.checkType(String, label);
     if (!isValid && label) timelineSetTweenLabelWarining(label);
 
     return isValid;
@@ -772,7 +772,7 @@ export const domNodeIsValidAndReturnElOrWin = (
     element,
     returnWindow = false
 ) => {
-    const isNode = mobCore.checkType(Element, element);
+    const isNode = MobCore.checkType(Element, element);
     // @ts-ignore
     const realEl = isNode ? element : document.querySelector(element);
 
@@ -791,7 +791,7 @@ export const domNodeIsValidAndReturnElOrWin = (
  * Check if value is a valid Element
  **/
 export const domNodeIsValidAndReturnNull = (element) => {
-    const isNode = mobCore.checkType(Element, element);
+    const isNode = MobCore.checkType(Element, element);
     // @ts-ignore
     const realEl = isNode ? element : document.querySelector(element);
 
@@ -844,19 +844,19 @@ export const scrollerDynamicValueIsValid = (obj, label) => {
     ];
 
     // obj is an Object
-    const valueIsObject = mobCore.checkType(Object, obj);
+    const valueIsObject = MobCore.checkType(Object, obj);
     //
     // position is a String and contains the right value
     const positionIsValid =
         valueIsObject &&
-        mobCore.checkType(String, obj?.position) &&
+        MobCore.checkType(String, obj?.position) &&
         positionChoice.includes(obj.position);
 
     // Value is a function and return a number
     const valueIsValid =
         valueIsObject &&
-        mobCore.checkType(Function, obj.value) &&
-        mobCore.checkType(Number, obj.value());
+        MobCore.checkType(Function, obj.value) &&
+        MobCore.checkType(Number, obj.value());
 
     // Validate all
     const isValid = valueIsObject && positionIsValid && valueIsValid;
@@ -875,7 +875,7 @@ export const scrollerDynamicValueIsValid = (obj, label) => {
  **/
 export const scrollerDynamicRangeIsValid = (fn) => {
     const isValid =
-        mobCore.checkType(Function, fn) && mobCore.checkType(Number, fn?.());
+        MobCore.checkType(Function, fn) && MobCore.checkType(Number, fn?.());
 
     if (!isValid && fn) scrollerDynmicRangeValueWarining();
 
@@ -923,7 +923,7 @@ export const scrollerAlignIsValid = (value) => {
     ];
 
     // @ts-ignore
-    const isValid = choice.includes(value) || mobCore.checkType(Number, value);
+    const isValid = choice.includes(value) || MobCore.checkType(Number, value);
 
     if (!isValid && value) scrollerAlignWarining(value, choice);
 
@@ -966,9 +966,9 @@ export const scrollerOnSwitchIsValid = (value) => {
  * Check if value is Number and return default
  **/
 export const scrollerOpacityIsValid = (value, label, defaultValue) => {
-    if (!value) return defaultValue;
+    if (value === undefined || value === null) return defaultValue;
 
-    const isValid = mobCore.checkType(Number, value);
+    const isValid = MobCore.checkType(Number, value);
     if (!isValid && value) scrollerOpacityWarning(value, label);
 
     return isValid ? value : defaultValue;
@@ -1013,7 +1013,7 @@ export const scrollerRangeIsValid = (value, type) => {
             // @ts-ignore
             const isOnlyNumber = checkIfIsOnlyNumber(value);
             const isValid =
-                mobCore.checkType(Number, Number(value)) &&
+                MobCore.checkType(Number, Number(value)) &&
                 isOnlyNumber &&
                 // @ts-ignore
                 value >= 0 &&
@@ -1027,7 +1027,7 @@ export const scrollerRangeIsValid = (value, type) => {
                   10 - value
                 : 10 - handleSetUp.get('parallax').defaultRange;
         } else {
-            const isValid = mobCore.checkType(String, value);
+            const isValid = MobCore.checkType(String, value);
             if (!isValid && value) scrollerRangeStringWarning(value);
 
             return isValid ? value : '0px';
@@ -1055,7 +1055,7 @@ export const breakpointIsValid = (mq, label, component) => {
     const mqObj = handleSetUp.get('mq');
     const choice = Object.keys(mqObj);
 
-    const isValid = mobCore.checkType(String, mq) && choice.includes(mq);
+    const isValid = MobCore.checkType(String, mq) && choice.includes(mq);
     if (!isValid && mq) breakpointWarning(mq, choice, label, component);
 
     return isValid ? mq : defaultMq;
@@ -1077,7 +1077,7 @@ export const breakpointTypeIsValid = (type, label, component) => {
 
     const choice = [MQ_MAX, MQ_MIN];
 
-    const isValid = mobCore.checkType(String, type) && choice.includes(type);
+    const isValid = MobCore.checkType(String, type) && choice.includes(type);
     if (!isValid && type) breakpointWarning(type, choice, label, component);
 
     return isValid ? type : defaultType;
@@ -1138,7 +1138,7 @@ export const scrollerPropiertiesIsValid = (
     /**
      * Check if is a string, custom css propierties is allowed
      */
-    const isValid = mobCore.checkType(String, value);
+    const isValid = MobCore.checkType(String, value);
     if (!isValid && value) scrollerPropiertiesWarining(value, choice);
 
     /**
@@ -1267,7 +1267,7 @@ export const scrollerSpringConfigIsValid = (config, type) => {
 export const scrollerLerpConfigIsValid = (value, type) => {
     const isValid =
         // @ts-ignore
-        mobCore.checkType(Number, Number(value)) && value > 0 && value <= 1;
+        MobCore.checkType(Number, Number(value)) && value > 0 && value <= 1;
 
     if (!isValid && value) scrollerLerpConfigWarning();
 

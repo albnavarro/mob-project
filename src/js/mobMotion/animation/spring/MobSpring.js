@@ -43,7 +43,7 @@ import {
     valueIsBooleanAndTrue,
 } from '../utils/tweenAction/tweenValidation.js';
 import { handleSetUp } from '../../setup.js';
-import { mobCore } from '../../../mobCore/index.js';
+import { MobCore } from '../../../mobCore/index.js';
 import { shouldInizializzeStagger } from '../utils/stagger/shouldInizialize.js';
 import { resume } from '../utils/resumeTween.js';
 import {
@@ -229,7 +229,7 @@ export default class MobSpring {
         this.#relative = relativeIsValid(data?.relative, 'spring');
         this.#configProps = springConfigIsValidAndGetNew(data?.config);
         this.updateConfigProp(data?.configProps ?? {});
-        this.#uniqueId = mobCore.getUnivoqueId();
+        this.#uniqueId = MobCore.getUnivoqueId();
         this.#isActive = false;
         this.#currentResolve = undefined;
         this.#currentReject = undefined;
@@ -355,8 +355,8 @@ export default class MobSpring {
             return;
         }
 
-        mobCore.useFrame(() => {
-            mobCore.useNextTick(({ time, fps }) => {
+        MobCore.useFrame(() => {
+            MobCore.useNextTick(({ time, fps }) => {
                 if (this.#isActive)
                     this.#draw(
                         time,
@@ -415,7 +415,7 @@ export default class MobSpring {
                 this.#callback
             )
         ) {
-            const { averageFPS } = await mobCore.useFps();
+            const { averageFPS } = await MobCore.useFps();
 
             fpsLoadedLog('spring', averageFPS);
             const cb = getStaggerArray(this.#callbackCache, this.#callback);
@@ -497,11 +497,11 @@ export default class MobSpring {
          * If tween is ended and the lst stagger is running, let it reach end position.
          */
         if (this.#isActive && clearCache)
-            this.#callbackCache.forEach(({ cb }) => mobCore.useCache.clean(cb));
+            this.#callbackCache.forEach(({ cb }) => MobCore.useCache.clean(cb));
 
         // Reject promise
         if (this.#currentReject) {
-            this.#currentReject(mobCore.ANIMATION_STOP_REJECT);
+            this.#currentReject(MobCore.ANIMATION_STOP_REJECT);
             this.#promise = undefined;
             this.#currentReject = undefined;
             this.#currentResolve = undefined;

@@ -1,11 +1,11 @@
-import { mobCore } from '../../../mobCore';
+import { MobCore } from '../../../mobCore';
 import {
     getTranslateValues,
     offset,
     outerHeight,
     outerWidth,
 } from '../../../mobCore/utils';
-import { tween } from '../../tween';
+import { MobTween } from '../../tween';
 
 export class MobMouseParallax {
     /**
@@ -105,7 +105,7 @@ export class MobMouseParallax {
         this.#width = 0;
         this.#offSetTop = 0;
         this.#offSetLeft = 0;
-        this.#spring = tween.createSpring({ data: { ax: 0, ay: 0 } });
+        this.#spring = MobTween.createSpring({ data: { ax: 0, ay: 0 } });
 
         // Mouse coord
         this.#pageCoord = { x: 0, y: 0 };
@@ -132,18 +132,18 @@ export class MobMouseParallax {
     init() {
         this.#getDimension();
 
-        this.#unsubscribeMouseMove = mobCore.useMouseMove(
+        this.#unsubscribeMouseMove = MobCore.useMouseMove(
             ({ page, client }) => {
                 this.#setGlobalCoord({ page, client });
                 this.#onMove();
             }
         );
 
-        this.#unsubscribeResize = mobCore.useResize(() => {
+        this.#unsubscribeResize = MobCore.useResize(() => {
             this.#getDimension();
         });
 
-        this.#unsubscribeScroll = mobCore.useScroll(({ scrollY }) => {
+        this.#unsubscribeScroll = MobCore.useScroll(({ scrollY }) => {
             this.#onScroll(scrollY);
         });
 

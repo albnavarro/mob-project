@@ -1,8 +1,8 @@
 //@ts-check
 
-import { mobCore } from '../../../mobCore';
-import { motionCore } from '../../core';
-import { tween } from '../../tween';
+import { MobCore } from '../../../mobCore';
+import { MobMotionCore } from '../../core';
+import { MobTween } from '../../tween';
 
 let isActive = false;
 
@@ -29,7 +29,7 @@ let rootElementToObserve;
 
 /** @type{import('./type').MobPageScroller} */
 const MobPageScroller = ({ velocity, rootElement }) => {
-    let lerp = tween.createLerp({ data: { scrollValue: window.scrollY } });
+    let lerp = MobTween.createLerp({ data: { scrollValue: window.scrollY } });
     rootElementToObserve = rootElement;
 
     const unsubscribe = lerp.subscribe(({ scrollValue }) => {
@@ -49,12 +49,12 @@ const MobPageScroller = ({ velocity, rootElement }) => {
     /**
      * Main handler.
      */
-    const unsubscribeMouseWheel = mobCore.useMouseWheel((event) => {
+    const unsubscribeMouseWheel = MobCore.useMouseWheel((event) => {
         if (isFreezed) return;
 
         event.preventDefault();
         smoothIsActive = true;
-        const currentValue = motionCore.clamp(
+        const currentValue = MobMotionCore.clamp(
             // @ts-ignore
             event.spinY * velocity + lastScrollValue,
             0,
@@ -68,7 +68,7 @@ const MobPageScroller = ({ velocity, rootElement }) => {
     /**
      * Update lerp value on native scroll event.
      */
-    const unsubscribeScroll = mobCore.useScroll(() => {
+    const unsubscribeScroll = MobCore.useScroll(() => {
         if (smoothIsActive || isFreezed) {
             return;
         }
@@ -81,7 +81,7 @@ const MobPageScroller = ({ velocity, rootElement }) => {
     /**
      * Stop lerp if use native scrollbar
      */
-    const unsubscribeMouseDown = mobCore.useMouseDown((event) => {
+    const unsubscribeMouseDown = MobCore.useMouseDown((event) => {
         if (isFreezed) return;
 
         const scrollBarWidth =

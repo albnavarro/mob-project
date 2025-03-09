@@ -1,6 +1,6 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { mobCore } from '../mobCore';
+import { MobCore } from '../mobCore';
 import { outerWidth } from '../mobCore/utils';
 
 class gsapTestClass {
@@ -217,7 +217,7 @@ class gsapTestClass {
             },
         });
 
-        mobCore.useResize(() => {
+        MobCore.useResize(() => {
             width = this.cardWidth(card);
             this.applyStyle(width, container, itemToScroll);
             percentRange = this.getPercentMaxScroll();
@@ -258,7 +258,7 @@ class gsapTestClass {
             },
         });
 
-        mobCore.useResize(() => {
+        MobCore.useResize(() => {
             width = this.cardWidth(card);
             this.applyStyle(width, container, itemToScroll);
             tl.scrollTrigger.refresh();

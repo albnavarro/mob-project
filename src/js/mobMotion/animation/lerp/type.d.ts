@@ -1,4 +1,4 @@
-import { TweenStopProps } from '../tween/type';
+import { TimeTweenStopProps } from '../tween/type';
 import { StaggerObject } from '../utils/stagger/type';
 
 export interface lerpTweenProps {
@@ -41,7 +41,7 @@ export interface lerpValues extends lerpInitialData {
 }
 
 export type lerpMergeProps = (props: lerpActions) => lerpDefault;
-export type lerpStop = (arg0?: TweenStopProps) => void;
+export type lerpStop = (arg0?: TimeTweenStopProps) => void;
 export type lerpPause = () => void;
 export type lerpResume = () => void;
 export type lerpResetData = () => void;

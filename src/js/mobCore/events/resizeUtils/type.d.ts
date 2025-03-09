@@ -1,4 +1,4 @@
-export interface handleResizeType {
+export interface HandleResize {
     scrollY: number;
     windowsHeight: number;
     windowsWidth: number;
@@ -7,4 +7,4 @@ export interface handleResizeType {
     horizontalResize: boolean;
 }
 
-export type handleResizeCallback = (arg0: handleResizeType) => void;
+export type HandleResizeCallback = (arg0: HandleResize) => void;

@@ -9,7 +9,7 @@ import { debounceFuncion } from '../debounce.js';
 let initialized = false;
 
 /**
- * @type {Map<String,import('./type.js').handleResizeCallback>}
+ * @type {Map<String,import('./type.js').HandleResizeCallback>}
  */
 const callbacks = new Map();
 
@@ -110,7 +110,7 @@ function init() {
 }
 
 /**
- * @param {import('./type.js').handleResizeCallback} cb - callback function fired on resize.
+ * @param {import('./type.js').HandleResizeCallback} cb - callback function fired on resize.
  * @returns {() => void}
  *
  * @description

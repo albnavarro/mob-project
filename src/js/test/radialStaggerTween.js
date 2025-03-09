@@ -1,11 +1,11 @@
-import { timeline, tween } from '../mobMotion';
+import { MobTimeline, MobTween } from '../mobMotion';
 
 export const radialStaggerTween = () => {
     const items = document.querySelectorAll(
         '.radial-stagger .radial-stagger__item'
     );
 
-    const tween1 = tween.createTween({
+    const tween1 = MobTween.createTimeTween({
         ease: 'easeInOutQuad',
         stagger: {
             each: 15,
@@ -28,8 +28,10 @@ export const radialStaggerTween = () => {
         });
     });
 
-    const timeline1 = timeline
-        .createAsyncTimeline({ repeat: -1, yoyo: true })
+    const timeline1 = MobTimeline.createAsyncTimeline({
+        repeat: -1,
+        yoyo: true,
+    })
         .goTo(tween1, { scale: 0.5 }, { duration: 1000 })
         .goTo(tween1, { scale: 2.5 }, { duration: 500 })
         .play();

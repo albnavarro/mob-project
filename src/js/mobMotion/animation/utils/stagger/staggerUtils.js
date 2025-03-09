@@ -1,6 +1,6 @@
 // @ts-check
 
-import { mobCore } from '../../../../mobCore/index.js';
+import { MobCore } from '../../../../mobCore/index.js';
 import {
     validateStaggerColRow,
     validateStaggerDirection,
@@ -19,7 +19,7 @@ import {
  * @param {number} each
  */
 export const getEachByFps = (each) => {
-    const { instantFps } = mobCore.store.get();
+    const { instantFps } = MobCore.store.get();
     const eachByFps = Math.round(each * (instantFps / 60));
 
     /*

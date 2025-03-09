@@ -1,4 +1,4 @@
-import { mobCore } from '../../../js/mobCore';
+import { MobCore } from '../../../js/mobCore';
 import { lightDescription } from './lightbox-description.js';
 import { lightboxUtils } from './lightbox-utils.js';
 
@@ -57,7 +57,7 @@ class LightBoxVideoClass {
             videoWrapper.classList.add('visible');
         }, 200);
 
-        this.unsubscribeResize = mobCore.useResize(() => {
+        this.unsubscribeResize = MobCore.useResize(() => {
             this.setVideoSize(wrapper, hGap, wGap, ratioW, ratioH);
         });
 

@@ -1,5 +1,5 @@
-import { mobCore } from '../mobCore';
-import { timeline, tween } from '../mobMotion';
+import { MobCore } from '../mobCore';
+import { MobTimeline, MobTween } from '../mobMotion';
 
 export function timlineMixTest() {
     const btnStart = document.querySelector('.mix-btn-start');
@@ -35,7 +35,7 @@ export function timlineMixTest() {
     });
 
     // DEFINE SPRING
-    const springBox1 = tween.createSpring({
+    const springBox1 = MobTween.createSpring({
         data: { x: 0, y: 0, rotate: 0 },
         config: 'wobbly',
     });
@@ -44,7 +44,7 @@ export function timlineMixTest() {
     });
 
     // DEFINE TWEEN
-    const tweenBox1 = tween.createTween({
+    const tweenBox1 = MobTween.createTimeTween({
         data: { x: 0, y: 0, rotate: 0 },
     });
 
@@ -53,13 +53,13 @@ export function timlineMixTest() {
     });
 
     // DEFINE TWEEN 2
-    const tweenBox2 = tween.createTween({ data: { rotate: 0 } });
+    const tweenBox2 = MobTween.createTimeTween({ data: { rotate: 0 } });
     tweenBox2.subscribe(({ rotate }) => {
         target2.style.transform = `rotate(${rotate}deg)`;
     });
 
     // DEFINE TIMELINE
-    const timeline1 = timeline.createAsyncTimeline({
+    const timeline1 = MobTimeline.createAsyncTimeline({
         repeat: 1,
         yoyo: false,
         autoSet: true,
@@ -170,7 +170,7 @@ export function timlineMixTest() {
         btnSuspensionStatus.innerHTML = `is in suspension: ${timeline1.isSuspended()}`;
         btnPauseStatus.innerHTML = `is paused: ${timeline1.isPaused()}`;
         btnActiveStatus.innerHTML = `is running: ${timeline1.isActive()}`;
-        mobCore.useNextFrame(() => loop());
+        MobCore.useNextFrame(() => loop());
     };
 
     loop();

@@ -1,4 +1,4 @@
-import { mobCore } from '../mobCore';
+import { MobCore } from '../mobCore';
 
 class StoreTestClass {
     constructor() {}
@@ -14,7 +14,7 @@ class StoreTestClass {
 
         const getValidate = document.querySelector('.getValidate');
 
-        const store = mobCore.createStore({
+        const store = MobCore.createStore({
             input: () => ({
                 value: 0,
                 type: Number,

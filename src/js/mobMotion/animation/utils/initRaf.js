@@ -1,6 +1,6 @@
 // @ts-check
 
-import { mobCore } from '../../../mobCore';
+import { MobCore } from '../../../mobCore';
 
 /**
  * @param {{ cb: () => boolean }[]} callbackPauseArray
@@ -19,8 +19,8 @@ export const initRaf = (
     pauseFunction,
     resolve
 ) => {
-    mobCore.useFrame(() => {
-        mobCore.useNextTick(({ time, fps }) => {
+    MobCore.useFrame(() => {
+        MobCore.useNextTick(({ time, fps }) => {
             const prevent = callbackPauseArray
                 .map(({ cb }) => cb())
                 .includes(true);

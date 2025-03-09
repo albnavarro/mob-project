@@ -1,4 +1,4 @@
-import { mobCore } from '../../../js/mobCore/index.js';
+import { MobCore } from '../../../js/mobCore/index.js';
 import { outerHeight, outerWidth } from '../../../js/mobCore/utils/index.js';
 
 class LightPichZoomClass {
@@ -52,39 +52,39 @@ class LightPichZoomClass {
         zoom.appendChild(zoomOut);
         this.setZoomBtnhandler();
 
-        this.unsubscribeWheel = mobCore.useMouseWheel(({ spinY, target }) => {
+        this.unsubscribeWheel = MobCore.useMouseWheel(({ spinY, target }) => {
             this.onWeel({ spinY, target });
         });
 
-        this.unsubscribeTouchStart = mobCore.useTouchStart(
+        this.unsubscribeTouchStart = MobCore.useTouchStart(
             ({ target, preventDefault }) => {
                 this.onMouseDown({ target, preventDefault });
             }
         );
 
-        this.unsubscribeMouseDown = mobCore.useMouseDown(
+        this.unsubscribeMouseDown = MobCore.useMouseDown(
             ({ target, preventDefault }) => {
                 this.onMouseDown({ target, preventDefault });
             }
         );
 
-        this.unsubscribeTouchEnd = mobCore.useTouchEnd(() => {
+        this.unsubscribeTouchEnd = MobCore.useTouchEnd(() => {
             this.onMouseUp();
         });
 
-        this.unsubscribeMouseUp = mobCore.useMouseUp(() => {
+        this.unsubscribeMouseUp = MobCore.useMouseUp(() => {
             this.onMouseUp();
         });
 
-        this.unsubscribeMouseMove = mobCore.useMouseMove(({ page }) => {
+        this.unsubscribeMouseMove = MobCore.useMouseMove(({ page }) => {
             this.onMove(false, page.x, page.y);
         });
 
-        this.unsubscribeTouchMove = mobCore.useTouchMove(({ page }) => {
+        this.unsubscribeTouchMove = MobCore.useTouchMove(({ page }) => {
             this.onMove(false, page.x, page.y);
         });
 
-        this.unsubscribeResize = mobCore.useResize(() => {
+        this.unsubscribeResize = MobCore.useResize(() => {
             this.resetZoom();
         });
     }

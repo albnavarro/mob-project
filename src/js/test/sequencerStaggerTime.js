@@ -1,4 +1,4 @@
-import { timeline, tween } from '../mobMotion';
+import { MobTimeline, MobTween } from '../mobMotion';
 
 export const sequencerStaggerTime = () => {
     const items = document.querySelectorAll('.master-stagger__item');
@@ -13,12 +13,12 @@ export const sequencerStaggerTime = () => {
         '.animation-playFromReverse'
     );
 
-    let masterSequencer = tween.createMasterSequencer();
+    let masterSequencer = MobTween.createMasterSequencer();
 
     // Example , not necessary
     const duration = 3000;
 
-    const staggers = tween.createStaggers({
+    const staggers = MobTween.createStaggers({
         items,
         stagger: {
             type: 'equal',
@@ -30,8 +30,10 @@ export const sequencerStaggerTime = () => {
     // Create sequencer
     const createSequencer = () => {
         staggers.forEach(({ item, start, end, index }) => {
-            const sequencer = tween
-                .createSequencer({ data: { y: 0 }, duration })
+            const sequencer = MobTween.createSequencer({
+                data: { y: 0 },
+                duration,
+            })
                 .goTo({ y: 300 }, { start, end, ease: 'easeInOutBack' })
                 .label(`label${index}`, start)
                 .add(({ direction, value }) => {
@@ -57,13 +59,11 @@ export const sequencerStaggerTime = () => {
     /**
      *  Animation
      **/
-    const timeline1 = timeline
-        .createSyncTimeline({
-            repeat: 3,
-            yoyo: true,
-            duration: 2000,
-        })
-        .add(masterSequencer);
+    const timeline1 = MobTimeline.createSyncTimeline({
+        repeat: 3,
+        yoyo: true,
+        duration: 2000,
+    }).add(masterSequencer);
 
     play.addEventListener('click', () => {
         timeline1.play();

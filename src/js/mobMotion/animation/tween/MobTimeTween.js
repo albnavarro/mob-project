@@ -41,7 +41,7 @@ import {
     relativeIsValid,
     valueIsBooleanAndTrue,
 } from '../utils/tweenAction/tweenValidation.js';
-import { mobCore } from '../../../mobCore/index.js';
+import { MobCore } from '../../../mobCore/index.js';
 import { shouldInizializzeStagger } from '../utils/stagger/shouldInizialize.js';
 import { mergeArrayTween } from '../utils/tweenAction/mergeArray.js';
 import {
@@ -51,7 +51,7 @@ import {
 } from '../utils/tweenAction/getValues.js';
 import { tweenGetValueOnDraw } from './getValuesOnDraw.js';
 
-export default class MobTween {
+export default class MobTimeTween {
     /**
      * @type {Function}
      *  This value lives from user call ( goTo etc..) until next call
@@ -69,7 +69,7 @@ export default class MobTween {
     #relative;
 
     /**
-     * @type {import('../utils/stagger/type').StaggerObject}
+     * @type {import('../utils/stagger/type.js').StaggerObject}
      */
     #stagger;
 
@@ -94,27 +94,27 @@ export default class MobTween {
     #promise;
 
     /**
-     * @type {import('./type').TweenStoreData[]}
+     * @type {import('./type.js').TimeTweenStoreData[]}
      */
     #values;
 
     /**
-     * @type {import('./type').TweenInitialData[]}
+     * @type {import('./type.js').TimeTweenInitialData[]}
      */
     #initialData;
 
     /**
-     * @type {import('../utils/callbacks/type').CallbackDefault}
+     * @type {import('../utils/callbacks/type.js').CallbackDefault}
      */
     #callback;
 
     /**
-     * @type {import('../utils/callbacks/type').CallbackCache}
+     * @type {import('../utils/callbacks/type.js').CallbackCache}
      */
     #callbackCache;
 
     /**
-     * @type {import('../utils/callbacks/type').CallbackDefault}
+     * @type {import('../utils/callbacks/type.js').CallbackDefault}
      */
     #callbackOnComplete;
 
@@ -178,22 +178,22 @@ export default class MobTween {
      * This value is the base value merged with new value in custom prop
      * passed form user in goTo etc..
      *
-     * @type{import('./type').TweenDefault}
+     * @type{import('./type.js').TimeTweenDefault}
      */
     #defaultProps;
 
     /**
-     * @type {import('../utils/stagger/type').StaggerFrameIndexObject}
+     * @type {import('../utils/stagger/type.js').StaggerFrameIndexObject}
      */
     #slowlestStagger;
 
     /**
-     * @type {import('../utils/stagger/type').StaggerFrameIndexObject}
+     * @type {import('../utils/stagger/type.js').StaggerFrameIndexObject}
      */
     #fastestStagger;
 
     /**
-     * @param {import('./type').TweenProps} [ data ]
+     * @param {import('./type.js').TimeTweenProps} [ data ]
      *
      * @example
      * ```javascript
@@ -242,7 +242,7 @@ export default class MobTween {
         this.#duration = durationIsNumberOrFunctionIsValid(data?.duration);
         this.#relative = relativeIsValid(data?.relative, 'tween');
         this.#stagger = getStaggerFromProps(data ?? {});
-        this.#uniqueId = mobCore.getUnivoqueId();
+        this.#uniqueId = MobCore.getUnivoqueId();
         this.#isActive = false;
         this.#currentReject = undefined;
         this.#promise = undefined;
@@ -365,8 +365,8 @@ export default class MobTween {
             return;
         }
 
-        mobCore.useFrame(() => {
-            mobCore.useNextTick(({ time }) => {
+        MobCore.useFrame(() => {
+            MobCore.useNextTick(({ time }) => {
                 if (this.#isActive) this.#draw(time, res);
             });
         });
@@ -404,7 +404,7 @@ export default class MobTween {
                 this.#callback
             )
         ) {
-            const { averageFPS } = await mobCore.useFps();
+            const { averageFPS } = await MobCore.useFps();
 
             fpsLoadedLog('tween', averageFPS);
             const cb = getStaggerArray(this.#callbackCache, this.#callback);
@@ -430,12 +430,12 @@ export default class MobTween {
 
             if (this.#callbackCache.length > this.#callback.length) {
                 this.#callbackCache =
-                    /** @type{import('../utils/callbacks/type').CallbackCache} */ (
+                    /** @type{import('../utils/callbacks/type.js').CallbackCache} */ (
                         staggerArray
                     );
             } else {
                 this.#callback =
-                    /** @type {import('../utils/callbacks/type').CallbackDefault} */ (
+                    /** @type {import('../utils/callbacks/type.js').CallbackDefault} */ (
                         staggerArray
                     );
             }
@@ -474,7 +474,7 @@ export default class MobTween {
     }
 
     /**
-     * @type {import('./type').TweenStop}
+     * @type {import('./type.js').TimeTweenStop}
      */
     stop({ clearCache = true } = {}) {
         this.#pauseTime = 0;
@@ -487,11 +487,11 @@ export default class MobTween {
          * If tween is ended and the lst stagger is running, let it reach end position.
          */
         if (this.#isActive && clearCache)
-            this.#callbackCache.forEach(({ cb }) => mobCore.useCache.clean(cb));
+            this.#callbackCache.forEach(({ cb }) => MobCore.useCache.clean(cb));
 
         // Abort promise
         if (this.#currentReject) {
-            this.#currentReject(mobCore.ANIMATION_STOP_REJECT);
+            this.#currentReject(MobCore.ANIMATION_STOP_REJECT);
             this.#promise = undefined;
             this.#currentReject = undefined;
         }
@@ -500,7 +500,7 @@ export default class MobTween {
     }
 
     /**
-     * @type {import('./type').TweenPause}
+     * @type {import('./type.js').TimeTweenPause}
      */
     pause() {
         if (this.#pauseStatus) return;
@@ -508,7 +508,7 @@ export default class MobTween {
     }
 
     /**
-     * @type {import('./type').TweenResume}
+     * @type {import('./type.js').TimeTweenResume}
      */
     resume() {
         if (!this.#pauseStatus) return;
@@ -517,7 +517,7 @@ export default class MobTween {
     }
 
     /**
-     * @type {import('../../utils/type').SetData}
+     * @type {import('../../utils/type.js').SetData}
      */
     setData(obj) {
         this.#values = Object.entries(obj).map((item) => {
@@ -555,7 +555,7 @@ export default class MobTween {
     }
 
     /**
-     * @type {import('./type').TweenResetData}
+     * @type {import('./type.js').TimeTweenResetData}
      */
     resetData() {
         this.#values = mergeDeep(this.#values, this.#initialData);
@@ -572,7 +572,7 @@ export default class MobTween {
 
         // Reject promise
         if (this.#currentReject) {
-            this.#currentReject(mobCore.ANIMATION_STOP_REJECT);
+            this.#currentReject(MobCore.ANIMATION_STOP_REJECT);
             this.#promise = undefined;
         }
 
@@ -587,7 +587,7 @@ export default class MobTween {
     }
 
     /**
-     * @type  {import('./type').TweenMergeProps}
+     * @type  {import('./type.js').TimeTweenMergeProps}
      *
      * @description
      * Merge special props with default props
@@ -603,7 +603,7 @@ export default class MobTween {
     }
 
     /**
-     * @type {import('../../utils/type').GoTo<import('./type').TweenAction>} obj to Values
+     * @type {import('../../utils/type.js').GoTo<import('./type.js').TimeTweenAction>} obj to Values
      */
     goTo(obj, props = {}) {
         if (this.#pauseStatus || this.#comeFromResume) this.stop();
@@ -613,7 +613,7 @@ export default class MobTween {
     }
 
     /**
-     * @type {import('../../utils/type').GoFrom<import('./type').TweenAction>} obj to Values
+     * @type {import('../../utils/type.js').GoFrom<import('./type.js').TimeTweenAction>} obj to Values
      */
     goFrom(obj, props = {}) {
         if (this.#pauseStatus || this.#comeFromResume) this.stop();
@@ -623,7 +623,7 @@ export default class MobTween {
     }
 
     /**
-     * @type {import('../../utils/type').GoFromTo<import('./type').TweenAction>} obj to Values
+     * @type {import('../../utils/type.js').GoFromTo<import('./type.js').TimeTweenAction>} obj to Values
      */
     goFromTo(fromObj, toObj, props = {}) {
         if (this.#pauseStatus || this.#comeFromResume) this.stop();
@@ -639,7 +639,7 @@ export default class MobTween {
     }
 
     /**
-     * @type {import('../../utils/type').Set<import('./type').TweenAction>} obj to Values
+     * @type {import('../../utils/type.js').Set<import('./type.js').TimeTweenAction>} obj to Values
      */
     set(obj, props = {}) {
         if (this.#pauseStatus || this.#comeFromResume) this.stop();
@@ -652,7 +652,7 @@ export default class MobTween {
     }
 
     /**
-     * @type {import('../../utils/type').SetImmediate<import('./type').TweenAction>} obj to Values
+     * @type {import('../../utils/type.js').SetImmediate<import('./type.js').TimeTweenAction>} obj to Values
      */
     setImmediate(obj, props = {}) {
         if (this.#pauseStatus || this.#comeFromResume) this.stop();
@@ -676,7 +676,7 @@ export default class MobTween {
     }
 
     /**
-     * @type {import('../../utils/type').DoAction<import('./type').TweenAction>} obj to Values
+     * @type {import('../../utils/type.js').DoAction<import('./type.js').TimeTweenAction>} obj to Values
      */
     #doAction(data, props = {}, obj) {
         this.#values = mergeArrayTween(data, this.#values);
@@ -710,7 +710,7 @@ export default class MobTween {
      * @description
      * Get current values, If the single value is a function it returns the result of the function.
      *
-     * @type {import('./type').TweenGetValue}
+     * @type {import('./type.js').TimeTweenGetValue}
      *
      * @example
      * ```javascript
@@ -727,7 +727,7 @@ export default class MobTween {
      * @description
      * Get initial values, If the single value is a function it returns the result of the function.
      *
-     * @type {import('./type').TweenGetValue}
+     * @type {import('./type.js').TimeTweenGetValue}
      *
      * @example
      * ```javascript
@@ -744,7 +744,7 @@ export default class MobTween {
      * @description
      * Get from values, If the single value is a function it returns the result of the function.
      *
-     * @type {import('./type').TweenGetValue}
+     * @type {import('./type.js').TimeTweenGetValue}
      *
      * @example
      * ```javascript
@@ -761,7 +761,7 @@ export default class MobTween {
      * @description
      * Get to values, If the single value is a function it returns the result of the function.
      *
-     * @type {import('./type').TweenGetValue}
+     * @type {import('./type.js').TimeTweenGetValue}
      *
      * @example
      * ```javascript
@@ -778,7 +778,7 @@ export default class MobTween {
      * @description
      * Get From values, if the single value is a function it returns the same function.
      *
-     * @type {import('./type').TweenGetValueNative}
+     * @type {import('./type.js').TimeTweenGetValueNative}
      *
      * @example
      * ```javascript
@@ -795,7 +795,7 @@ export default class MobTween {
      * @description
      * Get To values, if the single value is a function it returns the same function.
      *
-     * @type {import('./type').TweenGetValueNative}
+     * @type {import('./type.js').TimeTweenGetValueNative}
      *
      * @example
      * ```javascript
@@ -812,7 +812,7 @@ export default class MobTween {
      * @description
      * Get tween type
      *
-     * @type {import('./type').TweenGetType} tween type
+     * @type {import('./type.js').TimeTweenGetType} tween type
      *
      * @example
      * ```javascript
@@ -829,7 +829,7 @@ export default class MobTween {
      * @description
      * Get univoque Id
      *
-     * @type {import('./type').TweenGetId}
+     * @type {import('./type.js').TimeTweenGetId}
      *
      * @example
      * ```javascript
@@ -845,7 +845,7 @@ export default class MobTween {
     /**
      * Update ease with new preset
      *
-     * @type {import('./type').TweenUpdateEase}
+     * @type {import('./type.js').TimeTweenUpdateEase}
      *
      */
     updateEase(ease) {
@@ -856,7 +856,7 @@ export default class MobTween {
     }
 
     /**
-     * @type {import('./type').TweenSubscribe}
+     * @type {import('./type.js').TimeTweenSubscribe}
      *
      * ```
      * @description
@@ -873,7 +873,7 @@ export default class MobTween {
     }
 
     /**
-     * @type {import('./type').TweenSubscribeCache}
+     * @type {import('./type.js').TimeTweenSubscribeCache}
      *
      * @description
      * Callback that returns updated values ready to be usable, specific to manage large staggers.
@@ -909,7 +909,7 @@ export default class MobTween {
     }
 
     /**
-     * @type {import('./type').TweenOnComplete}
+     * @type {import('./type.js').TimeTweenOnComplete}
      *
      *
      * @description

@@ -1,4 +1,4 @@
-import { timeline, tween } from '../mobMotion';
+import { MobTimeline, MobTween } from '../mobMotion';
 
 export const infiniteAnimationSync = () => {
     const stagger = document.querySelectorAll('.infinite-tween .shape__target');
@@ -16,12 +16,11 @@ export const infiniteAnimationSync = () => {
     const duration = 10;
     const friction = duration / 2 / Math.PI;
 
-    const infinite = tween
-        .createSequencer({
-            stagger: { each: 5 },
-            data: { x: duration / 4, opacity: 1 },
-            duration,
-        })
+    const infinite = MobTween.createSequencer({
+        stagger: { each: 5 },
+        data: { x: duration / 4, opacity: 1 },
+        duration,
+    })
         .goTo(
             { x: duration + duration / 4 },
             { start: 0, end: duration, ease: 'easeLinear' }
@@ -42,13 +41,11 @@ export const infiniteAnimationSync = () => {
         });
     });
 
-    const syncTimeline = timeline
-        .createSyncTimeline({
-            repeat: -1,
-            yoyo: false,
-            duration: 3000,
-        })
-        .add(infinite);
+    const syncTimeline = MobTimeline.createSyncTimeline({
+        repeat: -1,
+        yoyo: false,
+        duration: 3000,
+    }).add(infinite);
 
     syncTimeline.onComplete(() => {
         console.log(`complete`);

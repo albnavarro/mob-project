@@ -1,4 +1,4 @@
-import { timeline, tween } from '../mobMotion';
+import { MobTimeline, MobTween } from '../mobMotion';
 import { detectSafari } from '../utility/isSafari.js';
 
 export const stressTestStagger = () => {
@@ -6,7 +6,7 @@ export const stressTestStagger = () => {
         '.radial-stress-stagger .radial-stress-stagger__item'
     );
 
-    const tween1 = tween.createTween({
+    const tween1 = MobTween.createTimeTween({
         ease: 'easeInOutQuad',
         stagger: {
             each: 15,
@@ -48,8 +48,10 @@ export const stressTestStagger = () => {
 
     // tween1.destroy();
 
-    const timeline1 = timeline
-        .createAsyncTimeline({ repeat: -1, yoyo: true })
+    const timeline1 = MobTimeline.createAsyncTimeline({
+        repeat: -1,
+        yoyo: true,
+    })
         .goTo(tween1, { scale: 1.5 }, { duration: 1000 })
         .goTo(tween1, { scale: 0.5 }, { duration: 500 })
         .goTo(tween1, { rotate: 180, scale: 1.2 }, { duration: 500 })

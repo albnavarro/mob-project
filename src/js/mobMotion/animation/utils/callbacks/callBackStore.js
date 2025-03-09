@@ -1,3 +1,3 @@
-import { mobCore } from '../../../../mobCore';
+import { MobCore } from '../../../../mobCore';
 
-export const callBackStore = mobCore.createStore({ id: 0 });
+export const callBackStore = MobCore.createStore({ id: 0 });

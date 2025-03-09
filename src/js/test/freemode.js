@@ -1,4 +1,4 @@
-import { timeline, tween } from '../mobMotion';
+import { MobTimeline, MobTween } from '../mobMotion';
 
 export const freeMode = () => {
     const el1 = document.querySelector('.freemode-item--1');
@@ -13,10 +13,10 @@ export const freeMode = () => {
     /*
      * Tween
      */
-    const tween1 = tween.createTween({ data: { y: 0 } });
-    const tween2 = tween.createTween({ data: { y: 0 } });
-    const tween3 = tween.createTween({ data: { y: 0 } });
-    const tweenStagger = tween.createTween({
+    const tween1 = MobTween.createTimeTween({ data: { y: 0 } });
+    const tween2 = MobTween.createTimeTween({ data: { y: 0 } });
+    const tween3 = MobTween.createTimeTween({ data: { y: 0 } });
+    const tweenStagger = MobTween.createTimeTween({
         data: { rotate: 0 },
         stagger: { each: 10 },
     });
@@ -42,8 +42,8 @@ export const freeMode = () => {
     /*
      * Timeline
      */
-    const goTimeline = timeline.createAsyncTimeline({ freeMode: true });
-    const backTimeline = timeline.createAsyncTimeline({ freeMode: true });
+    const goTimeline = MobTimeline.createAsyncTimeline({ freeMode: true });
+    const backTimeline = MobTimeline.createAsyncTimeline({ freeMode: true });
 
     goTimeline
         .createGroup()

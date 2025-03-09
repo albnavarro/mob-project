@@ -1,6 +1,6 @@
-import { mobCore } from '../mobCore';
+import { MobCore } from '../mobCore';
 import { outerHeight } from '../mobCore/utils';
-import { scroller, tween } from '../mobMotion';
+import { MobScroll, MobTween } from '../mobMotion';
 
 export const scrollStagger = () => {
     const items = document.querySelectorAll('rect');
@@ -19,7 +19,7 @@ export const scrollStagger = () => {
         valEl.innerHTML = val;
     });
 
-    const myParallaxTween = tween.createScrollerTween({
+    const myParallaxTween = MobTween.createScrollerTween({
         stagger: { each: 3, from: 'center' },
         ease: 'easeLinear',
         from: { rotate: 0 },
@@ -56,7 +56,7 @@ export const scrollStagger = () => {
         // });
 
         myParallaxTween.subscribeCache(item, ({ rotate }) => {
-            const rotateParsed = mobCore.shouldMakeSomething()
+            const rotateParsed = MobCore.shouldMakeSomething()
                 ? Math.round(rotate)
                 : rotate;
 
@@ -66,7 +66,7 @@ export const scrollStagger = () => {
         });
     });
 
-    const parallaxIn = scroller.createScrollTrigger({
+    const parallaxIn = MobScroll.createScrollTrigger({
         trigger,
         propierties: 'tween',
         tween: myParallaxTween,

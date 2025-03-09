@@ -1,4 +1,4 @@
-import { timeline, tween } from '../mobMotion';
+import { MobTimeline, MobTween } from '../mobMotion';
 import { isIOS } from '../utility/isIOS.js';
 
 export function staggerLerpTest() {
@@ -12,13 +12,13 @@ export function staggerLerpTest() {
     const stagger = document.querySelectorAll('.lerp .target-stagger');
 
     // DEFINE SPRING
-    const myTween = tween.createLerp({ data: { x: 0, y: 0 } });
+    const myTween = MobTween.createLerp({ data: { x: 0, y: 0 } });
 
     myTween.subscribe(({ x, y }) => {
         target.style.transform = `translate3D(0px,0px,0px) translate(${x}px, ${y}px)`;
     });
 
-    const myStagger = tween.createLerp({
+    const myStagger = MobTween.createLerp({
         stagger: { each: 4, from: 'edges' },
         data: { x: 0 },
     });
@@ -37,8 +37,11 @@ export function staggerLerpTest() {
 
     // When use waitComplete: false all the stagger of same tween must have the same each value to syncronize
     // DEFINE TIMELINE
-    const timeline1 = timeline
-        .createAsyncTimeline({ repeat: -1, yoyo: true, autoSet: false })
+    const timeline1 = MobTimeline.createAsyncTimeline({
+        repeat: -1,
+        yoyo: true,
+        autoSet: false,
+    })
         .goTo(myTween, { x: 500 }, { precision: 1 })
         .goTo(myTween, { y: 500 }, { precision: 1 })
         .createGroup({ waitComplete: false })

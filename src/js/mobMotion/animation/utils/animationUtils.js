@@ -1,6 +1,6 @@
 //@ts-check
 
-import { mobCore } from '../../../mobCore';
+import { MobCore } from '../../../mobCore';
 
 /**
  * @param {any} x
@@ -10,7 +10,7 @@ import { mobCore } from '../../../mobCore';
  * Sanitize Number in case is in calculator enutation.
  */
 export const getRoundedValue = (x) => {
-    if (mobCore.checkType(Number, x)) {
+    if (MobCore.checkType(Number, x)) {
         return Math.round(x * 10_000) / 10_000 || 0;
     }
 

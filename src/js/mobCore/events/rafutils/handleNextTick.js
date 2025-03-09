@@ -9,7 +9,7 @@ const callbacks = [];
  * @description
  * Add callback
  *
- * @param {import('./type.js').handleFrameCallbakType} cb - callback function
+ * @param {import('./type.js').HandleFrameCallbak} cb - callback function
  * @param {number} [ priority ]
  *
  * @example
@@ -46,7 +46,7 @@ const add = (cb = () => {}, priority = 100) => {
  * @description
  * Fire callback
  *
- * @param {import('./type.js').handleFrameType} cb - callback function
+ * @param {import('./type.js').HandleFrame} cb - callback function
  *
  * @example
  * ```javascript

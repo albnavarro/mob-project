@@ -1,4 +1,4 @@
-import { timeline, tween } from '../mobMotion';
+import { MobTimeline, MobTween } from '../mobMotion';
 
 export function lerpTest() {
     const btnStart = document.querySelector('.lerp-btn-start');
@@ -13,7 +13,7 @@ export function lerpTest() {
     const target = document.querySelector('.lerp-target');
 
     // DEFINE SPRING
-    const mylerp = tween.createLerp({
+    const mylerp = MobTween.createLerp({
         data: { x: 0, y: 0, rotate: 0 },
     });
     mylerp.subscribe(({ x, y, rotate }) => {
@@ -27,8 +27,11 @@ export function lerpTest() {
     }
 
     // DEFINE TIMELINE
-    const timeline1 = timeline
-        .createAsyncTimeline({ repeat: 2, yoyo: true, freeMode: true })
+    const timeline1 = MobTimeline.createAsyncTimeline({
+        repeat: 2,
+        yoyo: true,
+        freeMode: true,
+    })
         .set(mylerp, { x: 0, y: 0, rotate: 0 })
         .goTo(mylerp, { x: -200 }, { velocity: 0.02, precision: 1 })
         .goFromTo(mylerp, { x: -200 }, { x: 400 })

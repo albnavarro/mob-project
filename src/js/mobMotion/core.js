@@ -4,7 +4,7 @@ import { clamp } from './animation/utils/animationUtils.js';
 import { handleSetUp } from './setup.js';
 import { mq } from './utils/mediaManager.js';
 
-export const motionCore = {
+export const MobMotionCore = {
     /**
      * @description
      * - Here it is possible to modify the default values of the various modules of the library
@@ -16,7 +16,7 @@ export const motionCore = {
      * ```javascript
      * Default value schema:
      *
-     * core.setDefault.set({
+     * MobMotionCore.setDefault.set({
      *     startFps: 60,
      *     deferredNextTick: false,
      *     throttle: 100,
@@ -122,7 +122,7 @@ export const motionCore = {
      *
      * @example
      * ```javascript
-     * core.getDefault('parallax');
+     * MobMotionCore.getDefault('parallax');
      * ```
      */
     getDefault(prop) {
@@ -135,7 +135,7 @@ export const motionCore = {
      *
      * @example
      * ```javascript
-     * core.printDefault();
+     * MobMotionCore.printDefault();
      * ```
      */
     printDefault() {
@@ -154,10 +154,10 @@ export const motionCore = {
      *
      * ```javascript
      *   Property schema:
-     *   core.mq([String], [string])
+     *   MobMotionCore.mq([String], [string])
      *
-     *   const isDesktop = core.mq('min', 'desktop'); // true/false
-     *   const isMobile = core.mq('max', 'desktop'); // true/false
+     *   const isDesktop = MobMotionCore.mq('min', 'desktop'); // true/false
+     *   const isMobile = MobMotionCore.mq('max', 'desktop'); // true/false
      *   const desktopBreackPoint = core.mq('get', 'desktop'); // 992
      *
      *

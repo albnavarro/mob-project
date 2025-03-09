@@ -59,7 +59,7 @@ function handleMouse(eventType) {
     let initialized = false;
 
     /**
-     * @type {Map<string,import('./type.js').mouseEventCallback>}
+     * @type {Map<string,import('./type.js').MouseEventCallback>}
      */
     const callbacks = new Map();
 
@@ -160,7 +160,7 @@ function handleMouse(eventType) {
     /**
      * @description
      * add callback on mouse action
-     * @param {import('./type.js').mouseEventCallback} cb - callback function fired on mouse action.
+     * @param {import('./type.js').MouseEventCallback} cb - callback function fired on mouse action.
      * @returns {() => void}
      *
      */

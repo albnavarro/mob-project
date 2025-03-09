@@ -1,12 +1,12 @@
-import { mobCore } from '../mobCore';
-import { tween } from '../mobMotion';
+import { MobCore } from '../mobCore';
+import { MobTween } from '../mobMotion';
 
 export const circleAnimation = () => {
     const stagger = document.querySelectorAll('.circle-tween .shape__target');
     const play = document.querySelector('.circle-tween .anim-play');
     const stop = document.querySelector('.circle-tween .anim-stop');
 
-    const tween1 = tween.createSpring({
+    const tween1 = MobTween.createSpring({
         stagger: { each: 3, from: 'start' },
         data: { x: 0 },
     });
@@ -29,7 +29,7 @@ export const circleAnimation = () => {
     const loop = () => {
         counter++;
         tween1.goTo({ x: counter }).catch(() => {});
-        if (isRunning) mobCore.useNextFrame(() => loop());
+        if (isRunning) MobCore.useNextFrame(() => loop());
     };
 
     play.addEventListener('click', () => {

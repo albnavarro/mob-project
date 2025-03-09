@@ -1,4 +1,4 @@
-import { tween } from '../mobMotion';
+import { MobTween } from '../mobMotion';
 
 export const tweenRealtive = () => {
     // Tween
@@ -6,7 +6,7 @@ export const tweenRealtive = () => {
     const resetTween = document.querySelector('.tween-reset');
     const boxTween = document.querySelector('.tween-relative-item--tween');
 
-    const tween1 = tween.createTween({
+    const tween1 = MobTween.createTimeTween({
         ease: 'easeInOutQuad',
         data: { x: 0, rotate: 0 },
         duration: 500,
@@ -30,7 +30,7 @@ export const tweenRealtive = () => {
     const resetSpring = document.querySelector('.spring-reset');
     const boxSpring = document.querySelector('.tween-relative-item--spring');
 
-    const spring = tween.createSpring({
+    const spring = MobTween.createSpring({
         data: { x: 0, rotate: 0 },
         relative: true,
     });
@@ -52,7 +52,7 @@ export const tweenRealtive = () => {
     const resetLerp = document.querySelector('.lerp-reset');
     const boxLerp = document.querySelector('.tween-relative-item--lerp');
 
-    const lerp = tween.createLerp({
+    const lerp = MobTween.createLerp({
         data: { x: 0, rotate: 0 },
         relative: true,
     });

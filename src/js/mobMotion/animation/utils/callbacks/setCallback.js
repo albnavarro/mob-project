@@ -1,6 +1,6 @@
 // @ts-check
 
-import { mobCore } from '../../../../mobCore';
+import { MobCore } from '../../../../mobCore';
 import { callBackStore } from './callBackStore';
 
 /**
@@ -53,7 +53,7 @@ export const updateSubscribersCache = (
     const { id } = callBackStore.get();
 
     // add item and function related to handleCache.
-    const { id: cacheId, unsubscribe } = mobCore.useCache.add(
+    const { id: cacheId, unsubscribe } = MobCore.useCache.add(
         item,
         currentCallback
     );

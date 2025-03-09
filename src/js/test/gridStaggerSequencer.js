@@ -1,4 +1,4 @@
-import { timeline, tween } from '../mobMotion';
+import { MobTimeline, MobTween } from '../mobMotion';
 
 export const gridStaggerSequencer = () => {
     const items = document.querySelectorAll(
@@ -6,16 +6,15 @@ export const gridStaggerSequencer = () => {
     );
     const duration = 4000;
 
-    const tween1 = tween
-        .createSequencer({
-            ease: 'easeInOutBack',
-            stagger: {
-                each: 15,
-                grid: { col: 7, row: 7, direction: 'radial' },
-            },
-            data: { scale: 1, x: 0 },
-            duration,
-        })
+    const tween1 = MobTween.createSequencer({
+        ease: 'easeInOutBack',
+        stagger: {
+            each: 15,
+            grid: { col: 7, row: 7, direction: 'radial' },
+        },
+        data: { scale: 1, x: 0 },
+        duration,
+    })
         .goTo({ scale: 3 }, { end: duration / 2 })
         .goTo({ scale: 0.5 }, { start: duration / 2 })
         .goTo({ x: 100 });
@@ -32,12 +31,11 @@ export const gridStaggerSequencer = () => {
         });
     });
 
-    const timeline1 = timeline
-        .createSyncTimeline({
-            repeat: -1,
-            yoyo: true,
-            duration,
-        })
+    const timeline1 = MobTimeline.createSyncTimeline({
+        repeat: -1,
+        yoyo: true,
+        duration,
+    })
         .add(tween1)
         .play();
 };

@@ -1,11 +1,11 @@
-import { tween } from '../../js/mobMotion';
+import { MobTween } from '../../js/mobMotion';
 import {
     getTranslateValues,
     offset,
     outerHeight,
     outerWidth,
 } from '../../js/mobCore/utils/index.js';
-import { mobCore } from '../../js/mobCore';
+import { MobCore } from '../../js/mobCore';
 
 export default class MouseParallaxClass {
     constructor(data) {
@@ -18,7 +18,7 @@ export default class MouseParallaxClass {
         this.offSetTop = 0;
         this.offSetLeft = 0;
         this.smooth = 10;
-        this.spring = tween.createSpring();
+        this.spring = MobTween.createSpring();
         this.unsubscribeSpring = () => {};
         this.unsubscribeOnComplete = () => {};
 
@@ -35,16 +35,16 @@ export default class MouseParallaxClass {
     init() {
         this.getDimension();
 
-        this.unsubscribeMouseMove = mobCore.useMouseMove(({ page, client }) => {
+        this.unsubscribeMouseMove = MobCore.useMouseMove(({ page, client }) => {
             this.setGlobalCoord({ page, client });
             this.onMove();
         });
 
-        this.unsubscribeResize = mobCore.useResize(() => {
+        this.unsubscribeResize = MobCore.useResize(() => {
             this.getDimension();
         });
 
-        this.unsubscribeScroll = mobCore.useScroll(({ scrollY }) => {
+        this.unsubscribeScroll = MobCore.useScroll(({ scrollY }) => {
             this.onScroll(scrollY);
         });
 

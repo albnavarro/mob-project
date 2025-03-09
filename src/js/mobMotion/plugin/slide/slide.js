@@ -1,8 +1,8 @@
 //@ts-check
 
-import { mobCore } from '../../../mobCore/index.js';
+import { MobCore } from '../../../mobCore/index.js';
 import { outerHeight } from '../../../mobCore/utils/index.js';
-import MobTween from '../../animation/tween/MobTween.js';
+import MobTimeTween from '../../animation/tween/MobTimeTween.js';
 
 /** @type {Map<HTMLElement,import('./type').MobSlide>} */
 const slideItems = new Map();
@@ -11,7 +11,7 @@ const slideItems = new Map();
  * @type {(target: HTMLElement) => boolean}
  */
 const isNode = (target) => {
-    const isValid = mobCore.checkType(Element, target);
+    const isValid = MobCore.checkType(Element, target);
 
     if (!isValid)
         console.warn(`slide utils ${target} is not a valid Dom element`);
@@ -27,7 +27,7 @@ const isNode = (target) => {
  * @returns {import('./type').MobSlide} Unsubscribe function.
  */
 const setSlideData = (target) => {
-    const tween = new MobTween({ ease: 'easeOutQuad', data: { val: 0 } });
+    const tween = new MobTimeTween({ ease: 'easeOutQuad', data: { val: 0 } });
 
     return {
         tween,
@@ -186,7 +186,7 @@ export const MobSlide = (() => {
         target.style.height = `${currentHeight}px`;
 
         await tween.goTo({ val: height }, { duration: 500 });
-        mobCore.useNextTick(() => {
+        MobCore.useNextTick(() => {
             target.style.height = `auto`;
         });
     };

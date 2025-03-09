@@ -1,4 +1,4 @@
-import { scroller, tween } from '../mobMotion';
+import { MobScroll, MobTween } from '../mobMotion';
 
 export function indexParallax() {
     /**
@@ -7,17 +7,16 @@ export function indexParallax() {
     const item = document.querySelector('.index-parallax-1');
     const trigger = document.querySelector('.index-timeline');
 
-    const myParallaxTimeline = tween
-        .createSequencer({
-            duration: 10,
-            data: {
-                x: 0,
-                rotate: 0,
-                scale: 1,
-                opacity: 1,
-                y: 0,
-            },
-        })
+    const myParallaxTimeline = MobTween.createSequencer({
+        duration: 10,
+        data: {
+            x: 0,
+            rotate: 0,
+            scale: 1,
+            opacity: 1,
+            y: 0,
+        },
+    })
         .goFrom({ y: -100, opacity: 0 }, { start: 0, end: 3 })
         .goTo({ rotate: 90, scale: 1.5 }, { start: 2, end: 8 })
         .goTo({ y: 100, opacity: 0 }, { start: 7, end: 10 })
@@ -39,7 +38,7 @@ export function indexParallax() {
         item.style.opacity = opacity;
     });
 
-    const parallaxIn = scroller.createScrollTrigger({
+    const parallaxIn = MobScroll.createScrollTrigger({
         trigger: trigger,
         propierties: 'tween',
         tween: myParallaxTimeline,
@@ -55,7 +54,7 @@ export function indexParallax() {
      * Parallax
      */
     const parallaxItem = document.querySelector('.js-parallax-scale');
-    const tweenScale = tween.createScrollerTween({
+    const tweenScale = MobTween.createScrollerTween({
         from: { x: 0, scale: 1 },
         to: { x: -50, scale: 1.2 },
     });
@@ -66,7 +65,7 @@ export function indexParallax() {
         parallaxItem.style.transform = `translateX(${x}px) scale(${scale})`;
     });
 
-    const parallaxScale = scroller.createParallax({
+    const parallaxScale = MobScroll.createParallax({
         trigger: parallaxItem,
         easeType: 'spring',
         propierties: 'tween',
@@ -81,14 +80,14 @@ export function indexParallax() {
      * Various parallax
      */
 
-    const parallax1 = scroller.createParallax({
+    const parallax1 = MobScroll.createParallax({
         item: '.js-index-parallax-1',
         align: 'start',
         propierties: 'opacity',
     });
     parallax1.init();
 
-    const parallax2 = scroller.createParallax({
+    const parallax2 = MobScroll.createParallax({
         item: '.js-index-parallax-2',
         range: 8.5,
         align: 'center',
@@ -96,7 +95,7 @@ export function indexParallax() {
     });
     parallax2.init();
 
-    const parallax3 = scroller.createParallax({
+    const parallax3 = MobScroll.createParallax({
         item: '.js-index-parallax-3',
         propierties: 'opacity',
         opacityStart: 110,
@@ -105,7 +104,7 @@ export function indexParallax() {
     });
     parallax3.init();
 
-    const scrollTrigger1 = scroller.createScrollTrigger({
+    const scrollTrigger1 = MobScroll.createScrollTrigger({
         item: '.js-index-scrolltrigger-1',
         propierties: 'rotate',
         range: '45deg',
@@ -116,7 +115,7 @@ export function indexParallax() {
     });
     scrollTrigger1.init();
 
-    const parallax4 = scroller.createParallax({
+    const parallax4 = MobScroll.createParallax({
         item: '.js-index-parallax-4',
         perspective: 400,
         propierties: 'rotateX',
@@ -125,7 +124,7 @@ export function indexParallax() {
     });
     parallax4.init();
 
-    const parallax5 = scroller.createParallax({
+    const parallax5 = MobScroll.createParallax({
         item: '.js-index-parallax-5',
         reverse: true,
         ease: true,
@@ -133,7 +132,7 @@ export function indexParallax() {
     });
     parallax5.init();
 
-    const parallax6 = scroller.createParallax({
+    const parallax6 = MobScroll.createParallax({
         item: '.js-index-parallax-6',
         ease: true,
         easeType: 'spring',
@@ -154,7 +153,7 @@ export function indexParallax() {
     // });
     // parallax6.init();
 
-    const parallax7 = scroller.createParallax({
+    const parallax7 = MobScroll.createParallax({
         item: '.js-index-parallax-7',
         range: 9,
         align: 90,
@@ -164,7 +163,7 @@ export function indexParallax() {
     });
     parallax7.init();
 
-    const parallax8 = scroller.createParallax({
+    const parallax8 = MobScroll.createParallax({
         item: '.js-index-parallax-8',
         range: 6,
         onSwitch: 'in-stop',
@@ -172,7 +171,7 @@ export function indexParallax() {
     });
     parallax8.init();
 
-    const parallax9 = scroller.createParallax({
+    const parallax9 = MobScroll.createParallax({
         item: '.js-index-parallax-9',
         range: 4.5,
         onSwitch: 'out-stop',
@@ -181,7 +180,7 @@ export function indexParallax() {
     });
     parallax9.init();
 
-    const parallax10 = scroller.createParallax({
+    const parallax10 = MobScroll.createParallax({
         item: '.js-index-parallax-10',
         range: 9,
         align: 'bottom',
@@ -192,7 +191,7 @@ export function indexParallax() {
     });
     parallax10.init();
 
-    const parallax11 = scroller.createParallax({
+    const parallax11 = MobScroll.createParallax({
         item: '.js-index-parallax-11',
         range: 2,
         align: 'end',

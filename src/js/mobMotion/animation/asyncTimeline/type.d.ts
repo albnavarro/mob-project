@@ -1,5 +1,5 @@
 import { SpringChoiceConfig, SpringProps } from '../spring/type';
-import { EaseTypes, TweenCommonProps } from '../tween/type';
+import { EaseTypes, TimeTweenCommonProps } from '../tween/type';
 import {
     DirectionTypeAsync,
     DirectionTypeObjectLoop,
@@ -56,7 +56,7 @@ export interface AsyncTimelineTween {
     getId: () => string;
     set: (
         arg0: Record<string, number | (() => number)>,
-        ar1?: TweenCommonProps
+        ar1?: TimeTweenCommonProps
     ) => Promise<any>;
     goTo: () => Promise<any>;
     goFromTo: () => Promise<any>;

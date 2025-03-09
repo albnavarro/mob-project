@@ -1,4 +1,4 @@
-import { motionCore } from '../../../js/mobMotion';
+import { MobMotionCore } from '../../../js/mobMotion';
 import { MobSlide } from '../../../js/mobMotion/plugin';
 
 export class AccordionItemClass {
@@ -34,7 +34,7 @@ export class AccordionItemClass {
     }
 
     openItem(e) {
-        if (!motionCore.mq(this.queryType, this.breackpoint)) return;
+        if (!MobMotionCore.mq(this.queryType, this.breackpoint)) return;
 
         const btn = e.currentTarget;
         const item = btn.closest(this.itemClass);

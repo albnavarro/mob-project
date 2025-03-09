@@ -1,4 +1,4 @@
-export { motionCore } from './core.js';
-export { tween } from './tween.js';
-export { timeline } from './timeline.js';
-export { scroller } from './scroller.js';
+export { MobMotionCore } from './core.js';
+export { MobTween } from './tween.js';
+export { MobTimeline } from './timeline.js';
+export { MobScroll } from './scroller.js';

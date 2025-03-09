@@ -1,5 +1,5 @@
-import { mobCore } from '../mobCore';
-import { scroller } from '../mobMotion';
+import { MobCore } from '../mobCore';
+import { MobScroll } from '../mobMotion';
 import { MobHorizontalScroller } from '../mobMotion/plugin';
 
 const createScroller = ({ bottomScroller }) => {
@@ -21,7 +21,7 @@ const createScroller = ({ bottomScroller }) => {
     //     title.style.transform = `translateY(${y}px) scale(${scale})`;
     // });
 
-    let parallaxTest = scroller.createScrollTrigger({
+    let parallaxTest = MobScroll.createScrollTrigger({
         item: title,
         pin: true,
         // marker: 'pin',
@@ -53,7 +53,7 @@ const createScroller = ({ bottomScroller }) => {
 
     const parallaxTest2 = document.querySelectorAll('.js-parallax-test');
     const parallaxArray = [...parallaxTest2].map((item) => {
-        return scroller.createParallax({
+        return MobScroll.createParallax({
             item,
             propierties: 'x',
             reverse: true,
@@ -98,7 +98,7 @@ const createScroller = ({ bottomScroller }) => {
             bottomScroller.refresh();
         },
         onTick: ({ percent }) => {
-            mobCore.useFrame(() => {
+            MobCore.useFrame(() => {
                 scroller1.style.setProperty('--percent', `${percent}%`);
             });
         },

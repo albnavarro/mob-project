@@ -3,7 +3,7 @@
 import { MobScrollerConstant } from './animation/scroller/MobScrollerConstant.js';
 import MobScroller from './animation/scroller/MobScroller.js';
 
-export const scroller = {
+export const MobScroll = {
     /**
      * @param {import('./animation/scroller/type').MobScrollerCommon & import('./animation/scroller/type').Parallax} data
      * @returns {MobScroller}
@@ -13,7 +13,7 @@ export const scroller = {
      *  Property schema:
      *
      *
-     *  const myParallax = scroller.createParallax({
+     *  const myParallax = MobScroll.createParallax({
      *      item: String | Element,
      *      applyTo: [ String | Element ],
      *      trigger: [ String | Element ],
@@ -75,7 +75,7 @@ export const scroller = {
      *   Property schema:
      *
      *
-     *   const myScrollTrigger = scroller.createScrollTrigger({
+     *   const myScrollTrigger = MobScroll.createScrollTrigger({
      *       item: String | Element,
      *       applyTo: [ String | Element ],
      *       trigger: [ String | Element ],

@@ -46,4 +46,4 @@ export interface MouseEventParsed {
     pixelY?: number;
 }
 
-export type mouseEventCallback = (arg0: MouseEventParsed) => void;
+export type MouseEventCallback = (arg0: MouseEventParsed) => void;

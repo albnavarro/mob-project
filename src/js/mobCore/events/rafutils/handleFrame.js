@@ -33,7 +33,7 @@ const firstRunDuration = 2000;
 let frameIsRuning = false;
 
 /**
- * @type {import('./type.js').handleFrameArrayType}
+ * @type {import('./type.js').HandleFrameArray}
  */
 let callback = [];
 
@@ -399,7 +399,7 @@ export const handleFrame = (() => {
      * @description
      * Add callback
      *
-     * @param {import('./type.js').handleFrameCallbakType} cb - callback function
+     * @param {import('./type.js').HandleFrameCallbak} cb - callback function
      * @returns void
      *
      * @example
@@ -419,7 +419,7 @@ export const handleFrame = (() => {
      * @description
      * Add an array of callback
      *
-     * @param {import('./type.js').handleFrameArrayType} arr - array of callback
+     * @param {import('./type.js').HandleFrameArray} arr - array of callback
      */
     const addMultiple = (arr = []) => {
         callback = [...callback, ...arr];

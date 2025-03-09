@@ -1,4 +1,4 @@
-import { mobCore } from '../../../js/mobCore/index.js';
+import { MobCore } from '../../../js/mobCore/index.js';
 import { offset } from '../../../js/mobCore/utils/index.js';
 
 export class showElementItemClass {
@@ -22,11 +22,11 @@ export class showElementItemClass {
         this.calcOffset();
         this.checkPosition();
 
-        this.unsubscribeScroll = mobCore.useScroll(() => {
+        this.unsubscribeScroll = MobCore.useScroll(() => {
             this.checkPosition();
         });
 
-        this.unsubscribeResize = mobCore.useResize(() => {
+        this.unsubscribeResize = MobCore.useResize(() => {
             this.refresh();
         });
     }
@@ -56,14 +56,14 @@ export class showElementItemClass {
         const isAble = this.onlyOnce && this.firstActive ? false : true;
 
         if (postion < window.pageYOffset && this.hide && isAble) {
-            mobCore.useFrame(() => {
+            MobCore.useFrame(() => {
                 this.item.classList.remove(this.startClass);
                 this.item.classList.add(this.endClass);
                 this.hide = false;
                 this.firstActive = true;
             });
         } else if (postion >= window.pageYOffset && !this.hide && isAble) {
-            mobCore.useFrame(() => {
+            MobCore.useFrame(() => {
                 this.item.classList.remove(this.endClass);
                 this.item.classList.add(this.startClass);
                 this.hide = true;

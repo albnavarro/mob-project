@@ -1,6 +1,6 @@
 // @ts-check
 
-import { mobCore } from '../../../../mobCore/index.js';
+import { MobCore } from '../../../../mobCore/index.js';
 
 /**
  * @type {import('./type.js').DefaultCallback}
@@ -19,7 +19,7 @@ export const defaultCallback = ({
      * Fire callback without stagger.
      */
     if (stagger.each === 0 || !useStagger) {
-        mobCore.useFrame(() => {
+        MobCore.useFrame(() => {
             callback.forEach(({ cb }) => {
                 cb(callBackObject);
             });
@@ -28,9 +28,9 @@ export const defaultCallback = ({
         /**
          * Fire callback cache immediately.
          */
-        mobCore.useFrame(() => {
+        MobCore.useFrame(() => {
             callbackCache.forEach(({ cb }) => {
-                mobCore.useCache.fireObject({ id: cb, obj: callBackObject });
+                MobCore.useCache.fireObject({ id: cb, obj: callBackObject });
             });
         });
 
@@ -41,7 +41,7 @@ export const defaultCallback = ({
      * Fire callback with default stagger.
      */
     callback.forEach(({ cb, frame }) => {
-        mobCore.useFrameIndex(() => {
+        MobCore.useFrameIndex(() => {
             cb(callBackObject);
         }, frame);
     });
@@ -51,7 +51,7 @@ export const defaultCallback = ({
      * Update handleCache store.
      */
     callbackCache.forEach(({ cb, frame }) => {
-        mobCore.useCache.update({ id: cb, callBackObject, frame });
+        MobCore.useCache.update({ id: cb, callBackObject, frame });
     });
 };
 
@@ -78,7 +78,7 @@ export const defaultCallbackOnComplete = ({
     if (stagger.each === 0 || !useStagger) {
         onComplete();
 
-        mobCore.useNextFrame(() => {
+        MobCore.useNextFrame(() => {
             // Fire callback with exact end value
             callback.forEach(({ cb }) => {
                 cb(callBackObject);
@@ -88,7 +88,7 @@ export const defaultCallbackOnComplete = ({
              * Fire callback cache immediately.
              */
             callbackCache.forEach(({ cb }) => {
-                mobCore.useCache.fireObject({ id: cb, obj: callBackObject });
+                MobCore.useCache.fireObject({ id: cb, obj: callBackObject });
             });
 
             callbackOnComplete.forEach(({ cb }) => {
@@ -103,7 +103,7 @@ export const defaultCallbackOnComplete = ({
      * Fire callback with default stagger.
      */
     callback.forEach(({ cb, frame }, index) => {
-        mobCore.useFrameIndex(() => {
+        MobCore.useFrameIndex(() => {
             if (stagger.waitComplete) {
                 if (index === slowlestStagger.index) {
                     cb(callBackObject);
@@ -124,10 +124,10 @@ export const defaultCallbackOnComplete = ({
      * Fire callback with cache stagger.
      */
     callbackCache.forEach(({ cb, frame }, index) => {
-        mobCore.useFrameIndex(() => {
+        MobCore.useFrameIndex(() => {
             if (stagger.waitComplete) {
                 if (index === slowlestStagger.index) {
-                    mobCore.useCache.fireObject({
+                    MobCore.useCache.fireObject({
                         id: cb,
                         obj: callBackObject,
                     });
@@ -141,7 +141,7 @@ export const defaultCallbackOnComplete = ({
              * Fire callback cache immediately.
              */
             if (index === fastestStagger.index) {
-                mobCore.useCache.fireObject({ id: cb, obj: callBackObject });
+                MobCore.useCache.fireObject({ id: cb, obj: callBackObject });
                 onComplete();
             }
         }, frame);
@@ -151,7 +151,7 @@ export const defaultCallbackOnComplete = ({
      * Fire on complete callbacon complete callback
      */
     callbackOnComplete.forEach(({ cb, frame }) => {
-        mobCore.useFrameIndex(() => {
+        MobCore.useFrameIndex(() => {
             cb(callBackObject);
         }, frame + 1);
     });

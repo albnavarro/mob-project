@@ -6,8 +6,8 @@ import {
     outerWidth,
     offset,
 } from '../../../js/mobCore/utils/index.js';
-import { tween, motionCore } from '../../../js/mobMotion';
-import { mobCore } from '../../../js/mobCore/index.js';
+import { MobTween, MobMotionCore } from '../../../js/mobMotion';
+import { MobCore } from '../../../js/mobCore/index.js';
 
 export class PredictiveTurbolenceItemClass {
     constructor(data) {
@@ -30,7 +30,7 @@ export class PredictiveTurbolenceItemClass {
         this.offsetX = 0;
         this.width = 0;
         this.height = 0;
-        this.spring = tween.createSpring();
+        this.spring = MobTween.createSpring();
         this.unsubscribeSpring = () => {};
         this.unsubscribeScroll = () => {};
         this.unsubscribeResize = () => {};
@@ -42,7 +42,7 @@ export class PredictiveTurbolenceItemClass {
     }
 
     init() {
-        if (!motionCore.mq(this.queryType, this.breackpoint)) return;
+        if (!MobMotionCore.mq(this.queryType, this.breackpoint)) return;
 
         this.spring.setData({ baseFrequency: 0, scale: 0 });
 
@@ -61,14 +61,14 @@ export class PredictiveTurbolenceItemClass {
         this.inzializeSvg();
         this.onResize();
 
-        this.unsubscribeMouseMove = mobCore.useMouseMove(({ page }) => {
+        this.unsubscribeMouseMove = MobCore.useMouseMove(({ page }) => {
             this.setGlobalCoord({ page });
             this.onMove();
         });
-        this.unsubscribeScroll = mobCore.useScroll(({ scrollY }) => {
+        this.unsubscribeScroll = MobCore.useScroll(({ scrollY }) => {
             this.onScroll({ scrollY });
         });
-        this.unsubscribeResize = mobCore.useResize(() => {
+        this.unsubscribeResize = MobCore.useResize(() => {
             this.onResize();
         });
 

@@ -3,7 +3,7 @@
 import MobAsyncTimeline from './animation/asyncTimeline/AsyncTimeline.js';
 import MobSyncTimeline from './animation/syncTimeline/MobSyncTimeline.js';
 
-export const timeline = {
+export const MobTimeline = {
     /**
      * @param {import('./animation/syncTimeline/type.js').SyncTimeline} data
      * @return {MobSyncTimeline}
@@ -13,7 +13,7 @@ export const timeline = {
      * Property schema:
      *
      *
-     * const myTimeline = timeline.createSyncTimeline({
+     * const myTimeline = MobTimeline.createSyncTimeline({
      *   duration: [ Number ],
      *   yoyo: [ Boolean ],
      *   repeat: [ Number ]
@@ -57,7 +57,7 @@ export const timeline = {
      * Property schema:
      *
      *
-     * const myTimeline = timeline.createAsyncTimeline({
+     * const myTimeline = MobTimeline.createAsyncTimeline({
      *   yoyo: [ Boolean ],
      *   repeat: [ Number ],
      *   freeMode: [ Number ],

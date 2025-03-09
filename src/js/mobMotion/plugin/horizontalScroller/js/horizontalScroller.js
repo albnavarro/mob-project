@@ -19,7 +19,7 @@ import {
     valueIsFunctionAndReturnDefault,
     valueIsNumberAndReturnDefault,
 } from '../../../animation/utils/tweenAction/tweenValidation';
-import { mobCore } from '../../../../mobCore';
+import { MobCore } from '../../../../mobCore';
 import {
     FreezeMobPageScroll,
     UnFreezeMobPageScroll,
@@ -583,7 +583,7 @@ export class MobHorizontalScroller {
         );
 
         // @ts-ignore
-        this.#mainContainer = mobCore.checkType(String, data.root)
+        this.#mainContainer = MobCore.checkType(String, data.root)
             ? // @ts-ignore
               document.querySelector(data.root)
             : data.root;
@@ -672,7 +672,7 @@ export class MobHorizontalScroller {
         this.#onMouseUp = () => {
             UnFreezeMobPageScroll();
             this.#touchActive = false;
-            mobCore.useFrame(() => {
+            MobCore.useFrame(() => {
                 if (this.#row) this.#row.style.cursor = '';
             });
         };
@@ -680,7 +680,7 @@ export class MobHorizontalScroller {
         this.#onMouseLeave = () => {
             UnFreezeMobPageScroll();
             this.#touchActive = false;
-            mobCore.useFrame(() => {
+            MobCore.useFrame(() => {
                 if (this.#row) this.#row.style.cursor = '';
             });
         };
@@ -746,12 +746,12 @@ export class MobHorizontalScroller {
             this.#initScroller();
             if (this.#useDrag) this.#addDragListener();
 
-            mobCore.useResize(({ horizontalResize }) =>
+            MobCore.useResize(({ horizontalResize }) =>
                 this.onResize(horizontalResize)
             );
 
-            mobCore.useFrameIndex(() => {
-                mobCore.useNextTick(() => {
+            MobCore.useFrameIndex(() => {
+                MobCore.useNextTick(() => {
                     this.#afterInit?.();
                     this.#children.forEach((element) => {
                         element.refresh();
@@ -782,7 +782,7 @@ export class MobHorizontalScroller {
      */
     #onDrag(value) {
         if (!this.#shouldDragValue) return;
-        mobCore.useFrame(() =>
+        MobCore.useFrame(() =>
             window.scrollBy({ top: value, left: 0, behavior: 'instant' })
         );
     }
@@ -806,7 +806,7 @@ export class MobHorizontalScroller {
      * @type {() => void}
      */
     #addDragListener() {
-        this.#unsubscribeScroll = mobCore.useScroll(() => this.#shouldDrag());
+        this.#unsubscribeScroll = MobCore.useScroll(() => this.#shouldDrag());
         this.#shouldDrag();
 
         this.#row.addEventListener('click', this.#preventFireClick, {
@@ -868,7 +868,7 @@ export class MobHorizontalScroller {
         }
 
         return new Promise((resolve) => {
-            mobCore.useFrame(() => {
+            MobCore.useFrame(() => {
                 const width = this.#horizontalWidth;
                 this.#percentRange =
                     (100 * (width - window.innerWidth)) / width;
@@ -889,7 +889,7 @@ export class MobHorizontalScroller {
      */
     #getWidth() {
         return new Promise((resolve) => {
-            mobCore.useFrame(() => {
+            MobCore.useFrame(() => {
                 if (!mq[this.#queryType](this.#breakpoint)) {
                     resolve(true);
                     return;
@@ -917,7 +917,7 @@ export class MobHorizontalScroller {
         }
 
         return new Promise((resolve) => {
-            mobCore.useFrame(() => {
+            MobCore.useFrame(() => {
                 if (!mq[this.#queryType](this.#breakpoint) || !this.#shadows) {
                     resolve(true);
                     return;
@@ -998,7 +998,7 @@ export class MobHorizontalScroller {
                 return;
             }
 
-            mobCore.useFrame(() => {
+            MobCore.useFrame(() => {
                 if (!this.#shadows) return;
 
                 [...this.#shadows].forEach((item) => {
@@ -1235,8 +1235,8 @@ export class MobHorizontalScroller {
      * @type {() => void}
      */
     #refreshChildren() {
-        mobCore.useFrameIndex(() => {
-            mobCore.useNextTick(() => {
+        MobCore.useFrameIndex(() => {
+            MobCore.useNextTick(() => {
                 this.#afterRefresh?.();
                 this.#children.forEach((element) => {
                     element?.refresh?.();
@@ -1292,7 +1292,7 @@ export class MobHorizontalScroller {
             this.#moduleisActive = false;
 
             // Make sure that if component is running with ease the style is removed.
-            mobCore.useFrameIndex(() => {
+            MobCore.useFrameIndex(() => {
                 if (this.#row) {
                     this.#row.style.width = '';
                     this.#row.style.transform = '';
@@ -1341,7 +1341,7 @@ export class MobHorizontalScroller {
                     // @ts-ignore
                     this.#row = null;
 
-                    mobCore.useNextTick(() => {
+                    MobCore.useNextTick(() => {
                         this.#afterDestroy?.();
                         this.#afterDestroy = NOOP;
                         this.#children.forEach((element) => {

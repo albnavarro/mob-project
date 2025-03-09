@@ -1,18 +1,18 @@
 import { MobSmoothScroller } from '../mobMotion/plugin';
-import { scroller, tween, motionCore } from '../mobMotion';
+import { MobScroll, MobTween, MobMotionCore } from '../mobMotion';
 
 export const hScroller = () => {
     const btnPassiveTrue = document.querySelector('.btn-passive-true');
     const btnPassiveFalse = document.querySelector('.btn-passive-false');
 
     btnPassiveTrue.addEventListener('click', () => {
-        motionCore.setDefault({
+        MobMotionCore.setDefault({
             usePassive: true,
         });
     });
 
     btnPassiveFalse.addEventListener('click', () => {
-        motionCore.setDefault({
+        MobMotionCore.setDefault({
             usePassive: false,
         });
     });
@@ -22,7 +22,7 @@ export const hScroller = () => {
     /**
      *
      */
-    const parallaxOpacity = scroller.createParallax({
+    const parallaxOpacity = MobScroll.createParallax({
         item: document.querySelector('.parallax-via-js-opacity'),
         ease: true,
         propierties: 'opacity',
@@ -33,7 +33,7 @@ export const hScroller = () => {
     /**
      *
      */
-    const parallax0 = scroller.createParallax({
+    const parallax0 = MobScroll.createParallax({
         item: document.querySelector('.parallax-js-0'),
         ease: true,
         propierties: 'x',
@@ -44,7 +44,7 @@ export const hScroller = () => {
      *
      */
     const parallaxItemTween = document.querySelector('.parallax-js-1');
-    const parallaxTween = tween.createScrollerTween({
+    const parallaxTween = MobTween.createScrollerTween({
         from: { x: 0, rotate: 0, opacity: 1 },
         to: { x: 50, rotate: 50, opacity: 1.2 },
     });
@@ -56,7 +56,7 @@ export const hScroller = () => {
         parallaxItemTween.style.transform = `translateX(${x}px) rotate(${rotate}deg)`;
         parallaxItemTween.style.opacity = opacity;
     });
-    const parallax1 = scroller.createParallax({
+    const parallax1 = MobScroll.createParallax({
         item: document.querySelector('.parallax-js-1'),
         ease: false,
         propierties: 'tween',
@@ -70,7 +70,7 @@ export const hScroller = () => {
      *
      */
 
-    const parallax2 = scroller.createParallax({
+    const parallax2 = MobScroll.createParallax({
         item: document.querySelector('.parallax-js-2'),
         propierties: 'x',
         range: 7,
@@ -82,7 +82,7 @@ export const hScroller = () => {
     /**
      *
      */
-    const parallaxPin = scroller.createScrollTrigger({
+    const parallaxPin = MobScroll.createScrollTrigger({
         item: document.querySelector('.parallax-js-pin'),
         trigger: '.pluto',
         propierties: 'x',
@@ -100,10 +100,9 @@ export const hScroller = () => {
     const pluto = document.querySelector('.pluto3');
     pluto.style.webkitTransition = 'background-color .35s';
 
-    const myParallaxTimeline = tween
-        .createSequencer({
-            data: { x: 0, y: 0 },
-        })
+    const myParallaxTimeline = MobTween.createSequencer({
+        data: { x: 0, y: 0 },
+    })
         .goTo({ x: pluto.offsetWidth / 2 }, { start: 0, end: 2 })
         .goTo({ y: pluto.offsetHeight }, { start: 2.5, end: 5 })
         .goTo({ x: pluto.offsetWidth }, { start: 5, end: 7.5 })
@@ -117,7 +116,7 @@ export const hScroller = () => {
         target.style.transform = `translate(${x}px, ${y}px)`;
     });
 
-    const parallaxIn = scroller.createScrollTrigger({
+    const parallaxIn = MobScroll.createScrollTrigger({
         item: target,
         trigger: '.pluto3',
         propierties: 'tween',
@@ -157,7 +156,7 @@ export const hScroller = () => {
      *
      */
     const target2 = document.querySelector('.parallax-via-js-out');
-    const myParallaxTween = tween.createScrollerTween({
+    const myParallaxTween = MobTween.createScrollerTween({
         from: { x: 0, y: 0 },
         to: { x: -pluto.offsetWidth, y: pluto.offsetHeight },
     });
@@ -170,7 +169,7 @@ export const hScroller = () => {
         target2.style.transform = `translate(${x}px, ${y}px)`;
     });
 
-    let parallaxOut = scroller.createScrollTrigger({
+    let parallaxOut = MobScroll.createScrollTrigger({
         item: target2,
         trigger: '.pluto3',
         ease: true,
@@ -236,7 +235,7 @@ export const hScroller = () => {
     /**
      *
      */
-    const parallaxb1 = scroller.createParallax({
+    const parallaxb1 = MobScroll.createParallax({
         item: document.querySelector('.parallax-js-b1'),
         reverse: true,
         onSwitch: 'in-stop',
@@ -246,7 +245,7 @@ export const hScroller = () => {
     /**
      *
      */
-    const parallaxb2 = scroller.createScrollTrigger({
+    const parallaxb2 = MobScroll.createScrollTrigger({
         item: document.querySelector('.parallax-js-b2'),
         trigger: '.pluto2',
         start: 'right 100px',
@@ -274,7 +273,7 @@ export const hScroller = () => {
     /**
      *
      */
-    const parallaxC1 = scroller.createScrollTrigger({
+    const parallaxC1 = MobScroll.createScrollTrigger({
         item: document.querySelector('.parallax-js-c1'),
         trigger: '.pluto5',
         start: 'bottom',
@@ -286,7 +285,7 @@ export const hScroller = () => {
     /**
      *
      */
-    const parallaxC2 = scroller.createScrollTrigger({
+    const parallaxC2 = MobScroll.createScrollTrigger({
         item: document.querySelector('.parallax-js-c2'),
         propierties: 'x',
         trigger: '.pluto6',
@@ -299,7 +298,7 @@ export const hScroller = () => {
     /**
      *
      */
-    const parallaxC3 = scroller.createScrollTrigger({
+    const parallaxC3 = MobScroll.createScrollTrigger({
         item: document.querySelector('.parallax-js-c3'),
         marker: 'pin2',
         pin: true,
@@ -312,7 +311,7 @@ export const hScroller = () => {
     /**
      *
      */
-    const parallaxC4 = scroller.createParallax({
+    const parallaxC4 = MobScroll.createParallax({
         item: document.querySelector('.parallax-js-c4'),
         onSwitch: 'out-stop',
         propierties: 'x',

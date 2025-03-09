@@ -1,4 +1,4 @@
-import { timeline, tween } from '../mobMotion';
+import { MobTimeline, MobTween } from '../mobMotion';
 
 export function tweenTest() {
     const btnStart = document.querySelector('.tween-btn-start');
@@ -13,7 +13,9 @@ export function tweenTest() {
     const target = document.querySelector('.tween-target');
 
     // DEFINE SPRING
-    const myTween = tween.createTween({ data: { x: 0, y: 0, rotate: 0 } });
+    const myTween = MobTween.createTimeTween({
+        data: { x: 0, y: 0, rotate: 0 },
+    });
     myTween.subscribe(({ x, y, rotate }) => {
         target.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg)`;
     });
@@ -27,8 +29,11 @@ export function tweenTest() {
     }
 
     // DEFINE TIMELINE
-    const timeline1 = timeline
-        .createAsyncTimeline({ repeat: -1, yoyo: false, freeMode: true })
+    const timeline1 = MobTimeline.createAsyncTimeline({
+        repeat: -1,
+        yoyo: false,
+        freeMode: true,
+    })
         .set(myTween, { x: 0, y: 0, rotate: 0 })
         .goTo(myTween, { x: -200 })
         .goFromTo(myTween, { x: -200 }, { x: 400 }, { duration: 800 })

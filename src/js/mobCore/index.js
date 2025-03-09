@@ -41,10 +41,10 @@ import {
     handlePointerUp,
 } from './events/pointerEvent/handlePointer.js';
 
-export const mobCore = {
+export const MobCore = {
     /**
      * @description
-     * SimpleStore initialization.
+     * MobStore initialization.
      * The store accepts single properties or objects
      *  Each individual property can be initialized with a simple value or via a more complex setup.
      *  A complex set-up is created through a function that must return an object with the property `value` and at least one of the following properties:
@@ -81,12 +81,12 @@ export const mobCore = {
      *
      * ```javascript
      *
-     * const myStore = mobCore.createStore({
+     * const myStore = MobCore.createStore({
      *     prop1: 0,
      *     prop2: 0
      * });
      *
-     * const myStore = mobCore.createStore({
+     * const myStore = MobCore.createStore({
      *     myProp: () => ({
      *         value: 10,
      *         type: Number,
@@ -187,12 +187,12 @@ export const mobCore = {
      * Execute a callBack within the first available request animation frame.
      * Use this method to modify elements of the DOM
      *
-     * @param {import('./events/rafutils/type.js').handleFrameCallbakType} callback - callback function
+     * @param {import('./events/rafutils/type.js').HandleFrameCallbak} callback - callback function
      * @returns {void}
      *
      * @example
      * ```javascript
-     * mobCore.useframe(({ fps, shouldrender, time }) => {
+     * MobCore.useframe(({ fps, shouldrender, time }) => {
      *     // code ...
      * });
      *
@@ -206,13 +206,13 @@ export const mobCore = {
      * @description
      * Execute callbacks after scheduling the request animation frame. Use this method to read data from the DOM. To execute callbacks exactly after the request animation frame, set the global property deferredNextTick to true.
      *
-     * @param {import('./events/rafutils/type.js').handleFrameCallbakType} callback - callback function
+     * @param {import('./events/rafutils/type.js').HandleFrameCallbak} callback - callback function
      * @returns {void}
      *
      * @example
      * ```javascript
-     * mobCore.useFrame(() => {
-     *     mobCore.useNextTick(({ fps, time }) => {
+     * MobCore.useFrame(() => {
+     *     MobCore.useNextTick(({ fps, time }) => {
      *         // code
      *     });
      * });
@@ -220,20 +220,20 @@ export const mobCore = {
      * Loop request animation frame using handleNextTick:
      *
      * const loop = () => {
-     *     mobCore.useNextTick(() => {
+     *     MobCore.useNextTick(() => {
      *         // read from DOM
      *
-     *         mobCore.useFrame(() => {
+     *         MobCore.useFrame(() => {
      *             // write to the DOM
      *             loop();
      *         });
      *     });
      * };
      *
-     * mobCore.useFrame(() => loop());
+     * MobCore.useFrame(() => loop());
      *
      * To tick exactly after the request animation frame:
-     * mobCore.default('set', { deferredNextTick: true });
+     * MobCore.default('set', { deferredNextTick: true });
      *
      * ```
      */
@@ -245,19 +245,19 @@ export const mobCore = {
      * @description
      * Execute a callback to the next available frame allowing the creation of a request animation frame loop
      *
-     * @param {import('./events/rafutils/type.js').handleFrameCallbakType} callback - callback function
+     * @param {import('./events/rafutils/type.js').HandleFrameCallbak} callback - callback function
      * @returns {void}
      *
      * @example
      * ```javascript
      * const loop = () => {
-     *     mobCore.useNextFrame(({ fps, time }) => {
+     *     MobCore.useNextFrame(({ fps, time }) => {
      *         // code
      *         loop();
      *     });
      * };
      *
-     * mobCore.useFrame(() => loop());
+     * MobCore.useFrame(() => loop());
      *
      * ```
      */
@@ -269,13 +269,13 @@ export const mobCore = {
      * @description
      * Add callback to a specific frame.
      *
-     * @param {import('./events/rafutils/type.js').handleFrameCallbakType} callback - callback function
+     * @param {import('./events/rafutils/type.js').HandleFrameCallbak} callback - callback function
      * @param {number} frame
      * @returns {void}
      *
      * @example
      * ```javascript
-     * mobCore.useFrameIndex(({ fps, time }) => {
+     * MobCore.useFrameIndex(({ fps, time }) => {
      *     // code ...
      * }, 5);
      *
@@ -291,7 +291,7 @@ export const mobCore = {
         After the method will be resolved the first time, subsequent calls will be resolved immediately returning the previously calculated value.
         The method is launched the first time automatically at the first loading.
      *
-     * @param {import('./events/rafutils/type.js').loadFpsCallback} callback - callback function
+     * @param {import('./events/rafutils/type.js').LoadFpsCall} callback - callback function
      * @return {Promise<{averageFPS: number}>}
      *
      */
@@ -311,7 +311,7 @@ export const mobCore = {
      * @example
      * ```javascript
      *
-     * mobCore.useLoad(() => {
+     * MobCore.useLoad(() => {
      *     // code
      * });
      *
@@ -333,12 +333,12 @@ export const mobCore = {
      * @description
      * Add callback on resize using a debounce function.
      *
-     * @param {import('./events/resizeUtils/type.js').handleResizeCallback} callback - callback function fired on resize.
+     * @param {import('./events/resizeUtils/type.js').HandleResizeCallback} callback - callback function fired on resize.
      * @returns {() => void}
      *
      * @example
      * ```javascript
-     * mobCore.useResize(
+     * MobCore.useResize(
      *     ({
      *         documentHeight,
      *         horizontalResize,
@@ -361,12 +361,12 @@ export const mobCore = {
      * @description
      * Add callback on tab change.
      *
-     * @param {import('./events/visibilityChange/type.js').visibilityChangeCallback} callback - callback function fired on tab change.
+     * @param {import('./events/visibilityChange/type.js').VisibilityChangeCallback} callback - callback function fired on tab change.
      * @returns {() => void}
      *
      * @example
      * ```javascript
-     *  const unsubscribe = mobCore.useVisibilityChange(({ visibilityState }) => {
+     *  const unsubscribe = MobCore.useVisibilityChange(({ visibilityState }) => {
      *      // code
      *  });
      *
@@ -382,12 +382,12 @@ export const mobCore = {
      * @description
      * Add callback on mouse click
      *
-     * @param {import('./events/mouseUtils/type.js').mouseEventCallback} callback - callback function fired on mouse click.
+     * @param {import('./events/mouseUtils/type.js').MouseEventCallback} callback - callback function fired on mouse click.
      * @returns {() => void}
      *
      * @example
      * ```javascript
-     * const unsubscribe = mobCore.useMouseClick(
+     * const unsubscribe = MobCore.useMouseClick(
      *     ({ client, page, preventDefault, target, type }) => {
      *         // code
      *     }
@@ -405,12 +405,12 @@ export const mobCore = {
      * @description
      * Add callback on mouse down
      *
-     * @param {import('./events/mouseUtils/type.js').mouseEventCallback} callback - callback function fired on mouse down.
+     * @param {import('./events/mouseUtils/type.js').MouseEventCallback} callback - callback function fired on mouse down.
      * @returns {() => void}
      *
      * @example
      * ```javascript
-     * const unsubscribe = mobCore.useMouseDown(
+     * const unsubscribe = MobCore.useMouseDown(
      *     ({ client, page, preventDefault, target, type }) => {
      *         // code
      *     }
@@ -428,12 +428,12 @@ export const mobCore = {
      * @description
      * Add callback on touch start
      *
-     * @param {import('./events/mouseUtils/type.js').mouseEventCallback} callback - callback function fired on mouse touch start.
+     * @param {import('./events/mouseUtils/type.js').MouseEventCallback} callback - callback function fired on mouse touch start.
      * @returns {() => void}
      *
      * @example
      * ```javascript
-     * const unsubscribe = mobCore.useTouchStart(
+     * const unsubscribe = MobCore.useTouchStart(
      *     ({ client, page, preventDefault, target, type }) => {
      *         // code
      *     }
@@ -451,12 +451,12 @@ export const mobCore = {
      * @description
      * Add callback on mouse move
      *
-     * @param {import('./events/mouseUtils/type.js').mouseEventCallback} callback - callback function fired on mouse move.
+     * @param {import('./events/mouseUtils/type.js').MouseEventCallback} callback - callback function fired on mouse move.
      * @returns {() => void}
      *
      * @example
      * ```javascript
-     * const unsubscribe = mobCore.useMouseMove(
+     * const unsubscribe = MobCore.useMouseMove(
      *     ({ client, page, preventDefault, target, type }) => {
      *         // code
      *     }
@@ -474,12 +474,12 @@ export const mobCore = {
      * @description
      * Add callback on touch move
      *
-     * @param {import('./events/mouseUtils/type.js').mouseEventCallback} callback - callback function fired on touch move.
+     * @param {import('./events/mouseUtils/type.js').MouseEventCallback} callback - callback function fired on touch move.
      * @returns {() => void}
      *
      * @example
      * ```javascript
-     * const unsubscribe = mobCore.useTouchMove(
+     * const unsubscribe = MobCore.useTouchMove(
      *     ({ client, page, preventDefault, target, type }) => {
      *         // code
      *     }
@@ -497,12 +497,12 @@ export const mobCore = {
      * @description
      * Add callback on mouse up
      *
-     * @param {import('./events/mouseUtils/type.js').mouseEventCallback} callback - callback function fired on mouse up.
+     * @param {import('./events/mouseUtils/type.js').MouseEventCallback} callback - callback function fired on mouse up.
      * @returns {() => void}
      *
      * @example
      * ```javascript
-     * const unsubscribe = mobCore.useMouseUp(
+     * const unsubscribe = MobCore.useMouseUp(
      *     ({ client, page, preventDefault, target, type }) => {
      *         // code
      *     }
@@ -520,12 +520,12 @@ export const mobCore = {
      * @description
      * Add callback on touch end.
      *
-     * @param {import('./events/mouseUtils/type.js').mouseEventCallback} callback - callback function fired on touch end.
+     * @param {import('./events/mouseUtils/type.js').MouseEventCallback} callback - callback function fired on touch end.
      * @returns {() => void}
      *
      * @example
      * ```javascript
-     * const unsubscribe = mobCore.useTouchEnd(
+     * const unsubscribe = MobCore.useTouchEnd(
      *     ({ client, page, preventDefault, target, type }) => {
      *         // code
      *     }
@@ -543,12 +543,12 @@ export const mobCore = {
      * @description
      * Add callback on mouse wheel.
      *
-     * @param {import('./events/mouseUtils/type.js').mouseEventCallback} callback - callback function fired on mouse wheel.
+     * @param {import('./events/mouseUtils/type.js').MouseEventCallback} callback - callback function fired on mouse wheel.
      * @returns {() => void}
      *
      * @example
      * ```javascript
-     * const unsubscribe = mobCore.useMouseWheel(
+     * const unsubscribe = MobCore.useMouseWheel(
      *     ({
      *         client,
      *         page,
@@ -581,7 +581,7 @@ export const mobCore = {
      *
      * @example
      * ```javascript
-     * const unsubscribe = mobCore.useScroll(({ direction, scrollY }) => {
+     * const unsubscribe = MobCore.useScroll(({ direction, scrollY }) => {
      *     // code
      * });
      *
@@ -602,7 +602,7 @@ export const mobCore = {
      *
      * @example
      * ```javascript
-     * const unsubscribe = mobCore.useScrollImmediate(({ direction, scrollY }) => {
+     * const unsubscribe = MobCore.useScrollImmediate(({ direction, scrollY }) => {
      *     // code
      * });
      *
@@ -623,7 +623,7 @@ export const mobCore = {
      *
      * @example
      * ```javascript
-     * const unsubscribe = mobCore.useScrollThrottle(({ direction, scrollY }) => {
+     * const unsubscribe = MobCore.useScrollThrottle(({ direction, scrollY }) => {
      *    // code
      * });
      *
@@ -650,7 +650,7 @@ export const mobCore = {
      *
      * @example
      * ```javascript
-     * const unsubscribe = mobCore.useScrollStart(({ scrollY }) => {
+     * const unsubscribe = MobCore.useScrollStart(({ scrollY }) => {
      *     // code
      * });
      *
@@ -671,7 +671,7 @@ export const mobCore = {
      *
      * @example
      * ```javascript
-     * const unsubscribe = mobCore.useScrollEnd(({ scrollY }) => {
+     * const unsubscribe = MobCore.useScrollEnd(({ scrollY }) => {
      *     // code
      * });
      *
@@ -689,7 +689,7 @@ export const mobCore = {
      *
      * @example
      * ```javascript
-     * const unsubscribe = mobCore.usePointerOver((event) => {
+     * const unsubscribe = MobCore.usePointerOver((event) => {
      *         // code
      *     }
      * );
@@ -708,7 +708,7 @@ export const mobCore = {
      *
      * @example
      * ```javascript
-     * const unsubscribe = mobCore.usePointerDown((event) => {
+     * const unsubscribe = MobCore.usePointerDown((event) => {
      *         // code
      *     }
      * );
@@ -727,7 +727,7 @@ export const mobCore = {
      *
      * @example
      * ```javascript
-     * const unsubscribe = mobCore.usePointerMove((event) => {
+     * const unsubscribe = MobCore.usePointerMove((event) => {
      *         // code
      *     }
      * );
@@ -746,7 +746,7 @@ export const mobCore = {
      *
      * @example
      * ```javascript
-     * const unsubscribe = mobCore.usePointerUp((event) => {
+     * const unsubscribe = MobCore.usePointerUp((event) => {
      *         // code
      *     }
      * );
@@ -765,7 +765,7 @@ export const mobCore = {
      *
      * @example
      * ```javascript
-     * const unsubscribe = mobCore.usePointerOut((event) => {
+     * const unsubscribe = MobCore.usePointerOut((event) => {
      *         // code
      *     }
      * );
@@ -784,7 +784,7 @@ export const mobCore = {
      *
      * @example
      * ```javascript
-     * const unsubscribe = mobCore.usePointerLeave((event) => {
+     * const unsubscribe = MobCore.usePointerLeave((event) => {
      *         // code
      *     }
      * );
@@ -865,8 +865,8 @@ export const mobCore = {
      *
      * @example
      * ``` javascript
-     * mobCore.store.set('throttle', 300);
-     * const { throttle } = mobCore.store.get();
+     * MobCore.store.set('throttle', 300);
+     * const { throttle } = MobCore.store.get();
      * ....
      *
      * ```
@@ -890,7 +890,7 @@ export const mobCore = {
      *
      * @example
      * ``` javascript
-     * reject(mobCore.ANIMATION_STOP_REJECT);
+     * reject(MobCore.ANIMATION_STOP_REJECT);
      * ```
      */
     ANIMATION_STOP_REJECT: ANIMATION_STOP_REJECT,

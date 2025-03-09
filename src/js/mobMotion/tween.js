@@ -5,10 +5,10 @@ import MobScrollerTween from './animation/scroller/MobScrollerTween.js';
 import MobMasterSequencer from './animation/sequencer/MobMasterSequencer.js';
 import MobSequencer from './animation/sequencer/MobSequencer.js';
 import MobSpring from './animation/spring/MobSpring.js';
-import MobTween from './animation/tween/MobTween.js';
+import MobTimeTween from './animation/tween/MobTimeTween.js';
 import { MobCreateStaggers } from './animation/sequencer/MobCreateStagger.js';
 
-export const tween = {
+export const MobTween = {
     /**
      * @param {import('./animation/scroller/type').MobScrollerTween} data
      * @return {MobScrollerTween}
@@ -18,7 +18,7 @@ export const tween = {
      * Property schema:
      *
      *
-     * const myScrollerTween = tween.createScrollerTween({
+     * const myScrollerTween = MobTween.createScrollerTween({
      *   from: Object.<string, number>,
      *   to: Object.<string, number>,
      *   ease: [ String ],
@@ -60,7 +60,7 @@ export const tween = {
      * Property schema:
      *
      *
-     * const mySequencer = tween.createSequencer({
+     * const mySequencer = MobTween.createSequencer({
      *   data: Object.<string, number>,
      *   duration: [ Number ],
      *   ease: [ String ],
@@ -107,7 +107,7 @@ export const tween = {
      * @example
      *
      * ```javascript
-     * cont masterSequencer = tween.createMasterSequencer();
+     * cont masterSequencer = MobTween.createMasterSequencer();
      * const staggers = tween.createStaggers({})
      * staggers.forEach(({ item, start, end, index }) => {
      *     const sequencer = tween
@@ -133,7 +133,7 @@ export const tween = {
      * Property schema:
      *
      *
-     * const staggers = tween.createStaggers({
+     * const staggers = MobTween.createStaggers({
      *     items: Array.<Element|Object>,
      *     stagger: {
      *         type: [ String ],
@@ -167,15 +167,15 @@ export const tween = {
     },
 
     /**
-     * @param {import('./animation/tween/type').TweenProps} data
-     * @returns {MobTween}
+     * @param {import('./animation/tween/type').TimeTweenProps} data
+     * @returns {MobTimeTween}
      *
      * @example
      * ```javascript
      * Property schema:
      *
      *
-     * const myTween = tween.createTween({
+     * const myTween = MobTween.createTimeTween({
      *   data: Object.<string, number>,
      *   duration: [ Number ],
      *   ease: [ String ],
@@ -215,8 +215,8 @@ export const tween = {
      *
      * ```
      */
-    createTween(data) {
-        return new MobTween(data);
+    createTimeTween(data) {
+        return new MobTimeTween(data);
     },
 
     /**
@@ -229,7 +229,7 @@ export const tween = {
      * Property schema:
      *
      *
-     * const mySpring = tween.createSpring({
+     * const mySpring = MobTween.createSpring({
      *   data: Object.<string, number>,
      *   config: [ String ],
      *   configProps: {
@@ -289,7 +289,7 @@ export const tween = {
      * Property schema:
      *
      *
-     * const myLerp = tween.createLerp({
+     * const myLerp = MobTween.createLerp({
      *   data: Object.<string, number>,
      *   precision: [ Number ],
      *   velocity: [ Number ],

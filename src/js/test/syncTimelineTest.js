@@ -1,4 +1,4 @@
-import { timeline, tween } from '../mobMotion';
+import { MobTimeline, MobTween } from '../mobMotion';
 import { isIOS } from '../utility/isIOS.js';
 
 export function syncTimelineTest() {
@@ -45,11 +45,10 @@ export function syncTimelineTest() {
     let rotation = 720;
 
     // SINGLE
-    const seq1 = tween
-        .createSequencer({
-            ease: 'easeInOutCubic',
-            data: { x: 0, y: 0, rotate: 0, scale: 1 },
-        })
+    const seq1 = MobTween.createSequencer({
+        ease: 'easeInOutCubic',
+        data: { x: 0, y: 0, rotate: 0, scale: 1 },
+    })
         .goTo({ x: 800 }, { start: 0, end: 2.5, ease: 'easeInOutBack' })
         .goTo({ y: 450 }, { start: 2.5, end: 5, ease: 'easeInOutBack' })
         .goTo({ x: 0 }, { start: 5, end: 7.5, ease: 'easeInOutBack' })
@@ -77,11 +76,10 @@ export function syncTimelineTest() {
     });
 
     // STAGGER
-    const seqStagger = tween
-        .createSequencer({
-            stagger: { each: 10, from: 'end' },
-            data: { x: 0, scale: 1 },
-        })
+    const seqStagger = MobTween.createSequencer({
+        stagger: { each: 10, from: 'end' },
+        data: { x: 0, scale: 1 },
+    })
         .goTo({ x: 800 }, { start: 3, end: 5, ease: 'easeInOutBack' })
         .goTo({ x: 0 }, { start: 5, end: 7, ease: 'easeInOutBack' })
         .goTo({ scale: 2 }, { start: 3.5, end: 5, ease: 'easeOutCubic' })
@@ -100,12 +98,11 @@ export function syncTimelineTest() {
         });
     });
 
-    const syncTimeline = timeline
-        .createSyncTimeline({
-            repeat: 1,
-            yoyo: false,
-            duration: 10000,
-        })
+    const syncTimeline = MobTimeline.createSyncTimeline({
+        repeat: 1,
+        yoyo: false,
+        duration: 10000,
+    })
         .add(seq1)
         .add(seqStagger);
 

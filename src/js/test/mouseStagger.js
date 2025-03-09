@@ -1,5 +1,5 @@
-import { mobCore } from '../mobCore';
-import { timeline, tween } from '../mobMotion';
+import { MobCore } from '../mobCore';
+import { MobTimeline, MobTween } from '../mobMotion';
 
 export const mouseStagger = () => {
     // 1
@@ -8,7 +8,7 @@ export const mouseStagger = () => {
     const smallerBtn = document.querySelector('.down');
     console.log(biggerBtn, smallerBtn);
 
-    const spring = tween.createSpring({
+    const spring = MobTween.createSpring({
         config: 'gentle',
         stagger: { each: 4 },
         data: { x: 0, y: 0 },
@@ -27,14 +27,14 @@ export const mouseStagger = () => {
     });
 
     // In real time (like mousemove) use waitComplete: false, to avoid moviemnt when promise in sot resolved
-    mobCore.useMouseMove(({ client }) => {
+    MobCore.useMouseMove(({ client }) => {
         const { x, y } = client;
         spring.goTo({ x, y });
     });
 
     // 2
     const stagger = document.querySelectorAll('.stagger__item');
-    const tween1 = tween.createTween({
+    const tween1 = MobTween.createTimeTween({
         ease: 'easeInOutQuad',
         duration: 1000,
         stagger: { each: 10, from: 'start' },
@@ -51,9 +51,10 @@ export const mouseStagger = () => {
     biggerBtn.addEventListener('click', () => (val += 0.5));
     smallerBtn.addEventListener('click', () => (val -= 0.5));
 
-    const timeline1 = timeline
-        .createAsyncTimeline({ repeat: -1, yoyo: true })
-        .goTo(tween1, { scale: () => val * 2 });
+    const timeline1 = MobTimeline.createAsyncTimeline({
+        repeat: -1,
+        yoyo: true,
+    }).goTo(tween1, { scale: () => val * 2 });
     // .goTo(tween1, { scale: () => val * 3 })
     timeline1.play();
     timeline1.onLoopEnd(({ loop, direction }) => {
