@@ -60,7 +60,7 @@ export interface StaggerFrameIndexObject {
  *
  * The return array staggerArray && staggerArrayOnComplete has index and frame created/updated.
  */
-export type setStagger = <T extends any[], S extends any[]>(arg0: {
+export type SetStagger = <T extends any[], S extends any[]>(arg0: {
     arrayDefault: T;
     arrayOnStop: S;
     stagger: StaggerObject;

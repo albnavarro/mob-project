@@ -2,7 +2,7 @@ import { MqAction, MqValues } from '../../../utils/type';
 import { SpringChoiceConfig, SpringPresentConfigType } from '../../spring/type';
 import { EaseTypes } from '../../tween/type';
 
-export interface setUpType {
+export interface SetUpType {
     /**
      * @description
      * Use passive event on mouse/touch event.
@@ -199,9 +199,9 @@ export interface setUpType {
     };
 }
 
-export type SetUpGetData = () => setUpType;
+export type SetUpGetData = () => SetUpType;
 
-export type GetSetUp = <T extends keyof setUpType>(props: T) => setUpType[T];
+export type GetSetUp = <T extends keyof SetUpType>(props: T) => SetUpType[T];
 
 type DeepPartial<T> = T extends object
     ? {
@@ -209,4 +209,4 @@ type DeepPartial<T> = T extends object
       }
     : T;
 
-export type SetSetUp = (obj: DeepPartial<setUpType>) => void;
+export type SetSetUp = (obj: DeepPartial<SetUpType>) => void;

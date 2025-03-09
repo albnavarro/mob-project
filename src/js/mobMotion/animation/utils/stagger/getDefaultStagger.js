@@ -250,7 +250,7 @@ const getItemsByRow = (arrayDefault, stagger, chunckSizeCol) => {
 };
 
 /**
- * @type {import('./type.js').setStagger}
+ * @type {import('./type.js').SetStagger}
  */
 export const getDefaultStagger = ({
     arrayDefault,

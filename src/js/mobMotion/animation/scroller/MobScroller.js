@@ -386,7 +386,7 @@ export default class MobScroller {
 
     /**
      * @description
-     * @type {MobLerp & MobSpring & MobScrollerTween & MobSequencer}
+     * @type {import('../../type.js').MobMasterSequencer | MobScrollerTween | MobSequencer}
      */
     #tween;
 

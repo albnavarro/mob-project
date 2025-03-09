@@ -15,7 +15,7 @@ import { staggerColRowWarning } from '../warning.js';
 import { MobCore } from '../../../../mobCore/index.js';
 
 /**
- * @type {import('./type.js').setStagger}
+ * @type {import('./type.js').SetStagger}
  */
 const getRadial = ({
     arrayDefault,
@@ -111,7 +111,7 @@ const getRadial = ({
 };
 
 /**
- * @type {import('./type.js').setStagger}
+ * @type {import('./type.js').SetStagger}
  */
 const getDefault = ({
     arrayDefault,
@@ -156,7 +156,7 @@ const getDefault = ({
 };
 
 /**
- * @type {import('./type.js').setStagger}
+ * @type {import('./type.js').SetStagger}
  */
 export const setStagger = ({
     arrayDefault,

@@ -64,7 +64,7 @@ export const lerpPrecisionDefault = 0.01;
 export const lerpVelocityDefault = 0.06;
 
 /**
- * @param {import('./type.js').setUpType} obj
+ * @param {import('./type.js').SetUpType} obj
  */
 export const setupValidation = (obj) => {
     const deferredNextTick = checkSetUpType({
@@ -220,7 +220,7 @@ export const setupValidation = (obj) => {
 
     /**
      * @constant
-     * @type {import('./type.js').setUpType}
+     * @type {import('./type.js').SetUpType}
      */
     const result = {
         deferredNextTick,

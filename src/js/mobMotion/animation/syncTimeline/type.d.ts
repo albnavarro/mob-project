@@ -1,3 +1,5 @@
+import MobMasterSequencer from '../sequencer/MobMasterSequencer';
+import MobSequencer from '../sequencer/MobSequencer';
 import { DirectionType, DirectionTypeObjectLoop } from '../utils/timeline/type';
 import MobSyncTimeline from './MobSyncTimeline';
 
@@ -7,21 +9,7 @@ export interface SyncTimeline {
     repeat?: number;
 }
 
-export interface SyncTimelineSequencers {
-    draw: (arg0: {
-        partial: number;
-        isLastDraw: boolean;
-        useFrame: boolean;
-        direction: DirectionType;
-    }) => void;
-    getLabels: () => { name: string; time: number }[];
-    inzializeStagger: () => void;
-    disableStagger: () => void;
-    cleanCachedId: () => void;
-    resetLastValue: () => void;
-    destroy: () => void;
-    setStretchFactor: (arg0: number) => void;
-}
+export type SyncTimelineSequencers = MobSequencer | MobMasterSequencer;
 
 export interface SyncTimelineEvent<T> {
     id: number;

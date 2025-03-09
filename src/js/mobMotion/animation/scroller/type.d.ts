@@ -1,4 +1,6 @@
 import { MqAction, MqValues } from '../../utils/type';
+import MobMasterSequencer from '../sequencer/MobMasterSequencer';
+import MobSequencer from '../sequencer/MobSequencer';
 import { SpringChoiceConfig } from '../spring/type';
 import { EaseTypes } from '../tween/type';
 import { StaggerObject } from '../utils/stagger/type';
@@ -35,9 +37,9 @@ export interface MobScrollerCommon {
 
     /**
      * @description
-     * Instance of MobScrollerTween | MobSequncer
+     * Instance of  MobMasterSequencer | MobScrollerTween | MobSequncer
      */
-    tween?: object;
+    tween?: MobMasterSequencer | MobSequencer | MobScrollerTween;
 
     /**
      * @description
