@@ -6,8 +6,6 @@ import {
     slideDown,
 } from '../../../js/utility/animation.js';
 
-import { modernzier } from '../../../js/utility/modernizr.js';
-
 import {
     outerHeight,
     outerWidth,
@@ -16,7 +14,7 @@ import {
     getSiblings,
 } from '../../../js/mobCore/utils/index.js';
 import { MobCore } from '../../../js/mobCore/index.js';
-import { MobMotionCore } from '../../../js/mobMotion/core.js';
+import { MobMotionCore } from '../../../js/mobMotion';
 
 export class menuClass {
     constructor(data) {

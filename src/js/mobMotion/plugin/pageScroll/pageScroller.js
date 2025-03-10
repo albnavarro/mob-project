@@ -1,8 +1,7 @@
 //@ts-check
 
+import { MobMotionCore, MobTween } from '../..';
 import { MobCore } from '../../../mobCore';
-import { MobMotionCore } from '../../core';
-import { MobTween } from '../../tween';
 
 let isActive = false;
 

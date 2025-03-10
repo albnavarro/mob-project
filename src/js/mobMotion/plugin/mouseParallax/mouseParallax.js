@@ -1,3 +1,4 @@
+import { MobTween } from '../..';
 import { MobCore } from '../../../mobCore';
 import {
     getTranslateValues,
@@ -5,7 +6,6 @@ import {
     outerHeight,
     outerWidth,
 } from '../../../mobCore/utils';
-import { MobTween } from '../../tween';
 
 export class MobMouseParallax {
     /**

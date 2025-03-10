@@ -1,6 +1,6 @@
 import { forceRedraw } from '../../../js/utility/redrowNode.js';
 import { detectSafari } from '../../../js/utility/isSafari.js';
-import { MobMotionCore } from '../../../js/mobMotion/core.js';
+import { MobMotionCore } from '../../../js/mobMotion';
 
 export class WaveItemClass {
     constructor(data) {
