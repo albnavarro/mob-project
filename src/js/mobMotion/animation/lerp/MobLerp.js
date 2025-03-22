@@ -463,8 +463,7 @@ export default class MobLerp {
             this.#currentResolve = undefined;
         }
 
-        // Reset RAF
-        if (this.#isActive) this.#isActive = false;
+        this.#isActive = false;
     }
 
     /**

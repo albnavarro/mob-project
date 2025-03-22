@@ -507,10 +507,7 @@ export default class MobSpring {
             this.#currentResolve = undefined;
         }
 
-        // Reset RAF
-        if (this.#isActive) {
-            this.#isActive = false;
-        }
+        this.#isActive = false;
     }
 
     /**
