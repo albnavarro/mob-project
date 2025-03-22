@@ -727,7 +727,7 @@ export default class MobSpring {
             return Promise.resolve();
         }
 
-        if (!this.#isActive) {
+        if (!this.#isActive && !this.#promise) {
             this.#promise = new Promise((res, reject) => {
                 this.#startRaf(res, reject);
             });
