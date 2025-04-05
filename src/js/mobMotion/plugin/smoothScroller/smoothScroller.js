@@ -217,6 +217,11 @@ export class MobSmoothScroller {
     #onUpdateCallback;
 
     /**
+     * @type {import('./type').OnSwipe}
+     */
+    #onSwipeCallback;
+
+    /**
      * @type {(arg0: { shouldScroll: boolean }) => void}
      */
     #onAfterRefresh;
@@ -225,6 +230,11 @@ export class MobSmoothScroller {
      * @type {(arg0: { shouldScroll: boolean }) => void}
      */
     #afterInit;
+
+    /**
+     * @type {boolean}
+     */
+    #swipeisActive;
 
     /**
      * @type {any[]}
@@ -240,6 +250,31 @@ export class MobSmoothScroller {
      * @type {(arg0: Event) => void}
      */
     #scopedTouchMove;
+
+    /**
+     * @type {number}
+     */
+    #lastSpinX;
+
+    /**
+     * @type {number}
+     */
+    #lastSpinY;
+
+    /**
+     * @type {boolean}
+     */
+    #useHorizontalScroll;
+
+    /**
+     * @type {boolean}
+     */
+    #useSwipe;
+
+    /**
+     * @type {boolean}
+     */
+    #revertSwipeDirection;
 
     /**
      * @param { import('./type.ts').MobSmoothScroller } data
@@ -296,6 +331,9 @@ export class MobSmoothScroller {
         this.#dragEnable = false;
         this.#prevTouchVal = 0;
         this.#touchVal = 0;
+        this.#lastSpinX = 0;
+        this.#lastSpinY = 0;
+        this.#swipeisActive = false;
         this.#subscribeResize = NOOP;
         this.#subscribeScrollStart = NOOP;
         this.#subscribeScrollEnd = NOOP;
@@ -384,6 +422,30 @@ export class MobSmoothScroller {
             data?.onUpdate,
             'SmoothScroller: onUpdate',
             NOOP
+        );
+
+        this.#onSwipeCallback = valueIsFunctionAndReturnDefault(
+            data?.onSwipe,
+            'SmoothScroller: onSwipe',
+            NOOP
+        );
+
+        this.#useSwipe = valueIsBooleanAndReturnDefault(
+            data?.useSwipe,
+            'SmoothScroller: useSwipe',
+            false
+        );
+
+        this.#revertSwipeDirection = valueIsBooleanAndReturnDefault(
+            data?.revertSwipeDirection,
+            'SmoothScroller: revertSwipeDirection',
+            false
+        );
+
+        this.#useHorizontalScroll = valueIsBooleanAndReturnDefault(
+            data?.useHorizontalScroll,
+            'SmoothScroller: useBothAxis',
+            false
         );
 
         this.#onAfterRefresh = valueIsFunctionAndReturnDefault(
@@ -493,9 +555,10 @@ export class MobSmoothScroller {
                 }
             );
         } else {
-            this.#subscribeMouseWheel = MobCore.useMouseWheel((data) =>
-                this.#onWhell(data)
-            );
+            this.#subscribeMouseWheel = MobCore.useMouseWheel((data) => {
+                this.#detectSwipe(data);
+                this.#onWhell(data);
+            });
 
             this.#subscribeMouseMove = MobCore.useMouseMove((data) =>
                 this.#onTouchMove(data)
@@ -575,11 +638,44 @@ export class MobSmoothScroller {
     }
 
     /**
+     * @param {import('../../../mobCore/events/mouseUtils/type.js').MouseEventParsed} params
+     */
+    #detectSwipe({ pixelX }) {
+        if (
+            !this.#useSwipe ||
+            !pixelX ||
+            this.#swipeisActive ||
+            this.#onSwipeCallback.length === 0
+        )
+            return;
+
+        if (Math.abs(pixelX) > 40) {
+            this.#swipeisActive = true;
+
+            const direction = pixelX > 0 ? -1 : 1;
+            const directionParsed = this.#revertSwipeDirection
+                ? direction
+                : direction * -1;
+
+            this.#onSwipeCallback({
+                direction: directionParsed,
+                move: (value) => this.move(value),
+            });
+
+            setTimeout(() => {
+                this.#swipeisActive = false;
+            }, 500);
+        }
+    }
+
+    /**
      * @type {() => void}
      */
     #setScrolerStyle() {
-        // @ts-ignore
-        this.#scroller.style['user-select'] = 'none';
+        if (this.#scroller) {
+            // @ts-ignore
+            this.#scroller.style['user-select'] = 'none';
+        }
 
         const activeElement = /** @type{HTMLElement} */ (
             this.#scroller
@@ -794,8 +890,13 @@ export class MobSmoothScroller {
     /**
      * @type {import('./type').MobSmoothScrollerOnMouseEvent}
      */
-    #onWhell({ target, spinY, preventDefault }) {
-        if (!mq[this.#queryType](this.#breakpoint) || !spinY) return;
+    #onWhell({ target, spinY, spinX, preventDefault }) {
+        if (
+            !mq[this.#queryType](this.#breakpoint) ||
+            (!spinY && spinY !== 0) ||
+            (!spinX && spinX !== 0)
+        )
+            return;
 
         if (
             target === this.#scroller ||
@@ -806,9 +907,23 @@ export class MobSmoothScroller {
         ) {
             this.#dragEnable = false;
             preventDefault?.();
-            this.#endValue += spinY * this.#speed;
+
+            const spinXdiff = Math.abs(this.#lastSpinX - spinX);
+            const spinYdiff = Math.abs(this.#lastSpinY - spinY);
+
+            const spinValue =
+                this.#useHorizontalScroll && !this.#useSwipe
+                    ? (() => {
+                          return spinXdiff > spinYdiff ? spinX : spinY;
+                      })()
+                    : spinY;
+
+            this.#endValue += spinValue * this.#speed;
+
             this.#calculateValue();
             FreezeMobPageScroll();
+            this.#lastSpinY = spinY;
+            this.#lastSpinX = spinX;
         }
     }
 
@@ -817,12 +932,14 @@ export class MobSmoothScroller {
      * Move scroller
      *
      * @param {number} percent position in percent, from 0 to 100
+     * @return {Promise<void>} percent position in percent, from 0 to 100
      *
      * @example
      * myInstance.move(val);
      */
     move(percent) {
-        if (!mq[this.#queryType](this.#breakpoint)) return;
+        if (!mq[this.#queryType](this.#breakpoint))
+            return new Promise((resolve) => resolve());
 
         this.#percent = percent;
         this.#endValue = (this.#percent * this.#maxValue) / 100;
@@ -833,7 +950,7 @@ export class MobSmoothScroller {
          */
 
         // @ts-ignore
-        this.#motion.goTo({ val: this.#endValue });
+        return this.#motion.goTo({ val: this.#endValue });
     }
 
     /**

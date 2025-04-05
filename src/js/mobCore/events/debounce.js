@@ -1,9 +1,10 @@
 // @ts-check
 
 /**
- * @param {Function} fn
+ * @template T
+ * @param {T} fn
  * @param {number} [ time ]
- * @returns {Function}
+ * @returns T
  *
  * @description
  */

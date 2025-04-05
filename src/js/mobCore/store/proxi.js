@@ -1,4 +1,5 @@
 import { STORE_SET } from './constant';
+import { setCurrentDependencies } from './currentKey';
 import { storeMap, updateMainMap } from './storeMap';
 import { storeSetEntryPoint } from './storeSet';
 import { checkIfPropIsComputed } from './storeUtils';
@@ -49,6 +50,21 @@ export const getProxiEntryPoint = ({ instanceId }) => {
 
             return false;
         },
+        get(target, /** @type{string} */ prop) {
+            if (!(prop in target)) {
+                return false;
+            }
+
+            /**
+             * Autodetect dependencies
+             */
+            setCurrentDependencies(prop);
+
+            /**
+             * Return value
+             */
+            return target[prop];
+        },
     });
 
     /**
@@ -75,6 +91,21 @@ export const getProxiEntryPoint = ({ instanceId }) => {
         return new Proxy(store, {
             set() {
                 return false;
+            },
+            get(target, /** @type{string} */ prop) {
+                if (!(prop in target)) {
+                    return false;
+                }
+
+                /**
+                 * Autodetect dependencies
+                 */
+                setCurrentDependencies(prop);
+
+                /**
+                 * Return value
+                 */
+                return target[prop];
             },
         });
     });

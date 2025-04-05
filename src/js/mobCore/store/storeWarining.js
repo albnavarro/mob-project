@@ -9,7 +9,7 @@ import { getTypeName } from './storeType';
  */
 export const storeDepthWarning = (data, style) => {
     console.warn(
-        `%c SimpleStore supports an object with a depth of up to 2 levels, set 'Any' type to use obj as value, the input object has ${data} level`,
+        `%c MobStore supports an object with a depth of up to 2 levels, set 'Any' type to use obj as value, the input object has ${data} level`,
         style
     );
 };
@@ -34,7 +34,7 @@ export const storeComputedWarning = (keys, prop, style) => {
  */
 export const storeSetWarning = (prop, style) => {
     console.warn(
-        `%c SimpleStore, trying to execute set() method: store.${prop} not exist`,
+        `%c MobStore, trying to execute set() method: store.${prop} not exist`,
         style
     );
 };
@@ -197,7 +197,7 @@ export const storeComputedKeyUsedWarning = (keys, style) => {
  */
 export const storeWatchWarning = (prop, style) => {
     console.warn(
-        `%c SimpleStore error: the property ${prop} to watch doesn't exist in store`,
+        `%c MobStore error: the property ${prop} to watch doesn't exist in store`,
         style
     );
 };
@@ -221,7 +221,7 @@ export const storeObjectIsNotAnyWarning = (style, CUSTOM_OBJECT) => {
  */
 export const storePropInProxiWarning = (prop, style) => {
     console.warn(
-        `%c SimpleStore error: the property ${prop} does not exist in proxi`,
+        `%c MobStore error: the property ${prop} does not exist in proxi`,
         style
     );
 };

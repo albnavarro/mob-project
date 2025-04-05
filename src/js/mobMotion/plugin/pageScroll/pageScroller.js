@@ -96,6 +96,7 @@ const MobPageScroller = ({ velocity, rootElement }) => {
      * Update lerp value on change screen dimension
      */
     const resizeObserver = new ResizeObserver(() => {
+        lerp.stop();
         lerp.setImmediate({ scrollValue: window.scrollY });
     });
 

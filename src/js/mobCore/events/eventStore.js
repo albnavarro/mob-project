@@ -65,19 +65,19 @@ export const eventStore = mobStore(
 
         /**
          * @description
-         * Mouse wheell spinY max value ( 3 | -3 )
+         * Mouse wheell spinY max value ( 2.5 | -2.5 )
          */
         spinYMaxValue: () => ({
-            value: 3,
+            value: 2.5,
             type: Number,
         }),
 
         /**
          * @description
-         * Mouse wheell spinX max value ( 3 | -3 )
+         * Mouse wheell spinX max value ( 2.5 | -2.5 )
          */
         spinXMaxValue: () => ({
-            value: 3,
+            value: 2.5,
             type: Number,
         }),
     })

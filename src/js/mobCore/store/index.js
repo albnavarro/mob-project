@@ -118,7 +118,7 @@ export const mobStore = (data = {}) => {
 
             return unwatch;
         },
-        computed: (prop, keys, callback, { immediate = false } = {}) => {
+        computed: (prop, callback, keys = []) => {
             storeComputedEntryPoint({
                 instanceId,
                 prop,
@@ -126,11 +126,9 @@ export const mobStore = (data = {}) => {
                 callback,
             });
 
-            if (immediate) {
-                useNextLoop(() => {
-                    storeEmitEntryPoint({ instanceId, prop });
-                });
-            }
+            useNextLoop(() => {
+                storeEmitEntryPoint({ instanceId, prop });
+            });
         },
         emit: (prop) => {
             storeEmitEntryPoint({ instanceId, prop });

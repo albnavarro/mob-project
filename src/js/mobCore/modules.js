@@ -855,3 +855,4 @@ export { useNextLoop } from './utils/nextTick.js';
 export { getTime } from './events/rafutils/time.js';
 export { checkType, getTypeName } from './store/storeType.js';
 export { getUnivoqueId } from './utils/index.js';
+export { debounceFuncion as useDebounce } from './events/debounce.js';

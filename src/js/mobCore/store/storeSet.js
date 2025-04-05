@@ -3,6 +3,10 @@
 import { useNextLoop } from '../utils/nextTick';
 import { checkEquality } from './checkEquality';
 import { STORE_SET, STORE_UPDATE } from './constant';
+import {
+    getCurrentDependencies,
+    initializeCurrentDependencies,
+} from './currentKey';
 import { runCallbackQueqe } from './fireQueque';
 import { getLogStyle } from './logStyle';
 import { getStateFromMainMap, updateMainMap } from './storeMap';
@@ -751,12 +755,24 @@ export const storeComputedEntryPoint = ({
     callback,
 }) => {
     /**
+     * If there is no dependencies get keys from proxi used in callback.
+     */
+    const keysDetected =
+        keys.length === 0
+            ? (() => {
+                  initializeCurrentDependencies();
+                  callback({});
+                  return getCurrentDependencies();
+              })()
+            : keys;
+
+    /**
      * Valorize computed first time without callback.
      */
     initializeCompuntedProp({
         instanceId,
         prop,
-        keys,
+        keys: keysDetected,
         callback,
     });
 
@@ -766,7 +782,7 @@ export const storeComputedEntryPoint = ({
     storeComputedAction({
         instanceId,
         prop,
-        keys,
+        keys: keysDetected,
         fn: callback,
     });
 };
