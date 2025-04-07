@@ -576,7 +576,7 @@ export const valueIsNumberAndReturnDefault = (value, label, defaultValue) => {
     const isValid = MobCore.checkType(Number, value);
     if (!isValid && value) naumberWarning(value, label);
 
-    return isValid ? value : defaultValue;
+    return isValid ? /** @type{number} */ (value) : defaultValue;
 };
 
 /**
@@ -778,8 +778,8 @@ export const domNodeIsValidAndReturnElOrWin = (
 
     // @ts-ignore
     return returnWindow
-        ? (realEl ?? globalThis)
-        : (realEl ?? document.createElement('div'));
+        ? /** @type{HTMLElement} */ (realEl ?? globalThis)
+        : /** @type{HTMLElement} */ (realEl ?? document.createElement('div'));
 };
 
 /**

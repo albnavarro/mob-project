@@ -236,7 +236,7 @@ const getItemsByRow = (arrayDefault, stagger, chunckSizeCol) => {
         const chunkByCol = sliceIntoChunks(arrayDefault, chunckSizeCol);
 
         const colToRowArray = [
-            ...new Array(stagger.grid.col).keys(),
+            ...Array.from({ length: stagger.grid.col }).keys(),
             // @ts-ignore
         ].reduce((p, _c, i) => {
             return [...p, ...arrayColumn(chunkByCol, i)];
