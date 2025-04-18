@@ -635,9 +635,10 @@ export default class MobTimeTween {
      * @type {import('../../utils/type.js').SetImmediate<import('./type.js').TimeTweenAction>} obj To Values
      */
     setImmediate(obj, props = {}) {
-        if (this.#pauseStatus || this.#comeFromResume) this.stop();
-        this.#useStagger = false;
+        if (this.#isRunning) this.stop();
+        if (this.#pauseStatus) return;
 
+        this.#useStagger = false;
         const data = setUtils(obj);
         const propsParsed = props ? { ...props, duration: 1 } : { duration: 1 };
         this.#values = mergeArrayTween(data, this.#values);
@@ -650,8 +651,6 @@ export default class MobTimeTween {
 
         this.#values = setRelativeTween(this.#values, this.#relative);
         this.#values = setFromCurrentByTo(this.#values);
-
-        this.#isRunning = false;
         return;
     }
 

@@ -582,9 +582,10 @@ export default class MobLerp {
      * @type {import('../../utils/type.js').SetImmediate<import('./type.js').lerpActions>} obj To Values
      */
     setImmediate(obj, props = {}) {
+        if (this.#isRunning) this.stop();
         if (this.#pauseStatus) return;
-        this.#useStagger = false;
 
+        this.#useStagger = false;
         const data = setUtils(obj);
         this.#values = mergeArray(data, this.#values);
 
@@ -594,8 +595,6 @@ export default class MobLerp {
 
         this.#values = setRelative(this.#values, this.#relative);
         this.#values = setFromCurrentByTo(this.#values);
-
-        this.#isRunning = false;
         return;
     }
 

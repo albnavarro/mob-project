@@ -9,7 +9,7 @@ let isActive = false;
 let lastScrollValue = window.scrollY;
 
 /** @type {boolean} */
-let lerpIsActive = false;
+let useNativeScroll = true;
 
 /** @type {boolean} */
 let isFreezed = false;
@@ -25,12 +25,6 @@ let update = () => {};
 
 /** @type {HTMLElement | undefined} */
 let rootElementToObserve;
-
-const setValuesOnLerpInactive = () => {
-    lastScrollValue = window.scrollY;
-    lerpIsActive = false;
-    isFreezed = false;
-};
 
 /** @type {import('./type').MobPageScroller} */
 const MobPageScroller = ({ velocity, rootElement }) => {
@@ -48,7 +42,7 @@ const MobPageScroller = ({ velocity, rootElement }) => {
     });
 
     lerp.onComplete(() => {
-        setValuesOnLerpInactive();
+        lastScrollValue = window.scrollY;
     });
 
     /**
@@ -58,7 +52,7 @@ const MobPageScroller = ({ velocity, rootElement }) => {
         if (isFreezed) return;
 
         event.preventDefault();
-        lerpIsActive = true;
+        useNativeScroll = false;
         const currentValue = MobMotionCore.clamp(
             // @ts-ignore
             event.spinY * velocity + lastScrollValue,
@@ -74,7 +68,7 @@ const MobPageScroller = ({ velocity, rootElement }) => {
      * Update lerp value on native scroll event.
      */
     const unsubscribeScroll = MobCore.useScroll(() => {
-        if (lerpIsActive || isFreezed) {
+        if (!useNativeScroll) {
             return;
         }
 
@@ -94,7 +88,8 @@ const MobPageScroller = ({ velocity, rootElement }) => {
 
         if (event.page.x > window.innerWidth - scrollBarWidth) {
             lerp.stop();
-            setValuesOnLerpInactive();
+            lastScrollValue = window.scrollY;
+            useNativeScroll = true;
         }
     });
 
@@ -104,7 +99,7 @@ const MobPageScroller = ({ velocity, rootElement }) => {
     const resizeObserver = new ResizeObserver(() => {
         lerp.stop();
         lerp.setImmediate({ scrollValue: window.scrollY });
-        setValuesOnLerpInactive();
+        lastScrollValue = window.scrollY;
     });
 
     resizeObserver.observe(rootElement);
@@ -112,8 +107,8 @@ const MobPageScroller = ({ velocity, rootElement }) => {
     return {
         destroy: () => {
             lastScrollValue = 0;
-            lerpIsActive = false;
-            isFreezed = true;
+            useNativeScroll = true;
+            isFreezed = false;
 
             // Disconnect resizeObserver.
             if (rootElementToObserve) {
@@ -139,7 +134,7 @@ const MobPageScroller = ({ velocity, rootElement }) => {
         },
         stop: () => {
             lerp.stop();
-            setValuesOnLerpInactive();
+            lastScrollValue = window.scrollY;
         },
         update: () => {
             lerp.setImmediate({ scrollValue: window.scrollY });
@@ -154,8 +149,9 @@ export const InitMobPageScroll = ({
 } = {}) => {
     if (isActive) return;
 
-    setValuesOnLerpInactive();
+    lastScrollValue = window.scrollY;
     isActive = true;
+    isFreezed = false;
 
     ({ destroy, stop, update } = MobPageScroller({
         velocity,
@@ -168,7 +164,6 @@ export const FreezeMobPageScroll = () => {
     if (!isActive || isFreezed) return;
 
     stop();
-    lerpIsActive = false;
     isFreezed = true;
 };
 
@@ -184,7 +179,8 @@ export const UnFreezeAndUPdateMobPageScroll = () => {
     if (!isActive) return;
 
     update();
-    setValuesOnLerpInactive();
+    lastScrollValue = window.scrollY;
+    isFreezed = false;
 };
 
 /** @type{() => void} */
@@ -197,5 +193,4 @@ export const UpdateMobPageScroll = () => {
 /** @type{() => void} */
 export const DestroyMobPageScroll = () => {
     destroy();
-    isActive = false;
 };
