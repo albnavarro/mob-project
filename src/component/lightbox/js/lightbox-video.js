@@ -1,4 +1,4 @@
-import { MobCore } from '../../../js/mobCore';
+import { MobCore } from '../../../js/mob-core';
 import { lightDescription } from './lightbox-description.js';
 import { lightboxUtils } from './lightbox-utils.js';
 

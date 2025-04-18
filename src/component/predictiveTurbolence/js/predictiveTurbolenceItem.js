@@ -5,9 +5,9 @@ import {
     outerHeight,
     outerWidth,
     offset,
-} from '../../../js/mobCore/utils/index.js';
-import { MobTween, MobMotionCore } from '../../../js/mobMotion';
-import { MobCore } from '../../../js/mobCore/index.js';
+} from '../../../js/mob-core/utils/index.js';
+import { MobTween, MobMotionCore } from '../../../js/mob-motion';
+import { MobCore } from '../../../js/mob-core/index.js';
 
 export class PredictiveTurbolenceItemClass {
     constructor(data) {

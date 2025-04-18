@@ -1,0 +1,21 @@
+import MobAsyncTimeline from './animation/async-timeline/async-timeline';
+import MobLerp from './animation/lerp/mob-lerp';
+import MobScroller from './animation/scroller/mob-scroller';
+import MobScrollerTween from './animation/scroller/mob-scroller-tween';
+import MobMasterSequencer from './animation/sequencer/mob-master-sequencer';
+import MobSequencer from './animation/sequencer/mob-sequencer';
+import MobSpring from './animation/spring/mob-spring';
+import MobSyncTimeline from './animation/sync-timeline/mob-sync-timeline';
+import MobTimeTween from './animation/tween/mob-time-tween';
+import { MobBodyScroll } from './plugin/body-scroll/body-scroll';
+
+export type MobSpring = InstanceType<typeof MobSpring>;
+export type MobleLerp = InstanceType<typeof MobLerp>;
+export type MobTimeTween = InstanceType<typeof MobTimeTween>;
+export type MobAsyncTimeline = InstanceType<typeof MobAsyncTimeline>;
+export type MobSequencer = InstanceType<typeof MobSequencer>;
+export type MobSyncTimeline = InstanceType<typeof MobSyncTimeline>;
+export type MobScroller = InstanceType<typeof MobScroller>;
+export type MobScrollerTween = InstanceType<typeof MobScrollerTween>;
+export type MobMasterSequencer = InstanceType<typeof MobMasterSequencer>;
+export type MobBodyScroll = InstanceType<typeof MobBodyScroll>;

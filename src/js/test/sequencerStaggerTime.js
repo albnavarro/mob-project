@@ -1,4 +1,4 @@
-import { MobTimeline, MobTween } from '../mobMotion';
+import { MobTimeline, MobTween } from '../mob-motion';
 
 export const sequencerStaggerTime = () => {
     const items = document.querySelectorAll('.master-stagger__item');

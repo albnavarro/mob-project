@@ -1,7 +1,7 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { MobCore } from '../mobCore';
-import { outerWidth } from '../mobCore/utils';
+import { MobCore } from '../mob-core';
+import { outerWidth } from '../mob-core/utils';
 
 class gsapTestClass {
     constructor() {}

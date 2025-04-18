@@ -1,11 +1,11 @@
-import { MobTween } from '../../js/mobMotion';
+import { MobTween } from '../../js/mob-motion';
 import {
     getTranslateValues,
     offset,
     outerHeight,
     outerWidth,
-} from '../../js/mobCore/utils/index.js';
-import { MobCore } from '../../js/mobCore';
+} from '../../js/mob-core/utils/index.js';
+import { MobCore } from '../../js/mob-core';
 
 export default class MouseParallaxClass {
     constructor(data) {

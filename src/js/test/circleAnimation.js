@@ -1,5 +1,5 @@
-import { MobCore } from '../mobCore';
-import { MobTween } from '../mobMotion';
+import { MobCore } from '../mob-core';
+import { MobTween } from '../mob-motion';
 
 export const circleAnimation = () => {
     const stagger = document.querySelectorAll('.circle-tween .shape__target');

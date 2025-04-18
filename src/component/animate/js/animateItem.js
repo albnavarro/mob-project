@@ -1,4 +1,4 @@
-import { MobCore } from '../../../js/mobCore';
+import { MobCore } from '../../../js/mob-core';
 
 export class AnimateItemClass {
     constructor(data) {

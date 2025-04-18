@@ -69,8 +69,8 @@ import { testCanvas } from './test/testCanvas.js';
 import { freeMode } from './test/freemode.js';
 import { mouseParallaxTest } from './test/mouseParallaxTest.js';
 import { timlineReverseImmediateTest } from './test/timlineReverseImmediateTest.js';
-import { MobCore } from './mobCore/index.js';
-import { MobMotionCore } from './mobMotion';
+import { MobCore } from './mob-core';
+import { MobMotionCore } from './mob-motion';
 
 MobCore.useLoad(() => {
     MobMotionCore.setDefault({

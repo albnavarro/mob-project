@@ -1,6 +1,6 @@
-import { MobCore } from '../mobCore';
-import { outerHeight } from '../mobCore/utils';
-import { MobScroll, MobTween } from '../mobMotion';
+import { MobCore } from '../mob-core';
+import { outerHeight } from '../mob-core/utils';
+import { MobScroll, MobTween } from '../mob-motion';
 
 export const scrollStagger = () => {
     const items = document.querySelectorAll('rect');

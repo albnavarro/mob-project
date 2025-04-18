@@ -1,5 +1,5 @@
-import { MobMotionCore } from '../../../js/mobMotion';
-import { MobSlide } from '../../../js/mobMotion/plugin';
+import { MobMotionCore } from '../../../js/mob-motion';
+import { MobSlide } from '../../../js/mob-motion/plugin';
 
 export class AccordionItemClass {
     constructor(data) {

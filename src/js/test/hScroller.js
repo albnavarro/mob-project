@@ -1,5 +1,5 @@
-import { MobSmoothScroller } from '../mobMotion/plugin';
-import { MobScroll, MobTween, MobMotionCore } from '../mobMotion';
+import { MobSmoothScroller } from '../mob-motion/plugin';
+import { MobScroll, MobTween, MobMotionCore } from '../mob-motion';
 
 export const hScroller = () => {
     const btnPassiveTrue = document.querySelector('.btn-passive-true');

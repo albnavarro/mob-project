@@ -1,6 +1,6 @@
-import { MobCore } from '../../../js/mobCore';
-import { isDescendant } from '../../../js/mobCore/utils';
-import { MobTween } from '../../../js/mobMotion';
+import { MobCore } from '../../../js/mob-core';
+import { isDescendant } from '../../../js/mob-core/utils';
+import { MobTween } from '../../../js/mob-motion';
 
 export class DraggerItemClass {
     constructor(data) {

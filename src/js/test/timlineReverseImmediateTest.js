@@ -1,5 +1,5 @@
-import { MobCore } from '../mobCore';
-import { MobTimeline, MobTween } from '../mobMotion';
+import { MobCore } from '../mob-core';
+import { MobTimeline, MobTween } from '../mob-motion';
 
 export function timlineReverseImmediateTest() {
     const btnStart = document.querySelector('.reverse-immediate-btn-start');

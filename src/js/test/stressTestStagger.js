@@ -1,4 +1,4 @@
-import { MobTimeline, MobTween } from '../mobMotion';
+import { MobTimeline, MobTween } from '../mob-motion';
 import { detectSafari } from '../utility/isSafari.js';
 
 export const stressTestStagger = () => {

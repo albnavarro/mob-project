@@ -1,10 +1,10 @@
-import { MobCore } from '../../../js/mobCore/index.js';
+import { MobCore } from '../../../js/mob-core';
 import {
     outerHeight,
     outerWidth,
     offset,
-} from '../../../js/mobCore/utils/index.js';
-import { MobTween, MobMotionCore } from '../../../js/mobMotion';
+} from '../../../js/mob-core/utils/index.js';
+import { MobTween, MobMotionCore } from '../../../js/mob-motion';
 
 export class PageScrollItemClass {
     constructor(data) {

@@ -1,4 +1,4 @@
-import { MobTimeline, MobTween } from '../mobMotion';
+import { MobTimeline, MobTween } from '../mob-motion';
 
 export const radialStaggerTween = () => {
     const items = document.querySelectorAll(

@@ -1,5 +1,5 @@
-import { MobCore } from '../../../js/mobCore';
-import { MobBodyScroll } from '../../../js/mobMotion/plugin';
+import { MobCore } from '../../../js/mob-core';
+import { MobBodyScroll } from '../../../js/mob-motion/plugin';
 
 class totopClass {
     constructor() {

@@ -1,4 +1,4 @@
-import { MobTimeline, MobTween } from '../mobMotion';
+import { MobTimeline, MobTween } from '../mob-motion';
 
 export function staggerTweenTest() {
     const btnStart = document.querySelector('.tween .start');

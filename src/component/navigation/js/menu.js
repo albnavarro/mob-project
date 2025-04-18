@@ -12,9 +12,9 @@ import {
     offset,
     getParents,
     getSiblings,
-} from '../../../js/mobCore/utils/index.js';
-import { MobCore } from '../../../js/mobCore/index.js';
-import { MobMotionCore } from '../../../js/mobMotion';
+} from '../../../js/mob-core/utils/index.js';
+import { MobCore } from '../../../js/mob-core/index.js';
+import { MobMotionCore } from '../../../js/mob-motion';
 
 export class menuClass {
     constructor(data) {

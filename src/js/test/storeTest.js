@@ -1,4 +1,4 @@
-import { MobCore } from '../mobCore';
+import { MobCore } from '../mob-core';
 
 class StoreTestClass {
     constructor() {}

@@ -3,9 +3,9 @@ import {
     outerWidth,
     outerHeight,
     offset,
-} from '../../../js/mobCore/utils/index.js';
-import { MobCore } from '../../../js/mobCore/index.js';
-import { MobBodyScroll } from '../../../js/mobMotion/plugin/index.js';
+} from '../../../js/mob-core/utils/index.js';
+import { MobCore } from '../../../js/mob-core/index.js';
+import { MobBodyScroll } from '../../../js/mob-motion/plugin/index.js';
 
 export class tBlocksItemClass {
     constructor(container) {

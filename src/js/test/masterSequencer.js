@@ -1,6 +1,6 @@
-import { MobScroll, MobTween } from '../mobMotion';
-import { MobCore } from '../mobCore';
-import { outerHeight } from '../mobCore/utils';
+import { MobScroll, MobTween } from '../mob-motion';
+import { MobCore } from '../mob-core';
+import { outerHeight } from '../mob-core/utils';
 
 export const masterSequencer = () => {
     const items = document.querySelectorAll('.master-stagger__item');

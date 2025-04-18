@@ -5,9 +5,9 @@ import {
     outerHeight,
     outerWidth,
     getTranslateValues,
-} from '../../../js/mobCore/utils';
-import { MobCore } from '../../../js/mobCore';
-import { MobMotionCore } from '../../../js/mobMotion';
+} from '../../../js/mob-core/utils';
+import { MobCore } from '../../../js/mob-core';
+import { MobMotionCore } from '../../../js/mob-motion';
 
 export class GsapHorizontalCustomClass {
     constructor(data = {}) {

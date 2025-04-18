@@ -1,11 +1,11 @@
 import { move3DitemClass } from './move3Ditem.js';
-import { MobTween } from '../../../js/mobMotion';
+import { MobTween } from '../../../js/mob-motion';
 import {
     outerHeight,
     outerWidth,
     offset,
-} from '../../../js/mobCore/utils/index.js';
-import { MobCore } from '../../../js/mobCore/index.js';
+} from '../../../js/mob-core/utils/index.js';
+import { MobCore } from '../../../js/mob-core/index.js';
 
 export class move3DContainerClass {
     constructor(data) {

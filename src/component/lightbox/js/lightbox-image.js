@@ -2,7 +2,7 @@ import { lightDescription } from './lightbox-description.js';
 import { lightboxUtils } from './lightbox-utils.js';
 import { lightPichZoom } from './lightbox-zoom-pinch.js';
 import { LoadImages } from '../../../js/utility/loadImages.js';
-import { MobCore } from '../../../js/mobCore/index.js';
+import { MobCore } from '../../../js/mob-core/index.js';
 
 class LightBoxImageClass {
     constructor() {

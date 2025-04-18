@@ -1,4 +1,4 @@
-import { MobTween } from '../mobMotion';
+import { MobTween } from '../mob-motion';
 
 export const tweenRealtive = () => {
     // Tween

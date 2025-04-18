@@ -1,4 +1,4 @@
-import { MobTimeline, MobTween } from '../mobMotion';
+import { MobTimeline, MobTween } from '../mob-motion';
 import { isIOS } from '../utility/isIOS.js';
 
 export function syncTimelineTest() {

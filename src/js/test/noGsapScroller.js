@@ -1,6 +1,6 @@
-import { MobCore } from '../mobCore';
-import { MobScroll } from '../mobMotion';
-import { MobHorizontalScroller } from '../mobMotion/plugin';
+import { MobCore } from '../mob-core';
+import { MobScroll } from '../mob-motion';
+import { MobHorizontalScroller } from '../mob-motion/plugin';
 
 const createScroller = ({ bottomScroller }) => {
     const title = document.querySelector('.js-scroll-item');

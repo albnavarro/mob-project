@@ -1,4 +1,4 @@
-import { MobTimeline, MobTween } from '../mobMotion';
+import { MobTimeline, MobTween } from '../mob-motion';
 
 export const sinRevertAnimation = () => {
     const stagger = document.querySelectorAll('.sin-revert .shape__target');

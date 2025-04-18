@@ -1,7 +1,7 @@
 import { requestInterval } from '../../../js/utility/setInterval.js';
 import { forceRedraw } from '../../../js/utility/redrowNode.js';
 import { detectSafari } from '../../../js/utility/isSafari.js';
-import { MobMotionCore } from '../../../js/mobMotion';
+import { MobMotionCore } from '../../../js/mob-motion';
 
 export class GlitchItemClass {
     constructor(data) {

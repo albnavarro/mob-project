@@ -1,5 +1,5 @@
-import { MobCore } from '../mobCore';
-import { MobTimeline, MobTween } from '../mobMotion';
+import { MobCore } from '../mob-core';
+import { MobTimeline, MobTween } from '../mob-motion';
 
 export function timlineMixTest() {
     const btnStart = document.querySelector('.mix-btn-start');

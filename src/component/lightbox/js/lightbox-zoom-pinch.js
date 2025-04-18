@@ -1,5 +1,5 @@
-import { MobCore } from '../../../js/mobCore/index.js';
-import { outerHeight, outerWidth } from '../../../js/mobCore/utils/index.js';
+import { MobCore } from '../../../js/mob-core/index.js';
+import { outerHeight, outerWidth } from '../../../js/mob-core/utils/index.js';
 
 class LightPichZoomClass {
     constructor() {

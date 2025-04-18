@@ -1,4 +1,4 @@
-import { MobScroll, MobTween } from '../mobMotion';
+import { MobScroll, MobTween } from '../mob-motion';
 
 export function indexParallax() {
     /**

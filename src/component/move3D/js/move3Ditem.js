@@ -1,4 +1,4 @@
-import { MobTween } from '../../../js/mobMotion';
+import { MobTween } from '../../../js/mob-motion';
 import { move3DUtils } from './move3Dutils.js';
 
 export class move3DitemClass {

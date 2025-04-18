@@ -1,5 +1,5 @@
-import { outerHeight } from '../mobCore/utils';
-import { MobScroll, MobTween } from '../mobMotion';
+import { outerHeight } from '../mob-core/utils';
+import { MobScroll, MobTween } from '../mob-motion';
 
 export const createStagger = () => {
     const items = document.querySelectorAll('.create-stagger__item');
