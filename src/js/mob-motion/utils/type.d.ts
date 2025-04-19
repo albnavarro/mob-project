@@ -38,8 +38,8 @@ export type Set<K> = <T extends K>(
 
 export type DoAction<K> = (
     data: AllActionType[],
-    props?: K,
-    obj: Record<string, number | (() => number)>
+    obj: Record<string, number | (() => number)>,
+    props?: K
 ) => Promise<void>;
 
 export type SetImmediate<K> = (

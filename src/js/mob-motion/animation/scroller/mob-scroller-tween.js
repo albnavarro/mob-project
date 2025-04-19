@@ -11,7 +11,7 @@ import {
     updateSubscribersCache,
 } from '../utils/callbacks/set-callback.js';
 import { syncCallback } from '../utils/callbacks/sync-callback.js';
-import { goToUtils } from '../utils/tween-action/actions.js';
+import { parseGoToObject } from '../utils/tween-action/actions.js';
 import { staggerIsOutOfRangeWarning } from '../utils/warning.js';
 import {
     durationIsValid,
@@ -271,7 +271,7 @@ export default class MobScrollerTween {
      * @type {import('./type.js').MobScrollerTweenGoTo}
      */
     goTo(obj) {
-        const data = goToUtils(obj);
+        const data = parseGoToObject(obj);
         this.#mergeData(data);
         return this;
     }

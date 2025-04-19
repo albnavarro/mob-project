@@ -23,10 +23,10 @@ import {
     updateSubscribersCache,
 } from '../utils/callbacks/set-callback.js';
 import {
-    goToUtils,
-    goFromUtils,
-    goFromToUtils,
-    setUtils,
+    parseGoToObject,
+    parseGoFromObject,
+    parseGoFromToObject,
+    parseSetObject,
 } from '../utils/tween-action/actions.js';
 import { initRaf } from '../utils/init-raf.js';
 import {
@@ -311,7 +311,6 @@ export default class MobTimeTween {
         if (isSettled) {
             const onComplete = () => {
                 this.#isRunning = false;
-                this.#isRunning = false;
                 this.#pauseTime = 0;
 
                 /**
@@ -458,11 +457,11 @@ export default class MobTimeTween {
     /**
      * @type {import('./type.js').TimeTweenStop}
      */
-    stop({ clearCache = true } = {}) {
+    stop({ clearCache = true, updateValues = true } = {}) {
         this.#pauseTime = 0;
         this.#pauseStatus = false;
         this.#comeFromResume = false;
-        this.#values = setFromToByCurrent(this.#values);
+        if (updateValues) this.#values = setFromToByCurrent(this.#values);
 
         /**
          * If isRunning clear all funture stagger. If tween is ended and the lst stagger is running, let it reach end
@@ -550,14 +549,6 @@ export default class MobTimeTween {
      * @returns {void}
      */
     #updateDataWhileRunning() {
-        this.#isRunning = false;
-
-        // Reject promise
-        if (this.#currentReject) {
-            this.#currentReject(MobCore.ANIMATION_STOP_REJECT);
-            this.#currentPromise = undefined;
-        }
-
         this.#values = [...this.#values].map((item) => {
             if (!item.shouldUpdate) return item;
 
@@ -585,69 +576,75 @@ export default class MobTimeTween {
     /**
      * @type {import('../../utils/type.js').GoTo<import('./type.js').TimeTweenAction>} obj To Values
      */
-    goTo(obj, props = {}) {
+    goTo(toObject, specialProps = {}) {
         if (this.#pauseStatus || this.#comeFromResume) this.stop();
+
         this.#useStagger = true;
-        const data = goToUtils(obj);
-        return this.#doAction(data, props, obj);
+        const toObjectparsed = parseGoToObject(toObject);
+        return this.#doAction(toObjectparsed, toObject, specialProps);
     }
 
     /**
      * @type {import('../../utils/type.js').GoFrom<import('./type.js').TimeTweenAction>} obj To Values
      */
-    goFrom(obj, props = {}) {
+    goFrom(fromObject, specialProps = {}) {
         if (this.#pauseStatus || this.#comeFromResume) this.stop();
+
         this.#useStagger = true;
-        const data = goFromUtils(obj);
-        return this.#doAction(data, props, obj);
+        const fromObjectParsed = parseGoFromObject(fromObject);
+        return this.#doAction(fromObjectParsed, fromObject, specialProps);
     }
 
     /**
      * @type {import('../../utils/type.js').GoFromTo<import('./type.js').TimeTweenAction>} obj To Values
      */
-    goFromTo(fromObj, toObj, props = {}) {
+    goFromTo(fromObject, toObject, specialProps = {}) {
         if (this.#pauseStatus || this.#comeFromResume) this.stop();
-        this.#useStagger = true;
 
-        if (!compareKeys(fromObj, toObj)) {
-            compareKeysWarning('tween goFromTo:', fromObj, toObj);
+        this.#useStagger = true;
+        if (!compareKeys(fromObject, toObject)) {
+            compareKeysWarning('tween goFromTo:', fromObject, toObject);
             return new Promise((resolve) => resolve);
         }
 
-        const data = goFromToUtils(fromObj, toObj);
-        return this.#doAction(data, props, fromObj);
+        const objectParsed = parseGoFromToObject(fromObject, toObject);
+        return this.#doAction(objectParsed, fromObject, specialProps);
     }
 
     /**
      * @type {import('../../utils/type.js').Set<import('./type.js').TimeTweenAction>} obj To Values
      */
-    set(obj, props = {}) {
+    set(setObject, specialProps = {}) {
         if (this.#pauseStatus || this.#comeFromResume) this.stop();
+
         this.#useStagger = false;
-        const data = setUtils(obj);
+        const setObjectParsed = parseSetObject(setObject);
 
         // In set mode duration is small as possible
-        const propsParsed = props ? { ...props, duration: 1 } : { duration: 1 };
-        return this.#doAction(data, propsParsed, obj);
+        const propsParsed = specialProps
+            ? { ...specialProps, duration: 1 }
+            : { duration: 1 };
+        return this.#doAction(setObjectParsed, setObject, propsParsed);
     }
 
     /**
      * @type {import('../../utils/type.js').SetImmediate<import('./type.js').TimeTweenAction>} obj To Values
      */
-    setImmediate(obj, props = {}) {
-        if (this.#isRunning) this.stop();
+    setImmediate(setObject, specialProps = {}) {
+        // this.#value is updated below
+        if (this.#isRunning) this.stop({ updateValues: false });
         if (this.#pauseStatus) return;
 
         this.#useStagger = false;
-        const data = setUtils(obj);
-        const propsParsed = props ? { ...props, duration: 1 } : { duration: 1 };
-        this.#values = mergeArrayTween(data, this.#values);
-
-        if (this.#isRunning) this.#updateDataWhileRunning();
+        const setObjectParsed = parseSetObject(setObject);
+        const propsParsed = specialProps
+            ? { ...specialProps, duration: 1 }
+            : { duration: 1 };
+        this.#values = mergeArrayTween(setObjectParsed, this.#values);
 
         const { reverse } = this.#mergeProps(propsParsed);
         if (valueIsBooleanAndTrue(reverse, 'reverse'))
-            this.#values = setReverseValues(obj, this.#values);
+            this.#values = setReverseValues(setObject, this.#values);
 
         this.#values = setRelativeTween(this.#values, this.#relative);
         this.#values = setFromCurrentByTo(this.#values);
@@ -657,18 +654,25 @@ export default class MobTimeTween {
     /**
      * @type {import('../../utils/type.js').DoAction<import('./type.js').TimeTweenAction>} obj To Values
      */
-    #doAction(data, props = {}, obj) {
-        this.#values = mergeArrayTween(data, this.#values);
-        if (this.#isRunning) this.#updateDataWhileRunning();
+    #doAction(newObjectParsed, newObjectRaw, specialProps = {}) {
+        this.#values = mergeArrayTween(newObjectParsed, this.#values);
 
-        const { reverse, immediate } = this.#mergeProps(props);
+        if (this.#isRunning) {
+            /**
+             * Time tween need restart if called while running. this.#value is updated below
+             */
+            this.stop({ clearCache: false, updateValues: false });
+            this.#updateDataWhileRunning();
+        }
+
+        const { reverse, immediate } = this.#mergeProps(specialProps);
         if (valueIsBooleanAndTrue(reverse, 'reverse'))
-            this.#values = setReverseValues(obj, this.#values);
+            this.#values = setReverseValues(newObjectRaw, this.#values);
 
         this.#values = setRelativeTween(this.#values, this.#relative);
 
         if (valueIsBooleanAndTrue(immediate, 'immediate ')) {
-            this.#isRunning = false;
+            if (this.#isRunning) this.stop({ updateValues: false });
             this.#values = setFromCurrentByTo(this.#values);
             return Promise.resolve();
         }

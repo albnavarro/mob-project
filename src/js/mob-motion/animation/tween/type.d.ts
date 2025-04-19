@@ -69,6 +69,7 @@ export interface TimeTweenDefault {
 
 export interface TimeTweenStopProps {
     clearCache?: boolean;
+    updateValues?: boolean;
 }
 
 export interface TimeTweenInitialData {

@@ -10,7 +10,7 @@ import { dataTweenValueIsNotValidWarning } from '../warning.js';
  * @param {Record<string, number | (() => number)>} obj
  * @returns {import('./type.js').GoToParamsType[]}
  */
-export const goToUtils = (obj) => {
+export const parseGoToObject = (obj) => {
     return Object.keys(obj).map((item) => {
         if (!dataTweenValueIsValid(obj[item])) {
             dataTweenValueIsNotValidWarning(`${item}: ${obj[item]}`);
@@ -45,7 +45,7 @@ export const goToUtils = (obj) => {
  * @param {Record<string, number | (() => number)>} obj
  * @returns {import('./type.js').GoFromType[]}
  */
-export const goFromUtils = (obj) => {
+export const parseGoFromObject = (obj) => {
     return Object.keys(obj).map((item) => {
         if (!dataTweenValueIsValid(obj[item])) {
             dataTweenValueIsNotValidWarning(`${item}: ${obj[item]}`);
@@ -82,7 +82,7 @@ export const goFromUtils = (obj) => {
  * @param {Record<string, number | (() => number)>} toObj
  * @returns {import('./type.js').GoFromToType[]}
  */
-export const goFromToUtils = (fromObj, toObj) => {
+export const parseGoFromToObject = (fromObj, toObj) => {
     return Object.keys(fromObj).map((item) => {
         if (
             !dataTweenValueIsValid(toObj[item]) ||
@@ -135,7 +135,7 @@ export const goFromToUtils = (fromObj, toObj) => {
  * @param {Record<string, number | (() => number)>} obj
  * @returns {import('./type.js').GoFromToType[]}
  */
-export const setUtils = (obj) => {
+export const parseSetObject = (obj) => {
     return Object.keys(obj).map((item) => {
         if (!dataTweenValueIsValid(obj[item])) {
             dataTweenValueIsNotValidWarning(`${item}: ${obj[item]}`);

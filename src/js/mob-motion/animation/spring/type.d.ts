@@ -1,3 +1,4 @@
+import { TimeTweenStopProps } from '../tween/type';
 import { StaggerObject } from '../utils/stagger/type';
 
 export interface SpringProps {
@@ -64,7 +65,7 @@ export interface SpringValues extends SpringInitialData {
 }
 
 export type SpringMergeProps = (props: SpringActions) => SpringDefault;
-export type SpringStop = (arg0?: tweenStopProps) => void;
+export type SpringStop = (arg0?: TimeTweenStopProps) => void;
 export type SpringPause = () => void;
 export type SpringResume = () => void;
 export type SpringResetData = () => void;
