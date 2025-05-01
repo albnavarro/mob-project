@@ -106,6 +106,7 @@ const MobPageScroller = ({ velocity, rootElement }) => {
 
     return {
         destroy: () => {
+            isActive = false;
             lastScrollValue = 0;
             useNativeScroll = true;
             isFreezed = false;
