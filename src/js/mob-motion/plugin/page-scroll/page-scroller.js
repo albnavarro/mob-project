@@ -35,9 +35,9 @@ const MobPageScroller = ({ velocity, rootElement }) => {
         if (isFreezed) return;
 
         window.scrollTo({
-            top: scrollValue,
+            top: Math.trunc(scrollValue),
             left: 0,
-            behavior: 'auto',
+            behavior: 'instant',
         });
     });
 

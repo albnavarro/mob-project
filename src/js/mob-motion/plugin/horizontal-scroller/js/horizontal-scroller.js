@@ -1147,7 +1147,7 @@ export class MobHorizontalScroller {
             easeType: this.#easeType,
             springConfig: 'scroller',
             animateAtStart: this.#animateAtStart,
-            fromTo: this.#reverse,
+            reverse: this.#reverse,
             dynamicRange: () => {
                 return -(this.#horizontalWidth - window.innerWidth);
             },

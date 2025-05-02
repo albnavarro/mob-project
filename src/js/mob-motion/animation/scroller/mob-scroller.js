@@ -263,11 +263,6 @@ export default class MobScroller {
     /**
      * @type {boolean}
      */
-    #fromTo;
-
-    /**
-     * @type {boolean}
-     */
     #invertSide;
 
     /**
@@ -620,6 +615,9 @@ export default class MobScroller {
         this.#unsubscribeMotion = () => {};
         this.#unsubscribeOnComplete = () => {};
 
+        // Initial value of direction bottom/top or right/left
+        this.#invertSide = false;
+
         /**
          * Fixed prop
          */
@@ -658,18 +656,6 @@ export default class MobScroller {
             data?.end,
             'Scrolltrigger end propierties error:',
             'top'
-        );
-
-        this.#fromTo = valueIsBooleanAndReturnDefault(
-            data?.fromTo,
-            'Scrolltrigger fromTo propierties error:',
-            false
-        );
-
-        this.#invertSide = valueIsBooleanAndReturnDefault(
-            data?.invertSide,
-            'Scrolltrigger invertSide propierties error:',
-            false
         );
 
         this.#marker = valueIsStringAndReturnDefault(
@@ -1767,7 +1753,7 @@ export default class MobScroller {
         const partialVal = (partials / 100) * this.#numericRange;
 
         const valePerDirections = (() => {
-            if (this.#fromTo) {
+            if (this.#reverse) {
                 return this.#invertSide ? maxVal - partialVal : partialVal;
             } else {
                 return this.#invertSide ? partialVal : maxVal - partialVal;

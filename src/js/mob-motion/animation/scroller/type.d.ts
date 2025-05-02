@@ -107,6 +107,11 @@ export interface MobScrollerCommon {
     springConfig?: SpringChoiceConfig;
 
     /**
+     * Reverse the animation. The default value is false.
+     */
+    reverse?: boolean;
+
+    /**
      * Defines the applied property, you can apply a custom css property ( ex: 'margin-left' ). if you choose 'tween'
      * you will need to specify a MobSequncer or MobScrollerTween instance in the tween property. The default value is
      * 'x'.
@@ -137,8 +142,6 @@ export interface MobScrollerCommon {
      * default value is `false`.
      */
     useWillChange?: boolean;
-
-    invertSide?: boolean;
 }
 
 export interface Parallax {
@@ -168,11 +171,6 @@ export interface Parallax {
      * back. The default value is null, in this case the calculation from positive will become negative.
      */
     onSwitch?: 'in-stop' | 'in-back' | 'out-stop' | 'out-back';
-
-    /**
-     * Reverse the animation. The default value is false.
-     */
-    reverse?: boolean;
 
     /**
      * Defines the start value of the opacity animation with respect to the viewport. 100 corresponds to 100vh. The
@@ -252,11 +250,6 @@ export interface ScrollTrigger {
      * All the values is case insensitive
      */
     end?: string;
-
-    /**
-     * Reverse the animation. The default is false.
-     */
-    fromTo?: boolean;
 
     /**
      * Display start|end values with a solid line. In case you activate the pin property the top|bottom|right|left
