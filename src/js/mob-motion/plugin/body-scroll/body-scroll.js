@@ -1,5 +1,3 @@
-//@ts-check
-
 import { MobCore } from '../../../mob-core/index.js';
 import MobTimeTween from '../../animation/tween/mob-time-tween.js';
 import {

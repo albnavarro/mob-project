@@ -1,5 +1,3 @@
-// @ts-check
-
 import { clamp, getUnivoqueId } from '../../utils/index.js';
 import { eventStore } from '../event-store.js';
 import { normalizeWheel } from './normalize-whell.js';

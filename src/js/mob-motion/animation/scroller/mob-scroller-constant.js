@@ -1,5 +1,3 @@
-// @ts-check
-
 export const MobScrollerConstant = {
     // Constant misure units
     /**

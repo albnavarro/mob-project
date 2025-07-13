@@ -1,5 +1,3 @@
-// @ts-check
-
 import { useNextLoop } from '../utils/next-tick';
 
 /** @type {import('./type').MobStoreWatchWaintList} */

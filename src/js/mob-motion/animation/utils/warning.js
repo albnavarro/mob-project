@@ -1,5 +1,3 @@
-// @ts-check
-
 import { MobScrollerConstant } from '../scroller/mob-scroller-constant';
 import {
     STAGGER_START,

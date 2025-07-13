@@ -1,5 +1,3 @@
-// @ts-check
-
 import { runCallbackQueqe, runCallbackQueqeAsync } from './fire-queque';
 import { getLogStyle } from './log-style';
 import { getStateFromMainMap, storeMap } from './store-map';

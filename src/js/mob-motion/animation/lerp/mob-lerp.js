@@ -1,5 +1,3 @@
-// @ts-check
-
 import { compareKeys } from '../utils/animation-utils.js';
 import {
     setFromByCurrent,

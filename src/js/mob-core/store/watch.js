@@ -1,5 +1,3 @@
-// @ts-check
-
 import { getUnivoqueId } from '../utils';
 import { getLogStyle } from './log-style';
 import { getStateFromMainMap, storeMap, updateMainMap } from './store-map';

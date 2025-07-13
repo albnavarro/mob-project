@@ -1,5 +1,3 @@
-// @ts-check
-
 import { getUnivoqueId } from '../../utils';
 
 /**

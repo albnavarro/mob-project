@@ -1,5 +1,3 @@
-// @ts-check
-
 import { getTweenFn } from '../tween/tween-config.js';
 import { compareKeys, getRoundedValue } from '../utils/animation-utils.js';
 import { setStagger } from '../utils/stagger/set-stagger.js';

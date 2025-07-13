@@ -1,5 +1,3 @@
-// @ts-check
-
 import MobAsyncTimeline from './animation/async-timeline/async-timeline.js';
 import MobSyncTimeline from './animation/sync-timeline/mob-sync-timeline.js';
 

@@ -1,5 +1,3 @@
-// @ts-check
-
 import MobLerp from './animation/lerp/mob-lerp.js';
 import MobScrollerTween from './animation/scroller/mob-scroller-tween.js';
 import MobMasterSequencer from './animation/sequencer/mob-master-sequencer.js';

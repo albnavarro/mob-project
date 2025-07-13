@@ -1,5 +1,3 @@
-// @ts-check
-
 export const DIRECTION_DEFAULT = null;
 export const DIRECTION_ROW = 'row';
 export const DIRECTION_COL = 'col';

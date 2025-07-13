@@ -1,5 +1,3 @@
-// @ts-check
-
 import { getLogStyle } from './log-style';
 import { getStateFromMainMap, storeMap } from './store-map';
 import { storeGetPropWarning } from './store-warining';

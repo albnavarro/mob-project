@@ -1,5 +1,3 @@
-// @ts-check
-
 import { orderByProp } from './order-row';
 
 /**

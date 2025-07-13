@@ -1,5 +1,3 @@
-// @ts-check
-
 /** @type{Set<() => any>} */
 const setTimeOutQueque = new Set();
 

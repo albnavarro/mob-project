@@ -1,5 +1,3 @@
-// @ts-check
-
 /**
  * Return HTMLElement height with margin.
  *

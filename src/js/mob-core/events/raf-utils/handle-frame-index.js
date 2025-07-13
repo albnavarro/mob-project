@@ -1,5 +1,3 @@
-// @ts-check
-
 import { eventStore } from '../event-store.js';
 
 /**

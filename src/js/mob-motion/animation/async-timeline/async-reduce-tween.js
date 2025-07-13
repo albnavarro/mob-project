@@ -1,5 +1,3 @@
-// @ts-check
-
 import { asyncReduceData } from './async-reduce-data';
 
 /**

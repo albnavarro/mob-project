@@ -1,6 +1,3 @@
-//@ts-check
-
-// let horizontalCustomCssIsAlive = false;
 import { mq } from '../../../utils/media-manager.js';
 import { horizontalScrollerContstant } from './horizontal-scroller-constant.js';
 
@@ -53,8 +50,6 @@ export const horizontalScrollerCss = ({
     columnWidth,
     columnAlign,
 }) => {
-    // if (horizontalCustomCssIsAlive) return;
-    // horizontalCustomCssIsAlive = true;
     const media = mq['getBreackpoint'](breakpoint);
 
     /**

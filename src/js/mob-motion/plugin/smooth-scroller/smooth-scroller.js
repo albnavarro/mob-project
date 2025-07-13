@@ -1,5 +1,3 @@
-// @ts-check
-
 import MobLerp from '../../animation/lerp/mob-lerp.js';
 import MobSpring from '../../animation/spring/mob-spring.js';
 import { clamp } from '../../animation/utils/animation-utils.js';
@@ -664,16 +662,16 @@ export class MobSmoothScroller {
      * @type {() => void}
      */
     #setScrolerStyle() {
-        if (this.#scroller) {
-            // @ts-ignore
-            this.#scroller.style['user-select'] = 'none';
-        }
+        if (!this.#scroller) return;
 
-        const activeElement = /** @type {HTMLElement} */ (
+        // @ts-ignore
+        this.#scroller.style['user-select'] = 'none';
+
+        const activeElements = /** @type {HTMLElement} */ (
             this.#scroller
         ).querySelectorAll('a, button');
 
-        [...activeElement].forEach((item) => {
+        [...activeElements].forEach((item) => {
             item.setAttribute('draggable', 'false');
             // @ts-ignore
             item.style['user-select'] = 'none';

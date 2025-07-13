@@ -1,5 +1,3 @@
-// @ts-check
-
 import { NOOP } from '../../utils/functions-utils';
 
 /**

@@ -1,5 +1,3 @@
-// @ts-check
-
 import { getRoundedValue } from '../utils/animation-utils.js';
 import { setStagger } from '../utils/stagger/set-stagger.js';
 import {

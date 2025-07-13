@@ -1,5 +1,3 @@
-//@ts-check
-
 import MobScroller from '../../../animation/scroller/mob-scroller';
 import {
     getTranslateValues,

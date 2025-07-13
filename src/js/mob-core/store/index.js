@@ -1,5 +1,3 @@
-// @ts-check
-
 import { getUnivoqueId } from '../utils';
 import {
     storeComputedEntryPoint,
@@ -24,6 +22,7 @@ import { bindStoreEntryPoint } from './bind-store';
 import { destroyStoreEntryPoint } from './destroy';
 import { checkIfPropIsComputed } from './store-utils';
 import { useNextLoop } from '../utils/next-tick';
+import { getCurrentProp } from './current-key';
 
 /**
  * @param {import('./type').MobStoreParams} data
@@ -65,26 +64,44 @@ export const mobStore = (data = {}) => {
         getProp: (prop) => {
             return storeGetPropEntryPoint({ instanceId, prop });
         },
-        set: (prop, value, { emit = true } = {}) => {
-            const isComputed = checkIfPropIsComputed({ instanceId, prop });
+        set: (
+            /** @type{string|(() => any)} */ prop,
+            /** @type {any} */ value,
+            { emit = true } = {}
+        ) => {
+            const propParsed = getCurrentProp(prop);
+            const isComputed = checkIfPropIsComputed({
+                instanceId,
+                prop: propParsed,
+            });
+
             if (isComputed) return;
 
             storeSetEntryPoint({
                 instanceId,
-                prop,
+                prop: propParsed,
                 value,
                 fireCallback: emit ?? true,
                 clone: false,
                 action: STORE_SET,
             });
         },
-        update: (prop, value, { emit = true, clone = false } = {}) => {
-            const isComputed = checkIfPropIsComputed({ instanceId, prop });
+        update: (
+            /** @type{string|(() => any)} */ prop,
+            /** @type {any} */ value,
+            { emit = true, clone = false } = {}
+        ) => {
+            const propParsed = getCurrentProp(prop);
+            const isComputed = checkIfPropIsComputed({
+                instanceId,
+                prop: propParsed,
+            });
+
             if (isComputed) return;
 
             storeSetEntryPoint({
                 instanceId,
-                prop,
+                prop: propParsed,
                 value,
                 fireCallback: emit ?? true,
                 clone,
@@ -100,39 +117,55 @@ export const mobStore = (data = {}) => {
 
             storeQuickSetEntrypoint({ instanceId, prop, value });
         },
-        watch: (prop, callback, { wait = false, immediate = false } = {}) => {
+        watch: (
+            /** @type{string|(() => any)} */ prop,
+            /** @type {(current: any, previous: any, validation: import('./type').MobStoreValidateState) => void} */ callback,
+            { wait = false, immediate = false } = {}
+        ) => {
+            const propParsed = getCurrentProp(prop);
+
             const unwatch = watchEntryPoint({
                 instanceId,
-                prop,
+                prop: propParsed,
                 callback,
                 wait,
             });
 
             if (immediate) {
                 useNextLoop(() => {
-                    storeEmitEntryPoint({ instanceId, prop });
+                    storeEmitEntryPoint({ instanceId, prop: propParsed });
                 });
             }
 
             return unwatch;
         },
-        computed: (prop, callback, keys = []) => {
+        computed: (
+            /** @type{string|(() => any)} */ prop,
+            /** @type{(arg0: Record<string, any>) => any} */ callback,
+            /** @type {string[]} */ keys = []
+        ) => {
+            const propParsed = getCurrentProp(prop);
+
             storeComputedEntryPoint({
                 instanceId,
-                prop,
+                prop: propParsed,
                 keys,
                 callback,
             });
 
             useNextLoop(() => {
-                storeEmitEntryPoint({ instanceId, prop });
+                storeEmitEntryPoint({ instanceId, prop: propParsed });
             });
         },
-        emit: (prop) => {
-            storeEmitEntryPoint({ instanceId, prop });
+        emit: (/** @type{string|(() => any)} */ prop) => {
+            const propParsed = getCurrentProp(prop);
+
+            storeEmitEntryPoint({ instanceId, prop: propParsed });
         },
-        emitAsync: async (prop) => {
-            return storeEmitAsyncEntryPoint({ instanceId, prop });
+        emitAsync: async (/** @type{string|(() => any)} */ prop) => {
+            const propParsed = getCurrentProp(prop);
+
+            return storeEmitAsyncEntryPoint({ instanceId, prop: propParsed });
         },
         getValidation: () => {
             return storeGetValidationEntryPoint({ instanceId });

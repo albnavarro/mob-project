@@ -1,4 +1,3 @@
-// @ts-check
 import { getRoundedValue, lerp } from '../utils/animation-utils';
 
 /**

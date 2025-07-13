@@ -1,5 +1,3 @@
-// @ts-check
-
 import { MobCore } from '../../../mob-core';
 import { getRoundedValue } from '../utils/animation-utils';
 import { checkIsLastUsableProp } from './reduce-function';

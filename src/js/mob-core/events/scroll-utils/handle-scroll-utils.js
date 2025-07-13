@@ -1,5 +1,3 @@
-// @ts-check
-
 import { handleScrollImmediate } from './handle-scroll-immediate.js';
 import { debounceFuncion } from '../debounce.js';
 import { handleFrame } from '../raf-utils/handle-frame.js';

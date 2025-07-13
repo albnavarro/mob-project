@@ -1,5 +1,3 @@
-// @ts-check
-
 import { MobScrollerConstant } from './animation/scroller/mob-scroller-constant.js';
 import MobScroller from './animation/scroller/mob-scroller.js';
 

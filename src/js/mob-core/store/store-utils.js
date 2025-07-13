@@ -1,5 +1,3 @@
-// @ts-check
-
 import { getStateFromMainMap } from './store-map.js';
 import { checkType, storeType } from './store-type.js';
 import { storeDepthWarning } from './store-warining.js';

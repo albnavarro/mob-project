@@ -1,5 +1,3 @@
-// @ts-check
-
 import { getTypeName } from './store-type';
 
 /**

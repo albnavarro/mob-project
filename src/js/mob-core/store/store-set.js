@@ -1,5 +1,3 @@
-// @ts-check
-
 import { useNextLoop } from '../utils/next-tick';
 import { checkEquality } from './check-equality';
 import { STORE_SET, STORE_UPDATE } from './constant';

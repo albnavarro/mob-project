@@ -185,7 +185,7 @@ export const hScroller = () => {
                 return pluto.offsetWidth * 2;
             },
         },
-        fromTo: true,
+        reverse: true,
         propierties: 'tween',
         tween: myParallaxTween,
     });
@@ -291,7 +291,7 @@ export const hScroller = () => {
         trigger: '.pluto6',
         start: 'top',
         end: 'top +height',
-        fromTo: true,
+        reverse: true,
         range: '-100w',
     });
 

@@ -1,5 +1,3 @@
-//@ts-check
-
 import { checkType } from '../../../../mob-core/store/store-type.js';
 import { sliceIntoChunks, arrayColumn } from '../animation-utils.js';
 import {

@@ -1,5 +1,3 @@
-// @ts-check
-
 import { getRoundedValue } from '../utils/animation-utils';
 
 /**

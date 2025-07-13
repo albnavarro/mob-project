@@ -1,5 +1,3 @@
-// @ts-check
-
 import { handleSetUp } from '../../../setup';
 import { MQ_MAX, MQ_MIN } from '../set-up/set-up-validation.js';
 import { MobScrollerConstant } from '../../scroller/mob-scroller-constant.js';

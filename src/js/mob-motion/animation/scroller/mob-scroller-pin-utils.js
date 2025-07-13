@@ -1,5 +1,3 @@
-// @ts-check
-
 import { handleSetUp } from '../../setup';
 import { MobScrollerConstant } from './mob-scroller-constant';
 

@@ -1,5 +1,3 @@
-// @ts-check
-
 /**
  * @param {Object} param
  * @param {any[]} param.data

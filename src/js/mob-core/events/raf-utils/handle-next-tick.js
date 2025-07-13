@@ -1,5 +1,3 @@
-// @ts-check
-
 /**
  * @type {{ priority: number; cb: (arg0: { time: number; fps: number }) => void }[]}
  */

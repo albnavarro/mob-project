@@ -1,5 +1,3 @@
-// @ts-check
-
 import { ARRAY, MAP, SET, TYPE_IS_ANY } from './store-type';
 
 /**

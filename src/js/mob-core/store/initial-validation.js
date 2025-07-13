@@ -1,5 +1,3 @@
-// @ts-check
-
 import { STORE_SET } from './constant';
 import { getStateFromMainMap, updateMainMap } from './store-map';
 import { storeSetAction } from './store-set';

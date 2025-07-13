@@ -1,5 +1,3 @@
-// @ts-check
-
 import { handleNextFrame } from '../../../mob-core/events/raf-utils/handle-next-frame.js';
 import { handleNextTick } from '../../../mob-core/events/raf-utils/handle-next-tick.js';
 import { MobCore } from '../../../mob-core/index.js';

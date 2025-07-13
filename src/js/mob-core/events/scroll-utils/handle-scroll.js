@@ -1,5 +1,3 @@
-// @ts-check
-
 import { getUnivoqueId } from '../../utils/index.js';
 import { handleFrame } from '../raf-utils/handle-frame.js';
 import { handleNextTick } from '../raf-utils/handle-next-tick.js';

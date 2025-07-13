@@ -1,5 +1,3 @@
-// @ts-check
-
 import { clamp } from '../utils/animation-utils.js';
 import { syncTimelineLabelWarning } from '../utils/warning.js';
 import {

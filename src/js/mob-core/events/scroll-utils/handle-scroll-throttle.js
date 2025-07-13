@@ -1,5 +1,3 @@
-// @ts-check
-
 import { handleFrame } from '../raf-utils/handle-frame.js';
 import { handleNextTick } from '../raf-utils/handle-next-tick.js';
 import { throttle } from '../throttle.js';

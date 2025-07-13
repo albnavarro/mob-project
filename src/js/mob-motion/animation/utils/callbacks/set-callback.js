@@ -1,5 +1,3 @@
-// @ts-check
-
 import { MobCore } from '../../../../mob-core';
 import { callBackStore } from './call-back-store';
 

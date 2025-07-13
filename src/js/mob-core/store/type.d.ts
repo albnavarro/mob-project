@@ -80,49 +80,92 @@ export type MobStoregetProp<T> = <K extends keyof T>(
     arg0: Extract<K, string>
 ) => T[K];
 
-export type MobStoreSet<T> = <K extends keyof T>(
-    prop: Extract<K, string>,
-    value: T[K],
-    options?: {
-        emit?: boolean;
-    }
-) => void;
+interface MobStoreSet<T> {
+    <K extends keyof T>(
+        prop: Extract<K, string>,
+        value: T[K],
+        options?: {
+            emit?: boolean;
+        }
+    ): void;
+    <K extends T[keyof T]>(
+        prop: () => K,
+        value: NoInfer<K>,
+        options?: {
+            emit?: boolean;
+        }
+    ): void;
+}
 
-export type MobStoreUpdate<T> = <K extends keyof T>(
-    prop: Extract<K, string>,
-    value: (arg0: T[K]) => T[K],
-    options?: {
-        emit?: boolean;
-        clone?: boolean;
-    }
-) => void;
+interface MobStoreUpdate<T> {
+    <K extends keyof T>(
+        prop: Extract<K, string>,
+        value: (arg0: T[K]) => T[K],
+        options?: {
+            emit?: boolean;
+            clone?: boolean;
+        }
+    ): void;
+    <K extends T[keyof T]>(
+        prop: () => K,
+        value: (arg0: K) => NoInfer<K>,
+        options?: {
+            emit?: boolean;
+            clone?: boolean;
+        }
+    ): void;
+}
 
 export type MobStorequickSetProp<T> = <K extends keyof T>(
     prop: Extract<K, string>,
     value: T[K]
 ) => void;
 
-export type MobStoreWatch<T> = <K extends keyof T>(
-    prop: Extract<K, string>,
-    callback: (
-        current: T[K],
-        previous: T[K],
-        validate: MobStoreValidateState
-    ) => void,
-    options?: { wait?: boolean; immediate?: boolean }
-) => () => void;
+interface MobStoreWatch<T> {
+    <K extends keyof T>(
+        prop: Extract<K, string>,
+        callback: (
+            current: T[K],
+            previous: T[K],
+            validate: MobStoreValidateState
+        ) => void,
+        options?: { wait?: boolean; immediate?: boolean }
+    ): () => void;
+    <K extends T[keyof T]>(
+        prop: () => K,
+        callback: (
+            current: K,
+            previous: K,
+            validate: MobStoreValidateState
+        ) => void,
+        options?: { wait?: boolean; immediate?: boolean }
+    ): () => void;
+}
 
-export type MobStoreComputed<T> = <K extends keyof T>(
-    prop: Extract<K, string>,
-    callback: (arg0: T) => T[K],
-    keys?: Extract<keyof T, string>[]
-) => void;
+interface MobStoreComputed<T> {
+    <K extends keyof T>(
+        prop: K,
+        callback: (arg0: T) => T[K],
+        keys?: Extract<keyof T, string>[]
+    ): void;
+    <K extends T[keyof T]>(
+        prop: () => K,
+        callback: (arg0: T) => NoInfer<K>,
+        keys?: Extract<keyof T, string>[]
+    ): void;
+}
 
-export type MobStoreEmit<T> = (props: Extract<keyof T, string>) => void;
+interface MobStoreEmit<T> {
+    <K extends keyof T>(props: Extract<K, string>): void;
+    <K extends T[keyof T]>(props: () => K): void;
+}
 
-export type MobStoreEmitAsync<T> = (
-    props: Extract<keyof T, string>
-) => Promise<{ success: boolean }>;
+interface MobStoreEmitAsync<T> {
+    <K extends keyof T>(
+        props: Extract<K, string>
+    ): Promise<{ success: boolean }>;
+    <K extends T[keyof T]>(props: () => K): Promise<{ success: boolean }>;
+}
 
 export type MobStoreStoreProxi<T> = () => T;
 

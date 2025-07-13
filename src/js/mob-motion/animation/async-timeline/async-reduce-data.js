@@ -1,5 +1,3 @@
-// @ts-check
-
 /**
  * From data object return an object filtered by props in activeData
  *

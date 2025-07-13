@@ -1,5 +1,3 @@
-// @ts-check
-
 import { getDefaultStagger } from './get-default-stagger.js';
 import { getRadialArray } from './get-radial-stagger.js';
 import {

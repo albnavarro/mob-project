@@ -2077,7 +2077,7 @@ export default class MobScroller {
      */
     #resetTweenStyle(item) {
         // @ts-ignore
-        if (this.#tween) item.style = '';
+        if (this.#tween && item) item.style = '';
     }
 
     /**
@@ -2124,7 +2124,11 @@ export default class MobScroller {
         this.#motion?.destroy?.();
         // @ts-ignore
         this.#motion = null;
+
         this.#dynamicRange = () => {};
+        if (this.#dynamicStart?.value) this.#dynamicStart.value = () => 0;
+        if (this.#dynamicEnd?.value) this.#dynamicEnd.value = () => 0;
+
         this.#onEnter = () => {};
         this.#onEnterBack = () => {};
         this.#onLeave = () => {};

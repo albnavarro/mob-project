@@ -1,5 +1,3 @@
-//@ts-check
-
 /**
  * Get value of specific key from an array [{ prop: valueByKey }, ...]
  *

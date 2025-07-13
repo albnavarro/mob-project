@@ -1,5 +1,3 @@
-// @ts-check
-
 /**
  * Set fromValue with currentValue
  *

@@ -1,5 +1,3 @@
-// @ts-check
-
 import { UNTYPED } from './store-type';
 import { getLogStyle } from './log-style';
 import {

@@ -301,7 +301,7 @@ const useCache = handleCache;
  *
  * @example
  *     ```javascript
- *     MobCore.useResize(
+ *      const unsubscribe = MobCore.useResize(
  *         ({
  *             documentHeight,
  *             horizontalResize,

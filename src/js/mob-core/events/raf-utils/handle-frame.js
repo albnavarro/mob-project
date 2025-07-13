@@ -1,5 +1,3 @@
-// @ts-check
-
 import { handleVisibilityChange } from '../visibility-change/handle-visibility-change.js';
 import { handleCache } from './handle-cache.js';
 import { handleNextTick } from './handle-next-tick.js';

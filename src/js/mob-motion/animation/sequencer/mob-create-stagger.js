@@ -209,7 +209,9 @@ export const MobCreateStaggers = (data) => {
      */
     const staggerArrayFiltered = staggerArray.filter(
         ({ item }) =>
-            MobCore.checkType(Element, item) || MobCore.checkType(Object, item)
+            MobCore.checkType(Element, item) ||
+            MobCore.checkType(Object, item) ||
+            MobCore.checkType(Element, item?.deref?.())
     );
 
     if (staggerArrayFiltered.length === 0) {

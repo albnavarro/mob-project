@@ -1,5 +1,3 @@
-// @ts-check
-
 import { sliceIntoChunks } from '../animation-utils.js';
 import { MERGE_FROM_UP, MERGE_FROM_DOWN } from './stagger-costant.js';
 
