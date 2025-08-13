@@ -63,6 +63,15 @@ const MobPageScroller = ({ velocity, rootElement }) => {
     });
 
     /**
+     * Update lerp on scrollEnd eg. when search something in page
+     */
+    const unsubsribeScrollEnd = MobCore.useScrollEnd(() => {
+        const value = window.scrollY;
+        lastScrollValue = value;
+        lerp.setImmediate({ scrollValue: value });
+    });
+
+    /**
      * Update lerp value on native scroll event.
      */
     const unsubscribeScroll = MobCore.useScroll(() => {
@@ -125,6 +134,7 @@ const MobPageScroller = ({ velocity, rootElement }) => {
             rootElementToObserve = null;
             unsubscribe();
             unsubscribeScroll();
+            unsubsribeScrollEnd();
             unsubscribeMouseWheel();
             unsubscribeMouseDown();
             destroy = () => {};

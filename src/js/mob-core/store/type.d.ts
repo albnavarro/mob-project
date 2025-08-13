@@ -146,12 +146,12 @@ interface MobStoreComputed<T> {
     <K extends keyof T>(
         prop: K,
         callback: (arg0: T) => T[K],
-        keys?: Extract<keyof T, string>[]
+        keys?: (Extract<keyof T, string> | (() => T[keyof T]))[]
     ): void;
     <K extends T[keyof T]>(
         prop: () => K,
         callback: (arg0: T) => NoInfer<K>,
-        keys?: Extract<keyof T, string>[]
+        keys?: (Extract<keyof T, string> | (() => T[keyof T]))[]
     ): void;
 }
 

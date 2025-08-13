@@ -47,11 +47,26 @@ export const setCurrentDependencies = (key) => {
  * @param {string | (() => any)} prop
  * @returns {string}
  */
-export const getCurrentProp = (prop) => {
+export const extractkeyFromProp = (prop) => {
     const isString = checkType(String, prop);
     if (isString) return /** @type {string} */ (prop);
 
     initializeCurrentDependencies();
     /** @type {() => any} */ (prop)();
     return getFirstCurrentDependencies();
+};
+
+/**
+ * @param {(string | (() => any))[]} keys
+ * @returns {string[]}
+ */
+export const extractKeysFromArray = (keys) => {
+    return keys.map((key) => {
+        const isString = checkType(String, key);
+        if (isString) return /** @type {string} */ (key);
+
+        initializeCurrentDependencies();
+        /** @type {() => any} */ (key)();
+        return getFirstCurrentDependencies();
+    });
 };

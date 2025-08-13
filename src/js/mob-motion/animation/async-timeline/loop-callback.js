@@ -32,11 +32,11 @@ export const resolveTweenPromise = ({
      * --
      * this.isStopped: Timeline is stopped
      * --
-     * this.startOnDelay: play() etc.. is firedin delay
+     * this.startOnDelay: play() etc.. is fired in delay
      * --
      * sessionId: another tween is fired and this tween is in a
      * { waitComplete: false }, so the promise is resolved but
-     * this tween is in delay status, if antther session start
+     * this tween is in delay status, if another session start
      * the value of this.sessionId change,
      * in this case isStopped doesn't work because next
      * session set it to true
@@ -55,7 +55,7 @@ export const resolveTweenPromise = ({
 
     /*
      * Add tween to active stack, if timelienstatus is in pause
-     * onStartInPause methods trigger pause status inside
+     * onStartInPause methods trigger pause status inside tween.
      */
     const unsubscribeTweenStartInPause =
         tween && tween?.onStartInPause

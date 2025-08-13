@@ -22,7 +22,7 @@ import { bindStoreEntryPoint } from './bind-store';
 import { destroyStoreEntryPoint } from './destroy';
 import { checkIfPropIsComputed } from './store-utils';
 import { useNextLoop } from '../utils/next-tick';
-import { getCurrentProp } from './current-key';
+import { extractkeyFromProp, extractKeysFromArray } from './current-key';
 
 /**
  * @param {import('./type').MobStoreParams} data
@@ -69,7 +69,7 @@ export const mobStore = (data = {}) => {
             /** @type {any} */ value,
             { emit = true } = {}
         ) => {
-            const propParsed = getCurrentProp(prop);
+            const propParsed = extractkeyFromProp(prop);
             const isComputed = checkIfPropIsComputed({
                 instanceId,
                 prop: propParsed,
@@ -91,7 +91,7 @@ export const mobStore = (data = {}) => {
             /** @type {any} */ value,
             { emit = true, clone = false } = {}
         ) => {
-            const propParsed = getCurrentProp(prop);
+            const propParsed = extractkeyFromProp(prop);
             const isComputed = checkIfPropIsComputed({
                 instanceId,
                 prop: propParsed,
@@ -122,7 +122,7 @@ export const mobStore = (data = {}) => {
             /** @type {(current: any, previous: any, validation: import('./type').MobStoreValidateState) => void} */ callback,
             { wait = false, immediate = false } = {}
         ) => {
-            const propParsed = getCurrentProp(prop);
+            const propParsed = extractkeyFromProp(prop);
 
             const unwatch = watchEntryPoint({
                 instanceId,
@@ -142,14 +142,15 @@ export const mobStore = (data = {}) => {
         computed: (
             /** @type{string|(() => any)} */ prop,
             /** @type{(arg0: Record<string, any>) => any} */ callback,
-            /** @type {string[]} */ keys = []
+            /** @type{( string|(() => any))[]} */ keys = []
         ) => {
-            const propParsed = getCurrentProp(prop);
+            const propParsed = extractkeyFromProp(prop);
+            const keysParsed = extractKeysFromArray(keys);
 
             storeComputedEntryPoint({
                 instanceId,
                 prop: propParsed,
-                keys,
+                keys: keysParsed,
                 callback,
             });
 
@@ -158,12 +159,12 @@ export const mobStore = (data = {}) => {
             });
         },
         emit: (/** @type{string|(() => any)} */ prop) => {
-            const propParsed = getCurrentProp(prop);
+            const propParsed = extractkeyFromProp(prop);
 
             storeEmitEntryPoint({ instanceId, prop: propParsed });
         },
         emitAsync: async (/** @type{string|(() => any)} */ prop) => {
-            const propParsed = getCurrentProp(prop);
+            const propParsed = extractkeyFromProp(prop);
 
             return storeEmitAsyncEntryPoint({ instanceId, prop: propParsed });
         },

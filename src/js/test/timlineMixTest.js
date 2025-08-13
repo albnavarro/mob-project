@@ -60,8 +60,8 @@ export function timlineMixTest() {
 
     // DEFINE TIMELINE
     const timeline1 = MobTimeline.createAsyncTimeline({
-        repeat: 1,
-        yoyo: false,
+        repeat: 2,
+        yoyo: true,
         autoSet: true,
     });
 

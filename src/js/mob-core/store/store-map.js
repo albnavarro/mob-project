@@ -1,3 +1,5 @@
+import { useStoreCopy } from './strategy';
+
 /**
  * @type {import('./type').StoreMap}
  */
@@ -8,8 +10,12 @@ export const storeMap = new Map();
  * @returns {import('./type').StoreMapValue | undefined}
  */
 export const getStateFromMainMap = (id) => {
-    const valueNow = storeMap.get(id);
-    return valueNow ? { ...valueNow } : undefined;
+    if (useStoreCopy) {
+        const valueNow = storeMap.get(id);
+        return valueNow ? { ...valueNow } : undefined;
+    }
+
+    return storeMap.get(id);
 };
 
 /**
