@@ -1,7 +1,7 @@
 import { TimeTweenStopProps } from '../tween/type';
 import { StaggerObject } from '../utils/stagger/type';
 
-export interface lerpTweenProps {
+export interface LerpTweenProps {
     data: Record<string, number>;
     relative?: boolean;
     stagger?: Partial<StaggerObject>;
@@ -9,7 +9,7 @@ export interface lerpTweenProps {
     velocity?: number;
 }
 
-export interface lerpActions {
+export interface LerpActions {
     reverse?: boolean;
     relative?: boolean;
     immediate?: boolean;
@@ -17,7 +17,7 @@ export interface lerpActions {
     velocity?: number;
 }
 
-export interface lerpDefault {
+export interface LerpDefault {
     reverse: boolean;
     velocity: number;
     precision: number;
@@ -25,14 +25,14 @@ export interface lerpDefault {
     immediate: boolean;
 }
 
-export interface lerpInitialData {
+export interface LerpInitialData {
     prop: string;
     toValue: number;
     fromValue: number;
     currentValue: number;
 }
 
-export interface lerpValues extends lerpInitialData {
+export interface LerpValues extends LerpInitialData {
     fromFn: () => number;
     fromIsFn: boolean;
     toFn: () => number;
@@ -40,20 +40,20 @@ export interface lerpValues extends lerpInitialData {
     settled: boolean;
 }
 
-export type lerpMergeProps = (props: lerpActions) => lerpDefault;
-export type lerpStop = (arg0?: TimeTweenStopProps) => void;
-export type lerpPause = () => void;
-export type lerpResume = () => void;
-export type lerpResetData = () => void;
-export type lerpGetValue = () => Record<string, number>;
-export type lerpGetValueNative = () => Record<string, number | (() => number)>;
-export type lerpGetType = () => string;
-export type lerpGetId = () => string;
-export type lerpUpdateVelocity = (number) => void;
-export type lerpUpdatePrecision = (number) => void;
-export type lerpSubscribe = (cb: (arg0: any) => void) => () => void;
-export type lerpSubscribeCache = (
+export type LerpMergeProps = (props: LerpActions) => LerpDefault;
+export type LerpStop = (arg0?: TimeTweenStopProps) => void;
+export type LerpPause = () => void;
+export type LerpResume = () => void;
+export type LerpResetData = () => void;
+export type LerpGetValue = () => Record<string, number>;
+export type LerpGetValueNative = () => Record<string, number | (() => number)>;
+export type LerpGetType = () => string;
+export type LerpGetId = () => string;
+export type LerpUpdateVelocity = (number) => void;
+export type LerpUpdatePrecision = (number) => void;
+export type LerpSubscribe = (cb: (arg0: any) => void) => () => void;
+export type LerpSubscribeCache = (
     item: object | HTMLElement,
     cb: (arg0: Record<string, number>) => void
 ) => () => void;
-export type lerpOnComplete = (cb: (arg0: any) => void) => () => void;
+export type LerpOnComplete = (cb: (arg0: any) => void) => () => void;

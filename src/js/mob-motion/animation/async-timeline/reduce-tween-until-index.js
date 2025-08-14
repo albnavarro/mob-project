@@ -1,23 +1,32 @@
-import { asyncReduceData } from './async-reduce-data';
+import { filterActiveProps } from './fitler-active-props';
 
 /**
  * Get Obj data of tween in specific index Indlude check when multiple tween is synchronized index: get data until
  * specific index
  *
- * @param {import('./type').AsyncTimelineTweenItem[][]} tweenList
- * @param {import('./type').AsyncTimelineTween} tween
- * @param {number} index
+ * @param {object} params
+ * @param {import('./type').AsyncTimelineTweenItem[][]} params.timeline
+ * @param {import('./type').AsyncTimelineTween} params.tween
+ * @param {number} params.index
  * @returns {Record<string, number | (() => number)>}
  */
-export const asyncReduceTween = (tweenList, tween, index) => {
+export const reduceTweenUntilIndex = ({ timeline, tween, index }) => {
     let currentId = tween?.getId?.();
+
+    /**
+     * TODO: resolve better.
+     *
+     * Reduce issue, initial data in only number but function return number | (() => number), so cast constant.
+     *
+     * @type{Record<string, number|(()=>number)>}
+     */
     const initialData = tween?.getInitialData?.() || {};
 
-    return tweenList.slice(0, index).reduce((p, c) => {
+    return timeline.slice(0, index).reduce((previous, current) => {
         /*
          * Sync must be outside group so is at 0
          */
-        const currentFirstData = c[0].data;
+        const currentFirstData = current[0].data;
         const action = currentFirstData.action;
 
         /*
@@ -44,7 +53,7 @@ export const asyncReduceTween = (tweenList, tween, index) => {
             }
         }
 
-        const currentTween = c.find(({ data }) => {
+        const currentTween = current.find(({ data }) => {
             const uniqueId = data?.tween?.getId?.();
             return uniqueId === currentId;
         });
@@ -61,9 +70,12 @@ export const asyncReduceTween = (tweenList, tween, index) => {
          */
         const propsInUse =
             currentValueTo && currentTween
-                ? asyncReduceData(currentValueTo, currentTween.data.valuesTo)
+                ? filterActiveProps({
+                      data: currentValueTo,
+                      filterBy: currentTween.data.valuesTo,
+                  })
                 : {};
 
-        return { ...p, ...propsInUse };
+        return { ...previous, ...propsInUse };
     }, initialData);
 };

@@ -1,14 +1,15 @@
 /**
  * From data object return an object filtered by props in activeData
  *
- * @param {Record<string, number | (() => number)>} data
- * @param {Record<string, number | (() => number)>} activeData
+ * @param {object} params
+ * @param {Record<string, number | (() => number)>} params.data
+ * @param {Record<string, number | (() => number)>} params.filterBy
  */
-export const asyncReduceData = (data, activeData) => {
+export const filterActiveProps = ({ data, filterBy }) => {
     return Object.entries(data)
         .map((item) => {
             const [prop, val] = item;
-            const valueIsValid = prop in activeData;
+            const valueIsValid = prop in filterBy;
             return { data: { [prop]: val }, active: valueIsValid };
         })
         .filter(({ active }) => active)

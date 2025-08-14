@@ -97,12 +97,12 @@ export default class MobLerp {
     #currentPromise;
 
     /**
-     * @type {import('./type.js').lerpValues[] | []}
+     * @type {import('./type.js').LerpValues[] | []}
      */
     #values;
 
     /**
-     * @type {import('./type.js').lerpInitialData[]}
+     * @type {import('./type.js').LerpInitialData[]}
      */
     #initialData;
 
@@ -154,7 +154,7 @@ export default class MobLerp {
     /**
      * This value is the base value merged with new value in custom prop passed form user in goTo etc..
      *
-     * @type {import('./type.js').lerpDefault}
+     * @type {import('./type.js').LerpDefault}
      */
     #defaultProps;
 
@@ -211,7 +211,7 @@ export default class MobLerp {
      *
      *     ```;
      *
-     * @param {import('./type.js').lerpTweenProps} [data]
+     * @param {import('./type.js').LerpTweenProps} [data]
      */
     constructor(data) {
         this.#stagger = getStaggerFromProps(data ?? {});
@@ -427,7 +427,7 @@ export default class MobLerp {
     }
 
     /**
-     * @type {import('./type.js').lerpStop}
+     * @type {import('./type.js').LerpStop}
      */
     stop({ clearCache = true, updateValues = true } = {}) {
         if (this.#pauseStatus) this.#pauseStatus = false;
@@ -452,7 +452,7 @@ export default class MobLerp {
     }
 
     /**
-     * @type {import('./type.js').lerpPause}
+     * @type {import('./type.js').LerpPause}
      */
     pause() {
         if (this.#pauseStatus) return;
@@ -462,7 +462,7 @@ export default class MobLerp {
     }
 
     /**
-     * @type {import('./type.js').lerpResume}
+     * @type {import('./type.js').LerpResume}
      */
     resume() {
         if (!this.#pauseStatus) return;
@@ -506,14 +506,14 @@ export default class MobLerp {
     }
 
     /**
-     * @type {import('./type.js').lerpResetData}
+     * @type {import('./type.js').LerpResetData}
      */
     resetData() {
         this.#values = mergeDeep(this.#values, this.#initialData);
     }
 
     /**
-     * @type {import('./type.js').lerpMergeProps}
+     * @type {import('./type.js').LerpMergeProps}
      */
     #mergeProps(props) {
         const newProps = { ...this.#defaultProps, ...props };
@@ -526,7 +526,7 @@ export default class MobLerp {
     }
 
     /**
-     * @type {import('../../utils/type.js').GoTo<import('./type.js').lerpActions>} obj To Values
+     * @type {import('../../utils/type.js').GoTo<import('./type.js').LerpActions>} obj To Values
      */
     goTo(toObject, spacialProps = {}) {
         if (this.#pauseStatus) return new Promise((resolve) => resolve);
@@ -537,7 +537,7 @@ export default class MobLerp {
     }
 
     /**
-     * @type {import('../../utils/type.js').GoFrom<import('./type.js').lerpActions>} obj To Values
+     * @type {import('../../utils/type.js').GoFrom<import('./type.js').LerpActions>} obj To Values
      */
     goFrom(fromObject, specialProps = {}) {
         if (this.#pauseStatus) return new Promise((resolve) => resolve);
@@ -548,7 +548,7 @@ export default class MobLerp {
     }
 
     /**
-     * @type {import('../../utils/type.js').GoFromTo<import('./type.js').lerpActions>} obj To Values
+     * @type {import('../../utils/type.js').GoFromTo<import('./type.js').LerpActions>} obj To Values
      */
     goFromTo(fromObject, toObject, specialProps = {}) {
         if (this.#pauseStatus) return new Promise((resolve) => resolve);
@@ -565,7 +565,7 @@ export default class MobLerp {
     }
 
     /**
-     * @type {import('../../utils/type.js').Set<import('./type.js').lerpActions>} obj To Values
+     * @type {import('../../utils/type.js').Set<import('./type.js').LerpActions>} obj To Values
      */
     set(setObject, specialProps = {}) {
         if (this.#pauseStatus) return new Promise((resolve) => resolve);
@@ -575,7 +575,7 @@ export default class MobLerp {
     }
 
     /**
-     * @type {import('../../utils/type.js').SetImmediate<import('./type.js').lerpActions>} obj To Values
+     * @type {import('../../utils/type.js').SetImmediate<import('./type.js').LerpActions>} obj To Values
      */
     setImmediate(setObject, specialProps = {}) {
         // this.#value is updated below
@@ -596,7 +596,7 @@ export default class MobLerp {
     }
 
     /**
-     * @type {import('../../utils/type.js').DoAction<import('./type.js').lerpActions>} obj To Values
+     * @type {import('../../utils/type.js').DoAction<import('./type.js').LerpActions>} obj To Values
      */
     #doAction(newObjectparsed, newObjectRaw, spacialProps = {}) {
         this.#values = mergeArray(newObjectparsed, this.#values);
@@ -644,7 +644,7 @@ export default class MobLerp {
      *     const { prop } = myLerp.get();
      *     ```;
      *
-     * @type {import('./type.js').lerpGetValue}
+     * @type {import('./type.js').LerpGetValue}
      */
     get() {
         return getValueObj(this.#values, 'currentValue');
@@ -660,7 +660,7 @@ export default class MobLerp {
      *     const { prop } = myLerp.getIntialData();
      *     ```;
      *
-     * @type {import('./type.js').lerpGetValue}
+     * @type {import('./type.js').LerpGetValue}
      */
     getInitialData() {
         return getValueObj(this.#initialData, 'currentValue');
@@ -676,7 +676,7 @@ export default class MobLerp {
      *     const { prop } = myLerp.getFrom();
      *     ```;
      *
-     * @type {import('./type.js').lerpGetValue}
+     * @type {import('./type.js').LerpGetValue}
      */
     getFrom() {
         return getValueObj(this.#values, 'fromValue');
@@ -692,7 +692,7 @@ export default class MobLerp {
      *     const { prop } = myLerp.getTo();
      *     ```;
      *
-     * @type {import('./type.js').lerpGetValue}
+     * @type {import('./type.js').LerpGetValue}
      */
     getTo() {
         return getValueObj(this.#values, 'toValue');
@@ -708,7 +708,7 @@ export default class MobLerp {
      *     const { prop } = myLerp.getFromNativeType();
      *     ```;
      *
-     * @type {import('./type.js').lerpGetValueNative}
+     * @type {import('./type.js').LerpGetValueNative}
      */
     getFromNativeType() {
         return getValueObjFromNative(this.#values);
@@ -724,7 +724,7 @@ export default class MobLerp {
      *     const { prop } = myLerp.getToNativeType();
      *     ```;
      *
-     * @type {import('./type.js').lerpGetValueNative}
+     * @type {import('./type.js').LerpGetValueNative}
      */
     getToNativeType() {
         return getValueObjToNative(this.#values);
@@ -740,7 +740,7 @@ export default class MobLerp {
      *     const type = myLerp.getType();
      *     ```;
      *
-     * @type {import('./type.js').lerpGetType} tween Type
+     * @type {import('./type.js').LerpGetType} tween Type
      */
     getType() {
         return 'LERP';
@@ -756,7 +756,7 @@ export default class MobLerp {
      *     const type = myLerp.getId();
      *     ```;
      *
-     * @type {import('./type.js').lerpGetId}
+     * @type {import('./type.js').LerpGetId}
      */
     getId() {
         return this.#uniqueId;
@@ -773,7 +773,7 @@ export default class MobLerp {
      *
      *     ```;
      *
-     * @type {import('./type.js').lerpUpdateVelocity}
+     * @type {import('./type.js').LerpUpdateVelocity}
      */
     updateVelocity(velocity) {
         this.#velocity = lerpVelocityIsValid(velocity);
@@ -794,7 +794,7 @@ export default class MobLerp {
      *
      *     ```;
      *
-     * @type {import('./type.js').lerpUpdatePrecision}
+     * @type {import('./type.js').LerpUpdatePrecision}
      */
     updatePrecision(precision) {
         this.#velocity = lerpPrecisionIsValid(precision);
@@ -808,7 +808,7 @@ export default class MobLerp {
      * it works well on a not too large number of elements (approximately 100-200 elements) for large staggers it is
      * advisable to use the subscribeCache method .
      *
-     * @type {import('./type.js').lerpSubscribe}
+     * @type {import('./type.js').LerpSubscribe}
      */
     subscribe(cb) {
         const { arrayOfCallbackUpdated, unsubscribeCb } = updateSubScribers(
@@ -822,7 +822,7 @@ export default class MobLerp {
     /**
      * Callback that returns updated values ready to be usable, specific to manage large staggers.
      *
-     * @type {import('./type.js').lerpSubscribeCache}
+     * @type {import('./type.js').LerpSubscribeCache}
      */
     subscribeCache(item, fn) {
         const { arrayOfCallbackUpdated, unsubscribeCb, unsubscribeCache } =
@@ -858,7 +858,7 @@ export default class MobLerp {
      * scroll trigger is inactive). Useful for applying a different style to an inactive element. A typical example is
      * to remove the teansform3D property:
      *
-     * @type {import('./type.js').lerpOnComplete}
+     * @type {import('./type.js').LerpOnComplete}
      */
     onComplete(cb) {
         const { arrayOfCallbackUpdated, unsubscribeCb } = updateSubScribers(

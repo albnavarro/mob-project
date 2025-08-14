@@ -82,6 +82,16 @@ export function timlineMixTest() {
             { configProps: { mass: 2, precision: 0.5 }, delay: 500 }
         )
         .sync({ from: springBox1, to: tweenBox1 })
+        .add(() => {
+            console.log('add');
+        })
+        // .addAsync(({ loop, direction, resolve }) => {
+        //     console.log('start async function');
+        //     setTimeout(() => {
+        //         console.log('end async function:', loop, direction);
+        //         resolve();
+        //     }, 2000);
+        // })
         .createGroup({ waitComplete: false })
         .goTo(tweenBox1, { y: 400 }, { duration: () => durationTest })
         .goTo(tweenBox2, { rotate: 360 }, { duration: 2000, delay: 1000 })

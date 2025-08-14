@@ -1,5 +1,7 @@
-import { SpringChoiceConfig, SpringProps } from '../spring/type';
-import { EaseTypes, TimeTweenCommonProps } from '../tween/type';
+import { GoFrom, GoFromTo, GoTo, Set, SetImmediate } from '../../utils/type';
+import { LerpActions } from '../lerp/type';
+import { SpringActions } from '../spring/type';
+import { TimeTweenAction } from '../tween/type';
 import {
     DirectionTypeAsync,
     DirectionTypeObjectLoop,
@@ -35,32 +37,25 @@ export interface AsyncTimeline {
     autoSet?: boolean;
 }
 
-export interface AsyncTimelineTypeSpecialProps {
-    ease?: EaseTypes;
-    duration?: number;
-    config?: SpringChoiceConfig;
-    configProps?: SpringProps;
-    precision?: number;
-    velocity?: number;
-    reverse?: boolean;
-    relative?: boolean;
+export interface AsyncTimelineTypeSpecialProps
+    extends TimeTweenAction,
+        SpringActions,
+        LerpActions {
     delay?: number;
-    immediate?: boolean;
 }
 
 export interface AsyncTimelineTween {
     getId: () => string;
-    set: (
-        arg0: Record<string, number | (() => number)>,
-        ar1?: TimeTweenCommonProps
-    ) => Promise<any>;
-    goTo: () => Promise<any>;
-    goFromTo: () => Promise<any>;
-    getToNativeType: () => any;
+    set: Set<LerpActions | SpringActions | TimeTweenAction>;
+    setImmediate: SetImmediate<LerpActions | SpringActions | TimeTweenAction>;
+    goTo: GoTo<LerpActions | SpringActions | TimeTweenAction>;
+    goFrom: GoFrom<LerpActions | SpringActions | TimeTweenAction>;
+    goFromTo: GoFromTo<LerpActions | SpringActions | TimeTweenAction>;
+    getToNativeType: () => Record<string, number | (() => number)>;
     destroy: () => void;
-    onStartInPause: () => void;
+    onStartInPause: (cb: () => boolean) => void;
     resetData: () => void;
-    getInitialData: () => any;
+    getInitialData: () => Record<string, number>;
     stop: (arg0: { clearCache: boolean }) => any;
     pause?: () => void;
     resume?: () => void;
@@ -79,7 +74,8 @@ export interface AsyncTimelineRowData {
         from: AsyncTimelineTween;
         to: AsyncTimelineTween;
     };
-    tween: any;
+    tween?: AsyncTimelineTween;
+    callback: (arg0?: any) => any;
     tweenProps: AsyncTimelineTypeSpecialProps;
     valuesFrom: Record<string, number | (() => number)>;
     valuesTo: Record<string, number | (() => number)>;
@@ -125,25 +121,25 @@ export type AsyncTimelineAddToMainArray = (obj: AsyncTimelineRowData) => void;
 export type AsyncTimelineAddTweenToStore = (tween: AsyncTimelineTween) => void;
 
 export type AsyncTimelineSet = (
-    tween: any,
+    tween: AsyncTimelineTween,
     valuesSet: Record<string, number>,
     tweenProps: AsyncTimelineTypeSpecialProps
 ) => MobAsyncTimeline;
 
 export type AsyncTimelineGoTo = (
-    tween: any,
+    tween: AsyncTimelineTween,
     valuesTo: Record<string, number | (() => number)>,
     tweenProps?: AsyncTimelineTypeSpecialProps
 ) => MobAsyncTimeline;
 
 export type AsyncTimelineGoFrom = (
-    tween: any,
+    tween: AsyncTimelineTween,
     valuesFrom: Record<string, number | (() => number)>,
     tweenProps: AsyncTimelineTypeSpecialProps
 ) => MobAsyncTimeline;
 
 export type AsyncTimelineGoFromTo = (
-    tween: any,
+    tween: AsyncTimelineTween,
     valuesFrom: Record<string, number | (() => number)>,
     valuesTo: Record<string, number | (() => number)>,
     tweenProps: AsyncTimelineTypeSpecialProps

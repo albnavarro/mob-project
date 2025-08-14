@@ -313,7 +313,7 @@ function createSpring(data) {
  *
  *     ```;
  *
- * @param {import('./animation/lerp/type').lerpTweenProps} data
+ * @param {import('./animation/lerp/type').LerpTweenProps} data
  * @returns {MobLerp}
  */
 function createLerp(data) {
