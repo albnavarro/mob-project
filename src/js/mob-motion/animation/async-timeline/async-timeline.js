@@ -49,6 +49,11 @@ export default class MobAsyncTimeline {
     #autoSet;
 
     /**
+     * @type {boolean}
+     */
+    #inheritProps;
+
+    /**
      * @type {import('./type.js').AsyncTimelineTweenItem[][]}
      */
     #tweenList;
@@ -250,10 +255,11 @@ export default class MobAsyncTimeline {
      * @example
      *     ```javascript
      *     const myTimeline = new MobAsyncTimeline({
-     *       yoyo: [ Boolean ],
-     *       repeat: [ Number ],
-     *       freeMode: [ Number ],
-     *       autoSet: [ Number ],
+     *       yoyo: [ boolean ],
+     *       repeat: [ number ],
+     *       freeMode: [ boolean ],
+     *       autoSet: [ boolean ],
+     *       inheritProps: [ number ],
      *     })
      *
      *
@@ -276,6 +282,11 @@ export default class MobAsyncTimeline {
         this.#autoSet = valueIsBooleanAndReturnDefault(
             data?.autoSet,
             'asyncTimeline: autoSet',
+            true
+        );
+        this.#inheritProps = valueIsBooleanAndReturnDefault(
+            data?.inheritProps,
+            'asyncTimeline: inheritProps',
             true
         );
         this.#tweenList = [];
@@ -1098,12 +1109,23 @@ export default class MobAsyncTimeline {
         if (!asyncTimelineTweenIsValid(tween)) return this;
         tweenProps.delay = asyncTimelineDelayIsValid(tweenProps?.delay);
 
+        /**
+         * Get previousValues until this step and merge with user data
+         */
+        const previousValues = this.#inheritProps
+            ? reduceTweenUntilIndex({
+                  timeline: this.#tweenList,
+                  tween,
+                  index: this.#tweenList.length,
+              })
+            : {};
+
         const obj = {
             id: this.#currentTweenCounter,
             tween,
             action: 'set',
-            valuesTo: valuesSet,
-            valuesFrom: valuesSet,
+            valuesTo: { ...previousValues, ...valuesSet },
+            valuesFrom: { ...previousValues, ...valuesSet },
             tweenProps,
             groupProps: { waitComplete: this.#waitComplete },
         };
@@ -1122,11 +1144,22 @@ export default class MobAsyncTimeline {
         if (!asyncTimelineTweenIsValid(tween)) return this;
         tweenProps.delay = asyncTimelineDelayIsValid(tweenProps?.delay);
 
+        /**
+         * Get previousValues until this step and merge with user data
+         */
+        const previousValues = this.#inheritProps
+            ? reduceTweenUntilIndex({
+                  timeline: this.#tweenList,
+                  tween,
+                  index: this.#tweenList.length,
+              })
+            : {};
+
         const obj = {
             id: this.#currentTweenCounter,
             tween,
             action: 'goTo',
-            valuesTo,
+            valuesTo: { ...previousValues, ...valuesTo },
             tweenProps: tweenProps ?? {},
             groupProps: { waitComplete: this.#waitComplete },
         };
@@ -1145,11 +1178,22 @@ export default class MobAsyncTimeline {
         if (!asyncTimelineTweenIsValid(tween)) return this;
         tweenProps.delay = asyncTimelineDelayIsValid(tweenProps?.delay);
 
+        /**
+         * Get previousValues until this step and merge with user data
+         */
+        const previousValues = this.#inheritProps
+            ? reduceTweenUntilIndex({
+                  timeline: this.#tweenList,
+                  tween,
+                  index: this.#tweenList.length,
+              })
+            : {};
+
         const obj = {
             id: this.#currentTweenCounter,
             tween,
             action: 'goFrom',
-            valuesFrom,
+            valuesFrom: { ...previousValues, ...valuesFrom },
             tweenProps,
             groupProps: { waitComplete: this.#waitComplete },
         };
@@ -1168,12 +1212,23 @@ export default class MobAsyncTimeline {
         if (!asyncTimelineTweenIsValid(tween)) return this;
         tweenProps.delay = asyncTimelineDelayIsValid(tweenProps?.delay);
 
+        /**
+         * Get previousValues until this step and merge with user data
+         */
+        const previousValues = this.#inheritProps
+            ? reduceTweenUntilIndex({
+                  timeline: this.#tweenList,
+                  tween,
+                  index: this.#tweenList.length,
+              })
+            : {};
+
         const obj = {
             id: this.#currentTweenCounter,
             tween,
             action: 'goFromTo',
-            valuesFrom,
-            valuesTo,
+            valuesFrom: { ...previousValues, ...valuesFrom },
+            valuesTo: { ...previousValues, ...valuesTo },
             tweenProps,
             groupProps: { waitComplete: this.#waitComplete },
         };

@@ -35,6 +35,8 @@ export interface AsyncTimeline {
      * always restart from the initial (or final) value. `The default is false`
      */
     autoSet?: boolean;
+
+    inheritProps?: boolean;
 }
 
 export interface AsyncTimelineTypeSpecialProps
