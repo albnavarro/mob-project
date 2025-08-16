@@ -462,6 +462,23 @@ export default class MobSpring {
     }
 
     /**
+     * CAUTION. Use by asyncTimeline. If inside group with waitComplete: false the tween is not resolved and another
+     * step call the tween no new promise is created. Fire reject if there is one and set isRunning false. Next draw
+     * isRunning back to true
+     *
+     * @returns {void}
+     */
+    clearCurretPromise() {
+        if (this.#currentReject) {
+            this.#currentReject(MobCore.ANIMATION_STOP_REJECT);
+            this.#currentPromise = undefined;
+            this.#currentReject = undefined;
+            this.#currentResolve = undefined;
+            this.#isRunning = false;
+        }
+    }
+
+    /**
      * @type {import('./type.js').SpringStop}
      */
     stop({ clearCache = true, updateValues = true } = {}) {
@@ -469,10 +486,9 @@ export default class MobSpring {
         if (updateValues) this.#values = setFromToByCurrent(this.#values);
 
         /**
-         * If isRunning clear all funture stagger. If tween is ended and the lst stagger is running, let it reach end
-         * position.
+         * Clear stagger cache if needed.
          */
-        if (this.#isRunning && clearCache)
+        if (clearCache)
             this.#callbackCache.forEach(({ cb }) => MobCore.useCache.clean(cb));
 
         // Reject promise
@@ -544,6 +560,11 @@ export default class MobSpring {
                 toValue: item.toValue,
                 fromValue: item.fromValue,
                 currentValue: item.currentValue,
+                fromFn: () => 0,
+                fromIsFn: false,
+                toFn: () => 0,
+                toIsFn: false,
+                settled: false,
             };
         });
     }
@@ -843,6 +864,15 @@ export default class MobSpring {
      */
     getId() {
         return this.#uniqueId;
+    }
+
+    /**
+     * Return active state.
+     *
+     * @returns {boolean}
+     */
+    isActive() {
+        return this.#isRunning;
     }
 
     /**

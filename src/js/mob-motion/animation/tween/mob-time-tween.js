@@ -453,6 +453,14 @@ export default class MobTimeTween {
     }
 
     /**
+     * TimeTween doasn/t need this method. It use always from/to value. Spring/lerp use only to value to be reactive,
+     * See that tween for reference.
+     *
+     * @returns {void}
+     */
+    clearCurretPromise() {}
+
+    /**
      * @type {import('./type.js').TimeTweenStop}
      */
     stop({ clearCache = true, updateValues = true } = {}) {
@@ -462,10 +470,9 @@ export default class MobTimeTween {
         if (updateValues) this.#values = setFromToByCurrent(this.#values);
 
         /**
-         * If isRunning clear all funture stagger. If tween is ended and the lst stagger is running, let it reach end
-         * position.
+         * Clear stagger cache if needed.
          */
-        if (this.#isRunning && clearCache)
+        if (clearCache)
             this.#callbackCache.forEach(({ cb }) => MobCore.useCache.clean(cb));
 
         // Abort promise
@@ -822,6 +829,15 @@ export default class MobTimeTween {
      */
     getId() {
         return this.#uniqueId;
+    }
+
+    /**
+     * Return active state.
+     *
+     * @returns {boolean}
+     */
+    isActive() {
+        return this.#isRunning;
     }
 
     /**

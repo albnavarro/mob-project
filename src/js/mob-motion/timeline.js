@@ -56,7 +56,6 @@ function createSyncTimeline(data) {
  * myTimeline.goFromTo();
  * myTimeline.add();
  * myTimeline.addAsync();
- * myTimeline.sync();
  * myTimeline.createGroup();
  * myTimeline.closeGroup();
  * myTimeline.suspend();

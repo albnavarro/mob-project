@@ -31,6 +31,7 @@ export const radialStaggerTween = () => {
     const timeline1 = MobTimeline.createAsyncTimeline({
         repeat: -1,
         yoyo: true,
+        autoSet: false,
     })
         .goTo(tween1, { scale: 0.5 }, { duration: 1000 })
         .goTo(tween1, { scale: 2.5 }, { duration: 500 })

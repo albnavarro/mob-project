@@ -34,18 +34,10 @@ export function timlineMixTest() {
         durationTest = 1000;
     });
 
-    // DEFINE SPRING
-    const springBox1 = MobTween.createSpring({
-        data: { x: 0, y: 0, rotate: 0 },
-        config: 'wobbly',
-    });
-    springBox1.subscribe(({ x, y, rotate }) => {
-        target.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg)`;
-    });
-
     // DEFINE TWEEN
     const tweenBox1 = MobTween.createTimeTween({
         data: { x: 0, y: 0, rotate: 0 },
+        ease: 'easeOutQuart',
     });
 
     tweenBox1.subscribe(({ x, y, rotate }) => {
@@ -74,14 +66,13 @@ export function timlineMixTest() {
     });
 
     timeline1
-        .goTo(springBox1, { x: -200 })
+        .goTo(tweenBox1, { x: -200 })
         .goFromTo(
-            springBox1,
+            tweenBox1,
             { x: -200 },
             { x: 400 },
             { configProps: { mass: 2, precision: 0.5 }, delay: 500 }
         )
-        .sync({ from: springBox1, to: tweenBox1 })
         .add(() => {
             console.log('add');
         })
@@ -100,16 +91,15 @@ export function timlineMixTest() {
         .goTo(tweenBox1, { x: -100, rotate: 180 }, { ease: 'easeInElastic' })
         .suspend(() => toggleSuspend)
         // .add(() => timeline1.reverseNext())
-        .sync({ from: tweenBox1, to: springBox1 })
         .createGroup({ waitComplete: false })
         .goTo(
-            springBox1,
+            tweenBox1,
             { x: 0, y: 0, rotate: 0 },
             { configProps: { precision: 0.5 } }
         )
         .goTo(tweenBox2, { rotate: -180 }, { duration: 5000 })
         .closeGroup()
-        .goTo(springBox1, { x: -400 });
+        .goTo(tweenBox1, { x: -400 });
 
     // timeline1
     //     .goTo(tweenBox1, { x: -200 })
@@ -155,7 +145,7 @@ export function timlineMixTest() {
     });
 
     btnFrom.addEventListener('click', () => {
-        timeline1.setTween('label1', [tweenBox2, springBox1]).then(() => {
+        timeline1.setTween('label1', [tweenBox2]).then(() => {
             timeline1.playFrom('label1').then(() => {
                 console.log('resolve promise playFrom');
             });
@@ -163,7 +153,7 @@ export function timlineMixTest() {
     });
 
     btnFromReverse.addEventListener('click', () => {
-        timeline1.setTween('label1', [tweenBox2, springBox1]).then(() => {
+        timeline1.setTween('label1', [tweenBox2]).then(() => {
             timeline1.playFromReverse('label1').then(() => {
                 console.log('resolve promise playFromReverse');
             });

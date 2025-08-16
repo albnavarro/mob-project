@@ -470,8 +470,10 @@ export default class MobSyncTimeline {
      * @type {import('./type.js').SyncTimelinePlay}
      */
     play(props = {}) {
+        const useCurrent = props?.useCurrent;
+        if (!useCurrent) this.stop();
+
         return new Promise((resolve, reject) => {
-            const useCurrent = props?.useCurrent;
             if (this.#fpsIsInLoading) return;
 
             this.#rejectPromise();
@@ -482,6 +484,7 @@ export default class MobSyncTimeline {
              * If is running and useCurrent is true move from current time value
              */
             if (!this.#isStopped && !this.#isReverse && useCurrent) return;
+
             if (!this.#isStopped && this.#isReverse && useCurrent) {
                 this.reverse();
                 return;
@@ -512,6 +515,8 @@ export default class MobSyncTimeline {
      * @type {import('./type.js').SyncTimelinePlayFrom} value
      */
     playFrom(value = 0) {
+        this.stop();
+
         return new Promise((resolve, reject) => {
             if (this.#fpsIsInLoading) return;
 
@@ -575,6 +580,8 @@ export default class MobSyncTimeline {
      * @type {import('./type.js').syncTimelinePlayFromReverse} value
      */
     playFromReverse(value) {
+        this.stop();
+
         return new Promise((resolve, reject) => {
             if (this.#fpsIsInLoading) return;
 
@@ -611,8 +618,10 @@ export default class MobSyncTimeline {
      * @type {import('./type.js').SyncTimelinePlayReverse}
      */
     playReverse(props = {}) {
+        const useCurrent = props?.useCurrent;
+        if (!useCurrent) this.stop();
+
         return new Promise((resolve, reject) => {
-            const useCurrent = props?.useCurrent;
             if (this.#fpsIsInLoading) return;
 
             this.#rejectPromise();

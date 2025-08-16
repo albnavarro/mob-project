@@ -31,6 +31,7 @@ export const gridStaggerSpring = () => {
     const timeline1 = MobTimeline.createAsyncTimeline({
         repeat: -1,
         yoyo: true,
+        autoSet: false,
     });
     timeline1.goTo(tween1, { scale: 0.5 });
     timeline1.play();

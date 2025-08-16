@@ -27,7 +27,7 @@ export function staggerTweenTest() {
     });
 
     const myStagger = MobTween.createTimeTween({
-        stagger: { each: 4, from: 'start' },
+        stagger: { each: 10, from: 'start' },
         ease: 'easeOutSine',
         data: { x: 0 },
     });
@@ -44,18 +44,18 @@ export function staggerTweenTest() {
     //     });
     // });
 
-    const unsubscribeStaggerOnComplete = [...stagger].map((item) => {
-        return myStagger.onComplete(({ x }) => {
-            item.style.transform = `translate(${x}px, 0px)`;
-        });
-    });
+    // const unsubscribeStaggerOnComplete = [...stagger].map((item) => {
+    //     return myStagger.onComplete(({ x }) => {
+    //         item.style.transform = `translate(${x}px, 0px)`;
+    //     });
+    // });
 
     // When use waitComplete: false all the stagger of same tween must have the same each value to syncronize
     // DEFINE TIMELINE
     const timeline1 = MobTimeline.createAsyncTimeline({
         repeat: -1,
         yoyo: false,
-        autoSet: false,
+        autoSet: true,
     })
         .goTo(myTween, { x: 500 })
         .goTo(myTween, { y: 500 })

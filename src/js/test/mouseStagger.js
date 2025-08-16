@@ -54,6 +54,7 @@ export const mouseStagger = () => {
     const timeline1 = MobTimeline.createAsyncTimeline({
         repeat: -1,
         yoyo: true,
+        autoSet: false,
     }).goTo(tween1, { scale: () => val * 2 });
     // .goTo(tween1, { scale: () => val * 3 })
     timeline1.play();
