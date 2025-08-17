@@ -333,10 +333,6 @@ export default class MobLerp {
      * @param {number} fps Current FPS
      */
     #onReuqestAnim(time, fps) {
-        this.#values = [...this.#values].map((item) => {
-            return { ...item };
-        });
-
         this.#draw(time, fps);
     }
 

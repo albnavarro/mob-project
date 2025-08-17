@@ -1056,9 +1056,9 @@ export default class MobAsyncTimeline {
     /**
      * Common method, add all action to main array
      *
-     * @type {import('./type.js').AsyncTimelineAddToMainArray}
+     * @type {import('./type.js').AsyncTimelineAddAction}
      */
-    #addToMainArray(obj) {
+    #addAction(obj) {
         /**
          * Check if the is an active group and the group is just created
          */
@@ -1120,7 +1120,10 @@ export default class MobAsyncTimeline {
               })
             : {};
 
-        const obj = {
+        this.#currentTweenCounter++;
+
+        this.#addAction({
+            ...this.#defaultObj,
             id: this.#currentTweenCounter,
             tween,
             action: 'set',
@@ -1128,11 +1131,8 @@ export default class MobAsyncTimeline {
             valuesFrom: { ...previousValues, ...valuesSet },
             tweenProps,
             groupProps: { waitComplete: this.#waitComplete },
-        };
+        });
 
-        this.#currentTweenCounter++;
-        const mergedObj = { ...this.#defaultObj, ...obj };
-        this.#addToMainArray(mergedObj);
         this.#addTweenToStore(tween);
         return this;
     }
@@ -1155,18 +1155,18 @@ export default class MobAsyncTimeline {
               })
             : {};
 
-        const obj = {
+        this.#currentTweenCounter++;
+
+        this.#addAction({
+            ...this.#defaultObj,
             id: this.#currentTweenCounter,
             tween,
             action: 'goTo',
             valuesTo: { ...previousValues, ...valuesTo },
             tweenProps: tweenProps ?? {},
             groupProps: { waitComplete: this.#waitComplete },
-        };
+        });
 
-        this.#currentTweenCounter++;
-        const mergedObj = { ...this.#defaultObj, ...obj };
-        this.#addToMainArray(mergedObj);
         this.#addTweenToStore(tween);
         return this;
     }
@@ -1189,18 +1189,18 @@ export default class MobAsyncTimeline {
               })
             : {};
 
-        const obj = {
+        this.#currentTweenCounter++;
+
+        this.#addAction({
+            ...this.#defaultObj,
             id: this.#currentTweenCounter,
             tween,
             action: 'goFrom',
             valuesFrom: { ...previousValues, ...valuesFrom },
             tweenProps,
             groupProps: { waitComplete: this.#waitComplete },
-        };
+        });
 
-        this.#currentTweenCounter++;
-        const mergedObj = { ...this.#defaultObj, ...obj };
-        this.#addToMainArray(mergedObj);
         this.#addTweenToStore(tween);
         return this;
     }
@@ -1223,7 +1223,10 @@ export default class MobAsyncTimeline {
               })
             : {};
 
-        const obj = {
+        this.#currentTweenCounter++;
+
+        this.#addAction({
+            ...this.#defaultObj,
             id: this.#currentTweenCounter,
             tween,
             action: 'goFromTo',
@@ -1231,11 +1234,8 @@ export default class MobAsyncTimeline {
             valuesTo: { ...previousValues, ...valuesTo },
             tweenProps,
             groupProps: { waitComplete: this.#waitComplete },
-        };
+        });
 
-        this.#currentTweenCounter++;
-        const mergedObj = { ...this.#defaultObj, ...obj };
-        this.#addToMainArray(mergedObj);
         this.#addTweenToStore(tween);
         return this;
     }
@@ -1257,16 +1257,16 @@ export default class MobAsyncTimeline {
             return this;
         }
 
-        const obj = {
+        this.#currentTweenCounter++;
+
+        this.#addAction({
+            ...this.#defaultObj,
             id: this.#currentTweenCounter,
             callback,
             action: 'add',
             groupProps: { waitComplete: this.#waitComplete },
-        };
+        });
 
-        this.#currentTweenCounter++;
-        const mergedObj = { ...this.#defaultObj, ...obj };
-        this.#addToMainArray(mergedObj);
         return this;
     }
 
@@ -1284,16 +1284,16 @@ export default class MobAsyncTimeline {
             return this;
         }
 
-        const obj = {
+        this.#currentTweenCounter++;
+
+        this.#addAction({
+            ...this.#defaultObj,
             id: this.#currentTweenCounter,
             callback,
             action: 'addAsync',
             groupProps: { waitComplete: this.#waitComplete },
-        };
+        });
 
-        this.#currentTweenCounter++;
-        const mergedObj = { ...this.#defaultObj, ...obj };
-        this.#addToMainArray(mergedObj);
         return this;
     }
 
@@ -1309,16 +1309,15 @@ export default class MobAsyncTimeline {
             return this;
         }
 
-        const obj = {
+        this.#currentTweenCounter++;
+
+        this.#addAction({
+            ...this.#defaultObj,
             id: this.#currentTweenCounter,
             action: 'createGroup',
             groupProps,
-        };
+        });
 
-        this.#currentTweenCounter++;
-
-        const mergedObj = { ...this.#defaultObj, ...obj };
-        this.#addToMainArray(mergedObj);
         this.#waitComplete = groupProps?.waitComplete ?? false;
         this.#groupId = this.#groupCounter++;
         return this;
@@ -1330,15 +1329,14 @@ export default class MobAsyncTimeline {
     closeGroup() {
         this.#groupId = undefined;
 
-        const obj = {
-            id: this.#currentTweenCounter,
-            action: 'closeGroup',
-        };
-
         this.#currentTweenCounter++;
 
-        const mergedObj = { ...this.#defaultObj, ...obj };
-        this.#addToMainArray(mergedObj);
+        this.#addAction({
+            ...this.#defaultObj,
+            id: this.#currentTweenCounter,
+            action: 'closeGroup',
+        });
+
         this.#waitComplete = false;
         return this;
     }
@@ -1355,16 +1353,16 @@ export default class MobAsyncTimeline {
             return this;
         }
 
-        const obj = {
+        this.#currentTweenCounter++;
+
+        this.#addAction({
+            ...this.#defaultObj,
             id: this.#currentTweenCounter,
             callback: fn,
             action: 'suspend',
             groupProps: { waitComplete: this.#waitComplete },
-        };
+        });
 
-        this.#currentTweenCounter++;
-        const mergedObj = { ...this.#defaultObj, ...obj };
-        this.#addToMainArray(mergedObj);
         return this;
     }
 
@@ -1383,16 +1381,16 @@ export default class MobAsyncTimeline {
         if (!valueStringIsValid(labelProps?.name, 'asyncTimeline label:'))
             return this;
 
-        const obj = {
+        this.#currentTweenCounter++;
+
+        this.#addAction({
+            ...this.#defaultObj,
             id: this.#currentTweenCounter,
             action: 'label',
             labelProps,
             groupProps: { waitComplete: this.#waitComplete },
-        };
+        });
 
-        this.#currentTweenCounter++;
-        const mergedObj = { ...this.#defaultObj, ...obj };
-        this.#addToMainArray(mergedObj);
         return this;
     }
 
@@ -1413,20 +1411,23 @@ export default class MobAsyncTimeline {
         this.#tweenStore.forEach(({ tween }) => {
             const setValueTo = tween.getInitialData();
 
-            const obj = {
-                id: this.#currentTweenCounter,
-                tween,
-                action: 'set',
-                valuesFrom: setValueTo,
-                valuesTo: setValueTo,
-                groupProps: { waitComplete: this.#waitComplete },
-            };
-
             this.#currentTweenCounter++;
 
-            const mergedObj = { ...this.#defaultObj, ...obj };
             this.#tweenList = [
-                [{ group: undefined, data: mergedObj }],
+                [
+                    {
+                        group: undefined,
+                        data: {
+                            ...this.#defaultObj,
+                            id: this.#currentTweenCounter,
+                            tween,
+                            action: 'set',
+                            valuesFrom: setValueTo,
+                            valuesTo: setValueTo,
+                            groupProps: { waitComplete: this.#waitComplete },
+                        },
+                    },
+                ],
                 ...this.#tweenList,
             ];
         });
@@ -1442,18 +1443,22 @@ export default class MobAsyncTimeline {
                 index: this.#tweenList.length,
             });
 
-            const obj = {
-                id: this.#currentTweenCounter,
-                tween,
-                action: 'set',
-                valuesFrom: setValueTo,
-                valuesTo: setValueTo,
-                groupProps: { waitComplete: this.#waitComplete },
-            };
-
             this.#currentTweenCounter++;
-            const mergedObj = { ...this.#defaultObj, ...obj };
-            this.#tweenList.push([{ group: undefined, data: mergedObj }]);
+
+            this.#tweenList.push([
+                {
+                    group: undefined,
+                    data: {
+                        ...this.#defaultObj,
+                        id: this.#currentTweenCounter,
+                        tween,
+                        action: 'set',
+                        valuesFrom: setValueTo,
+                        valuesTo: setValueTo,
+                        groupProps: { waitComplete: this.#waitComplete },
+                    },
+                },
+            ]);
         });
     }
 
