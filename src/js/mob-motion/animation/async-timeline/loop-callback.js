@@ -2,49 +2,35 @@ import { NOOP } from '../../utils/functions-utils';
 
 /**
  * @param {Object} param
- * @param {(reason?: any) => void} param.reject
- * @param {(reason?: any) => void} param.res
- * @param {boolean} param.isStopped
- * @param {boolean} param.startOnDelay
- * @param {boolean} param.isInPause
+ * @param {(reason?: any) => void} param.mainReject
+ * @param {(reason?: any) => void} param.mainResolve
+ * @param {() => boolean} param.isStopped
+ * @param {() => boolean} param.isInPause
  * @param {(tween: any) => function} param.addToActiveTween
  * @param {number} param.previousSessionId
- * @param {number} param.currentSessionId
+ * @param {() => number} param.currentSessionId
  * @param {any} param.tween
- * @param {Record<string, any>} param.fn
+ * @param {Record<string, any>} param.stepFunction
  * @param {string} param.action
  */
 export const resolveTweenPromise = ({
-    reject,
-    res,
+    mainReject,
+    mainResolve,
     isStopped,
-    startOnDelay,
     previousSessionId,
     currentSessionId,
     isInPause,
     tween,
-    fn,
+    stepFunction,
     action,
     addToActiveTween,
 }) => {
     /*
-     * IF:
-     * --
-     * this.isStopped: Timeline is stopped
-     * --
-     * this.startOnDelay: play() etc.. is fired in delay
-     * --
-     * sessionId: another tween is fired and this tween is in a
-     * { waitComplete: false }, so the promise is resolved but
-     * this tween is in delay status, if another session start
-     * the value of this.sessionId change,
-     * in this case isStopped doesn't work because next
-     * session set it to true
-     * --
+     * Promles section rejct timeline if:
+     * - This check is utils when delay is active
      */
-
-    if (isStopped || startOnDelay || previousSessionId !== currentSessionId) {
-        reject();
+    if (isStopped() || previousSessionId !== currentSessionId()) {
+        mainReject();
         return;
     }
 
@@ -54,21 +40,24 @@ export const resolveTweenPromise = ({
     const unsubscribeActiveTween = addToActiveTween(tween);
 
     /*
-     * Add tween to active stack, if timelienstatus is in pause
-     * onStartInPause methods trigger pause status inside tween.
+     * When tween try to go, check if timeline is in pause.
+     *
+     * - The tween might not have been paused if it was in a delay phase.
+     *   This is an additional check to ensure it doesn't start when it shouldn't.
      */
-    const unsubscribeTweenStartInPause =
-        tween && tween?.onStartInPause
-            ? tween.onStartInPause(() => {
-                  return isInPause;
+    const unsubscribeValidation =
+        tween && tween?.validateInitialization
+            ? tween.validateInitialization({
+                  validation: () => isInPause(),
+                  callback: () => tween.pause?.(),
               })
             : NOOP;
 
-    fn[action]()
-        .then(() => res({ resolve: true }))
+    stepFunction[action]()
+        .then(() => mainResolve({ resolve: true }))
         .catch(() => {})
         .finally(() => {
             unsubscribeActiveTween();
-            unsubscribeTweenStartInPause();
+            unsubscribeValidation();
         });
 };

@@ -124,6 +124,24 @@ export default class MobMasterSequencer {
     }
 
     /**
+     * @returns {void}
+     */
+    freezeCachedId() {
+        this.#children.forEach((item) => {
+            item.freezeCachedId();
+        });
+    }
+
+    /**
+     * @returns {void}
+     */
+    unFreezeCachedId() {
+        this.#children.forEach((item) => {
+            item.unFreezeCachedId();
+        });
+    }
+
+    /**
      * @returns {string}
      */
     getType() {

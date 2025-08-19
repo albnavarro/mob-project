@@ -1,3 +1,4 @@
+// @ts-check
 import { MobCore } from '../mob-core';
 import { MobTimeline, MobTween } from '../mob-motion';
 

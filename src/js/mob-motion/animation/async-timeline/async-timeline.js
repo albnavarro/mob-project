@@ -54,6 +54,11 @@ export default class MobAsyncTimeline {
     #inheritProps;
 
     /**
+     * @type {boolean}
+     */
+    #forceFromTo;
+
+    /**
      * @type {import('./type.js').AsyncTimelineTweenItem[][]}
      */
     #tweenList;
@@ -146,21 +151,6 @@ export default class MobAsyncTimeline {
      * @type {boolean}
      */
     #isStopped;
-
-    /**
-     * @type {boolean}
-     */
-    #delayIsRunning;
-
-    /**
-     * @type {boolean}
-     */
-    #startOnDelay;
-
-    /**
-     * @type {import('./type.js').AsyncTimelineAfterReject}
-     */
-    #actionAfterReject;
 
     /**
      * @type {number}
@@ -289,6 +279,11 @@ export default class MobAsyncTimeline {
             'asyncTimeline: inheritProps',
             true
         );
+        this.#forceFromTo = valueIsBooleanAndReturnDefault(
+            data?.forceFromTo,
+            'asyncTimeline: forceFromTo',
+            false
+        );
         this.#tweenList = [];
         this.#currentTween = [];
         this.#tweenStore = [];
@@ -324,12 +319,6 @@ export default class MobAsyncTimeline {
         this.#isInSuspension = false;
         this.#addAsyncIsActive = false;
         this.#isStopped = true;
-        this.#delayIsRunning = false;
-        this.#startOnDelay = false;
-        this.#actionAfterReject = {
-            active: false,
-            fn: () => {},
-        };
         this.#sessionId = 0;
         this.#activetweenCounter = 0;
         this.#timeOnPause = 0;
@@ -476,15 +465,25 @@ export default class MobAsyncTimeline {
                 }
             );
 
-            /*
+            /**
              * Current action data. Than we match key in object.
+             *
+             * NORMALI TWEEN
+             *
+             * - Create a fresh primise from tween: Tweens, when called with a new action while still running, do not
+             *   create a new promise but instead reuse the first promise created. The promise is resolved once the
+             *   tween completes. Here, we have a special case: with Promise.race (waitComplete: false), the
+             *   longest-running tween will not create a new promise in the next step because it is still active. This
+             *   leads to entering a step without a new promise to resolve. In this scenario, we need to ensure that
+             *   whenever a tween executes an action in the current step, there is always a promise related to that
+             *   step. Therefore, we force the tween to reject any active promises and create a new one.
+             * - Normalize pasue status, if timeline is not in pause tween should not be in pause.
+             *   tween.validateInitialization() if used set tween in pause. in next loop remov epause if timeline is
+             *   not.
              */
-            const fn = {
+            const stepFunction = {
                 set: () => {
-                    /**
-                     * Clear eventually previous primise from promise race condition
-                     */
-                    tween?.clearCurretPromise?.();
+                    if (!this.#isInPause) tween?.clearCurretPromise?.();
 
                     return tween?.[/** @type {'set'} */ (action)](
                         valuesFrom,
@@ -492,10 +491,7 @@ export default class MobAsyncTimeline {
                     );
                 },
                 goTo: () => {
-                    /**
-                     * Clear eventually previous primise from promise race condition
-                     */
-                    tween?.clearCurretPromise?.();
+                    if (!this.#isInPause) tween?.clearCurretPromise?.();
 
                     return tween?.[/** @type {'goTo'} */ (action)](
                         valuesTo,
@@ -503,10 +499,7 @@ export default class MobAsyncTimeline {
                     );
                 },
                 goFrom: () => {
-                    /**
-                     * Clear eventually previous primise from promise race condition
-                     */
-                    tween?.clearCurretPromise?.();
+                    if (!this.#isInPause) tween?.clearCurretPromise?.();
 
                     return tween?.[/** @type {'goFrom'} */ (action)](
                         valuesFrom,
@@ -514,10 +507,7 @@ export default class MobAsyncTimeline {
                     );
                 },
                 goFromTo: () => {
-                    /**
-                     * Clear eventually previous primise from promise race condition
-                     */
-                    tween?.clearCurretPromise?.();
+                    if (!this.#isInPause) tween?.clearCurretPromise?.();
 
                     return tween?.[/** @type {'goFromTo'} */ (action)](
                         valuesFrom,
@@ -624,7 +614,7 @@ export default class MobAsyncTimeline {
                 },
             };
 
-            return new Promise((res, reject) => {
+            return new Promise((mainResolve, mainReject) => {
                 // Get delay
                 const delay = isImmediate ? false : tweenProps?.delay;
                 const previousSessionId = this.#sessionId;
@@ -634,18 +624,17 @@ export default class MobAsyncTimeline {
                  */
                 if (delay) {
                     const start = MobCore.getTime();
-                    this.#delayIsRunning = true;
 
                     requestAnimationFrame(() => {
                         this.#loopOnDelay({
                             start,
                             deltaTimeOnpause: 0,
                             delay,
-                            reject,
-                            res,
+                            mainReject,
+                            mainResolve,
                             previousSessionId,
                             tween,
-                            fn,
+                            stepFunction,
                             action,
                         });
                     });
@@ -653,17 +642,19 @@ export default class MobAsyncTimeline {
                     return;
                 }
 
+                /**
+                 * Here we resolve single tween promise
+                 */
                 resolveTweenPromise({
-                    reject,
-                    res,
-                    isStopped: this.#isStopped,
-                    startOnDelay: this.#startOnDelay,
-                    isInPause: this.#isInPause,
+                    mainReject,
+                    mainResolve,
+                    isStopped: () => this.#isStopped,
+                    isInPause: () => this.#isInPause,
                     addToActiveTween: (tween) => this.#addToActiveTween(tween),
-                    currentSessionId: this.#sessionId,
+                    currentSessionId: () => this.#sessionId,
                     previousSessionId,
                     tween,
-                    fn,
+                    stepFunction,
                     action,
                 });
             });
@@ -822,16 +813,8 @@ export default class MobAsyncTimeline {
                     });
                 }
             })
-            .catch(() => {
-                // If play or reverse or playFromLabel is fired diring delay tween fail
-                // After fail we can fire the action
-                if (this.#actionAfterReject.active) {
-                    console.log('actionAfterReject fired');
-                    this.#actionAfterReject.fn();
-                    this.#actionAfterReject.fn = () => {};
-                    this.#actionAfterReject.active = false;
-                    return;
-                }
+            .catch((/** @type {any} */ error) => {
+                if (error) console.log(error);
             })
             .finally(() => {
                 /**
@@ -848,22 +831,22 @@ export default class MobAsyncTimeline {
      * @param {number} param0.start
      * @param {number} param0.deltaTimeOnpause
      * @param {number} param0.delay
-     * @param {(value: any) => void} param0.reject - Timeline current group item promise
-     * @param {(value: any) => void} param0.res - Timeline current group item promise
+     * @param {(value: any) => void} param0.mainReject
+     * @param {(value: any) => void} param0.mainResolve
      * @param {number} param0.previousSessionId
      * @param {any} param0.tween
-     * @param {Record<string, () => void>} param0.fn
+     * @param {Record<string, () => void>} param0.stepFunction
      * @param {string} param0.action
      */
     #loopOnDelay({
         start,
         deltaTimeOnpause,
         delay,
-        reject,
-        res,
+        mainReject,
+        mainResolve,
         previousSessionId,
         tween,
-        fn,
+        stepFunction,
         action,
     }) {
         const current = MobCore.getTime();
@@ -871,41 +854,24 @@ export default class MobAsyncTimeline {
         /**
          * Time elapsed from the start of current timeline step.
          */
-        let delta = current - start;
+        const delta = current - start;
 
         /*
          * Time elapsed from pause() start.
          */
         if (this.#isInPause) deltaTimeOnpause = current - this.#timeOnPause;
 
-        /*
-         * #actionAfterReject cache next action ( play/playReverse ) when user call previous method and a tween is waitng delay end.
-         * this condition equalize delay && delta value so enter in the resolveTweenPromise function.
-         */
-        if (this.#actionAfterReject.active) {
-            deltaTimeOnpause = 0;
-            delta = delay;
-        }
-
         /**
          * RESOLVE DELAY:
          *
-         * Delta - deltaTimeOnpause: reconciliate time: total duration of current timeline step less time elapsed in
-         * pause. Loop #loopOnDelay until reconciliate time is minus delay time
-         *
-         * When reconciliate time is over delay value the tween should go ( delay is ended ). NOTE: dealy is timeline
-         * internal property not tween property. th if is the real delay check.
-         *
-         * If the time elapsed in current timeline step is over delay value need to resolve or reject timeline item
-         * group promsie. the same in case of stop new play, or reverse next
-         *
-         * If there is no problem run tween, if there is problem reject promise of current timeline group item, so
-         * timeline con go in next step.
-         *
-         * OK: resolve current timeline group promise. timeline group item promise is resolved by tweeen resolve.
-         *
-         * NO OK: reject current timeline group promise. if isStopped if play() if fired when pause status is active if
-         * sessionId change
+         * - Delta - deltaTimeOnpause: reconciliate time: total duration of current timeline step less time elapsed in
+         *   pause.
+         * - When reconciliate time is over delay value the tween should go ( delay is ended ). NOTE: dealy is timeline
+         *   internal property not tween property. th if is the real delay check.
+         * - If the time elapsed in current timeline step is over delay value need to resolve or reject timeline item
+         *   group promsie.
+         * - If there is no problem run tween, if there is problem reject promise of current timeline group item, so
+         *   timeline con go in next step.
          */
         if (
             delta - deltaTimeOnpause >= delay ||
@@ -913,23 +879,20 @@ export default class MobAsyncTimeline {
             this.#isReverseNext
         ) {
             /**
-             * Is settled to true on first loopOnDelay() execution.
+             * Here we resolve single tween promise
              */
-            this.#delayIsRunning = false;
-
             resolveTweenPromise({
-                reject,
-                res,
-                isStopped: this.#isStopped,
-                startOnDelay: this.#startOnDelay,
-                isInPause: this.#isInPause,
+                mainReject,
+                mainResolve,
+                isStopped: () => this.#isStopped,
+                isInPause: () => this.#isInPause,
                 addToActiveTween: (tween) => {
                     return this.#addToActiveTween(tween);
                 },
-                currentSessionId: this.#sessionId,
+                currentSessionId: () => this.#sessionId,
                 previousSessionId,
                 tween,
-                fn,
+                stepFunction,
                 action,
             });
 
@@ -944,11 +907,11 @@ export default class MobAsyncTimeline {
                 start,
                 deltaTimeOnpause,
                 delay,
-                reject,
-                res,
+                mainReject,
+                mainResolve,
                 previousSessionId,
                 tween,
-                fn,
+                stepFunction,
                 action,
             });
         });
@@ -1043,8 +1006,22 @@ export default class MobAsyncTimeline {
                     }
 
                     case 'goFrom': {
-                        timelineReverseGoFromWarning();
-                        this.stop();
+                        if (!this.#forceFromTo) {
+                            timelineReverseGoFromWarning();
+                            this.stop();
+                        }
+
+                        /**
+                         * With enable forceFromTo is the same of goFromTo
+                         */
+                        return {
+                            ...item,
+                            data: {
+                                ...data,
+                                valuesFrom: valuesTo,
+                                valuesTo: valuesFrom,
+                            },
+                        };
                     }
                 }
 
@@ -1144,28 +1121,43 @@ export default class MobAsyncTimeline {
         if (!asyncTimelineTweenIsValid(tween)) return this;
         tweenProps.delay = asyncTimelineDelayIsValid(tweenProps?.delay);
 
+        const inheritProps = reduceTweenUntilIndex({
+            timeline: this.#tweenList,
+            tween,
+            index: this.#tweenList.length,
+        });
+
         /**
          * Get previousValues until this step and merge with user data
          */
-        const previousValues = this.#inheritProps
-            ? reduceTweenUntilIndex({
-                  timeline: this.#tweenList,
-                  tween,
-                  index: this.#tweenList.length,
-              })
-            : {};
+        const previousValues =
+            this.#inheritProps || this.#forceFromTo ? inheritProps : {};
 
         this.#currentTweenCounter++;
 
-        this.#addAction({
-            ...this.#defaultObj,
-            id: this.#currentTweenCounter,
-            tween,
-            action: 'goTo',
-            valuesTo: { ...previousValues, ...valuesTo },
-            tweenProps: tweenProps ?? {},
-            groupProps: { waitComplete: this.#waitComplete },
-        });
+        if (this.#forceFromTo) {
+            this.#addAction({
+                ...this.#defaultObj,
+                id: this.#currentTweenCounter,
+                tween,
+                action: 'goFromTo',
+                valuesFrom: { ...previousValues },
+                valuesTo: { ...previousValues, ...valuesTo },
+
+                tweenProps: tweenProps ?? {},
+                groupProps: { waitComplete: this.#waitComplete },
+            });
+        } else {
+            this.#addAction({
+                ...this.#defaultObj,
+                id: this.#currentTweenCounter,
+                tween,
+                action: 'goTo',
+                valuesTo: { ...previousValues, ...valuesTo },
+                tweenProps: tweenProps ?? {},
+                groupProps: { waitComplete: this.#waitComplete },
+            });
+        }
 
         this.#addTweenToStore(tween);
         return this;
@@ -1178,28 +1170,42 @@ export default class MobAsyncTimeline {
         if (!asyncTimelineTweenIsValid(tween)) return this;
         tweenProps.delay = asyncTimelineDelayIsValid(tweenProps?.delay);
 
+        const inheritProps = reduceTweenUntilIndex({
+            timeline: this.#tweenList,
+            tween,
+            index: this.#tweenList.length,
+        });
+
         /**
          * Get previousValues until this step and merge with user data
          */
-        const previousValues = this.#inheritProps
-            ? reduceTweenUntilIndex({
-                  timeline: this.#tweenList,
-                  tween,
-                  index: this.#tweenList.length,
-              })
-            : {};
+        const previousValues =
+            this.#inheritProps || this.#forceFromTo ? inheritProps : {};
 
         this.#currentTweenCounter++;
 
-        this.#addAction({
-            ...this.#defaultObj,
-            id: this.#currentTweenCounter,
-            tween,
-            action: 'goFrom',
-            valuesFrom: { ...previousValues, ...valuesFrom },
-            tweenProps,
-            groupProps: { waitComplete: this.#waitComplete },
-        });
+        if (this.#forceFromTo) {
+            this.#addAction({
+                ...this.#defaultObj,
+                id: this.#currentTweenCounter,
+                tween,
+                action: 'goFromTo',
+                valuesFrom: { ...previousValues, ...valuesFrom },
+                valuesTo: { ...previousValues },
+                tweenProps: tweenProps ?? {},
+                groupProps: { waitComplete: this.#waitComplete },
+            });
+        } else {
+            this.#addAction({
+                ...this.#defaultObj,
+                id: this.#currentTweenCounter,
+                tween,
+                action: 'goFrom',
+                valuesFrom: { ...previousValues, ...valuesFrom },
+                tweenProps,
+                groupProps: { waitComplete: this.#waitComplete },
+            });
+        }
 
         this.#addTweenToStore(tween);
         return this;
@@ -1566,7 +1572,6 @@ export default class MobAsyncTimeline {
      */
     async playFrom(label) {
         await this.#waitFps();
-
         return this.#playFromUpDown(label, false);
     }
 
@@ -1575,7 +1580,6 @@ export default class MobAsyncTimeline {
      */
     async playFromReverse(label) {
         await this.#waitFps();
-
         return this.#playFromUpDown(label, true);
     }
 
@@ -1672,20 +1676,6 @@ export default class MobAsyncTimeline {
                 if (this.#tweenList.length === 0 || this.#addAsyncIsActive)
                     return;
 
-                /**
-                 * If a tween has delay and is not start reject main promise and fire the new pipe
-                 * This.#actionAfterReject will be fired when reject main promise.
-                 */
-                if (this.#delayIsRunning && !this.#actionAfterReject.active) {
-                    this.#startOnDelay = true;
-                    this.#actionAfterReject = {
-                        fn: () => this.play(),
-                        active: true,
-                    };
-                    return;
-                }
-
-                this.#startOnDelay = false;
                 this.stop();
                 this.#isStopped = false;
 
@@ -1780,7 +1770,6 @@ export default class MobAsyncTimeline {
             const currentResolve = resolve ?? thisResolve;
             const currentReject = reject ?? thisReject;
             const forceYoYoNow = forceYoYo;
-            const callbackNow = callback;
 
             if (this.#autoSet) this.#addSetBlocks();
 
@@ -1790,30 +1779,8 @@ export default class MobAsyncTimeline {
             if (this.#tweenList.length === 0 || this.#addAsyncIsActive) return;
 
             /**
-             * If a tween has delay and is not start reject main promise and fire the new pipe This.#actionAfterReject
-             * will be fired when reject main promise.
-             */
-            if (this.#delayIsRunning && !this.#actionAfterReject.active) {
-                this.#startOnDelay = true;
-
-                this.#actionAfterReject = {
-                    fn: () =>
-                        this.playReverse({
-                            forceYoYo: forceYoYoNow,
-                            callback: callbackNow,
-                            resolve: currentResolve,
-                            reject: currentReject,
-                        }),
-                    active: true,
-                };
-
-                return;
-            }
-
-            /**
              * Rest necessary props
              */
-            this.#startOnDelay = false;
             this.stop();
             this.#isStopped = false;
 
@@ -1907,11 +1874,11 @@ export default class MobAsyncTimeline {
      * @type {import('./type.js').AsyncTimelinePause}
      */
     pause() {
+        if (this.#isInPause) return;
+
         this.#isInPause = true;
         this.#timeOnPause = MobCore.getTime();
-        this.#currentTween.forEach(({ tween }) => {
-            tween?.pause?.();
-        });
+        this.#pauseAllTween();
     }
 
     /**
@@ -1921,7 +1888,8 @@ export default class MobAsyncTimeline {
         if (this.#isInPause) {
             this.#isInPause = false;
             this.#timeOnPause = 0;
-            this.#resumeEachTween();
+
+            this.#resumeAllTween();
         }
 
         if (this.#isInSuspension) {
@@ -1948,6 +1916,35 @@ export default class MobAsyncTimeline {
     }
 
     /**
+     * @returns {void}
+     */
+    #pauseAllTween() {
+        this.#currentTween.forEach(({ tween }) => {
+            tween?.pause?.();
+        });
+    }
+
+    /**
+     * @returns {void}
+     */
+    #resumeAllTween() {
+        this.#currentTween.forEach(({ tween }) => {
+            tween?.resume?.();
+        });
+    }
+
+    /**
+     * Unfreeze stagger used with subscribeCache. Use es: play after pause need restore stagger cache
+     *
+     * @returns {void}
+     */
+    // #unFreezeAllTweenStagger() {
+    //     this.#currentTween.forEach(({ tween }) => {
+    //         tween?.unFreezeStagger?.();
+    //     });
+    // }
+
+    /**
      * @type {() => void}
      */
     #resetUseLabel() {
@@ -1957,15 +1954,6 @@ export default class MobAsyncTimeline {
             isReverse: false,
             callback: undefined,
         };
-    }
-
-    /**
-     * @type {() => void}
-     */
-    #resumeEachTween() {
-        this.#currentTween.forEach(({ tween }) => {
-            tween?.resume?.();
-        });
     }
 
     /**
@@ -2105,10 +2093,6 @@ export default class MobAsyncTimeline {
             callback: undefined,
             index: -1,
             isReverse: false,
-        };
-        this.#actionAfterReject = {
-            active: false,
-            fn: () => {},
         };
     }
 }

@@ -714,21 +714,35 @@ export default class MobSyncTimeline {
     /**
      * @type {import('./type.js').SyncTimelinePause}
      */
-    pause() {
+    pause({ freezeCache = true } = {}) {
         if (this.#isStopped || this.#isInPause || this.#fpsIsInLoading) return;
 
         this.#isStopped = false;
         this.#isInPause = true;
+
+        if (freezeCache) {
+            this.#sequencers.forEach((item) => {
+                item.freezeCachedId();
+            });
+            return;
+        }
     }
 
     /**
      * @type {import('./type.js').SyncTimelineResume}
      */
-    resume() {
+    resume({ unFreezeCache = true } = {}) {
         if (this.#isStopped || !this.#isInPause || this.#fpsIsInLoading) return;
 
         this.#isStopped = false;
         this.#isInPause = false;
+
+        if (unFreezeCache) {
+            this.#sequencers.forEach((item) => {
+                item.unFreezeCachedId();
+            });
+            return;
+        }
     }
 
     /**

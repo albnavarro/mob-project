@@ -122,9 +122,9 @@ export default class MobSpring {
     #callbackOnComplete;
 
     /**
-     * @type {{ cb: () => boolean }[]}
+     * @type {{ validation: () => boolean; callback: () => void }[]}
      */
-    #callbackStartInPause;
+    #externalValidations;
 
     /**
      * @type {(() => void)[]}
@@ -145,6 +145,11 @@ export default class MobSpring {
      * @type {boolean}
      */
     #useStagger;
+
+    /**
+     * @type {boolean}
+     */
+    #staggerIsFreezed;
 
     /**
      * @type {boolean}
@@ -234,11 +239,12 @@ export default class MobSpring {
         this.#callback = [];
         this.#callbackCache = [];
         this.#callbackOnComplete = [];
-        this.#callbackStartInPause = [];
+        this.#externalValidations = [];
         this.#unsubscribeCache = [];
         this.#pauseStatus = false;
         this.#firstRun = true;
         this.#useStagger = true;
+        this.#staggerIsFreezed = false;
         this.#fpsInLoading = false;
         this.#defaultProps = {
             reverse: false,
@@ -282,13 +288,15 @@ export default class MobSpring {
          */
         const callBackObject = getValueObj(this.#values, 'currentValue');
 
-        defaultCallback({
-            stagger: this.#stagger,
-            callback: this.#callback,
-            callbackCache: this.#callbackCache,
-            callBackObject: callBackObject,
-            useStagger: this.#useStagger,
-        });
+        if (!this.#pauseStatus) {
+            defaultCallback({
+                stagger: this.#stagger,
+                callback: this.#callback,
+                callbackCache: this.#callbackCache,
+                callBackObject: callBackObject,
+                useStagger: this.#useStagger,
+            });
+        }
 
         /**
          * Check if all values is completed
@@ -297,8 +305,6 @@ export default class MobSpring {
 
         if (allSettled) {
             const onComplete = () => {
-                this.#isRunning = false;
-
                 /**
                  * End of animation Set fromValue with ended value At the next call fromValue become the start value
                  */
@@ -312,16 +318,16 @@ export default class MobSpring {
                 /**
                  * On complete
                  */
-                if (!this.#pauseStatus && this.#currentResolve) {
-                    this.#currentResolve(true);
+                this.#currentResolve?.(true);
+                this.#currentPromise = undefined;
+                this.#currentReject = undefined;
+                this.#currentResolve = undefined;
 
-                    /**
-                     * Set promise reference to null once resolved
-                     */
-                    this.#currentPromise = undefined;
-                    this.#currentReject = undefined;
-                    this.#currentResolve = undefined;
-                }
+                /**
+                 * Can happen that with fat pause/resume settled is resolve in pause. In this case consider pause ended.
+                 */
+                this.#pauseStatus = false;
+                this.#isRunning = false;
             };
 
             /**
@@ -454,23 +460,30 @@ export default class MobSpring {
             this.#fpsInLoading = false;
         }
 
-        initRaf(
-            this.#callbackStartInPause,
-            (time, fps) => this.#onReuqestAnim(time, fps),
-            () => this.pause()
-        );
+        /**
+         * - Check if tween should run.
+         * - External toll like async-timeline should use this method for avoid a tween that should be in pause run
+         *   accidentally.
+         */
+        initRaf({
+            validationFunction: this.#externalValidations,
+            defaultRafInit: (time, fps) => this.#onReuqestAnim(time, fps),
+        });
     }
 
     /**
-     * CAUTION. Use by asyncTimeline. If inside group with waitComplete: false the tween is not resolved and another
-     * step call the tween no new promise is created. Fire reject if there is one and set isRunning false. Next draw
-     * isRunning back to true
+     * AsyncTimeline utils.
+     *
+     * - We perform a Promise.reject() of the tween. We are sure that the tween can start with a new promise to resolve.
+     *   If in a Promise.race(), a tween continues because it is slower and risks not resolving its promise, we force
+     *   manual cleanup. Importantly, this must not happen when the tween is paused—forcing the this.#isRunning
+     *   parameter could interfere with the pause mechanism.
      *
      * @returns {void}
      */
     clearCurretPromise() {
-        if (this.#currentReject) {
-            this.#currentReject(MobCore.ANIMATION_STOP_REJECT);
+        if (!this.#pauseStatus) {
+            this.#currentReject?.(MobCore.ANIMATION_STOP_REJECT);
             this.#currentPromise = undefined;
             this.#currentReject = undefined;
             this.#currentResolve = undefined;
@@ -484,6 +497,8 @@ export default class MobSpring {
     stop({ clearCache = true, updateValues = true } = {}) {
         if (this.#pauseStatus) this.#pauseStatus = false;
         if (updateValues) this.#values = setFromToByCurrent(this.#values);
+
+        this.unFreezeStagger();
 
         /**
          * Clear stagger cache if needed.
@@ -503,6 +518,31 @@ export default class MobSpring {
     }
 
     /**
+     * @returns {void}
+     */
+    freezeStagger() {
+        if (this.#staggerIsFreezed) return;
+
+        this.#callbackCache.forEach(({ cb }) => MobCore.useCache.freeze(cb));
+        this.#staggerIsFreezed = true;
+    }
+
+    /**
+     * @param {object} [params]
+     * @param {boolean} [params.updateFrame]
+     * @returns {void}
+     */
+    unFreezeStagger({ updateFrame = true } = {}) {
+        if (!this.#staggerIsFreezed) return;
+
+        this.#callbackCache.forEach(({ cb }) =>
+            MobCore.useCache.unFreeze({ id: cb, update: updateFrame })
+        );
+
+        this.#staggerIsFreezed = false;
+    }
+
+    /**
      * @type {import('./type.js').SpringPause}
      */
     pause() {
@@ -510,6 +550,7 @@ export default class MobSpring {
         this.#pauseStatus = true;
         this.#isRunning = false;
         this.#values = setFromByCurrent(this.#values);
+        this.freezeStagger();
     }
 
     /**
@@ -518,6 +559,7 @@ export default class MobSpring {
     resume() {
         if (!this.#pauseStatus) return;
         this.#pauseStatus = false;
+        this.unFreezeStagger();
 
         if (!this.#isRunning && this.#currentResolve) {
             resume((time, fps) => this.#onReuqestAnim(time, fps));
@@ -632,10 +674,25 @@ export default class MobSpring {
      * @type {import('../../utils/type.js').GoTo<import('./type.js').SpringActions>} obj To Values
      */
     goTo(toObject, specialProps = {}) {
-        if (this.#pauseStatus) return new Promise((resolve) => resolve);
+        /**
+         * Skip if is in pause
+         */
+        if (this.#pauseStatus)
+            return Promise.reject(MobCore.ANIMATION_STOP_REJECT);
 
+        /**
+         * Enable stagger.
+         */
         this.#useStagger = true;
+
+        /**
+         * Normalize data
+         */
         const toObjectParsed = parseGoToObject(toObject);
+
+        /**
+         * Fire action
+         */
         return this.#doAction(toObjectParsed, toObject, specialProps);
     }
 
@@ -643,10 +700,25 @@ export default class MobSpring {
      * @type {import('../../utils/type.js').GoFrom<import('./type.js').SpringActions>} obj To Values
      */
     goFrom(fromObject, spacialProps = {}) {
-        if (this.#pauseStatus) return new Promise((resolve) => resolve);
+        /**
+         * Skip if is in pause
+         */
+        if (this.#pauseStatus)
+            return Promise.reject(MobCore.ANIMATION_STOP_REJECT);
 
+        /**
+         * Enable stagger.
+         */
         this.#useStagger = true;
+
+        /**
+         * Normalize data
+         */
         const fromObjectParsed = parseGoFromObject(fromObject);
+
+        /**
+         * Fire action
+         */
         return this.#doAction(fromObjectParsed, fromObject, spacialProps);
     }
 
@@ -654,15 +726,28 @@ export default class MobSpring {
      * @type {import('../../utils/type.js').GoFromTo<import('./type.js').SpringActions>} obj To Values
      */
     goFromTo(fromObject, toObject, specialProps = {}) {
-        if (this.#pauseStatus) return new Promise((resolve) => resolve);
+        /**
+         * Skip if is in pause
+         */
+        if (this.#pauseStatus)
+            return Promise.reject(MobCore.ANIMATION_STOP_REJECT);
+
+        /**
+         * Set does not need stagger.
+         */
         this.#useStagger = true;
 
-        // Check if fromObj has the same keys of toObj
+        /**
+         * Check if keys from/to is equal.
+         */
         if (!compareKeys(fromObject, toObject)) {
             compareKeysWarning('spring goFromTo:', fromObject, toObject);
             return new Promise((resolve) => resolve);
         }
 
+        /**
+         * Normalize data
+         */
         const objectParsed = parseGoFromToObject(fromObject, toObject);
         return this.#doAction(objectParsed, fromObject, specialProps);
     }
@@ -671,10 +756,25 @@ export default class MobSpring {
      * @type {import('../../utils/type.js').Set<import('./type.js').SpringActions>} obj To Values
      */
     set(setObject, specialProps = {}) {
-        if (this.#pauseStatus) return new Promise((resolve) => resolve);
+        /**
+         * Skip if is in pause
+         */
+        if (this.#pauseStatus)
+            return Promise.reject(MobCore.ANIMATION_STOP_REJECT);
 
+        /**
+         * Set does not need stagger.
+         */
         this.#useStagger = false;
+
+        /**
+         * Normalize data
+         */
         const setObjectParsed = parseSetObject(setObject);
+
+        /**
+         * Fire action
+         */
         return this.#doAction(setObjectParsed, setObject, specialProps);
     }
 
@@ -682,19 +782,47 @@ export default class MobSpring {
      * @type {import('../../utils/type.js').SetImmediate<import('./type.js').SpringActions>} obj To Values
      */
     setImmediate(setObject, specialProps = {}) {
-        // this.#value is updated below
-        if (this.#isRunning) this.stop({ updateValues: false });
+        /**
+         * Secure check, stop tween if is running, TODO:should remove ?
+         */
+        if (this.#isRunning)
+            this.stop({ clearCache: false, updateValues: false });
+
+        /**
+         * Skip if is in pause
+         */
         if (this.#pauseStatus) return;
 
+        /**
+         * Immediate does not need stagger.
+         */
         this.#useStagger = false;
+
+        /**
+         * Normalize data
+         */
         const setObjectParsed = parseSetObject(setObject);
+
+        /**
+         * Update values
+         */
         this.#values = mergeArray(setObjectParsed, this.#values);
 
+        /**
+         * Check and update reverse.
+         */
         const { reverse } = this.#mergeProps(specialProps ?? {});
         if (valueIsBooleanAndTrue(reverse, 'reverse'))
             this.#values = setReverseValues(setObject, this.#values);
 
+        /**
+         * Check and update relative.
+         */
         this.#values = setRelative(this.#values, this.#relative);
+
+        /**
+         * Finally update current value.
+         */
         this.#values = setFromCurrentByTo(this.#values);
         return;
     }
@@ -706,11 +834,21 @@ export default class MobSpring {
         this.#values = mergeArray(newObjectParsed, this.#values);
 
         const { reverse, immediate } = this.#mergeProps(spacialProps);
+
+        /**
+         * Check reverse.
+         */
         if (valueIsBooleanAndTrue(reverse, 'reverse'))
             this.#values = setReverseValues(newObjectRaw, this.#values);
 
+        /**
+         * Update relative.
+         */
         this.#values = setRelative(this.#values, this.#relative);
 
+        /**
+         * Execute immediate if settled and exit.
+         */
         if (valueIsBooleanAndTrue(immediate, 'immediate ')) {
             if (this.#isRunning) this.stop({ updateValues: false });
             this.#values = setFromCurrentByTo(this.#values);
@@ -952,14 +1090,20 @@ export default class MobSpring {
      * applied to the tween and before the delay ends the timeline pauses the tween at the end of the delay will
      * automatically pause. Add callback to start in pause to stack
      *
-     * @param {() => boolean} cb Cal function
-     * @returns {() => void} Unsubscribe callback
+     * @param {object} params
+     * @param {() => boolean} params.validation
+     * @param {() => void} params.callback
+     * @returns {() => void}
      */
-    onStartInPause(cb) {
-        const arrayOfCallbackUpdated = [...this.#callbackStartInPause, { cb }];
-        this.#callbackStartInPause = arrayOfCallbackUpdated;
+    validateInitialization({ validation, callback }) {
+        const valuesUpdated = [
+            ...this.#externalValidations,
+            { validation, callback },
+        ];
 
-        return () => (this.#callbackStartInPause = []);
+        this.#externalValidations = valuesUpdated;
+
+        return () => (this.#externalValidations = []);
     }
 
     /**
@@ -988,7 +1132,7 @@ export default class MobSpring {
     destroy() {
         if (this.#currentPromise) this.stop();
         this.#callbackOnComplete = [];
-        this.#callbackStartInPause = [];
+        this.#externalValidations = [];
         this.#callback = [];
         this.#callbackCache = [];
         this.#values = [];

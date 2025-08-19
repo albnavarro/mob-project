@@ -121,9 +121,9 @@ export default class MobTimeTween {
     #callbackOnComplete;
 
     /**
-     * @type {{ cb: () => boolean }[]}
+     * @type {{ validation: () => boolean; callback: () => void }[]}
      */
-    #callbackStartInPause;
+    #externalValidations;
 
     /**
      * @type {(() => void)[]}
@@ -134,11 +134,6 @@ export default class MobTimeTween {
      * @type {boolean}
      */
     #pauseStatus;
-
-    /**
-     * @type {boolean}
-     */
-    #comeFromResume;
 
     /**
      * @type {number}
@@ -164,6 +159,11 @@ export default class MobTimeTween {
      * @type {boolean}
      */
     #useStagger;
+
+    /**
+     * @type {boolean}
+     */
+    #staggerIsFreezed;
 
     /**
      * @type {boolean}
@@ -246,15 +246,15 @@ export default class MobTimeTween {
         this.#callback = [];
         this.#callbackCache = [];
         this.#callbackOnComplete = [];
-        this.#callbackStartInPause = [];
+        this.#externalValidations = [];
         this.#unsubscribeCache = [];
         this.#pauseStatus = false;
-        this.#comeFromResume = false;
         this.#startTime = 0;
         this.#timeElapsed = 0;
         this.#pauseTime = 0;
         this.#firstRun = true;
         this.#useStagger = true;
+        this.#staggerIsFreezed = false;
         this.#fpsInLoading = false;
         this.#defaultProps = {
             duration: this.#duration,
@@ -280,6 +280,7 @@ export default class MobTimeTween {
         if (this.#pauseStatus) {
             this.#pauseTime = time - this.#startTime - this.#timeElapsed;
         }
+
         this.#timeElapsed = time - this.#startTime - this.#pauseTime;
 
         if (Math.round(this.#timeElapsed) >= this.#duration) {
@@ -298,19 +299,18 @@ export default class MobTimeTween {
         // Prepare an obj to pass to the callback
         const callBackObject = getValueObj(this.#values, 'currentValue');
 
-        defaultCallback({
-            stagger: this.#stagger,
-            callback: this.#callback,
-            callbackCache: this.#callbackCache,
-            callBackObject: callBackObject,
-            useStagger: this.#useStagger,
-        });
+        if (!this.#pauseStatus) {
+            defaultCallback({
+                stagger: this.#stagger,
+                callback: this.#callback,
+                callbackCache: this.#callbackCache,
+                callBackObject: callBackObject,
+                useStagger: this.#useStagger,
+            });
+        }
 
         if (isSettled) {
             const onComplete = () => {
-                this.#isRunning = false;
-                this.#pauseTime = 0;
-
                 /**
                  * End of animation Set fromValue with ended value At the next call fromValue become the start value
                  */
@@ -324,15 +324,20 @@ export default class MobTimeTween {
                     };
                 });
 
-                // On complete
-                if (!this.#pauseStatus && this.#currentResolve) {
-                    this.#currentResolve(true);
+                /**
+                 * On complete
+                 */
+                this.#currentResolve?.(true);
+                this.#currentPromise = undefined;
+                this.#currentReject = undefined;
+                this.#currentResolve = undefined;
 
-                    // Set promise reference to null once resolved
-                    this.#currentPromise = undefined;
-                    this.#currentReject = undefined;
-                    this.#currentResolve = undefined;
-                }
+                /**
+                 * Can happen that with fat pause/resume settled is resolve in pause. In this case consider pause ended.
+                 */
+                this.#pauseTime = 0;
+                this.#pauseStatus = false;
+                this.#isRunning = false;
             };
 
             defaultCallbackOnComplete({
@@ -445,20 +450,36 @@ export default class MobTimeTween {
             this.#fpsInLoading = false;
         }
 
-        initRaf(
-            this.#callbackStartInPause,
-            (time) => this.#onReuqestAnim(time),
-            () => this.pause()
-        );
+        /**
+         * - Check if tween should run.
+         * - External toll like async-timeline should use this method for avoid a tween that should be in pause run
+         *   accidentally.
+         */
+        initRaf({
+            validationFunction: this.#externalValidations,
+            defaultRafInit: (time) => this.#onReuqestAnim(time),
+        });
     }
 
     /**
-     * TimeTween doasn/t need this method. It use always from/to value. Spring/lerp use only to value to be reactive,
-     * See that tween for reference.
+     * AsyncTimeline utils.
+     *
+     * - We perform a Promise.reject() of the tween. We are sure that the tween can start with a new promise to resolve.
+     *   If in a Promise.race(), a tween continues because it is slower and risks not resolving its promise, we force
+     *   manual cleanup. Importantly, this must not happen when the tween is paused—forcing the this.#isRunning
+     *   parameter could interfere with the pause mechanism.
      *
      * @returns {void}
      */
-    clearCurretPromise() {}
+    clearCurretPromise() {
+        if (!this.#pauseStatus) {
+            this.#currentReject?.(MobCore.ANIMATION_STOP_REJECT);
+            this.#currentPromise = undefined;
+            this.#currentReject = undefined;
+            this.#currentResolve = undefined;
+            this.#isRunning = false;
+        }
+    }
 
     /**
      * @type {import('./type.js').TimeTweenStop}
@@ -466,8 +487,10 @@ export default class MobTimeTween {
     stop({ clearCache = true, updateValues = true } = {}) {
         this.#pauseTime = 0;
         this.#pauseStatus = false;
-        this.#comeFromResume = false;
+
         if (updateValues) this.#values = setFromToByCurrent(this.#values);
+
+        this.unFreezeStagger();
 
         /**
          * Clear stagger cache if needed.
@@ -487,11 +510,37 @@ export default class MobTimeTween {
     }
 
     /**
+     * @returns {void}
+     */
+    freezeStagger() {
+        if (this.#staggerIsFreezed) return;
+
+        this.#callbackCache.forEach(({ cb }) => MobCore.useCache.freeze(cb));
+        this.#staggerIsFreezed = true;
+    }
+
+    /**
+     * @param {object} [params]
+     * @param {boolean} [params.updateFrame]
+     * @returns {void}
+     */
+    unFreezeStagger({ updateFrame = true } = {}) {
+        if (!this.#staggerIsFreezed) return;
+
+        this.#callbackCache.forEach(({ cb }) =>
+            MobCore.useCache.unFreeze({ id: cb, update: updateFrame })
+        );
+
+        this.#staggerIsFreezed = false;
+    }
+
+    /**
      * @type {import('./type.js').TimeTweenPause}
      */
     pause() {
         if (this.#pauseStatus) return;
         this.#pauseStatus = true;
+        this.freezeStagger();
     }
 
     /**
@@ -500,7 +549,7 @@ export default class MobTimeTween {
     resume() {
         if (!this.#pauseStatus) return;
         this.#pauseStatus = false;
-        this.#comeFromResume = true;
+        this.unFreezeStagger();
     }
 
     /**
@@ -582,10 +631,24 @@ export default class MobTimeTween {
      * @type {import('../../utils/type.js').GoTo<import('./type.js').TimeTweenAction>} obj To Values
      */
     goTo(toObject, specialProps = {}) {
-        if (this.#pauseStatus || this.#comeFromResume) this.stop();
+        /**
+         * Timeline tween need a clean restart, is not 'reactive' like spring or lerp.
+         */
+        this.stop({ clearCache: false, updateValues: true });
 
+        /**
+         * Enable stagger.
+         */
         this.#useStagger = true;
+
+        /**
+         * Normalize data
+         */
         const toObjectparsed = parseGoToObject(toObject);
+
+        /**
+         * Fire action
+         */
         return this.#doAction(toObjectparsed, toObject, specialProps);
     }
 
@@ -593,10 +656,24 @@ export default class MobTimeTween {
      * @type {import('../../utils/type.js').GoFrom<import('./type.js').TimeTweenAction>} obj To Values
      */
     goFrom(fromObject, specialProps = {}) {
-        if (this.#pauseStatus || this.#comeFromResume) this.stop();
+        /**
+         * Timeline tween need a clean restart, is not 'reactive' like spring or lerp.
+         */
+        this.stop({ clearCache: false, updateValues: true });
 
+        /**
+         * Enable stagger.
+         */
         this.#useStagger = true;
+
+        /**
+         * Normalize data
+         */
         const fromObjectParsed = parseGoFromObject(fromObject);
+
+        /**
+         * Fire action
+         */
         return this.#doAction(fromObjectParsed, fromObject, specialProps);
     }
 
@@ -604,15 +681,32 @@ export default class MobTimeTween {
      * @type {import('../../utils/type.js').GoFromTo<import('./type.js').TimeTweenAction>} obj To Values
      */
     goFromTo(fromObject, toObject, specialProps = {}) {
-        if (this.#pauseStatus || this.#comeFromResume) this.stop();
+        /**
+         * Timeline tween need a clean restart, is not 'reactive' like spring or lerp.
+         */
+        this.stop({ clearCache: false, updateValues: true });
 
+        /**
+         * Set does not need stagger.
+         */
         this.#useStagger = true;
+
+        /**
+         * Check if keys from/to is equal.
+         */
         if (!compareKeys(fromObject, toObject)) {
             compareKeysWarning('tween goFromTo:', fromObject, toObject);
             return new Promise((resolve) => resolve);
         }
 
+        /**
+         * Normalize data
+         */
         const objectParsed = parseGoFromToObject(fromObject, toObject);
+
+        /**
+         * Fire action
+         */
         return this.#doAction(objectParsed, fromObject, specialProps);
     }
 
@@ -620,15 +714,31 @@ export default class MobTimeTween {
      * @type {import('../../utils/type.js').Set<import('./type.js').TimeTweenAction>} obj To Values
      */
     set(setObject, specialProps = {}) {
-        if (this.#pauseStatus || this.#comeFromResume) this.stop();
+        /**
+         * Timeline tween need a clean restart, is not 'reactive' like spring or lerp.
+         */
+        this.stop({ clearCache: false, updateValues: true });
 
+        /**
+         * Set does not need stagger.
+         */
         this.#useStagger = false;
+
+        /**
+         * Normalize data
+         */
         const setObjectParsed = parseSetObject(setObject);
 
-        // In set mode duration is small as possible
+        /**
+         * Immediate is very fast, 1 ms
+         */
         const propsParsed = specialProps
             ? { ...specialProps, duration: 1 }
             : { duration: 1 };
+
+        /**
+         * Fire action
+         */
         return this.#doAction(setObjectParsed, setObject, propsParsed);
     }
 
@@ -636,22 +746,53 @@ export default class MobTimeTween {
      * @type {import('../../utils/type.js').SetImmediate<import('./type.js').TimeTweenAction>} obj To Values
      */
     setImmediate(setObject, specialProps = {}) {
-        // this.#value is updated below
-        if (this.#isRunning) this.stop({ updateValues: false });
+        /**
+         * Secure check, stop tween if is running, TODO:should remove ? updateValues in below
+         */
+        this.stop({ clearCache: false, updateValues: false });
+
+        /**
+         * Skip if is in pause
+         */
         if (this.#pauseStatus) return;
 
+        /**
+         * Immediate does not need stagger.
+         */
         this.#useStagger = false;
+
+        /**
+         * Normalize data
+         */
         const setObjectParsed = parseSetObject(setObject);
+
+        /**
+         * Immediate is very fast, 1 ms
+         */
         const propsParsed = specialProps
             ? { ...specialProps, duration: 1 }
             : { duration: 1 };
+
+        /**
+         * Update values
+         */
         this.#values = mergeArrayTween(setObjectParsed, this.#values);
 
+        /**
+         * Check and update reverse.
+         */
         const { reverse } = this.#mergeProps(propsParsed);
         if (valueIsBooleanAndTrue(reverse, 'reverse'))
             this.#values = setReverseValues(setObject, this.#values);
 
+        /**
+         * Check and update relative.
+         */
         this.#values = setRelativeTween(this.#values, this.#relative);
+
+        /**
+         * Finally update current value.
+         */
         this.#values = setFromCurrentByTo(this.#values);
         return;
     }
@@ -662,22 +803,32 @@ export default class MobTimeTween {
     #doAction(newObjectParsed, newObjectRaw, specialProps = {}) {
         this.#values = mergeArrayTween(newObjectParsed, this.#values);
 
-        if (this.#isRunning) {
-            /**
-             * Time tween need restart if called while running. this.#value is updated below
-             */
-            this.stop({ clearCache: false, updateValues: false });
-            this.#updateDataWhileRunning();
-        }
-
         const { reverse, immediate } = this.#mergeProps(specialProps);
+
+        /**
+         * Check reverse.
+         */
         if (valueIsBooleanAndTrue(reverse, 'reverse'))
             this.#values = setReverseValues(newObjectRaw, this.#values);
 
+        /**
+         * Update relative.
+         */
         this.#values = setRelativeTween(this.#values, this.#relative);
 
+        /**
+         * Execute immediate if settled and exit.
+         */
         if (valueIsBooleanAndTrue(immediate, 'immediate ')) {
-            if (this.#isRunning) this.stop({ updateValues: false });
+            /**
+             * Time tween need restart if called while running. this.#value is updated below At stop by default from/to
+             * value is updated, for next if only set/goTo is used without define from value.
+             */
+            if (this.#isRunning) {
+                this.stop({ clearCache: false, updateValues: false });
+                this.#updateDataWhileRunning();
+            }
+
             this.#values = setFromCurrentByTo(this.#values);
             return Promise.resolve();
         }
@@ -893,14 +1044,20 @@ export default class MobTimeTween {
      * applied to the tween and before the delay ends the timeline pauses the tween at the end of the delay will
      * automatically pause. Add callback to start in pause to stack
      *
-     * @param {() => boolean} cb Cal function
-     * @returns {() => void} Unsubscribe callback
+     * @param {object} params
+     * @param {() => boolean} params.validation
+     * @param {() => void} params.callback
+     * @returns {() => void}
      */
-    onStartInPause(cb) {
-        const arrayOfCallbackUpdated = [...this.#callbackStartInPause, { cb }];
-        this.#callbackStartInPause = arrayOfCallbackUpdated;
+    validateInitialization({ validation, callback }) {
+        const valuesUpdated = [
+            ...this.#externalValidations,
+            { validation, callback },
+        ];
 
-        return () => (this.#callbackStartInPause = []);
+        this.#externalValidations = valuesUpdated;
+
+        return () => (this.#externalValidations = []);
     }
 
     /**
@@ -931,7 +1088,7 @@ export default class MobTimeTween {
     destroy() {
         if (this.#currentPromise) this.stop();
         this.#callbackOnComplete = [];
-        this.#callbackStartInPause = [];
+        this.#externalValidations = [];
         this.#callback = [];
         this.#callbackCache = [];
         this.#values = [];

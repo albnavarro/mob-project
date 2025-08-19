@@ -42,8 +42,19 @@ export const freeMode = () => {
     /*
      * Timeline
      */
-    const goTimeline = MobTimeline.createAsyncTimeline({ freeMode: true });
-    const backTimeline = MobTimeline.createAsyncTimeline({ freeMode: true });
+    const goTimeline = MobTimeline.createAsyncTimeline({
+        freeMode: true,
+        autoSet: false,
+        inheritProps: false,
+        forceFromTo: false,
+    });
+
+    const backTimeline = MobTimeline.createAsyncTimeline({
+        freeMode: true,
+        autoSet: false,
+        inheritProps: false,
+        forceFromTo: false,
+    });
 
     goTimeline
         .createGroup()

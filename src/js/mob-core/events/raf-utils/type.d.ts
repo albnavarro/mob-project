@@ -28,6 +28,10 @@ export interface HandleCacheSubscriberValue {
     el: object | HTMLElement;
     fn: (arg0: any, arg1: object | HTMLElement) => void;
     data: Map<number, object>;
+    freeze: {
+        active: boolean;
+        atFrame: number;
+    };
 }
 
 export type HandleCacheSubscriberMap = Map<string, HandleCacheSubscriberValue>;

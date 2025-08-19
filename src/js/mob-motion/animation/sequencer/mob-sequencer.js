@@ -812,6 +812,22 @@ export default class MobSequencer {
     }
 
     /**
+     * ...
+     */
+    freezeCachedId() {
+        this.#callbackCache.forEach(({ cb }) => MobCore.useCache.freeze(cb));
+    }
+
+    /**
+     * ...
+     */
+    unFreezeCachedId() {
+        this.#callbackCache.forEach(({ cb }) =>
+            MobCore.useCache.unFreeze({ id: cb, update: true })
+        );
+    }
+
+    /**
      * Disable stagger for one run
      */
     disableStagger() {

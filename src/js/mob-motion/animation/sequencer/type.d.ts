@@ -84,6 +84,8 @@ export interface MasterSequencerItem {
     resetLastValue: () => void;
     cleanCachedId: () => void;
     destroy: () => void;
+    freezeCachedId: () => void;
+    unFreezeCachedId: () => void;
 }
 
 export interface CreateSequencerType<T> {

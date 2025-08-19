@@ -22,7 +22,7 @@ export const reduceTweenUntilIndex = ({ timeline, tween, index }) => {
      */
     const initialData = tween?.getInitialData?.() || {};
 
-    return timeline.slice(0, index).reduce((previous, current) => {
+    const result = timeline.slice(0, index).reduce((previous, current) => {
         const currentTween = current.find(({ data }) => {
             const uniqueId = data?.tween?.getId?.();
             return uniqueId === currentId;
@@ -48,4 +48,10 @@ export const reduceTweenUntilIndex = ({ timeline, tween, index }) => {
 
         return { ...previous, ...propsInUse };
     }, initialData);
+
+    /**
+     * Reset tween to initial value.
+     */
+    tween.setImmediate(initialData);
+    return result;
 };

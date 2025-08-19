@@ -29,8 +29,8 @@ export type syncTimelinePlayFromReverse = (
     value?: number | string
 ) => Promise<any>;
 
-export type SyncTimelinePause = () => void;
-export type SyncTimelineResume = () => void;
+export type SyncTimelinePause = (arg0?: { freezeCache?: boolean }) => void;
+export type SyncTimelineResume = (arg0?: { unFreezeCache?: boolean }) => void;
 export type SyncTimelineReverse = () => void;
 
 export type SyncTimelineStop = (arg0?: {

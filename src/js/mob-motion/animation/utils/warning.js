@@ -94,7 +94,7 @@ export const timelineSuspendWarning = (val) => {
  */
 export const timelineReverseGoFromWarning = () => {
     console.warn(
-        `SyncTimeline: in revese ( or yoyo mode) only goTo || goFromTo || set action is allowed. Using goFrom makes no sense in this context. Timeline will stopped.`
+        `SyncTimeline: in revese ( or yoyo mode) only goTo || goFromTo || set action is allowed. Using goFrom makes no sense in this context. Enable forceFromTo to use from action in reverse mode`
     );
 };
 

@@ -1,6 +1,9 @@
 import { GoFrom, GoFromTo, GoTo, Set, SetImmediate } from '../../utils/type';
+import MobLerp from '../lerp/mob-lerp';
 import { LerpActions } from '../lerp/type';
+import MobSpring from '../spring/mob-spring';
 import { SpringActions } from '../spring/type';
+import MobTimeTween from '../tween/mob-time-tween';
 import { TimeTweenAction } from '../tween/type';
 import {
     DirectionTypeAsync,
@@ -37,6 +40,8 @@ export interface AsyncTimeline {
     autoSet?: boolean;
 
     inheritProps?: boolean;
+
+    forceFromTo?: boolean;
 }
 
 export interface AsyncTimelineTypeSpecialProps
@@ -46,24 +51,13 @@ export interface AsyncTimelineTypeSpecialProps
     delay?: number;
 }
 
-export interface AsyncTimelineTween {
-    getId: () => string;
+export type AsyncTimelineTween = (MobSpring | MobLerp | MobTimeTween) & {
     set: Set<LerpActions | SpringActions | TimeTweenAction>;
     setImmediate: SetImmediate<LerpActions | SpringActions | TimeTweenAction>;
     goTo: GoTo<LerpActions | SpringActions | TimeTweenAction>;
     goFrom: GoFrom<LerpActions | SpringActions | TimeTweenAction>;
     goFromTo: GoFromTo<LerpActions | SpringActions | TimeTweenAction>;
-    getToNativeType: () => Record<string, number | (() => number)>;
-    destroy: () => void;
-    onStartInPause: (cb: () => boolean) => void;
-    resetData: () => void;
-    getInitialData: () => Record<string, number>;
-    stop: (arg0?: { clearCache: boolean }) => any;
-    pause?: () => void;
-    resume?: () => void;
-    isActive?: () => boolean;
-    clearCurretPromise?: () => void;
-}
+};
 
 export interface AsyncTimelineRowData {
     action: string;

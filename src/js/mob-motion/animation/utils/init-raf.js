@@ -1,22 +1,38 @@
 import { MobCore } from '../../../mob-core';
 
 /**
- * Fire mean request animation frame function. In case the is some function add form timeline fire pauseFUnction.
+ * - Execute request animation frame init function.
+ * - After default run, execute user function if there is one.
+ * - Validate function start from external tool ( eg: asynctimeline ).
  *
- * @param {{ cb: () => boolean }[]} callbackPauseArray
- * @param {(time: number, fps: number) => void} rafFunction
- * @param {() => void} pauseFunction
+ * @param {object} params
+ * @param {{ validation: () => boolean; callback: () => void }[]} params.validationFunction
+ * @param {(time: number, fps: number) => void} params.defaultRafInit
  * @returns {void}
  */
-export const initRaf = (callbackPauseArray, rafFunction, pauseFunction) => {
+export const initRaf = ({ validationFunction, defaultRafInit }) => {
     MobCore.useFrame(() => {
         MobCore.useNextTick(({ time, fps }) => {
-            const prevent = callbackPauseArray
-                .map(({ cb }) => cb())
-                .includes(true);
+            /**
+             * Find first validation that retrurn true from last inserted.
+             */
+            const result = validationFunction.findLast(({ validation }) =>
+                validation()
+            );
 
-            rafFunction(time, fps);
-            if (prevent) pauseFunction();
+            /**
+             * Default run
+             */
+            defaultRafInit(time, fps);
+
+            /**
+             * After default initialization launch custom function if there is one. Fire callback
+             */
+            if (result) {
+                result?.callback();
+                console.log('custom tween run function extrecuted');
+                return;
+            }
         });
     });
 };
