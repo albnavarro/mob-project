@@ -13,7 +13,7 @@ export const eventStore = mobStore(
          * Use passive event.
          */
         usePassive: () => ({
-            value: true,
+            value: false,
             type: Boolean,
         }),
 

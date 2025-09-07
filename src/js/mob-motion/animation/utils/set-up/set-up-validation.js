@@ -46,7 +46,8 @@ export const mqDefault = {
     tablet: 768,
     desktop: 992,
     large: 1200,
-    xLarge: 1400,
+    xLarge: 1600,
+    xxLarge: 1980,
 };
 export const sequencerDurationDefault = 10;
 export const lerpConfigDefault = 0.06;

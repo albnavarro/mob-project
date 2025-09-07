@@ -22,7 +22,7 @@ export default class MobMasterSequencer {
     /**
      * @trype {string}
      */
-    #type;
+    #type = 'sequencer';
 
     /**
      * @type {import('./type').MasterSequencerItem[]}
@@ -30,7 +30,6 @@ export default class MobMasterSequencer {
     #children;
 
     constructor() {
-        this.#type = 'sequencer';
         this.#children = [];
     }
 

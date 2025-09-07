@@ -28,57 +28,57 @@ export class MobSmoothScroller {
     /**
      * @type {boolean}
      */
-    #propsIsValid;
+    #propsIsValid = true;
 
     /**
      * @type {number}
      */
-    #endValue;
+    #endValue = 0;
 
     /**
      * @type {number}
      */
-    #percent;
+    #percent = 0;
 
     /**
      * @type {number}
      */
-    #screenWidth;
+    #screenWidth = 0;
 
     /**
      * @type {number}
      */
-    #screenHeight;
+    #screenHeight = 0;
 
     /**
      * @type {number}
      */
-    #firstTouchValue;
+    #firstTouchValue = 0;
 
     /**
      * @type {number}
      */
-    #threshold;
+    #threshold = 30;
 
     /**
      * @type {number}
      */
-    #maxValue;
+    #maxValue = 0;
 
     /**
      * @type {boolean}
      */
-    #dragEnable;
+    #dragEnable = false;
 
     /**
      * @type {number}
      */
-    #prevTouchVal;
+    #prevTouchVal = 0;
 
     /**
      * @type {number}
      */
-    #touchVal;
+    #touchVal = 0;
 
     /**
      * @type {() => void}
@@ -142,6 +142,12 @@ export class MobSmoothScroller {
     #subscribeMouseClick;
 
     /**
+     * @type {() => void}
+     * @returns {void}
+     */
+    #subscribeDebuoceWhell;
+
+    /**
      * @type {MobLerp | MobSpring}
      */
     #motion;
@@ -149,12 +155,12 @@ export class MobSmoothScroller {
     /**
      * @type {() => void}
      */
-    #unsubscribeMotion;
+    #subscribeMotion;
 
     /**
      * @type {() => void}
      */
-    #unsubscribeOnComplete;
+    #subscribeOnComplete;
 
     /**
      * @type {string}
@@ -228,7 +234,7 @@ export class MobSmoothScroller {
     /**
      * @type {boolean}
      */
-    #swipeisActive;
+    #swipeisActive = false;
 
     /**
      * @type {any[]}
@@ -248,12 +254,12 @@ export class MobSmoothScroller {
     /**
      * @type {number}
      */
-    #lastSpinX;
+    #lastSpinX = 0;
 
     /**
      * @type {number}
      */
-    #lastSpinY;
+    #lastSpinY = 0;
 
     /**
      * @type {boolean}
@@ -312,20 +318,6 @@ export class MobSmoothScroller {
      * @param {import('./type.js').MobSmoothScroller} data
      */
     constructor(data) {
-        this.#propsIsValid = true;
-        this.#endValue = 0;
-        this.#percent = 0;
-        this.#screenWidth = 0;
-        this.#screenHeight = 0;
-        this.#firstTouchValue = 0;
-        this.#threshold = 30;
-        this.#maxValue = 0;
-        this.#dragEnable = false;
-        this.#prevTouchVal = 0;
-        this.#touchVal = 0;
-        this.#lastSpinX = 0;
-        this.#lastSpinY = 0;
-        this.#swipeisActive = false;
         this.#subscribeResize = NOOP;
         this.#subscribeScrollStart = NOOP;
         this.#subscribeScrollEnd = NOOP;
@@ -337,10 +329,12 @@ export class MobSmoothScroller {
         this.#subscribeMouseMove = NOOP;
         this.#subscribeTouchMove = NOOP;
         this.#subscribeMouseClick = NOOP;
+        this.#subscribeDebuoceWhell = NOOP;
+
         // @ts-ignore
         this.#motion = {};
-        this.#unsubscribeMotion = NOOP;
-        this.#unsubscribeOnComplete = NOOP;
+        this.#subscribeMotion = NOOP;
+        this.#subscribeOnComplete = NOOP;
         this.#direction = directionIsValid(data?.direction, 'SmoothScroller');
         this.#isDestroyed = false;
 
@@ -463,6 +457,8 @@ export class MobSmoothScroller {
         });
 
         this.#scopedWhell = (event) => {
+            this.#addWhellingClass();
+
             const { spinY } = MobCore.normalizeWheel(event);
             this.#onScopedWhell({
                 spinY,
@@ -483,6 +479,35 @@ export class MobSmoothScroller {
                 },
             });
         };
+
+        /**
+         * Remove wheeling class at the end of wheel.
+         */
+        this.#subscribeDebuoceWhell = MobCore.useMouseWheel(
+            MobCore.debounce(() => {
+                this.#removeWhellingClass();
+            }, 500)
+        );
+    }
+
+    /**
+     * @type {() => void}
+     */
+    #removeWhellingClass() {
+        if (!this.#scroller) return;
+
+        // @ts-ignore
+        this.#scroller.classList.remove('is-whelling');
+    }
+
+    /**
+     * @type {() => void}
+     */
+    #addWhellingClass() {
+        if (!this.#scroller) return;
+
+        // @ts-ignore
+        this.#scroller.classList.add('is-whelling');
     }
 
     /**
@@ -513,6 +538,7 @@ export class MobSmoothScroller {
 
             default: {
                 this.#motion = new MobLerp();
+                this.#motion.updateVelocity(0.1);
                 break;
             }
         }
@@ -544,7 +570,12 @@ export class MobSmoothScroller {
                     passive: true,
                 }
             );
-        } else {
+        }
+
+        /**
+         * Non scoped event
+         */
+        if (!this.#scopedEvent) {
             this.#subscribeMouseWheel = MobCore.useMouseWheel((data) => {
                 this.#detectSwipe(data);
                 this.#onWhell(data);
@@ -704,11 +735,11 @@ export class MobSmoothScroller {
         if (!this.#motion) return;
 
         this.#motion.setData({ val: 0 });
-        this.#unsubscribeMotion = this.#motion.subscribe(({ val }) => {
+        this.#subscribeMotion = this.#motion.subscribe(({ val }) => {
             /** @type {HTMLElement} */ (this.#scroller).style.transform =
                 this.#direction == MobScrollerConstant.DIRECTION_VERTICAL
-                    ? `translate3d(0px, 0px, 0px) translateY(${-val}px)`
-                    : `translate3d(0px, 0px, 0px) translateX(${-val}px)`;
+                    ? `translate3d(0px, 0px, 0px) translateY(${-Math.trunc(val)}px)`
+                    : `translate3d(0px, 0px, 0px) translateX(${-Math.trunc(val)}px)`;
 
             /**
              * TODO Move to scroll Start (scopedEvent or not , wheel touch etc...) Used by instance with ease = true;
@@ -733,11 +764,11 @@ export class MobSmoothScroller {
             });
         });
 
-        this.#unsubscribeOnComplete = this.#motion.onComplete(({ val }) => {
+        this.#subscribeOnComplete = this.#motion.onComplete(({ val }) => {
             /** @type {HTMLElement} */ (this.#scroller).style.transform =
                 this.#direction == MobScrollerConstant.DIRECTION_VERTICAL
-                    ? `translateY(${-val}px)`
-                    : `translateX(${-val}px)`;
+                    ? `translateY(${-Math.trunc(val)}px)`
+                    : `translateX(${-Math.trunc(val)}px)`;
 
             MobCore.useNextTick(() => {
                 this.#onTickCallback({
@@ -799,13 +830,32 @@ export class MobSmoothScroller {
     }
 
     /**
+     * Speed variation by screensize
+     */
+    #getDelta() {
+        return this.#direction === MobScrollerConstant.DIRECTION_HORIZONTAL
+            ? this.#screenWidth / 1920
+            : this.#screenHeight / 1080;
+    }
+
+    /**
      * @type {(arg0: { spinY: number }) => void}
      */
-    #onScopedWhell({ spinY }) {
+    #onScopedWhell({ spinY = 0 }) {
         if (!mq[this.#queryType](this.#breakpoint)) return;
 
         this.#dragEnable = false;
-        this.#endValue += spinY * this.#speed;
+
+        /**
+         * Speed variation by screensize
+         */
+        const delta = this.#getDelta();
+
+        /**
+         * Normalize spinValue between -1 && 1.
+         */
+        const spinYParsed = clamp(spinY, -1, 1);
+        this.#endValue += spinYParsed * this.#speed * delta;
         this.#calculateValue();
     }
 
@@ -878,13 +928,9 @@ export class MobSmoothScroller {
     /**
      * @type {import('./type.js').MobSmoothScrollerOnMouseEvent}
      */
-    #onWhell({ target, spinY, spinX, preventDefault }) {
-        if (
-            !mq[this.#queryType](this.#breakpoint) ||
-            (!spinY && spinY !== 0) ||
-            (!spinX && spinX !== 0)
-        )
-            return;
+    #onWhell({ target, spinY = 0, spinX = 0, preventDefault }) {
+        if (!mq[this.#queryType](this.#breakpoint)) return;
+        this.#addWhellingClass();
 
         if (
             target === this.#scroller ||
@@ -894,11 +940,18 @@ export class MobSmoothScroller {
             )
         ) {
             this.#dragEnable = false;
+
             preventDefault?.();
+            FreezeMobPageScroll();
 
             const spinXdiff = Math.abs(this.#lastSpinX - spinX);
             const spinYdiff = Math.abs(this.#lastSpinY - spinY);
 
+            /**
+             * In horizontal mode, allow scroll in X and Y direction if no swipe is used.
+             *
+             * With swipe enabled use only vertical wheel, both vertical && horizontal mode.
+             */
             const spinValue =
                 this.#useHorizontalScroll && !this.#useSwipe
                     ? (() => {
@@ -906,10 +959,22 @@ export class MobSmoothScroller {
                       })()
                     : spinY;
 
-            this.#endValue += spinValue * this.#speed;
+            /**
+             * When there is no advanced return;
+             */
+            if (Math.abs(spinValue) === 0) return;
 
+            /**
+             * Speed variation by screensize
+             */
+            const delta = this.#getDelta();
+
+            /**
+             * Normalize spinValue between -1 && 1.
+             */
+            this.#endValue +=
+                clamp(spinValue, -1, 1) * this.#speed * clamp(delta, 1, 10);
             this.#calculateValue();
-            FreezeMobPageScroll();
             this.#lastSpinY = spinY;
             this.#lastSpinX = spinX;
         }
@@ -1081,8 +1146,9 @@ export class MobSmoothScroller {
         this.#subscribeMouseMove();
         this.#subscribeTouchMove();
         this.#subscribeMouseClick();
-        this.#unsubscribeMotion();
-        this.#unsubscribeOnComplete();
+        this.#subscribeMotion();
+        this.#subscribeOnComplete();
+        this.#subscribeDebuoceWhell();
         this.#motion?.destroy();
         // @ts-ignore
         this.#motion = null;

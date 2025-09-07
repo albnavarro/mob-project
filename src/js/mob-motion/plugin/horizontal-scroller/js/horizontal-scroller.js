@@ -27,42 +27,42 @@ export class MobHorizontalScroller {
     /**
      * @type {boolean}
      */
-    #propsisValid;
+    #propsisValid = true;
 
     /**
      * @type {number}
      */
-    #triggerTopPosition;
+    #triggerTopPosition = 0;
 
     /**
      * @type {boolean}
      */
-    #touchActive;
+    #touchActive = false;
 
     /**
      * @type {number}
      */
-    #lastTouchValueX;
+    #lastTouchValueX = 0;
 
     /**
      * @type {number}
      */
-    #dragSecureAreaBottom;
+    #dragSecureAreaBottom = 100;
 
     /**
      * @type {number}
      */
-    #dragSecureAreaTop;
+    #dragSecureAreaTop = 100;
 
     /**
      * @type {boolean}
      */
-    #shouldDragValue;
+    #shouldDragValue = false;
 
     /**
      * @type {number}
      */
-    #scrollValue;
+    #scrollValue = 0;
 
     /**
      * @type {() => void}
@@ -398,14 +398,6 @@ export class MobHorizontalScroller {
      * @param {import('./type').MobHorizontalScroller} data
      */
     constructor(data) {
-        this.#propsisValid = true;
-        this.#triggerTopPosition = 0;
-        this.#touchActive = false;
-        this.#lastTouchValueX = 0;
-        this.#dragSecureAreaBottom = 100;
-        this.#dragSecureAreaTop = 100;
-        this.#shouldDragValue = false;
-        this.#scrollValue = 0;
         this.#unsubscribeScroll = () => {};
         this.#firstTouchValue = 0;
         this.#container = data?.container ?? '';

@@ -74,6 +74,12 @@ export const loadFps = (duration = 30) => {
             // convert to seconds
             now *= 0.001;
 
+            if (then === 0) {
+                then = now;
+                requestAnimationFrame(render);
+                return;
+            }
+
             // compute time since last frame
             const deltaTime = now - then;
 

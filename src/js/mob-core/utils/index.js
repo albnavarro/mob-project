@@ -313,6 +313,15 @@ export function isVisibleInViewport(element) {
 }
 
 /**
+ * @param {HTMLElement} element
+ * @returns {boolean}
+ */
+export function isVisibleInViewportSmart(element) {
+    var rect = element.getBoundingClientRect();
+    return rect.top >= 0 && rect.bottom <= window.innerHeight;
+}
+
+/**
  * @param {number} num
  * @param {number} lower
  * @param {number} upper

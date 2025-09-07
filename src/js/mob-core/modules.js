@@ -1,3 +1,5 @@
+export { throttle } from './events/throttle.js';
+export { debounceFuncion as debounce } from './events/debounce.js';
 import { eventStore } from './events/event-store.js';
 import { handleLoad } from './events/load-utils/handle-load.js';
 import {

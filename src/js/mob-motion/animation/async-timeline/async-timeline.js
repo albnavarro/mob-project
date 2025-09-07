@@ -975,8 +975,8 @@ export default class MobAsyncTimeline {
      */
     #revertTween() {
         this.#isReverse = !this.#isReverse;
-        this.#tweenList = this.#tweenList.reverse().map((group) => {
-            return group.reverse().map((item) => {
+        this.#tweenList = this.#tweenList.toReversed().map((group) => {
+            return group.toReversed().map((item) => {
                 const { data } = item;
                 const { action, valuesFrom, prevValueTo, valuesTo } = data;
 

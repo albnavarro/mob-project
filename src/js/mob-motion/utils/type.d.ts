@@ -1,15 +1,19 @@
 import { AllActionType } from '../animation/utils/tween-action/type';
 
+export type StringWithAutocomplete<T> = T | (string & Record<never, never>);
+
 export type MqAction = 'min' | 'max';
 export type MqActionMethods = 'min' | 'max' | 'get';
-export type MqValues =
+export type MqValues = StringWithAutocomplete<
     | 'xSmall'
     | 'small'
     | 'medium'
     | 'tablet'
     | 'desktop'
     | 'large'
-    | 'xLarge';
+    | 'xLarge'
+    | 'xxLarge'
+>;
 
 // Tween/Spring/Lerp commone action type
 

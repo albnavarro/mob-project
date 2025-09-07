@@ -11,17 +11,17 @@ export class MobScrollerPin {
     /**
      * @type {number}
      */
-    #scrollerHeight;
+    #scrollerHeight = 0;
 
     /**
      * @type {number}
      */
-    #start;
+    #start = 0;
 
     /**
      * @type {number}
      */
-    #startFromTop;
+    #startFromTop = 0;
 
     /**
      * @type {boolean | undefined}
@@ -236,9 +236,6 @@ export class MobScrollerPin {
     #anticipatePinOnLoad;
 
     constructor() {
-        this.#scrollerHeight = 0;
-        this.#start = 0;
-        this.#startFromTop = 0;
         this.#invertSide = undefined;
         this.#end = 0;
         this.#getStart = () => 0;

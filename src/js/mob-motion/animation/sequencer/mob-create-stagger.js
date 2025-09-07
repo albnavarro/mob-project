@@ -226,7 +226,7 @@ export const MobCreateStaggers = (data) => {
      * 3 - The length of resulted array is the number of 'chunck' es: 3
      */
     const frameArray = staggerArrayFiltered.map(({ frame }) => frame);
-    const frameSet = [...new Set(frameArray)].sort((a, b) => a - b);
+    const frameSet = [...new Set(frameArray)].toSorted((a, b) => a - b);
     const numItem = frameSet.length;
 
     /*

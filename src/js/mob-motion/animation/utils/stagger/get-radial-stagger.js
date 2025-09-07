@@ -162,7 +162,7 @@ export const getRadialArray = (arr, stagger) => {
                       },
                       []
                   )
-                  .reverse();
+                  .toReversed();
 
     // Remove empty row added at start
     const cleanArray = finalArray.reduce(

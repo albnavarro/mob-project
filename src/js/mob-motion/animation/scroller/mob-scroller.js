@@ -59,47 +59,47 @@ export default class MobScroller {
     /**
      * @type {boolean}
      */
-    #isInzialized;
+    #isInzialized = false;
 
     /**
      * @type {boolean}
      */
-    #willChangeIsActive;
+    #willChangeIsActive = false;
 
     /**
      * @type {number}
      */
-    #offset;
+    #offset = 0;
 
     /**
      * @type {number}
      */
-    #screenPosition;
+    #screenPosition = 0;
 
     /**
      * @type {number}
      */
-    #endValue;
+    #endValue = 0;
 
     /**
      * @type {number}
      */
-    #height;
+    #height = 0;
 
     /**
      * @type {number}
      */
-    #width;
+    #width = 0;
 
     /**
      * @type {number}
      */
-    #scrollerScroll;
+    #scrollerScroll = 0;
 
     /**
      * @type {number}
      */
-    #scrollerHeight;
+    #scrollerHeight = 0;
 
     /**
      * @type {number}
@@ -580,15 +580,6 @@ export default class MobScroller {
      */
 
     constructor(data) {
-        this.#isInzialized = false;
-        this.#willChangeIsActive = false;
-        this.#offset = 0;
-        this.#screenPosition = 0;
-        this.#endValue = 0;
-        this.#height = 0;
-        this.#width = 0;
-        this.#scrollerScroll = 0;
-        this.#scrollerHeight = 0;
         this.#windowInnerWidth = window.innerWidth;
         this.#windowInnerHeight = window.innerHeight;
         this.#gap = 150;

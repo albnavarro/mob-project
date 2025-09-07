@@ -49,10 +49,10 @@ const objectAreEqual = (obj1, obj2, checkDataOrder = false) => {
     let _obj2 = obj2;
     if (!checkDataOrder) {
         if (Array.isArray(obj1)) {
-            _obj1 = [...obj1].sort();
+            _obj1 = [...obj1].toSorted();
         }
         if (Array.isArray(obj2)) {
-            _obj2 = [...obj2].sort();
+            _obj2 = [...obj2].toSorted();
         }
     }
     if (typeof _obj1 !== 'object' || typeof _obj2 !== 'object') {
