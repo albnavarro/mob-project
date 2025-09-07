@@ -1,6 +1,9 @@
 import { MobScroll, MobTween } from '../mob-motion';
+import { InitMobPageScroll } from '../mob-motion/plugin/page-scroll/page-scroller';
 
 export function indexParallax() {
+    InitMobPageScroll({ rootElement: document.querySelector('main') });
+
     /**
      * Sequencer
      */
@@ -43,8 +46,8 @@ export function indexParallax() {
         propierties: 'tween',
         tween: myParallaxTimeline,
         breackpoint: 'medium',
-        start: 'bottom',
-        end: 'top -height',
+        start: 'bottom +height +100px',
+        end: 'top +height',
         ease: true,
         marker: 'parallax-timeline',
     });

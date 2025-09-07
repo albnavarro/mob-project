@@ -921,7 +921,9 @@ export default class MobScroller {
              * First render
              */
             this.#easeRender();
-        } else {
+        }
+
+        if (!this.#ease) {
             if (this.#scroller === globalThis) {
                 this.#unsubscribeScroll = getScrollFunction({
                     pin: this.#pin,
