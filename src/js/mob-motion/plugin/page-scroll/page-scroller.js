@@ -1,6 +1,5 @@
 import { MobMotionCore, MobTween } from '../..';
 import { MobCore } from '../../../mob-core';
-import { clamp } from '../../core';
 
 /** @type {number} */
 let windowInnerheight = window.innerHeight;
@@ -84,11 +83,7 @@ const MobPageScroller = ({ velocity, rootElement }) => {
         useNativeScroll = false;
         addWhellingClass();
 
-        /**
-         * Normalize spinValue between -1 && 1.
-         */
-        const spinY = clamp(event.spinY ?? 0, -1, 1);
-
+        const spinY = event.spinY ?? 0;
         const currentValue = MobMotionCore.clamp(
             spinY * velocity + lastScrollValue,
             0,

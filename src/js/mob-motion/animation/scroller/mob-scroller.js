@@ -582,7 +582,7 @@ export default class MobScroller {
     constructor(data) {
         this.#windowInnerWidth = window.innerWidth;
         this.#windowInnerHeight = window.innerHeight;
-        this.#gap = 150;
+        this.#gap = 800;
         this.#numericRange = 0;
         this.#unsubscribeResize = () => {};
         this.#unsubscribeScroll = () => {};
@@ -1867,7 +1867,9 @@ export default class MobScroller {
         // Prefixed align
         switch (this.#align) {
             case MobScrollerConstant.ALIGN_START: {
-                return this.#scrollerScroll / rangeNumber;
+                return (
+                    (this.#scrollerScroll + this.#screenPosition) / rangeNumber
+                );
             }
 
             case MobScrollerConstant.ALIGN_TOP:
