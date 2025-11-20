@@ -1106,6 +1106,7 @@ export default class MobSpring {
 
         this.#externalValidations = valuesUpdated;
 
+        // eslint-disable-next-line unicorn/consistent-function-scoping
         return () => (this.#externalValidations = []);
     }
 

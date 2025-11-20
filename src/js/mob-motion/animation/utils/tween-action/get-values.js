@@ -6,13 +6,21 @@
  * @returns {Record<string, number>}
  */
 export const getValueObj = (arr, key) => {
-    return arr
-        .map((item) => ({ [item['prop']]: Number.parseFloat(item[key]) }))
-        .reduce((p, c) => ({ ...p, ...c }), {});
+    return Object.fromEntries(
+        arr.map((item) => {
+            const value = item[key];
+            return [
+                item['prop'],
+                typeof value === 'number' ? value : Number.parseFloat(value),
+            ];
+        })
+    );
 };
 
 /**
  * Get toValue of specific key from an array ( function or number )
+ *
+ * - TODO: usare Object.fromEntries
  *
  * @param {Record<'toIsFn' | 'toFn' | 'prop' | 'toValue', any>[]} arr
  * @returns {Record<string, number | (() => number)>}
@@ -29,6 +37,8 @@ export const getValueObjToNative = (arr) => {
 
 /**
  * Get fromValue of specific key from an array ( function or number )
+ *
+ * - TODO: usare Object.fromEntries
  *
  * @param {Record<'fromIsFn' | 'fromFn' | 'prop' | 'fromValue', any>[]} arr
  * @returns {Record<string, number | (() => number)>}

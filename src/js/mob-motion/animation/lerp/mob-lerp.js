@@ -1034,6 +1034,7 @@ export default class MobLerp {
 
         this.#externalValidations = valuesUpdated;
 
+        // eslint-disable-next-line unicorn/consistent-function-scoping
         return () => (this.#externalValidations = []);
     }
 

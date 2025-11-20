@@ -1060,6 +1060,7 @@ export default class MobTimeTween {
 
         this.#externalValidations = valuesUpdated;
 
+        // eslint-disable-next-line unicorn/consistent-function-scoping
         return () => (this.#externalValidations = []);
     }
 

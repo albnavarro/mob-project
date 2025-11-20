@@ -822,7 +822,7 @@ export const scrollerTweenIsValid = (instance) => {
  * @returns {string | Number} ALign value
  */
 export const scrollerAlignIsValid = (value) => {
-    if (!value) return MobScrollerConstant.ALIGN_CENTER;
+    if (!value && value !== 0) return MobScrollerConstant.ALIGN_CENTER;
 
     const choice = [
         MobScrollerConstant.ALIGN_START,
