@@ -1,8 +1,6 @@
 import { eventStore } from '../event-store';
 
-/**
- * @type {boolean}
- */
+/** @type {boolean} */
 let loadFpsIsReady = false;
 
 /**
@@ -10,20 +8,13 @@ let loadFpsIsReady = false;
  *   first time, subsequent calls will be resolved immediately returning the previously calculated value. The method is
  *   launched the first time automatically at the first loading.
  *
- * @example
- *     ```javascript
- *
- *     loadFps(60).then(({ averageFPS }) => {
- *         // code
- *     });
- *
- *     ```;
- *
- * @param {number} [duration=30] - Loop duration in frame, the default value is 30. Default is `30`
+ * @param {object} params
+ * @param {boolean} [params.force]
+ * @param {number} [params.duration]
  * @returns {Promise<import('./type').LoadFps>} The promise launched after the loop
  */
-export const loadFps = (duration = 30) => {
-    if (loadFpsIsReady) {
+export const loadFps = ({ force = false, duration = 30 } = {}) => {
+    if (loadFpsIsReady && !force) {
         const { instantFps } = eventStore.get();
 
         return new Promise((resolve) => {

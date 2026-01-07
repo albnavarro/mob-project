@@ -1,12 +1,15 @@
 import { removeSelfIdToBindInstanceBy } from './bind-store';
-import { getStateFromMainMap, removeStateFromMainMap } from './store-map';
+import { removeStateFromMainMap, storeMap } from './store-map';
 
 /**
  * @param {string} instanceId
  * @returns {void}
  */
 export const destroyStoreEntryPoint = (instanceId) => {
-    const state = getStateFromMainMap(instanceId);
+    /**
+     * Here use original map not a copies.
+     */
+    const state = storeMap.get(instanceId);
     if (!state) return;
 
     state.callBackWatcher.clear();

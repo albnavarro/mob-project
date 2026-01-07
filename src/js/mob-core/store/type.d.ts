@@ -37,6 +37,7 @@ export interface StoreMapValue {
     bindInstance: string[];
     bindInstanceBy: string[];
     unsubscribeBindInstance: (() => void)[];
+    proxiReadOnlyProp: Set<string>;
 }
 
 /**
@@ -59,6 +60,7 @@ export interface MobStoreReturnType<T extends StoreDefaultMap> {
     emit: MobStoreEmit<T>;
     emitAsync: MobStoreEmitAsync<T>;
     getProxi: MobStoreStoreProxi<T>;
+    setProxiReadOnlyProp: MobStoreProxiReadOnly;
     getValidation: () => object | undefined;
     debug: () => void;
     debugStore: () => void;
@@ -86,6 +88,7 @@ interface MobStoreSet<T> {
         value: T[K],
         options?: {
             emit?: boolean;
+            usePropAsString?: boolean;
         }
     ): void;
     <K extends T[keyof T]>(
@@ -93,6 +96,7 @@ interface MobStoreSet<T> {
         value: NoInfer<K>,
         options?: {
             emit?: boolean;
+            usePropAsString?: boolean;
         }
     ): void;
 }
@@ -104,6 +108,7 @@ interface MobStoreUpdate<T> {
         options?: {
             emit?: boolean;
             clone?: boolean;
+            usePropAsString?: boolean;
         }
     ): void;
     <K extends T[keyof T]>(
@@ -112,6 +117,7 @@ interface MobStoreUpdate<T> {
         options?: {
             emit?: boolean;
             clone?: boolean;
+            usePropAsString?: boolean;
         }
     ): void;
 }
@@ -146,12 +152,18 @@ interface MobStoreComputed<T> {
     <K extends keyof T>(
         prop: K,
         callback: (arg0: T) => T[K],
-        keys?: (Extract<keyof T, string> | (() => T[keyof T]))[]
+        keys?: (Extract<keyof T, string> | (() => T[keyof T]))[],
+        options?: {
+            usePropAsString?: boolean;
+        }
     ): void;
     <K extends T[keyof T]>(
         prop: () => K,
         callback: (arg0: T) => NoInfer<K>,
-        keys?: (Extract<keyof T, string> | (() => T[keyof T]))[]
+        keys?: (Extract<keyof T, string> | (() => T[keyof T]))[],
+        options?: {
+            usePropAsString?: boolean;
+        }
     ): void;
 }
 
@@ -168,6 +180,8 @@ interface MobStoreEmitAsync<T> {
 }
 
 export type MobStoreStoreProxi<T> = () => T;
+
+export type MobStoreProxiReadOnly = (values: string[]) => void;
 
 export type MobStoreAlias =
     | 'String'
@@ -210,8 +224,8 @@ export interface storeSetAction {
     clone?: boolean;
     instanceId: string;
     useStrict?: boolean;
-    state: StoreMapValue;
     action: 'SET' | 'UPDATE';
+    initalizeStep?: boolean;
 }
 
 export interface MobStoreQuickSetEntryPoint {

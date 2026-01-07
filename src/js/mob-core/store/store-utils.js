@@ -28,45 +28,45 @@ export const maxDepth = (object) => {
  * @returns {Object<string, Object<string, any> | any>}
  */
 export const getDataRecursive = (data, shouldRecursive = true) => {
-    return Object.entries(data).reduce((p, c) => {
-        const [key, value] = c;
-        const functionResult = storeType.isFunction(value)
-            ? /** @type {Function} */ (value)()
-            : {};
+    return Object.fromEntries(
+        Object.entries(data).map(([key, value]) => {
+            /**
+             * First level value is an object. Recursive step to parse each props of object.
+             *
+             * - This step set shouldRecursive to false.
+             */
+            if (storeType.isObject(value) && shouldRecursive) {
+                return [key, getDataRecursive(value, false)];
+            }
 
-        /**
-         * First level value is an object. Recursive function if find an Object.
-         */
-        if (storeType.isObject(value) && shouldRecursive) {
-            return {
-                ...p,
+            /**
+             * Check if it's a function that return an object.
+             *
+             * - Complex state has value and ate least validate or type or skipEqual
+             */
+            if (storeType.isFunction(value)) {
+                const functionResult = value();
 
-                [key]: getDataRecursive(
-                    /** @type {import('./type.js').MobStoreParams} */ (value),
-                    false
-                ),
-            };
-        }
+                /**
+                 * Complex data with validate || type || skipEqual
+                 */
+                if (
+                    storeType.isObject(functionResult) &&
+                    'value' in functionResult &&
+                    ['validate', 'type', 'skipEqual'].some(
+                        (prop) => prop in functionResult
+                    )
+                ) {
+                    return [key, functionResult.value];
+                }
+            }
 
-        /**
-         * Complex data with validate|type|skipEqual.
-         */
-        if (
-            storeType.isFunction(value) &&
-            storeType.isObject(functionResult) &&
-            'value' in functionResult &&
-            ('validate' in functionResult ||
-                'type' in functionResult ||
-                'skipEqual' in functionResult)
-        ) {
-            return { ...p, [key]: functionResult.value };
-        }
-
-        /**
-         * Simple value
-         */
-        return { ...p, [key]: value };
-    }, {});
+            /**
+             * Simple value
+             */
+            return [key, value];
+        })
+    );
 };
 
 /**
@@ -84,49 +84,46 @@ export const getPropRecursive = (
     fallback,
     shouldRecursive = true
 ) => {
-    return Object.entries(data).reduce((p, c) => {
-        const [key, value] = c;
-        const functionResult = storeType.isFunction(value)
-            ? /** @type {Function} */ (value)()
-            : {};
+    return Object.fromEntries(
+        Object.entries(data).map(([key, value]) => {
+            /**
+             * First level value is an object. Recursive step to parse each props of object.
+             *
+             * - This step set shouldRecursive to false.
+             */
+            if (storeType.isObject(value) && shouldRecursive) {
+                return [key, getPropRecursive(value, prop, fallback, false)];
+            }
 
-        /**
-         * First level value is an object. Recursive function if find an Object.
-         */
-        if (storeType.isObject(value) && shouldRecursive) {
-            return {
-                ...p,
+            /**
+             * Check if it's a function that return an object.
+             *
+             * - Complex state has value and ate least validate or type or skipEqual
+             */
+            if (storeType.isFunction(value)) {
+                const functionResult = value();
 
-                [key]: getPropRecursive(
-                    /** @type {import('./type.js').MobStoreParams} */ (value),
-                    prop,
-                    fallback,
-                    false
-                ),
-            };
-        }
+                /**
+                 * Complex data with specific key ( validate, skipEqual etc.. )
+                 */
+                if (
+                    storeType.isObject(functionResult) &&
+                    'value' in functionResult &&
+                    prop in functionResult
+                ) {
+                    const propParsed = storeType.isString(functionResult[prop])
+                        ? functionResult[prop].toUpperCase()
+                        : functionResult[prop];
+                    return [key, propParsed];
+                }
+            }
 
-        /**
-         * Complex data with specific key ( validate, skipequel etc.. )
-         */
-        if (
-            storeType.isFunction(value) &&
-            storeType.isObject(functionResult) &&
-            'value' in functionResult &&
-            prop in functionResult
-        ) {
-            const propParsed = storeType.isString(functionResult[prop])
-                ? functionResult[prop].toUpperCase()
-                : functionResult[prop];
-
-            return { ...p, [key]: propParsed };
-        }
-
-        /**
-         * Simple value
-         */
-        return { ...p, [key]: fallback };
-    }, {});
+            /**
+             * Simple value
+             */
+            return [key, fallback];
+        })
+    );
 };
 
 /**

@@ -6,7 +6,7 @@ import {
 } from './store-set';
 import { updateMainMap } from './store-map';
 import { inizializeAllProps, inizializeValidation } from './initial-validation';
-import { watchEntryPoint } from './watch';
+import { watchEntryPoint } from './store-watch';
 import { inizializeInstance } from './inizialize-instance';
 import { storeGetEntryPoint, storeGetPropEntryPoint } from './store-get';
 import { storeEmitAsyncEntryPoint, storeEmitEntryPoint } from './store-emit';
@@ -17,12 +17,13 @@ import {
     storeGetValidationEntryPoint,
 } from './store-debug';
 import { STORE_SET, STORE_UPDATE } from './constant';
-import { getProxiEntryPoint } from './proxi';
+import { getProxiEntryPoint } from './store-proxi';
 import { bindStoreEntryPoint } from './bind-store';
 import { destroyStoreEntryPoint } from './destroy';
 import { checkIfPropIsComputed } from './store-utils';
 import { useNextLoop } from '../utils/next-tick';
 import { extractkeyFromProp, extractKeysFromArray } from './current-key';
+import { setProxiPropReadOnlyEntryPoint } from './proxi-read-only';
 
 /**
  * @param {import('./type').MobStoreParams} data
@@ -67,9 +68,17 @@ export const mobStore = (data = {}) => {
         set: (
             /** @type{string|(() => any)} */ prop,
             /** @type {any} */ value,
-            { emit = true } = {}
+            { emit = true, usePropAsString = false } = {}
         ) => {
-            const propParsed = extractkeyFromProp(prop);
+            /**
+             * MobJs for check prop use the same function.
+             *
+             * - Prop in this case is always a string
+             */
+            const propParsed = usePropAsString
+                ? /** @type {string} */ (prop)
+                : extractkeyFromProp(prop);
+
             const isComputed = checkIfPropIsComputed({
                 instanceId,
                 prop: propParsed,
@@ -89,9 +98,17 @@ export const mobStore = (data = {}) => {
         update: (
             /** @type{string|(() => any)} */ prop,
             /** @type {any} */ value,
-            { emit = true, clone = false } = {}
+            { emit = true, clone = false, usePropAsString = false } = {}
         ) => {
-            const propParsed = extractkeyFromProp(prop);
+            /**
+             * MobJs for check prop use the same function.
+             *
+             * - Prop in this case is always a string
+             */
+            const propParsed = usePropAsString
+                ? /** @type {string} */ (prop)
+                : extractkeyFromProp(prop);
+
             const isComputed = checkIfPropIsComputed({
                 instanceId,
                 prop: propParsed,
@@ -142,9 +159,18 @@ export const mobStore = (data = {}) => {
         computed: (
             /** @type{string|(() => any)} */ prop,
             /** @type{(arg0: Record<string, any>) => any} */ callback,
-            /** @type{( string|(() => any))[]} */ keys = []
+            /** @type{( string|(() => any))[]} */ keys = [],
+            { usePropAsString = false } = {}
         ) => {
-            const propParsed = extractkeyFromProp(prop);
+            /**
+             * MobJs for check prop use the same function.
+             *
+             * - Prop in this case is always a string
+             */
+            const propParsed = usePropAsString
+                ? /** @type {string} */ (prop)
+                : extractkeyFromProp(prop);
+
             const keysParsed = extractKeysFromArray(keys);
 
             storeComputedEntryPoint({
@@ -167,6 +193,9 @@ export const mobStore = (data = {}) => {
             const propParsed = extractkeyFromProp(prop);
 
             return storeEmitAsyncEntryPoint({ instanceId, prop: propParsed });
+        },
+        setProxiReadOnlyProp: (values) => {
+            setProxiPropReadOnlyEntryPoint({ instanceId, values });
         },
         getValidation: () => {
             return storeGetValidationEntryPoint({ instanceId });

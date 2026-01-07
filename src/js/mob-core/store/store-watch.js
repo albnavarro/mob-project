@@ -1,13 +1,13 @@
 import { getUnivoqueId } from '../utils';
 import { getLogStyle } from './log-style';
-import { getStateFromMainMap, storeMap, updateMainMap } from './store-map';
+import { getStateFromMainMap, updateMainMap } from './store-map';
 import { storeWatchWarning } from './store-warining';
 
 /**
  * @param {import('./type').MobStoreWatchAction} param
  * @returns {import('./type').MobStoreWatchReturnObject}
  */
-export const storeWatchAction = ({ state, prop, callback, wait }) => {
+const subscribeWatch = ({ state, prop, callback, wait }) => {
     const { store, callBackWatcher } = state;
     const logStyle = getLogStyle();
 
@@ -40,7 +40,7 @@ export const storeWatchAction = ({ state, prop, callback, wait }) => {
  * @param {string} param.instanceId
  * @param {string} param.unsubscribeId
  */
-export const unsubScribeWatch = ({ instanceId, unsubscribeId }) => {
+const unsubScribeWatch = ({ instanceId, unsubscribeId }) => {
     const state = getStateFromMainMap(instanceId);
     if (!state) return;
 
@@ -59,11 +59,11 @@ export const unsubScribeWatch = ({ instanceId, unsubscribeId }) => {
  * @param {(current: any, previous: any, validate: boolean | { [key: string]: boolean }) => void} param.callback
  * @returns {() => any}
  */
-export const watchMobStore = ({ instanceId, prop, callback, wait }) => {
+const watchMobStore = ({ instanceId, prop, callback, wait }) => {
     const state = getStateFromMainMap(instanceId);
     if (!state) return () => {};
 
-    const { state: newState, unsubscribeId } = storeWatchAction({
+    const { state: newState, unsubscribeId } = subscribeWatch({
         state,
         prop,
         callback,
@@ -98,21 +98,42 @@ export const watchEntryPoint = ({ instanceId, prop, callback, wait }) => {
 
     const currentBindId =
         [instanceId, ...bindInstance].find((id) => {
-            const store = storeMap.get(id)?.store;
+            const store = getStateFromMainMap(id)?.store;
             return store && prop in store;
         }) ?? '';
 
-    const unsubscribe = watchMobStore({
+    const innerUnsubscribe = watchMobStore({
         instanceId: currentBindId,
         prop,
         callback,
         wait,
     });
 
+    /**
+     * WatchMobStore get/update store,
+     *
+     * - If prop is in current instanceId watchMobStore update state.
+     * - So reload fresh state.
+     */
+    const stateAfterWatchInit = getStateFromMainMap(instanceId);
+    if (!stateAfterWatchInit) return () => {};
+
     updateMainMap(instanceId, {
-        ...state,
-        unsubscribeBindInstance: [...unsubscribeBindInstance, unsubscribe],
+        ...stateAfterWatchInit,
+        unsubscribeBindInstance: [...unsubscribeBindInstance, innerUnsubscribe],
     });
 
-    return unsubscribe;
+    return () => {
+        innerUnsubscribe();
+
+        const stateAfterUnsubscribe = getStateFromMainMap(instanceId);
+        if (!stateAfterUnsubscribe) return;
+
+        updateMainMap(instanceId, {
+            ...stateAfterUnsubscribe,
+            unsubscribeBindInstance: unsubscribeBindInstance.filter(
+                (unsubscribe) => unsubscribe !== innerUnsubscribe
+            ),
+        });
+    };
 };

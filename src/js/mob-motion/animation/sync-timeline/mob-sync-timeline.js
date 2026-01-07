@@ -470,6 +470,8 @@ export default class MobSyncTimeline {
      * @type {import('./type.js').SyncTimelinePlay}
      */
     play(props = {}) {
+        this.resume();
+
         const useCurrent = props?.useCurrent;
         if (!useCurrent) this.stop();
 
@@ -515,6 +517,7 @@ export default class MobSyncTimeline {
      * @type {import('./type.js').SyncTimelinePlayFrom} value
      */
     playFrom(value = 0) {
+        this.resume();
         this.stop();
 
         return new Promise((resolve, reject) => {
@@ -580,6 +583,7 @@ export default class MobSyncTimeline {
      * @type {import('./type.js').syncTimelinePlayFromReverse} value
      */
     playFromReverse(value) {
+        this.resume();
         this.stop();
 
         return new Promise((resolve, reject) => {
@@ -618,6 +622,8 @@ export default class MobSyncTimeline {
      * @type {import('./type.js').SyncTimelinePlayReverse}
      */
     playReverse(props = {}) {
+        this.resume();
+
         const useCurrent = props?.useCurrent;
         if (!useCurrent) this.stop();
 
@@ -734,7 +740,6 @@ export default class MobSyncTimeline {
     resume({ unFreezeCache = true } = {}) {
         if (this.#isStopped || !this.#isInPause || this.#fpsIsInLoading) return;
 
-        this.#isStopped = false;
         this.#isInPause = false;
 
         if (unFreezeCache) {
@@ -749,7 +754,8 @@ export default class MobSyncTimeline {
      * @type {import('./type.js').SyncTimelineReverse}
      */
     reverse() {
-        if (this.#isStopped || this.#isInPause || this.#fpsIsInLoading) return;
+        if (this.#isInPause) this.resume();
+        if (this.#isStopped || this.#fpsIsInLoading) return;
 
         // Reset sequancer callback add function state
         this.#resetSequencerLastValue();
@@ -766,8 +772,11 @@ export default class MobSyncTimeline {
      * @returns {void}
      */
     stop({ clearCache = true } = {}) {
+        /**
+         * In case timeline is in pause reset pause status.
+         */
+        this.resume();
         this.#isStopped = true;
-        this.#isInPause = false;
         this.#rejectPromise();
 
         if (clearCache) {

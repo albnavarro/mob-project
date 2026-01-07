@@ -43,7 +43,7 @@ export class tBlocksItemClass {
                     value: '',
                     type: String,
                     validate: (val) => {
-                        const values = [this.UPDATE, this.REMOVE];
+                        const values = [this.UPDATE, this.REMOVE, ''];
                         return values.includes(val);
                     },
                 }),
@@ -57,7 +57,7 @@ export class tBlocksItemClass {
                     value: '',
                     type: String,
                     validate: (val) => {
-                        const values = [this.REMOVE, this.ADD];
+                        const values = [this.REMOVE, this.ADD, ''];
                         return values.includes(val);
                     },
                 }),

@@ -36,6 +36,7 @@ import {
     handlePointerOver,
     handlePointerUp,
 } from './events/pointer-event/handle-pointer.js';
+import { LinkedList } from './data-set/linked-list/index.js';
 
 /**
  * MobStore initialization. The store accepts single properties or objects Each individual property can be initialized
@@ -259,16 +260,11 @@ function useFrameIndex(callback = () => {}, frame = 0) {
 }
 
 /**
- * Runs a request animation frame loop to detect the frame rate of the monitor. After the method will be resolved the
- * first time, subsequent calls will be resolved immediately returning the previously calculated value. The method is
- * launched the first time automatically at the first loading.
- *
- * @param {import('./events/raf-utils/type.js').LoadFpsCall} callback - Callback function
+ * @param {{ force?: boolean; duration?: number }} options
  * @returns {Promise<{ averageFPS: number }>}
  */
-async function useFps(callback = () => {}) {
-    const obj = await loadFps();
-    callback(obj);
+async function useFps({ force = false, duration = 30 } = {}) {
+    const obj = await loadFps({ force, duration });
     return obj;
 }
 
@@ -793,6 +789,10 @@ function usePointerLeave(callback = () => {}) {
  */
 const store = eventStore;
 
+function useLinkedList() {
+    return new LinkedList();
+}
+
 export {
     store,
     usePointerLeave,
@@ -828,6 +828,7 @@ export {
     getFps,
     getInstantFps,
     createStore,
+    useLinkedList,
 };
 
 export { normalizeWheel } from './events/mouse-utils/normalize-whell.js';

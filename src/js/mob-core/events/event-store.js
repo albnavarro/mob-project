@@ -2,7 +2,10 @@
 import { mobStore } from '../store';
 
 /**
- * @import {MobStoreParams, MobStoreReturnType} from "../store/type".MobStore;
+ * @import {
+ *   MobStoreParams,
+ *   MobStoreReturnType
+ * } from "../store/type"
  */
 
 /** @type {MobStoreReturnType<import('./type').EventStore>} */

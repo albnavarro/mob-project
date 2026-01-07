@@ -10,7 +10,7 @@ import { storeEmitWarning } from './store-warining';
  * @param {string} param.prop
  * @returns {void}
  */
-export const storeEmit = ({ instanceId, prop }) => {
+const storeEmit = ({ instanceId, prop }) => {
     const state = getStateFromMainMap(instanceId);
     if (!state) return;
     const { store, callBackWatcher, validationStatusObject, bindInstanceBy } =
@@ -28,6 +28,9 @@ export const storeEmit = ({ instanceId, prop }) => {
             instanceId,
         });
 
+        /**
+         * AddToComputedWaitLsit get and update map.
+         */
         addToComputedWaitLsit({ instanceId, prop });
         bindInstanceBy.forEach((id) => {
             addToComputedWaitLsit({ instanceId: id, prop });
@@ -66,6 +69,9 @@ export const storeEmitEntryPoint = ({ instanceId, prop }) => {
             return store && prop in store;
         }) ?? '';
 
+    /**
+     * StoreEmit get and update map.
+     */
     storeEmit({ instanceId: currentBindId, prop });
 };
 
@@ -75,7 +81,7 @@ export const storeEmitEntryPoint = ({ instanceId, prop }) => {
  * @param {string} param.prop
  * @returns {Promise<any>}
  */
-export const storeEmitAsync = async ({ instanceId, prop }) => {
+const storeEmitAsync = async ({ instanceId, prop }) => {
     const state = getStateFromMainMap(instanceId);
     if (!state) return new Promise((resolve) => resolve(''));
     const { store, callBackWatcher, validationStatusObject, bindInstanceBy } =

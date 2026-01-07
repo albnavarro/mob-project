@@ -28,9 +28,11 @@ export const storeGetEntryPoint = (instanceId) => {
         return storeGet(instanceId);
     }
 
-    return [...bindInstance, instanceId]
-        .map((id) => storeGet(id))
-        .reduce((previous, current) => ({ ...previous, ...current }), {});
+    return Object.fromEntries(
+        [...bindInstance, instanceId].flatMap((id) =>
+            Object.entries(storeGet(id))
+        )
+    );
 };
 
 /**
@@ -39,7 +41,7 @@ export const storeGetEntryPoint = (instanceId) => {
  * @param {string} param.prop
  * @returns {any}
  */
-export const storeGetProp = ({ instanceId, prop }) => {
+const storeGetProp = ({ instanceId, prop }) => {
     const state = getStateFromMainMap(instanceId);
     if (!state) return;
 

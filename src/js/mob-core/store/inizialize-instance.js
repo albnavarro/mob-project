@@ -67,5 +67,6 @@ export const inizializeInstance = (data) => {
         bindInstance: [],
         bindInstanceBy: [],
         unsubscribeBindInstance: [],
+        proxiReadOnlyProp: new Set(),
     };
 };

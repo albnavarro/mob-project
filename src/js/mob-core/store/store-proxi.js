@@ -1,8 +1,11 @@
 import { STORE_SET } from './constant';
 import { setCurrentDependencies } from './current-key';
+import { getLogStyle } from './log-style';
 import { storeMap, updateMainMap } from './store-map';
 import { storeSetEntryPoint } from './store-set';
 import { checkIfPropIsComputed } from './store-utils';
+import { storeProxiReadOnlyWarning } from './store-warining';
+import { storeStrategyNeedCopy } from './strategy';
 
 /**
  * Proxi state/states with the original reference of store object.
@@ -12,10 +15,15 @@ import { checkIfPropIsComputed } from './store-utils';
  * @returns {Record<string, any>}
  */
 export const getProxiEntryPoint = ({ instanceId }) => {
+    const logStyle = getLogStyle();
     const state = storeMap.get(instanceId);
     if (!state) return {};
 
-    const { bindInstance, proxiObject: previousProxiObject } = state;
+    const {
+        bindInstance,
+        proxiObject: previousProxiObject,
+        proxiReadOnlyProp,
+    } = state;
 
     /**
      * Return previous proxi if exist.
@@ -31,9 +39,27 @@ export const getProxiEntryPoint = ({ instanceId }) => {
      */
     const selfProxi = new Proxy(store, {
         set(target, /** @type {string} */ prop, value) {
-            if (prop in target) {
+            /**
+             * - With shallow copy refer to original store reference
+             * - With custom copy get update store from main map, copies here is not necessary.
+             * - Fallback to target if component is destroyed and there is no reference, typically call proxi after
+             *   destroy
+             */
+            const store = storeStrategyNeedCopy()
+                ? (storeMap.get(instanceId)?.store ?? target)
+                : target;
+
+            if (!store) return false;
+
+            if (prop in store) {
                 const isComputed = checkIfPropIsComputed({ instanceId, prop });
-                if (isComputed) return false;
+                const isReadOnly = proxiReadOnlyProp.has(prop);
+
+                if (isReadOnly) {
+                    storeProxiReadOnlyWarning(prop, logStyle);
+                }
+
+                if (isComputed || isReadOnly) return false;
 
                 storeSetEntryPoint({
                     instanceId,
@@ -50,7 +76,19 @@ export const getProxiEntryPoint = ({ instanceId }) => {
             return false;
         },
         get(target, /** @type {string} */ prop) {
-            if (!(prop in target)) {
+            /**
+             * - With shallow copy refer to original store reference
+             * - With custom copy get update store from main map, copies here is not necessary.
+             * - Fallback to target if component is destroyed and there is no reference, typically call proxi after
+             *   destroy
+             */
+            const store = storeStrategyNeedCopy()
+                ? (storeMap.get(instanceId)?.store ?? target)
+                : target;
+
+            if (!store) return false;
+
+            if (!(prop in store)) {
                 return false;
             }
 
@@ -62,7 +100,7 @@ export const getProxiEntryPoint = ({ instanceId }) => {
             /**
              * Return value
              */
-            return target[prop];
+            return store[prop];
         },
     });
 
@@ -91,7 +129,19 @@ export const getProxiEntryPoint = ({ instanceId }) => {
                 return false;
             },
             get(target, /** @type {string} */ prop) {
-                if (!(prop in target)) {
+                /**
+                 * - With shallow copy refer to original store reference
+                 * - With custom copy get update store from main map, copies here is not necessary.
+                 * - Fallback to target if component is destroyed and there is no reference, typically call proxi after
+                 *   destroy
+                 */
+                const store = storeStrategyNeedCopy()
+                    ? (storeMap.get(id)?.store ?? target)
+                    : target;
+
+                if (!store) return false;
+
+                if (!(prop in store)) {
                     return false;
                 }
 
@@ -103,7 +153,7 @@ export const getProxiEntryPoint = ({ instanceId }) => {
                 /**
                  * Return value
                  */
-                return target[prop];
+                return store[prop];
             },
         });
     });

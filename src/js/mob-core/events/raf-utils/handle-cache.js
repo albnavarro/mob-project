@@ -212,11 +212,10 @@ const get = (id) => {
 const fire = (frameCounter) => {
     for (const value of subscriberMap.values()) {
         const { data, fn, el, freeze } = value;
-        if (freeze.active) return;
 
         const callBackObject = data.get(frameCounter);
 
-        if (callBackObject) {
+        if (callBackObject && !freeze.active) {
             fn(callBackObject, el);
 
             data.delete(frameCounter);

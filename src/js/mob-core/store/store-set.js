@@ -22,6 +22,7 @@ import {
     storeSetPropTypeWarning,
     storeSetPropValWarning,
     storeSetWarning,
+    storeValidationFailInCreation,
 } from './store-warining';
 
 /**
@@ -31,21 +32,24 @@ import {
 /**
  * @param {Object} param
  * @param {string} param.instanceId
- * @param {import('./type').StoreMapValue} param.state
  * @param {string} param.prop
  * @param {any} param.val
  * @param {boolean} param.fireCallback
  * @param {boolean} param.useStrict
- * @returns {import('./type').StoreMapValue | undefined}
+ * @param {boolean} [param.initalizeStep]
+ * @returns {void}
  */
 const setProp = ({
     instanceId,
-    state,
     prop,
     val,
     fireCallback = true,
     useStrict = true,
+    initalizeStep = false,
 }) => {
+    const state = getStateFromMainMap(instanceId);
+    if (!state) return;
+
     const {
         type,
         fnTransformation,
@@ -107,6 +111,13 @@ const setProp = ({
     ]?.(valueTransformed, oldVal);
 
     /**
+     * In creation step advise that validation is failed.
+     */
+    if (!isValidated && initalizeStep) {
+        storeValidationFailInCreation(prop, logStyle);
+    }
+
+    /**
      * In strict mode return is prop is not valid
      */
     if (strict[prop] && !isValidated && useStrict) return;
@@ -122,14 +133,23 @@ const setProp = ({
     const isEqual = skipEqual[prop]
         ? checkEquality(type[prop], oldVal, valueTransformed)
         : false;
-    if (isEqual) return;
+
+    if (isEqual && !initalizeStep) return;
 
     /**
      * Finally set new value
      */
     store[prop] = valueTransformed;
 
-    if (fireCallback) {
+    /**
+     * Update map before fire addToComputedWaitLsit
+     */
+    updateMainMap(instanceId, { ...state, store, validationStatusObject });
+
+    /**
+     * Fire callback
+     */
+    if (fireCallback && !initalizeStep) {
         runCallbackQueqe({
             callBackWatcher,
             prop,
@@ -139,37 +159,37 @@ const setProp = ({
             instanceId,
         });
 
+        /**
+         * AddToComputedWaitLsit get and update map.
+         */
         addToComputedWaitLsit({ instanceId, prop });
         bindInstanceBy.forEach((id) => {
             addToComputedWaitLsit({ instanceId: id, prop });
         });
     }
-
-    return {
-        ...state,
-        store,
-        validationStatusObject,
-    };
 };
 
 /**
  * @param {Object} param
  * @param {string} param.instanceId
- * @param {import('./type').StoreMapValue} param.state
  * @param {string} param.prop
  * @param {any} param.val
  * @param {boolean} param.fireCallback
  * @param {boolean} param.useStrict
- * @returns {import('./type').StoreMapValue | undefined}
+ * @param {boolean} [param.initalizeStep]
+ * @returns {void}
  */
 const setObj = ({
     instanceId,
-    state,
     prop,
     val,
     fireCallback = true,
     useStrict = true,
+    initalizeStep = false,
 }) => {
+    const state = getStateFromMainMap(instanceId);
+    if (!state) return;
+
     const {
         store,
         type,
@@ -213,18 +233,17 @@ const setObj = ({
     /**
      * Transform value
      */
-    const valueTransformed = Object.entries(val)
-        .map((item) => {
+    const valueTransformed = Object.fromEntries(
+        Object.entries(val).map((item) => {
             const [subProp, subVal] = item;
             const subValOld = store[prop][subProp];
 
-            return {
-                [subProp]:
-                    fnTransformation[prop][subProp]?.(subVal, subValOld) ??
-                    subVal,
-            };
+            return [
+                subProp,
+                fnTransformation[prop][subProp]?.(subVal, subValOld) ?? subVal,
+            ];
         })
-        .reduce((previous, current) => ({ ...previous, ...current }));
+    );
 
     /**
      * Check type of each propierties
@@ -303,6 +322,14 @@ const setObj = ({
          * logic.
          */
         const validateResult = fnValidate[prop][subProp]?.(subVal, subValOld);
+
+        /**
+         * In creation step advise if some props is not valid
+         */
+        if (!validateResult && initalizeStep) {
+            storeValidationFailInCreation(prop, logStyle);
+        }
+
         if (validateResult === undefined) {
             storeObjectIsNotAnyWarning(logStyle, TYPE_IS_ANY);
         }
@@ -354,14 +381,19 @@ const setObj = ({
      * If shouldSkipEqual = true and previous object is equal new object return. If at least one modified property of
      * the object has skipEqual set to false then the entire object is considered mutated even if all values are equal
      */
-    if (prevValueIsEqualNew) return;
+    if (prevValueIsEqualNew && !initalizeStep) return;
 
     /**
      * Finally update Object.
      */
     store[prop] = newObjectValues;
 
-    if (fireCallback) {
+    /**
+     * Update map before fire addToComputedWaitLsit
+     */
+    updateMainMap(instanceId, { ...state, store, validationStatusObject });
+
+    if (fireCallback && !initalizeStep) {
         runCallbackQueqe({
             callBackWatcher,
             prop,
@@ -371,33 +403,35 @@ const setObj = ({
             instanceId,
         });
 
+        /**
+         * AddToComputedWaitLsit get and update map.
+         */
         addToComputedWaitLsit({ instanceId, prop });
         bindInstanceBy.forEach((id) => {
             addToComputedWaitLsit({ instanceId: id, prop });
         });
     }
-
-    return {
-        ...state,
-        store,
-        validationStatusObject,
-    };
 };
 
 /**
+ * Here we decided if is normal prop or object prop.
+ *
  * @param {import('./type').storeSetAction} params
- * @returns {import('./type').StoreMapValue | undefined}
+ * @returns {void}
  */
-export const storeSetAction = ({
+export const storeSetEntryPoint = ({
     instanceId,
-    state,
     prop,
     value,
     fireCallback = true,
     clone = false,
     useStrict = true,
     action,
+    initalizeStep = false,
 }) => {
+    const state = getStateFromMainMap(instanceId);
+    if (!state) return;
+
     const { store, type } = state;
     if (!store) return;
 
@@ -429,55 +463,38 @@ export const storeSetAction = ({
      */
     const isCustomObject = type[prop] === TYPE_IS_ANY;
 
-    return storeType.isObject(previousValue) && !isCustomObject
-        ? setObj({
-              instanceId,
-              state,
-              prop,
-              val: valueParsed,
-              fireCallback,
-              useStrict,
-          })
-        : setProp({
-              instanceId,
-              state,
-              prop,
-              val: valueParsed,
-              fireCallback,
-              useStrict,
-          });
-};
+    /**
+     * State is an Object
+     */
+    if (storeType.isObject(previousValue) && !isCustomObject) {
+        setObj({
+            instanceId,
+            prop,
+            val: valueParsed,
+            fireCallback,
+            useStrict,
+            initalizeStep,
+        });
 
-/**
- * @param {import('./type').MobStoreSetEntryPoint} param
- * @returns {void}
- */
-export const storeSetEntryPoint = ({
-    instanceId,
-    prop,
-    value,
-    fireCallback,
-    clone,
-    action,
-}) => {
-    const state = getStateFromMainMap(instanceId);
-    if (!state) return;
+        return;
+    }
 
-    const newState = storeSetAction({
+    /**
+     * State is a normal prop.
+     */
+    setProp({
         instanceId,
-        state,
         prop,
-        value,
+        val: valueParsed,
         fireCallback,
-        clone,
-        action,
+        useStrict,
+        initalizeStep,
     });
-
-    if (!newState) return;
-    updateMainMap(instanceId, newState);
 };
 
 /**
+ * Set value without type/validattion/etc.. check.
+ *
  * @param {import('./type').MobStoreQuickSetEntryPoint} param
  * @returns {void}
  */
@@ -497,6 +514,8 @@ export const storeQuickSetEntrypoint = ({ instanceId, prop, value }) => {
      */
     store[prop] = value;
 
+    updateMainMap(instanceId, { ...state, store });
+
     runCallbackQueqe({
         callBackWatcher,
         prop,
@@ -505,12 +524,10 @@ export const storeQuickSetEntrypoint = ({ instanceId, prop, value }) => {
         validationValue: true,
         instanceId,
     });
-
-    updateMainMap(instanceId, { ...state, store });
 };
 
 /**
- * ## COMPUTED
+ * Merge all state from current instance and bind store.
  */
 
 /**
@@ -530,6 +547,8 @@ const mergeStoreFromBindInstance = ({ store, bindInstance }) => {
 };
 
 /**
+ * Main function to fire computed. Check for all computed in instance.
+ *
  * @param {string} instanceId
  */
 const fireComputed = (instanceId) => {
@@ -565,13 +584,9 @@ const fireComputed = (instanceId) => {
         /**
          * Get dependencies current state;
          */
-        const valuesToObject = keys
-            .map((item) => {
-                return { [item]: storeMerged[item] };
-            })
-            .reduce((previous, current) => {
-                return { ...previous, ...current };
-            }, {});
+        const valuesToObject = Object.fromEntries(
+            keys.map((item) => [item, storeMerged[item]])
+        );
 
         return {
             prop,
@@ -602,6 +617,14 @@ const fireComputed = (instanceId) => {
 };
 
 /**
+ * When a prop is updated ( set o emit ). add prop to computed waiting list.
+ *
+ * - At the end of current event loop fire computed.
+ * - ComputedPropsQueque save all props for computed check.
+ * - At this time we doesn't now if prop is a dependencies.
+ * - ComputedRunning is reset in fireComputed function.
+ * - The same function is used both for current instance and binded instance.
+ *
  * @param {Object} param
  * @param {string} param.instanceId
  * @param {string} param.prop
@@ -634,10 +657,12 @@ export const addToComputedWaitLsit = ({ instanceId, prop }) => {
 };
 
 /**
+ * Save callback in map store. Check for circular dependencies.
+ *
  * @param {import('./type').MobStoreComputedAction} params
  * @returns {void}
  */
-export const storeComputedAction = ({ instanceId, prop, keys, fn }) => {
+const storeComputedAction = ({ instanceId, prop, keys, fn }) => {
     const state = getStateFromMainMap(instanceId);
     if (!state) return;
 
@@ -681,12 +706,7 @@ export const storeComputedAction = ({ instanceId, prop, keys, fn }) => {
  * @param {(arg0: { [key: string]: any }) => void} param.callback
  * @returns {void}
  */
-export const initializeCompuntedProp = ({
-    instanceId,
-    prop,
-    keys,
-    callback,
-}) => {
+const initializeCompuntedProp = ({ instanceId, prop, keys, callback }) => {
     const state = getStateFromMainMap(instanceId);
     if (!state) return;
 
@@ -699,16 +719,18 @@ export const initializeCompuntedProp = ({
 
     /**
      * Create onject with values for computed function.
+     *
+     * - Return a tuple [key, value],[key, value].
+     * - Transform in an object {key, value}
      */
-    const valuesObject = keys
-        .map((key) => {
-            if (key in storeMerged) return { [key]: storeMerged[key] };
-            return;
-        })
-        .filter((item) => item !== undefined)
-        .reduce((previous, current) => {
-            return { ...previous, ...current };
-        }, {});
+    const valuesObject = Object.fromEntries(
+        keys
+            .map((key) => {
+                if (key in storeMerged) return [key, storeMerged[key]];
+                return;
+            })
+            .filter((item) => item !== undefined)
+    );
 
     /**
      * Get prop value.
