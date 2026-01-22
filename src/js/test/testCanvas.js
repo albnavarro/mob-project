@@ -61,7 +61,7 @@ export const testCanvas = () => {
     // });
 
     itemsArr.forEach((item) => {
-        tween1.subscribeCache(item, ({ scale, rotate, opacity }) => {
+        tween1.subscribeCache(({ scale, rotate, opacity }) => {
             item.scale = scale;
             item.rotate = rotate;
             item.opacity = opacity;

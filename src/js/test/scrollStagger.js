@@ -55,7 +55,7 @@ export const scrollStagger = () => {
         //     }px, ${50 - unitInverse * unit}px) rotate(${rotate}deg)`;
         // });
 
-        myParallaxTween.subscribeCache(item, ({ rotate }) => {
+        myParallaxTween.subscribeCache(({ rotate }) => {
             const rotateParsed = MobCore.shouldMakeSomething()
                 ? Math.round(rotate)
                 : rotate;

@@ -87,7 +87,7 @@ export function syncTimelineTest() {
         .label('label2', 7);
 
     const unsubscribeStagger = [...starger].map((item) => {
-        return seqStagger.subscribeCache(item, ({ x, scale }) => {
+        return seqStagger.subscribeCache(({ x, scale }) => {
             item.style.transform = `translate3D(0,0,0) translate(${x}px, 0px) scale(${scale})`;
         });
     });

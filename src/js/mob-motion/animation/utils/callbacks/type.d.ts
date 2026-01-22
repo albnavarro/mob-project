@@ -60,8 +60,7 @@ export type SetCallBack = (
 ) => SetCallbackReturnObject;
 
 export type SetCallBackCache = (
-    item: object | HTMLElement,
-    currentCallback: (arg0: any, arg1: object | HTMLElement) => void,
+    currentCallback: (arg0: any) => void,
     arrayOfCallback: CallbackCache,
     unsubscribeCacheArray: (() => void)[]
 ) => SetCallbackCacheReturnObject;

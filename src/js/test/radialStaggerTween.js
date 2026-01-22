@@ -23,7 +23,7 @@ export const radialStaggerTween = () => {
     // });
 
     items.forEach((item) => {
-        tween1.subscribeCache(item, ({ scale }) => {
+        tween1.subscribeCache(({ scale }) => {
             item.style.transform = `scale(${scale})`;
         });
     });

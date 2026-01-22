@@ -33,7 +33,7 @@ export function staggerTweenTest() {
     });
 
     const unsubscribeStagger = [...stagger].map((item) => {
-        return myStagger.subscribeCache(item, ({ x }) => {
+        return myStagger.subscribeCache(({ x }) => {
             item.style.transform = `translate3D(0px,0px,0px) translate(${x}px, 0px)`;
         });
     });

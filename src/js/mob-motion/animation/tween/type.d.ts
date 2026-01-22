@@ -105,7 +105,6 @@ export type TimeTweenGetId = () => string;
 export type TimeTweenUpdateEase = (arg0: EaseTypes) => void;
 export type TimeTweenSubscribe = (cb: (arg0: any) => void) => () => void;
 export type TimeTweenSubscribeCache = (
-    item: object | HTMLElement,
     cb: (arg0: Record<string, number>) => void
 ) => () => void;
 export type TimeTweenOnComplete = (cb: (arg0: any) => void) => () => void;

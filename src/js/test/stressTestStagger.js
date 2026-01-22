@@ -26,7 +26,7 @@ export const stressTestStagger = () => {
         //     });
         // });
         items.forEach((item) => {
-            tween1.subscribeCache(item, ({ scale, rotate, opacity }) => {
+            tween1.subscribeCache(({ scale, rotate, opacity }) => {
                 item.style.transform = `translate3D(0, 0, 1px) scale(${scale}) rotate(${rotate}deg)`;
                 item.style.opacity = opacity;
             });
@@ -39,7 +39,7 @@ export const stressTestStagger = () => {
         //     });
         // });
         items.forEach((item) => {
-            tween1.subscribeCache(item, ({ scale, rotate, opacity }) => {
+            tween1.subscribeCache(({ scale, rotate, opacity }) => {
                 item.style.transform = `scale(${scale}) rotate(${rotate}deg)`;
                 item.style.opacity = opacity;
             });

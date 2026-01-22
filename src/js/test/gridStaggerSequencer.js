@@ -20,7 +20,7 @@ export const gridStaggerSequencer = () => {
         .goTo({ x: 100 });
 
     items.forEach((item) => {
-        tween1.subscribeCache(item, ({ scale, x }) => {
+        tween1.subscribeCache(({ scale, x }) => {
             item.style.transform = `translate3D(0,0,0) scale(${scale}) translateX(${x}%)`;
         });
     });

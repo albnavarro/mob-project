@@ -80,7 +80,6 @@ export type SpringUdateConfigProp = (arg0: Partial<SpringProps>) => void;
 export type SpringUdateConfig = (arg0: SpringChoiceConfig) => void;
 export type SpringSubscribe = (cb: (arg0: any) => void) => () => void;
 export type SpringSubscribeCache = (
-    item: object | HTMLElement,
     cb: (arg0: Record<string, number>) => void
 ) => () => void;
 export type SpringOnComplete = (cb: (arg0: any) => void) => () => void;

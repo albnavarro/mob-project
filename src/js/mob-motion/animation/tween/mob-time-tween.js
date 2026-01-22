@@ -1028,10 +1028,9 @@ export default class MobTimeTween {
      *
      * @type {import('./type.js').TimeTweenSubscribeCache}
      */
-    subscribeCache(item, fn) {
+    subscribeCache(fn) {
         const { arrayOfCallbackUpdated, unsubscribeCb, unsubscribeCache } =
             updateSubscribersCache(
-                item,
                 fn,
                 this.#callbackCache,
                 this.#unsubscribeCache

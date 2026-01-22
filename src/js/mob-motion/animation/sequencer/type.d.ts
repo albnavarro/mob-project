@@ -126,7 +126,6 @@ export type SequencerSubscribe = (arg0: (arg0: any) => void) => () => void;
 export type SequencerOnStop = (arg0: (arg0: any) => void) => () => void;
 
 export type SequencerSubscribeCache = (
-    item: object | HTMLElement,
     cb: (arg0: Record<string, number>) => void
 ) => () => void;
 

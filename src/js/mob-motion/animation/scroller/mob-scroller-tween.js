@@ -312,10 +312,9 @@ export default class MobScrollerTween {
     /**
      * @type {import('./type.js').MobScrollerTweenSubscribeCache}
      */
-    subscribeCache(item, fn) {
+    subscribeCache(fn) {
         const { arrayOfCallbackUpdated, unsubscribeCb, unsubscribeCache } =
             updateSubscribersCache(
-                item,
                 fn,
                 this.#callbackCache,
                 this.#unsubscribeCache

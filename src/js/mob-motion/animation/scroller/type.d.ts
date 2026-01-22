@@ -335,7 +335,6 @@ export type MobScrollerTweenSubscribe = (arg0: (any) => void) => () => void;
 export type MobScrollerTweenOnStop = (arg0: (any) => void) => () => void;
 
 export type MobScrollerTweenSubscribeCache = (
-    item: object | HTMLElement,
     cb: (arg0: Record<string, number>) => void
 ) => () => void;
 

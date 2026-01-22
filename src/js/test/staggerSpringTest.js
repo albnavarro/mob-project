@@ -23,7 +23,7 @@ export function staggerSpringTest() {
     });
 
     stagger.forEach((item) => {
-        myStagger.subscribeCache(item, ({ x }) => {
+        myStagger.subscribeCache(({ x }) => {
             item.style.transform = `translate3D(0px,0px,0px) translate(${x}px, 0px)`;
         });
     });

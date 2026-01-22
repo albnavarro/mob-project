@@ -1002,10 +1002,9 @@ export default class MobLerp {
      *
      * @type {import('./type.js').LerpSubscribeCache}
      */
-    subscribeCache(item, fn) {
+    subscribeCache(fn) {
         const { arrayOfCallbackUpdated, unsubscribeCb, unsubscribeCache } =
             updateSubscribersCache(
-                item,
                 fn,
                 this.#callbackCache,
                 this.#unsubscribeCache

@@ -1074,10 +1074,9 @@ export default class MobSpring {
      *
      * @type {import('./type.js').SpringSubscribeCache}
      */
-    subscribeCache(item, fn) {
+    subscribeCache(fn) {
         const { arrayOfCallbackUpdated, unsubscribeCb, unsubscribeCache } =
             updateSubscribersCache(
-                item,
                 fn,
                 this.#callbackCache,
                 this.#unsubscribeCache

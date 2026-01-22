@@ -17,15 +17,13 @@ const subscriberMap = new Map();
 /**
  * Add new item to cache.
  *
- * @param {Object | HTMLElement} el
- * @param {(arg0: any, arg1: Object | HTMLElement) => void} fn
+ * @param {(arg0: any) => void} fn
  * @returns {{ id: string; unsubscribe: () => void }}
  */
-const add = (el = {}, fn = () => {}) => {
+const add = (fn = () => {}) => {
     const id = getUnivoqueId();
 
     subscriberMap.set(id, {
-        el,
         fn,
         data: new Map(),
         freeze: {
@@ -180,16 +178,16 @@ const unFreeze = ({ id, update = true }) => {
  * @returns {void}
  */
 const clean = (id) => {
-    const el = subscriberMap.get(id);
-    if (!el) return;
+    const item = subscriberMap.get(id);
+    if (!item) return;
 
     /*
      * When we remove some items before fired we have to update the
      * cachecounter so handleFrame can stop
      */
-    const frameToSubstract = el.data.size;
+    const frameToSubstract = item.data.size;
     cacheCoutner = cacheCoutner - frameToSubstract;
-    el.data.clear();
+    item.data.clear();
 };
 
 /**
@@ -211,12 +209,12 @@ const get = (id) => {
  */
 const fire = (frameCounter) => {
     for (const value of subscriberMap.values()) {
-        const { data, fn, el, freeze } = value;
+        const { data, fn, freeze } = value;
 
         const callBackObject = data.get(frameCounter);
 
         if (callBackObject && !freeze.active) {
-            fn(callBackObject, el);
+            fn(callBackObject);
 
             data.delete(frameCounter);
             cacheCoutner--;
@@ -238,10 +236,10 @@ const fireObject = ({ id, obj = {} }) => {
     const item = subscriberMap.get(id);
     if (!item) return;
 
-    const { el, fn, freeze } = item;
+    const { fn, freeze } = item;
     if (freeze.active) return;
 
-    fn(obj, el);
+    fn(obj);
 };
 
 /**
@@ -258,7 +256,7 @@ const getCacheCounter = () => cacheCoutner;
  */
 const updateFrameId = (maxFramecounter) => {
     for (const [key, value] of subscriberMap) {
-        const { data, fn, el, freeze } = value;
+        const { data, fn, freeze } = value;
 
         const newMap = new Map();
         for (const [frame, object] of data) {
@@ -266,7 +264,7 @@ const updateFrameId = (maxFramecounter) => {
             data.delete(frame);
         }
 
-        subscriberMap.set(key, { data: newMap, fn, el, freeze });
+        subscriberMap.set(key, { data: newMap, fn, freeze });
     }
 };
 

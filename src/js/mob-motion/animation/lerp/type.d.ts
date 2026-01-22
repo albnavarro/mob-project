@@ -53,7 +53,6 @@ export type LerpUpdateVelocity = (number) => void;
 export type LerpUpdatePrecision = (number) => void;
 export type LerpSubscribe = (cb: (arg0: any) => void) => () => void;
 export type LerpSubscribeCache = (
-    item: object | HTMLElement,
     cb: (arg0: Record<string, number>) => void
 ) => () => void;
 export type LerpOnComplete = (cb: (arg0: any) => void) => () => void;

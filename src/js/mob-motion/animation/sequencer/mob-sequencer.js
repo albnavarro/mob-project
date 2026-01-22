@@ -762,10 +762,9 @@ export default class MobSequencer {
      *
      * @type {import('./type.js').SequencerSubscribeCache}
      */
-    subscribeCache(item, fn = () => {}) {
+    subscribeCache(fn = () => {}) {
         const { arrayOfCallbackUpdated, unsubscribeCb, unsubscribeCache } =
             updateSubscribersCache(
-                item,
                 fn,
                 this.#callbackCache,
                 this.#unsubscribeCache

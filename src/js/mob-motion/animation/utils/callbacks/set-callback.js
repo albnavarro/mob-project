@@ -40,7 +40,6 @@ export const updateSubScribers = (currentCallback, arrayOfCallback) => {
  * @type {import('./type').SetCallBackCache}
  */
 export const updateSubscribersCache = (
-    item,
     currentCallback,
     arrayOfCallback,
     unsubscribeCacheArray
@@ -49,10 +48,7 @@ export const updateSubscribersCache = (
     const { id } = callBackStore.get();
 
     // add item and function related to handleCache.
-    const { id: cacheId, unsubscribe } = MobCore.useCache.add(
-        item,
-        currentCallback
-    );
+    const { id: cacheId, unsubscribe } = MobCore.useCache.add(currentCallback);
 
     // Update main callback array.
     // index and frame is settled on first run of tween
