@@ -2,7 +2,7 @@ import { StaggerFrameIndexObject, StaggerObject } from '../stagger/type';
 
 export interface CallbackObject<T> {
     cb: T;
-    id: number;
+    id: string;
     index: number;
     frame: number;
 }

@@ -117,6 +117,10 @@ function handleMouse(eventType) {
             type,
             preventDefault: () =>
                 usePassive ? () => {} : event.preventDefault(),
+            spinX: 0,
+            spinY: 0,
+            pixelX: 0,
+            pixelY: 0,
         };
 
         // Add spin value if is wheel event
@@ -125,12 +129,10 @@ function handleMouse(eventType) {
             const spinXMaxValue = eventStore.getProp('spinXMaxValue');
             const { spinX, spinY, pixelX, pixelY } = normalizeWheel(event);
 
-            Object.assign(mouseData, {
-                spinX: clamp(spinX, -spinXMaxValue, spinXMaxValue),
-                spinY: clamp(spinY, -spinYMaxValue, spinYMaxValue),
-                pixelX,
-                pixelY,
-            });
+            mouseData.spinX = clamp(spinX, -spinXMaxValue, spinXMaxValue);
+            mouseData.spinY = clamp(spinY, -spinYMaxValue, spinYMaxValue);
+            mouseData.pixelX = pixelX;
+            mouseData.pixelY = pixelY;
         }
 
         for (const value of callbacks.values()) {
