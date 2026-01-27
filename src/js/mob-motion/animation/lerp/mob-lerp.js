@@ -296,9 +296,9 @@ export default class MobLerp {
                 /**
                  * End of animation Set fromValue with ended value At the next call fromValue become the start value
                  */
-                this.#values = [...this.#values].map((item) => {
-                    return { ...item, fromValue: item.toValue };
-                });
+                for (const item of this.#values) {
+                    item.fromValue = item.toValue;
+                }
 
                 /**
                  * On complete

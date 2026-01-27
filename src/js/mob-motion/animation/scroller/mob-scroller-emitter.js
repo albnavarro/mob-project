@@ -69,21 +69,24 @@ export function MobScrollerEmitter({
     onLeave,
     onLeaveBack,
 }) {
-    const fn = {
-        [MobScrollerConstant.ON_LEAVE]: () => {
-            if (onLeave) onLeave();
-        },
-        [MobScrollerConstant.ON_ENTER_BACK]: () => {
-            if (onEnterBack) onEnterBack();
-        },
-        [MobScrollerConstant.ON_LEAVE_BACK]: () => {
-            if (onLeaveBack) onLeaveBack();
-        },
-        [MobScrollerConstant.ON_ENTER]: () => {
-            if (onEnter) onEnter();
-        },
-        [MobScrollerConstant.ON_NOOP]: () => {},
-    };
+    const result = action({ prevValue, value, maxVal });
 
-    fn[action({ prevValue, value, maxVal })]();
+    switch (result) {
+        case MobScrollerConstant.ON_LEAVE: {
+            if (onLeave) onLeave();
+            break;
+        }
+        case MobScrollerConstant.ON_ENTER_BACK: {
+            if (onEnterBack) onEnterBack();
+            break;
+        }
+        case MobScrollerConstant.ON_LEAVE_BACK: {
+            if (onLeaveBack) onLeaveBack();
+            break;
+        }
+        case MobScrollerConstant.ON_ENTER: {
+            if (onEnter) onEnter();
+            break;
+        }
+    }
 }

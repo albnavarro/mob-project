@@ -152,6 +152,20 @@ export default class MobSyncTimeline {
     #currentReject;
 
     /**
+     * Reusable object for onUpdate callbacks to avoid per-frame allocations
+     *
+     * @type {{ time: number; direction: import('../utils/timeline/type.js').DirectionType }}
+     */
+    #updateData;
+
+    /**
+     * Reusable object for onLoopEnd callbacks to avoid per-loop allocations
+     *
+     * @type {{ direction: import('../utils/timeline/type.js').DirectionType; loop: number }}
+     */
+    #loopData;
+
+    /**
      * Available methods:
      *
      * ```javascript
@@ -219,6 +233,8 @@ export default class MobSyncTimeline {
         this.#callbackOnUpdate = [];
         this.#currentResolve = undefined;
         this.#currentReject = undefined;
+        this.#updateData = { time: 0, direction: directionConstant.NONE };
+        this.#loopData = { direction: directionConstant.NONE, loop: 0 };
     }
 
     /**
@@ -228,7 +244,7 @@ export default class MobSyncTimeline {
     #updateTime(time, fps) {
         if (this.#isStopped || this.#fpsIsInLoading) return;
 
-        // If loop anitcipate by half frame ( in milliseconds ) next loop so we a have more precise animation
+        // If loop anticipate by half frame ( in milliseconds ) next loop so we a have more precise animation
         const frameThreshold =
             !this.#repeat ||
             (this.#repeat >= 2 && this.#loopCounter === this.#repeat - 1)
@@ -251,6 +267,8 @@ export default class MobSyncTimeline {
             ? this.#timeAtReverse - (this.#timeElapsed - this.#timeAtReverse)
             : this.#timeElapsed;
 
+        const direction = this.getDirection();
+
         if (!this.#isInPause) {
             this.#currentTime = clamp(partial, 0, this.#duration);
 
@@ -261,18 +279,17 @@ export default class MobSyncTimeline {
                         partial: this.#currentTime,
                         isLastDraw: false,
                         useFrame: true,
-                        direction: this.getDirection(),
+                        direction,
                     });
                 });
 
                 /*
                  * Fire callbackOnUpdate
                  */
+                this.#updateData.time = this.#currentTime;
+                this.#updateData.direction = direction;
                 this.#callbackOnUpdate.forEach(({ cb }) => {
-                    cb({
-                        time: this.#currentTime,
-                        direction: this.getDirection(),
-                    });
+                    cb(this.#updateData);
                 });
             }
         }
@@ -311,8 +328,8 @@ export default class MobSyncTimeline {
 
         /*
          * Store direction value before chengee during nextFrame
+         * (already cached at start of function)
          **/
-        const direction = this.getDirection();
         MobCore.useNextFrame(() => {
             /*
              *
@@ -333,12 +350,9 @@ export default class MobSyncTimeline {
                 // check end timeline use the right value not reset
                 this.#loopIteration = 0;
 
-                this.#callbackLoop.forEach(({ cb }) =>
-                    cb({
-                        direction,
-                        loop: this.#loopCounter,
-                    })
-                );
+                this.#loopData.direction = direction;
+                this.#loopData.loop = this.#loopCounter;
+                this.#callbackLoop.forEach(({ cb }) => cb(this.#loopData));
             }
         });
 
@@ -358,7 +372,7 @@ export default class MobSyncTimeline {
                     partial: endTime,
                     isLastDraw: true,
                     useFrame: true,
-                    direction: this.getDirection(),
+                    direction,
                 });
             });
 

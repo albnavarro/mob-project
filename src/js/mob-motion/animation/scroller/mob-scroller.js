@@ -1941,21 +1941,12 @@ export default class MobScroller {
      * @param {number} value
      */
     #updateStyle(value) {
-        if (this.#applyTo) {
-            Object.assign(this.#applyTo.style, this.#getStyle(value));
-        } else if (this.#item) {
-            Object.assign(this.#item.style, this.#getStyle(value));
-        }
-
         this.#lastValue = value;
         this.#firstTime = false;
-    }
 
-    /**
-     * @param {number} value
-     */
-    #getStyle(value) {
-        if (this.#shouldTrackOnlyEvents) return;
+        // @ts-ignore
+        const el = this.#applyTo || this.#item;
+        if (!el || this.#shouldTrackOnlyEvents) return;
 
         const force3DStyle = this.#force3D ? 'translate3D(0px, 0px, 0px)' : '';
 
@@ -1977,51 +1968,44 @@ export default class MobScroller {
 
         switch (this.#propierties) {
             case MobScrollerConstant.PROP_VERTICAL: {
-                return {
-                    // translate: `0 ${val}px`,
-                    // transform: `${force3DStyle}`,
-                    transform: `${force3DStyle} translateY(${valueParsed}px)`,
-                    willChange: shouldWill,
-                };
+                el.style.transform = `${force3DStyle} translateY(${valueParsed}px)`;
+                el.style.willChange = shouldWill;
+                break;
             }
 
             case MobScrollerConstant.PROP_HORIZONTAL: {
-                return {
-                    transform: `${force3DStyle} translateX(${valueParsed}px)`,
-                    willChange: shouldWill,
-                };
+                el.style.transform = `${force3DStyle} translateX(${valueParsed}px)`;
+                el.style.willChange = shouldWill;
+                break;
             }
 
             case MobScrollerConstant.PROP_ROTATE: {
-                return {
-                    transform: `${force3DStyle} rotate(${valueParsed}deg)`,
-                    willChange: shouldWill,
-                };
+                el.style.transform = `${force3DStyle} rotate(${valueParsed}deg)`;
+                el.style.willChange = shouldWill;
+                break;
             }
 
             case MobScrollerConstant.PROP_ROTATEY: {
-                return {
-                    transform: `${force3DStyle} rotateY(${valueParsed}deg)`,
-                    willChange: shouldWill,
-                };
+                el.style.transform = `${force3DStyle} rotateY(${valueParsed}deg)`;
+                el.style.willChange = shouldWill;
+                break;
             }
 
             case MobScrollerConstant.PROP_ROTATEX: {
-                return {
-                    transform: `${force3DStyle} rotateX(${valueParsed}deg)`,
-                    willChange: shouldWill,
-                };
+                el.style.transform = `${force3DStyle} rotateX(${valueParsed}deg)`;
+                el.style.willChange = shouldWill;
+                break;
             }
 
             case MobScrollerConstant.PROP_ROTATEZ: {
-                return {
-                    transform: `${force3DStyle} rotateZ(${valueParsed}deg)`,
-                    willChange: shouldWill,
-                };
+                el.style.transform = `${force3DStyle} rotateZ(${valueParsed}deg)`;
+                el.style.willChange = shouldWill;
+                break;
             }
 
             case MobScrollerConstant.PROP_OPACITY: {
-                return { opacity: `${value}` };
+                el.style.opacity = `${value}`;
+                break;
             }
 
             case MobScrollerConstant.PROP_SCALE: {
@@ -2029,10 +2013,9 @@ export default class MobScroller {
                     this.#type === MobScrollerConstant.TYPE_SCROLLTRIGGER
                         ? value
                         : 1 + value / 1000;
-                return {
-                    transform: `${force3DStyle} scale(${scaleVal})`,
-                    willChange: shouldWill,
-                };
+                el.style.transform = `${force3DStyle} scale(${scaleVal})`;
+                el.style.willChange = shouldWill;
+                break;
             }
 
             case MobScrollerConstant.PROP_SCALE_X: {
@@ -2040,10 +2023,9 @@ export default class MobScroller {
                     this.#type === MobScrollerConstant.TYPE_SCROLLTRIGGER
                         ? value
                         : 1 + value / 1000;
-                return {
-                    transform: `${force3DStyle} scaleX(${scaleVal})`,
-                    willChange: shouldWill,
-                };
+                el.style.transform = `${force3DStyle} scaleX(${scaleVal})`;
+                el.style.willChange = shouldWill;
+                break;
             }
 
             case MobScrollerConstant.PROP_SCALE_Y: {
@@ -2051,16 +2033,15 @@ export default class MobScroller {
                     this.#type === MobScrollerConstant.TYPE_SCROLLTRIGGER
                         ? value
                         : 1 + value / 1000;
-                return {
-                    transform: `${force3DStyle} scaleY(${scaleVal})`,
-                    willChange: shouldWill,
-                };
+                el.style.transform = `${force3DStyle} scaleY(${scaleVal})`;
+                el.style.willChange = shouldWill;
+                break;
             }
 
             default: {
-                return {
-                    [this.#propierties.toLowerCase()]: `${value}px`,
-                };
+                // @ts-ignore
+                el.style[this.#propierties.toLowerCase()] = `${value}px`;
+                break;
             }
         }
     }

@@ -180,7 +180,7 @@ export default class MobScrollerTween {
      * @param {boolean} obj.useFrame - Compatibiliey with sequencer for Parallxx
      */
     draw({ partial, isLastDraw }) {
-        this.#values = [...this.#values].map((item) => {
+        for (const item of this.#values) {
             const { toIsFn, toFn, toValue, fromIsFn, fromFn, fromValue } = item;
 
             const toValueParsed = toIsFn ? toFn() : toValue;
@@ -194,11 +194,8 @@ export default class MobScrollerTween {
                 this.#duration
             );
 
-            return {
-                ...item,
-                currentValue: getRoundedValue(currentValue),
-            };
-        });
+            item.currentValue = getRoundedValue(currentValue);
+        }
 
         // Prepare an obj to pass to the callback
         const callBackObject = getValueObj(this.#values, 'currentValue');

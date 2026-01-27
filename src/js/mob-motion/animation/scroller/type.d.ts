@@ -304,7 +304,7 @@ export interface MobScrollerMove {
 
 export interface MobScrollerTween {
     from: Record<string, number>;
-    to: Record<string, number>;
+    to: Record<string, number | (() => number)>;
     stagger?: Partial<StaggerObject>;
     ease?: EaseTypes;
     duration?: number;

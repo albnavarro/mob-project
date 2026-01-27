@@ -187,7 +187,12 @@ const nextTickFn = () => {
     /**
      * Get next callback
      */
-    callback = [...callback, ...handleNextFrame.get()];
+    const nextFrames = handleNextFrame.get();
+    if (nextFrames.length > 0) {
+        for (const nextFrame of nextFrames) {
+            callback.push(nextFrame);
+        }
+    }
 
     /**
      * Next frame condition

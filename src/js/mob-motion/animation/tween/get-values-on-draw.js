@@ -16,6 +16,7 @@ export const tweenGetValueOnDraw = ({
 }) => {
     return values.map((item) => {
         if (item.shouldUpdate) {
+            // @ts-ignore
             const rawCurrentValue = ease(
                 timeElapsed,
                 item.fromValue,

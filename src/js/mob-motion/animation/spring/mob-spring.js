@@ -308,12 +308,9 @@ export default class MobSpring {
                 /**
                  * End of animation Set fromValue with ended value At the next call fromValue become the start value
                  */
-                this.#values = [...this.#values].map((item) => {
-                    return {
-                        ...item,
-                        fromValue: item.toValue,
-                    };
-                });
+                for (const item of this.#values) {
+                    item.fromValue = item.toValue;
+                }
 
                 /**
                  * On complete
@@ -366,12 +363,9 @@ export default class MobSpring {
      * @param {number} fps Current FPS
      */
     #onReuqestAnim(time, fps) {
-        this.#values = [...this.#values].map((item) => {
-            return {
-                ...item,
-                velocity: Math.trunc(this.#configProps.velocity),
-            };
-        });
+        for (const item of this.#values) {
+            item.velocity = Math.trunc(this.#configProps.velocity);
+        }
 
         /**
          * Normalize spring config props

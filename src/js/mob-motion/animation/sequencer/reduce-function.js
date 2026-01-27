@@ -53,11 +53,15 @@ export const getFirstValidValueBack = (arr, index, prop, propToFind) => {
  * @returns {boolean}
  */
 export const checkIsLastUsableProp = (arr, index, prop, partial) => {
-    return arr.slice(index + 1).reduce((previous, { start, values }) => {
-        const nextActiveItem = values.find((nextItem) => {
-            return nextItem.prop === prop && nextItem.active;
-        });
+    for (let i = index + 1; i < arr.length; i++) {
+        const { start, values } = arr[i];
 
-        return nextActiveItem && start <= partial ? false : previous;
-    }, true);
+        for (const nextItem of values) {
+            if (nextItem.prop === prop && nextItem.active && start <= partial) {
+                return false;
+            }
+        }
+    }
+
+    return true;
 };

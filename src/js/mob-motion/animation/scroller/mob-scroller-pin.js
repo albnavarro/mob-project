@@ -553,7 +553,7 @@ export class MobScrollerPin {
                 // @ts-ignore
                 return this.#findStyle(this.#pin, item);
             })
-            .filter((item) => item !== null)
+            .filter(Boolean)
             .reduce((p, c) => {
                 return { ...p, ...c };
             }, {});

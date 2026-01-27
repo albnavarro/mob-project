@@ -334,16 +334,6 @@ export default class MobSequencer {
         }
 
         /**
-         * Reset settled status
-         */
-        this.#values = [...this.#values].map((item) => {
-            return {
-                ...item,
-                settled: false,
-            };
-        });
-
-        /**
          * Get new values
          */
         this.#values = sequencerGetValusOnDraw({

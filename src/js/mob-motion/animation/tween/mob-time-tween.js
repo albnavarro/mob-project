@@ -314,15 +314,12 @@ export default class MobTimeTween {
                 /**
                  * End of animation Set fromValue with ended value At the next call fromValue become the start value
                  */
-                this.#values = [...this.#values].map((item) => {
-                    if (!item.shouldUpdate) return item;
-
-                    return {
-                        ...item,
-                        toValue: item.currentValue,
-                        fromValue: item.currentValue,
-                    };
-                });
+                for (const item of this.#values) {
+                    if (item.shouldUpdate) {
+                        item.toValue = item.currentValue;
+                        item.fromValue = item.currentValue;
+                    }
+                }
 
                 /**
                  * On complete
@@ -606,14 +603,11 @@ export default class MobTimeTween {
      * @returns {void}
      */
     #updateDataWhileRunning() {
-        this.#values = [...this.#values].map((item) => {
-            if (!item.shouldUpdate) return item;
-
-            return {
-                ...item,
-                fromValue: item.currentValue,
-            };
-        });
+        for (const item of this.#values) {
+            if (item.shouldUpdate) {
+                item.fromValue = item.currentValue;
+            }
+        }
     }
 
     /**
