@@ -19,14 +19,29 @@ export const useNextLoop = (fn) => {
     }
 };
 
-// https://macarthur.me/posts/navigating-the-event-loop
+/** @type{(() => void)[]} */
+// const queue = [];
+// let size = 0;
+// let scheduled = false;
 
 /**
- * Alternative 1 Safari not support at moment. requestIdleCallback(() => { fn(); });
+ * @param {() => void} fn
  */
-
-/**
- * Alternative 2:
- *
- * Const channel = new MessageChannel(); channel.port1.onmessage = fn; channel.port2.postMessage('');
- */
+// export const useNextLoop = (fn) => {
+//     queue[size++] = fn;
+//
+//     if (!scheduled) {
+//         scheduled = true;
+//
+//         setTimeout(() => {
+//             for (let i = 0; i < size; i++) {
+//                 queue[i]();
+//
+//                 // @ts-ignore
+//                 queue[i] = null; // libera reference
+//             }
+//             size = 0;
+//             scheduled = false;
+//         });
+//     }
+// };
