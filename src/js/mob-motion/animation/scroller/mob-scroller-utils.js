@@ -37,7 +37,6 @@ const returnWhenFail = () => {
  * @param {boolean} obj.invert
  * @param {number} obj.endValInNumber
  * @param {number} obj.scrollerHeight
- * @param {number} obj.isNegative
  * @param {number} obj.startPoint
  * @param {boolean} obj.isFromTopLeft
  * @returns Number
@@ -46,13 +45,11 @@ const getValueInPx = ({
     invert,
     endValInNumber,
     scrollerHeight,
-    isNegative,
     startPoint,
     isFromTopLeft,
 }) => {
-    const valueFromTop = endValInNumber * isNegative - startPoint;
-    const valueFromBottom =
-        scrollerHeight - endValInNumber * isNegative - startPoint;
+    const valueFromTop = endValInNumber - startPoint;
+    const valueFromBottom = scrollerHeight - endValInNumber - startPoint;
 
     if (invert) {
         return isFromTopLeft ? valueFromTop : valueFromBottom;
@@ -69,7 +66,6 @@ const getValueInPx = ({
  * @param {number} obj.endValInNumber
  * @param {number} obj.scrollerHeight
  * @param {number} obj.screenUnit
- * @param {number} obj.isNegative
  * @param {number} obj.startPoint
  * @param {boolean} obj.isFromTopLeft
  * @returns Number
@@ -79,22 +75,17 @@ const getValueInVwVh = ({
     scrollerHeight,
     screenUnit,
     endValInNumber,
-    isNegative,
     startPoint,
     isFromTopLeft,
 }) => {
     if (invert) {
         return isFromTopLeft
-            ? scrollerHeight -
-                  screenUnit * (100 - endValInNumber * isNegative) -
-                  startPoint
-            : screenUnit * (100 - endValInNumber * isNegative) - startPoint;
+            ? scrollerHeight - screenUnit * (100 - endValInNumber) - startPoint
+            : screenUnit * (100 - endValInNumber) - startPoint;
     } else {
         return isFromTopLeft
-            ? scrollerHeight -
-                  screenUnit * endValInNumber * isNegative -
-                  startPoint
-            : screenUnit * endValInNumber * isNegative - startPoint;
+            ? scrollerHeight - screenUnit * endValInNumber - startPoint
+            : screenUnit * endValInNumber - startPoint;
     }
 };
 
@@ -219,31 +210,24 @@ export const getStartPoint = (screenUnit, data, direction) => {
     );
 
     /**
-     * Check if number is negative
+     * - "-100px" -> -100
+     * - ".5vh" -> 0.5
+     * - " 50 px" -> 50
      */
-    const firstChar = String(numberVal).charAt(0);
-    const isNegative = firstChar === '-' ? -1 : 1;
-
-    /**
-     * Get number without px or vw etc..
-     */
-    const number = Number.parseFloat(
-        // @ts-ignore
-        String(numberVal).replaceAll(/^\D+/g, '')
-    );
-    const startValInNumber = number ?? 0;
+    const val = Number.parseFloat(String(numberVal));
+    const startValInNumber = Number.isNaN(val) ? 0 : val;
 
     /**
      * Get final value without height/halfHeight etc..
      */
     return unitMisure === MobScrollerConstant.PX
         ? {
-              value: startValInNumber * isNegative,
+              value: startValInNumber,
               additionalVal,
               position: getScrollerPositionFromContanst(position),
           }
         : {
-              value: screenUnit * startValInNumber * isNegative,
+              value: screenUnit * startValInNumber,
               additionalVal,
               position: getScrollerPositionFromContanst(position),
           };
@@ -283,19 +267,12 @@ export const getEndPoint = (
     );
 
     /**
-     * Check if number is negative
+     * - "-100px" -> -100
+     * - ".5vh" -> 0.5
+     * - " 50 px" -> 50
      */
-    const firstChar = String(numberVal).charAt(0);
-    const isNegative = firstChar === '-' ? -1 : 1;
-
-    /**
-     * Get number without px or vw etc..
-     */
-    const number = Number.parseFloat(
-        // @ts-ignore
-        String(numberVal).replaceAll(/^\D+/g, '')
-    );
-    const endValInNumber = number ?? 0;
+    const val = Number.parseFloat(String(numberVal));
+    const endValInNumber = Number.isNaN(val) ? 0 : val;
 
     /**
      * Get position constant from prallax constant
@@ -319,7 +296,6 @@ export const getEndPoint = (
                         invert: true,
                         endValInNumber,
                         scrollerHeight,
-                        isNegative,
                         startPoint,
                         isFromTopLeft,
                     })
@@ -327,7 +303,6 @@ export const getEndPoint = (
                         invert: false,
                         endValInNumber,
                         scrollerHeight,
-                        isNegative,
                         startPoint,
                         isFromTopLeft,
                     }),
@@ -341,7 +316,6 @@ export const getEndPoint = (
                         scrollerHeight,
                         screenUnit,
                         endValInNumber,
-                        isNegative,
                         startPoint,
                         isFromTopLeft,
                     })
@@ -350,7 +324,6 @@ export const getEndPoint = (
                         scrollerHeight,
                         screenUnit,
                         endValInNumber,
-                        isNegative,
                         startPoint,
                         isFromTopLeft,
                     }),
