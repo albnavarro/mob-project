@@ -1,5 +1,3 @@
-// @ts-check
-
 import {
     getScrollerPositionFromContanst,
     getStartEndUnitMisure,
@@ -39,7 +37,7 @@ const returnWhenFail = () => {
  * @param {number} obj.scrollerHeight
  * @param {number} obj.startPoint
  * @param {boolean} obj.isFromTopLeft
- * @returns Number
+ * @returns {number}
  */
 const getValueInPx = ({
     invert,
@@ -68,7 +66,7 @@ const getValueInPx = ({
  * @param {number} obj.screenUnit
  * @param {number} obj.startPoint
  * @param {boolean} obj.isFromTopLeft
- * @returns Number
+ * @returns {number}
  */
 const getValueInVwVh = ({
     invert,
@@ -118,21 +116,29 @@ export const detectViewPortInterception = ({
  * @returns {import('./utils-type.js').scrollTriggerLimitValues} Return object with values or default
  */
 export const getStartEndValue = (values, direction) => {
-    // Get number value if exist, check values array to find a item with almost 1 number ad get it
+    /**
+     * Get number value if exist, check values array to find a item with almost 1 number ad get it
+     */
     const numberInString = values.find((item) => {
         return [...item].some((c) => !Number.isNaN(Number.parseFloat(c)));
     });
 
-    // Get unit misure from nunmber case insensitive
+    /**
+     * Get unit misure from nunmber case insensitive
+     */
     const unitMisure = getStartEndUnitMisure(numberInString);
 
-    // Number without unit misure is not allowed
+    /**
+     * Number without unit misure is not allowed
+     */
     if (numberInString && !unitMisure) {
         scrollerWarningNoUnitMiusure();
         return returnWhenFail();
     }
 
-    // Number in vh is not allowed in horizontal mode
+    /**
+     * Number in vh is not allowed in horizontal mode
+     */
     if (
         numberInString &&
         unitMisure === MobScrollerConstant.VH &&
@@ -142,7 +148,9 @@ export const getStartEndValue = (values, direction) => {
         return returnWhenFail();
     }
 
-    // Number in vw is not allowed in vertical mode
+    /**
+     * Number in vw is not allowed in vertical mode
+     */
     if (
         numberInString &&
         unitMisure === MobScrollerConstant.VW &&
@@ -152,7 +160,9 @@ export const getStartEndValue = (values, direction) => {
         return returnWhenFail();
     }
 
-    // Get aditonal value +height +halfHeight -height -etc... if exist
+    /**
+     * Get aditonal value +height +halfHeight -height -etc... if exist
+     */
     const additionaChoice = [
         MobScrollerConstant.PLUS_HEIGHT,
         MobScrollerConstant.PLUS_HEIGHT_HALF,
@@ -167,7 +177,9 @@ export const getStartEndValue = (values, direction) => {
         return exactMatchInsesitivePropArray(additionaChoice, item);
     });
 
-    // Get position top || bottom || left || right
+    /**
+     * Get position top || bottom || left || right
+     */
     const positionMap = [
         MobScrollerConstant.POSITION_BOTTOM,
         MobScrollerConstant.POSITION_TOP,
@@ -342,7 +354,9 @@ export const getEndPoint = (
 export const processFixedLimit = (value, stringValue, height, width) => {
     const str = String(stringValue);
 
-    // plus
+    /**
+     * Plus ( + )
+     */
     if (exactMatchInsensitive(str, MobScrollerConstant.PLUS_HEIGHT_HALF)) {
         return value + height / 2;
     }
@@ -359,7 +373,9 @@ export const processFixedLimit = (value, stringValue, height, width) => {
         return value + width;
     }
 
-    // minus
+    /**
+     * Minus ( - )
+     */
     if (exactMatchInsensitive(str, MobScrollerConstant.MINUS_HEIGHT_HALF)) {
         return value - height / 2;
     }

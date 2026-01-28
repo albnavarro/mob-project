@@ -1,5 +1,3 @@
-// @ts-check
-
 export const propToSet = {
     fromValue: {
         get: 'toValue',
