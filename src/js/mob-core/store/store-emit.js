@@ -13,14 +13,14 @@ import { storeEmitWarning } from './store-warining';
 const storeEmit = ({ instanceId, prop }) => {
     const state = getStateFromMainMap(instanceId);
     if (!state) return;
-    const { store, callBackWatcher, validationStatusObject, bindInstanceBy } =
+    const { store, watcherByProp, validationStatusObject, bindInstanceBy } =
         state;
 
     if (!store) return;
 
     if (prop in store) {
         runCallbackQueqe({
-            callBackWatcher,
+            watcherByProp,
             prop,
             newValue: store[prop],
             oldValue: store[prop],
@@ -79,24 +79,24 @@ export const storeEmitEntryPoint = ({ instanceId, prop }) => {
  * @param {Object} param
  * @param {string} param.instanceId
  * @param {string} param.prop
- * @returns {Promise<any>}
+ * @returns {Promise<{ success: boolean }>}
  */
 const storeEmitAsync = async ({ instanceId, prop }) => {
     const state = getStateFromMainMap(instanceId);
-    if (!state) return new Promise((resolve) => resolve(''));
-    const { store, callBackWatcher, validationStatusObject, bindInstanceBy } =
+    if (!state) return new Promise((resolve) => resolve({ success: false }));
+
+    const { store, watcherByProp, validationStatusObject, bindInstanceBy } =
         state;
 
-    if (!store) return { success: false };
+    if (!store) return new Promise((resolve) => resolve({ success: false }));
 
     if (prop in store) {
         await runCallbackQueqeAsync({
-            callBackWatcher,
+            watcherByProp,
             prop,
             newValue: store[prop],
             oldValue: store[prop],
             validationValue: validationStatusObject[prop],
-            instanceId,
         });
 
         addToComputedWaitLsit({ instanceId, prop });

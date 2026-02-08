@@ -57,6 +57,8 @@ export const extractkeyFromProp = (prop) => {
 };
 
 /**
+ * Keys should be one string or a function that fire only one proxi
+ *
  * @param {(string | (() => any))[]} keys
  * @returns {string[]}
  */

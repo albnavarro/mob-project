@@ -61,10 +61,12 @@ const fire = ({ currentFrame, time, fps }) => {
  * @param {number} index
  */
 const add = (callback, index) => {
+    const indexSanitize = Math.max(index, 0);
+
     /**
      * @type {number}
      */
-    const frameIndex = index + eventStore.getProp('currentFrame');
+    const frameIndex = indexSanitize + eventStore.getProp('currentFrame');
 
     /**
      * Add callback to array related to specific index idf exxist or create in a bigger set of callaback

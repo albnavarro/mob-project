@@ -149,10 +149,22 @@ const shouldMakeSomethingStart = () => {
 };
 
 /**
+ * Reset frame counter.
+ *
+ * - CurrentFrame > frame limit
+ */
+const performFrameCounterReset = () => {
+    currentFrame = 0;
+    eventStore.quickSetProp('currentFrame', currentFrame);
+    handleFrameIndex.updateKeys(currentFrameLimit);
+    handleCache.updateFrameId(currentFrameLimit);
+};
+
+/**
  * Stop timer when user change tab
  */
 handleVisibilityChange(({ visibilityState }) => {
-    isStopped = visibilityState === 'visible';
+    isStopped = visibilityState !== 'visible';
 });
 
 catchAnimationReject();
@@ -172,11 +184,8 @@ const nextTickFn = () => {
      * If currentFrame reach currentFrameLimit back to zero to avoid big numbers
      * executte the operation outside requestAnimationFrame if deferredNextTick is active
      */
-    if (currentFrame === currentFrameLimit) {
-        currentFrame = 0;
-        eventStore.quickSetProp('currentFrame', currentFrame);
-        handleFrameIndex.updateKeys(currentFrameLimit);
-        handleCache.updateFrameId(currentFrameLimit);
+    if (currentFrame >= currentFrameLimit) {
+        performFrameCounterReset();
     }
 
     /*
@@ -215,6 +224,12 @@ const nextTickFn = () => {
         initFrame();
     } else {
         isStopped = true;
+
+        /**
+         * - Non ci sono piu frame futuri.
+         * - PerformReset non é necessario ( non abbiamo callback in coda da riallineare ) ).
+         * - Avendo una cosa vuota basta resettare currentFrame per poter partire da un counter 0.
+         */
         currentFrame = 0;
         lastTime = time;
         eventStore.quickSetProp('currentFrame', currentFrame);
@@ -278,11 +293,6 @@ const render = (timestamp) => {
                 : eventStore.getProp('instantFps');
         fpsPrevTime = time;
         frames = 0;
-
-        /**
-         * Prevent fps error; Se a minimum of 30 fps.
-         */
-        fps = fps < 30 ? eventStore.getProp('instantFps') : fps;
     }
 
     /**

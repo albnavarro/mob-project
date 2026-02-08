@@ -65,6 +65,11 @@ const add = (fn = () => {}) => {
 const update = ({ id, callBackObject, frame }) => {
     if (!subscriberMap.has(id)) return;
 
+    /**
+     * Frame must be positive
+     */
+    const frameSanitized = Math.max(frame, 0);
+
     const { currentFrame } = eventStore.get();
     const item = subscriberMap.get(id);
 
@@ -74,9 +79,9 @@ const update = ({ id, callBackObject, frame }) => {
     /**
      * If frame is overridden the counter is not synchronized with real number of callback. So skip.
      */
-    if (data.has(frame + currentFrame)) return;
+    if (data.has(frameSanitized + currentFrame)) return;
 
-    data.set(frame + currentFrame, callBackObject);
+    data.set(frameSanitized + currentFrame, callBackObject);
     cacheCoutner++;
 };
 
@@ -264,7 +269,13 @@ const updateFrameId = (maxFramecounter) => {
             data.delete(frame);
         }
 
-        subscriberMap.set(key, { data: newMap, fn, freeze });
+        subscriberMap.set(key, {
+            data: newMap,
+            fn,
+            freeze: freeze.active
+                ? { ...freeze, atFrame: freeze.atFrame - maxFramecounter }
+                : freeze,
+        });
     }
 };
 

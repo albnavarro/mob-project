@@ -1142,11 +1142,11 @@ export default class MobScroller {
             this.#unitMisure = MobScrollerConstant.PX;
         } else {
             const str = String(this.#range);
-            const firstChar = str.charAt(0);
-            const isNegative = firstChar === '-' ? -1 : 1;
 
             /**
-             * Check if px|vw|deg or other is associated with the right props Ex: rotate have a value like '45deg'
+             * Validate value and return value or 0px.
+             *
+             * Check if px|vw|deg or other is associated with the right props Es: rotate have a value like '45deg'
              */
             const strParsed = checkStringRangeOnPropierties(
                 str,
@@ -1155,11 +1155,13 @@ export default class MobScroller {
 
             /**
              * Extract number forms string
+             *
+             * - "-100px" -> -100
+             * - ".5vh" -> 0.5
+             * - " 50 px" -> 50
              */
-            this.#numericRange =
-                // @ts-ignore
-                Number.parseFloat(strParsed.replaceAll(/^\D+/g, '')) *
-                isNegative;
+            const value = Number.parseFloat(str);
+            this.#numericRange = Number.isNaN(value) ? 0 : value;
 
             /**
              * Get px|vw|etc...
@@ -1481,12 +1483,57 @@ export default class MobScroller {
     }
 
     /**
-     * Method used to control the instance from the outside. The methods accept two parameters:
+     * Permette di pilotare un'istanza MobScroller da un'altra istanza (parent), tipicamente utilizzato in scenari come
+     * horizontal scrolling con parallax interni, smooth scroll virtuali che controllano animazioni interne, o timeline
+     * sincronizzate.
      *
-     * `value`: The scroll position of the parent. If no value is provided, the instance will calculate it autonomously.
+     * **Meccanismo Force3D e Ottimizzazione GPU**
      *
-     * `parentIsMoving`: Value that indicates if the component using the method is moving. The value is used to manage
-     * the addition of the translate3D property. The default value is false
+     * Quando un'istanza è controllata esternamente (iSControlledFromOutside = true), la gestione del force3D
+     * (translateZ(0)) viene delegata al parent attraverso il parametro parentIsMoving:
+     *
+     * 1. ParentIsMoving = true + isInViewport = true:
+     *
+     *    - Attiva this.#force3D = true
+     *    - Applica transform: translate3d(...) forzando il layer compositing GPU
+     *    - Previene tearing e jitter durante lo scroll rapido
+     * 2. ParentIsMoving = false (scroll fermo):
+     *
+     *    - Disattiva force3D (this.#force3D = false)
+     *    - Il browser può liberare risorse GPU
+     *    - Permette il repainting ottimizzato per interazioni statiche (hover, click)
+     *
+     * Questo meccanismo è essenziale perché in uno scenario con molti elementi animati (es. 50+ parallax in una
+     * sezione), tenere force3D sempre attivo saturerebbe la GPU. Invece, lo attiviamo selettivamente solo quando il
+     * parent segnala "sto scorrendo".
+     *
+     * **Flusso di rendering**
+     *
+     * - Se ease = true: il valore viene passato a #easeRender() che lo usa come target per MobLerp/MobSpring.
+     *   L'interpolazione smooth garantisce fluidità anche a FPS variabili del parent. In questo caso parentIsMoving è
+     *   ignorato perché il force3D viene gestito dal motore di interpolazione che mantiene force3D attivo durante tutta
+     *   la transizione.
+     * - Se ease = false: il valore viene processato immediatamente da #noEasingRender(). In questo caso force3D dipende
+     *   esclusivamente da parentIsMoving, diversamente dalla modalità autonoma dove force3D si attiva su scroll nativo
+     *   e si disattiva su scroll end rilevato dal DOM.
+     *
+     * **Vantaggi architetturali**
+     *
+     * 1. Single Source of Truth: solo il parent legge il DOM (scrollLeft/Top/getBoundingClientRect), i figli ricevono
+     *    valori pre-calcolati eliminando layout thrashing.
+     * 2. Sync perfetta: parent e figli aggiornano nello stesso frame RAF, eliminando il lag tipico di sistemi basati su
+     *    eventi scroll separati.
+     * 3. Risparmio computazionale: se il child è fuori viewport (isInViewport = false), move() ritorna immediatamente
+     *    senza calcolare valori o applicare stili, anche se chiamato ad ogni frame dal parent.
+     *
+     * **Note tecniche**
+     *
+     * - Se l'istanza ha un breakpoint disattivato (mq check fallito), move() ritorna immediatamente senza elaborare il
+     *   valore.
+     * - Il refresh del parent non refresha automaticamente i figli: ogni istanza mantiene la propria geometria e deve
+     *   essere refreshata separatamente su resize.
+     * - Se l'istanza ha uno screen custom diverso da window, il valore passato dal parent viene automaticamente
+     *   compensato aggiungendo #screenPosition.
      *
      * @example
      *     ```javascript
@@ -1728,6 +1775,32 @@ export default class MobScroller {
     }
 
     #getFixedValue() {
+        /*
+         * PASSO 1: Calcolo della distanza percorsa (partials)
+         *
+         * Geometria di riferimento:
+         * - this.#scrollerScroll: posizione assoluta dello scroll (0 = top del documento)
+         * - this.#scrollerHeight: altezza del viewport (o container screen)
+         * - this.#offset: posizione assoluta del top/left dell'elemento trigger rispetto al documento
+         * - this.#startPoint: distanza dal bordo viewport dove inizia l'animazione (in px)
+         * - this.#endPoint: lunghezza totale della traccia di animazione (in px)
+         * - this.#invertSide: boolean che indica se l'animazione procede dal top/left verso il basso/dx (true)
+         *   o dal bottom/right verso l'alto/sx (false)
+         *
+         * Logica invertSide = false (default: bottom → top):
+         * L'animazione inizia quando il TOP dell'elemento tocca il BOTTOM del viewport meno startPoint.
+         * this.#scrollerScroll + this.#scrollerHeight rappresenta la posizione Y del bottom del viewport.
+         * Sottraendo (this.#offset + this.#endPoint) otteniamo quanto il bottom del viewport ha "superato"
+         * il punto finale dell'animazione.
+         * Il risultato è negativo: più scorriamo verso il basso (aumenta scroll), più il valore diventa
+         * negativo (ci avviciniamo all'elemento).
+         *
+         * Logica invertSide = true (top → bottom):
+         * L'animazione inizia quando il BOTTOM dell'elemento tocca il TOP del viewport più startPoint.
+         * Il calcolo inverte la logica per considerare la distanza dal top del viewport.
+         * -(scroll + start + end - (offset + end)) semplifica a -(scroll + start - offset)
+         * Ovvero: quanto lo scroll ha superato la posizione (offset - start).
+         */
         const partials = this.#invertSide
             ? -(
                   this.#scrollerScroll +
@@ -1742,9 +1815,45 @@ export default class MobScroller {
                   (this.#offset + this.#endPoint)
               );
 
+        /*
+         * PASSO 2: Normalizzazione sul range utente
+         *
+         * maxVal: Il valore massimo che l'animazione deve raggiungere, espresso nell'unità utente.
+         * Esempio: se range = "100px" o "100deg", numericRange = 100.
+         * La formula scala linearmente: se endPoint (px) corrisponde al 100% dell'animazione,
+         * allora ogni pixel di endPoint vale (numericRange/100).
+         *
+         * partialVal: Quanto abbiamo "consumato" dell'animazione nell'unità utente.
+         * partials è in px (o unità screen), lo convertiamo nella scala dell'utente.
+         * Nota: partials è tipicamente negativo quando siamo "prima" dell'inizio animazione
+         * e diventa positivo (o meno negativo) avvicinandoci al punto finale.
+         */
         const maxVal = (this.#endPoint / 100) * this.#numericRange;
         const partialVal = (partials / 100) * this.#numericRange;
 
+        /*
+         * PASSO 3: Orientamento del valore (reverse vs invertSide)
+         *
+         * Due flag indipendenti che controllano 4 combinazioni:
+         *
+         * reverse: Inverte il senso di crescita dell'animazione.
+         * - Normalmente: scroll avanti → valore cresce da 0 a maxVal
+         * - Con reverse: scroll avanti → valore decresce da maxVal a 0
+         *
+         * invertSide: Cambia il sistema di riferimento (da dove misuriamo).
+         * - false: Misuriamo quanto manca ad arrivare (maxVal - progresso)
+         * - true: Misuriamo quanto abbiamo fatto (progresso diretto)
+         *
+         * Tabella risultati:
+         * reverse=false, invert=false: valore = maxVal - partialVal (scroll giù → valore su)
+         * reverse=true,  invert=false: valore = partialVal          (scroll giù → valore giù, ma da max a 0 scende)
+         * reverse=false, invert=true:  valore = partialVal          (scroll giù → valore giù, da 0 a max sale)
+         * reverse=true,  invert=true:  valore = maxVal - partialVal (scroll giù → valore su, ma max a 0, inverte segno)
+         *
+         * Nota: partialVal in realtà contiene il "delta" di avvicinamento, non la posizione assoluta.
+         * Quando invertSide=false, valori più negativi di partialVal (siamo lontani) devono dare 0,
+         * quindi facciamo maxVal - partialVal.
+         */
         const valePerDirections = (() => {
             if (this.#reverse) {
                 return this.#invertSide ? maxVal - partialVal : partialVal;
@@ -1753,18 +1862,61 @@ export default class MobScroller {
             }
         })();
 
+        /*
+         * PASSO 4: Clamping (limitazione ai bordi)
+         *
+         * L'animazione non deve superare i limiti 0 e maxVal (o maxVal e 0 se maxVal è negativo).
+         * Il valore negativo finale (-clamp) serve per uniformare la convenzione CSS:
+         * - translateY(-100px) muove verso l'alto
+         * - rotate(-45deg) ruota in senso antiorario
+         * - scale(0.5) rimpicciolisce (ma qui è gestito diversamente in #updateStyle)
+         *
+         * Se maxVal > 0 (animazione crescente): limitiamo tra 0 e maxVal
+         * Se maxVal < 0 (animazione negativa, es: "rotate -45deg"): limitiamo tra maxVal e 0
+         */
         const clampValue =
             maxVal > 0
                 ? -clamp(valePerDirections, 0, maxVal)
                 : -clamp(valePerDirections, maxVal, 0);
 
+        /*
+         * PASSO 5: Ottimizzazione rendering (skip frame identici)
+         *
+         * Se il valore clampato è identico al frame precedente (stessa posizione di scroll
+         * e stessa geometria), non serve ricalcolare stili o emitter.
+         * Questo salva cicli CPU su scroll lenti o fermi.
+         */
         this.#fixedShouldRender = this.#prevFixedClamp !== clampValue;
         this.#prevFixedClamp = clampValue;
         if (!this.#fixedShouldRender && !this.#firstTime) return this.#endValue;
 
+        /*
+         * PASSO 6: Conversione in percentuale standard (0-100%)
+         *
+         * Indipendentemente dall'unità utente (px, deg, scale), convertiamo in una percentuale
+         * normalizzata della durata totale dell'animazione.
+         * Questo standardizza il calcolo per le diverse proprietà CSS in #updateStyle.
+         *
+         * Esempio: se endPoint = 800px e numericRange = 100px, maxVal = 800.
+         * Se siamo a 400px di scroll nella zona attiva, clampValue ≈ -400.
+         * percentValue = (-400 * 100) / 800 = -50%.
+         */
         const percentValue = (clampValue * 100) / this.#endPoint;
 
-        // Fire callback if there is
+        /*
+         * PASSO 7: Emissione eventi di lifecycle
+         *
+         * valePerDirections (valore grezzo prima del clamp) determina le transizioni:
+         * - valePerDirections ≤ 0: Prima dell'inizio (non ancora entrati)
+         * - 0 < valePerDirections < maxVal: Dentro la zona attiva
+         * - valePerDirections ≥ maxVal: Dopo il completamento (usciti)
+         *
+         * Confrontando con prevValue possiamo determinare:
+         * - Entrata da sopra: prev ≤ 0 e current > 0
+         * - Entrata da sotto: prev ≥ max e current < max (ma > 0)
+         * - Uscita verso basso: prev < max e current ≥ max
+         * - Uscita verso alto: prev > 0 e current ≤ 0
+         */
         if (
             this.#onEnter ||
             this.#onEnterBack ||
@@ -1773,7 +1925,7 @@ export default class MobScroller {
         ) {
             MobScrollerEmitter({
                 prevValue: this.#prevFixedRawValue,
-                value: valePerDirections,
+                value: valePerDirections, // Usiamo il valore grezzo per rilevare transizioni precise
                 maxVal: maxVal,
                 onEnter: this.#onEnter,
                 onEnterBack: this.#onEnterBack,
@@ -1782,8 +1934,25 @@ export default class MobScroller {
             });
         }
 
+        /**
+         * Aggiorniamo lo stato per il prossimo frame
+         */
         this.#prevFixedRawValue = valePerDirections;
 
+        /*
+         * PASSO 8: Conversione finale per proprietà specifiche
+         *
+         * A seconda della proprietà animata, interprettiamo la percentuale diversamente:
+         *
+         * - y/x/rotate: La percentuale rappresenta la progressione diretta
+         * - scale/opacity: Rappresentano moltiplicatori (1.0 = default)
+         *
+         * Per scale/opacity: il valore va da 1 (0%) a (1 - percent) (100%)
+         * Per esempio con range scale 0.5: 1 - 0.5 = 0.5 (rimpicciolisce a metà)
+         *
+         * Per y/x/rotate: il valore è la percentuale diretta negata (-percent)
+         * che verrà poi moltiplicata per le unità (px, vh, deg) in #getHVval()
+         */
         switch (this.#propierties) {
             case MobScrollerConstant.PROP_HORIZONTAL:
             case MobScrollerConstant.PROP_VERTICAL: {

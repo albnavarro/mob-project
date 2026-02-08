@@ -26,6 +26,8 @@ import { extractkeyFromProp, extractKeysFromArray } from './current-key';
 import { setProxiPropReadOnlyEntryPoint } from './proxi-read-only';
 
 /**
+ * This module implements a reactive store.
+ *
  * @param {import('./type').MobStoreParams} data
  * @returns {import('./type').MobStoreReturnType<any>}
  */
@@ -57,6 +59,13 @@ export const mobStore = (data = {}) => {
     return {
         getId: () => instanceId,
         bindStore: (value) => {
+            /**
+             * Note:
+             *
+             * - In a normal flow store the bind another Store ( this store ) must be destroyed before binded store.
+             * - This store use component and potentially other methods that referee to binded store
+             * - So this stor emust be removed before binded store.
+             */
             bindStoreEntryPoint({ value, instanceId });
         },
         get: () => {
@@ -79,6 +88,11 @@ export const mobStore = (data = {}) => {
                 ? /** @type {string} */ (prop)
                 : extractkeyFromProp(prop);
 
+            /**
+             * StoreSetEntryPoint is called by compured, proxi etc..
+             *
+             * - So isComputed check is isolated outSide entryPoint
+             */
             const isComputed = checkIfPropIsComputed({
                 instanceId,
                 prop: propParsed,
@@ -109,6 +123,11 @@ export const mobStore = (data = {}) => {
                 ? /** @type {string} */ (prop)
                 : extractkeyFromProp(prop);
 
+            /**
+             * StoreSetEntryPoint is called by compured, proxi etc..
+             *
+             * - So isComputed check is isolated outSide entryPoint
+             */
             const isComputed = checkIfPropIsComputed({
                 instanceId,
                 prop: propParsed,
@@ -125,6 +144,13 @@ export const mobStore = (data = {}) => {
                 action: STORE_UPDATE,
             });
         },
+        /**
+         * Restituisce un Proxy reattivo sullo store.
+         *
+         * - IMPORTANTE: Se usi `bindStore()`, chiámalo PRIMA di `getProxi()`.
+         * - Il proxy viene creato e cachato alla prima chiamata;
+         * - Binding successivi non saranno riflessi nell'istanza proxy esistente.
+         */
         getProxi: () => {
             return getProxiEntryPoint({ instanceId });
         },
@@ -173,6 +199,9 @@ export const mobStore = (data = {}) => {
 
             const keysParsed = extractKeysFromArray(keys);
 
+            /**
+             * - Insiee entryPoint check is compured is duplicated.
+             */
             storeComputedEntryPoint({
                 instanceId,
                 prop: propParsed,

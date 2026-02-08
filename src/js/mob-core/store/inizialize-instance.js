@@ -17,7 +17,8 @@ export const inizializeInstance = (data) => {
     const dataDepth = maxDepth(data);
 
     return {
-        callBackWatcher: new Map(),
+        watcherByProp: new Map(),
+        watcherMetadata: new Map(),
         callBackComputed: new Set(),
         computedPropsQueque: new Set(),
         validationStatusObject: {},

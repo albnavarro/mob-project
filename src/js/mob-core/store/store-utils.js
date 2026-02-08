@@ -48,12 +48,12 @@ export const getDataRecursive = (data, shouldRecursive = true) => {
                 const functionResult = value();
 
                 /**
-                 * Complex data with validate || type || skipEqual
+                 * Complex data with validate || type || skipEqual || strict
                  */
                 if (
                     storeType.isObject(functionResult) &&
                     'value' in functionResult &&
-                    ['validate', 'type', 'skipEqual'].some(
+                    ['validate', 'type', 'skipEqual', 'strict'].some(
                         (prop) => prop in functionResult
                     )
                 ) {
@@ -209,7 +209,7 @@ export const checkIfPropIsComputed = ({ instanceId, prop }) => {
 
     if (isComputed) {
         console.warn(
-            `${prop} is used as computed, explicit set is disallowed.`
+            `${prop} is used as computed target, set and multiple computed on same prop is blocked.`
         );
     }
 

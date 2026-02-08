@@ -5,19 +5,33 @@ export type StoreMap = Map<string, StoreMapValue>;
 
 export type MobStoreValidateState = boolean | Record<string, boolean>;
 
+export interface WatcherCallback {
+    fn: (
+        current: any,
+        previous: any,
+        validate: MobStoreValidateState
+    ) => void | Promise<void>;
+    wait: boolean;
+}
+
 export interface StoreMapValue {
-    callBackWatcher: Map<
-        string,
-        {
-            prop: string;
-            fn: (
-                current: any,
-                previous: any,
-                validate: MobStoreValidateState
-            ) => void;
-            wait: boolean;
-        }
-    >;
+    /**
+     * Main record, store every callback by prop for O(1) access.
+     *
+     * - First key: prop
+     * - Inner key: unsubscribeId
+     */
+    watcherByProp: Map<string, Map<string, WatcherCallback>>;
+
+    /**
+     * Support map, for fast unsubscribe.
+     *
+     * Get prop for unsubscribeId so we havbe direct access to watcherByProp.
+     *
+     * - Key: unsubscribeId;
+     * - Value: prop
+     */
+    watcherMetadata: Map<string, string>; // id -> propName
     callBackComputed: Set<{
         prop: string;
         fn: (arg0: Record<string, any>) => void;
@@ -85,7 +99,7 @@ export type MobStoregetProp<T> = <K extends keyof T>(
 interface MobStoreSet<T> {
     <K extends keyof T>(
         prop: Extract<K, string>,
-        value: T[K],
+        value: Partial<T[K]>,
         options?: {
             emit?: boolean;
             usePropAsString?: boolean;
@@ -93,7 +107,7 @@ interface MobStoreSet<T> {
     ): void;
     <K extends T[keyof T]>(
         prop: () => K,
-        value: NoInfer<K>,
+        value: NoInfer<Partial<K>>,
         options?: {
             emit?: boolean;
             usePropAsString?: boolean;
@@ -104,7 +118,7 @@ interface MobStoreSet<T> {
 interface MobStoreUpdate<T> {
     <K extends keyof T>(
         prop: Extract<K, string>,
-        value: (arg0: T[K]) => T[K],
+        value: (arg0: Partial<T[K]>) => Partial<T[K]>,
         options?: {
             emit?: boolean;
             clone?: boolean;
@@ -113,7 +127,7 @@ interface MobStoreUpdate<T> {
     ): void;
     <K extends T[keyof T]>(
         prop: () => K,
-        value: (arg0: K) => NoInfer<K>,
+        value: (arg0: K) => NoInfer<Partial<K>>,
         options?: {
             emit?: boolean;
             clone?: boolean;
@@ -258,18 +272,7 @@ export interface MobStoreComputedAction {
 }
 
 export interface MobStoreCallbackQueue {
-    callBackWatcher: Map<
-        string,
-        {
-            prop: string;
-            fn: (
-                arg0: any,
-                arg1: any,
-                arg2: boolean | Record<string, boolean>
-            ) => void | Promise<void>;
-            wait: boolean;
-        }
-    >;
+    watcherByProp: Map<string, Map<string, WatcherCallback>>;
     prop: string;
     newValue: any;
     oldValue: any;

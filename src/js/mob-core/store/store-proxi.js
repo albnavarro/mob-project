@@ -1,64 +1,77 @@
+// store-proxi.js (modificato)
+
 import { STORE_SET } from './constant';
 import { setCurrentDependencies } from './current-key';
 import { getLogStyle } from './log-style';
 import { storeMap, updateMainMap } from './store-map';
 import { storeSetEntryPoint } from './store-set';
+import { checkType } from './store-type';
 import { checkIfPropIsComputed } from './store-utils';
 import { storeProxiReadOnlyWarning } from './store-warining';
-import { storeStrategyNeedCopy } from './strategy';
 
 /**
- * Proxi state/states with the original reference of store object.
+ * Controlla se il valore è un oggetto che dovrebbe essere congelato (non primitivi, non Map/Set che devono rimanere
+ * modificabili)
  *
- * @param {object} params
- * @param {string} params.instanceId
+ * @param {any} value
+ * @returns {boolean}
+ */
+const shouldFreeze = (value) => {
+    /**
+     * Non congelare null/undefined
+     */
+    if (value == null) return false;
+
+    /**
+     * Non congelare primitivi
+     */
+    if (!checkType(Object, value)) return false;
+
+    /**
+     * NON congelare Map e Set - l'utente deve poterli usare con .set/.get e poi chiamare emit manualmente
+     */
+    if (checkType(Map, value)) return false;
+    if (checkType(Set, value)) return false;
+
+    /**
+     * Non congelare funzioni
+     */
+    if (checkType(Function, value)) return false;
+
+    /**
+     * Congela Array e Object normali
+     */
+    return true;
+};
+
+/**
+ * Crea un proxy dinamico con protezione anti-mutazione nested.
+ *
+ * - Get: legge da self e binded stores, restituisce valori congelati
+ * - Set: scrive SOLO su self store
+ *
+ * @param {string} instanceId
  * @returns {Record<string, any>}
  */
-export const getProxiEntryPoint = ({ instanceId }) => {
+const createDynamicProxy = (instanceId) => {
     const logStyle = getLogStyle();
-    const state = storeMap.get(instanceId);
-    if (!state) return {};
 
-    const {
-        bindInstance,
-        proxiObject: previousProxiObject,
-        proxiReadOnlyProp,
-    } = state;
+    return new Proxy(
+        {},
+        {
+            set(_, /** @type {string} */ prop, value) {
+                const mainState = storeMap.get(instanceId);
+                if (!mainState) return false;
 
-    /**
-     * Return previous proxi if exist.
-     */
-    if (previousProxiObject) {
-        return previousProxiObject;
-    }
+                /**
+                 * Set operation is applied only in `self` store.
+                 */
+                if (!(prop in mainState.store)) return false;
 
-    const store = state?.store;
-
-    /**
-     * Create self proxi
-     */
-    const selfProxi = new Proxy(store, {
-        set(target, /** @type {string} */ prop, value) {
-            /**
-             * - With shallow copy refer to original store reference
-             * - With custom copy get update store from main map, copies here is not necessary.
-             * - Fallback to target if component is destroyed and there is no reference, typically call proxi after
-             *   destroy
-             */
-            const store = storeStrategyNeedCopy()
-                ? (storeMap.get(instanceId)?.store ?? target)
-                : target;
-
-            if (!store) return false;
-
-            if (prop in store) {
                 const isComputed = checkIfPropIsComputed({ instanceId, prop });
-                const isReadOnly = proxiReadOnlyProp.has(prop);
+                const isReadOnly = mainState.proxiReadOnlyProp.has(prop);
 
-                if (isReadOnly) {
-                    storeProxiReadOnlyWarning(prop, logStyle);
-                }
-
+                if (isReadOnly) storeProxiReadOnlyWarning(prop, logStyle);
                 if (isComputed || isReadOnly) return false;
 
                 storeSetEntryPoint({
@@ -71,116 +84,110 @@ export const getProxiEntryPoint = ({ instanceId }) => {
                 });
 
                 return true;
-            }
-
-            return false;
-        },
-        get(target, /** @type {string} */ prop) {
-            /**
-             * - With shallow copy refer to original store reference
-             * - With custom copy get update store from main map, copies here is not necessary.
-             * - Fallback to target if component is destroyed and there is no reference, typically call proxi after
-             *   destroy
-             */
-            const store = storeStrategyNeedCopy()
-                ? (storeMap.get(instanceId)?.store ?? target)
-                : target;
-
-            if (!store) return false;
-
-            if (!(prop in store)) {
-                return false;
-            }
-
-            /**
-             * Autodetect dependencies
-             */
-            setCurrentDependencies(prop);
-
-            /**
-             * Return value
-             */
-            return store[prop];
-        },
-    });
-
-    /**
-     * Rerturn self proxi if no bindedInstace is used.
-     */
-
-    if (!bindInstance || bindInstance.length === 0) {
-        updateMainMap(instanceId, {
-            ...state,
-            proxiObject: selfProxi,
-        });
-
-        return selfProxi;
-    }
-
-    /**
-     * Create proxi for binded store. Binded proxi has only read operation.
-     */
-    const bindedProxi = bindInstance.map((id) => {
-        const state = storeMap.get(id);
-        const store = state?.store ?? {};
-
-        return new Proxy(store, {
-            set() {
-                return false;
             },
-            get(target, /** @type {string} */ prop) {
+
+            get(_, /** @type {string} */ prop) {
+                if (!storeMap.has(instanceId)) return;
+
+                const state = storeMap.get(instanceId);
+                if (!state) return;
+
+                let value;
+
                 /**
-                 * - With shallow copy refer to original store reference
-                 * - With custom copy get update store from main map, copies here is not necessary.
-                 * - Fallback to target if component is destroyed and there is no reference, typically call proxi after
-                 *   destroy
+                 * Cerca prima in self, poi nei binded
                  */
-                const store = storeStrategyNeedCopy()
-                    ? (storeMap.get(id)?.store ?? target)
-                    : target;
-
-                if (!store) return false;
-
-                if (!(prop in store)) {
-                    return false;
+                if (prop in state.store) {
+                    value = state.store[prop];
+                    setCurrentDependencies(prop);
                 }
 
-                /**
-                 * Autodetect dependencies
-                 */
-                setCurrentDependencies(prop);
+                if (!(prop in state.store)) {
+                    for (const bindId of state.bindInstance) {
+                        const bindState = storeMap.get(bindId);
+
+                        if (bindState && prop in bindState.store) {
+                            value = bindState.store[prop];
+                            setCurrentDependencies(prop);
+                            break;
+                        }
+                    }
+                }
+
+                if (value === undefined) return;
 
                 /**
-                 * Return value
+                 * QUesto controllo serve a spinge l'uso della riassegnazione.
+                 *
+                 * Se è un Object o Array. restituisci una versione congelata.
+                 *
+                 * Map e Set rimangono modificabili (l'utente deve usare emit).
+                 *
+                 * NOTA:
+                 *
+                 * Non usiamo Object.freeze() direttamente sul valore originale per non rompere lo store interno.
+                 * Creiamo una shallow copy e la congeliamo.
+                 *
+                 * Es:
+                 *
+                 * - Proxi.myObj.prop = 2;
+                 * - `proxi.myObj`, qui il getter del proxi viene invocato resituendo un aversione congelata
+                 * - `.prop = 2`, qui viene invocato il setter ma il valore é congelato.
                  */
-                return store[prop];
+                if (shouldFreeze(value)) {
+                    /**
+                     * Shallow copy + freeze per bloccare mutazioni nested
+                     *
+                     * Ma permettere comunque la lettura delle proprietà
+                     */
+                    if (Array.isArray(value)) return Object.freeze([...value]);
+                    return Object.freeze({ ...value });
+                }
+
+                return value;
             },
-        });
-    });
 
-    /**
-     * Create a proxy with all new proxi. Reflect operation to the proxies with prop
-     */
-    const bindedProxiArray = new Proxy([selfProxi, ...bindedProxi], {
-        set(proxies, prop, value) {
-            const currentProxi = proxies.find((proxi) => prop in proxi);
-            if (!currentProxi) return false;
+            has(_, /** @type {string} */ prop) {
+                if (!storeMap.has(instanceId)) return false;
 
-            Reflect.set(currentProxi, prop, value);
-            return true;
-        },
-        get(proxies, prop) {
-            const currentProxi = proxies.find((proxi) => prop in proxi);
-            if (!currentProxi) return false;
+                const state = storeMap.get(instanceId);
+                if (!state) return false;
 
-            return Reflect.get(currentProxi, prop);
-        },
-    });
+                /**
+                 * HAS: cerca prima in self, poi nei binded
+                 */
+                if (prop in state.store) return true;
+
+                for (const bindId of state.bindInstance) {
+                    const bindState = storeMap.get(bindId);
+                    if (bindState && prop in bindState.store) return true;
+                }
+
+                return false;
+            },
+        }
+    );
+};
+
+/**
+ * @param {object} params
+ * @param {string} params.instanceId
+ * @returns {Record<string, any>}
+ */
+export const getProxiEntryPoint = ({ instanceId }) => {
+    const state = storeMap.get(instanceId);
+    if (!state) return {};
+
+    if (state.proxiObject) {
+        return state.proxiObject;
+    }
+
+    const proxiObject = createDynamicProxy(instanceId);
 
     updateMainMap(instanceId, {
         ...state,
-        proxiObject: bindedProxiArray,
+        proxiObject,
     });
 
-    return bindedProxiArray;
+    return proxiObject;
 };

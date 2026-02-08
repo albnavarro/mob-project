@@ -8,7 +8,7 @@ import { storeWatchWarning } from './store-warining';
  * @returns {import('./type').MobStoreWatchReturnObject}
  */
 const subscribeWatch = ({ state, prop, callback, wait }) => {
-    const { store, callBackWatcher } = state;
+    const { store, watcherByProp, watcherMetadata } = state;
     const logStyle = getLogStyle();
 
     if (!store)
@@ -27,10 +27,27 @@ const subscribeWatch = ({ state, prop, callback, wait }) => {
     }
 
     const id = getUnivoqueId();
-    callBackWatcher.set(id, { fn: callback, prop, wait });
+
+    /**
+     * Check if watcherByProp has current prop, if not create.
+     */
+    if (!watcherByProp.has(prop)) watcherByProp.set(prop, new Map());
+
+    /**
+     * Add data ( callback && wait value ) to current callbacks quque by prop.
+     */
+    watcherByProp.get(prop)?.set(id, { fn: callback, wait });
+
+    /**
+     * Add reference id ( unsubscribeId ) -> prop for fast unsubscribe.
+     *
+     * - Get prop from id
+     * - Clean from watcherByProp record inside prop subMap.
+     */
+    watcherMetadata.set(id, prop);
 
     return {
-        state: { ...state, callBackWatcher },
+        state: { ...state, watcherByProp, watcherMetadata },
         unsubscribeId: id,
     };
 };
@@ -44,11 +61,31 @@ const unsubScribeWatch = ({ instanceId, unsubscribeId }) => {
     const state = getStateFromMainMap(instanceId);
     if (!state) return;
 
-    const { callBackWatcher } = state;
-    if (!callBackWatcher) return;
+    const { watcherByProp, watcherMetadata } = state;
+    if (!watcherByProp || !watcherMetadata) return;
 
-    callBackWatcher.delete(unsubscribeId);
-    updateMainMap(instanceId, { ...state, callBackWatcher });
+    /**
+     * Get reference prop by unsubscribeId
+     */
+    const prop = watcherMetadata.get(unsubscribeId);
+
+    if (prop) {
+        /**
+         * - Delete record from watcherByProp.
+         * - Remove record from watcherMetadata.
+         */
+        watcherByProp.get(prop)?.delete(unsubscribeId);
+        watcherMetadata.delete(unsubscribeId);
+
+        /**
+         * - In case there is no more prop active remove main record from watcherByProp.
+         */
+        if (watcherByProp.get(prop)?.size === 0) {
+            watcherByProp.delete(prop);
+        }
+
+        updateMainMap(instanceId, { ...state, watcherByProp, watcherMetadata });
+    }
 };
 
 /**
@@ -131,9 +168,10 @@ export const watchEntryPoint = ({ instanceId, prop, callback, wait }) => {
 
         updateMainMap(instanceId, {
             ...stateAfterUnsubscribe,
-            unsubscribeBindInstance: unsubscribeBindInstance.filter(
-                (unsubscribe) => unsubscribe !== innerUnsubscribe
-            ),
+            unsubscribeBindInstance:
+                stateAfterUnsubscribe.unsubscribeBindInstance.filter(
+                    (unsubscribe) => unsubscribe !== innerUnsubscribe
+                ),
         });
     };
 };

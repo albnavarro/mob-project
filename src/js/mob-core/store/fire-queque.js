@@ -4,6 +4,18 @@ import { useNextLoop } from '../utils/next-tick';
 const waitMap = new Map();
 
 /**
+ * Clean waitMap when component is destroyed
+ *
+ * - WaitMap is global
+ * - Component should be destroyed before useNextLoop is called.
+ *
+ * @type {(id: string) => void}
+ */
+export const removeIdFromWaitMap = (id) => {
+    waitMap.delete(id);
+};
+
+/**
  * Fire callback on state update ( setState, emit ). Used to fire callback in watch function.
  *
  * - Wait: ( fire next event loop )
@@ -18,25 +30,25 @@ const waitMap = new Map();
  * @returns {void}
  */
 export const runCallbackQueqe = ({
-    callBackWatcher,
+    watcherByProp,
     prop,
     newValue,
     oldValue,
     validationValue,
     instanceId,
 }) => {
-    for (const { prop: currentProp, fn, wait } of callBackWatcher.values()) {
-        /*
-         * No wait next loop
-         */
-        if (currentProp === prop && !wait) {
+    const propWatchers = watcherByProp?.get(prop);
+    if (!propWatchers || propWatchers.size === 0) return;
+
+    for (const { fn, wait } of propWatchers.values()) {
+        if (!wait) {
             fn(newValue, oldValue, validationValue);
         }
 
         /*
          * Wait next loop
          */
-        if (instanceId && currentProp === prop && wait) {
+        if (instanceId && wait) {
             /**
              * Get all props for current instanceId.
              */
@@ -47,21 +59,37 @@ export const runCallbackQueqe = ({
             /**
              * Props is in queue ?
              */
-            const shouldWait = queueByInstanceId.has(prop);
+            const firstCycle = !queueByInstanceId.has(prop);
+
+            /**
+             * With multiple watch with multiple wait we should stare every single callback.
+             */
+            const callbacksAccumulated = firstCycle
+                ? []
+                : (queueByInstanceId.get(prop)?.callbacks ?? []);
+
+            /**
+             * Preserve old value before tick
+             */
+            const existing = queueByInstanceId.get(prop);
 
             /**
              * Update or initialize single prop value to last.
              */
             queueByInstanceId.set(prop, {
                 newValue,
-                oldValue,
-                validationValue,
-            });
 
-            /**
-             * If is in queue return;
-             */
-            if (shouldWait) return;
+                /**
+                 * Preserve old value before tick
+                 */
+                oldValue: existing?.oldValue ?? oldValue,
+                validationValue,
+
+                /**
+                 * NOTE: for more efficence consider to push `fn` instead use spread.
+                 */
+                callbacks: [...new Set([...callbacksAccumulated, fn])],
+            });
 
             /**
              * Update main instanceId map
@@ -69,38 +97,48 @@ export const runCallbackQueqe = ({
             waitMap.set(instanceId, queueByInstanceId);
 
             /**
-             * Fire callback.
+             * Fire callback one tick after.
+             *
+             * - Fire only one time nextLoop is fired on first watch with wait props setteld.
              */
-            useNextLoop(() => {
-                /**
-                 * Get last updated value
-                 */
-                const propsPerIdNow = waitMap.get(instanceId);
-                const current = propsPerIdNow?.get(prop);
+            if (firstCycle) {
+                useNextLoop(() => {
+                    /**
+                     * Get last updated value
+                     */
+                    const propsPerIdNow = waitMap.get(instanceId);
+                    const current = propsPerIdNow?.get(prop);
 
-                if (
-                    current.newValue !== undefined ||
-                    current.newValue !== null
-                ) {
-                    fn(
-                        current.newValue,
-                        current.oldValue,
-                        current.validationValue
-                    );
-                }
+                    if (
+                        current &&
+                        current.newValue !== undefined &&
+                        current.newValue !== null
+                    ) {
+                        /**
+                         * Fire every single callback related to every watch with wait props active.
+                         */
+                        for (const currentFunction of current.callbacks) {
+                            currentFunction(
+                                current.newValue,
+                                current.oldValue,
+                                current.validationValue
+                            );
+                        }
+                    }
 
-                /**
-                 * Remove prop in instanceId map once fired.
-                 */
-                propsPerIdNow?.delete(prop);
+                    /**
+                     * Remove prop in instanceId map once fired.
+                     */
+                    propsPerIdNow?.delete(prop);
 
-                /**
-                 * If instanceId has no more prop in queque delete.
-                 */
-                if (propsPerIdNow?.size === 0) {
-                    waitMap.delete(instanceId);
-                }
-            });
+                    /**
+                     * If instanceId has no more prop in queque delete.
+                     */
+                    if (propsPerIdNow?.size === 0) {
+                        waitMap.delete(instanceId);
+                    }
+                });
+            }
         }
     }
 };
@@ -110,13 +148,16 @@ export const runCallbackQueqe = ({
  * @returns {Promise<any>}
  */
 export const runCallbackQueqeAsync = async ({
-    callBackWatcher,
+    watcherByProp,
     prop,
     newValue,
     oldValue,
     validationValue,
 }) => {
-    for (const { prop: currentProp, fn } of callBackWatcher.values()) {
-        if (currentProp === prop) await fn(newValue, oldValue, validationValue);
+    const propWatchers = watcherByProp?.get(prop);
+    if (!propWatchers || propWatchers.size === 0) return;
+
+    for (const { fn } of propWatchers.values()) {
+        await fn(newValue, oldValue, validationValue);
     }
 };

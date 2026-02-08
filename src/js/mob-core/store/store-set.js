@@ -9,7 +9,11 @@ import { runCallbackQueqe } from './fire-queque';
 import { getLogStyle } from './log-style';
 import { getStateFromMainMap, updateMainMap } from './store-map';
 import { checkType, storeType, TYPE_IS_ANY } from './store-type';
-import { cloneValueOrGet, maxDepth } from './store-utils';
+import {
+    checkIfPropIsComputed,
+    cloneValueOrGet,
+    maxDepth,
+} from './store-utils';
 import {
     storeComputedKeyUsedWarning,
     storeObjectIsNotAnyWarning,
@@ -58,7 +62,7 @@ const setProp = ({
         strict,
         validationStatusObject,
         skipEqual,
-        callBackWatcher,
+        watcherByProp,
         bindInstanceBy,
     } = state;
     const logStyle = getLogStyle();
@@ -151,7 +155,7 @@ const setProp = ({
      */
     if (fireCallback && !initalizeStep) {
         runCallbackQueqe({
-            callBackWatcher,
+            watcherByProp,
             prop,
             newValue: valueTransformed,
             oldValue: oldVal,
@@ -198,7 +202,7 @@ const setObj = ({
         fnValidate,
         validationStatusObject,
         skipEqual,
-        callBackWatcher,
+        watcherByProp,
         bindInstanceBy,
     } = state;
     const logStyle = getLogStyle();
@@ -237,6 +241,22 @@ const setObj = ({
         Object.entries(val).map((item) => {
             const [subProp, subVal] = item;
             const subValOld = store[prop][subProp];
+
+            /**
+             * Trasforma il valore solo se il dato è effettivamente cambiato.
+             *
+             * - Confrontiamo il nuovo valore con il vecchio valore trasformato
+             * - Se coincidono non abbiamo bisogno di traformarlo
+             * - Questo permetti di modificare una sola propietá senza triggere un nuovo transform in una propietá non
+             *   mutata.
+             *
+             * Durante l'inizializzazione tutti i trasfrom devono essere eseguiti almeno una volta.
+             */
+            if (
+                !initalizeStep &&
+                checkEquality(type[prop][subProp], subVal, subValOld)
+            )
+                return [subProp, subVal];
 
             return [
                 subProp,
@@ -310,6 +330,11 @@ const setObj = ({
      * Validate value (value passed to setObj is a Object to merge with original) and store the result in
      * validationStatusObject arr id there is no validation return true, otherwise get boolean value from fnValidate
      * obj
+     *
+     * - La validazione viene effettuata sempre a prescindere che il dato sia effettivamante cambiato
+     * - QUesto garantisce piu sicurezza.
+     * - Object ( controlled ) non e sepcifco per le performance.
+     * - Per le performance conviene utilizzare una propietá normale.
      */
     Object.entries(newValParsedByStrict).forEach((item) => {
         const [subProp, subVal] = item;
@@ -353,22 +378,44 @@ const setObj = ({
         (subProp) => skipEqual[prop][subProp] === true
     );
 
+    let allPropsDethIsValid = true;
+
+    /**
+     * - Depth check, skip seObject if depth is not respected and objecy is not ANY
+     * - Check depth BEFORE .every() to properly block execution
+     */
+    for (const [key, value] of Object.entries(newValParsedByStrict)) {
+        const isCustomObject = type[prop][key] === TYPE_IS_ANY;
+        const dataDepth = maxDepth(value);
+
+        if (dataDepth > 1 && !isCustomObject) {
+            storeSetObjDepthWarning(prop, valueTransformed, logStyle);
+
+            /**
+             * First time value is checked ( initialize ) set validation to false if datadeph is wrong
+             */
+            validationStatusObject[prop][key] = false;
+
+            /**
+             * Skip setObject
+             */
+            allPropsDethIsValid = false;
+        }
+    }
+
+    /**
+     * Persist validation status and exit if depth check failed
+     */
+    if (!allPropsDethIsValid) {
+        updateMainMap(instanceId, { ...state, validationStatusObject });
+        return;
+    }
+
     /**
      * Check if all old props value is equal new props value.
      */
     const prevValueIsEqualNew = shouldSkipEqual
         ? Object.entries(newObjectValues).every(([key, value]) => {
-              const isCustomObject = type[prop][key] === TYPE_IS_ANY;
-
-              /**
-               * Check val have nested Object ( not 'Any' )
-               */
-              const dataDepth = maxDepth(value);
-              if (dataDepth > 1 && !isCustomObject) {
-                  storeSetObjDepthWarning(prop, valueTransformed, logStyle);
-                  return;
-              }
-
               return checkEquality(
                   type[prop][key],
                   oldObjectValues[key],
@@ -395,7 +442,7 @@ const setObj = ({
 
     if (fireCallback && !initalizeStep) {
         runCallbackQueqe({
-            callBackWatcher,
+            watcherByProp,
             prop,
             newValue: store[prop],
             oldValue: oldObjectValues,
@@ -502,7 +549,9 @@ export const storeQuickSetEntrypoint = ({ instanceId, prop, value }) => {
     const state = getStateFromMainMap(instanceId);
     if (!state) return;
 
-    const { store, callBackWatcher } = state;
+    const { store, watcherByProp } = state;
+
+    if (!(prop in store)) return;
 
     /**
      * Update value and fire callback associated
@@ -517,7 +566,7 @@ export const storeQuickSetEntrypoint = ({ instanceId, prop, value }) => {
     updateMainMap(instanceId, { ...state, store });
 
     runCallbackQueqe({
-        callBackWatcher,
+        watcherByProp,
         prop,
         newValue: value,
         oldValue: oldVal,
@@ -617,13 +666,24 @@ const fireComputed = (instanceId) => {
 };
 
 /**
- * When a prop is updated ( set o emit ). add prop to computed waiting list.
+ * When a prop is updated (set or emit), add prop to computed waiting list.
  *
  * - At the end of current event loop fire computed.
  * - ComputedPropsQueque save all props for computed check.
- * - At this time we doesn't now if prop is a dependencies.
+ * - At this time we don't know if prop is a dependency.
  * - ComputedRunning is reset in fireComputed function.
  * - The same function is used both for current instance and binded instance.
+ *
+ * Note: addToComputedWaitList performs an additional map update even when called from setProp/setObj which have already
+ * updated the state.
+ *
+ * This redundancy is intentional and acceptable:
+ *
+ * 1. The cost is negligible (shallow copy of ~15 properties)
+ * 2. Maintains the autonomy of addToComputedWaitList for other entry points (emit)
+ * 3. Avoids complications in passing pre-loaded state
+ *
+ * Atomicity is guaranteed by the single-threaded nature of JavaScript.
  *
  * @param {Object} param
  * @param {string} param.instanceId
@@ -765,6 +825,16 @@ export const storeComputedEntryPoint = ({
     keys,
     callback,
 }) => {
+    /**
+     * Only one computed per prop is allowed.
+     */
+    const isComputed = checkIfPropIsComputed({
+        instanceId,
+        prop,
+    });
+
+    if (isComputed) return;
+
     /**
      * If there is no dependencies get keys from proxi used in callback.
      */

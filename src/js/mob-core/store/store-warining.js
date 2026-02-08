@@ -130,7 +130,7 @@ export const storeSetObjDepthWarning = (prop, val, style) => {
     console.warn(
         `%c trying to execute setObj data method on '${prop}' propierties: '${JSON.stringify(
             val
-        )}' have a depth > 1, nested obj is not allowed`,
+        )}' have a depth > 1, nested obj is not allowed, use 'any' type for deep nested object`,
         style
     );
 };
