@@ -5,24 +5,27 @@ import { handleNextTick } from '../raf-utils/handle-next-tick.js';
 import { getUnivoqueId } from '../../utils/index.js';
 
 /**
- * @type {() => void}
- */
-let unsubscribeScrollStart = () => {};
-
-/**
- * @type {() => void}
- */
-let unsubscribeScrollEnd = () => {};
-
-/**
- * @type {any}
- */
-let debouceFunctionReference = () => {};
-
-/**
  * @param {'START' | 'END'} type
  */
 function handleScrollUtils(type) {
+    /**
+     * @type {() => void}
+     */
+    // eslint-disable-next-line unicorn/consistent-function-scoping
+    let unsubscribeScrollStart = () => {};
+
+    /**
+     * @type {() => void}
+     */
+    // eslint-disable-next-line unicorn/consistent-function-scoping
+    let unsubscribeScrollEnd = () => {};
+
+    /**
+     * @type {any}
+     */
+    // eslint-disable-next-line unicorn/consistent-function-scoping
+    let debouceFunctionReference = () => {};
+
     /**
      * @type {boolean}
      */
@@ -50,7 +53,9 @@ function handleScrollUtils(type) {
         if (callbacks.size === 0) {
             unsubscribeScrollEnd();
 
-            // Unsubscribe from scroll callback
+            /**
+             * Unsubscribe from scroll callback
+             */
             if (type === 'START') {
                 unsubscribeScrollStart();
             }
@@ -61,12 +66,16 @@ function handleScrollUtils(type) {
 
         handleFrame.add(() => {
             handleNextTick.add(() => {
-                // Prepare data to callback
+                /**
+                 * Prepare data to callback
+                 */
                 const scrollData = {
-                    scrollY: window.scrollY,
+                    scrollY: globalThis.scrollY,
                 };
 
-                // Fire end of scroll
+                /**
+                 * Fire end of scroll
+                 */
                 if (type === 'END') {
                     for (const value of callbacks.values()) {
                         value(scrollData);
@@ -85,20 +94,28 @@ function handleScrollUtils(type) {
         if (initialized) return;
         initialized = true;
 
-        // Add debunce function to detect scroll end
+        /**
+         * Add debunce function to detect scroll end
+         *
+         * - Necessary in scrollStart to update isScrolling value.
+         */
         debouceFunctionReference = debounceFuncion(() => handler());
         unsubscribeScrollEnd = handleScrollImmediate(debouceFunctionReference);
 
-        // Use normal scroll event ( no debuonce ) to detect if page is scrolling
+        /**
+         * Use normal scroll event ( no debuonce ) to detect if page is scrolling
+         */
         if (type === 'START') {
             unsubscribeScrollStart = handleScrollImmediate(({ scrollY }) => {
                 const scrollData = {
                     scrollY,
                 };
 
-                // At first scroll isScrolling is false
-                // Fire event ad set isScrolling to true
-                // At debounce end isScrolling return to false to trigger next scroll
+                /**
+                 * - At first scroll isScrolling is false
+                 * - Fire event ad set isScrolling to true
+                 * - At debounce end isScrolling return to false to trigger next scroll
+                 */
                 if (!isScrolling) {
                     isScrolling = true;
 
@@ -114,18 +131,28 @@ function handleScrollUtils(type) {
      * @param {import('./type.js').HandleScrollCallback<import('./type.js').HandleScrollUtils>} cb - Callback function
      * @returns {() => void} Unsubscribe callback
      */
-    const addCb = (cb) => {
-        const id = getUnivoqueId();
-        callbacks.set(id, cb);
-
-        if (typeof globalThis !== 'undefined') {
-            init();
+    const addCallback = (cb) => {
+        if (globalThis.window === undefined) {
+            return () => {};
         }
 
-        return () => callbacks.delete(id);
+        const id = getUnivoqueId();
+        callbacks.set(id, cb);
+        init();
+
+        return () => {
+            callbacks.delete(id);
+
+            /**
+             * Triggera il cleanup in handler()
+             */
+            if (callbacks.size === 0 && initialized) {
+                handler();
+            }
+        };
     };
 
-    return addCb;
+    return addCallback;
 }
 
 /**

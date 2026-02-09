@@ -45,9 +45,14 @@ let time = getTime();
 let startTime = 0;
 
 /**
+ * RawTime accumula il tempo reale del browser.
+ *
+ * - Nella prima versione il valore di rawTime partiva da 0.
+ * - Nella versioen attuale il tempo parte allineato a time.
+ *
  * @type {number}
  */
-let rawTime = 0;
+let rawTime = getTime();
 
 /**
  * @type {number}
@@ -65,6 +70,11 @@ let lastTime = 0;
 let timeLost = 0;
 
 /**
+ * ATTENZIONE: isStopped ha due significati:
+ *
+ * 1. Tab in background (da handleVisibilityChange)
+ * 2. Loop fermo per mancanza di lavoro (da nextTickFn)
+ *
  * @type {boolean}
  */
 let isStopped = false;
@@ -261,8 +271,20 @@ const render = (timestamp) => {
     const frameDuration = Math.round(1000 / fps);
 
     /**
-     * Get time lost ( if the difference of current time with last time and frame duration is han 100ms ). Problem with
-     * workspace and switch to dirrent application without fire visibilityChange event.
+     * Compensazione lag non rilevato da visibilitychange.
+     *
+     * Meccanismo: quando rilevato scostamento significativo (>100ms):
+     *
+     * - Applica correzione costante frame-dopo-frame.
+     * - Il delta-time viene mantenuto stabile.
+     * - L'offset rimane fisso fino al reset del loop.
+     *
+     * Priorità: garantire avanzamento fluido delle animazioni piuttosto che sincronizzazione assoluta col tempo di
+     * sistema.
+     *
+     * - Soglia 100ms: valore percettivo, non tecnico.
+     * - Rappresenta il tempo minimo di freeze percepibile dall'utente.
+     * - Costante indipendentemente dal frame rate (30/60/144Hz)
      */
     timeLost = Math.abs(time - lastTime - frameDuration);
     const timeToSubsctract = timeLost > 100 ? timeLost : 0;
@@ -281,7 +303,9 @@ const render = (timestamp) => {
     }
 
     /**
-     * Get fps Update fps every second
+     * - Calcolo FPS ogni secondo.
+     * - Condizione time > fpsPrevTime + 1000 garantisce timeDelta > 1000,
+     * - Quindi divisione sempre sicura.
      */
     if (time > fpsPrevTime + 1000 && !isStopped) {
         /**

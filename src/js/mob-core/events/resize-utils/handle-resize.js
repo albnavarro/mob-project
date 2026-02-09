@@ -19,12 +19,12 @@ let debouceFunctionReference = () => {};
 /**
  * @type {number}
  */
-let previousWindowHeight = window.innerHeight;
+let previousWindowHeight = 0;
 
 /**
  * @type {number}
  */
-let previousWindowWidth = window.innerWidth;
+let previousWindowWidth = 0;
 
 /**
  * @returns {void}
@@ -34,8 +34,7 @@ function handler() {
      * If there is no subscritor remove handler.
      */
     if (callbacks.size === 0) {
-        // @ts-ignore
-        window.removeEventListener('resize', debouceFunctionReference);
+        globalThis.removeEventListener('resize', debouceFunctionReference);
 
         initialized = false;
         return;
@@ -46,12 +45,12 @@ function handler() {
     /**
      * @type {number}
      */
-    const windowsHeight = window.innerHeight;
+    const windowsHeight = globalThis.innerHeight;
 
     /**
      * @type {number}
      */
-    const windowsWidth = window.innerWidth;
+    const windowsWidth = globalThis.innerWidth;
 
     /**
      * @type {boolean}
@@ -75,7 +74,7 @@ function handler() {
 
     // Prepare data to callback
     const resizeData = {
-        scrollY: window.scrollY,
+        scrollY: globalThis.scrollY,
         windowsHeight,
         windowsWidth,
         documentHeight: document.documentElement.scrollHeight,
@@ -98,11 +97,14 @@ function init() {
     if (initialized) return;
     initialized = true;
 
+    previousWindowHeight = globalThis.window.innerHeight;
+    previousWindowWidth = globalThis.window.innerWidth;
+
     // Add debunce function to detect scroll end
     // @ts-ignore
     debouceFunctionReference = debounceFuncion(() => handler());
-    // @ts-ignore
-    window.addEventListener('resize', debouceFunctionReference, {
+
+    globalThis.addEventListener('resize', debouceFunctionReference, {
         passive: false,
     });
 }
@@ -130,15 +132,23 @@ function init() {
  * @param {import('./type.js').HandleResizeCallback} cb - Callback function fired on resize.
  * @returns {() => void}
  */
-const addCb = (cb) => {
-    const id = getUnivoqueId();
-    callbacks.set(id, cb);
-
-    if (typeof globalThis !== 'undefined') {
-        init();
+const addCallback = (cb) => {
+    if (globalThis.window === undefined) {
+        return () => {};
     }
 
-    return () => callbacks.delete(id);
+    const id = getUnivoqueId();
+    callbacks.set(id, cb);
+    init();
+
+    return () => {
+        callbacks.delete(id);
+
+        if (callbacks.size === 0 && initialized) {
+            globalThis.removeEventListener('resize', debouceFunctionReference);
+            initialized = false;
+        }
+    };
 };
 
-export const handleResize = (() => addCb)();
+export const handleResize = (() => addCallback)();

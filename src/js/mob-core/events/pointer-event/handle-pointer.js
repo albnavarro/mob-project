@@ -53,14 +53,22 @@ function handlePointer(eventType) {
      * @returns {() => void}
      */
     const addCallback = (cb) => {
-        const id = getUnivoqueId();
-        callbacks.set(id, cb);
-
-        if (typeof globalThis !== 'undefined') {
-            init();
+        if (globalThis.window === undefined) {
+            return () => {};
         }
 
-        return () => callbacks.delete(id);
+        const id = getUnivoqueId();
+        callbacks.set(id, cb);
+        init();
+
+        return () => {
+            callbacks.delete(id);
+
+            if (callbacks.size === 0 && initialized) {
+                globalThis.removeEventListener(eventType, handler);
+                initialized = false;
+            }
+        };
     };
 
     return addCallback;

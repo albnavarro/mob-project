@@ -831,7 +831,7 @@ export {
     useLinkedList,
 };
 
-export { normalizeWheel } from './events/mouse-utils/normalize-whell.js';
+export { normalizeWheel } from './events/mouse-utils/normalize-whell';
 export { ANIMATION_STOP_REJECT } from './events/error-handler/catch-animation-reject.js';
 export { useNextLoop } from './utils/next-tick.js';
 export { getTime } from './events/raf-utils/time.js';

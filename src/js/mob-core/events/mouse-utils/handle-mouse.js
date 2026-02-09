@@ -1,6 +1,6 @@
 import { clamp, getUnivoqueId } from '../../utils/index.js';
 import { eventStore } from '../event-store.js';
-import { normalizeWheel } from './normalize-whell.js';
+import { normalizeWheel } from './normalize-whell';
 
 /**
  * @param {Object} obj
@@ -8,29 +8,7 @@ import { normalizeWheel } from './normalize-whell.js';
  * @param {Object} obj.event
  * @returns {any}
  */
-function getPageData({ type, event }) {
-    const touchEvent = /** @type {TouchEvent} */ (event);
-
-    /**
-     * 'touchend'
-     */
-    if (type === 'touchend' && 'changedTouches' in event) {
-        return touchEvent.changedTouches[0];
-    }
-
-    /**
-     * 'mousedown', 'touchstart', 'mousemove', 'touchmove', 'mouseup'
-     */
-    return 'touches' in touchEvent ? touchEvent.touches[0] : event;
-}
-
-/**
- * @param {Object} obj
- * @param {import('./type.js').MouseEventType} obj.type
- * @param {Object} obj.event
- * @returns {any}
- */
-function getClientData({ type, event }) {
+function getEventData({ type, event }) {
     const touchEvent = /** @type {TouchEvent} */ (event);
 
     /**
@@ -91,14 +69,12 @@ function handleMouse(eventType) {
         );
 
         /**
-         * @type {{ pageX: number; pageY: number }}
+         * @type {{ pageX: number; pageY: number; clientX: number; clientY: number }}
          */
-        const { pageX, pageY } = getPageData({ type, event });
-
-        /**
-         * @type {{ clientX: number; clientY: number }}
-         */
-        const { clientX, clientY } = getClientData({ type, event });
+        const { pageX, pageY, clientX, clientY } = getEventData({
+            type,
+            event,
+        });
 
         /** @type {EventTarget | null} */
         const target = event.target;
@@ -115,6 +91,12 @@ function handleMouse(eventType) {
             },
             target,
             type,
+
+            /**
+             * Prevents the default action of the event. When usePassive is true, the browser ignores preventDefault()
+             * on passive listeners, so we provide a no-op function to avoid runtime errors and unnecessary calls. When
+             * usePassive is false, the native preventDefault() is used.
+             */
             preventDefault: () =>
                 usePassive ? () => {} : event.preventDefault(),
             spinX: 0,
@@ -161,18 +143,26 @@ function handleMouse(eventType) {
      * @param {import('./type.js').MouseEventCallback} cb - Callback function fired on mouse action.
      * @returns {() => void}
      */
-    const addCb = (cb) => {
-        const id = getUnivoqueId();
-        callbacks.set(id, cb);
-
-        if (typeof globalThis !== 'undefined') {
-            init();
+    const addCallback = (cb) => {
+        if (globalThis.window === undefined) {
+            return () => {};
         }
 
-        return () => callbacks.delete(id);
+        const id = getUnivoqueId();
+        callbacks.set(id, cb);
+        init();
+
+        return () => {
+            callbacks.delete(id);
+
+            if (callbacks.size === 0 && initialized) {
+                globalThis.removeEventListener(eventType, handler);
+                initialized = false;
+            }
+        };
     };
 
-    return addCb;
+    return addCallback;
 }
 
 /**

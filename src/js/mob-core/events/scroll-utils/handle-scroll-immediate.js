@@ -15,12 +15,12 @@ const DOWN = 'DOWN';
 /**
  * @type {number}
  */
-let prev = window.scrollY;
+let previousScrollValue = 0;
 
 /**
  * @type {number}
  */
-let val = window.scrollY;
+let currentScrollValue = 0;
 
 /**
  * @type {import('./type').ScrollDirection}
@@ -31,7 +31,7 @@ let direction = DOWN;
  * @type {import('./type').HandleScroll}
  */
 let scrollData = {
-    scrollY: val,
+    scrollY: currentScrollValue,
     direction,
 };
 
@@ -43,26 +43,27 @@ function handler() {
      * If - if there is no subscritor remove handler
      */
     if (callbacks.size === 0) {
-        window.removeEventListener('scroll', handler);
+        globalThis.removeEventListener('scroll', handler);
 
         initialized = false;
         return;
     }
 
-    prev = val;
-    val = window.scrollY;
-    direction = val > prev ? DOWN : UP;
+    previousScrollValue = currentScrollValue;
+    currentScrollValue = globalThis.scrollY;
+    direction = currentScrollValue > previousScrollValue ? DOWN : UP;
 
-    // Prepare data to callback
+    /**
+     * Prepare data to callback
+     */
     scrollData = {
-        scrollY: val,
+        scrollY: currentScrollValue,
         direction,
     };
 
     /**
      * Check if browser lost frame. If true skip.
      */
-    // callback.forEach(({ cb }) => cb(scrollData));
     for (const value of callbacks.values()) {
         value(scrollData);
     }
@@ -76,6 +77,9 @@ function handler() {
 function init() {
     if (initialized) return;
     initialized = true;
+
+    previousScrollValue = globalThis.scrollY;
+    currentScrollValue = globalThis.scrollY;
 
     window.addEventListener('scroll', handler, {
         passive: true,
@@ -98,20 +102,28 @@ function init() {
  * @param {import('./type').HandleScrollCallback<import('./type').HandleScroll>} cb - Callback function
  * @returns {() => void} Unsubscribe callback
  */
-const addCb = (cb) => {
-    const id = getUnivoqueId();
-    callbacks.set(id, cb);
-
-    if (typeof globalThis !== 'undefined') {
-        init();
+const addCallback = (cb) => {
+    if (globalThis.window === undefined) {
+        return () => {};
     }
 
-    return () => callbacks.delete(id);
+    const id = getUnivoqueId();
+    callbacks.set(id, cb);
+    init();
+
+    return () => {
+        callbacks.delete(id);
+
+        if (callbacks.size === 0 && initialized) {
+            globalThis.removeEventListener('scroll', handler);
+            initialized = false;
+        }
+    };
 };
 
 /**
  * Execute a callback immediately on scroll
  */
 export const handleScrollImmediate = (() => {
-    return addCb;
+    return addCallback;
 })();

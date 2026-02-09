@@ -69,18 +69,26 @@ function init() {
  * @param {import('./type.js').HandleScrollCallback<import('./type.js').HandleScroll>} cb - Callback function
  * @returns {() => void} Unsubscribe callback
  */
-const addCb = (cb) => {
-    const id = getUnivoqueId();
-    callbacks.set(id, cb);
-
-    if (typeof globalThis !== 'undefined') {
-        init();
+const addCallback = (cb) => {
+    if (globalThis.window === undefined) {
+        return () => {};
     }
 
-    return () => callbacks.delete(id);
+    const id = getUnivoqueId();
+    callbacks.set(id, cb);
+    init();
+
+    return () => {
+        callbacks.delete(id);
+
+        if (callbacks.size === 0 && initialized) {
+            unsubscribe();
+            initialized = false;
+        }
+    };
 };
 
 /**
  * Perform a callback to the first nextTick available after scrolling
  */
-export const handleScroll = (() => addCb)();
+export const handleScroll = (() => addCallback)();
