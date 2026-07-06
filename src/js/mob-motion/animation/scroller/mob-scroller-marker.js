@@ -259,10 +259,17 @@ export const MobScrollerMarker = ({
     };
 
     MobCore.useFrame(() => {
-        // @ts-ignore
-        Object.assign(lastStartMarker?.style, { ...style, ...startStyle });
-        // @ts-ignore
-        Object.assign(lastEndMarkerEl?.style, { ...style, ...endStyle });
+        Object.assign(
+            /** @type {HTMLElement} */ (lastStartMarker)?.style,
+            style,
+            startStyle
+        );
+
+        Object.assign(
+            /** @type {HTMLElement} */ (lastEndMarkerEl)?.style,
+            style,
+            endStyle
+        );
     });
 
     return {

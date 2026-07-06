@@ -44,8 +44,8 @@ const getStaggerEqual = ({ each, duration, numItem, index, eachByNumItem }) => {
     const remainSpace = duration - staggerDuration;
 
     // Avoid division with 0
-    const validNumItem = numItem - 1 > 0 ? numItem - 1 : 1;
-    const remainSpaceUnit = remainSpace / validNumItem;
+    const gapCount = Math.max(1, numItem - 1);
+    const remainSpaceUnit = remainSpace / gapCount;
     const staggerStart = remainSpaceUnit * index;
 
     return {

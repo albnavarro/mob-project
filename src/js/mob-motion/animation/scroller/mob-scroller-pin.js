@@ -393,12 +393,13 @@ export class MobScrollerPin {
         MobCore.useFrame(() => {
             if (!this.#pin || !this.#wrapper) return;
 
-            Object.assign(this.#wrapper.style, { ...markerWrapperStyle });
-            Object.assign(this.#pin.style, {
-                ...display,
-                ...pinStyleFromItem,
-                ...requiredStyleToadd,
-            });
+            Object.assign(this.#wrapper.style, markerWrapperStyle);
+            Object.assign(
+                this.#pin.style,
+                display,
+                pinStyleFromItem,
+                requiredStyleToadd
+            );
         });
 
         this.#checkIfShouldTranspond();
@@ -731,13 +732,13 @@ export class MobScrollerPin {
         MobCore.useFrame(() => {
             if (!this.#pin) return;
 
-            Object.assign(this.#pin.style, {
-                ...pinStyleFromItem,
-                ...requiredStyleToAdd,
-            });
+            Object.assign(
+                this.#pin.style,
+                pinStyleFromItem,
+                requiredStyleToAdd
+            );
 
             if (this.#item) Object.assign(this.#item.style, styleToAdd);
-
             document.body.append(this.#pin);
         });
     }

@@ -288,7 +288,7 @@ const render = (timestamp) => {
      */
     timeLost = Math.abs(time - lastTime - frameDuration);
     const timeToSubsctract = timeLost > 100 ? timeLost : 0;
-    time = time - timeToSubsctract;
+    time -= timeToSubsctract;
     lastTime = time;
 
     /**

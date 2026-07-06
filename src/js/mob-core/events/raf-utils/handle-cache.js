@@ -50,7 +50,7 @@ const add = (fn = () => {}) => {
             subscriberMap.delete(id);
             if (!frameToSubstract) return;
 
-            cacheCoutner = cacheCoutner - frameToSubstract;
+            cacheCoutner -= frameToSubstract;
         },
     };
 };
@@ -193,7 +193,7 @@ const clean = (id) => {
      * cachecounter so handleFrame can stop
      */
     const frameToSubstract = item.data.size;
-    cacheCoutner = cacheCoutner - frameToSubstract;
+    cacheCoutner -= frameToSubstract;
     item.data.clear();
 };
 
