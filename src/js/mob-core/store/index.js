@@ -16,7 +16,13 @@ import {
     storeDebugValidateEntryPoint,
     storeGetValidationEntryPoint,
 } from './store-debug';
-import { STORE_SET, STORE_UPDATE } from './constant';
+import {
+    PROXI_ALL,
+    PROXI_BOUNDED,
+    PROXI_SELF,
+    STORE_SET,
+    STORE_UPDATE,
+} from './constant';
 import { getProxiEntryPoint } from './store-proxi';
 import { bindStoreEntryPoint } from './bind-store';
 import { destroyStoreEntryPoint } from './destroy';
@@ -152,7 +158,13 @@ export const mobStore = (data = {}) => {
          * - Binding successivi non saranno riflessi nell'istanza proxy esistente.
          */
         getProxi: () => {
-            return getProxiEntryPoint({ instanceId });
+            return getProxiEntryPoint({ instanceId, strategy: PROXI_ALL });
+        },
+        getSelfProxi: () => {
+            return getProxiEntryPoint({ instanceId, strategy: PROXI_SELF });
+        },
+        getBoundedProxi: () => {
+            return getProxiEntryPoint({ instanceId, strategy: PROXI_BOUNDED });
         },
         quickSetProp: (prop, value) => {
             const isComputed = checkIfPropIsComputed({ instanceId, prop });

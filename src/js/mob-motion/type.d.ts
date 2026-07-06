@@ -10,7 +10,7 @@ import MobTimeTween from './animation/tween/mob-time-tween';
 import { MobBodyScroll } from './plugin/body-scroll/body-scroll';
 
 export type MobSpring = InstanceType<typeof MobSpring>;
-export type MobleLerp = InstanceType<typeof MobLerp>;
+export type MobLerp = InstanceType<typeof MobLerp>;
 export type MobTimeTween = InstanceType<typeof MobTimeTween>;
 export type MobAsyncTimeline = InstanceType<typeof MobAsyncTimeline>;
 export type MobSequencer = InstanceType<typeof MobSequencer>;

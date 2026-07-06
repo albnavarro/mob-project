@@ -52,8 +52,8 @@ const getRadial = ({
 
     // Get stagger index the minumn and the fastest and the slowest
     let counter = 0;
-    cleanCb.forEach((chunk, i) => {
-        chunk.forEach((item) => {
+    for (const [i, chunk] of cleanCb.entries()) {
+        for (const item of chunk) {
             /*
              * Get stagger each by fps
              */
@@ -75,8 +75,8 @@ const getRadial = ({
                 };
 
             counter++;
-        });
-    });
+        }
+    }
 
     // Get on Complete Callback
     const cleanEndCb = (() => {
@@ -92,13 +92,13 @@ const getRadial = ({
     const endstaggerArray = cleanEndCb.flat();
 
     // Update onComplete cb with right stagger
-    staggerArray.forEach((item, i) => {
+    for (const [i, item] of staggerArray.entries()) {
         // If there an OnCompelte callback
         if (endstaggerArray.length > 0) {
             endstaggerArray[i].index = item.index;
             endstaggerArray[i].frame = item.frame;
         }
-    });
+    }
 
     return {
         staggerArray,

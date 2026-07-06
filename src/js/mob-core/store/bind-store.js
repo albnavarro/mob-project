@@ -53,6 +53,7 @@ export const removeSelfIdToBindInstanceBy = ({ selfId, bindId }) => {
  * @param {object} params
  * @param {import('./type').BindStoreValueType} params.bindStores
  * @param {import('./type').StoreMapValue} params.selfStore
+ * @returns {boolean}
  */
 const checkDuplicatedBindProp = ({ bindStores, selfStore }) => {
     const storeToArray = checkType(Array, bindStores)
@@ -67,27 +68,34 @@ const checkDuplicatedBindProp = ({ bindStores, selfStore }) => {
 
     const stores = [...storeToArray, selfStore.store];
 
+    let hasConflict = false;
+
     /**
      * All-Pairs Comparison: O(n × m).
      *
      * - 1 loop O(n) ( stores )
      * - 2 loop O(m) ( key in stores )
      */
-    stores.forEach((store, index) => {
-        stores.forEach((storeCheck, indexCheck) => {
+    for (const [index, store] of stores.entries()) {
+        for (const [indexCheck, storeCheck] of stores.entries()) {
             // Skip: same store (index = indexCheck) and already checked pairs (index < indexCheck)
-            if (index <= indexCheck) return;
+            if (index <= indexCheck) continue;
 
             const duplicate = Object.keys(store).filter((key) => {
                 return Object.keys(storeCheck).includes(key);
             });
 
-            if (duplicate.length > 0)
+            if (duplicate.length > 0) {
+                hasConflict = true;
+
                 console.warn(
                     `bindStore: prop conflict on following prop: '${duplicate}', bind store key must be univoque'`
                 );
-        });
-    });
+            }
+        }
+    }
+
+    return hasConflict;
 };
 
 /**
@@ -104,8 +112,15 @@ export const bindStoreEntryPoint = ({ value, instanceId }) => {
 
     /**
      * Check if selfStore and duplicated store has conflict with keys.
+     *
+     * - In case has conflict skip
      */
-    checkDuplicatedBindProp({ bindStores: value, selfStore: state });
+    const hasConflict = checkDuplicatedBindProp({
+        bindStores: value,
+        selfStore: state,
+    });
+
+    if (hasConflict) return;
 
     const { bindInstance, bindInstanceBy } = state;
     if (!bindInstance) return;
@@ -148,7 +163,7 @@ export const bindStoreEntryPoint = ({ value, instanceId }) => {
         bindInstance: bindInstanceUpdated,
     });
 
-    ids.forEach((id) => {
+    for (const id of ids) {
         addSelfIdToBindInstanceBy({ selfId: instanceId, bindId: id });
-    });
+    }
 };

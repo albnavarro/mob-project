@@ -108,8 +108,8 @@ export const detectViewPortInterception = ({
  * Filter input value with number in value and additional value
  *
  * @example
- *     { numberVal: '100px', additionalVal: '+height', position:"top" }
- *     default:  { numberVal: '0', additionalVal: '', position:"bottom" }
+ *     {numberVal: '100px', additionalVal: '+height', position:"top"} default:
+ *     { numberVal: '0', additionalVal: '', position:"bottom" }
  *
  * @param {string[]} values Spitted input value es: 100px +h => ['100px','+height', 'top']
  * @param {string} direction

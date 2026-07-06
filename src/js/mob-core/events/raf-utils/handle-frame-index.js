@@ -11,12 +11,12 @@ const indexCallbackMap = new Map();
  * @param {number} currentFrameLimit
  */
 const updateKeys = (currentFrameLimit) => {
-    const oldMapToArray = [...indexCallbackMap.entries()];
+    const oldMapToArray = indexCallbackMap.entries().toArray();
     indexCallbackMap.clear();
 
-    oldMapToArray.forEach(([index, value]) => {
+    for (const [index, value] of oldMapToArray) {
         indexCallbackMap.set(index - currentFrameLimit, value);
-    });
+    }
 };
 
 /**
@@ -41,7 +41,7 @@ const fire = ({ currentFrame, time, fps }) => {
     const callabacks = indexCallbackMap.get(currentFrame) ?? [];
     if (!callabacks || callabacks.length === 0) return;
 
-    callabacks.forEach((item) => item({ time, fps }));
+    for (const item of callabacks) item({ time, fps });
     indexCallbackMap.delete(currentFrame);
 };
 

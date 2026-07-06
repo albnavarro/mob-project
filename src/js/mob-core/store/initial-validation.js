@@ -37,7 +37,7 @@ export const inizializeAllProps = (instanceId, initialState) => {
     /**
      * First run execute each propierites to check validation without fire event
      */
-    Object.entries(store).forEach((item) => {
+    for (const item of Object.entries(store)) {
         const [prop, value] = item;
 
         storeSetEntryPoint({
@@ -49,5 +49,5 @@ export const inizializeAllProps = (instanceId, initialState) => {
             action: STORE_SET,
             initalizeStep: true,
         });
-    });
+    }
 };

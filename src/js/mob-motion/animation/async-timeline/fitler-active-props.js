@@ -9,7 +9,7 @@ export const filterActiveProps = ({ data, filterBy }) => {
     return Object.entries(data)
         .map((item) => {
             const [prop, val] = item;
-            const valueIsValid = prop in filterBy;
+            const valueIsValid = Object.hasOwn(filterBy, prop);
             return { data: { [prop]: val }, active: valueIsValid };
         })
         .filter(({ active }) => active)

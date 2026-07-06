@@ -248,9 +248,11 @@ export const MobCreateStaggers = (data) => {
             }
 
             if (
-                stagger.type === STAGGER_TYPE_START ||
-                stagger.type === STAGGER_TYPE_END ||
-                stagger.type === STAGGER_TYPE_CENTER
+                [
+                    STAGGER_TYPE_START,
+                    STAGGER_TYPE_END,
+                    STAGGER_TYPE_CENTER,
+                ].includes(stagger.type)
             ) {
                 return getStaggerSpecial({
                     duration,

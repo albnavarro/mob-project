@@ -21,7 +21,7 @@ export const storeDebugStoreEntryPoint = ({ instanceId }) => {
     if (!state) return;
 
     const { store } = state;
-    console.log(store);
+    console.log(JSON.stringify(store, null, 2));
 };
 
 /**
@@ -33,7 +33,7 @@ export const storeDebugValidateEntryPoint = ({ instanceId }) => {
     if (!state) return;
 
     const { validationStatusObject } = state;
-    console.log(validationStatusObject);
+    console.log(JSON.stringify(validationStatusObject, null, 2));
 };
 
 /**
@@ -42,5 +42,7 @@ export const storeDebugValidateEntryPoint = ({ instanceId }) => {
  */
 export const storeDebugEntryPoint = ({ instanceId }) => {
     const state = getStateFromMainMap(instanceId);
-    console.log(state);
+    if (!state) return;
+
+    console.log(JSON.stringify(state, null, 2));
 };

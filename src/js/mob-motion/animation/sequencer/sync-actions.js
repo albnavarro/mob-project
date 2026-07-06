@@ -8,9 +8,9 @@ import { dataTweenValueIsNotValidWarning } from '../utils/warning.js';
  * @returns {{ prop: string; toValue: number | (() => number); ease: () => void }[]}
  */
 export const goToSyncUtils = (obj, ease) => {
-    return Object.keys(obj).map((item) => {
-        if (!dataTweenValueIsValid(obj[item])) {
-            dataTweenValueIsNotValidWarning(`${item}: ${obj[item]}`);
+    return Object.entries(obj).map(([item, value]) => {
+        if (!dataTweenValueIsValid(value)) {
+            dataTweenValueIsNotValidWarning(`${item}: ${value}`);
             return {
                 prop: item,
                 toValue: 0,
@@ -20,7 +20,7 @@ export const goToSyncUtils = (obj, ease) => {
 
         return {
             prop: item,
-            toValue: obj[item],
+            toValue: value,
             ease: getTweenFn(ease),
         };
     });
@@ -32,9 +32,9 @@ export const goToSyncUtils = (obj, ease) => {
  * @returns {{ prop: string; fromValue: number | (() => number); ease: () => void }[]}
  */
 export const goFromSyncUtils = (obj, ease) => {
-    return Object.keys(obj).map((item) => {
-        if (!dataTweenValueIsValid(obj[item])) {
-            dataTweenValueIsNotValidWarning(`${item}: ${obj[item]}`);
+    return Object.entries(obj).map(([item, value]) => {
+        if (!dataTweenValueIsValid(value)) {
+            dataTweenValueIsNotValidWarning(`${item}: ${value}`);
             return {
                 prop: item,
                 fromValue: 0,
@@ -44,7 +44,7 @@ export const goFromSyncUtils = (obj, ease) => {
 
         return {
             prop: item,
-            fromValue: obj[item],
+            fromValue: value,
             ease: getTweenFn(ease),
         };
     });
@@ -62,13 +62,15 @@ export const goFromSyncUtils = (obj, ease) => {
  * }[]}
  */
 export const goFromToSyncUtils = (fromObj, toObj, ease) => {
-    return Object.keys(fromObj).map((item) => {
+    return Object.entries(fromObj).map(([item, fromValue]) => {
+        const toValue = toObj[item];
+
         if (
-            !dataTweenValueIsValid(toObj[item]) ||
-            !dataTweenValueIsValid(fromObj[item])
+            !dataTweenValueIsValid(toValue) ||
+            !dataTweenValueIsValid(fromValue)
         ) {
             dataTweenValueIsNotValidWarning(
-                `${item}: ${toObj[item]} || ${item}: ${fromObj[item]}`
+                `${item}: ${toValue} || ${item}: ${fromValue}`
             );
             return {
                 prop: item,
@@ -80,8 +82,8 @@ export const goFromToSyncUtils = (fromObj, toObj, ease) => {
 
         return {
             prop: item,
-            fromValue: fromObj[item],
-            toValue: toObj[item],
+            fromValue,
+            toValue,
             ease: getTweenFn(ease),
         };
     });

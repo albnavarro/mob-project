@@ -12,7 +12,7 @@ export const getRoundedValue = (x) => {
     }
 
     if (Math.abs(x) < 1) {
-        const e = Number.parseInt(x.toString().split('e-')[1]);
+        const e = Number.parseInt(x.toString().split('e-', 2)[1]);
         if (e) {
             x *= Math.pow(10, e - 1);
             x =
@@ -21,7 +21,7 @@ export const getRoundedValue = (x) => {
                 x.toString().slice(2);
         }
     } else {
-        let e = Number.parseInt(x.toString().split('+')[1]);
+        let e = Number.parseInt(x.toString().split('+', 2)[1]);
         if (e > 20) {
             e -= 20;
             x /= Math.pow(10, e);
@@ -58,8 +58,8 @@ export const lerp = (start, end, amt) => {
  * @returns {boolean}
  */
 export const compareKeys = (a, b) => {
-    const aKeys = Object.keys(a).toSorted();
-    const bKeys = Object.keys(b).toSorted();
+    const aKeys = Object.keys(a).toSorted((a, b) => a.localeCompare(b));
+    const bKeys = Object.keys(b).toSorted((a, b) => a.localeCompare(b));
 
     return (
         aKeys.length === bKeys.length &&

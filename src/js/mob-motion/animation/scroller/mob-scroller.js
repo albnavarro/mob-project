@@ -849,143 +849,6 @@ export default class MobScroller {
                 : new MobLerp();
     }
 
-    /**
-     * Initialize instance
-     */
-    init() {
-        if (this.#isInzialized) {
-            console.warn(
-                'Parallax/scrollTrigger: The init() method cannot be launched more than once. If you are passing the instance to components like horizontalScroller or smoothScroller via the children property, they will initialize the instance.'
-            );
-            return;
-        }
-
-        this.#isInzialized = true;
-        this.#setMotion();
-        this.#calcScreenPosition();
-        this.#calcOffset();
-        this.#calcHeight();
-        this.#calcWidth();
-        this.#getScreenHeight();
-        this.setPerspective();
-
-        if (this.#propierties === MobScrollerConstant.PROP_TWEEN) {
-            this.#range = this.#tween?.getDuration
-                ? this.#tween.getDuration()
-                : 0;
-            this.#dynamicRange = () => this.#range;
-            this.#tween?.inzializeStagger?.();
-        }
-
-        if (this.#type == MobScrollerConstant.TYPE_SCROLLTRIGGER) {
-            this.#limiterOff = true;
-            this.#calcRangeAndUnitMiusure();
-            this.#calcFixedLimit();
-        }
-
-        /**
-         * If scroller is !== window the instance is controlled by another component Use move() methods to control
-         * children
-         */
-        if (this.#ease) {
-            /**
-             * Force transform3D onscroll start
-             */
-            this.#unsubscribeScrollStart = MobCore.useScrollStart(() => {
-                if (!this.#disableForce3D) this.#force3D = true;
-            });
-
-            /**
-             * Avoid error with scroll module operation Clean render at the end of the scroll
-             */
-            this.#unsubscribeScrollEnd = MobCore.useScrollEnd(() => {
-                MobCore.useFrame(() => {
-                    MobCore.useNextTick(() => {
-                        this.#easeRender();
-                    });
-                });
-            });
-
-            if (this.#scroller === globalThis) {
-                this.#unsubscribeScroll = getScrollFunction({
-                    pin: this.#pin,
-                    ease: this.#ease,
-                    useThrottle: this.#useThrottle,
-                    callback: () => {
-                        this.#easeRender();
-                    },
-                });
-            }
-
-            /**
-             * First render
-             */
-            this.#easeRender();
-        }
-
-        if (!this.#ease) {
-            if (this.#scroller === globalThis) {
-                this.#unsubscribeScroll = getScrollFunction({
-                    pin: this.#pin,
-                    ease: this.#ease,
-                    useThrottle: this.#useThrottle,
-                    callback: () => {
-                        this.#updateEndValue();
-                        this.#noEasingRender();
-                    },
-                });
-            }
-
-            /**
-             * First render
-             */
-            this.#updateEndValue();
-            this.#noEasingRender();
-
-            /**
-             * Execute render on scrollEnd to remove 3Dtransform
-             */
-            this.#unsubscribeScrollEnd = MobCore.useScrollEnd(() => {
-                /**
-                 * Force draw no 3d on scroll end with no ease.
-                 */
-                this.#noEasingRender({ forceRender: true });
-            });
-        }
-
-        /**
-         * Initialize marker
-         */
-        if (this.#scroller !== globalThis && this.#marker) {
-            this.#unsubscribeMarker = MobCore.useScroll(() => {
-                // Refresh marker
-                this.#calcFixedLimit();
-            });
-        }
-
-        /**
-         * Initialize refresh
-         */
-        this.#unsubscribeResize = MobCore.useResize(({ horizontalResize }) => {
-            if (horizontalResize) this.refresh();
-        });
-
-        /**
-         * Initialize pin
-         */
-        if (this.#pin) {
-            this.#pinInstance = new MobScrollerPin();
-
-            if (mq[this.#queryType](this.#breakpoint)) {
-                MobCore.useNextTick(() => {
-                    this.#getScrollerOffset();
-                    this.#pinInstance?.init(this.#getPinParams());
-                    this.#pinInstance?.onScroll(this.#scrollerScroll);
-                });
-            }
-        }
-    }
-
     #getPinParams() {
         return {
             item: this.#item,
@@ -1000,64 +863,6 @@ export default class MobScroller {
             getStart: () => this.#startPoint,
             getEnd: () => this.#endPoint,
         };
-    }
-
-    /**
-     * @param {HTMLElement | globalThis} scroller
-     */
-    setScroller(scroller) {
-        this.#scroller = domNodeIsValidAndReturnElOrWin(scroller, true);
-    }
-
-    /**
-     * @param {HTMLElement | globalThis} screen
-     */
-    setScreen(screen) {
-        this.#screen = domNodeIsValidAndReturnElOrWin(screen, true);
-    }
-
-    /**
-     * @param {string} direction
-     */
-    setDirection(direction) {
-        this.#direction = directionIsValid(direction, 'Parallax/Scrolltrigger');
-    }
-
-    /**
-     * @param {import('../../utils/type.js').MqValues} breakpoint
-     */
-    setBreakPoint(breakpoint) {
-        this.#breakpoint = breakpointIsValid(
-            breakpoint,
-            'breakpoint',
-            'Parallax/Scrolltrigger'
-        );
-    }
-
-    /**
-     * @param {import('../../utils/type.js').MqAction} queryType
-     */
-    setQueryType(queryType) {
-        this.#queryType = breakpointTypeIsValid(
-            queryType,
-            'queryType',
-            'Parallax/Scrolltrigger'
-        );
-    }
-
-    /**
-     * @private
-     */
-    setPerspective() {
-        if (this.#perspective && this.#item && this.#item.parentNode) {
-            const style = {
-                perspective: `${this.#perspective}px`,
-                'transform-style': 'preserve-3d',
-            };
-            const parent = this.#item.parentNode;
-            // @ts-ignore
-            Object.assign(parent.style, style);
-        }
     }
 
     #setMotion() {
@@ -1276,22 +1081,24 @@ export default class MobScroller {
     }
 
     #setMarker() {
-        if (this.#marker) {
-            // Add Marker
-            const { startMarker, endMarker } = MobScrollerMarker({
-                startMarker: this.#startMarker,
-                endMarker: this.#endMarker,
-                startPoint: this.#startPoint,
-                endPoint: this.#endPoint,
-                screen: this.#screen,
-                direction: this.#direction,
-                invertSide: this.#invertSide,
-                label: this.#marker,
-            });
-
-            this.#startMarker = startMarker;
-            this.#endMarker = endMarker;
+        if (!this.#marker) {
+            return;
         }
+
+        // Add Marker
+        const { startMarker, endMarker } = MobScrollerMarker({
+            startMarker: this.#startMarker,
+            endMarker: this.#endMarker,
+            startPoint: this.#startPoint,
+            endPoint: this.#endPoint,
+            screen: this.#screen,
+            direction: this.#direction,
+            invertSide: this.#invertSide,
+            label: this.#marker,
+        });
+
+        this.#startMarker = startMarker;
+        this.#endMarker = endMarker;
     }
 
     #calcOffset() {
@@ -1426,165 +1233,6 @@ export default class MobScroller {
     }
 
     /**
-     * Recalculate positions and align all values
-     */
-    refresh() {
-        if (this.#pin && this.#pinInstance) this.#pinInstance.destroy();
-
-        this.#calcScreenPosition();
-        this.#calcOffset();
-        this.#calcHeight();
-        this.#calcWidth();
-        this.#getScreenHeight();
-
-        if (this.#type == MobScrollerConstant.TYPE_SCROLLTRIGGER) {
-            this.#calcFixedLimit();
-            if (this.#dynamicRange) this.#calcRangeAndUnitMiusure();
-
-            if (
-                this.#pin &&
-                this.#pinInstance &&
-                mq[this.#queryType](this.#breakpoint)
-            ) {
-                this.#pinInstance?.init(this.#getPinParams());
-            }
-        }
-        //
-        // reset value to update animation after resize
-        this.#lastValue = undefined;
-        this.#firstTime = true;
-
-        //
-        if (mq[this.#queryType](this.#breakpoint)) {
-            if (this.#ease) {
-                this.#easeRender();
-            } else {
-                this.#updateEndValue();
-
-                // Disable 3d transform at first render after refresh.
-                this.#noEasingRender({ forceRender: true });
-            }
-        } else {
-            if (this.#ease) this.#motion?.stop?.();
-
-            // Reset Style
-            // For tween is necessary reset inside tween callback
-            MobCore.useFrameIndex(() => {
-                if (this.#applyTo) {
-                    this.#resetTweenStyle(this.#applyTo);
-                    Object.assign(this.#applyTo.style, this.#getResetStyle());
-                } else {
-                    this.#resetTweenStyle(this.#item);
-                    if (this.#item)
-                        Object.assign(this.#item.style, this.#getResetStyle());
-                }
-            }, 3);
-        }
-    }
-
-    /**
-     * Permette di pilotare un'istanza MobScroller da un'altra istanza (parent), tipicamente utilizzato in scenari come
-     * horizontal scrolling con parallax interni, smooth scroll virtuali che controllano animazioni interne, o timeline
-     * sincronizzate.
-     *
-     * **Meccanismo Force3D e Ottimizzazione GPU**
-     *
-     * Quando un'istanza è controllata esternamente (iSControlledFromOutside = true), la gestione del force3D
-     * (translateZ(0)) viene delegata al parent attraverso il parametro parentIsMoving:
-     *
-     * 1. ParentIsMoving = true + isInViewport = true:
-     *
-     *    - Attiva this.#force3D = true
-     *    - Applica transform: translate3d(...) forzando il layer compositing GPU
-     *    - Previene tearing e jitter durante lo scroll rapido
-     * 2. ParentIsMoving = false (scroll fermo):
-     *
-     *    - Disattiva force3D (this.#force3D = false)
-     *    - Il browser può liberare risorse GPU
-     *    - Permette il repainting ottimizzato per interazioni statiche (hover, click)
-     *
-     * Questo meccanismo è essenziale perché in uno scenario con molti elementi animati (es. 50+ parallax in una
-     * sezione), tenere force3D sempre attivo saturerebbe la GPU. Invece, lo attiviamo selettivamente solo quando il
-     * parent segnala "sto scorrendo".
-     *
-     * **Flusso di rendering**
-     *
-     * - Se ease = true: il valore viene passato a #easeRender() che lo usa come target per MobLerp/MobSpring.
-     *   L'interpolazione smooth garantisce fluidità anche a FPS variabili del parent. In questo caso parentIsMoving è
-     *   ignorato perché il force3D viene gestito dal motore di interpolazione che mantiene force3D attivo durante tutta
-     *   la transizione.
-     * - Se ease = false: il valore viene processato immediatamente da #noEasingRender(). In questo caso force3D dipende
-     *   esclusivamente da parentIsMoving, diversamente dalla modalità autonoma dove force3D si attiva su scroll nativo
-     *   e si disattiva su scroll end rilevato dal DOM.
-     *
-     * **Vantaggi architetturali**
-     *
-     * 1. Single Source of Truth: solo il parent legge il DOM (scrollLeft/Top/getBoundingClientRect), i figli ricevono
-     *    valori pre-calcolati eliminando layout thrashing.
-     * 2. Sync perfetta: parent e figli aggiornano nello stesso frame RAF, eliminando il lag tipico di sistemi basati su
-     *    eventi scroll separati.
-     * 3. Risparmio computazionale: se il child è fuori viewport (isInViewport = false), move() ritorna immediatamente
-     *    senza calcolare valori o applicare stili, anche se chiamato ad ogni frame dal parent.
-     *
-     * **Note tecniche**
-     *
-     * - Se l'istanza ha un breakpoint disattivato (mq check fallito), move() ritorna immediatamente senza elaborare il
-     *   valore.
-     * - Il refresh del parent non refresha automaticamente i figli: ogni istanza mantiene la propria geometria e deve
-     *   essere refreshata separatamente su resize.
-     * - Se l'istanza ha uno screen custom diverso da window, il valore passato dal parent viene automaticamente
-     *   compensato aggiungendo #screenPosition.
-     *
-     * @example
-     *     ```javascript
-     *
-     *
-     *     Control the instance from another scrollTrigger:
-     *
-     *     const myScroller = mobbu.createScrollTrigger({
-     *         ...
-     *         onTick: ({ value, parentIsMoving }) => {
-     *             myInstance.move({ value, parentIsMoving });
-     *         },
-     *         ...
-     *     });
-     *     ```;
-     *
-     * @param {import('./type.js').MobScrollerMove} obj
-     */
-    move({ value, parentIsMoving = false }) {
-        if (!mq[this.#queryType](this.#breakpoint) || !value) return;
-        this.#iSControlledFromOutside = true;
-        const scrollVal = this.#getScrollValueOnMove(value);
-
-        if (this.#ease) {
-            this.#easeRender(scrollVal);
-        } else {
-            this.#updateEndValue(scrollVal);
-            const forceRender =
-                this.#isInViewport || this.#firstTime || undefined;
-            this.#noEasingRender({ forceRender, parentIsMoving });
-        }
-    }
-
-    /**
-     * Trigger scrollStart event Used by smoothScroll to activate 3D if child (this) have ease = true
-     */
-    triggerScrollStart() {
-        if (!this.#ease) return;
-        if (!this.#disableForce3D) this.#force3D = true;
-    }
-
-    /**
-     * Trigger scrollEnd event Used by smoothScroll to deactivate 3D if child (this) have ease = false
-     */
-    triggerScrollEnd() {
-        if (this.#ease) return;
-
-        this.#noEasingRender({ forceRender: true });
-    }
-
-    /**
      * @param {number | undefined} value
      */
     #getScrollValueOnMove(value) {
@@ -1592,13 +1240,6 @@ export default class MobScroller {
         if (this.#screen !== globalThis) return value + this.#screenPosition;
 
         return value;
-    }
-
-    /**
-     * Stop lerp|spring tween.
-     */
-    stopMotion() {
-        this.#motion?.stop?.();
     }
 
     /**
@@ -2013,8 +1654,8 @@ export default class MobScroller {
 
         const value =
             this.#align == MobScrollerConstant.ALIGN_START
-                ? -this.#scrollerScroll * -1
-                : (this.#scrollerScroll + vhLimit - this.#offset) * -1;
+                ? -(-this.#scrollerScroll)
+                : -(this.#scrollerScroll + vhLimit - this.#offset);
 
         const valClamped =
             this.#align == MobScrollerConstant.ALIGN_START
@@ -2252,6 +1893,369 @@ export default class MobScroller {
                 return { [this.#propierties.toLowerCase()]: `` };
             }
         }
+    }
+
+    /**
+     * Initialize instance
+     */
+    init() {
+        if (this.#isInzialized) {
+            console.warn(
+                'Parallax/scrollTrigger: The init() method cannot be launched more than once. If you are passing the instance to components like horizontalScroller or smoothScroller via the children property, they will initialize the instance.'
+            );
+            return;
+        }
+
+        this.#isInzialized = true;
+        this.#setMotion();
+        this.#calcScreenPosition();
+        this.#calcOffset();
+        this.#calcHeight();
+        this.#calcWidth();
+        this.#getScreenHeight();
+        this.setPerspective();
+
+        if (this.#propierties === MobScrollerConstant.PROP_TWEEN) {
+            this.#range = this.#tween?.getDuration
+                ? this.#tween.getDuration()
+                : 0;
+            this.#dynamicRange = () => this.#range;
+            this.#tween?.inzializeStagger?.();
+        }
+
+        if (this.#type == MobScrollerConstant.TYPE_SCROLLTRIGGER) {
+            this.#limiterOff = true;
+            this.#calcRangeAndUnitMiusure();
+            this.#calcFixedLimit();
+        }
+
+        /**
+         * If scroller is !== window the instance is controlled by another component Use move() methods to control
+         * children
+         */
+        if (this.#ease) {
+            /**
+             * Force transform3D onscroll start
+             */
+            this.#unsubscribeScrollStart = MobCore.useScrollStart(() => {
+                if (!this.#disableForce3D) this.#force3D = true;
+            });
+
+            /**
+             * Avoid error with scroll module operation Clean render at the end of the scroll
+             */
+            this.#unsubscribeScrollEnd = MobCore.useScrollEnd(() => {
+                MobCore.useFrame(() => {
+                    MobCore.useNextTick(() => {
+                        this.#easeRender();
+                    });
+                });
+            });
+
+            if (this.#scroller === globalThis) {
+                this.#unsubscribeScroll = getScrollFunction({
+                    pin: this.#pin,
+                    ease: this.#ease,
+                    useThrottle: this.#useThrottle,
+                    callback: () => {
+                        this.#easeRender();
+                    },
+                });
+            }
+
+            /**
+             * First render
+             */
+            this.#easeRender();
+        }
+
+        if (!this.#ease) {
+            if (this.#scroller === globalThis) {
+                this.#unsubscribeScroll = getScrollFunction({
+                    pin: this.#pin,
+                    ease: this.#ease,
+                    useThrottle: this.#useThrottle,
+                    callback: () => {
+                        this.#updateEndValue();
+                        this.#noEasingRender();
+                    },
+                });
+            }
+
+            /**
+             * First render
+             */
+            this.#updateEndValue();
+            this.#noEasingRender();
+
+            /**
+             * Execute render on scrollEnd to remove 3Dtransform
+             */
+            this.#unsubscribeScrollEnd = MobCore.useScrollEnd(() => {
+                /**
+                 * Force draw no 3d on scroll end with no ease.
+                 */
+                this.#noEasingRender({ forceRender: true });
+            });
+        }
+
+        /**
+         * Initialize marker
+         */
+        if (this.#scroller !== globalThis && this.#marker) {
+            this.#unsubscribeMarker = MobCore.useScroll(() => {
+                // Refresh marker
+                this.#calcFixedLimit();
+            });
+        }
+
+        /**
+         * Initialize refresh
+         */
+        this.#unsubscribeResize = MobCore.useResize(({ horizontalResize }) => {
+            if (horizontalResize) this.refresh();
+        });
+
+        /**
+         * Initialize pin
+         */
+        if (this.#pin) {
+            this.#pinInstance = new MobScrollerPin();
+
+            if (mq[this.#queryType](this.#breakpoint)) {
+                MobCore.useNextTick(() => {
+                    this.#getScrollerOffset();
+                    this.#pinInstance?.init(this.#getPinParams());
+                    this.#pinInstance?.onScroll(this.#scrollerScroll);
+                });
+            }
+        }
+    }
+
+    /**
+     * @param {HTMLElement | globalThis} scroller
+     */
+    setScroller(scroller) {
+        this.#scroller = domNodeIsValidAndReturnElOrWin(scroller, true);
+    }
+
+    /**
+     * @param {HTMLElement | globalThis} screen
+     */
+    setScreen(screen) {
+        this.#screen = domNodeIsValidAndReturnElOrWin(screen, true);
+    }
+
+    /**
+     * @param {string} direction
+     */
+    setDirection(direction) {
+        this.#direction = directionIsValid(direction, 'Parallax/Scrolltrigger');
+    }
+
+    /**
+     * @param {import('../../utils/type.js').MqValues} breakpoint
+     */
+    setBreakPoint(breakpoint) {
+        this.#breakpoint = breakpointIsValid(
+            breakpoint,
+            'breakpoint',
+            'Parallax/Scrolltrigger'
+        );
+    }
+
+    /**
+     * @param {import('../../utils/type.js').MqAction} queryType
+     */
+    setQueryType(queryType) {
+        this.#queryType = breakpointTypeIsValid(
+            queryType,
+            'queryType',
+            'Parallax/Scrolltrigger'
+        );
+    }
+
+    /**
+     * @private
+     */
+    setPerspective() {
+        if (!(this.#perspective && this.#item && this.#item.parentNode)) {
+            return;
+        }
+
+        const style = {
+            perspective: `${this.#perspective}px`,
+            'transform-style': 'preserve-3d',
+        };
+        const parent = this.#item.parentNode;
+        // @ts-ignore
+        Object.assign(parent.style, style);
+    }
+
+    /**
+     * Recalculate positions and align all values
+     */
+    refresh() {
+        if (this.#pin && this.#pinInstance) this.#pinInstance.destroy();
+
+        this.#calcScreenPosition();
+        this.#calcOffset();
+        this.#calcHeight();
+        this.#calcWidth();
+        this.#getScreenHeight();
+
+        if (this.#type == MobScrollerConstant.TYPE_SCROLLTRIGGER) {
+            this.#calcFixedLimit();
+            if (this.#dynamicRange) this.#calcRangeAndUnitMiusure();
+
+            if (
+                this.#pin &&
+                this.#pinInstance &&
+                mq[this.#queryType](this.#breakpoint)
+            ) {
+                this.#pinInstance?.init(this.#getPinParams());
+            }
+        }
+        //
+        // reset value to update animation after resize
+        this.#lastValue = undefined;
+        this.#firstTime = true;
+
+        //
+        if (mq[this.#queryType](this.#breakpoint)) {
+            if (this.#ease) {
+                this.#easeRender();
+            } else {
+                this.#updateEndValue();
+
+                // Disable 3d transform at first render after refresh.
+                this.#noEasingRender({ forceRender: true });
+            }
+        } else {
+            if (this.#ease) this.#motion?.stop?.();
+
+            // Reset Style
+            // For tween is necessary reset inside tween callback
+            MobCore.useFrameIndex(() => {
+                if (this.#applyTo) {
+                    this.#resetTweenStyle(this.#applyTo);
+                    Object.assign(this.#applyTo.style, this.#getResetStyle());
+                } else {
+                    this.#resetTweenStyle(this.#item);
+                    if (this.#item)
+                        Object.assign(this.#item.style, this.#getResetStyle());
+                }
+            }, 3);
+        }
+    }
+
+    /**
+     * Permette di pilotare un'istanza MobScroller da un'altra istanza (parent), tipicamente utilizzato in scenari come
+     * horizontal scrolling con parallax interni, smooth scroll virtuali che controllano animazioni interne, o timeline
+     * sincronizzate.
+     *
+     * **Meccanismo Force3D e Ottimizzazione GPU**
+     *
+     * Quando un'istanza è controllata esternamente (iSControlledFromOutside = true), la gestione del force3D
+     * (translateZ(0)) viene delegata al parent attraverso il parametro parentIsMoving:
+     *
+     * 1. ParentIsMoving = true + isInViewport = true:
+     *
+     *    - Attiva this.#force3D = true
+     *    - Applica transform: translate3d(...) forzando il layer compositing GPU
+     *    - Previene tearing e jitter durante lo scroll rapido
+     * 2. ParentIsMoving = false (scroll fermo):
+     *
+     *    - Disattiva force3D (this.#force3D = false)
+     *    - Il browser può liberare risorse GPU
+     *    - Permette il repainting ottimizzato per interazioni statiche (hover, click)
+     *
+     * Questo meccanismo è essenziale perché in uno scenario con molti elementi animati (es. 50+ parallax in una
+     * sezione), tenere force3D sempre attivo saturerebbe la GPU. Invece, lo attiviamo selettivamente solo quando il
+     * parent segnala "sto scorrendo".
+     *
+     * **Flusso di rendering**
+     *
+     * - Se ease = true: il valore viene passato a #easeRender() che lo usa come target per MobLerp/MobSpring.
+     *   L'interpolazione smooth garantisce fluidità anche a FPS variabili del parent. In questo caso parentIsMoving è
+     *   ignorato perché il force3D viene gestito dal motore di interpolazione che mantiene force3D attivo durante tutta
+     *   la transizione.
+     * - Se ease = false: il valore viene processato immediatamente da #noEasingRender(). In questo caso force3D dipende
+     *   esclusivamente da parentIsMoving, diversamente dalla modalità autonoma dove force3D si attiva su scroll nativo
+     *   e si disattiva su scroll end rilevato dal DOM.
+     *
+     * **Vantaggi architetturali**
+     *
+     * 1. Single Source of Truth: solo il parent legge il DOM (scrollLeft/Top/getBoundingClientRect), i figli ricevono
+     *    valori pre-calcolati eliminando layout thrashing.
+     * 2. Sync perfetta: parent e figli aggiornano nello stesso frame RAF, eliminando il lag tipico di sistemi basati su
+     *    eventi scroll separati.
+     * 3. Risparmio computazionale: se il child è fuori viewport (isInViewport = false), move() ritorna immediatamente
+     *    senza calcolare valori o applicare stili, anche se chiamato ad ogni frame dal parent.
+     *
+     * **Note tecniche**
+     *
+     * - Se l'istanza ha un breakpoint disattivato (mq check fallito), move() ritorna immediatamente senza elaborare il
+     *   valore.
+     * - Il refresh del parent non refresha automaticamente i figli: ogni istanza mantiene la propria geometria e deve
+     *   essere refreshata separatamente su resize.
+     * - Se l'istanza ha uno screen custom diverso da window, il valore passato dal parent viene automaticamente
+     *   compensato aggiungendo #screenPosition.
+     *
+     * @example
+     *     ```javascript
+     *
+     *
+     *     Control the instance from another scrollTrigger:
+     *
+     *     const myScroller = mobbu.createScrollTrigger({
+     *         ...
+     *         onTick: ({ value, parentIsMoving }) => {
+     *             myInstance.move({ value, parentIsMoving });
+     *         },
+     *         ...
+     *     });
+     *     ```;
+     *
+     * @param {import('./type.js').MobScrollerMove} obj
+     */
+    move({ value, parentIsMoving = false }) {
+        if (!mq[this.#queryType](this.#breakpoint) || !value) return;
+        this.#iSControlledFromOutside = true;
+        const scrollVal = this.#getScrollValueOnMove(value);
+
+        if (this.#ease) {
+            this.#easeRender(scrollVal);
+        } else {
+            this.#updateEndValue(scrollVal);
+            const forceRender =
+                this.#isInViewport || this.#firstTime || undefined;
+            this.#noEasingRender({ forceRender, parentIsMoving });
+        }
+    }
+
+    /**
+     * Trigger scrollStart event Used by smoothScroll to activate 3D if child (this) have ease = true
+     */
+    triggerScrollStart() {
+        if (!this.#ease) return;
+        if (!this.#disableForce3D) this.#force3D = true;
+    }
+
+    /**
+     * Trigger scrollEnd event Used by smoothScroll to deactivate 3D if child (this) have ease = false
+     */
+    triggerScrollEnd() {
+        if (this.#ease) return;
+
+        this.#noEasingRender({ forceRender: true });
+    }
+
+    /**
+     * Stop lerp|spring tween.
+     */
+    stopMotion() {
+        this.#motion?.stop?.();
     }
 
     /**

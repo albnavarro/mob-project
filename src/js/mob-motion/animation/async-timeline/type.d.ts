@@ -45,9 +45,7 @@ export interface AsyncTimeline {
 }
 
 export interface AsyncTimelineTypeSpecialProps
-    extends TimeTweenAction,
-        SpringActions,
-        LerpActions {
+    extends TimeTweenAction, SpringActions, LerpActions {
     delay?: number;
 }
 

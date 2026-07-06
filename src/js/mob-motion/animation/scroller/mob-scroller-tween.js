@@ -122,44 +122,63 @@ export default class MobScrollerTween {
     }
 
     /**
+     * Return the new array maeged with main array created in setData
+     *
+     * @param {import('../utils/tween-action/type.js').GoToParamsType[]} newData New datato merge
+     * @returns {void}
+     */
+    #mergeData(newData) {
+        this.#values = this.#values.map((item) => {
+            const itemToMerge = newData.find((newItem) => {
+                return newItem.prop === item.prop;
+            });
+
+            // If exist merge
+            return itemToMerge ? { ...item, ...itemToMerge } : { ...item };
+        });
+    }
+
+    /**
      * Inzialize stagger array
      *
      * @returns {void}
      */
     inzializeStagger() {
-        if (
+        if (!(
             this.#stagger.each > 0 &&
             (this.#callbackCache.length > 0 || this.#callback.length > 0)
-        ) {
-            const cb = getStaggerArray(this.#callbackCache, this.#callback);
-
-            if (this.#stagger.grid.col > cb.length) {
-                staggerIsOutOfRangeWarning(cb.length);
-                return;
-            }
-
-            const { staggerArray, staggerArrayOnComplete } = setStagger({
-                arrayDefault: cb,
-                arrayOnStop: this.#callbackOnStop,
-                stagger: this.#stagger,
-                slowlestStagger: STAGGER_DEFAULT_INDEX_OBJ, //sequencer doesn't support fastestStagger
-                fastestStagger: STAGGER_DEFAULT_INDEX_OBJ, //sequencer doesn't support fastestStagger
-            });
-
-            if (this.#callbackCache.length > this.#callback.length) {
-                this.#callbackCache =
-                    /** @type {import('../utils/callbacks/type.js').CallbackCache} */ (
-                        staggerArray
-                    );
-            } else {
-                this.#callback =
-                    /** @type {import('../utils/callbacks/type.js').CallbackDefault} */ (
-                        staggerArray
-                    );
-            }
-
-            this.#callbackOnStop = staggerArrayOnComplete;
+        )) {
+            return;
         }
+
+        const cb = getStaggerArray(this.#callbackCache, this.#callback);
+
+        if (this.#stagger.grid.col > cb.length) {
+            staggerIsOutOfRangeWarning(cb.length);
+            return;
+        }
+
+        const { staggerArray, staggerArrayOnComplete } = setStagger({
+            arrayDefault: cb,
+            arrayOnStop: this.#callbackOnStop,
+            stagger: this.#stagger,
+            slowlestStagger: STAGGER_DEFAULT_INDEX_OBJ, //sequencer doesn't support fastestStagger
+            fastestStagger: STAGGER_DEFAULT_INDEX_OBJ, //sequencer doesn't support fastestStagger
+        });
+
+        if (this.#callbackCache.length > this.#callback.length) {
+            this.#callbackCache =
+                /** @type {import('../utils/callbacks/type.js').CallbackCache} */ (
+                    staggerArray
+                );
+        } else {
+            this.#callback =
+                /** @type {import('../utils/callbacks/type.js').CallbackDefault} */ (
+                    staggerArray
+                );
+        }
+
+        this.#callbackOnStop = staggerArrayOnComplete;
     }
 
     /**
@@ -239,23 +258,6 @@ export default class MobScrollerTween {
         });
 
         return this;
-    }
-
-    /**
-     * Return the new array maeged with main array created in setData
-     *
-     * @param {import('../utils/tween-action/type.js').GoToParamsType[]} newData New datato merge
-     * @returns {void}
-     */
-    #mergeData(newData) {
-        this.#values = this.#values.map((item) => {
-            const itemToMerge = newData.find((newItem) => {
-                return newItem.prop === item.prop;
-            });
-
-            // If exist merge
-            return itemToMerge ? { ...item, ...itemToMerge } : { ...item };
-        });
     }
 
     /**
@@ -350,7 +352,7 @@ export default class MobScrollerTween {
         this.#callbackOnStop = [];
         this.#callback = [];
         this.#callbackCache = [];
-        this.#unsubscribeCache.forEach((unsubscribe) => unsubscribe());
+        for (const unsubscribe of this.#unsubscribeCache) unsubscribe();
         this.#unsubscribeCache = [];
     }
 }

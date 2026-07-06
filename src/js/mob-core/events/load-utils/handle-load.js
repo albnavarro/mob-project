@@ -75,4 +75,4 @@ const addCallback = (cb) => {
 /**
  * Function to execute a callback on page load
  */
-export const handleLoad = (() => addCallback)();
+export const handleLoad = addCallback;

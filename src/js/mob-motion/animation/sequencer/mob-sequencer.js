@@ -203,6 +203,154 @@ export default class MobSequencer {
     }
 
     /**
+     * @param {object} obj
+     * @param {number} obj.partial
+     * @param {boolean} obj.isLastDraw
+     * @param {import('../utils/timeline/type.js').DirectionType} [obj.direction]
+     */
+    #onDraw({
+        partial = 0,
+        isLastDraw = false,
+        direction = directionConstant.NONE,
+    }) {
+        /*
+         * First time run or after reset lasValue
+         * all the last value is null so get the current value
+         */
+        if (this.#firstRun) {
+            this.#lastPartial = partial;
+            this.#actionAtFirstRender(partial);
+        }
+
+        /**
+         * Inside a timeline the direction is controlled by timeline and pass the value because timeline know the loop
+         * state and direction is stable Inside a parallax we have a fallback, but we don't have a loop
+         *
+         * On first run check is jumped
+         */
+        if (
+            !this.#firstRun &&
+            this.#lastPartial &&
+            (!direction || direction === directionConstant.NONE)
+        ) {
+            this.#direction =
+                partial >= this.#lastPartial
+                    ? directionConstant.FORWARD
+                    : directionConstant.BACKWARD;
+        }
+
+        if (
+            !this.#firstRun &&
+            (direction === directionConstant.BACKWARD ||
+                direction === directionConstant.FORWARD)
+        ) {
+            this.#direction = direction;
+        }
+
+        /**
+         * Get new values
+         */
+        this.#values = sequencerGetValusOnDraw({
+            timeline: this.#timeline,
+            valuesState: this.#values,
+            partial,
+        });
+
+        const callBackObject = getValueObj(this.#values, 'currentValue');
+
+        syncCallback({
+            each: this.#stagger.each,
+            useStagger: this.#useStagger,
+            isLastDraw,
+            callBackObject,
+            callback: this.#callback,
+            callbackCache: this.#callbackCache,
+            callbackOnStop: this.#callbackOnStop,
+        });
+
+        this.#fireAddCallBack(partial);
+
+        this.#useStagger = true;
+        this.#lastPartial = partial;
+        this.#firstRun = false;
+    }
+
+    /**
+     * Fire addCallback first time without check the previous position. because first time we can start from any
+     * position and we doesn't a have previous position So we fire the callback once To skip this callback, check
+     * isForce prop in callback
+     *
+     * @property {number} [time=0] Default is `0`
+     */
+    #actionAtFirstRender(time = 0) {
+        if (!this.#forceAddFnAtFirstRun) return;
+
+        for (const { fn, time: fnTime } of this.#callbackAdd) {
+            const mustFireForward = {
+                shouldFire: time >= fnTime,
+                direction: directionConstant.FORWARD,
+            };
+
+            const mustFireBackward = {
+                shouldFire: time <= fnTime,
+                direction: directionConstant.BACKWARD,
+            };
+
+            const mustFire =
+                mustFireForward.shouldFire || mustFireBackward.shouldFire;
+
+            if (!mustFire) continue;
+
+            const direction = mustFireForward.shouldFire
+                ? mustFireForward.direction
+                : mustFireBackward.direction;
+
+            fn({ direction, value: time, isForced: true });
+        }
+
+        this.#forceAddFnAtFirstRun = false;
+    }
+
+    /**
+     * Fire callBack at specific time
+     *
+     * @property {number} [time=0] Default is `0`
+     */
+    #fireAddCallBack(time = 0) {
+        for (const { fn, time: fnTime } of this.#callbackAdd) {
+            /*
+             * In forward mode current time must be greater or equal than fn time
+             * and the last current time must be minor than fn time to prevent
+             * the the fn is fired before fn time is reached
+             */
+            const mustFireForward =
+                this.#direction === directionConstant.FORWARD &&
+                time > fnTime &&
+                this.#lastPartial <= fnTime;
+
+            /*
+             * In backward mode current time must be minor or equal than fn time
+             * and the last current time must be greater than fn time to prevent
+             * the the fn is fired before fn time is reached
+             * time and fnTime cannot be the same, because fnTime
+             * is equal max duration of timeline/parallax the previous value
+             * can be equal max duration, so we avoid double firing of fn
+             */
+            const mustFireBackward =
+                this.#direction === directionConstant.BACKWARD &&
+                time < fnTime &&
+                this.#lastPartial >= fnTime;
+
+            // const mustFire =
+            //     (mustFireForward || mustFireBackward) && shouldFired;
+            const mustFire = mustFireForward || mustFireBackward;
+            if (!mustFire) continue;
+
+            fn({ direction: this.#direction, value: time, isForced: false });
+        }
+    }
+
+    /**
      * Inzialize stagger array
      */
     inzializeStagger() {
@@ -289,160 +437,12 @@ export default class MobSequencer {
     }
 
     /**
-     * @param {object} obj
-     * @param {number} obj.partial
-     * @param {boolean} obj.isLastDraw
-     * @param {import('../utils/timeline/type.js').DirectionType} [obj.direction]
-     */
-    #onDraw({
-        partial = 0,
-        isLastDraw = false,
-        direction = directionConstant.NONE,
-    }) {
-        /*
-         * First time run or after reset lasValue
-         * all the last value is null so get the current value
-         */
-        if (this.#firstRun) {
-            this.#lastPartial = partial;
-            this.#actionAtFirstRender(partial);
-        }
-
-        /**
-         * Inside a timeline the direction is controlled by timeline and pass the value because timeline know the loop
-         * state and direction is stable Inside a parallax we have a fallback, but we don't have a loop
-         *
-         * On first run check is jumped
-         */
-        if (
-            !this.#firstRun &&
-            this.#lastPartial &&
-            (!direction || direction === directionConstant.NONE)
-        ) {
-            this.#direction =
-                partial >= this.#lastPartial
-                    ? directionConstant.FORWARD
-                    : directionConstant.BACKWARD;
-        }
-
-        if (
-            !this.#firstRun &&
-            (direction === directionConstant.BACKWARD ||
-                direction === directionConstant.FORWARD)
-        ) {
-            this.#direction = direction;
-        }
-
-        /**
-         * Get new values
-         */
-        this.#values = sequencerGetValusOnDraw({
-            timeline: this.#timeline,
-            valuesState: this.#values,
-            partial,
-        });
-
-        const callBackObject = getValueObj(this.#values, 'currentValue');
-
-        syncCallback({
-            each: this.#stagger.each,
-            useStagger: this.#useStagger,
-            isLastDraw,
-            callBackObject,
-            callback: this.#callback,
-            callbackCache: this.#callbackCache,
-            callbackOnStop: this.#callbackOnStop,
-        });
-
-        this.#fireAddCallBack(partial);
-
-        this.#useStagger = true;
-        this.#lastPartial = partial;
-        this.#firstRun = false;
-    }
-
-    /**
      * Methods call by syncTimeline, everty time user use play, playFrom etc.. or loop end. Reset the data that control
      * add callback to have a new clean state
      */
     resetLastValue() {
         this.#firstRun = true;
         this.#lastPartial = 0;
-    }
-
-    /**
-     * Fire addCallback first time without check the previous position. because first time we can start from any
-     * position and we doesn't a have previous position So we fire the callback once To skip this callback, check
-     * isForce prop in callback
-     *
-     * @property {number} [time=0] Default is `0`
-     */
-    #actionAtFirstRender(time = 0) {
-        if (!this.#forceAddFnAtFirstRun) return;
-
-        this.#callbackAdd.forEach(({ fn, time: fnTime }) => {
-            const mustFireForward = {
-                shouldFire: time >= fnTime,
-                direction: directionConstant.FORWARD,
-            };
-
-            const mustFireBackward = {
-                shouldFire: time <= fnTime,
-                direction: directionConstant.BACKWARD,
-            };
-
-            const mustFire =
-                mustFireForward.shouldFire || mustFireBackward.shouldFire;
-
-            if (!mustFire) return;
-
-            const direction = mustFireForward.shouldFire
-                ? mustFireForward.direction
-                : mustFireBackward.direction;
-
-            fn({ direction, value: time, isForced: true });
-        });
-
-        this.#forceAddFnAtFirstRun = false;
-    }
-
-    /**
-     * Fire callBack at specific time
-     *
-     * @property {number} [time=0] Default is `0`
-     */
-    #fireAddCallBack(time = 0) {
-        this.#callbackAdd.forEach(({ fn, time: fnTime }) => {
-            /*
-             * In forward mode current time must be greater or equal than fn time
-             * and the last current time must be minor than fn time to prevent
-             * the the fn is fired before fn time is reached
-             */
-            const mustFireForward =
-                this.#direction === directionConstant.FORWARD &&
-                time > fnTime &&
-                this.#lastPartial <= fnTime;
-
-            /*
-             * In backward mode current time must be minor or equal than fn time
-             * and the last current time must be greater than fn time to prevent
-             * the the fn is fired before fn time is reached
-             * time and fnTime cannot be the same, because fnTime
-             * is equal max duration of timeline/parallax the previous value
-             * can be equal max duration, so we avoid double firing of fn
-             */
-            const mustFireBackward =
-                this.#direction === directionConstant.BACKWARD &&
-                time < fnTime &&
-                this.#lastPartial >= fnTime;
-
-            // const mustFire =
-            //     (mustFireForward || mustFireBackward) && shouldFired;
-            const mustFire = mustFireForward || mustFireBackward;
-            if (!mustFire) return;
-
-            fn({ direction: this.#direction, value: time, isForced: false });
-        });
     }
 
     /**
@@ -797,23 +797,22 @@ export default class MobSequencer {
      * when it is stopped
      */
     cleanCachedId() {
-        this.#callbackCache.forEach(({ cb }) => MobCore.useCache.clean(cb));
+        for (const { cb } of this.#callbackCache) MobCore.useCache.clean(cb);
     }
 
     /**
      * ...
      */
     freezeCachedId() {
-        this.#callbackCache.forEach(({ cb }) => MobCore.useCache.freeze(cb));
+        for (const { cb } of this.#callbackCache) MobCore.useCache.freeze(cb);
     }
 
     /**
      * ...
      */
     unFreezeCachedId() {
-        this.#callbackCache.forEach(({ cb }) =>
-            MobCore.useCache.unFreeze({ id: cb, update: true })
-        );
+        for (const { cb } of this.#callbackCache)
+            MobCore.useCache.unFreeze({ id: cb, update: true });
     }
 
     /**
@@ -835,7 +834,7 @@ export default class MobSequencer {
         this.#callbackCache = [];
         this.#callbackOnStop = [];
         this.#callbackAdd = [];
-        this.#unsubscribeCache.forEach((unsubscribe) => unsubscribe());
+        for (const unsubscribe of this.#unsubscribeCache) unsubscribe();
         this.#unsubscribeCache = [];
     }
 }

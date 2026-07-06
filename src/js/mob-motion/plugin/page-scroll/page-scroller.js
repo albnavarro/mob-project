@@ -32,10 +32,20 @@ let update = () => {};
 /** @type {HTMLElement | undefined} */
 let rootElementToObserve;
 
+/**
+ * UTILS:
+ *
+ * - Add is-whelling class to body when lerp is in movement.
+ */
 const removeWhellingClass = () => {
     document.body.classList.remove('is-whelling');
 };
 
+/**
+ * UTILS:
+ *
+ * - Remove is-whelling class to body when lerp stop.
+ */
 const addWhellingClass = () => {
     document.body.classList.add('is-whelling');
 };
@@ -43,7 +53,10 @@ const addWhellingClass = () => {
 /**
  * Necessary.
  *
- * Enable the possibility to use preventDefault to block scroll page on wheel event. ( we scroll page manually ).
+ * Enable the possibility to use preventDefault in global wheel event.
+ *
+ * - ByPass native wheel scroll.
+ * - Used by unsubscribeWhellPrevent ( global window event ).
  */
 MobMotionCore.setDefault({
     usePassive: false,
@@ -51,6 +64,9 @@ MobMotionCore.setDefault({
 
 /** @type {import('./type').MobPageScroller} */
 const MobPageScroller = ({ velocity, rootElement }) => {
+    /**
+     * Classic lerp tween.
+     */
     let lerp = MobTween.createLerp({
         data: { scrollValue: window.scrollY },
         precision: 1,
@@ -59,6 +75,9 @@ const MobPageScroller = ({ velocity, rootElement }) => {
 
     rootElementToObserve = rootElement;
 
+    /**
+     * Callback fire when user trigger wheel event.
+     */
     const unsubscribe = lerp.subscribe(({ scrollValue }) => {
         if (isFreezed) return;
 
@@ -69,12 +88,17 @@ const MobPageScroller = ({ velocity, rootElement }) => {
         });
     });
 
+    /**
+     * Callback fire when lerp complete current scroll.
+     */
     lerp.onComplete(() => {
         lastScrollValue = window.scrollY;
     });
 
     /**
      * Main handler.
+     *
+     * - Prepare value to move lerp instance.
      */
     const unsubscribeMouseWheel = MobCore.useMouseWheel((event) => {
         if (isFreezed) return;
@@ -95,7 +119,9 @@ const MobPageScroller = ({ velocity, rootElement }) => {
     });
 
     /**
-     * Disable scroll on well event. we manage scroll manually with scrollTo() API.
+     * Disable native scroll on well event.
+     *
+     * - Scroll si controlled by lerp.
      */
     const unsubscribeWhellPrevent = MobCore.useMouseWheel(
         ({ preventDefault }) => {
@@ -122,20 +148,34 @@ const MobPageScroller = ({ velocity, rootElement }) => {
     });
 
     /**
-     * Update lerp value on native scroll event.
+     * Update lerp without trigger lerp callback.
+     *
+     * - Normally this scroll is used when user use scrollbar.
      */
     const unsubscribeScroll = MobCore.useScroll(() => {
         if (!useNativeScroll) {
             return;
         }
 
+        /**
+         * Get crrent scrollY value.
+         */
         const value = window.scrollY;
         lastScrollValue = value;
+
+        /**
+         * Update lerp store without trigger callback
+         *
+         * - Next time lerp fire callback start calculate from current scrollY.
+         */
         lerp.setImmediate({ scrollValue: value });
     });
 
     /**
-     * Stop lerp on pointerDown. Stop lerp even is touch or mouse click.
+     * Stop lerp on pointerDown.
+     *
+     * - Stop lerp even is touch or mouse click.
+     * - Simplest way to permite native scroll with scrollbar.
      */
     const unsubscribePointerDown = MobCore.usePointerDown(() => {
         if (isFreezed) return;
@@ -148,6 +188,8 @@ const MobPageScroller = ({ velocity, rootElement }) => {
 
     /**
      * Update lerp value on change screen dimension
+     *
+     * - No lerp callback id fired.
      */
     const resizeObserver = new ResizeObserver(() => {
         lerp.stop();
@@ -166,7 +208,9 @@ const MobPageScroller = ({ velocity, rootElement }) => {
             useNativeScroll = true;
             isFreezed = false;
 
-            // Disconnect resizeObserver.
+            /**
+             * Disconnect resizeObserver.
+             */
             if (rootElementToObserve) {
                 resizeObserver.unobserve(rootElementToObserve);
                 resizeObserver.disconnect();
@@ -222,7 +266,11 @@ export const InitMobPageScroll = ({
     }));
 };
 
-/** @type{() => void} */
+/**
+ * Freeze module without destroy.
+ *
+ * @type{() => void}
+ */
 export const FreezeMobPageScroll = () => {
     if (!isActive || isFreezed) return;
 
@@ -230,14 +278,22 @@ export const FreezeMobPageScroll = () => {
     isFreezed = true;
 };
 
-/** @type{() => void} */
+/**
+ * Unfreeze module.
+ *
+ * @type{() => void}
+ */
 export const UnFreezeMobPageScroll = () => {
     if (!isActive || !isFreezed) return;
 
     isFreezed = false;
 };
 
-/** @type{() => void} */
+/**
+ * Freeze module without destroy anche update lerp without fire callback.
+ *
+ * @type{() => void}
+ */
 export const UnFreezeAndUPdateMobPageScroll = () => {
     if (!isActive || !isFreezed) return;
 
@@ -246,29 +302,55 @@ export const UnFreezeAndUPdateMobPageScroll = () => {
     isFreezed = false;
 };
 
-/** @type{() => void} */
+/**
+ * Update lerp without fire callback.
+ *
+ * @type{() => void}
+ */
 export const UpdateMobPageScroll = () => {
     if (!isActive) return;
 
     update();
 };
 
-/** @type{() => void} */
+/**
+ * Destroy module.
+ *
+ * @type{() => void}
+ */
 export const DestroyMobPageScroll = () => {
     destroy();
 };
 
-/** @type{() => void} */
+/**
+ * Utils:
+ *
+ * - Enable bypass native wheel event.
+ *
+ * @type{() => void}
+ */
 export const enebalePreventScroll = () => {
     usePrevent = true;
 };
 
-/** @type{() => void} */
+/**
+ * Utils:
+ *
+ * - Disable bypass native wheel event.
+ *
+ * @type{() => void}
+ */
 export const disablePreventScroll = () => {
     usePrevent = false;
 };
 
-/** @type{() => boolean} */
+/**
+ * Utils:
+ *
+ * - Get current active status.
+ *
+ * @type{() => boolean}
+ */
 export const getActiveStateScroll = () => {
     return isActive;
 };

@@ -559,7 +559,7 @@ export const printEaseKey = () => {
  * @type {(arg0: string) => () => void}
  */
 export const getTweenFn = (prop) => {
-    if (prop in tweenConfig) {
+    if (Object.hasOwn(tweenConfig, prop)) {
         return tweenConfig[prop];
     } else {
         tweenEaseWarning(prop);

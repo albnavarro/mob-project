@@ -92,11 +92,14 @@ const setProp = ({
 
     /**
      * Transform value
+     *
+     * - Skip initialization step
      */
-    const valueTransformed =
-        /** @type{{[key:string]: ((current: any, previous: any) => any)}} */ (
-            fnTransformation
-        )[prop]?.(val, oldVal) ?? val;
+    const valueTransformed = initalizeStep
+        ? val
+        : /** @type{{[key:string]: ((current: any, previous: any) => any)}} */ (
+              fnTransformation[prop]?.(val, oldVal) ?? val
+          );
 
     /**
      * Validation
@@ -124,7 +127,7 @@ const setProp = ({
     /**
      * In strict mode return is prop is not valid
      */
-    if (strict[prop] && !isValidated && useStrict) return;
+    if (strict[prop] === true && !isValidated && useStrict) return;
 
     /**
      * Update validation array.
@@ -134,9 +137,10 @@ const setProp = ({
     /**
      * Check if last value is equal new value. if true and skipEqual is true for this prop return.
      */
-    const isEqual = skipEqual[prop]
-        ? checkEquality(type[prop], oldVal, valueTransformed)
-        : false;
+    const isEqual =
+        skipEqual[prop] === true
+            ? checkEquality(type[prop], oldVal, valueTransformed)
+            : false;
 
     if (isEqual && !initalizeStep) return;
 
@@ -167,9 +171,9 @@ const setProp = ({
          * AddToComputedWaitLsit get and update map.
          */
         addToComputedWaitLsit({ instanceId, prop });
-        bindInstanceBy.forEach((id) => {
+        for (const id of bindInstanceBy) {
             addToComputedWaitLsit({ instanceId: id, prop });
-        });
+        }
     }
 };
 
@@ -237,33 +241,31 @@ const setObj = ({
     /**
      * Transform value
      */
-    const valueTransformed = Object.fromEntries(
-        Object.entries(val).map((item) => {
-            const [subProp, subVal] = item;
-            const subValOld = store[prop][subProp];
+    const valueTransformed = initalizeStep
+        ? val
+        : Object.fromEntries(
+              Object.entries(val).map((item) => {
+                  const [subProp, subVal] = item;
+                  const subValOld = store[prop][subProp];
 
-            /**
-             * Trasforma il valore solo se il dato è effettivamente cambiato.
-             *
-             * - Confrontiamo il nuovo valore con il vecchio valore trasformato
-             * - Se coincidono non abbiamo bisogno di traformarlo
-             * - Questo permetti di modificare una sola propietá senza triggere un nuovo transform in una propietá non
-             *   mutata.
-             *
-             * Durante l'inizializzazione tutti i trasfrom devono essere eseguiti almeno una volta.
-             */
-            if (
-                !initalizeStep &&
-                checkEquality(type[prop][subProp], subVal, subValOld)
-            )
-                return [subProp, subVal];
+                  /**
+                   * Trasforma il valore solo se il dato è effettivamente cambiato.
+                   *
+                   * - Confrontiamo il nuovo valore con il vecchio valore trasformato
+                   * - Se coincidono non abbiamo bisogno di traformarlo
+                   * - Questo permetti di modificare una sola propietá senza triggere un nuovo transform in una propietá
+                   *   non mutata.
+                   */
+                  if (checkEquality(type[prop][subProp], subVal, subValOld))
+                      return [subProp, subVal];
 
-            return [
-                subProp,
-                fnTransformation[prop][subProp]?.(subVal, subValOld) ?? subVal,
-            ];
-        })
-    );
+                  return [
+                      subProp,
+                      fnTransformation[prop][subProp]?.(subVal, subValOld) ??
+                          subVal,
+                  ];
+              })
+          );
 
     /**
      * Check type of each propierties
@@ -299,7 +301,7 @@ const setObj = ({
             const [subProp, subVal] = item;
             const subValOld = store[prop][subProp];
 
-            return strict[prop][subProp] && useStrict
+            return strict[prop][subProp] === true && useStrict
                 ? {
                       strictCheck: fnValidate[prop][subProp]?.(
                           subVal,
@@ -336,7 +338,7 @@ const setObj = ({
      * - Object ( controlled ) non e sepcifco per le performance.
      * - Per le performance conviene utilizzare una propietá normale.
      */
-    Object.entries(newValParsedByStrict).forEach((item) => {
+    for (const item of Object.entries(newValParsedByStrict)) {
         const [subProp, subVal] = item;
         const subValOld = store[prop][subProp];
 
@@ -360,7 +362,7 @@ const setObj = ({
         }
 
         validationStatusObject[prop][subProp] = validateResult;
-    });
+    }
 
     /**
      * Update value and fire callback associated
@@ -454,9 +456,9 @@ const setObj = ({
          * AddToComputedWaitLsit get and update map.
          */
         addToComputedWaitLsit({ instanceId, prop });
-        bindInstanceBy.forEach((id) => {
+        for (const id of bindInstanceBy) {
             addToComputedWaitLsit({ instanceId: id, prop });
-        });
+        }
     }
 };
 
@@ -487,7 +489,7 @@ export const storeSetEntryPoint = ({
     /**
      * Check if prop exist in store
      */
-    if (!(prop in store)) {
+    if (!Object.hasOwn(store, prop)) {
         storeSetWarning(prop, logStyle);
         return;
     }
@@ -551,7 +553,7 @@ export const storeQuickSetEntrypoint = ({ instanceId, prop, value }) => {
 
     const { store, watcherByProp } = state;
 
-    if (!(prop in store)) return;
+    if (!Object.hasOwn(store, prop)) return;
 
     /**
      * Update value and fire callback associated
@@ -655,14 +657,14 @@ const fireComputed = (instanceId) => {
     /**
      * Update computed value after computedRunning is ended.
      */
-    computedValues.forEach(({ prop, value }) => {
+    for (const { prop, value } of computedValues) {
         storeSetEntryPoint({
             instanceId,
             prop,
             value,
             action: STORE_SET,
         });
-    });
+    }
 };
 
 /**
@@ -717,6 +719,105 @@ export const addToComputedWaitLsit = ({ instanceId, prop }) => {
 };
 
 /**
+ * Check for circular dependencies using DFS.
+ *
+ * - Creiamo un grafo completo delle dipendenze per assicurarci che tutte li chiavi ( dipendenze ) non riportino a
+ *   targetProp.
+ *
+ * @example
+ *     storeTest.computed(
+ *     () => proxi.a,
+ *     () => proxi.c + 1      // prop: 'a', keys: ['c']
+ *     );
+ *
+ *     storeTest.computed(
+ *     () => proxi.b,
+ *     () => proxi.a + 1      // prop: 'b', keys: ['a']
+ *     );
+ *
+ *     storeTest.computed(
+ *     () => proxi.c,
+ *     () => proxi.b + 1      // prop: 'c', keys: ['b']
+ *     );
+ *
+ *     Dipendenze:
+ *     a dipende da c
+ *     b dipende da a
+ *     c dipende da b
+ *
+ *     Verifica ciclo su c:
+ *
+ *     1. targetProp: c | targetKeys: [b]
+ *     Quale computed calcola b? -> il computed con prop b (keys: [a])
+ *
+ *     2. targetProp: c | targetKeys: [a]
+ *     Quale computed calcola a? -> il computed con prop a (keys: [c])
+ *
+ *     3. targetProp: c | targetKeys: [c]
+ *     targetKeys include targetProp! -> dipendenza circolare
+ *
+ * @param {string} targetProp - La prop corrente da analizzare.
+ * @param {string[]} targetKeys - Le chiavi correnti da analizzare.
+ * @param {Set<{ prop: string; fn: (arg0: Record<string, any>) => void; keys: string[] }>} callBackComputed
+ * @param {Set<string>} [visited] - Prop giá visitata.
+ * @returns {boolean}
+ */
+const hasCircularDependencies = (
+    targetProp,
+    targetKeys,
+    callBackComputed,
+    visited = new Set()
+) => {
+    /**
+     * Se una delle dipendenze è il target stesso, abbiamo una dipendenza circolare.
+     *
+     * - Le dipendenze possono attraversare piu computed.
+     */
+    if (targetKeys.includes(targetProp)) return true;
+
+    for (const key of targetKeys) {
+        /**
+         * Se una prop è già stata esplorata in questo percorso, la saltiamo.
+         *
+         * - Evita loop infiniti nel grafo (es. a -> b -> a -> b ...)
+         */
+        if (visited.has(key)) continue;
+        visited.add(key);
+
+        /**
+         * Trova il computed che produce questa key.
+         *
+         * - Se `key` è prodotta da un computed, dobbiamo esplorare le dipendenze di QUEL computed (ricorsione).
+         * - Così seguiamo la catena: c dipende da b, b dipende da a, a dipende da c? -> CICLO!
+         */
+        const computedForKey = [...callBackComputed].find(
+            ({ prop }) => prop === key
+        );
+
+        if (
+            /**
+             * Esplora ricorsivamente le dipendenze del computed trovato.
+             *
+             * - `targetProp` rimane fisso: è il computed che stiamo aggiungendo.
+             * - Se nelle dipendenze transitive ritorna a `targetProp`, abbiamo un ciclo.
+             * - `computedForKey.keys` sono le nuove dipendenze da esplorare.
+             */
+            computedForKey &&
+            hasCircularDependencies(
+                targetProp,
+                computedForKey.keys,
+                callBackComputed,
+                visited
+            )
+        ) {
+            return true;
+        }
+    }
+
+    return false;
+};
+
+/**
  * Save callback in map store. Check for circular dependencies.
  *
  * @param {import('./type').MobStoreComputedAction} params
@@ -728,18 +829,9 @@ const storeComputedAction = ({ instanceId, prop, keys, fn }) => {
 
     const { callBackComputed } = state;
 
-    const hasCircularDependecies = [...callBackComputed].reduce(
-        (previous, { prop: currentProp, keys: currentKeys }) => {
-            return (
-                currentKeys.includes(prop) &&
-                keys.includes(currentProp) &&
-                !previous
-            );
-        },
-        false
-    );
+    const hasCircular = hasCircularDependencies(prop, keys, callBackComputed);
 
-    if (keys.includes(prop) || hasCircularDependecies) {
+    if (keys.includes(prop) || hasCircular) {
         storeComputedKeyUsedWarning(keys, getLogStyle());
         return;
     }
@@ -786,7 +878,8 @@ const initializeCompuntedProp = ({ instanceId, prop, keys, callback }) => {
     const valuesObject = Object.fromEntries(
         keys
             .map((key) => {
-                if (key in storeMerged) return [key, storeMerged[key]];
+                if (Object.hasOwn(storeMerged, key))
+                    return [key, storeMerged[key]];
                 return;
             })
             .filter((item) => item !== undefined)

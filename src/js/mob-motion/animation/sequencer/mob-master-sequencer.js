@@ -41,9 +41,9 @@ export default class MobMasterSequencer {
      * @returns {void}
      */
     draw({ partial, isLastDraw, useFrame }) {
-        this.#children.forEach((item) => {
+        for (const item of this.#children) {
             item.draw({ partial, isLastDraw, useFrame });
-        });
+        }
     }
 
     /**
@@ -58,9 +58,9 @@ export default class MobMasterSequencer {
      * @returns {void}
      */
     inzializeStagger() {
-        this.#children.forEach((item) => {
+        for (const item of this.#children) {
             item.inzializeStagger();
-        });
+        }
     }
 
     /**
@@ -68,9 +68,9 @@ export default class MobMasterSequencer {
      * @returns {void}
      */
     setDuration(val) {
-        this.#children.forEach((item) => {
+        for (const item of this.#children) {
             item.setDuration(val);
-        });
+        }
     }
 
     /**
@@ -85,9 +85,9 @@ export default class MobMasterSequencer {
      * @returns {void}
      */
     setStretchFactor(val) {
-        this.#children.forEach((item) => {
+        for (const item of this.#children) {
             item.setStretchFactor(val);
-        });
+        }
     }
 
     /**
@@ -101,43 +101,43 @@ export default class MobMasterSequencer {
      * @returns {void}
      */
     resetLastValue() {
-        this.#children.forEach((item) => item.resetLastValue());
+        for (const item of this.#children) item.resetLastValue();
     }
 
     /**
      * @returns {void}
      */
     disableStagger() {
-        this.#children.forEach((item) => {
+        for (const item of this.#children) {
             item.disableStagger();
-        });
+        }
     }
 
     /**
      * @returns {void}
      */
     cleanCachedId() {
-        this.#children.forEach((item) => {
+        for (const item of this.#children) {
             item.cleanCachedId();
-        });
+        }
     }
 
     /**
      * @returns {void}
      */
     freezeCachedId() {
-        this.#children.forEach((item) => {
+        for (const item of this.#children) {
             item.freezeCachedId();
-        });
+        }
     }
 
     /**
      * @returns {void}
      */
     unFreezeCachedId() {
-        this.#children.forEach((item) => {
+        for (const item of this.#children) {
             item.unFreezeCachedId();
-        });
+        }
     }
 
     /**
@@ -151,9 +151,9 @@ export default class MobMasterSequencer {
      * @returns {void}
      */
     destroy() {
-        this.#children.forEach((item) => {
+        for (const item of this.#children) {
             item.destroy();
-        });
+        }
         this.#children = [];
     }
 }

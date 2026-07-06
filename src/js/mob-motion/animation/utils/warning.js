@@ -397,6 +397,15 @@ export const functionWarning = (val, label) => {
 };
 
 /**
+ * @param {any} val
+ * @param {any} label
+ * @returns {void}
+ */
+export const arrayWarning = (val, label) => {
+    console.warn(`${label}: '${val}' is not a Array`);
+};
+
+/**
  * @returns {void}
  */
 export const lerpVelocityWarining = () => {

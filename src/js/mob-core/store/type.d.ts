@@ -48,6 +48,8 @@ export interface StoreMapValue {
     strict: Record<string, any>;
     skipEqual: Record<string, any>;
     proxiObject?: Record<string, any> | null | undefined;
+    selfProxiObject?: Record<string, any> | null | undefined;
+    boundedProxiObject?: Record<string, any> | null | undefined;
     bindInstance: string[];
     bindInstanceBy: string[];
     unsubscribeBindInstance: (() => void)[];
@@ -74,6 +76,8 @@ export interface MobStoreReturnType<T extends StoreDefaultMap> {
     emit: MobStoreEmit<T>;
     emitAsync: MobStoreEmitAsync<T>;
     getProxi: MobStoreStoreProxi<T>;
+    getSelfProxi: MobStoreStoreProxiSelf<T>;
+    getBoundedProxi: MobStoreStoreProxiBounded<T>;
     setProxiReadOnlyProp: MobStoreProxiReadOnly;
     getValidation: () => object | undefined;
     debug: () => void;
@@ -83,8 +87,7 @@ export interface MobStoreReturnType<T extends StoreDefaultMap> {
 }
 
 export type BindStoreValueType =
-    | MobStoreReturnType<any>
-    | MobStoreReturnType<any>[];
+    MobStoreReturnType<any> | MobStoreReturnType<any>[];
 
 export type BindStore = (value: BindStoreValueType) => void;
 
@@ -194,6 +197,8 @@ interface MobStoreEmitAsync<T> {
 }
 
 export type MobStoreStoreProxi<T> = () => T;
+export type MobStoreStoreProxiSelf<T> = () => T;
+export type MobStoreStoreProxiBounded<T> = () => T;
 
 export type MobStoreProxiReadOnly = (values: string[]) => void;
 
@@ -280,48 +285,48 @@ export interface MobStoreCallbackQueue {
     instanceId?: string;
 }
 
-export type MobStoreFunctionValue<T, K> = () => {
+export interface MobStoreComplexObject<T, K> {
     /**
      * Initial value
      */
-    value: T[K];
+    __value: T[K];
 
     /**
      * Supported types: `String|Number|Object|Function|Array|Boolean|Element|HTMLElement|Map|Set|NodeList|"Any"`. The
      * property will not be updated if it doesn't match, you will have a warning. For custom Object use 'Any'. Support
      * Constructor || String. Es: type: Number || type: 'Number'
      */
-    type?: any;
+    __type?: any;
 
     /**
      * Function to transform value. This function will have the current value and old value as input parameter.
      */
-    transform?: (value: T[K], previousValue: T[K]) => T[K];
+    __transform?: (value: T[K], previousValue: T[K]) => T[K];
 
     /**
      * Validation function to parse value. This function will have the current value and old value as input parameter
      * and will return a boolean value. The validation status of each property will be displayed in the watchers and
      * will be retrievable using the getValidation() method.
      */
-    validate?: (value: T[K], previousValue: T[K]) => boolean;
+    __validate?: (value: T[K], previousValue: T[K]) => boolean;
 
     /**
      * If set to true, the validation function will become blocking and the property will be updated only if the
      * validation function is successful. THe default value is `false`.
      */
-    strict?: boolean;
+    __strict?: boolean;
 
     /**
      * If the value is equal to the previous one, the property will not be updated. The watches will not be executed and
      * the property will have no effect on the computed related to it. The default value is `true`.
      */
-    skipEqual?: boolean;
-};
+    __skipEqual?: boolean;
+}
 
 type MobStoreState<T> = {
-    [K in keyof T]: MobStoreFunctionValue<T, K> | T[K] | MobStoreState<T[K]>;
+    [K in keyof T]: MobStoreComplexObject<T, K> | T[K] | MobStoreState<T[K]>;
 };
 
-export type MobStoreParams<T = any> = MobStoreState<T>;
+export type MobStoreParams<T = any> = Partial<MobStoreState<T>>;
 
 export type MobStoreWatchWaintList = Map<string, Map<string, any>>;

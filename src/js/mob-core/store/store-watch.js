@@ -17,7 +17,7 @@ const subscribeWatch = ({ state, prop, callback, wait }) => {
             unsubscribeId: '',
         };
 
-    if (!(prop in store)) {
+    if (!Object.hasOwn(store, prop)) {
         storeWatchWarning(prop, logStyle);
 
         return {
@@ -127,16 +127,22 @@ export const watchEntryPoint = ({ instanceId, prop, callback, wait }) => {
     const state = getStateFromMainMap(instanceId);
     if (!state) return () => {};
 
-    const { bindInstance, unsubscribeBindInstance } = state;
-
-    if (!bindInstance || bindInstance.length === 0) {
+    /**
+     * Prioritá agli store propi ( itself )
+     */
+    if (Object.hasOwn(state.store, prop)) {
         return watchMobStore({ instanceId, prop, callback, wait });
     }
 
+    /**
+     * Se la prop non é nello store itself controlliamo gli store bounded.
+     */
+    const { bindInstance, unsubscribeBindInstance } = state;
+
     const currentBindId =
-        [instanceId, ...bindInstance].find((id) => {
+        bindInstance.find((id) => {
             const store = getStateFromMainMap(id)?.store;
-            return store && prop in store;
+            return store && Object.hasOwn(store, prop);
         }) ?? '';
 
     const innerUnsubscribe = watchMobStore({

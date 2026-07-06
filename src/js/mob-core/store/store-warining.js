@@ -193,6 +193,18 @@ export const storeComputedKeyUsedWarning = (keys, style) => {
  * @param {string} style
  * @returns {void}
  */
+export const storeComputedPropUsedWarning = (prop, style) => {
+    console.warn(
+        `%c ${prop} is already used as a computed target, explicit set is not allowed`,
+        style
+    );
+};
+
+/**
+ * @param {string} prop
+ * @param {string} style
+ * @returns {void}
+ */
 export const storeWatchWarning = (prop, style) => {
     console.warn(
         `%c MobStore error: the property ${prop} to watch doesn't exist in store`,

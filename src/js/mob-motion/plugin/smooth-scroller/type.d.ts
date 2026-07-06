@@ -13,12 +13,12 @@ export type OnUpdate = (arg0: {
     parentIsMoving: boolean;
 }) => void;
 
-export type OnSwipe = (arg0: {
-    direction: number;
-    move: (value: number) => void;
-}) => void;
-
 export interface MobSmoothScroller {
+    syncTab?: boolean;
+    fixedTab?: boolean;
+    syncArrow?: boolean;
+    arrowThreshold?: number;
+
     /**
      * Defines the scroll direction
      */
@@ -55,17 +55,6 @@ export interface MobSmoothScroller {
     useHorizontalScroll?: boolean;
 
     /**
-     * Enable horizontal swipe. If useSwipe is used useHorizontalScroll will be disabled. each sipe event onSwipe
-     * callback is fired.
-     */
-    useSwipe?: boolean;
-
-    /**
-     * Reverse swipe direction.
-     */
-    revertSwipeDirection?: boolean;
-
-    /**
      * You can adjust the speed of the wheel event. The default value is `60`.
      */
     speed?: number;
@@ -87,12 +76,6 @@ export interface MobSmoothScroller {
      * parameter. `value`: scroll value `percent`: scroll value in percent
      */
     onUpdate?: OnUpdate;
-
-    /**
-     * Function that is launched at each swipe event. The function will have an Object as input parameter. `direction`:
-     * swipe direction, 1 || -1 `move`: callback that move scroller by a percent value,
-     */
-    onSwipe?: OnSwipe;
 
     /**
      * Function that is launched after refresh
@@ -117,7 +100,27 @@ export interface MobSmoothScroller {
      */
     queryType?: MqAction;
 
+    /**
+     * Which breakpoint should use
+     */
     breakpoint?: MqValues;
+
+    /**
+     * Array of snap point in percent
+     */
+    snapPoints?: number[];
+
+    /**
+     * Minimum velocity to trigger snap.
+     */
+    velocityThreshold?: number;
+
+    /**
+     * Smoothness of velocoty update, 1 is instant, below 1 velocity increase smoothly.
+     *
+     * - With < 1 value user must use more strong gesture to trigger snap.
+     */
+    velocityEasing?: number;
 }
 
 export type MobSmoothScrollerOnMouseEvent = (

@@ -7,7 +7,7 @@ import { ARRAY, MAP, SET, TYPE_IS_ANY } from './store-type';
  */
 const mapsAreEqual = (m1, m2) =>
     m1.size === m2.size &&
-    [...m1.keys()].every((key) => m1.get(key) === m2.get(key));
+    m1.keys().every((key) => m1.get(key) === m2.get(key));
 
 /**
  * @param {Set<any>} a
@@ -18,77 +18,154 @@ const setsAreEqual = (a, b) =>
     a.size === b.size && [...a].every((value) => b.has(value));
 
 /**
- * A function to compare if two arrays have the same elements regardless of their order
+ * Confronta due array per uguaglianza posizionale.
  *
- * @param {[]} a
- * @param {[]} b
+ * L'ordine degli elementi è significativo: due array sono uguali solo se hanno la stessa lunghezza e ogni elemento
+ * nella stessa posizione è uguale.
+ *
+ * - Utilizza esclusivamente `objectAreEqual` per il confronto degli elementi.
+ * - Questa funzione è sufficiente per tutti i tipi: per primitive esegue un veloce strict equality (===), per oggetti
+ *   esegue deep comparison ricorsiva.
+ *
+ * @param {any[]} a
+ * @param {any[]} b
  * @returns {boolean}
  */
 const arrayAreEquals = (a, b) => {
+    /**
+     * Lunghezze diverse = non possono essere uguali
+     */
     if (a.length !== b.length) return false;
-    const elements = new Set([...a, ...b]);
-    for (const x of elements) {
-        const count1 = a.filter((e) => e === x).length;
-        const count2 = b.filter((e) => e === x).length;
-        if (count1 !== count2) return false;
+
+    /**
+     * Confronto posizionale:
+     *
+     * - Ogni elemento deve corrispondere alla stessa index
+     */
+    for (const [i, element] of a.entries()) {
+        if (!objectAreEqual(element, b[i])) {
+            return false;
+        }
     }
+
     return true;
 };
 
 /**
- * @param {any} obj1
- * @param {any} obj2
+ * Deep comparison of two values. Optimized for performance with early exits and circular reference protection.
+ *
+ * @param {any} a
+ * @param {any} b
+ * @param {WeakMap<object, WeakSet<object>>} [seen] - Circular reference tracker
  * @returns {boolean}
  */
-const objectAreEqual = (obj1, obj2, checkDataOrder = false) => {
-    const checkDataOrderParanoic = false;
-    if (obj1 === null || obj2 === null) {
-        return obj1 === obj2;
+const objectAreEqual = (a, b, seen = new WeakMap()) => {
+    /**
+     * Same reference (includes both null, both undefined, same object)
+     */
+    if (a === b) return true;
+
+    /**
+     * One is null/undefined, the other is not
+     */
+    if (a == null || b == null) return false;
+
+    /**
+     * Different types
+     */
+    const typeA = typeof a;
+    const typeB = typeof b;
+    if (typeA !== typeB) return false;
+
+    /**
+     * Primitives (already checked === above, so they're different)
+     */
+    if (typeA !== 'object') return false;
+
+    /**
+     * Circular reference protection
+     */
+    if (seen.has(a)) {
+        const seenSet = seen.get(a);
+        if (seenSet?.has(b)) return true;
     }
-    let _obj1 = obj1;
-    let _obj2 = obj2;
-    if (!checkDataOrder) {
-        if (Array.isArray(obj1)) {
-            _obj1 = [...obj1].toSorted();
+
+    /**
+     * Track this comparison
+     */
+    if (!seen.has(a)) seen.set(a, new WeakSet());
+    seen.get(a)?.add(b);
+
+    /**
+     * Arrays - positional comparison (order matters)
+     */
+    const isArrayA = Array.isArray(a);
+    const isArrayB = Array.isArray(b);
+    if (isArrayA !== isArrayB) return false;
+
+    if (isArrayA) {
+        if (a.length !== b.length) return false;
+        for (const [i, element] of a.entries()) {
+            if (!objectAreEqual(element, b[i], seen)) return false;
         }
-        if (Array.isArray(obj2)) {
-            _obj2 = [...obj2].toSorted();
-        }
-    }
-    if (typeof _obj1 !== 'object' || typeof _obj2 !== 'object') {
-        return _obj1 === _obj2;
+        return true;
     }
 
-    const obj1Props = Object.getOwnPropertyNames(_obj1);
-    const obj2Props = Object.getOwnPropertyNames(_obj2);
-    if (obj1Props.length !== obj2Props.length) {
-        return false;
+    /**
+     * Date
+     */
+    if (a instanceof Date && b instanceof Date) {
+        return a.getTime() === b.getTime();
+    }
+    if (a instanceof Date || b instanceof Date) return false;
+
+    /**
+     * RegExp
+     */
+    if (a instanceof RegExp && b instanceof RegExp) {
+        return a.source === b.source && a.flags === b.flags;
     }
 
-    if (checkDataOrderParanoic && checkDataOrder) {
-        // will result in {a:1, b:2} !== {b:2, a:1}
-        // its not normal, but if you want this behavior, set checkDataOrderParanoic = true
-        const propOrder = obj1Props.toString() === obj2Props.toString();
-        if (!propOrder) {
-            return false;
-        }
-    }
+    if (a instanceof RegExp || b instanceof RegExp) return false;
 
-    for (const prop of obj1Props) {
-        const val1 = _obj1[prop];
-        const val2 = _obj2[prop];
-
-        if (typeof val1 === 'object' && typeof val2 === 'object') {
-            if (objectAreEqual(val1, val2, checkDataOrder)) {
-                continue;
-            } else {
+    /**
+     * Map
+     */
+    if (a instanceof Map && b instanceof Map) {
+        if (a.size !== b.size) return false;
+        for (const [key, val] of a) {
+            if (!b.has(key) || !objectAreEqual(val, b.get(key), seen)) {
                 return false;
             }
         }
-        if (val1 !== val2) {
-            return false;
-        }
+        return true;
     }
+    if (a instanceof Map || b instanceof Map) return false;
+
+    /**
+     * Set
+     */
+    if (a instanceof Set && b instanceof Set) {
+        if (a.size !== b.size) return false;
+        for (const val of a) {
+            if (!b.has(val)) return false;
+        }
+        return true;
+    }
+    if (a instanceof Set || b instanceof Set) return false;
+
+    /**
+     * Plain objects
+     */
+    const keysA = Object.keys(a);
+    const keysB = Object.keys(b);
+    if (keysA.length !== keysB.length) return false;
+
+    for (const key of keysA) {
+        if (!Object.prototype.hasOwnProperty.call(b, key)) return false;
+        if (!objectAreEqual(a[key], b[key], seen)) return false;
+    }
+
     return true;
 };
 

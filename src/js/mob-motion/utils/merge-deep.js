@@ -13,9 +13,11 @@ export const mergeDeep = (target, source, isMergingArrays = true) => {
             // eslint-disable-next-line unicorn/prefer-structured-clone
             cloneObj = JSON.parse(JSON.stringify(obj));
         } catch {
-            // If the stringify fails due to circular reference, the merge defaults
-            //   to a less-safe assignment that may still mutate elements in the target.
-            // You can change this part to throw an error for a truly safe deep merge.
+            /**
+             * If the stringify fails due to circular reference, the merge defaults to a less-safe assignment that may
+             * still mutate elements in the target. You can change this part to throw an error for a truly safe deep
+             * merge.
+             */
             cloneObj = Object.assign({}, obj);
         }
         return cloneObj;
@@ -25,9 +27,8 @@ export const mergeDeep = (target, source, isMergingArrays = true) => {
 
     if (!isObject(target) || !isObject(source)) return source;
 
-    Object.keys(source).forEach((key) => {
+    for (const [key, sourceValue] of Object.entries(source)) {
         const targetValue = target[key];
-        const sourceValue = source[key];
 
         if (Array.isArray(targetValue) && Array.isArray(sourceValue))
             if (isMergingArrays) {
@@ -50,7 +51,7 @@ export const mergeDeep = (target, source, isMergingArrays = true) => {
                 isMergingArrays
             );
         else target[key] = sourceValue;
-    });
+    }
 
     return target;
 };

@@ -72,6 +72,7 @@ import {
     timelineSetTweenLabelWarining,
     tweenEaseWarning,
     valueStringWarning,
+    arrayWarning,
 } from '../warning';
 import {
     checkIfIsOnlyNumber,
@@ -146,7 +147,7 @@ export const repeatIsValid = (repeat) => {
  * @returns {import('../../tween/type').EaseTypes}
  */
 export const easeIsValid = (ease) => {
-    const isValid = ease && ease in tweenConfig;
+    const isValid = ease && Object.hasOwn(tweenConfig, ease);
     if (!isValid && ease) tweenEaseWarning(ease);
 
     return isValid ? ease : handleSetUp.get('sequencer').ease;
@@ -159,7 +160,7 @@ export const easeIsValid = (ease) => {
  * @returns {Function}
  */
 export const easeScrollerTweenIsValid = (ease) => {
-    const isValid = ease && ease in tweenConfig;
+    const isValid = ease && Object.hasOwn(tweenConfig, ease);
     if (!isValid && ease) tweenEaseWarning(ease);
 
     return isValid
@@ -349,7 +350,7 @@ export const relativeIsValid = (val, tweenType) => {
  * @returns {Function}
  */
 export const easeTweenIsValidGetFunction = (ease) => {
-    const isValid = ease && ease in tweenConfig;
+    const isValid = ease && Object.hasOwn(tweenConfig, ease);
     if (!isValid && ease) tweenEaseWarning(ease);
 
     return isValid
@@ -364,7 +365,7 @@ export const easeTweenIsValidGetFunction = (ease) => {
  * @returns {import('../../tween/type').EaseTypes}
  */
 export const easeTweenIsValid = (ease) => {
-    const isValid = ease && ease in tweenConfig;
+    const isValid = ease && Object.hasOwn(tweenConfig, ease);
     if (!isValid && ease) tweenEaseWarning(ease);
 
     return isValid ? ease : handleSetUp.get('tween').ease;
@@ -380,7 +381,7 @@ export const springConfigIsValidAndGetNew = (config) => {
     const { config: allConfig } = handleSetUp.get('spring');
 
     //Get config from store
-    const isInConfig = config && config in allConfig;
+    const isInConfig = config && Object.hasOwn(allConfig, config);
 
     // Get obj config
     const obj = isInConfig ? allConfig[config] : {};
@@ -425,7 +426,7 @@ export const springConfigIsValidAndGetNew = (config) => {
  */
 export const springConfigIsValid = (config) => {
     const { config: allConfig } = handleSetUp.get('spring');
-    const isValid = config && config in allConfig;
+    const isValid = config && Object.hasOwn(allConfig, config);
     if (!isValid && config) springPresetWarning(config);
 
     return isValid;
@@ -539,6 +540,23 @@ export const valueIsNumberAndReturnDefault = (value, label, defaultValue) => {
 export const valueIsFunctionAndReturnDefault = (value, label, defaultValue) => {
     const isValid = MobCore.checkType(Function, value);
     if (!isValid && value) functionWarning(value, label);
+
+    // @ts-ignore
+    return isValid ? value : defaultValue;
+};
+
+/**
+ * Check if value is Function and return default
+ *
+ * @template T
+ * @param {T | undefined} value
+ * @param {string} label
+ * @param {number[] | undefined} defaultValue
+ * @returns {T}
+ */
+export const valueIsArrayAndReturnDefault = (value, label, defaultValue) => {
+    const isValid = MobCore.checkType(Array, value);
+    if (!isValid && value) arrayWarning(value, label);
 
     // @ts-ignore
     return isValid ? value : defaultValue;
@@ -1209,10 +1227,12 @@ export const checkStringRangeOnPropierties = (value, properties) => {
      * Check ROTATE PROP
      */
     if (
-        properties === MobScrollerConstant.PROP_ROTATE ||
-        properties === MobScrollerConstant.PROP_ROTATEX ||
-        properties === MobScrollerConstant.PROP_ROTATEY ||
-        properties === MobScrollerConstant.PROP_ROTATEZ
+        [
+            MobScrollerConstant.PROP_ROTATE,
+            MobScrollerConstant.PROP_ROTATEX,
+            MobScrollerConstant.PROP_ROTATEY,
+            MobScrollerConstant.PROP_ROTATEZ,
+        ].includes(properties)
     ) {
         const isValid = exactMatchInsesitiveNumberPropArray(
             [MobScrollerConstant.DEGREE],
@@ -1230,9 +1250,11 @@ export const checkStringRangeOnPropierties = (value, properties) => {
      * Check SCALE PROP
      */
     if (
-        properties === MobScrollerConstant.PROP_SCALE ||
-        properties === MobScrollerConstant.PROP_SCALE_X ||
-        properties === MobScrollerConstant.PROP_SCALE_Y
+        [
+            MobScrollerConstant.PROP_SCALE,
+            MobScrollerConstant.PROP_SCALE_X,
+            MobScrollerConstant.PROP_SCALE_Y,
+        ].includes(properties)
     ) {
         const isValid = checkIfIsOnlyNumberPositiveNegative(value);
         if (!isValid) scrollTriggerRangeScaleWarning(value, properties);

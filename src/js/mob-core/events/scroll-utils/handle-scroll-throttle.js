@@ -108,4 +108,4 @@ const addCallback = (cb) => {
 /**
  * Performs a scroll callback using a throttle function
  */
-export const handleScrollThrottle = (() => addCallback)();
+export const handleScrollThrottle = addCallback;

@@ -24,72 +24,72 @@ export class tBlocksItemClass {
         );
 
         this.store = MobCore.createStore({
-            itemsNotActive: () => ({
-                value: this.container.querySelectorAll(
+            itemsNotActive: {
+                __value: this.container.querySelectorAll(
                     '.tBlocks__item:not(.tBlocks__item--active)'
                 ),
-                type: NodeList,
-            }),
-            activeItem: () => ({
-                value: this.container.querySelector('.tBlocks__item--active'),
-                type: Element,
-            }),
+                __type: NodeList,
+            },
+            activeItem: {
+                __value: this.container.querySelector('.tBlocks__item--active'),
+                __type: Element,
+            },
             swapItem: {
-                item: () => ({
-                    value: document.createElement('div'),
-                    type: Element,
-                }),
-                action: () => ({
-                    value: '',
-                    type: String,
-                    validate: (val) => {
+                item: {
+                    __value: document.createElement('div'),
+                    __type: Element,
+                },
+                action: {
+                    __value: '',
+                    __type: String,
+                    __validate: (val) => {
                         const values = [this.UPDATE, this.REMOVE, ''];
                         return values.includes(val);
                     },
-                }),
+                },
             },
             clone: {
-                item: () => ({
-                    value: document.createElement('div'),
-                    type: Element,
-                }),
-                action: () => ({
-                    value: '',
-                    type: String,
-                    validate: (val) => {
+                item: {
+                    __value: document.createElement('div'),
+                    __type: Element,
+                },
+                action: {
+                    __value: '',
+                    __type: String,
+                    __validate: (val) => {
                         const values = [this.REMOVE, this.ADD, ''];
                         return values.includes(val);
                     },
-                }),
+                },
             },
-            horizontalDirection: () => ({
-                value: this.DX,
-                type: String,
-                validate: (val) => {
+            horizontalDirection: {
+                __value: this.DX,
+                __type: String,
+                __validate: (val) => {
                     const values = [this.SX, this.DX];
                     return values.includes(val);
                 },
-            }),
-            verticalDirection: () => ({
-                value: this.UP,
-                type: String,
-                validate: (val) => {
+            },
+            verticalDirection: {
+                __value: this.UP,
+                __type: String,
+                __validate: (val) => {
                     const values = [this.UP, this.DOWN];
                     return values.includes(val);
                 },
-            }),
-            offsetLeft: () => ({
-                value: 0,
-                type: Number,
-            }),
-            center: () => ({
-                value: 0,
-                type: Number,
-            }),
-            unsubscribeResize: () => ({
-                value: () => {},
-                type: Function,
-            }),
+            },
+            offsetLeft: {
+                __value: 0,
+                __type: Number,
+            },
+            center: {
+                __value: 0,
+                __type: Number,
+            },
+            unsubscribeResize: {
+                __value: () => {},
+                __type: Function,
+            },
         });
 
         Object.freeze(this);

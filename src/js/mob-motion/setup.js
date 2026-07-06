@@ -200,7 +200,7 @@ export const handleSetUp = (() => {
      * @type {import('./animation/utils/set-up/type.js').GetSetUp}
      */
     const get = (prop) => {
-        if (!(prop in data)) {
+        if (!Object.hasOwn(data, prop)) {
             console.warn(`handleSetUp: ${prop} is not a setup propierties`);
         }
 

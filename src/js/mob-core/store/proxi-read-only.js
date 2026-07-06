@@ -12,9 +12,9 @@ export const setProxiPropReadOnlyEntryPoint = ({ instanceId, values }) => {
 
     const { proxiReadOnlyProp } = state;
 
-    values.forEach((value) => {
+    for (const value of values) {
         proxiReadOnlyProp.add(value);
-    });
+    }
 
     updateMainMap(instanceId, state);
 };

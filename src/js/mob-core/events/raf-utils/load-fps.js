@@ -3,6 +3,9 @@ import { eventStore } from '../event-store';
 /** @type {boolean} */
 let loadFpsIsReady = false;
 
+/** @type {Promise<import('./type').LoadFps> | null} */
+let pendingPromise = null;
+
 /**
  * - Runs a request animation frame loop to detect the frame rate of the monitor. After the method will be resolved the
  *   first time, subsequent calls will be resolved immediately returning the previously calculated value. The method is
@@ -16,13 +19,19 @@ let loadFpsIsReady = false;
 export const loadFps = ({ force = false, duration = 30 } = {}) => {
     if (loadFpsIsReady && !force) {
         const { instantFps } = eventStore.get();
-
-        return new Promise((resolve) => {
-            resolve({ averageFPS: instantFps });
-        });
+        return Promise.resolve({ averageFPS: instantFps });
     }
 
-    return new Promise((resolve) => {
+    /**
+     * Concurrency.
+     *
+     * - Return always first primise generated.
+     */
+    if (pendingPromise) {
+        return pendingPromise;
+    }
+
+    pendingPromise = new Promise((resolve) => {
         /**
          * @type {number[]}
          */
@@ -102,6 +111,7 @@ export const loadFps = ({ force = false, duration = 30 } = {}) => {
             if (frameCounter >= duration) {
                 eventStore.quickSetProp('instantFps', averageFPS);
                 loadFpsIsReady = true;
+                pendingPromise = null;
                 resolve({ averageFPS });
                 return;
             }
@@ -110,4 +120,6 @@ export const loadFps = ({ force = false, duration = 30 } = {}) => {
         };
         requestAnimationFrame(render);
     });
+
+    return pendingPromise;
 };

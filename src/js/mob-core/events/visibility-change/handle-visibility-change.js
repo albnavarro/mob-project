@@ -61,7 +61,7 @@ function init() {
  * @param {import('./type').VisibilityChangeCallback} cb - Callback function fired on tab change.
  * @returns {() => void}
  */
-const addCb = (cb) => {
+const addCallabck = (cb) => {
     const id = getUnivoqueId();
     callbacks.set(id, cb);
 
@@ -72,4 +72,4 @@ const addCb = (cb) => {
     return () => callbacks.delete(id);
 };
 
-export const handleVisibilityChange = (() => addCb)();
+export const handleVisibilityChange = addCallabck;

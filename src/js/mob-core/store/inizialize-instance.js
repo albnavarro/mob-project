@@ -1,10 +1,16 @@
 import { UNTYPED } from './store-type';
-import { getLogStyle } from './log-style';
 import {
     inizializeSpecificProp,
     inizializeStoreData,
     maxDepth,
 } from './store-utils';
+import {
+    STORE_SKIP_EQUAL_KEY,
+    STORE_STRICT_KEY,
+    STORE_TRANSFORM_KEY,
+    STORE_TYPE_KEY,
+    STORE_VALIDATE_KEY,
+} from './constant';
 
 /**
  * @param {import('./type').MobStoreParams} data
@@ -26,45 +32,35 @@ export const inizializeInstance = (data) => {
         computedRunning: false,
         store: inizializeStoreData({
             data,
-            depth: dataDepth,
-            logStyle: getLogStyle(),
         }),
         type: inizializeSpecificProp({
             data,
-            prop: 'type',
-            depth: dataDepth,
-            logStyle: getLogStyle(),
+            prop: STORE_TYPE_KEY,
             fallback: UNTYPED,
         }),
         fnTransformation: inizializeSpecificProp({
             data,
-            prop: 'transform',
-            depth: dataDepth,
-            logStyle: getLogStyle(),
+            prop: STORE_TRANSFORM_KEY,
             fallback: (/** @type {any} */ value) => value,
         }),
         fnValidate: inizializeSpecificProp({
             data,
-            prop: 'validate',
-            depth: dataDepth,
-            logStyle: getLogStyle(),
+            prop: STORE_VALIDATE_KEY,
             fallback: () => true,
         }),
         strict: inizializeSpecificProp({
             data,
-            prop: 'strict',
-            depth: dataDepth,
-            logStyle: getLogStyle(),
+            prop: STORE_STRICT_KEY,
             fallback: false,
         }),
         skipEqual: inizializeSpecificProp({
             data,
-            prop: 'skipEqual',
-            depth: dataDepth,
-            logStyle: getLogStyle(),
+            prop: STORE_SKIP_EQUAL_KEY,
             fallback: true,
         }),
         proxiObject: undefined,
+        boundedProxiObject: undefined,
+        selfProxiObject: undefined,
         bindInstance: [],
         bindInstanceBy: [],
         unsubscribeBindInstance: [],

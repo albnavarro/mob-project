@@ -91,4 +91,4 @@ const addCallback = (cb) => {
 /**
  * Perform a callback to the first nextTick available after scrolling
  */
-export const handleScroll = (() => addCallback)();
+export const handleScroll = addCallback;

@@ -47,7 +47,7 @@ const storeGetProp = ({ instanceId, prop }) => {
 
     const store = state?.store;
 
-    if (store && prop in store) {
+    if (store && Object.hasOwn(store, prop)) {
         return store[prop];
     } else {
         storeGetPropWarning(prop, getLogStyle());
@@ -74,7 +74,7 @@ export const storeGetPropEntryPoint = ({ instanceId, prop }) => {
     const currentBindId =
         [instanceId, ...bindInstance].find((id) => {
             const store = storeMap.get(id)?.store;
-            return store && prop in store;
+            return store && Object.hasOwn(store, prop);
         }) ?? '';
 
     return storeGetProp({ instanceId: currentBindId, prop });

@@ -10,9 +10,9 @@ export const useNextLoop = (fn) => {
 
     if (setTimeOutQueque.size === 1) {
         setTimeout(() => {
-            setTimeOutQueque.forEach((fn) => {
+            for (const fn of setTimeOutQueque) {
                 fn();
-            });
+            }
 
             setTimeOutQueque.clear();
         });

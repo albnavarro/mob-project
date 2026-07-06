@@ -24,10 +24,12 @@ export const throttle = (func, limit) => {
             clearTimeout(lastFunc);
             lastFunc = setTimeout(
                 function () {
-                    if (getTime() - lastRan >= limit) {
-                        func.apply(context, args);
-                        lastRan = getTime();
+                    if (!(getTime() - lastRan >= limit)) {
+                        return;
                     }
+
+                    func.apply(context, args);
+                    lastRan = getTime();
                 },
                 limit - (getTime() - lastRan)
             );

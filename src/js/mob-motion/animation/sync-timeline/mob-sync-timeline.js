@@ -274,23 +274,23 @@ export default class MobSyncTimeline {
 
             // When come from playReverse skip first frame because is 0
             if (!this.#skipFirstRender) {
-                this.#sequencers.forEach((item) => {
+                for (const item of this.#sequencers) {
                     item.draw({
                         partial: this.#currentTime,
                         isLastDraw: false,
                         useFrame: true,
                         direction,
                     });
-                });
+                }
 
                 /*
                  * Fire callbackOnUpdate
                  */
                 this.#updateData.time = this.#currentTime;
                 this.#updateData.direction = direction;
-                this.#callbackOnUpdate.forEach(({ cb }) => {
+                for (const { cb } of this.#callbackOnUpdate) {
                     cb(this.#updateData);
-                });
+                }
             }
         }
 
@@ -339,21 +339,22 @@ export default class MobSyncTimeline {
              * Prevent error from cycle that start from end
              * in reverse mode
              **/
-            if (
+            if (!(
                 !this.#fpsIsInLoading &&
                 !this.#completed &&
                 this.#loopIteration > this.#minLoopIteration
-            ) {
-                this.#completed = true;
-                this.#loopCounter++;
-                // this callback is fired after a frame so
-                // check end timeline use the right value not reset
-                this.#loopIteration = 0;
-
-                this.#loopData.direction = direction;
-                this.#loopData.loop = this.#loopCounter;
-                this.#callbackLoop.forEach(({ cb }) => cb(this.#loopData));
+            )) {
+                return;
             }
+
+            this.#completed = true;
+            this.#loopCounter++;
+            // this callback is fired after a frame so
+            // check end timeline use the right value not reset
+            this.#loopIteration = 0;
+            this.#loopData.direction = direction;
+            this.#loopData.loop = this.#loopCounter;
+            for (const { cb } of this.#callbackLoop) cb(this.#loopData);
         });
 
         /**
@@ -367,14 +368,14 @@ export default class MobSyncTimeline {
             // Fire callbackLoop onStop of each sequencr
             // Prevent async problem, endTime back to start, so store the value
             const endTime = this.#currentTime;
-            this.#sequencers.forEach((item) => {
+            for (const item of this.#sequencers) {
                 item.draw({
                     partial: endTime,
                     isLastDraw: true,
                     useFrame: true,
                     direction,
                 });
-            });
+            }
 
             this.#isStopped = true;
             this.#resetTime();
@@ -382,7 +383,7 @@ export default class MobSyncTimeline {
             if (this.#isReverse) this.#isReverse = false;
 
             // Fire last callback on Complete
-            this.#callbackComplete.forEach(({ cb }) => cb());
+            for (const { cb } of this.#callbackComplete) cb();
             if (this.#currentResolve) this.#currentResolve(true);
             return;
         }
@@ -466,13 +467,118 @@ export default class MobSyncTimeline {
     }
 
     /**
+     * @param {number} time
+     */
+    #playFromTime(time = 0) {
+        // Reset sequancer callback add function state
+        this.#resetSequencerLastValue();
+        this.#resetTime();
+
+        /*
+         * Set time
+         */
+        this.#currentTime = time;
+        this.#timeAtReverseBack = -this.#currentTime;
+
+        /*
+         * Generic prop
+         */
+        this.#isPlayngReverse = false;
+        this.#loopIteration = 0;
+
+        /*
+         * Prevent multiple firing
+         */
+        this.#fpsIsInLoading = true;
+        this.#startAnimation(time);
+    }
+
+    /**
      * @returns {void}
      */
     #rejectPromise() {
-        if (this.#currentReject) {
-            this.#currentReject(MobCore.ANIMATION_STOP_REJECT);
-            this.#currentReject = undefined;
+        if (!this.#currentReject) {
+            return;
         }
+
+        this.#currentReject(MobCore.ANIMATION_STOP_REJECT);
+        this.#currentReject = undefined;
+    }
+
+    /**
+     * @param {number} time
+     * @returns {void}
+     */
+    #playFromTimeReverse(time = 0) {
+        // Reset sequancer callback add function state
+        this.#resetSequencerLastValue();
+
+        /*
+         * Set time
+         */
+        this.#timeElapsed = time;
+        this.#currentTime = time;
+        this.#pauseTime = time;
+        this.#timeAtReverse = 0;
+        this.#timeAtReverseBack = 0;
+
+        /*
+         * Generic prop
+         */
+        this.#startReverse = true;
+        this.#isPlayngReverse = true;
+        this.#skipFirstRender = true;
+        this.#loopIteration = 0;
+
+        /*
+         * Prevent multiple firing
+         */
+        this.#fpsIsInLoading = true;
+        this.#startAnimation(time);
+    }
+
+    /**
+     * Find label than match the occurrency and return the time
+     *
+     * @param {number} partial
+     * @returns {Promise<any>}
+     */
+    async #startAnimation(partial) {
+        if (this.#repeat === 0) return;
+
+        const { averageFPS } = await MobCore.useFps();
+
+        fpsLoadedLog('sequencer', averageFPS);
+        this.#isReverse = false;
+
+        for (const item of this.#sequencers) {
+            item.inzializeStagger();
+            item.disableStagger();
+            item.draw({
+                partial,
+                isLastDraw: false,
+                useFrame: true,
+                direction: this.getDirection(),
+            });
+        }
+
+        MobCore.useFrame(() => {
+            MobCore.useNextTick(({ time, fps }) => {
+                this.#startTime = time;
+                this.#fpsIsInLoading = false;
+                this.#isStopped = false;
+                this.#isInPause = false;
+                this.#loopCounter = 0;
+                this.#updateTime(time, fps);
+            });
+        });
+    }
+
+    /**
+     * @returns {void}
+     */
+    #resetSequencerLastValue() {
+        for (const item of this.#sequencers) item.resetLastValue();
     }
 
     /**
@@ -547,33 +653,6 @@ export default class MobSyncTimeline {
             // @ts-ignore
             this.#playFromTime(labelTime);
         });
-    }
-
-    /**
-     * @param {number} time
-     */
-    #playFromTime(time = 0) {
-        // Reset sequancer callback add function state
-        this.#resetSequencerLastValue();
-        this.#resetTime();
-
-        /*
-         * Set time
-         */
-        this.#currentTime = time;
-        this.#timeAtReverseBack = -this.#currentTime;
-
-        /*
-         * Generic prop
-         */
-        this.#isPlayngReverse = false;
-        this.#loopIteration = 0;
-
-        /*
-         * Prevent multiple firing
-         */
-        this.#fpsIsInLoading = true;
-        this.#startAnimation(time);
     }
 
     /**
@@ -663,75 +742,6 @@ export default class MobSyncTimeline {
     }
 
     /**
-     * @param {number} time
-     * @returns {void}
-     */
-    #playFromTimeReverse(time = 0) {
-        // Reset sequancer callback add function state
-        this.#resetSequencerLastValue();
-
-        /*
-         * Set time
-         */
-        this.#timeElapsed = time;
-        this.#currentTime = time;
-        this.#pauseTime = time;
-        this.#timeAtReverse = 0;
-        this.#timeAtReverseBack = 0;
-
-        /*
-         * Generic prop
-         */
-        this.#startReverse = true;
-        this.#isPlayngReverse = true;
-        this.#skipFirstRender = true;
-        this.#loopIteration = 0;
-
-        /*
-         * Prevent multiple firing
-         */
-        this.#fpsIsInLoading = true;
-        this.#startAnimation(time);
-    }
-
-    /**
-     * Find label than match the occurrency and return the time
-     *
-     * @param {number} partial
-     * @returns {Promise<any>}
-     */
-    async #startAnimation(partial) {
-        if (this.#repeat === 0) return;
-
-        const { averageFPS } = await MobCore.useFps();
-
-        fpsLoadedLog('sequencer', averageFPS);
-        this.#isReverse = false;
-
-        this.#sequencers.forEach((item) => {
-            item.inzializeStagger();
-            item.disableStagger();
-            item.draw({
-                partial,
-                isLastDraw: false,
-                useFrame: true,
-                direction: this.getDirection(),
-            });
-        });
-
-        MobCore.useFrame(() => {
-            MobCore.useNextTick(({ time, fps }) => {
-                this.#startTime = time;
-                this.#fpsIsInLoading = false;
-                this.#isStopped = false;
-                this.#isInPause = false;
-                this.#loopCounter = 0;
-                this.#updateTime(time, fps);
-            });
-        });
-    }
-
-    /**
      * @type {import('./type.js').SyncTimelinePause}
      */
     pause({ freezeCache = true } = {}) {
@@ -741,9 +751,9 @@ export default class MobSyncTimeline {
         this.#isInPause = true;
 
         if (freezeCache) {
-            this.#sequencers.forEach((item) => {
+            for (const item of this.#sequencers) {
                 item.freezeCachedId();
-            });
+            }
             return;
         }
     }
@@ -757,9 +767,9 @@ export default class MobSyncTimeline {
         this.#isInPause = false;
 
         if (unFreezeCache) {
-            this.#sequencers.forEach((item) => {
+            for (const item of this.#sequencers) {
                 item.unFreezeCachedId();
-            });
+            }
             return;
         }
     }
@@ -794,9 +804,9 @@ export default class MobSyncTimeline {
         this.#rejectPromise();
 
         if (clearCache) {
-            this.#sequencers.forEach((item) => {
+            for (const item of this.#sequencers) {
                 item.cleanCachedId();
-            });
+            }
             return;
         }
 
@@ -807,14 +817,14 @@ export default class MobSyncTimeline {
          */
 
         // Fire callbackLoop onStop of each sequencr
-        this.#sequencers.forEach((item) => {
+        for (const item of this.#sequencers) {
             item.draw({
                 partial: this.#currentTime,
                 isLastDraw: true,
                 useFrame: true,
                 direction: this.getDirection(),
             });
-        });
+        }
     }
 
     /**
@@ -844,13 +854,6 @@ export default class MobSyncTimeline {
         this.#duration = duration;
 
         return this;
-    }
-
-    /**
-     * @returns {void}
-     */
-    #resetSequencerLastValue() {
-        this.#sequencers.forEach((item) => item.resetLastValue());
     }
 
     /**
@@ -1007,7 +1010,7 @@ export default class MobSyncTimeline {
      */
     destroy() {
         this.stop();
-        this.#sequencers.forEach((item) => item.destroy());
+        for (const item of this.#sequencers) item.destroy();
         this.#sequencers = [];
         this.#callbackOnUpdate = [];
         this.#callbackLoop = [];

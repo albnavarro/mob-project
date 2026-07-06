@@ -50,9 +50,9 @@ export const deepClone = (obj, hash = new WeakMap()) => {
         /** @type {any[]} */
         const clonedArray = [];
         hash.set(obj, clonedArray);
-        obj.forEach((item, index) => {
+        for (const [index, item] of obj.entries()) {
             clonedArray[index] = deepClone(item, hash);
-        });
+        }
 
         return clonedArray;
     }
@@ -70,9 +70,9 @@ export const deepClone = (obj, hash = new WeakMap()) => {
     if (obj instanceof Map) {
         const clonedMap = new Map();
         hash.set(obj, clonedMap);
-        obj.forEach((value, key) => {
+        for (const [key, value] of obj.entries()) {
             clonedMap.set(deepClone(key, hash), deepClone(value, hash));
-        });
+        }
 
         return clonedMap;
     }
@@ -83,9 +83,9 @@ export const deepClone = (obj, hash = new WeakMap()) => {
     if (obj instanceof Set) {
         const clonedSet = new Set();
         hash.set(obj, clonedSet);
-        obj.forEach((value) => {
+        for (const value of obj) {
             clonedSet.add(deepClone(value, hash));
-        });
+        }
 
         return clonedSet;
     }
@@ -99,7 +99,7 @@ export const deepClone = (obj, hash = new WeakMap()) => {
     /**
      * Normal propierties
      */
-    Object.getOwnPropertyNames(obj).forEach((key) => {
+    for (const key of Object.getOwnPropertyNames(obj)) {
         const descriptor = Object.getOwnPropertyDescriptor(obj, key);
         if (descriptor) {
             // Se è un data descriptor (ha value), clona il value
@@ -113,12 +113,12 @@ export const deepClone = (obj, hash = new WeakMap()) => {
                 Object.defineProperty(clonedObj, key, descriptor);
             }
         }
-    });
+    }
 
     /**
      * Symbols
      */
-    Object.getOwnPropertySymbols(obj).forEach((symbol) => {
+    for (const symbol of Object.getOwnPropertySymbols(obj)) {
         const descriptor = Object.getOwnPropertyDescriptor(obj, symbol);
         if (descriptor) {
             if ('value' in descriptor) {
@@ -130,7 +130,7 @@ export const deepClone = (obj, hash = new WeakMap()) => {
                 Object.defineProperty(clonedObj, symbol, descriptor);
             }
         }
-    });
+    }
 
     return clonedObj;
 };

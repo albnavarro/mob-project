@@ -603,13 +603,13 @@ export class MobHorizontalScroller {
         this.#shadowMainClassTransition = originalShadowClass.replace('.', '');
         this.#buttons = this.#row.querySelectorAll('a, button');
 
-        this.#children.forEach((element) => {
+        for (const element of this.#children) {
             if (this.#row) element.setScroller(this.#row);
             element.setDirection('horizontal');
             element.setBreakPoint(this.#breakpoint);
             element.setQueryType(this.#queryType);
             element.init();
-        });
+        }
 
         if (this.#addCss)
             horizontalScrollerCss({
@@ -702,54 +702,18 @@ export class MobHorizontalScroller {
     }
 
     /**
-     * Initialize insatance
-     *
-     * @example
-     *     myInstance.init();
-     *
-     * @type {() => void}
-     */
-    init() {
-        if (!this.#propsisValid) return;
-
-        pipe(
-            this.#getWidth.bind(this),
-            this.#setDimension.bind(this),
-            this.#createShadow.bind(this),
-            this.#updateShadow.bind(this)
-        )().then(() => {
-            this.#initScroller();
-            if (this.#useDrag) this.#addDragListener();
-
-            MobCore.useResize(({ horizontalResize }) =>
-                this.onResize(horizontalResize)
-            );
-
-            MobCore.useFrameIndex(() => {
-                MobCore.useNextTick(() => {
-                    this.#afterInit?.();
-                    this.#children.forEach((element) => {
-                        element.refresh();
-                    });
-                });
-            }, 3);
-        });
-    }
-
-    /**
      * @type {() => void}
      */
     #setLinkAttribute() {
-        [...this.#buttons].forEach((item) =>
-            item.setAttribute('draggable', 'false')
-        );
+        for (const item of this.#buttons)
+            item.setAttribute('draggable', 'false');
     }
 
     /**
      * @type {() => void}
      */
     #removeLinkAttribute() {
-        [...this.#buttons].forEach((item) => item.removeAttribute('draggable'));
+        for (const item of this.#buttons) item.removeAttribute('draggable');
     }
 
     /**
@@ -918,31 +882,36 @@ export class MobHorizontalScroller {
                             : '';
 
                         return /* HTML */ ` <div
-                            class="${this.#shadowMainClassTransition} ${this
-                                .#shadowMainClassTransition}--${shadowLabel}"
+                            class="${this.#shadowMainClassTransition} ${
+                                this.#shadowMainClassTransition
+                            }--${shadowLabel}"
                             data-shadow="${shadowLabel}"
                         >
                             <span
-                                class="${this
-                                    .#shadowMainClassTransition}--in-center ${debugClass}"
+                                class="${
+                                    this.#shadowMainClassTransition
+                                }--in-center ${debugClass}"
                             >
                                 ${inCenterLabel}
                             </span>
                             <span
-                                class="${this
-                                    .#shadowMainClassTransition}--out-center ${debugClass}"
+                                class="${
+                                    this.#shadowMainClassTransition
+                                }--out-center ${debugClass}"
                             >
                                 ${outCenterlabel}
                             </span>
                             <span
-                                class="${this
-                                    .#shadowMainClassTransition}--left ${debugClass}"
+                                class="${
+                                    this.#shadowMainClassTransition
+                                }--left ${debugClass}"
                             >
                                 ${leftLabel}
                             </span>
                             <span
-                                class="${this
-                                    .#shadowMainClassTransition}--end ${debugClass}"
+                                class="${
+                                    this.#shadowMainClassTransition
+                                }--end ${debugClass}"
                             >
                                 ${endLabel}
                             </span>
@@ -960,7 +929,7 @@ export class MobHorizontalScroller {
      * @type {() => void}
      */
     #removeShadow() {
-        if (this.#trigger) this.#trigger.innerHTML = '';
+        if (this.#trigger) this.#trigger.replaceChildren();
     }
 
     /**
@@ -976,7 +945,7 @@ export class MobHorizontalScroller {
             MobCore.useFrame(() => {
                 if (!this.#shadows) return;
 
-                [...this.#shadows].forEach((item) => {
+                for (const item of this.#shadows) {
                     const percentrange = this.#percentRange / 100;
                     const shadowData = item.dataset['shadow'];
                     const width = outerWidth(item);
@@ -997,7 +966,7 @@ export class MobHorizontalScroller {
                      */
                     const shadowTransitionEl =
                         this.#mainContainer.querySelector(
-                            `.${this.#shadowMainClassTransition}[data-shadow="${shadowData}"]`
+                            `.${this.#shadowMainClassTransition}[data-shadow="${CSS.escape(shadowData ?? '')}"]`
                         );
 
                     /**
@@ -1109,7 +1078,7 @@ export class MobHorizontalScroller {
 
                     if (shadowTransitionEl)
                         shadowTransitionEl.style.height = `${left}px`;
-                });
+                }
 
                 resolve(true);
             });
@@ -1174,9 +1143,9 @@ export class MobHorizontalScroller {
                     });
 
                 // Builtin children onTick;
-                this.#children.forEach((element) => {
+                for (const element of this.#children) {
                     element.move({ value: valueParsed, parentIsMoving });
-                });
+                }
             },
             onEnter: this.#onEnter,
             onEnterBack: this.#onEnterBack,
@@ -1213,11 +1182,127 @@ export class MobHorizontalScroller {
         MobCore.useFrameIndex(() => {
             MobCore.useNextTick(() => {
                 this.#afterRefresh?.();
-                this.#children.forEach((element) => {
+                for (const element of this.#children) {
                     element?.refresh?.();
-                });
+                }
             });
         }, 3);
+    }
+
+    /**
+     * @type {(arg0: { destroyAll?: boolean }) => void}
+     */
+    #killScroller({ destroyAll = false }) {
+        if (!(this.#moduleisActive || destroyAll)) {
+            return;
+        }
+
+        this.#scrollTriggerInstance?.destroy?.();
+        // @ts-ignore
+        this.#scrollTriggerInstance = null;
+        if (this.#trigger) this.#trigger.style.height = '';
+        if (this.#mainContainer) this.#mainContainer.style.height = '';
+        if (this.#trigger) this.#trigger.style.marginTop = '';
+        this.#removeShadow();
+        this.#removeLinkAttribute();
+        this.#moduleisActive = false;
+
+        // Make sure that if component is running with ease the style is removed.
+        MobCore.useFrameIndex(() => {
+            if (this.#row) {
+                this.#row.style.width = '';
+                this.#row.style.transform = '';
+            }
+
+            if (destroyAll && this.#mainContainer) {
+                if (this.#useDrag) this.#removeDragListener();
+
+                const styleDiv =
+                    this.#mainContainer.querySelector('.scroller-style');
+                if (styleDiv) styleDiv.remove();
+
+                /**
+                 * All element is null only on Destroy. Avoid to use union type with null.
+                 */
+
+                // @ts-ignore
+                this.#mainContainer = null;
+                // @ts-ignore
+                this.#trigger = null;
+                // @ts-ignore
+                this.#row = null;
+                // @ts-ignore
+                this.#columns = [];
+                // @ts-ignore
+                this.#shadows = [];
+                this.#afterInit = NOOP;
+                this.#afterRefresh = NOOP;
+                this.#onTick = NOOP;
+                this.#onEnter = NOOP;
+                this.#onEnterBack = NOOP;
+                this.#onLeave = NOOP;
+                this.#onLeaveBack = NOOP;
+                // @ts-ignore
+                this.#scrollTriggerInstance = null;
+                this.#moduleisActive = false;
+                this.#buttons = [];
+
+                // @ts-ignore
+                this.#mainContainer = null;
+                // @ts-ignore
+                this.#container = null;
+                // @ts-ignore
+                this.#trigger = null;
+                // @ts-ignore
+                this.#row = null;
+
+                MobCore.useNextTick(() => {
+                    this.#afterDestroy?.();
+                    this.#afterDestroy = NOOP;
+                    for (let element of this.#children) {
+                        element?.destroy?.();
+                        // @ts-ignore
+                        element = null;
+                    }
+                    this.#children = [];
+                });
+            }
+        }, 3);
+    }
+
+    /**
+     * Initialize insatance
+     *
+     * @example
+     *     myInstance.init();
+     *
+     * @type {() => void}
+     */
+    init() {
+        if (!this.#propsisValid) return;
+
+        pipe(
+            this.#getWidth.bind(this),
+            this.#setDimension.bind(this),
+            this.#createShadow.bind(this),
+            this.#updateShadow.bind(this)
+        )().then(() => {
+            this.#initScroller();
+            if (this.#useDrag) this.#addDragListener();
+
+            MobCore.useResize(({ horizontalResize }) =>
+                this.onResize(horizontalResize)
+            );
+
+            MobCore.useFrameIndex(() => {
+                MobCore.useNextTick(() => {
+                    this.#afterInit?.();
+                    for (const element of this.#children) {
+                        element.refresh();
+                    }
+                });
+            }, 3);
+        });
     }
 
     /**
@@ -1248,85 +1333,6 @@ export class MobHorizontalScroller {
                 resolve(true);
             });
         });
-    }
-
-    /**
-     * @type {(arg0: { destroyAll?: boolean }) => void}
-     */
-    #killScroller({ destroyAll = false }) {
-        if (this.#moduleisActive || destroyAll) {
-            this.#scrollTriggerInstance?.destroy?.();
-            // @ts-ignore
-            this.#scrollTriggerInstance = null;
-            if (this.#trigger) this.#trigger.style.height = '';
-            if (this.#mainContainer) this.#mainContainer.style.height = '';
-            if (this.#trigger) this.#trigger.style.marginTop = '';
-            this.#removeShadow();
-            this.#removeLinkAttribute();
-            this.#moduleisActive = false;
-
-            // Make sure that if component is running with ease the style is removed.
-            MobCore.useFrameIndex(() => {
-                if (this.#row) {
-                    this.#row.style.width = '';
-                    this.#row.style.transform = '';
-                }
-
-                if (destroyAll && this.#mainContainer) {
-                    if (this.#useDrag) this.#removeDragListener();
-
-                    const styleDiv =
-                        this.#mainContainer.querySelector('.scroller-style');
-                    if (styleDiv) styleDiv.remove();
-
-                    /**
-                     * All element is null only on Destroy. Avoid to use union type with null.
-                     */
-
-                    // @ts-ignore
-                    this.#mainContainer = null;
-                    // @ts-ignore
-                    this.#trigger = null;
-                    // @ts-ignore
-                    this.#row = null;
-                    // @ts-ignore
-                    this.#columns = [];
-                    // @ts-ignore
-                    this.#shadows = [];
-                    this.#afterInit = NOOP;
-                    this.#afterRefresh = NOOP;
-                    this.#onTick = NOOP;
-                    this.#onEnter = NOOP;
-                    this.#onEnterBack = NOOP;
-                    this.#onLeave = NOOP;
-                    this.#onLeaveBack = NOOP;
-                    // @ts-ignore
-                    this.#scrollTriggerInstance = null;
-                    this.#moduleisActive = false;
-                    this.#buttons = [];
-
-                    // @ts-ignore
-                    this.#mainContainer = null;
-                    // @ts-ignore
-                    this.#container = null;
-                    // @ts-ignore
-                    this.#trigger = null;
-                    // @ts-ignore
-                    this.#row = null;
-
-                    MobCore.useNextTick(() => {
-                        this.#afterDestroy?.();
-                        this.#afterDestroy = NOOP;
-                        this.#children.forEach((element) => {
-                            element?.destroy?.();
-                            // @ts-ignore
-                            element = null;
-                        });
-                        this.#children = [];
-                    });
-                }
-            }, 3);
-        }
     }
 
     /**

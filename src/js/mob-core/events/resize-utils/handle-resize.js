@@ -151,4 +151,4 @@ const addCallback = (cb) => {
     };
 };
 
-export const handleResize = (() => addCallback)();
+export const handleResize = addCallback;

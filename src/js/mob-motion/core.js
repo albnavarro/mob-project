@@ -1,5 +1,6 @@
 import { mq as _mq } from './utils/media-manager.js';
 import { handleSetUp } from './setup.js';
+import { handleVelocity } from './event/velocity-utils/handle-velocity.js';
 
 /**
  * - Here it is possible to modify the default values of the various modules of the library
@@ -135,6 +136,25 @@ function printDefault() {
 }
 
 /**
+ * @example
+ *     ```javascript
+ *     const unsubscribe = MobMotionCore.useVelocity((data) => {
+ *             // code
+ *         }
+ *     );
+ *
+ *     unsubscribe();
+ *
+ *     ```;
+ *
+ * @param {import('./event/velocity-utils/type.js').VelocityCallBack} callback - Callback function
+ * @returns {() => void}
+ */
+function useVelocity(callback = () => {}) {
+    return handleVelocity(callback);
+}
+
+/**
  * Returns a boolean value if the action value is equal to 'min' or 'max', returns a numeric value if it is equal to
  * 'get'
  *
@@ -171,5 +191,5 @@ function mq(action, breakpoint) {
     }
 }
 
-export { setDefault, printDefault, getDefault, mq };
+export { setDefault, printDefault, getDefault, mq, useVelocity };
 export { clamp } from './animation/utils/animation-utils.js';

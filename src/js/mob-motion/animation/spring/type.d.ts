@@ -19,11 +19,7 @@ export interface SpringPresentConfigType {
 }
 
 export type SpringChoiceConfig =
-    | 'default'
-    | 'gentle'
-    | 'wobbly'
-    | 'bounce'
-    | 'scroller';
+    'default' | 'gentle' | 'wobbly' | 'bounce' | 'scroller';
 
 export interface SpringTweenProps {
     data: Record<string, number>;

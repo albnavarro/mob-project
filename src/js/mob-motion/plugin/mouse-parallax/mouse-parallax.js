@@ -121,41 +121,6 @@ export class MobMouseParallax {
     }
 
     /**
-     * Initialize insatance
-     *
-     * @example
-     *     myInstance.init();
-     *
-     * @type {() => void}
-     */
-    init() {
-        this.#getDimension();
-
-        this.#unsubscribeMouseMove = MobCore.useMouseMove(
-            ({ page, client }) => {
-                this.#setGlobalCoord({ page, client });
-                this.#onMove();
-            }
-        );
-
-        this.#unsubscribeResize = MobCore.useResize(() => {
-            this.#getDimension();
-        });
-
-        this.#unsubscribeScroll = MobCore.useScroll(({ scrollY }) => {
-            this.#onScroll(scrollY);
-        });
-
-        this.#unsubscribeSpring = this.#spring.subscribe(({ ax, ay }) => {
-            this.#item.style.transform = `translate3D(0,0,0) translateX(${ax}px) translateY(${ay}px)`;
-        });
-
-        this.#unsubscribeOnComplete = this.#spring.onComplete(({ ax, ay }) => {
-            this.#item.style.transform = `translateX(${ax}px) translateY(${ay}px)`;
-        });
-    }
-
-    /**
      * @type {(arg0: { page: { x: number; y: number }; client: { x: number; y: number } }) => void}
      */
     #setGlobalCoord({ page, client }) {
@@ -220,6 +185,41 @@ export class MobMouseParallax {
               };
 
         this.#spring.goTo({ ax, ay }).catch(() => {});
+    }
+
+    /**
+     * Initialize insatance
+     *
+     * @example
+     *     myInstance.init();
+     *
+     * @type {() => void}
+     */
+    init() {
+        this.#getDimension();
+
+        this.#unsubscribeMouseMove = MobCore.useMouseMove(
+            ({ page, client }) => {
+                this.#setGlobalCoord({ page, client });
+                this.#onMove();
+            }
+        );
+
+        this.#unsubscribeResize = MobCore.useResize(() => {
+            this.#getDimension();
+        });
+
+        this.#unsubscribeScroll = MobCore.useScroll(({ scrollY }) => {
+            this.#onScroll(scrollY);
+        });
+
+        this.#unsubscribeSpring = this.#spring.subscribe(({ ax, ay }) => {
+            this.#item.style.transform = `translate3D(0,0,0) translateX(${ax}px) translateY(${ay}px)`;
+        });
+
+        this.#unsubscribeOnComplete = this.#spring.onComplete(({ ax, ay }) => {
+            this.#item.style.transform = `translateX(${ax}px) translateY(${ay}px)`;
+        });
     }
 
     /**

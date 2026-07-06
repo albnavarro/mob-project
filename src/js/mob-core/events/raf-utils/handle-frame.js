@@ -124,9 +124,9 @@ let shouldMakeSomethingIsActive = false;
 const mustMakeSomethingCheck = () => fps < (maxFps / 5) * 3;
 
 /**
- * @returns {boolean}
+ * @returns {boolean} Check
  *
- *   Check if frame dropped medium.
+ *   If frame dropped medium.
  */
 const shouldMakeSomethingCheck = () => fps < (maxFps / 5) * 4;
 
@@ -337,7 +337,7 @@ const render = (timestamp) => {
     /**
      * Fire callbnack
      */
-    callback.forEach((item) => item({ time, fps }));
+    for (const item of callback) item({ time, fps });
 
     /*
      * Fire callback related to specific index frame

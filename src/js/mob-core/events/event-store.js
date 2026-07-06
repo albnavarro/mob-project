@@ -5,7 +5,7 @@ import { mobStore } from '../store';
  * @import {
  *   MobStoreParams,
  *   MobStoreReturnType
- * } from "../store/type"
+ * } from '../store/type'
  */
 
 /** @type {MobStoreReturnType<import('./type').EventStore>} */
@@ -15,65 +15,65 @@ export const eventStore = mobStore(
         /**
          * Use passive event.
          */
-        usePassive: () => ({
-            value: false,
-            type: Boolean,
-        }),
+        usePassive: {
+            __value: false,
+            __type: Boolean,
+        },
 
         /**
          * Frame Event
          */
-        currentFrame: () => ({
-            value: 0,
-            type: Number,
-        }),
+        currentFrame: {
+            __value: 0,
+            __type: Number,
+        },
 
         /**
          * Initial fps value
          */
-        instantFps: () => ({
-            value: 60,
-            type: Number,
-        }),
+        instantFps: {
+            __value: 60,
+            __type: Number,
+        },
 
         /**
          * Trigger nexFrame
          */
-        requestFrame: () => ({
-            value: () => {},
-            type: Function,
-        }),
+        requestFrame: {
+            __value: () => {},
+            __type: Function,
+        },
 
         /**
          * Send nextTick on next loop
          */
-        deferredNextTick: () => ({
-            value: true,
-            type: Boolean,
-        }),
+        deferredNextTick: {
+            __value: true,
+            __type: Boolean,
+        },
 
         /**
          * Throttle scroll value
          */
-        throttle: () => ({
-            value: 60,
-            type: Number,
-        }),
+        throttle: {
+            __value: 60,
+            __type: Number,
+        },
 
         /**
          * Mouse wheell spinY max value ( 2.5 | -2.5 )
          */
-        spinYMaxValue: () => ({
-            value: 2.5,
-            type: Number,
-        }),
+        spinYMaxValue: {
+            __value: 2.5,
+            __type: Number,
+        },
 
         /**
          * Mouse wheell spinX max value ( 2.5 | -2.5 )
          */
-        spinXMaxValue: () => ({
-            value: 2.5,
-            type: Number,
-        }),
+        spinXMaxValue: {
+            __value: 2.5,
+            __type: Number,
+        },
     })
 );

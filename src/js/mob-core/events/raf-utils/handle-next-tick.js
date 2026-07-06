@@ -54,7 +54,7 @@ const fire = ({ time, fps }) => {
     if (callbacks.length === 0) return;
 
     callbacks.sort((a, b) => a.priority - b.priority);
-    callbacks.forEach(({ cb }) => cb({ time, fps }));
+    for (const { cb } of callbacks) cb({ time, fps });
     callbacks.length = 0;
 };
 

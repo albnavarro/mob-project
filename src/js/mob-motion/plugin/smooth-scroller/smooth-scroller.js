@@ -9,6 +9,7 @@ import {
     breakpointTypeIsValid,
     directionIsValid,
     genericEaseTypeIsValid,
+    valueIsArrayAndReturnDefault,
     valueIsBooleanAndReturnDefault,
     valueIsFunctionAndReturnDefault,
     valueIsNumberAndReturnDefault,
@@ -25,6 +26,28 @@ import {
 } from '../page-scroll/page-scroller.js';
 
 export class MobSmoothScroller {
+    static #DEBOUNCE_FRAMES = 4000;
+
+    /**
+     * @type {boolean}
+     */
+    #syncTab = false;
+
+    /**
+     * @type {boolean}
+     */
+    #fixedTab = true;
+
+    /**
+     * @type {boolean}
+     */
+    #syncArrow = false;
+
+    /**
+     * @type {number}
+     */
+    #arrowThreshold = 100;
+
     /**
      * @type {boolean}
      */
@@ -83,69 +106,81 @@ export class MobSmoothScroller {
     /**
      * @type {() => void}
      */
-    #subscribeResize;
+    #unSubscribeResize;
 
     /**
      * @type {() => void}
      */
-    #subscribeScrollStart;
+    #unSubscribeScrollStart;
 
     /**
      * @type {() => void}
      */
-    #subscribeScrollEnd;
+    #unSubscribeScrollEnd;
 
     /**
      * @type {() => void}
      */
-    #subscribeTouchStart;
+    #unSubscribeTouchStart;
 
     /**
      * @type {() => void}
      */
-    #subscribeTouchEnd;
-
-    /**
-     * @type {() => void}
-     * @returns {void}
-     */
-    #subscribeMouseDown;
+    #unSubscribeTouchEnd;
 
     /**
      * @type {() => void}
      * @returns {void}
      */
-    #subscribeMouseUp;
+    #unSubscribeMouseDown;
 
     /**
      * @type {() => void}
      * @returns {void}
      */
-    #subscribeMouseWheel;
+    #unSubscribeMouseUp;
 
     /**
      * @type {() => void}
      * @returns {void}
      */
-    #subscribeMouseMove;
+    #unSubscribeMouseWheel;
 
     /**
      * @type {() => void}
      * @returns {void}
      */
-    #subscribeTouchMove;
+    #unSubscribeMouseMove;
 
     /**
      * @type {() => void}
      * @returns {void}
      */
-    #subscribeMouseClick;
+    #unSubscribeTouchMove;
 
     /**
      * @type {() => void}
      * @returns {void}
      */
-    #subscribeDebuoceWhell;
+    #unSubscribeMouseClick;
+
+    /**
+     * @type {() => void}
+     * @returns {void}
+     */
+    #unSubscribeDebounceWhell;
+
+    /**
+     * @type {() => void}
+     * @returns {void}
+     */
+    #unSubscribeMouseLeave = () => UnFreezeMobPageScroll();
+
+    /**
+     * @type {() => void}
+     * @returns {void}
+     */
+    #unSubscribeHandleTab = () => {};
 
     /**
      * @type {MobLerp | MobSpring}
@@ -187,8 +222,14 @@ export class MobSmoothScroller {
      */
     #queryType;
 
+    /**
+     * @type {string | Element | null}
+     */
     #scroller;
 
+    /**
+     * @type {string | Element | null}
+     */
     #screen;
 
     /**
@@ -217,11 +258,6 @@ export class MobSmoothScroller {
     #onUpdateCallback;
 
     /**
-     * @type {import('./type.js').OnSwipe}
-     */
-    #onSwipeCallback;
-
-    /**
      * @type {(arg0: { shouldScroll: boolean }) => void}
      */
     #onAfterRefresh;
@@ -230,11 +266,6 @@ export class MobSmoothScroller {
      * @type {(arg0: { shouldScroll: boolean }) => void}
      */
     #afterInit;
-
-    /**
-     * @type {boolean}
-     */
-    #swipeisActive = false;
 
     /**
      * @type {any[]}
@@ -267,14 +298,64 @@ export class MobSmoothScroller {
     #useHorizontalScroll;
 
     /**
-     * @type {boolean}
+     * @type {number[]}
      */
-    #useSwipe;
+    #snapPoints;
 
     /**
      * @type {boolean}
      */
-    #revertSwipeDirection;
+    #freezeSnap = false;
+
+    /**
+     * @type {number}
+     */
+    #velocity = 1;
+
+    /**
+     * @type {number}
+     */
+    #previousEndValue = 0;
+
+    /**
+     * @type {number}
+     */
+    #previousTime = 0;
+
+    /**
+     * @type {number}
+     */
+    #scrollDirection = 0;
+
+    /**
+     * @type {any}
+     */
+    #snapResetDebounce = null;
+
+    /**
+     * @type {number}
+     */
+    #lastSnapTime = MobCore.getTime();
+
+    /**
+     * @type {number}
+     */
+    #velocityThreshold;
+
+    /**
+     * @type {number}
+     */
+    #velocityEasing;
+
+    /**
+     * @type {(arg0: KeyboardEvent) => void}
+     */
+    #eventKeyArrow;
+
+    /**
+     * @type {number}
+     */
+    #rtl;
 
     /**
      * Create new SmoothScroller instance.
@@ -296,6 +377,7 @@ export class MobSmoothScroller {
      *            drag: [Boolean],
      *            scopedEvent: [Boolean],
      *            children: [child1,child2, ...],
+     *            snapPoints: [1,2,...],
      *            ease: [Boolean],
      *            easeType: [String],
      *            afterInit: () => {
@@ -318,21 +400,43 @@ export class MobSmoothScroller {
      * @param {import('./type.js').MobSmoothScroller} data
      */
     constructor(data) {
-        this.#subscribeResize = NOOP;
-        this.#subscribeScrollStart = NOOP;
-        this.#subscribeScrollEnd = NOOP;
-        this.#subscribeTouchStart = NOOP;
-        this.#subscribeTouchEnd = NOOP;
-        this.#subscribeMouseDown = NOOP;
-        this.#subscribeMouseUp = NOOP;
-        this.#subscribeMouseWheel = NOOP;
-        this.#subscribeMouseMove = NOOP;
-        this.#subscribeTouchMove = NOOP;
-        this.#subscribeMouseClick = NOOP;
-        this.#subscribeDebuoceWhell = NOOP;
+        this.#unSubscribeResize = NOOP;
+        this.#unSubscribeScrollStart = NOOP;
+        this.#unSubscribeScrollEnd = NOOP;
+        this.#unSubscribeTouchStart = NOOP;
+        this.#unSubscribeTouchEnd = NOOP;
+        this.#unSubscribeMouseDown = NOOP;
+        this.#unSubscribeMouseUp = NOOP;
+        this.#unSubscribeMouseWheel = NOOP;
+        this.#unSubscribeMouseMove = NOOP;
+        this.#unSubscribeTouchMove = NOOP;
+        this.#unSubscribeMouseClick = NOOP;
+        this.#unSubscribeDebounceWhell = NOOP;
+        this.#unSubscribeHandleTab = NOOP;
 
-        // @ts-ignore
-        this.#motion = {};
+        /**
+         * Move in opposite direction with rtl
+         */
+        const dir = document.documentElement.getAttribute('dir');
+        this.#rtl = dir === 'rtl' ? -1 : 1;
+
+        /**
+         * Initialize tween param.
+         *
+         * - Them we store here real tween.
+         */
+        this.#motion = {
+            updateVelocity: NOOP,
+            // @ts-ignore
+            subscribe: NOOP,
+            // @ts-ignore
+            onComplete: NOOP,
+            goTo: () => Promise.resolve(),
+            set: () => Promise.resolve(),
+            stop: NOOP,
+            destroy: NOOP,
+        };
+
         this.#subscribeMotion = NOOP;
         this.#subscribeOnComplete = NOOP;
         this.#direction = directionIsValid(data?.direction, 'SmoothScroller');
@@ -410,24 +514,6 @@ export class MobSmoothScroller {
             NOOP
         );
 
-        this.#onSwipeCallback = valueIsFunctionAndReturnDefault(
-            data?.onSwipe,
-            'SmoothScroller: onSwipe',
-            NOOP
-        );
-
-        this.#useSwipe = valueIsBooleanAndReturnDefault(
-            data?.useSwipe,
-            'SmoothScroller: useSwipe',
-            false
-        );
-
-        this.#revertSwipeDirection = valueIsBooleanAndReturnDefault(
-            data?.revertSwipeDirection,
-            'SmoothScroller: revertSwipeDirection',
-            false
-        );
-
         this.#useHorizontalScroll = valueIsBooleanAndReturnDefault(
             data?.useHorizontalScroll,
             'SmoothScroller: useBothAxis',
@@ -446,15 +532,57 @@ export class MobSmoothScroller {
             NOOP
         );
 
+        this.#syncTab = valueIsBooleanAndReturnDefault(
+            data?.syncTab,
+            'syncTab',
+            false
+        );
+
+        this.#syncArrow = valueIsBooleanAndReturnDefault(
+            data?.syncArrow,
+            'syncArrow',
+            false
+        );
+
+        this.#arrowThreshold = valueIsNumberAndReturnDefault(
+            data?.arrowThreshold,
+            'arrowThreshold',
+            100
+        );
+
+        this.#fixedTab = valueIsBooleanAndReturnDefault(
+            data?.fixedTab,
+            'fixedTab',
+            true
+        );
+
+        this.#snapPoints = valueIsArrayAndReturnDefault(
+            data?.snapPoints,
+            'SmoothScroller: snapPoints',
+            []
+        );
+
+        this.#velocityThreshold = valueIsNumberAndReturnDefault(
+            data?.velocityThreshold,
+            'SmoothScroller: velocityThreshold',
+            3
+        );
+
+        this.#velocityEasing = valueIsNumberAndReturnDefault(
+            data?.velocityEasing,
+            'SmoothScroller: velocityEasing',
+            0.4
+        );
+
         this.#children = data?.children || [];
-        this.#children.forEach((element) => {
+        for (const element of this.#children) {
             element.setScroller(this.#scroller);
             element.setDirection(this.#direction);
             element.setScreen(this.#screen);
             element.setBreakPoint(this.#breakpoint);
             element.setQueryType(this.#queryType);
             element.init();
-        });
+        }
 
         this.#scopedWhell = (event) => {
             this.#addWhellingClass();
@@ -480,10 +608,38 @@ export class MobSmoothScroller {
             });
         };
 
+        this.#eventKeyArrow = (event) => {
+            const keyEvent = event.key?.toUpperCase();
+            if (keyEvent !== 'ARROWDOWN' && keyEvent !== 'ARROWUP') return;
+
+            const valueToAdd =
+                keyEvent === 'ARROWDOWN'
+                    ? this.#arrowThreshold
+                    : -this.#arrowThreshold;
+
+            this.#endValue = clamp(
+                Math.round(this.#endValue + valueToAdd),
+                0,
+                this.#maxValue
+            );
+
+            /**
+             * Preveniamo il caso in cui la gesture `enter` venga interpretata come mouseClick.
+             *
+             * - In questo case il check `preventChecker` impedirebbe di eseguire l'azione di click
+             * - FirstTouchValue && endValue devono coincidere, non stiamo draggando l'elemento, ma il sistema puo pensare
+             *   di si.
+             */
+            this.#firstTouchValue = this.#endValue;
+            this.#updateScrollState();
+            this.#executeScroll();
+            event.preventDefault();
+        };
+
         /**
          * Remove wheeling class at the end of wheel.
          */
-        this.#subscribeDebuoceWhell = MobCore.useMouseWheel(
+        this.#unSubscribeDebounceWhell = MobCore.useMouseWheel(
             MobCore.debounce(() => {
                 this.#removeWhellingClass();
             }, 500)
@@ -520,172 +676,130 @@ export class MobSmoothScroller {
     }
 
     /**
-     * Initialize insatance
-     *
-     * @example
-     *     myInstance.init();
-     *
-     * @type {() => void}
+     * @param {HTMLElement} focusedElement
      */
-    init() {
-        if (!this.#propsIsValid) return;
+    #checkIfElementIsInsideScreen(focusedElement) {
+        if (!this.#screen) return;
 
-        switch (this.#easeType) {
-            case MobScrollerConstant.EASE_SPRING: {
-                this.#motion = new MobSpring();
-                break;
-            }
+        const screenRect = /** @type {HTMLElement} */ (
+            this.#screen
+        ).getBoundingClientRect();
+        const focusedRect = focusedElement.getBoundingClientRect();
 
-            default: {
-                this.#motion = new MobLerp();
-                this.#motion.updateVelocity(0.1);
-                break;
-            }
+        const isVertical =
+            this.#direction === MobScrollerConstant.DIRECTION_VERTICAL;
+        const elementSize = isVertical
+            ? focusedElement.clientHeight
+            : focusedElement.clientWidth;
+        const screenSize = isVertical ? screenRect.height : screenRect.width;
+        const safetyMargin = Math.ceil(elementSize * 0.1);
+        const threshold = elementSize + safetyMargin;
+
+        if (elementSize > screenSize) return true;
+
+        if (isVertical) {
+            const distanceToTop = focusedRect.top - screenRect.top;
+            const distanceToBottom = screenRect.bottom - focusedRect.bottom;
+            return distanceToTop < threshold || distanceToBottom < threshold;
+        } else {
+            const distanceToLeft = focusedRect.left - screenRect.left;
+            const distanceToRight = screenRect.right - focusedRect.right;
+            return distanceToLeft < threshold || distanceToRight < threshold;
         }
-
-        /**
-         * Scoped event
-         */
-        if (this.#scopedEvent) {
-            /** @type {HTMLElement} */ (this.#scroller).addEventListener(
-                'wheel',
-                this.#scopedWhell,
-                {
-                    passive: true,
-                }
-            );
-
-            /** @type {HTMLElement} */ (this.#scroller).addEventListener(
-                'mousemove',
-                this.#scopedTouchMove,
-                {
-                    passive: true,
-                }
-            );
-
-            /** @type {HTMLElement} */ (this.#scroller).addEventListener(
-                'touchmove',
-                this.#scopedTouchMove,
-                {
-                    passive: true,
-                }
-            );
-        }
-
-        /**
-         * Non scoped event
-         */
-        if (!this.#scopedEvent) {
-            this.#subscribeMouseWheel = MobCore.useMouseWheel((data) => {
-                this.#detectSwipe(data);
-                this.#onWhell(data);
-            });
-
-            this.#subscribeMouseMove = MobCore.useMouseMove((data) =>
-                this.#onTouchMove(data)
-            );
-            this.#subscribeTouchMove = MobCore.useTouchMove((data) =>
-                this.#onTouchMove(data)
-            );
-        }
-
-        /**
-         * Common event
-         */
-        this.#subscribeResize = MobCore.useResize(() => this.refresh());
-
-        this.#subscribeScrollStart = MobCore.useScrollStart(() =>
-            this.#refreshScroller()
-        );
-
-        this.#subscribeScrollEnd = MobCore.useScrollEnd(() =>
-            this.#refreshScroller()
-        );
-
-        this.#subscribeTouchStart = MobCore.useTouchStart((data) =>
-            this.#onMouseDown(data)
-        );
-
-        this.#subscribeTouchEnd = MobCore.useTouchEnd((data) =>
-            this.#onMouseUp(data)
-        );
-
-        this.#subscribeMouseDown = MobCore.useMouseDown((data) =>
-            this.#onMouseDown(data)
-        );
-
-        this.#subscribeMouseUp = MobCore.useMouseUp((data) =>
-            this.#onMouseUp(data)
-        );
-
-        /**
-         * UnFreeze page scroller
-         */
-        /** @type {HTMLElement} */ (this.#scroller).addEventListener(
-            'mouseleave',
-            () => {
-                UnFreezeMobPageScroll();
-            }
-        );
-
-        if (this.#drag) {
-            this.#subscribeMouseClick = MobCore.useMouseClick(
-                ({ target, preventDefault }) => {
-                    this.#preventChecker({ target, preventDefault });
-                }
-            );
-        }
-
-        this.#initMotion();
-
-        if (mq[this.#queryType](this.#breakpoint)) {
-            this.#setScrolerStyle();
-            this.#refreshScroller();
-        }
-
-        MobCore.useFrameIndex(() => {
-            MobCore.useNextTick(() => {
-                if (this.#isDestroyed) return;
-
-                this.#afterInit?.({
-                    shouldScroll: this.#getScrollableStatus(),
-                });
-
-                this.#children.forEach((element) => {
-                    element.refresh();
-                });
-            });
-        }, 3);
     }
 
     /**
-     * @param {import('../../../mob-core/events/mouse-utils/type.js').MouseEventParsed} params
+     * Update scroller after user Tab
      */
-    #detectSwipe({ pixelX }) {
-        if (
-            !this.#useSwipe ||
-            !pixelX ||
-            this.#swipeisActive ||
-            this.#onSwipeCallback.length === 0
-        )
-            return;
+    #setUsability() {
+        let tabIsActive = false;
 
-        if (Math.abs(pixelX) > 40) {
-            this.#swipeisActive = true;
+        if (this.#syncTab) {
+            this.#unSubscribeHandleTab = MobCore.useTabHandler(() => {
+                if (
+                    tabIsActive ||
+                    !this.#screen ||
+                    !this.#scroller ||
+                    /** @type {any} */ (this.#screen) === globalThis
+                )
+                    return;
 
-            const direction = pixelX > 0 ? -1 : 1;
-            const directionParsed = this.#revertSwipeDirection
-                ? direction
-                : direction * -1;
+                tabIsActive = true;
+                const screenEl = /** @type {HTMLElement} */ (this.#screen);
+                const scrollerEl = /** @type {HTMLElement} */ (this.#scroller);
 
-            this.#onSwipeCallback({
-                direction: directionParsed,
-                move: (value) => this.move(value).catch(() => {}),
+                MobCore.useFrameIndex(() => {
+                    MobCore.useNextTick(() => {
+                        const focusedElement = document.activeElement;
+
+                        if (
+                            !focusedElement ||
+                            !scrollerEl.contains(focusedElement)
+                        ) {
+                            tabIsActive = false;
+                            return;
+                        }
+
+                        /**
+                         * Aggiorna lo scroller
+                         *
+                         * - A ogni tab.
+                         * - Quando l'elemento con il focus stá per uscire dallo schermo.
+                         */
+                        if (
+                            !this.#fixedTab &&
+                            !this.#checkIfElementIsInsideScreen(
+                                /** @type {HTMLElement} */ (focusedElement)
+                            )
+                        ) {
+                            tabIsActive = false;
+                            return;
+                        }
+
+                        const scrollerRect = scrollerEl.getBoundingClientRect();
+                        const focusedRect =
+                            focusedElement.getBoundingClientRect();
+
+                        const targetScrollValue =
+                            this.#direction ===
+                            MobScrollerConstant.DIRECTION_VERTICAL
+                                ? focusedRect.top -
+                                  scrollerRect.top -
+                                  screenEl.offsetHeight / 5
+                                : focusedRect.left -
+                                  scrollerRect.left -
+                                  screenEl.offsetWidth / 5;
+
+                        this.#endValue = clamp(
+                            Math.round(targetScrollValue),
+                            0,
+                            this.#maxValue
+                        );
+
+                        /**
+                         * Preveniamo il caso in cui la gesture `enter` venga interpretata come mouseClick.
+                         *
+                         * - In questo case il check `preventChecker` impedirebbe di eseguire l'azione di click
+                         * - FirstTouchValue && endValue devono coincidere, non stiamo draggando l'elemento, ma il sistema
+                         *   puo pensare di si.
+                         */
+                        this.#firstTouchValue = this.#endValue;
+
+                        screenEl.scrollTop = 0;
+                        screenEl.scrollLeft = 0;
+
+                        this.#updateScrollState();
+                        this.#executeScroll();
+                        tabIsActive = false;
+                    });
+                }, 2);
             });
+        }
 
-            setTimeout(() => {
-                this.#swipeisActive = false;
-            }, 500);
+        if (this.#syncArrow) {
+            const screen = /** @type {any} */ (this.#screen);
+            if (screen === globalThis) return;
+            screen.addEventListener('keydown', this.#eventKeyArrow);
         }
     }
 
@@ -702,11 +816,11 @@ export class MobSmoothScroller {
             this.#scroller
         ).querySelectorAll('a, button');
 
-        [...activeElements].forEach((item) => {
+        for (const item of activeElements) {
             item.setAttribute('draggable', 'false');
             // @ts-ignore
             item.style['user-select'] = 'none';
-        });
+        }
     }
 
     /**
@@ -721,11 +835,11 @@ export class MobSmoothScroller {
             this.#scroller
         ).querySelectorAll('a, button');
 
-        [...activeElement].forEach((item) => {
+        for (const item of activeElement) {
             item.removeAttribute('draggable');
             // @ts-ignore
             item.style['user-select'] = '';
-        });
+        }
     }
 
     /**
@@ -734,19 +848,22 @@ export class MobSmoothScroller {
     #initMotion() {
         if (!this.#motion) return;
 
-        this.#motion.setData({ val: 0 });
         this.#subscribeMotion = this.#motion.subscribe(({ val }) => {
             /** @type {HTMLElement} */ (this.#scroller).style.transform =
                 this.#direction == MobScrollerConstant.DIRECTION_VERTICAL
                     ? `translate3d(0px, 0px, 0px) translateY(${-Math.trunc(val)}px)`
-                    : `translate3d(0px, 0px, 0px) translateX(${-Math.trunc(val)}px)`;
+                    : `translate3d(0px, 0px, 0px) translateX(${-Math.trunc(val * this.#rtl)}px)`;
 
             /**
-             * TODO Move to scroll Start (scopedEvent or not , wheel touch etc...) Used by instance with ease = true;
+             * TODO:
+             *
+             * - TriggerScrollStart() should be called once at the beginning of motion,
+             * - Not on every tick. Currently there is no dedicated "first tick" event from
+             * - Internalli children set this.#force3D = true when triggerScrollStart is Called.
              */
-            this.#children.forEach((element) => {
+            for (const element of this.#children) {
                 element.triggerScrollStart();
-            });
+            }
 
             MobCore.useNextTick(() => {
                 this.#onTickCallback({
@@ -755,12 +872,12 @@ export class MobSmoothScroller {
                     parentIsMoving: true,
                 });
 
-                this.#children.forEach((element) => {
+                for (const element of this.#children) {
                     element.move({
                         value: -val,
                         parentIsMoving: true,
                     });
-                });
+                }
             });
         });
 
@@ -768,7 +885,7 @@ export class MobSmoothScroller {
             /** @type {HTMLElement} */ (this.#scroller).style.transform =
                 this.#direction == MobScrollerConstant.DIRECTION_VERTICAL
                     ? `translateY(${-Math.trunc(val)}px)`
-                    : `translateX(${-Math.trunc(val)}px)`;
+                    : `translateX(${-Math.trunc(val * this.#rtl)}px)`;
 
             MobCore.useNextTick(() => {
                 this.#onTickCallback({
@@ -777,13 +894,13 @@ export class MobSmoothScroller {
                     parentIsMoving: false,
                 });
 
-                this.#children.forEach((element) => {
+                for (const element of this.#children) {
                     element.triggerScrollEnd();
                     element.move({
                         value: -val,
                         parentIsMoving: false,
                     });
-                });
+                }
             });
         });
     }
@@ -811,7 +928,8 @@ export class MobSmoothScroller {
                 : /** @type {HTMLElement} */ (this.#scroller).offsetWidth -
                   this.#screenWidth;
 
-        this.#calculateValue();
+        this.#updateScrollState();
+        this.#executeScroll();
     }
 
     /**
@@ -826,37 +944,75 @@ export class MobSmoothScroller {
             y: client?.y ?? 0,
         });
         this.#endValue += Math.round(this.#prevTouchVal - this.#touchVal);
-        this.#calculateValue();
+        this.#endValue = clamp(this.#endValue, 0, this.#maxValue);
+
+        this.#updateScrollState();
+        this.#executeScroll();
     }
 
     /**
-     * Speed variation by screensize
-     */
-    #getDelta() {
-        return this.#direction === MobScrollerConstant.DIRECTION_HORIZONTAL
-            ? this.#screenWidth / 1920
-            : this.#screenHeight / 1080;
-    }
-
-    /**
+     * TODO: aggiungere spinX e controllo come per onWhell ( x or y ) ?
+     *
+     * - Scoped wheel ad ora tiene in cosiderazione solo l'asse delle Y.
+     *
      * @type {(arg0: { spinY: number }) => void}
      */
     #onScopedWhell({ spinY = 0 }) {
         if (!mq[this.#queryType](this.#breakpoint)) return;
+        FreezeMobPageScroll();
 
         this.#dragEnable = false;
 
         /**
-         * Speed variation by screensize
+         * Eseguiamo un reset del debounce per la detext del fine wheel.
+         *
+         * - Evitiamo che i valori di velocity etc.. vengano resettati troppo presto dal timeout attivo.
+         * - In questo modo goToNextSnap userá un valore di velocity reale e non forzato a 1.
+         * - CheckSnapOpportunity si occuperá di creare un nuovo timeout se necessario ( snap individuato ).
+         * - Questa é la logica della gestione del debounce attivando quando uno snap é intercettato.
          */
-        const delta = this.#getDelta();
+        this.#clearSnapTimeout();
 
         /**
          * Normalize spinValue between -1 && 1.
          */
         const spinYParsed = clamp(spinY, -1, 1);
-        this.#endValue += spinYParsed * this.#speed * delta;
-        this.#calculateValue();
+        this.#endValue += spinYParsed * this.#speed;
+        this.#endValue = clamp(this.#endValue, 0, this.#maxValue);
+        this.#updateScrollState();
+
+        /**
+         * Gestisce il lifecycle dello snap:
+         *
+         * 1. Interrompe eventuali snap in corso (freezeSnap = false)
+         * 2. Aggiorna/Cancella il timer di debounce
+         * 3. Valuta se attivare un nuovo snap (velocity > 5, direzione, etc.)
+         *
+         * Se uno snap viene attivato, il flusso corrente termina qui
+         *
+         * - Lo motion gestirà l'animazione verso il punto di snap.
+         */
+        const useSnap =
+            this.#snapPoints.length > 0 ? this.#checkSnapOpportunity() : false;
+
+        if (useSnap) {
+            /**
+             * Schedula il timeout per tracciare la fine degli eventi di wheel.
+             *
+             * - Con lo snap attivo non viene eseguita executeScroll
+             */
+            this.#scheduleSnapTimeout();
+            return;
+        }
+
+        this.#executeScroll();
+
+        /**
+         * Schedula il timeout per tracciare la fine degli eventi di wheel.
+         */
+        if (this.#snapPoints.length > 0) {
+            this.#scheduleSnapTimeout();
+        }
     }
 
     /**
@@ -878,10 +1034,18 @@ export class MobSmoothScroller {
         ) {
             this.#firstTouchValue = this.#endValue;
             this.#dragEnable = true;
+            FreezeMobPageScroll();
+
+            /**
+             * Clear pending snap timeout.
+             */
+            if (this.#snapPoints.length > 0) this.#clearSnapTimeout();
+
             this.#prevTouchVal = this.#getMousePos({
                 x: client?.x ?? 0,
                 y: client?.y ?? 0,
             });
+
             this.#touchVal = this.#getMousePos({
                 x: client?.x ?? 0,
                 y: client?.y ?? 0,
@@ -894,35 +1058,58 @@ export class MobSmoothScroller {
      */
     #onMouseUp() {
         this.#dragEnable = false;
+        UnFreezeMobPageScroll();
+
+        if (this.#snapPoints.length > 0) {
+            /**
+             * Check next snap on drag end;
+             */
+            this.#goToNextSnap();
+
+            /**
+             * Prepara lo stato per il prossimo input (evento) dopo uno snap da drag.
+             *
+             * - Dopo uno swipe veloce (con conseguente snap), la velocity rimane alta (es. 8.0).
+             * - Il primo wheel troverebbe velocity >= 3 e verrebbe intercettato da goToNextSnap().
+             * - Verrebbe forzato un nuovo snap (spesso verso lo stesso punto), rendendo il wheel non reattivo.
+             * - Questo metodo schedula il ripristino di velocity a 1 dopo ~25ms (1500/fps).
+             * - Così il prossimo wheel troverà velocity insufficiente per triggerare un nuovo snap e potrà scorrere
+             *   liberamente.
+             */
+            this.#scheduleSnapTimeout();
+        }
     }
 
     /**
      * @type {import('./type.js').MobSmoothScrollerOnMouseEvent}
      */
     #onTouchMove({ target, client, preventDefault }) {
-        if (
+        if (!(
+            this.#dragEnable &&
+            this.#drag &&
             (target === this.#scroller ||
                 isDescendant(
                     /** @type {HTMLElement} */ (this.#scroller),
                     /** @type {HTMLElement} */ (target)
-                )) &&
-            this.#dragEnable &&
-            this.#drag
-        ) {
-            // @ts-ignore
-            preventDefault();
-
-            this.#prevTouchVal = this.#touchVal;
-            this.#touchVal = this.#getMousePos({
-                x: client?.x ?? 0,
-                y: client?.y ?? 0,
-            });
-
-            const result = Math.round(this.#prevTouchVal - this.#touchVal);
-            this.#endValue += result;
-
-            this.#calculateValue();
+                ))
+        )) {
+            return;
         }
+
+        // @ts-ignore
+        preventDefault();
+
+        this.#prevTouchVal = this.#touchVal;
+        this.#touchVal = this.#getMousePos({
+            x: client?.x ?? 0,
+            y: client?.y ?? 0,
+        });
+
+        const result = Math.round(this.#prevTouchVal - this.#touchVal);
+        this.#endValue += result;
+        this.#endValue = clamp(this.#endValue, 0, this.#maxValue);
+        this.#updateScrollState();
+        this.#executeScroll();
     }
 
     /**
@@ -944,20 +1131,30 @@ export class MobSmoothScroller {
             preventDefault?.();
             FreezeMobPageScroll();
 
+            /**
+             * Eseguiamo un reset del debounce per la detext del fine wheel.
+             *
+             * - Evitiamo che i valori di velocity etc.. vengano resettati troppo presto dal timeout attivo.
+             * - In questo modo goToNextSnap userá un valore di velocity reale e non forzato a 1.
+             * - CheckSnapOpportunity si occuperá di creare un nuovo timeout se necessario ( snap individuato ).
+             * - Questa é la logica della gestione del debounce attivando quando uno snap é intercettato.
+             */
+            this.#clearSnapTimeout();
+
+            /**
+             * Default mode.
+             */
             const spinXdiff = Math.abs(this.#lastSpinX - spinX);
             const spinYdiff = Math.abs(this.#lastSpinY - spinY);
 
             /**
-             * In horizontal mode, allow scroll in X and Y direction if no swipe is used.
-             *
-             * With swipe enabled use only vertical wheel, both vertical && horizontal mode.
+             * In horizontal mode, allow scroll in X and Y direction.
              */
-            const spinValue =
-                this.#useHorizontalScroll && !this.#useSwipe
-                    ? (() => {
-                          return spinXdiff > spinYdiff ? spinX : spinY;
-                      })()
-                    : spinY;
+            const spinValue = this.#useHorizontalScroll
+                ? (() => {
+                      return spinXdiff > spinYdiff ? spinX : spinY;
+                  })()
+                : spinY;
 
             /**
              * When there is no advanced return;
@@ -965,78 +1162,315 @@ export class MobSmoothScroller {
             if (Math.abs(spinValue) === 0) return;
 
             /**
-             * Speed variation by screensize
-             */
-            const delta = this.#getDelta();
-
-            /**
              * Normalize spinValue between -1 && 1.
              */
-            this.#endValue +=
-                clamp(spinValue, -1, 1) * this.#speed * clamp(delta, 1, 10);
-            this.#calculateValue();
+            this.#endValue += clamp(spinValue, -1, 1) * this.#speed;
+            this.#endValue = clamp(this.#endValue, 0, this.#maxValue);
+            this.#updateScrollState();
+
+            /**
+             * Gestisce il lifecycle dello snap:
+             *
+             * 1. Interrompe eventuali snap in corso (freezeSnap = false)
+             * 2. Aggiorna/Cancella il timer di debounce
+             * 3. Valuta se attivare un nuovo snap (velocity > X, direzione, etc.)
+             *
+             * Se uno snap viene attivato, il flusso corrente termina qui
+             *
+             * - Lo motion gestirà l'animazione verso il punto di snap.
+             */
+            const useSnap =
+                this.#snapPoints.length > 0
+                    ? this.#checkSnapOpportunity()
+                    : false;
+
+            if (useSnap) {
+                /**
+                 * Schedula il timeout per tracciare la fine degli eventi di wheel.
+                 *
+                 * - Con lo snap attivo non viene eseguita executeScroll
+                 */
+                this.#scheduleSnapTimeout();
+                return;
+            }
+
+            /**
+             * - Aggiorna:
+             * - PercentValue
+             *
+             * Lancia il tween
+             */
+            this.#executeScroll();
             this.#lastSpinY = spinY;
             this.#lastSpinX = spinX;
+
+            /**
+             * Schedula il timeout per tracciare la fine degli eventi di wheel.
+             */
+            if (this.#snapPoints.length > 0) {
+                this.#scheduleSnapTimeout();
+            }
         }
     }
 
     /**
-     * Move scroller
+     * Schedula il reset di velocity ( per coerenza anche di freezeSnap ).
      *
-     * @example
-     *     myInstance.move(val);
-     *
-     * @param {number} percent Position in percent, from 0 to 100
-     * @returns {Promise<void>} Percent position in percent, from 0 to 100
-     */
-    move(percent) {
-        if (!mq[this.#queryType](this.#breakpoint))
-            return new Promise((resolve) => resolve());
-
-        this.#percent = percent;
-        this.#endValue = (this.#percent * this.#maxValue) / 100;
-
-        /**
-         * This.motion use spring or lerp, so goTo generic type is not the same. But we don't use props here, so skip ts
-         * error
-         */
-
-        // @ts-ignore
-        return this.#motion.goTo({ val: this.#endValue });
-    }
-
-    /**
-     * Move scroller immediatr
-     *
-     * @example
-     *     myInstance.set(val);
-     *
-     * @param {number} percent Position in percent, from 0 to 100
-     */
-    set(percent) {
-        if (!mq[this.#queryType](this.#breakpoint)) return;
-
-        this.#percent = percent;
-        this.#endValue = (this.#percent * this.#maxValue) / 100;
-
-        /**
-         * This.motion use spring or lerp, so set generic type is not the same. But we don't use props here, so skip ts
-         * error
-         */
-
-        // @ts-ignore
-        this.#motion.set({ val: this.#endValue });
-    }
-
-    /**
-     * Utils
+     * - Viene chiamato dopo ogni wheel, dopo uno snap o al rilascio del drag.
+     * - Il reset avviene dopo 3 frame ( 3000ms / currentFps ),
+     * - 3000 = 3 secondi.
+     * - CurrentFps = frame per secondo
+     * - Questo serve a gestire eventi molto ravvicinati del trackpad.
+     * - Se arrivano nuovi eventi durante questa finestra, il timer viene cancellato e rischedulato, permettendo alla
+     *   velocity di accumularsi senza reset.
      *
      * @type {() => void}
      */
-    #calculateValue() {
-        const percentValue = (this.#endValue * 100) / this.#maxValue;
+    #scheduleSnapTimeout() {
+        if (this.#snapResetDebounce) {
+            clearTimeout(this.#snapResetDebounce);
+        }
+
+        this.#snapResetDebounce = setTimeout(
+            () => {
+                this.#freezeSnap = false;
+                this.#velocity = 1;
+                this.#snapResetDebounce = null;
+            },
+            Math.ceil(MobSmoothScroller.#DEBOUNCE_FRAMES / MobCore.getFps())
+        );
+    }
+
+    #clearSnapTimeout() {
+        if (!this.#snapResetDebounce) {
+            return;
+        }
+
+        /**
+         * 1. CANCELLIAMO il timeout di reset pending
+         *
+         * - Se il timer scadesse ora, resetterebbe velocity a 1.
+         * - Con velocity = 1, il check successivo `this.#velocity < X` in goToNextSnap() fallirebbe.
+         * - Impedirebbe cosi l'attivazione dello snap nonostante l'utente stia scrollando velocemente.
+         *
+         * Il clearTimeout mantiene la velocity accumulata per permettere la valutazione corretta del prossimo snap.
+         */
+        clearTimeout(this.#snapResetDebounce);
+        this.#snapResetDebounce = null;
+    }
+
+    /**
+     * @returns {boolean | undefined}
+     */
+    #checkSnapOpportunity() {
+        if (this.#snapPoints.length === 0) return;
+
+        /**
+         * 2. INTERRUMPIAMO lo snap in corso (se c'è)
+         *
+         * - Se eravamo già in uno snap automatico:
+         * - Lo interrompiamo per dare priorità al nuovo input utente.
+         * - FreezeSnap = false permette a updateScrollState() di riprendere e il motion gestirà il cambio target in modo
+         *   fluido.
+         */
+        if (this.#freezeSnap) {
+            this.#freezeSnap = false;
+        }
+
+        /**
+         * 3. VALUTIAMO il nuovo snap
+         *
+         * - Ora che velocity è preservata (non resettata dal timer) e freezeSnap è sbloccato, possiamo valutare se
+         *   attivare uno snap.
+         * - Se attivato, freezeSnap tornerà true e il motion gestirà l'animazione.
+         */
+        return !this.#dragEnable && this.#goToNextSnap();
+    }
+
+    /**
+     * Go to next snap by velocity;
+     *
+     * @returns {boolean | undefined}
+     */
+    #goToNextSnap() {
+        if (
+            this.#snapPoints.length === 0 ||
+            this.#velocity < this.#velocityThreshold ||
+            this.#freezeSnap
+        )
+            return;
+
+        const percentTarget =
+            this.#scrollDirection === 1
+                ? this.#snapPoints.find((percent) => {
+                      return this.#percent <= percent;
+                  })
+                : this.#snapPoints.findLast((percent) => {
+                      return this.#percent >= percent;
+                  });
+
+        if (!percentTarget && percentTarget !== 0) return;
+
+        this.#freezeSnap = true;
+
+        /**
+         * Importante. Questo é l'unico punto in cui settare lastSnapTime.
+         *
+         * - Si tratta dell' ultimo livello di sicurezza per preservare la chiamata dello snap
+         */
+        this.#lastSnapTime = MobCore.getTime();
+        this.move(percentTarget);
+
+        return true;
+    }
+
+    #setVelocity() {
+        const time = MobCore.getTime();
+        const diffTime = time - this.#previousTime;
+
+        /**
+         * DiffEndValue al cambio di direzione genera un valore molto piccolo ( cambio segno ) per cui la velocitá sará
+         * 1.
+         */
+        const diffEndValue = this.#endValue - this.#previousEndValue;
+
+        /**
+         * - Calcola la direzione dello scroll.
+         * - Il risultato è sempre 1 (avanti) o -1 (indietro)
+         * - #setVelocity() viene invocata esclusivamente da #updateScrollState(), che a sua volta è triggerata solo da
+         *   input utente reale (wheel, drag, touch).
+         * - In tutti questi casi #endValue è già stato modificato, quindi diffEndValue non può mai essere 0 in condizioni
+         *   normali.
+         */
+        this.#scrollDirection = Math.sign(diffEndValue);
+
+        /**
+         * Identifichiamo la pausa esplicita dell'utente (ha smesso di scrollare)
+         *
+         * - Usiamo lo stesso threshold del debounce (3 frame).
+         * - Se passano più di 3 frame senza nuovi eventi, consideriamo la pausa intenzionale.
+         */
+        const threshold = Math.ceil(
+            MobSmoothScroller.#DEBOUNCE_FRAMES / MobCore.getFps()
+        );
+
+        /**
+         * Arriviamo da uno scorrimento continuo.
+         *
+         * - Il check su diffEndValue ( valore attuale e precedente uguale ) é necessario perché:
+         * - 1. Drag con movimento < 0.5px (arrotontato a 0 da Math.round())
+         * - 2. Scroll oltre i limiti (clamp blocca il valore)
+         */
+        if (diffTime <= threshold && diffEndValue !== 0) {
+            /**
+             * Normalizza diffTime a un baseline di 60fps
+             *
+             * - Su display ad alto refresh rate (120Hz, 144Hz) gli eventi arrivano con diffTime più basso.
+             * - Gonfiando artificialmente la velocity.
+             * - Math.max porta diffTime ad almeno 16.67ms, equiparando la velocity a quella che si avrebbe a 60fps.
+             * - Per eventi meno frequenti (mouse wheel, ~80-100ms) diffTime è già maggiore del baseline, quindi non viene
+             *   alterato.
+             */
+            const baselineInterval = 1000 / 60;
+            const normalizedDiffTime = Math.max(diffTime, baselineInterval);
+            const vv = diffEndValue / normalizedDiffTime;
+
+            /**
+             * Velocitá instantanea
+             */
+            const newVelocity =
+                Math.round((Math.abs(vv) + 1) * 10_000) / 10_000;
+
+            /**
+             * Media pesata della velocitá precedente e istantanea.
+             *
+             * - Questo evitá che lo snap scatti direttamente sui picchi.
+             * - Smorziamo il picco in modo che:
+             * - Lo snap non scatti su un singolo picco
+             * - Lo snap scatterá quando abbiamo una sequenza temporale di eventi veloci.
+             *
+             * Esempio pratico:
+             *
+             * - NewVelocity: 4.6, 4.6
+             * - This.#velocity: 2.44, 3.304
+             *
+             * EMA ( Exponential Moving Average ):
+             *
+             * - Media mobile che dá piu peso ai valori recenti tramite un fattore di smoothing.
+             */
+            this.#velocity = Math.max(
+                1,
+                this.#velocityEasing * newVelocity +
+                    (1 - this.#velocityEasing) * this.#velocity
+            );
+        }
+
+        /**
+         * Dopo una pausa gestiamo la ripresa dal valore neutro di velocitá pari a 1.
+         */
+        if (diffTime > threshold) {
+            this.#velocity = 1;
+        }
+
+        this.#previousTime = time;
+        this.#previousEndValue = this.#endValue;
+    }
+
+    /**
+     * @returns {void}
+     */
+    #updateScrollState() {
+        /**
+         * Layer di sicurezza n1.
+         */
+        if (this.#snapPoints.length > 0 && this.#freezeSnap) return;
+
+        /**
+         * Layer di sicurezza n2.
+         *
+         * - Se appena dopo uno snap ci troviamo inquesto punto del codice vuol dire che:
+         * - Sappiamo che stiamo esenguendo uno snap,e questo evento é da considerarsi involontario
+         * - Usiamo 100ms come threshold, nei primi 100ms da uno snap siamo sicuri che l'azione corrente é uno snap.
+         * - Ci blocchiamo subito.
+         * - Questo evento puó eseere causato da vari motivi, es: rotella del mouse con inerzia su monitor ad alta
+         *   frequenza.
+         * - 100ms sono un tempo ragionevole, dopo uno snap qualsiasi evento che arriva nei primi 100ms é per forza un
+         *   residuo indesiderato.
+         * - Senza questo controllo il target dello span corrente rischia di essere alterato.
+         */
+        if (this.#snapPoints.length > 0) {
+            const currentTime = MobCore.getTime();
+            const timeFromLastSnap = Math.abs(this.#lastSnapTime - currentTime);
+            if (timeFromLastSnap < 100) return;
+        }
+
+        /**
+         * Update base value
+         *
+         * - Prevent division by 0 ( NaN ).
+         */
+        const percentValue =
+            this.#maxValue > 0 ? (this.#endValue * 100) / this.#maxValue : 0;
         this.#percent = clamp(percentValue, 0, 100);
-        this.#endValue = clamp(this.#endValue, 0, this.#maxValue);
+
+        /**
+         * Start velocity check.
+         */
+        if (this.#snapPoints.length > 0) this.#setVelocity();
+
+        return;
+    }
+
+    #executeScroll() {
+        /**
+         * Layer di sicurezza n1.
+         *
+         * - Tutti i `chiamanti` di #executeScroll devono prima eseguire `#checkSnapOpportunity()`.
+         * - `#scheduleCurrentSnap()` modificano il valore di freezeSnap a false.
+         * - Manteniamo il controllo in caso di future modifiche.
+         * - SnapPoints.length serve a proteggere per fuiture modifiche, attualamente non sarebbe necessario.
+         */
+        if (this.#snapPoints.length > 0 && this.#freezeSnap) return;
 
         /**
          * This.motion use spring or lerp, so goTo generic type is not the same. But we don't use props here, so skip ts
@@ -1086,6 +1520,224 @@ export class MobSmoothScroller {
     }
 
     /**
+     * Initialize insatance
+     *
+     * @example
+     *     myInstance.init();
+     *
+     * @type {() => void}
+     */
+    init() {
+        if (!this.#propsIsValid) return;
+
+        switch (this.#easeType) {
+            case MobScrollerConstant.EASE_SPRING: {
+                this.#motion = new MobSpring({
+                    data: { val: 0 },
+                    config: 'scroller',
+                    configProps: {
+                        tension: 15,
+                    },
+                });
+                break;
+            }
+
+            default: {
+                this.#motion = new MobLerp({ data: { val: 0 } });
+                this.#motion.updateVelocity(0.1);
+                break;
+            }
+        }
+
+        /**
+         * Scoped event
+         */
+        if (this.#scopedEvent) {
+            /** @type {HTMLElement} */ (this.#scroller).addEventListener(
+                'wheel',
+                this.#scopedWhell,
+                {
+                    passive: true,
+                }
+            );
+
+            /** @type {HTMLElement} */ (this.#scroller).addEventListener(
+                'mousemove',
+                this.#scopedTouchMove,
+                {
+                    passive: true,
+                }
+            );
+
+            /**
+             * See global `MobCore.useTouchMove` issue
+             */
+            // /** @type {HTMLElement} */ (this.#scroller).addEventListener(
+            //     'touchmove',
+            //     this.#scopedTouchMove,
+            //     {
+            //         passive: true,
+            //     }
+            // );
+        }
+
+        /**
+         * Non scoped event
+         */
+        if (!this.#scopedEvent) {
+            this.#unSubscribeMouseWheel = MobCore.useMouseWheel((data) => {
+                this.#onWhell(data);
+            });
+
+            this.#unSubscribeMouseMove = MobCore.useMouseMove((data) => {
+                this.#onTouchMove(data);
+            });
+
+            /**
+             * See global `MobCore.useTouchMove` issue
+             */
+            // this.#unSubscribeTouchMove = MobCore.useTouchMove((data) => {
+            //     this.#onTouchMove(data);
+            // });
+        }
+
+        /**
+         * Common event
+         */
+        this.#unSubscribeResize = MobCore.useResize(() => this.refresh());
+
+        this.#unSubscribeScrollStart = MobCore.useScrollStart(() =>
+            this.#refreshScroller()
+        );
+
+        this.#unSubscribeScrollEnd = MobCore.useScrollEnd(() =>
+            this.#refreshScroller()
+        );
+
+        this.#unSubscribeTouchStart = MobCore.useTouchStart((data) =>
+            this.#onMouseDown(data)
+        );
+
+        this.#unSubscribeTouchEnd = MobCore.useTouchEnd((data) =>
+            this.#onMouseUp(data)
+        );
+
+        this.#unSubscribeMouseDown = MobCore.useMouseDown((data) =>
+            this.#onMouseDown(data)
+        );
+
+        this.#unSubscribeMouseUp = MobCore.useMouseUp((data) =>
+            this.#onMouseUp(data)
+        );
+
+        /**
+         * TouchMove at moment do not use scoped vs !norScoped logic.
+         *
+         * - With scped logc FreezeMobPageScroll is ok.
+         * - But we does not now when fire UnFreezeMobPageScroll.
+         * - Event similar to mouseleave is missed from touch logix.
+         * - TODO: how fire UnFreezeMobPageScroll with scoped touch.
+         */
+        this.#unSubscribeTouchMove = MobCore.useTouchMove((data) => {
+            this.#onTouchMove(data);
+        });
+
+        /**
+         * UnFreeze page scroller
+         */
+        /** @type {HTMLElement} */ (this.#scroller).addEventListener(
+            'mouseleave',
+            this.#unSubscribeMouseLeave
+        );
+
+        if (this.#drag) {
+            this.#unSubscribeMouseClick = MobCore.useMouseClick(
+                ({ target, preventDefault }) => {
+                    this.#preventChecker({ target, preventDefault });
+                }
+            );
+        }
+
+        this.#initMotion();
+        this.#setUsability();
+
+        if (mq[this.#queryType](this.#breakpoint)) {
+            this.#setScrolerStyle();
+            this.#refreshScroller();
+        }
+
+        MobCore.useFrameIndex(() => {
+            MobCore.useNextTick(() => {
+                if (this.#isDestroyed) return;
+
+                this.#afterInit?.({
+                    shouldScroll: this.#getScrollableStatus(),
+                });
+
+                for (const element of this.#children) {
+                    element.refresh();
+                }
+            });
+        }, 3);
+    }
+
+    /**
+     * Move scroller
+     *
+     * @example
+     *     myInstance.move(val);
+     *
+     * @param {number} percent Position in percent, from 0 to 100
+     * @returns {Promise<void>} Percent position in percent, from 0 to 100
+     */
+    move(percent) {
+        if (!mq[this.#queryType](this.#breakpoint))
+            return new Promise((resolve) => resolve());
+
+        this.#percent = percent;
+        this.#endValue = clamp(
+            (this.#percent * this.#maxValue) / 100,
+            0,
+            this.#maxValue
+        );
+
+        /**
+         * This.motion use spring or lerp, so goTo generic type is not the same. But we don't use props here, so skip ts
+         * error
+         */
+
+        // @ts-ignore
+        return this.#motion.goTo({ val: this.#endValue });
+    }
+
+    /**
+     * Move scroller immediatr
+     *
+     * @example
+     *     myInstance.set(val);
+     *
+     * @param {number} percent Position in percent, from 0 to 100
+     */
+    set(percent) {
+        if (!mq[this.#queryType](this.#breakpoint)) return;
+
+        this.#percent = percent;
+        this.#endValue = clamp(
+            (this.#percent * this.#maxValue) / 100,
+            0,
+            this.#maxValue
+        );
+
+        /**
+         * This.motion use spring or lerp, so set generic type is not the same. But we don't use props here, so skip ts
+         * error
+         */
+
+        // @ts-ignore
+        this.#motion.set({ val: this.#endValue });
+    }
+
+    /**
      * Refresh instance
      *
      * @example
@@ -1117,9 +1769,9 @@ export class MobSmoothScroller {
                     shouldScroll: this.#getScrollableStatus(),
                 });
 
-                this.#children.forEach((element) => {
+                for (const element of this.#children) {
                     element.refresh();
-                });
+                }
             });
         }, 2);
     }
@@ -1135,49 +1787,79 @@ export class MobSmoothScroller {
     destroy() {
         this.#isDestroyed = true;
         this.#removeScrolerStyle();
-        this.#subscribeResize();
-        this.#subscribeScrollStart();
-        this.#subscribeScrollEnd();
-        this.#subscribeTouchStart();
-        this.#subscribeTouchEnd();
-        this.#subscribeMouseDown();
-        this.#subscribeMouseUp();
-        this.#subscribeMouseWheel();
-        this.#subscribeMouseMove();
-        this.#subscribeTouchMove();
-        this.#subscribeMouseClick();
+        this.#unSubscribeResize();
+        this.#unSubscribeScrollStart();
+        this.#unSubscribeScrollEnd();
+        this.#unSubscribeTouchStart();
+        this.#unSubscribeTouchEnd();
+        this.#unSubscribeMouseDown();
+        this.#unSubscribeMouseUp();
+        this.#unSubscribeMouseWheel();
+        this.#unSubscribeMouseMove();
+        this.#unSubscribeTouchMove();
+        this.#unSubscribeMouseClick();
         this.#subscribeMotion();
         this.#subscribeOnComplete();
-        this.#subscribeDebuoceWhell();
+        this.#unSubscribeDebounceWhell();
+        this.#unSubscribeHandleTab();
         this.#motion?.destroy();
         // @ts-ignore
         this.#motion = null;
-        this.#children.forEach((element) => {
+        for (const element of this.#children) {
             element?.destroy?.();
-        });
+        }
         this.#children = [];
         this.#onTickCallback = NOOP;
         this.#onUpdateCallback = NOOP;
         this.#onAfterRefresh = NOOP;
         this.#afterInit = NOOP;
+        UnFreezeMobPageScroll();
+
+        if (this.#snapResetDebounce) {
+            clearTimeout(this.#snapResetDebounce);
+            this.#snapResetDebounce = null;
+        }
+
+        /** @type {HTMLElement} */ (this.#scroller).removeEventListener(
+            'mouseleave',
+            this.#unSubscribeMouseLeave
+        );
+
+        this.#unSubscribeMouseLeave = NOOP;
+
+        if (this.#syncArrow) {
+            /** @type {HTMLElement} */ (this.#screen).removeEventListener(
+                'keydown',
+                this.#eventKeyArrow
+            );
+
+            this.#eventKeyArrow = NOOP;
+        }
 
         if (this.#scopedEvent) {
             /** @type {HTMLElement} */ (this.#scroller)?.removeEventListener(
                 'wheel',
                 this.#scopedWhell
             );
+
             /** @type {HTMLElement} */ (this.#scroller)?.removeEventListener(
                 'mousemove',
                 this.#scopedTouchMove
             );
+
             /** @type {HTMLElement} */ (this.#scroller)?.removeEventListener(
                 'touchmove',
                 this.#scopedTouchMove
             );
+
+            this.#scopedTouchMove = NOOP;
+            this.#scopedWhell = NOOP;
         }
 
         MobCore.useFrameIndex(() => {
             MobCore.useNextTick(() => {
+                /** @type {HTMLElement} */ (this.#scroller).style.transform =
+                    '';
                 this.#scroller = null;
                 this.#screen = null;
             });

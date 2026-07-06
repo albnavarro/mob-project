@@ -37,6 +37,8 @@ import {
     handlePointerUp,
 } from './events/pointer-event/handle-pointer.js';
 import { LinkedList } from './data-set/linked-list/index.js';
+import { handleEscHandler } from './events/esc-handler/handle-esc.js';
+import { handleTabHandler } from './events/tab-handler/handle-tab.js';
 
 /**
  * MobStore initialization. The store accepts single properties or objects Each individual property can be initialized
@@ -753,6 +755,44 @@ function usePointerOut(callback = () => {}) {
 /**
  * @example
  *     ```javascript
+ *     const unsubscribe = MobCore.escHandler(() => {
+ *             // code
+ *         }
+ *     );
+ *
+ *     unsubscribe();
+ *
+ *     ```;
+ *
+ * @param {import('./events/esc-handler/type.js').EscHandlerCallback} callback - Callback function
+ * @returns {() => void}
+ */
+function useEscHandler(callback = () => {}) {
+    return handleEscHandler(callback);
+}
+
+/**
+ * @example
+ *     ```javascript
+ *     const unsubscribe = MobCore.escHandler(() => {
+ *             // code
+ *         }
+ *     );
+ *
+ *     unsubscribe();
+ *
+ *     ```;
+ *
+ * @param {import('./events/tab-handler/type.js').TabHandlerCallback} callback - Callback function
+ * @returns {() => void}
+ */
+function useTabHandler(callback = () => {}) {
+    return handleTabHandler(callback);
+}
+
+/**
+ * @example
+ *     ```javascript
  *     const unsubscribe = MobCore.usePointerLeave((event) => {
  *             // code
  *         }
@@ -815,6 +855,8 @@ export {
     useMouseDown,
     useMouseClick,
     useVisibilityChange,
+    useEscHandler,
+    useTabHandler,
     useResize,
     useCache,
     useLoad,
