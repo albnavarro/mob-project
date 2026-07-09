@@ -83,9 +83,9 @@ const getRadial = ({
         if (arrayOnStop.length > 0) {
             const { cleanArray } = getRadialArray(arrayOnStop, stagger);
             return cleanArray.flat();
-        } else {
-            return [];
         }
+
+        return [];
     })();
 
     const staggerArray = cleanCb.flat();

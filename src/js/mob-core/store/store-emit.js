@@ -105,10 +105,10 @@ const storeEmitAsync = async ({ instanceId, prop }) => {
         }
 
         return { success: true };
-    } else {
-        storeEmitWarning(prop, getLogStyle());
-        return { success: false };
     }
+
+    storeEmitWarning(prop, getLogStyle());
+    return { success: false };
 };
 
 /**

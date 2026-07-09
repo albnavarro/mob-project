@@ -1053,12 +1053,12 @@ export default class MobScroller {
                     endPosition === MobScrollerConstant.POSITION_RIGHT
                     ? -1
                     : 1;
-            } else {
-                return endPosition === MobScrollerConstant.POSITION_BOTTOM ||
-                    endPosition === MobScrollerConstant.POSITION_RIGHT
-                    ? 1
-                    : -1;
             }
+
+            return endPosition === MobScrollerConstant.POSITION_BOTTOM ||
+                endPosition === MobScrollerConstant.POSITION_RIGHT
+                ? 1
+                : -1;
         })();
 
         // Add/subtract with height or half value
@@ -1498,9 +1498,9 @@ export default class MobScroller {
         const valePerDirections = (() => {
             if (this.#reverse) {
                 return this.#invertSide ? maxVal - partialVal : partialVal;
-            } else {
-                return this.#invertSide ? partialVal : maxVal - partialVal;
             }
+
+            return this.#invertSide ? partialVal : maxVal - partialVal;
         })();
 
         /*
@@ -1814,7 +1814,7 @@ export default class MobScroller {
             }
 
             case MobScrollerConstant.PROP_OPACITY: {
-                el.style.opacity = `${value}`;
+                el.style.opacity = String(value);
                 break;
             }
 

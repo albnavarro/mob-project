@@ -51,9 +51,9 @@ const getValueInPx = ({
 
     if (invert) {
         return isFromTopLeft ? valueFromTop : valueFromBottom;
-    } else {
-        return isFromTopLeft ? valueFromBottom : valueFromTop;
     }
+
+    return isFromTopLeft ? valueFromBottom : valueFromTop;
 };
 
 /**
@@ -80,11 +80,11 @@ const getValueInVwVh = ({
         return isFromTopLeft
             ? scrollerHeight - screenUnit * (100 - endValInNumber) - startPoint
             : screenUnit * (100 - endValInNumber) - startPoint;
-    } else {
-        return isFromTopLeft
-            ? scrollerHeight - screenUnit * endValInNumber - startPoint
-            : screenUnit * endValInNumber - startPoint;
     }
+
+    return isFromTopLeft
+        ? scrollerHeight - screenUnit * endValInNumber - startPoint
+        : screenUnit * endValInNumber - startPoint;
 };
 
 /**

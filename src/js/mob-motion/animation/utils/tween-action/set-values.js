@@ -76,7 +76,7 @@ export const setRelative = (arr, relative) => {
 /**
  * @type {number}
  */
-const tweenSmallNumber = 0.000_01;
+const tweenSmallNumber = 0.00001;
 
 /**
  * Set toValue in relative mode, sum value from currentValue Used by classic tween

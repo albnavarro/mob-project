@@ -319,7 +319,7 @@ export const tweenConfig = {
         /** @type {number} */ amountOfChange,
         /** @type {number} */ duration
     ) => {
-        let s = 1.701_58;
+        let s = 1.70158;
         let p = 0;
         let a = amountOfChange;
         if (elapsed === 0) {
@@ -351,7 +351,7 @@ export const tweenConfig = {
         /** @type {number} */ amountOfChange,
         /** @type {number} */ duration
     ) => {
-        let s = 1.701_58;
+        let s = 1.70158;
         let p = 0;
         let a = amountOfChange;
         if (elapsed === 0) {
@@ -383,7 +383,7 @@ export const tweenConfig = {
         /** @type {number} */ amountOfChange,
         /** @type {number} */ duration
     ) => {
-        let s = 1.701_58;
+        let s = 1.70158;
         let p = 0;
         let a = amountOfChange;
         if (elapsed === 0) {
@@ -426,7 +426,7 @@ export const tweenConfig = {
         /** @type {number} */ initialValue,
         /** @type {number} */ amountOfChange,
         /** @type {number} */ duration,
-        s = 1.701_58
+        s = 1.70158
     ) => {
         return (
             amountOfChange *
@@ -441,7 +441,7 @@ export const tweenConfig = {
         /** @type {number} */ initialValue,
         /** @type {number} */ amountOfChange,
         /** @type {number} */ duration,
-        s = 1.701_58
+        s = 1.70158
     ) => {
         return (
             amountOfChange *
@@ -457,7 +457,7 @@ export const tweenConfig = {
         /** @type {number} */ initialValue,
         /** @type {number} */ amountOfChange,
         /** @type {number} */ duration,
-        s = 1.701_58
+        s = 1.70158
     ) => {
         if ((elapsed /= duration / 2) < 1) {
             return (
@@ -498,25 +498,23 @@ export const tweenConfig = {
     ) => {
         if ((elapsed /= duration) < 1 / 2.75) {
             return amountOfChange * (7.5625 * elapsed * elapsed) + initialValue;
-        } else if (elapsed < 2 / 2.75) {
+        }
+
+        if (elapsed < 2 / 2.75) {
             return (
                 amountOfChange *
                     (7.5625 * (elapsed -= 1.5 / 2.75) * elapsed + 0.75) +
                 initialValue
             );
-        } else if (elapsed < 2.5 / 2.75) {
-            return (
-                amountOfChange *
-                    (7.5625 * (elapsed -= 2.25 / 2.75) * elapsed + 0.9375) +
-                initialValue
-            );
-        } else {
-            return (
-                amountOfChange *
-                    (7.5625 * (elapsed -= 2.625 / 2.75) * elapsed + 0.984_375) +
-                initialValue
-            );
         }
+
+        return elapsed < 2.5 / 2.75
+            ? amountOfChange *
+                  (7.5625 * (elapsed -= 2.25 / 2.75) * elapsed + 0.9375) +
+                  initialValue
+            : amountOfChange *
+                  (7.5625 * (elapsed -= 2.625 / 2.75) * elapsed + 0.984375) +
+                  initialValue;
     },
     [easeReference.easeInOutBounce]: (
         /** @type {number} */ elapsed,
@@ -561,8 +559,8 @@ export const printEaseKey = () => {
 export const getTweenFn = (prop) => {
     if (Object.hasOwn(tweenConfig, prop)) {
         return tweenConfig[prop];
-    } else {
-        tweenEaseWarning(prop);
-        return tweenConfig[handleSetUp.get('tween').ease];
     }
+
+    tweenEaseWarning(prop);
+    return tweenConfig[handleSetUp.get('tween').ease];
 };

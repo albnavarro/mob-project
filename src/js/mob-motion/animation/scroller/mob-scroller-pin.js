@@ -452,7 +452,13 @@ export class MobScrollerPin {
             const style = getComputedStyle(/** @type {Element} */ (node));
 
             if (
-                Object.hasOwn(style, rule) &&
+                /**
+                 * CSSStyleDeclaration é un oggetto hgost speciale.
+                 *
+                 * - In firefix le propietá css sono esposte tramite prototype o meccanismo interni del motore.
+                 * - Object.hasOwn() in firefix puó fallire in questo caso.
+                 */
+                Reflect.has(style, rule) &&
                 !this.#nonRelevantRule.includes(style[rule])
             ) {
                 return { [rule]: style[rule] };
@@ -504,9 +510,9 @@ export class MobScrollerPin {
                     return value === 'fixed' || value === 'absolute'
                         ? true
                         : false;
-                } else {
-                    return true;
                 }
+
+                return true;
             })
             .includes(true);
     }
@@ -987,10 +993,10 @@ export class MobScrollerPin {
         ) {
             this.#afterPinCounter++;
             return;
-        } else {
-            this.#afterPinCounter = 0;
-            this.#justPinned = false;
         }
+
+        this.#afterPinCounter = 0;
+        this.#justPinned = false;
 
         const scrollDirection =
             this.#prevScroll > scrollTop

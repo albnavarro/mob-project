@@ -127,16 +127,18 @@ export const getRadialArray = (arr, stagger) => {
                   ) => {
                       if (index < y) {
                           return previous;
-                      } else if (index === y) {
-                          const merged = [...radialXY[index]];
-                          previous.push(merged);
-                          return previous;
+                      }
+
+                      if (index === y) {
+                          const mergedEqual = [...radialXY[index]];
+                          previous.push(mergedEqual);
                       } else {
                           const downRow = radialXY[y - (index - y)] ?? [];
-                          const merged = [...radialXY[index], ...downRow];
-                          previous.push(merged);
-                          return previous;
+                          const mergedLast = [...radialXY[index], ...downRow];
+                          previous.push(mergedLast);
                       }
+
+                      return previous;
                   },
                   []
               )
@@ -149,16 +151,18 @@ export const getRadialArray = (arr, stagger) => {
                       ) => {
                           if (index > y) {
                               return previous;
-                          } else if (index === y) {
-                              const merged = [...radialXY[index]];
-                              previous.push(merged);
-                              return previous;
+                          }
+
+                          if (index === y) {
+                              const mergedEqual = [...radialXY[index]];
+                              previous.push(mergedEqual);
                           } else {
                               const upRow = radialXY[y + (y - index)] ?? [];
-                              const merged = [...radialXY[index], ...upRow];
-                              previous.push(merged);
-                              return previous;
+                              const mergedLast = [...radialXY[index], ...upRow];
+                              previous.push(mergedLast);
                           }
+
+                          return previous;
                       },
                       []
                   )

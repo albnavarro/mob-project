@@ -948,12 +948,12 @@ export const scrollerRangeIsValid = (value, type) => {
                 ? // @ts-ignore
                   10 - value
                 : 10 - handleSetUp.get('parallax').defaultRange;
-        } else {
-            const isValid = MobCore.checkType(String, value);
-            if (!isValid && value) scrollerRangeStringWarning(value);
-
-            return isValid ? value : '0px';
         }
+
+        const isValid = MobCore.checkType(String, value);
+        if (!isValid && value) scrollerRangeStringWarning(value);
+
+        return isValid ? value : '0px';
     };
 
     // @ts-ignore

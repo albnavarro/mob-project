@@ -701,11 +701,11 @@ export class MobSmoothScroller {
             const distanceToTop = focusedRect.top - screenRect.top;
             const distanceToBottom = screenRect.bottom - focusedRect.bottom;
             return distanceToTop < threshold || distanceToBottom < threshold;
-        } else {
-            const distanceToLeft = focusedRect.left - screenRect.left;
-            const distanceToRight = screenRect.right - focusedRect.right;
-            return distanceToLeft < threshold || distanceToRight < threshold;
         }
+
+        const distanceToLeft = focusedRect.left - screenRect.left;
+        const distanceToRight = screenRect.right - focusedRect.right;
+        return distanceToLeft < threshold || distanceToRight < threshold;
     }
 
     /**

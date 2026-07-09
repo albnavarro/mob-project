@@ -19,9 +19,9 @@ export const getMarkerWrapperStyle = ({ marker, direction, invertSide }) => {
         return invertSide
             ? { borderBottom: borderStyle }
             : { borderTop: borderStyle };
-    } else {
-        return invertSide
-            ? { borderRight: borderStyle }
-            : { borderLeft: borderStyle };
     }
+
+    return invertSide
+        ? { borderRight: borderStyle }
+        : { borderLeft: borderStyle };
 };

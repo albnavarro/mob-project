@@ -237,9 +237,9 @@ const getItemsByRow = (arrayDefault, stagger, chunckSizeCol) => {
 
         // @ts-ignore
         return [...colToRowArray].flat();
-    } else {
-        return arrayDefault;
     }
+
+    return arrayDefault;
 };
 
 /**

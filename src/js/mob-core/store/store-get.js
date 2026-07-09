@@ -49,10 +49,10 @@ const storeGetProp = ({ instanceId, prop }) => {
 
     if (store && Object.hasOwn(store, prop)) {
         return store[prop];
-    } else {
-        storeGetPropWarning(prop, getLogStyle());
-        return;
     }
+
+    storeGetPropWarning(prop, getLogStyle());
+    return;
 };
 
 /**
