@@ -79,6 +79,16 @@ function handleMouse(eventType) {
         /** @type {EventTarget | null} */
         const target = event.target;
 
+        /**
+         * PreventDefault() deve essere eseguito in maniera sincrona.
+         *
+         * - Se ci sono consumer che usano funzioni asincrone all'interno della callback, preventDefault() deve essere
+         *   eseguito durante il dispatch sincrono dell'evento, non in codice asincrono.
+         * - Controlliamo se preventDefault() viene chiamato e lo eseguiamo in maniera sincrona dopo l'esecuzione delle
+         *   callback.
+         */
+        let shouldPrevent = false;
+
         // Prepare data to callback
         const mouseData = {
             page: {
@@ -93,12 +103,12 @@ function handleMouse(eventType) {
             type,
 
             /**
-             * Prevents the default action of the event. When usePassive is true, the browser ignores preventDefault()
-             * on passive listeners, so we provide a no-op function to avoid runtime errors and unnecessary calls. When
-             * usePassive is false, the native preventDefault() is used.
+             * Signals the intention to prevent the default action of the event. When usePassive is true, this is a
+             * no-op (passive listeners cannot prevent default). When usePassive is false, the native preventDefault()
+             * is called synchronously after all callbacks have executed.
              */
             preventDefault: () =>
-                usePassive ? () => {} : event.preventDefault(),
+                usePassive ? () => {} : (shouldPrevent = true),
             spinX: 0,
             spinY: 0,
             pixelX: 0,
@@ -119,6 +129,10 @@ function handleMouse(eventType) {
 
         for (const value of callbacks.values()) {
             value(mouseData);
+        }
+
+        if (shouldPrevent) {
+            event.preventDefault();
         }
     }
 

@@ -147,7 +147,6 @@ export const MobCreateStaggers = (data) => {
     const items = staggerItemsIsValid(data?.items);
     const stagger = getStaggerFromProps(data);
     const duration = durationIsValid(data?.duration);
-    const eachProportion = 10;
 
     /**
      * In createStagger each must be > 0
@@ -180,6 +179,8 @@ export const MobCreateStaggers = (data) => {
         staggerIsOutOfRangeWarning(items.length);
         each = 1;
     }
+
+    const eachProportion = 10;
 
     /**
      * In classic mode each must be between 1 and eachProportion

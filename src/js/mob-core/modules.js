@@ -39,6 +39,7 @@ import {
 import { LinkedList } from './data-set/linked-list/index.js';
 import { handleEscHandler } from './events/esc-handler/handle-esc.js';
 import { handleTabHandler } from './events/tab-handler/handle-tab.js';
+import { handleNativeScrollEnd } from './events/scroll-utils/handle-scroll-native-end.js';
 
 /**
  * MobStore initialization. The store accepts single properties or objects Each individual property can be initialized
@@ -658,6 +659,30 @@ function useScrollEnd(callback = () => {}) {
 }
 
 /**
+ * Execute a callback at the end of the scroll
+ *
+ * @example
+ *     ```javascript
+ *     const unsubscribe = MobCore.useNativeScrollEnd(({ scrollY }) => {
+ *         // code
+ *     });
+ *
+ *     unsubscribe()
+ *
+ *     ```;
+ *
+ * @param {import('./events/scroll-utils/type.js').HandleScrollCallback<
+ *     import('./events/scroll-utils/type.js').HandleScrollUtils
+ * >} callback
+ *   - Callback function
+ *
+ * @returns {() => void}
+ */
+function useNativeScrollEnd(callback = () => {}) {
+    return handleNativeScrollEnd(callback);
+}
+
+/**
  * @example
  *     ```javascript
  *     const unsubscribe = MobCore.usePointerOver((event) => {
@@ -842,6 +867,7 @@ export {
     usePointerDown,
     usePointerOver,
     useScrollEnd,
+    useNativeScrollEnd,
     useScrollStart,
     useScrollThrottle,
     useScrollImmediate,

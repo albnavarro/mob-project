@@ -547,7 +547,6 @@ export default class MobAsyncTimeline {
                      * session.
                      */
                     this.#addAsyncIsActive = true;
-                    const sessionId = this.#sessionId;
 
                     /*
                      * Prevent fire the same last addAsync
@@ -557,6 +556,8 @@ export default class MobAsyncTimeline {
                     if (prevActionIsCurrent) {
                         return new Promise((res) => res({ resolve: true }));
                     }
+
+                    const sessionId = this.#sessionId;
 
                     return new Promise((res, reject) => {
                         if (isImmediate) {
@@ -1458,11 +1459,6 @@ export default class MobAsyncTimeline {
      * @type {import('./type.js').AsyncTimelineAdd}
      */
     add(fn = NOOP) {
-        const callback = functionIsValidAndReturnDefault(
-            fn,
-            () => {},
-            'timeline add function'
-        );
         /**
          * Can't add this interpolation inside a group. groupId props is not null when active.
          */
@@ -1472,6 +1468,11 @@ export default class MobAsyncTimeline {
         }
 
         this.#currentTweenCounter++;
+        const callback = functionIsValidAndReturnDefault(
+            fn,
+            () => {},
+            'timeline add function'
+        );
 
         this.#addAction({
             ...this.#defaultObj,
@@ -1488,8 +1489,6 @@ export default class MobAsyncTimeline {
      * @type {import('./type.js').AsyncTimelineAddAsync}
      */
     addAsync(fn) {
-        const callback = addAsyncFunctionIsValid(fn);
-
         /**
          * Can't add this interpolation inside a group. groupId props is not null when active.
          */
@@ -1498,6 +1497,7 @@ export default class MobAsyncTimeline {
             return this;
         }
 
+        const callback = addAsyncFunctionIsValid(fn);
         this.#currentTweenCounter++;
 
         this.#addAction({

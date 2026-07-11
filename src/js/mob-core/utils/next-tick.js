@@ -15,7 +15,7 @@ export const useNextLoop = (fn) => {
             }
 
             setTimeOutQueque.clear();
-        });
+        }, 0);
     }
 };
 

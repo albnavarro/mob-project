@@ -24,19 +24,6 @@ let isRunning = false;
 /** @type {boolean} */
 let overflow = false;
 
-/**
- * Init tween
- */
-tween.subscribe(({ val }) => {
-    window.scrollTo({
-        top: val,
-        left: 0,
-        behavior: 'auto',
-    });
-
-    UpdateMobPageScroll();
-});
-
 /** @type{() => void} */
 const onComplete = () => {
     if (overflow) document.body.style.overflow = '';
@@ -53,24 +40,37 @@ const stopTween = () => {
 };
 
 /**
- * Stop scrolling on mouseWheel, MouseDown, TouchStart.
- */
-MobCore.useMouseWheel(() => {
-    stopTween();
-});
-
-MobCore.useMouseDown(() => {
-    stopTween();
-});
-
-MobCore.useTouchStart(() => {
-    stopTween();
-});
-
-/**
  * Scroll body to values or element.
  */
 export const MobBodyScroll = (() => {
+    /**
+     * Init tween
+     */
+    tween.subscribe(({ val }) => {
+        window.scrollTo({
+            top: val,
+            left: 0,
+            behavior: 'auto',
+        });
+
+        UpdateMobPageScroll();
+    });
+
+    /**
+     * Stop scrolling on mouseWheel, MouseDown, TouchStart.
+     */
+    MobCore.useMouseWheel(() => {
+        stopTween();
+    });
+
+    MobCore.useMouseDown(() => {
+        stopTween();
+    });
+
+    MobCore.useTouchStart(() => {
+        stopTween();
+    });
+
     /**
      * @example
      *     ```javascript
@@ -145,7 +145,7 @@ export const MobBodyScroll = (() => {
                 .goFromTo(
                     { val: window.scrollY },
                     { val: targetParsed },
-                    { duration }
+                    { duration: Math.max(1, duration) }
                 )
                 .then(() => {
                     onComplete();

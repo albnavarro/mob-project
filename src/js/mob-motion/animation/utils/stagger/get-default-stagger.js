@@ -57,10 +57,6 @@ export const getRandomChoice = (arrayChunk, each, index) => {
  */
 const getStaggerIndex = (index, arraylenght, stagger, randomChoice = []) => {
     const { from, each } = stagger;
-    /*
-    Get stagger each by fps
-    */
-    const eachByFps = getEachByFps(each);
 
     if (from === STAGGER_RANDOM) {
         return {
@@ -68,6 +64,11 @@ const getStaggerIndex = (index, arraylenght, stagger, randomChoice = []) => {
             frame: (() => randomChoice[getRandomInt(randomChoice.length)])(),
         };
     }
+
+    /*
+    Get stagger each by fps
+    */
+    const eachByFps = getEachByFps(each);
 
     if (from === STAGGER_START) {
         return {
@@ -314,10 +315,12 @@ export const getDefaultStagger = ({
     // Set other chunk, copy from first [0]
     for (const chunkItem of chunked) {
         for (const [i, item] of chunkItem.entries()) {
-            if (item) {
-                item.index = chunked[0][i].index;
-                item.frame = chunked[0][i].frame;
+            if (!item) {
+                continue;
             }
+
+            item.index = chunked[0][i].index;
+            item.frame = chunked[0][i].frame;
         }
     }
 

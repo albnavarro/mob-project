@@ -170,9 +170,9 @@ export class MobMouseParallax {
               };
 
         const x = this.#clientCoord.x;
-        const y = this.#centerToViewoport
-            ? this.#clientCoord.y
-            : this.#pageCoord.y;
+        const { y } = this.#centerToViewoport
+            ? this.#clientCoord
+            : this.#pageCoord;
 
         const { ax, ay } = this.#centerToViewoport
             ? {

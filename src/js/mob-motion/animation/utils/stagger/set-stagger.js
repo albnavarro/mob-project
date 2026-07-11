@@ -94,10 +94,12 @@ const getRadial = ({
     // Update onComplete cb with right stagger
     for (const [i, item] of staggerArray.entries()) {
         // If there an OnCompelte callback
-        if (endstaggerArray.length > 0) {
-            endstaggerArray[i].index = item.index;
-            endstaggerArray[i].frame = item.frame;
+        if (endstaggerArray.length === 0) {
+            continue;
         }
+
+        endstaggerArray[i].index = item.index;
+        endstaggerArray[i].frame = item.frame;
     }
 
     return {

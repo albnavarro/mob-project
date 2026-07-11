@@ -94,6 +94,17 @@ export class MobSmoothScroller {
     #dragEnable = false;
 
     /**
+     * Track the is-whelling state to touch the DOM only once per gesture.
+     *
+     * - Safari invalidates style on every classList.add() call, even when the token is already present.
+     * - `#addWhellingClass()` runs on every wheel event, so without this guard the class toggle would trigger a style
+     *   recalc per frame ( freeze on big scrollers ).
+     *
+     * @type {boolean}
+     */
+    #isWhelling = false;
+
+    /**
      * @type {number}
      */
     #prevTouchVal = 0;
@@ -650,8 +661,9 @@ export class MobSmoothScroller {
      * @type {() => void}
      */
     #removeWhellingClass() {
-        if (!this.#scroller) return;
+        if (!this.#scroller || !this.#isWhelling) return;
 
+        this.#isWhelling = false;
         // @ts-ignore
         this.#scroller.classList.remove('is-whelling');
     }
@@ -660,8 +672,9 @@ export class MobSmoothScroller {
      * @type {() => void}
      */
     #addWhellingClass() {
-        if (!this.#scroller) return;
+        if (!this.#scroller || this.#isWhelling) return;
 
+        this.#isWhelling = true;
         // @ts-ignore
         this.#scroller.classList.add('is-whelling');
     }
@@ -693,9 +706,9 @@ export class MobSmoothScroller {
             : focusedElement.clientWidth;
         const screenSize = isVertical ? screenRect.height : screenRect.width;
         const safetyMargin = Math.ceil(elementSize * 0.1);
-        const threshold = elementSize + safetyMargin;
 
         if (elementSize > screenSize) return true;
+        const threshold = elementSize + safetyMargin;
 
         if (isVertical) {
             const distanceToTop = focusedRect.top - screenRect.top;
@@ -1786,6 +1799,7 @@ export class MobSmoothScroller {
      */
     destroy() {
         this.#isDestroyed = true;
+        this.#removeWhellingClass();
         this.#removeScrolerStyle();
         this.#unSubscribeResize();
         this.#unSubscribeScrollStart();

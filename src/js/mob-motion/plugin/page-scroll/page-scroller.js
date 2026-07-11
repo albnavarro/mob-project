@@ -5,7 +5,7 @@ import { MobCore } from '../../../mob-core';
 let windowInnerheight = window.innerHeight;
 
 /** @type {number} */
-let windowOffsetheight = document.body.offsetHeight;
+let windowOffsetheight = document.documentElement.scrollHeight;
 
 let isActive = false;
 
@@ -33,37 +33,44 @@ let update = () => {};
 let rootElementToObserve;
 
 /**
+ * @type {boolean}
+ */
+let isWhelling = false;
+
+/**
  * UTILS:
- *
- * - Add is-whelling class to body when lerp is in movement.
  */
 const removeWhellingClass = () => {
+    if (!isWhelling) return;
+
+    isWhelling = false;
     document.body.classList.remove('is-whelling');
 };
 
 /**
  * UTILS:
- *
- * - Remove is-whelling class to body when lerp stop.
  */
 const addWhellingClass = () => {
+    if (isWhelling) return;
+
+    isWhelling = true;
     document.body.classList.add('is-whelling');
 };
 
-/**
- * Necessary.
- *
- * Enable the possibility to use preventDefault in global wheel event.
- *
- * - ByPass native wheel scroll.
- * - Used by unsubscribeWhellPrevent ( global window event ).
- */
-MobMotionCore.setDefault({
-    usePassive: false,
-});
-
 /** @type {import('./type').MobPageScroller} */
 const MobPageScroller = ({ velocity, rootElement }) => {
+    /**
+     * Necessary.
+     *
+     * Enable the possibility to use preventDefault in global wheel event.
+     *
+     * - ByPass native wheel scroll.
+     * - Used by the wheel handler ( global window event ) to preventDefault.
+     */
+    MobMotionCore.setDefault({
+        usePassive: false,
+    });
+
     /**
      * Classic lerp tween.
      */
@@ -101,9 +108,16 @@ const MobPageScroller = ({ velocity, rootElement }) => {
      * - Prepare value to move lerp instance.
      */
     const unsubscribeMouseWheel = MobCore.useMouseWheel((event) => {
+        /**
+         * Bypass native wheel scroll, scroll is controlled by lerp.
+         *
+         * - Respect `usePrevent` so `disablePreventScroll()` can restore native scroll.
+         * - Keep preventing even while freezed to block native wheel scroll.
+         */
+        if (usePrevent) event.preventDefault();
+
         if (isFreezed) return;
 
-        event.preventDefault();
         useNativeScroll = false;
         addWhellingClass();
 
@@ -111,23 +125,12 @@ const MobPageScroller = ({ velocity, rootElement }) => {
         const currentValue = MobMotionCore.clamp(
             spinY * velocity + lastScrollValue,
             0,
-            windowOffsetheight - windowInnerheight
+            Math.max(0, windowOffsetheight - windowInnerheight)
         );
 
         lastScrollValue = currentValue;
         lerp.goTo({ scrollValue: currentValue }).catch(() => {});
     });
-
-    /**
-     * Disable native scroll on well event.
-     *
-     * - Scroll si controlled by lerp.
-     */
-    const unsubscribeWhellPrevent = MobCore.useMouseWheel(
-        ({ preventDefault }) => {
-            if (usePrevent) preventDefault();
-        }
-    );
 
     /**
      * Remove wheeling class on end wheel with debounce.
@@ -139,9 +142,17 @@ const MobPageScroller = ({ velocity, rootElement }) => {
     );
 
     /**
-     * Update lerp on scrollEnd eg. when search something in page
+     * Update lerp on scrollEnd eg. when search something in page.
+     *
+     * - `useScrollEnd` is a debounced scroll listener ( 200ms ), not the native scrollend event.
+     * - While the lerp is driving the scroll it emits scroll events on every frame; on Safari these can be
+     *   coalesced/delayed enough to let the debounce fire mid-gesture, and `setImmediate` would then stop the lerp
+     *   before it reaches its target ( freeze ).
+     * - Only resync when the scroll comes from outside ( lerp idle ): eg. find in page, anchor jump.
      */
     const unsubsribeScrollEnd = MobCore.useScrollEnd(() => {
+        if (lerp.isActive()) return;
+
         const value = window.scrollY;
         lastScrollValue = value;
         lerp.setImmediate({ scrollValue: value });
@@ -196,7 +207,7 @@ const MobPageScroller = ({ velocity, rootElement }) => {
         lerp.setImmediate({ scrollValue: window.scrollY });
         lastScrollValue = window.scrollY;
         windowInnerheight = window.innerHeight;
-        windowOffsetheight = document.body.offsetHeight;
+        windowOffsetheight = document.documentElement.scrollHeight;
     });
 
     resizeObserver.observe(rootElement);
@@ -207,6 +218,7 @@ const MobPageScroller = ({ velocity, rootElement }) => {
             lastScrollValue = 0;
             useNativeScroll = true;
             isFreezed = false;
+            removeWhellingClass();
 
             /**
              * Disconnect resizeObserver.
@@ -230,7 +242,6 @@ const MobPageScroller = ({ velocity, rootElement }) => {
             unsubscribeMouseWheel();
             unsubscribePointerDown();
             unsubscribeDebounceWheel();
-            unsubscribeWhellPrevent();
             destroy = () => {};
             stop = () => {};
             update = () => {};
@@ -256,7 +267,7 @@ export const InitMobPageScroll = ({
     isActive = true;
     isFreezed = false;
     windowInnerheight = window.innerHeight;
-    windowOffsetheight = document.body.offsetHeight;
+    windowOffsetheight = document.documentElement.scrollHeight;
     usePrevent = true;
     useNativeScroll = false;
 

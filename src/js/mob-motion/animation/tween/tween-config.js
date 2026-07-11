@@ -1,3 +1,5 @@
+/* eslint-disable unicorn/no-declarations-before-early-exit */
+
 // https://github.com/bameyrick/js-easing-s/blob/master/src/index.ts
 import { handleSetUp } from '../../setup.js';
 import { easeReference } from '../utils/set-up/set-up-validation.js';

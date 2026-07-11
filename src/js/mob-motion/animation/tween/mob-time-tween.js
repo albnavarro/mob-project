@@ -315,10 +315,12 @@ export default class MobTimeTween {
                  * End of animation Set fromValue with ended value At the next call fromValue become the start value
                  */
                 for (const item of this.#values) {
-                    if (item.shouldUpdate) {
-                        item.toValue = item.currentValue;
-                        item.fromValue = item.currentValue;
+                    if (!item.shouldUpdate) {
+                        continue;
                     }
+
+                    item.toValue = item.currentValue;
+                    item.fromValue = item.currentValue;
                 }
 
                 /**

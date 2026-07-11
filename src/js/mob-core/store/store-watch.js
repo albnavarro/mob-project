@@ -9,7 +9,6 @@ import { storeWatchWarning } from './store-warining';
  */
 const subscribeWatch = ({ state, prop, callback, wait }) => {
     const { store, watcherByProp, watcherMetadata } = state;
-    const logStyle = getLogStyle();
 
     if (!store)
         return {
@@ -18,7 +17,7 @@ const subscribeWatch = ({ state, prop, callback, wait }) => {
         };
 
     if (!Object.hasOwn(store, prop)) {
-        storeWatchWarning(prop, logStyle);
+        storeWatchWarning(prop, getLogStyle());
 
         return {
             state: undefined,

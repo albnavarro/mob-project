@@ -10,11 +10,6 @@ import { defaultTimestep, getTime } from './time.js';
 import { useNextLoop } from '../../utils/next-tick.js';
 
 /**
- * Calculate a precise fps
- */
-loadFps();
-
-/**
  * 10000 is maximum stagger frame delay
  */
 const currentFrameLimit = 10_000_000;
@@ -169,20 +164,6 @@ const performFrameCounterReset = () => {
     handleFrameIndex.updateKeys(currentFrameLimit);
     handleCache.updateFrameId(currentFrameLimit);
 };
-
-/**
- * Stop timer when user change tab
- */
-handleVisibilityChange(({ visibilityState }) => {
-    isStopped = visibilityState !== 'visible';
-});
-
-catchAnimationReject();
-
-// Call new requestAnimationFrame on event emit
-eventStore.watch('requestFrame', () => {
-    initFrame();
-});
 
 /**
  * Next tick function
@@ -391,6 +372,25 @@ const initFrame = () => {
  * Execute a callBack within the first available request animation frame. Use this method to modify elements of the DOM
  */
 export const handleFrame = (() => {
+    /**
+     * Calculate a precise fps
+     */
+    loadFps();
+
+    /**
+     * Stop timer when user change tab
+     */
+    handleVisibilityChange(({ visibilityState }) => {
+        isStopped = visibilityState !== 'visible';
+    });
+
+    catchAnimationReject();
+
+    // Call new requestAnimationFrame on event emit
+    eventStore.watch('requestFrame', () => {
+        initFrame();
+    });
+
     /**
      * Get current fps
      *

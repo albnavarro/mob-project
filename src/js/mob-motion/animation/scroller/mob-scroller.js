@@ -1344,12 +1344,12 @@ export default class MobScroller {
         )
             return;
 
+        // Maybe a destroy method is callad during animation, so check if exist.
+        if (!this.#motion) return;
+
         // First time render with no easing
         const action =
             this.#firstTime && !this.#animateAtStart ? 'set' : 'goTo';
-
-        // Maybe a destroy method is callad during animation, so check if exist.
-        if (!this.#motion) return;
 
         this.#motion
             [action]({ val: this.#endValue }, this.#motionParameters)

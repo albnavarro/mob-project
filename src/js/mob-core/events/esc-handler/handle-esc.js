@@ -29,10 +29,30 @@ function handler(event) {
     if (eventKey !== 'Escape') return;
 
     /**
+     * PreventDefault() deve essere eseguito in maniera sincrona.
+     *
+     * - Se ci sono consumer che usano funzioni asincrone all'interno della callback, preventDefault() deve essere
+     *   eseguito durante il dispatch sincrono dell'evento, non in codice asincrono.
+     * - Controlliamo se preventDefault() viene chiamato e lo eseguiamo in maniera sincrona dopo l'esecuzione delle
+     *   callback.
+     */
+    let shouldPrevent = false;
+
+    /**
      * Check if browser lost frame. If true skip.
      */
     for (const value of callbacks.values()) {
-        value({ preventDefault: () => event.preventDefault() });
+        const control = {
+            preventDefault() {
+                shouldPrevent = true;
+            },
+        };
+
+        value(control);
+    }
+
+    if (shouldPrevent) {
+        event.preventDefault();
     }
 }
 

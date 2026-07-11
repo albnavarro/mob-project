@@ -24,7 +24,7 @@ export const throttle = (func, limit) => {
             clearTimeout(lastFunc);
             lastFunc = setTimeout(
                 function () {
-                    if (!(getTime() - lastRan >= limit)) {
+                    if (getTime() - lastRan < limit) {
                         return;
                     }
 

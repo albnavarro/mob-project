@@ -303,42 +303,25 @@ export const getEndPoint = (
      */
     return unitMisure === MobScrollerConstant.PX
         ? {
-              value: invertSide
-                  ? getValueInPx({
-                        invert: true,
-                        endValInNumber,
-                        scrollerHeight,
-                        startPoint,
-                        isFromTopLeft,
-                    })
-                  : getValueInPx({
-                        invert: false,
-                        endValInNumber,
-                        scrollerHeight,
-                        startPoint,
-                        isFromTopLeft,
-                    }),
+              value: getValueInPx({
+                  invert: invertSide,
+                  endValInNumber,
+                  scrollerHeight,
+                  startPoint,
+                  isFromTopLeft,
+              }),
               additionalVal,
               position: positionFromConstant,
           }
         : {
-              value: invertSide
-                  ? getValueInVwVh({
-                        invert: true,
-                        scrollerHeight,
-                        screenUnit,
-                        endValInNumber,
-                        startPoint,
-                        isFromTopLeft,
-                    })
-                  : getValueInVwVh({
-                        invert: false,
-                        scrollerHeight,
-                        screenUnit,
-                        endValInNumber,
-                        startPoint,
-                        isFromTopLeft,
-                    }),
+              value: getValueInVwVh({
+                  invert: invertSide,
+                  scrollerHeight,
+                  screenUnit,
+                  endValInNumber,
+                  startPoint,
+                  isFromTopLeft,
+              }),
               additionalVal,
               position: positionFromConstant,
           };
