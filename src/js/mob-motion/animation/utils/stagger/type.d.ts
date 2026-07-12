@@ -27,8 +27,8 @@ export interface StaggerObject {
         | 'center'
         | 'edges'
         | 'random'
-        | { x: number; y: number }
-        | number;
+        | number
+        | { x: number; y: number };
 
     /**
      * Grid object

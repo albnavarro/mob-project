@@ -38,14 +38,14 @@ const shouldFreeze = (value) => {
     if (!checkType(Object, value)) return false;
 
     /**
-     * NON congelare Map e Set - l'utente deve poterli usare con .set/.get e poi chiamare emit manualmente
+     * NON congelare Map e Set e funzionr
+     *
+     * - L'utente deve poterli usare con .set/.get e poi chiamare emit manualmente
+     * - Per maggior leggibilitá disabilitimo in questo caso la regola `unicorn/prefer-boolean-return`
      */
     if (checkType(Map, value)) return false;
     if (checkType(Set, value)) return false;
-
-    /**
-     * Non congelare funzioni
-     */
+    // eslint-disable-next-line unicorn/prefer-boolean-return
     if (checkType(Function, value)) return false;
 
     /**

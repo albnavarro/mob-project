@@ -118,9 +118,14 @@ export const detectViewPortInterception = ({
 export const getStartEndValue = (values, direction) => {
     /**
      * Get number value if exist, check values array to find a item with almost 1 number ad get it
+     *
+     * - Disable `prefer-number-coercion`, value should be number + string.
      */
     const numberInString = values.find((item) => {
-        return [...item].some((c) => !Number.isNaN(Number.parseFloat(c)));
+        return [...item].some(
+            // eslint-disable-next-line unicorn/prefer-number-coercion
+            (current) => !Number.isNaN(Number.parseFloat(current))
+        );
     });
 
     /**
@@ -222,10 +227,13 @@ export const getStartPoint = (screenUnit, data, direction) => {
     );
 
     /**
+     * - Disable `prefer-number-coercion`, value should be number + string.
      * - "-100px" -> -100
      * - ".5vh" -> 0.5
      * - " 50 px" -> 50
      */
+
+    // eslint-disable-next-line unicorn/prefer-number-coercion
     const val = Number.parseFloat(String(numberVal));
     const startValInNumber = Number.isNaN(val) ? 0 : val;
 
@@ -279,10 +287,13 @@ export const getEndPoint = (
     );
 
     /**
+     * - Disable `prefer-number-coercion`, value should be number + string.
      * - "-100px" -> -100
      * - ".5vh" -> 0.5
      * - " 50 px" -> 50
      */
+
+    // eslint-disable-next-line unicorn/prefer-number-coercion
     const val = Number.parseFloat(String(numberVal));
     const endValInNumber = Number.isNaN(val) ? 0 : val;
 

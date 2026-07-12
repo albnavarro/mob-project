@@ -11,7 +11,7 @@ export const getValueObj = (arr, key) => {
             const value = item[key];
             return [
                 item['prop'],
-                typeof value === 'number' ? value : Number.parseFloat(value),
+                typeof value === 'number' ? value : Number(value),
             ];
         })
     );
@@ -30,7 +30,7 @@ export const getValueObjToNative = (arr) => {
         .map((item) => {
             return item.toIsFn
                 ? { [item.prop]: item.toFn }
-                : { [item.prop]: Number.parseFloat(item.toValue) };
+                : { [item.prop]: Number(item.toValue) };
         })
         .reduce((p, c) => ({ ...p, ...c }), {});
 };
@@ -48,7 +48,7 @@ export const getValueObjFromNative = (arr) => {
         .map((item) => {
             return item.fromIsFn
                 ? { [item.prop]: item.fromFn }
-                : { [item.prop]: Number.parseFloat(item.fromValue) };
+                : { [item.prop]: Number(item.fromValue) };
         })
         .reduce((p, c) => ({ ...p, ...c }), {});
 };

@@ -941,9 +941,7 @@ export default class MobScroller {
     #calcRangeAndUnitMiusure() {
         if (this.#dynamicRange) {
             const range = this.#dynamicRange();
-            this.#numericRange = Number.isNaN(range)
-                ? 0
-                : Number.parseFloat(range);
+            this.#numericRange = Number.isNaN(range) ? 0 : range;
             this.#unitMisure = MobScrollerConstant.PX;
         } else {
             const str = String(this.#range);
@@ -959,12 +957,14 @@ export default class MobScroller {
             );
 
             /**
-             * Extract number forms string
-             *
+             * - Disable `prefer-number-coercion`, value should be number + string.
+             * - Extract number forms string
              * - "-100px" -> -100
              * - ".5vh" -> 0.5
              * - " 50 px" -> 50
              */
+
+            // eslint-disable-next-line unicorn/prefer-number-coercion
             const value = Number.parseFloat(str);
             this.#numericRange = Number.isNaN(value) ? 0 : value;
 

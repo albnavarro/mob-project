@@ -7,29 +7,16 @@ import { MobCore } from '../../../mob-core';
  * @returns {number}
  */
 export const getRoundedValue = (x) => {
-    if (MobCore.checkType(Number, x)) {
+    /**
+     * Se è già un numero, arrotonda direttamente
+     */
+    if (MobCore.checkType(Number, x))
         return Math.round(x * 10_000) / 10_000 || 0;
-    }
 
-    if (Math.abs(x) < 1) {
-        const e = Number.parseInt(x.toString().split('e-', 2)[1]);
-        if (e) {
-            x *= Math.pow(10, e - 1);
-            x =
-                '0.' +
-                Array.from({ length: e }).join('0') +
-                x.toString().slice(2);
-        }
-    } else {
-        let e = Number.parseInt(x.toString().split('+', 2)[1]);
-        if (e > 20) {
-            e -= 20;
-            x /= Math.pow(10, e);
-            x += Array.from({ length: e + 1 }).join('0');
-        }
-    }
-
-    return Number.parseFloat(Number.parseFloat(x).toFixed(4));
+    /**
+     * Fallback: Number gestisce nativamente stringhe numeriche e e-notation
+     */
+    return Math.round(Number(x) * 10_000) / 10_000 || 0;
 };
 
 /**
