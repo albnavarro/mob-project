@@ -338,7 +338,9 @@ export class MobScrollerPin {
 
     #resetSpring() {
         if (this.#pin && this.#spring)
-            this.#spring.set({ collision: 0, verticalGap: 0 }).catch(() => {});
+            void this.#spring
+                .set({ collision: 0, verticalGap: 0 })
+                .catch(() => {});
     }
 
     #createPin() {
@@ -598,7 +600,7 @@ export class MobScrollerPin {
         });
 
         if (this.#animatePin && !this.#firstTime && this.#pin && this.#spring) {
-            this.#spring
+            void this.#spring
                 .goFrom({ collision: gap })
                 .then(() => {
                     this.#resetPinTransform();

@@ -82,7 +82,7 @@ export default class MobLerp {
     #isRunning;
 
     /**
-     * @type{((value:any) => void)|undefined }
+     * @type{(() => void)|undefined }
      */
     #currentResolve;
 
@@ -303,7 +303,7 @@ export default class MobLerp {
                 /**
                  * On complete
                  */
-                this.#currentResolve?.(true);
+                this.#currentResolve?.();
                 this.#currentPromise = undefined;
                 this.#currentReject = undefined;
                 this.#currentResolve = undefined;
@@ -415,8 +415,8 @@ export default class MobLerp {
     }
 
     /**
-     * @param {(arg0: any) => void} resolve
-     * @param {(value: any) => void} reject
+     * @param {() => void} resolve
+     * @param {() => void} reject
      * @returns {Promise<any>}
      */
     async #startRaf(resolve, reject) {
@@ -457,7 +457,7 @@ export default class MobLerp {
     /**
      * @type {import('../../utils/type.js').DoAction<import('./type.js').LerpActions>} obj To Values
      */
-    #doAction(newObjectparsed, newObjectRaw, spacialProps = {}) {
+    async #doAction(newObjectparsed, newObjectRaw, spacialProps = {}) {
         this.#values = mergeArray(newObjectparsed, this.#values);
 
         const { reverse, immediate } = this.#mergeProps(spacialProps ?? {});
@@ -479,7 +479,7 @@ export default class MobLerp {
         if (valueIsBooleanAndTrue(immediate, 'immediate ')) {
             if (this.#isRunning) this.stop({ updateValues: false });
             this.#values = setFromCurrentByTo(this.#values);
-            return Promise.resolve();
+            return;
         }
 
         /**
@@ -498,9 +498,15 @@ export default class MobLerp {
             });
         }
 
-        return shouldInitializeRAF && this.#currentPromise
-            ? this.#currentPromise
-            : Promise.reject(MobCore.ANIMATION_STOP_REJECT).catch(() => {});
+        if (shouldInitializeRAF && this.#currentPromise) {
+            return this.#currentPromise;
+        }
+
+        try {
+            await Promise.reject(MobCore.ANIMATION_STOP_REJECT);
+        } catch {
+            // Intentionally ignored: animation already running, request discarded
+        }
     }
 
     /**
@@ -716,7 +722,7 @@ export default class MobLerp {
          */
         if (!compareKeys(htmlObject, toObject)) {
             compareKeysWarning('lerp goFromTo:', htmlObject, toObject);
-            return new Promise((resolve) => resolve);
+            return Promise.resolve();
         }
 
         /**

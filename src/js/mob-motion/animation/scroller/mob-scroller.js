@@ -1351,7 +1351,7 @@ export default class MobScroller {
         const action =
             this.#firstTime && !this.#animateAtStart ? 'set' : 'goTo';
 
-        this.#motion
+        void this.#motion
             [action]({ val: this.#endValue }, this.#motionParameters)
             .catch(() => {});
     }

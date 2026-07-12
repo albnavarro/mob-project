@@ -129,7 +129,7 @@ const MobPageScroller = ({ velocity, rootElement }) => {
         );
 
         lastScrollValue = currentValue;
-        lerp.goTo({ scrollValue: currentValue }).catch(() => {});
+        void lerp.goTo({ scrollValue: currentValue }).catch(() => {});
     });
 
     /**

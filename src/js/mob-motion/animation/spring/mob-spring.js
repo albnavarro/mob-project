@@ -82,7 +82,7 @@ export default class MobSpring {
     #isRunning;
 
     /**
-     * @type{((value:any) => void)|undefined }
+     * @type{(() => void)|undefined }
      */
     #currentResolve;
 
@@ -315,7 +315,7 @@ export default class MobSpring {
                 /**
                  * On complete
                  */
-                this.#currentResolve?.(true);
+                this.#currentResolve?.();
                 this.#currentPromise = undefined;
                 this.#currentReject = undefined;
                 this.#currentResolve = undefined;
@@ -413,7 +413,7 @@ export default class MobSpring {
     /**
      * @type {import('../../utils/type.js').DoAction<import('./type.js').SpringActions>} obj To Values
      */
-    #doAction(newObjectParsed, newObjectRaw, spacialProps = {}) {
+    async #doAction(newObjectParsed, newObjectRaw, spacialProps = {}) {
         this.#values = mergeArray(newObjectParsed, this.#values);
 
         const { reverse, immediate } = this.#mergeProps(spacialProps);
@@ -435,7 +435,7 @@ export default class MobSpring {
         if (valueIsBooleanAndTrue(immediate, 'immediate ')) {
             if (this.#isRunning) this.stop({ updateValues: false });
             this.#values = setFromCurrentByTo(this.#values);
-            return Promise.resolve();
+            return;
         }
 
         /**
@@ -454,9 +454,15 @@ export default class MobSpring {
             });
         }
 
-        return shouldInitializeRAF && this.#currentPromise
-            ? this.#currentPromise
-            : Promise.reject(MobCore.ANIMATION_STOP_REJECT).catch(() => {});
+        if (shouldInitializeRAF && this.#currentPromise) {
+            return this.#currentPromise;
+        }
+
+        try {
+            await Promise.reject(MobCore.ANIMATION_STOP_REJECT);
+        } catch {
+            // Intentionally ignored: animation already running, request discarded
+        }
     }
 
     /**
@@ -543,8 +549,8 @@ export default class MobSpring {
     }
 
     /**
-     * @param {(value: any) => void} resolve
-     * @param {(value: any) => void} reject
+     * @param {() => void} resolve
+     * @param {() => void} reject
      * @returns {Promise<any>}
      */
     async #startRaf(resolve, reject) {
@@ -790,7 +796,7 @@ export default class MobSpring {
          */
         if (!compareKeys(htmlObject, toObject)) {
             compareKeysWarning('spring goFromTo:', htmlObject, toObject);
-            return new Promise((resolve) => resolve);
+            return Promise.resolve();
         }
 
         /**

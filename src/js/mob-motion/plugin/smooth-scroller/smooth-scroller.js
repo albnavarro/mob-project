@@ -1489,9 +1489,7 @@ export class MobSmoothScroller {
          * This.motion use spring or lerp, so goTo generic type is not the same. But we don't use props here, so skip ts
          * error
          */
-
-        // @ts-ignore
-        this.#motion.goTo({ val: this.#endValue }).catch(() => {});
+        void this.#motion.goTo({ val: this.#endValue }).catch(() => {});
 
         /**
          * Fire on update callback

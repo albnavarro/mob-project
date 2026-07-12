@@ -8,7 +8,7 @@ import {
 import { horizontalScrollerCss } from './horizontal-scroller-css.js';
 import { mq } from '../../../utils/media-manager.js';
 import { horizontalScrollerContstant } from './horizontal-scroller-constant';
-import { NOOP, pipe } from '../../../utils/functions-utils';
+import { NOOP } from '../../../utils/functions-utils';
 import {
     breakpointIsValid,
     breakpointTypeIsValid,
@@ -797,132 +797,104 @@ export class MobHorizontalScroller {
     }
 
     /**
-     * @type {() => Promise<boolean>}
+     * @returns {void}
      */
     #setDimension() {
         if (!this.#trigger || !this.#mainContainer || !this.#row) {
-            return new Promise((resolve) => {
-                resolve(true);
-            });
+            return;
         }
 
-        return new Promise((resolve) => {
-            MobCore.useFrame(() => {
-                const width = this.#horizontalWidth;
-                this.#percentRange =
-                    (100 * (width - window.innerWidth)) / width;
+        const width = this.#horizontalWidth;
+        this.#percentRange = (100 * (width - window.innerWidth)) / width;
 
-                if (width > 0) {
-                    this.#trigger.style.height = `${width}px`;
-                    this.#mainContainer.style.height = `${width}px`;
-                    this.#row.style.width = `${width}px`;
-                }
-
-                resolve(true);
-            });
-        });
+        if (width > 0) {
+            this.#trigger.style.height = `${width}px`;
+            this.#mainContainer.style.height = `${width}px`;
+            this.#row.style.width = `${width}px`;
+        }
     }
 
     /**
-     * @type {() => Promise<boolean>}
+     * @returns {void}
      */
     #getWidth() {
-        return new Promise((resolve) => {
-            MobCore.useFrame(() => {
-                if (!mq[this.#queryType](this.#breakpoint)) {
-                    resolve(true);
-                    return;
-                }
+        if (!mq[this.#queryType](this.#breakpoint)) {
+            return;
+        }
 
-                this.#horizontalWidth = [...this.#columns]
-                    .map((item) => {
-                        return outerWidth(item);
-                    })
-                    .reduce((a, b) => a + b, 0);
-
-                resolve(true);
-            });
-        });
+        this.#horizontalWidth = [...this.#columns]
+            .map((item) => {
+                return outerWidth(item);
+            })
+            .reduce((a, b) => a + b, 0);
     }
 
     /**
-     * @type {() => Promise<boolean>}
+     * @returns {void}
      */
     #createShadow() {
         if (!this.#trigger) {
-            return new Promise((resolve) => {
-                resolve(true);
-            });
+            return;
         }
 
-        return new Promise((resolve) => {
-            MobCore.useFrame(() => {
-                if (!mq[this.#queryType](this.#breakpoint) || !this.#shadows) {
-                    resolve(true);
-                    return;
-                }
+        if (!mq[this.#queryType](this.#breakpoint) || !this.#shadows) {
+            return;
+        }
 
-                const shadowsTransition = [...this.#shadows]
-                    .map((item) => {
-                        const shadowLabel = item.dataset['shadow'];
-                        const useDebug = Object.hasOwn(item.dataset, 'debug');
-                        const debugClass = useDebug ? 'debug' : '';
+        const shadowsTransition = [...this.#shadows]
+            .map((item) => {
+                const shadowLabel = item.dataset['shadow'];
+                const useDebug = Object.hasOwn(item.dataset, 'debug');
+                const debugClass = useDebug ? 'debug' : '';
 
-                        const leftLabel = useDebug
-                            ? `left left : ${shadowLabel}`
-                            : '';
-                        const inCenterLabel = useDebug
-                            ? `in center : ${shadowLabel}`
-                            : '';
-                        const outCenterlabel = useDebug
-                            ? `center out : ${shadowLabel}`
-                            : '';
-                        const endLabel = useDebug
-                            ? `in out : ${shadowLabel}`
-                            : '';
+                const leftLabel = useDebug ? `left left : ${shadowLabel}` : '';
+                const inCenterLabel = useDebug
+                    ? `in center : ${shadowLabel}`
+                    : '';
+                const outCenterlabel = useDebug
+                    ? `center out : ${shadowLabel}`
+                    : '';
+                const endLabel = useDebug ? `in out : ${shadowLabel}` : '';
 
-                        return /* HTML */ ` <div
-                            class="${this.#shadowMainClassTransition} ${
-                                this.#shadowMainClassTransition
-                            }--${shadowLabel}"
-                            data-shadow="${shadowLabel}"
-                        >
-                            <span
-                                class="${
-                                    this.#shadowMainClassTransition
-                                }--in-center ${debugClass}"
-                            >
-                                ${inCenterLabel}
-                            </span>
-                            <span
-                                class="${
-                                    this.#shadowMainClassTransition
-                                }--out-center ${debugClass}"
-                            >
-                                ${outCenterlabel}
-                            </span>
-                            <span
-                                class="${
-                                    this.#shadowMainClassTransition
-                                }--left ${debugClass}"
-                            >
-                                ${leftLabel}
-                            </span>
-                            <span
-                                class="${
-                                    this.#shadowMainClassTransition
-                                }--end ${debugClass}"
-                            >
-                                ${endLabel}
-                            </span>
-                        </div>`;
-                    })
-                    .join('');
+                return /* HTML */ ` <div
+                    class="${this.#shadowMainClassTransition} ${
+                        this.#shadowMainClassTransition
+                    }--${shadowLabel}"
+                    data-shadow="${shadowLabel}"
+                >
+                    <span
+                        class="${
+                            this.#shadowMainClassTransition
+                        }--in-center ${debugClass}"
+                    >
+                        ${inCenterLabel}
+                    </span>
+                    <span
+                        class="${
+                            this.#shadowMainClassTransition
+                        }--out-center ${debugClass}"
+                    >
+                        ${outCenterlabel}
+                    </span>
+                    <span
+                        class="${
+                            this.#shadowMainClassTransition
+                        }--left ${debugClass}"
+                    >
+                        ${leftLabel}
+                    </span>
+                    <span
+                        class="${
+                            this.#shadowMainClassTransition
+                        }--end ${debugClass}"
+                    >
+                        ${endLabel}
+                    </span>
+                </div>`;
+            })
+            .join('');
 
-                this.#trigger.innerHTML = shadowsTransition;
-                resolve(true);
-            });
-        });
+        this.#trigger.innerHTML = shadowsTransition;
     }
 
     /**
@@ -933,156 +905,139 @@ export class MobHorizontalScroller {
     }
 
     /**
-     * @type {() => Promise<boolean>}
+     * @returns {void}
      */
     #updateShadow() {
-        return new Promise((resolve) => {
-            if (!mq[this.#queryType](this.#breakpoint)) {
-                resolve(true);
-                return;
-            }
+        if (!mq[this.#queryType](this.#breakpoint)) {
+            return;
+        }
 
-            MobCore.useFrame(() => {
-                if (!this.#shadows) return;
+        if (!this.#shadows) return;
 
-                for (const item of this.#shadows) {
-                    const percentrange = this.#percentRange / 100;
-                    const shadowData = item.dataset['shadow'];
-                    const width = outerWidth(item);
-                    const height = outerHeight(this.#row);
-                    const x = getTranslateValues(this.#row)?.x ?? 0;
-                    const offset = this.#reverse
-                        ? this.#horizontalWidth -
-                          (item.getBoundingClientRect().right - x)
-                        : item.getBoundingClientRect().left - x;
-                    const screenRatio = window.innerWidth / window.innerHeight;
-                    const windowDifference =
-                        window.innerWidth - window.innerHeight;
-                    const widthAmount = offset / screenRatio;
-                    const diffAmount = offset - offset / screenRatio;
+        for (const item of this.#shadows) {
+            const percentrange = this.#percentRange / 100;
+            const shadowData = item.dataset['shadow'];
+            const width = outerWidth(item);
+            const height = outerHeight(this.#row);
+            const x = getTranslateValues(this.#row)?.x ?? 0;
+            const offset = this.#reverse
+                ? this.#horizontalWidth -
+                  (item.getBoundingClientRect().right - x)
+                : item.getBoundingClientRect().left - x;
+            const screenRatio = window.innerWidth / window.innerHeight;
+            const windowDifference = window.innerWidth - window.innerHeight;
+            const widthAmount = offset / screenRatio;
+            const diffAmount = offset - offset / screenRatio;
 
-                    /**
-                     * @type {HTMLElement | null}
-                     */
-                    const shadowTransitionEl =
-                        this.#mainContainer.querySelector(
-                            `.${this.#shadowMainClassTransition}[data-shadow="${CSS.escape(shadowData ?? '')}"]`
-                        );
+            /**
+             * @type {HTMLElement | null}
+             */
+            const shadowTransitionEl = this.#mainContainer.querySelector(
+                `.${this.#shadowMainClassTransition}[data-shadow="${CSS.escape(shadowData ?? '')}"]`
+            );
 
-                    /**
-                     * @type {HTMLElement | null | undefined}
-                     */
-                    const inCenterMarker = shadowTransitionEl?.querySelector(
-                        `.${this.#shadowMainClassTransition}--in-center`
-                    );
+            /**
+             * @type {HTMLElement | null | undefined}
+             */
+            const inCenterMarker = shadowTransitionEl?.querySelector(
+                `.${this.#shadowMainClassTransition}--in-center`
+            );
 
-                    /**
-                     * @type {HTMLElement | null | undefined}
-                     */
-                    const outCenterMarker = shadowTransitionEl?.querySelector(
-                        `.${this.#shadowMainClassTransition}--out-center`
-                    );
+            /**
+             * @type {HTMLElement | null | undefined}
+             */
+            const outCenterMarker = shadowTransitionEl?.querySelector(
+                `.${this.#shadowMainClassTransition}--out-center`
+            );
 
-                    /**
-                     * @type {HTMLElement | null | undefined}
-                     */
-                    const leftMarker = shadowTransitionEl?.querySelector(
-                        `.${this.#shadowMainClassTransition}--left`
-                    );
+            /**
+             * @type {HTMLElement | null | undefined}
+             */
+            const leftMarker = shadowTransitionEl?.querySelector(
+                `.${this.#shadowMainClassTransition}--left`
+            );
 
-                    /**
-                     * @type {HTMLElement | null | undefined}
-                     */
-                    const endMarker = shadowTransitionEl?.querySelector(
-                        `.${this.#shadowMainClassTransition}--end`
-                    );
+            /**
+             * @type {HTMLElement | null | undefined}
+             */
+            const endMarker = shadowTransitionEl?.querySelector(
+                `.${this.#shadowMainClassTransition}--end`
+            );
 
-                    // Strength shadow end item to bottom of page
-                    const plusFull =
-                        window.innerWidth > window.innerHeight
-                            ? window.innerHeight
-                            : 0;
+            // Strength shadow end item to bottom of page
+            const plusFull =
+                window.innerWidth > window.innerHeight ? window.innerHeight : 0;
 
-                    // Strength center in out item to bottom of page
-                    const plusHalf =
-                        window.innerWidth > window.innerHeight
-                            ? window.innerHeight / 2
-                            : 0;
+            // Strength center in out item to bottom of page
+            const plusHalf =
+                window.innerWidth > window.innerHeight
+                    ? window.innerHeight / 2
+                    : 0;
 
-                    const start = (() => {
-                        switch (offset) {
-                            case 0: {
-                                return 0;
-                            }
-
-                            default: {
-                                return (
-                                    widthAmount +
-                                    diffAmount / percentrange -
-                                    windowDifference / percentrange
-                                );
-                            }
-                        }
-                    })();
-
-                    const left = (() => {
-                        const val =
-                            window.innerWidth > window.innerHeight
-                                ? windowDifference / percentrange
-                                : windowDifference / percentrange +
-                                  window.innerWidth / screenRatio;
-
-                        switch (offset) {
-                            case 0: {
-                                return 0;
-                            }
-
-                            default: {
-                                return val;
-                            }
-                        }
-                    })();
-
-                    const end = (() => {
-                        const val1 = width / screenRatio;
-                        const val2 =
-                            (width - width / screenRatio) / percentrange;
-                        return val1 + val2 + left;
-                    })();
-
-                    const inCenter = (() => {
-                        return end / 2 + plusHalf;
-                    })();
-
-                    if (this.#useSticky) {
-                        // @ts-ignore
-                        this.#trigger.style['margin-top'] = `-${height}px`;
+            const start = (() => {
+                switch (offset) {
+                    case 0: {
+                        return 0;
                     }
 
-                    if (shadowTransitionEl)
-                        shadowTransitionEl.style.top = `${start}px`;
-
-                    if (inCenterMarker)
-                        inCenterMarker.style.height = `${inCenter}px`;
-
-                    if (outCenterMarker)
-                        outCenterMarker.style.height = `${inCenter}px`;
-
-                    if (outCenterMarker)
-                        outCenterMarker.style.top = `${inCenter}px`;
-
-                    if (leftMarker) leftMarker.style.height = `${left}px`;
-
-                    if (endMarker)
-                        endMarker.style.height = `${end + plusFull}px`;
-
-                    if (shadowTransitionEl)
-                        shadowTransitionEl.style.height = `${left}px`;
+                    default: {
+                        return (
+                            widthAmount +
+                            diffAmount / percentrange -
+                            windowDifference / percentrange
+                        );
+                    }
                 }
+            })();
 
-                resolve(true);
-            });
-        });
+            const left = (() => {
+                const val =
+                    window.innerWidth > window.innerHeight
+                        ? windowDifference / percentrange
+                        : windowDifference / percentrange +
+                          window.innerWidth / screenRatio;
+
+                switch (offset) {
+                    case 0: {
+                        return 0;
+                    }
+
+                    default: {
+                        return val;
+                    }
+                }
+            })();
+
+            const end = (() => {
+                const val1 = width / screenRatio;
+                const val2 = (width - width / screenRatio) / percentrange;
+                return val1 + val2 + left;
+            })();
+
+            const inCenter = (() => {
+                return end / 2 + plusHalf;
+            })();
+
+            if (this.#useSticky) {
+                // @ts-ignore
+                this.#trigger.style['margin-top'] = `-${height}px`;
+            }
+
+            if (shadowTransitionEl) shadowTransitionEl.style.top = `${start}px`;
+
+            if (inCenterMarker) inCenterMarker.style.height = `${inCenter}px`;
+
+            if (outCenterMarker) outCenterMarker.style.height = `${inCenter}px`;
+
+            if (outCenterMarker) outCenterMarker.style.top = `${inCenter}px`;
+
+            if (leftMarker) leftMarker.style.height = `${left}px`;
+
+            if (endMarker) endMarker.style.height = `${end + plusFull}px`;
+
+            if (shadowTransitionEl)
+                shadowTransitionEl.style.height = `${left}px`;
+        }
     }
 
     /**
@@ -1161,18 +1116,15 @@ export class MobHorizontalScroller {
     }
 
     /**
-     * @type {() => void}
+     * @returns {void}
      */
     #createScroller() {
-        pipe(
-            this.#getWidth.bind(this),
-            this.#setDimension.bind(this),
-            this.#createShadow.bind(this),
-            this.#updateShadow.bind(this)
-        )().then(() => {
-            this.#initScroller();
-            this.#refreshChildren();
-        });
+        this.#getWidth();
+        this.#setDimension();
+        this.#createShadow();
+        this.#updateShadow();
+        this.#initScroller();
+        this.#refreshChildren();
     }
 
     /**
@@ -1276,33 +1228,31 @@ export class MobHorizontalScroller {
      * @example
      *     myInstance.init();
      *
-     * @type {() => void}
+     * @returns {void}
      */
     init() {
         if (!this.#propsisValid) return;
 
-        pipe(
-            this.#getWidth.bind(this),
-            this.#setDimension.bind(this),
-            this.#createShadow.bind(this),
-            this.#updateShadow.bind(this)
-        )().then(() => {
-            this.#initScroller();
-            if (this.#useDrag) this.#addDragListener();
+        this.#getWidth();
+        this.#setDimension();
+        this.#createShadow();
+        this.#updateShadow();
 
-            MobCore.useResize(({ horizontalResize }) =>
-                this.onResize(horizontalResize)
-            );
+        this.#initScroller();
+        if (this.#useDrag) this.#addDragListener();
 
-            MobCore.useFrameIndex(() => {
-                MobCore.useNextTick(() => {
-                    this.#afterInit?.();
-                    for (const element of this.#children) {
-                        element.refresh();
-                    }
-                });
-            }, 3);
-        });
+        MobCore.useResize(({ horizontalResize }) =>
+            this.onResize(horizontalResize)
+        );
+
+        MobCore.useFrameIndex(() => {
+            MobCore.useNextTick(() => {
+                this.#afterInit?.();
+                for (const element of this.#children) {
+                    element.refresh();
+                }
+            });
+        }, 3);
     }
 
     /**
@@ -1311,28 +1261,22 @@ export class MobHorizontalScroller {
      * @example
      *     myInstance.refresh();
      *
-     * @type {() => Promise<boolean>}
+     * @returns {void}
      */
     refresh() {
         if (!this.#moduleisActive || !mq[this.#queryType](this.#breakpoint))
-            return new Promise((resolve) => resolve(true));
+            return;
 
-        return new Promise((resolve) => {
-            pipe(
-                this.#getWidth.bind(this),
-                this.#setDimension.bind(this),
-                this.#updateShadow.bind(this)
-            )().then(() => {
-                this.#scrollTriggerInstance?.stopMotion?.();
-                this.#triggerTopPosition = offset(this.#trigger).top;
+        this.#getWidth();
+        this.#setDimension();
+        this.#updateShadow();
+        this.#scrollTriggerInstance?.stopMotion?.();
+        this.#triggerTopPosition = offset(this.#trigger).top;
 
-                if (this.#moduleisActive) {
-                    this.#scrollTriggerInstance?.refresh?.();
-                    this.#refreshChildren();
-                }
-                resolve(true);
-            });
-        });
+        if (this.#moduleisActive) {
+            this.#scrollTriggerInstance?.refresh?.();
+            this.#refreshChildren();
+        }
     }
 
     /**

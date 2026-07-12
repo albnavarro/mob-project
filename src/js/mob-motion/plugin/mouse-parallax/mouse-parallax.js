@@ -184,7 +184,7 @@ export class MobMouseParallax {
                   ay: (y - this.#offSetTop - vh / 2) / this.#rangey,
               };
 
-        this.#spring.goTo({ ax, ay }).catch(() => {});
+        void this.#spring.goTo({ ax, ay }).catch(() => {});
     }
 
     /**

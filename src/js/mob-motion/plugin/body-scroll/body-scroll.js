@@ -34,9 +34,7 @@ const onComplete = () => {
 /** @type{() => void} */
 const stopTween = () => {
     if (!isRunning) return;
-
     tween.stop();
-    onComplete();
 };
 
 /**
@@ -91,7 +89,7 @@ export const MobBodyScroll = (() => {
      * @param {Number | Element} target
      * @param {import('./type.js').MobBodyScroll} [data]
      */
-    const to = (target, data) => {
+    const to = async (target, data) => {
         if (typeof globalThis === 'undefined') return;
 
         const targetParsed = (() => {
@@ -137,27 +135,21 @@ export const MobBodyScroll = (() => {
 
         if (overflow) document.body.style.overflow = 'hidden';
 
-        return new Promise((resolve) => {
-            isRunning = true;
-            FreezeMobPageScroll();
+        isRunning = true;
+        FreezeMobPageScroll();
 
-            tween
-                .goFromTo(
-                    { val: window.scrollY },
-                    { val: targetParsed },
-                    { duration: Math.max(1, duration) }
-                )
-                .then(() => {
-                    onComplete();
-                    isRunning = false;
-                    resolve(true);
-                })
-                .catch(() => {
-                    onComplete();
-                    isRunning = false;
-                    resolve(true);
-                });
-        });
+        try {
+            await tween.goFromTo(
+                { val: window.scrollY },
+                { val: targetParsed },
+                { duration: Math.max(1, duration) }
+            );
+        } catch (error) {
+            console.log(error);
+        } finally {
+            onComplete();
+            isRunning = false;
+        }
     };
 
     return {

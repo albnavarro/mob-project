@@ -81,7 +81,7 @@ export default class MobTimeTween {
     #isRunning;
 
     /**
-     * @type{((value:any) => void)|undefined }
+     * @type{(() => void)|undefined }
      */
     #currentResolve;
 
@@ -326,7 +326,7 @@ export default class MobTimeTween {
                 /**
                  * On complete
                  */
-                this.#currentResolve?.(true);
+                this.#currentResolve?.();
                 this.#currentPromise = undefined;
                 this.#currentReject = undefined;
                 this.#currentResolve = undefined;
@@ -437,8 +437,8 @@ export default class MobTimeTween {
     }
 
     /**
-     * @param {(value: any) => void} resolve
-     * @param {(value: any) => void} reject
+     * @param {() => void} resolve
+     * @param {() => void} reject
      * @returns {Promise<any>}
      */
     async #startRaf(resolve, reject) {
@@ -493,7 +493,7 @@ export default class MobTimeTween {
     /**
      * @type {import('../../utils/type.js').DoAction<import('./type.js').TimeTweenAction>} obj To Values
      */
-    #doAction(newObjectParsed, newObjectRaw, specialProps = {}) {
+    async #doAction(newObjectParsed, newObjectRaw, specialProps = {}) {
         this.#values = mergeArrayTween(newObjectParsed, this.#values);
 
         const { reverse, immediate } = this.#mergeProps(specialProps);
@@ -523,7 +523,7 @@ export default class MobTimeTween {
             }
 
             this.#values = setFromCurrentByTo(this.#values);
-            return Promise.resolve();
+            return;
         }
 
         /**
@@ -542,9 +542,15 @@ export default class MobTimeTween {
             });
         }
 
-        return shouldInitializeRAF && this.#currentPromise
-            ? this.#currentPromise
-            : Promise.reject(MobCore.ANIMATION_STOP_REJECT).catch(() => {});
+        if (shouldInitializeRAF && this.#currentPromise) {
+            return this.#currentPromise;
+        }
+
+        try {
+            await Promise.reject(MobCore.ANIMATION_STOP_REJECT);
+        } catch {
+            // Intentionally ignored: animation already running, request discarded
+        }
     }
 
     /**
@@ -754,7 +760,7 @@ export default class MobTimeTween {
          */
         if (!compareKeys(htmlObject, toObject)) {
             compareKeysWarning('tween goFromTo:', htmlObject, toObject);
-            return new Promise((resolve) => resolve);
+            return Promise.resolve();
         }
 
         /**
