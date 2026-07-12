@@ -12,8 +12,9 @@ import { NOOP } from '../../utils/functions-utils';
  * @param {any} param.tween
  * @param {Record<string, any>} param.stepFunction
  * @param {string} param.action
+ * @returns {Promise<void>}
  */
-export const resolveTweenPromise = ({
+export const resolveTweenPromise = async ({
     mainReject,
     mainResolve,
     isStopped,
@@ -53,11 +54,13 @@ export const resolveTweenPromise = ({
               })
             : NOOP;
 
-    stepFunction[action]()
-        .then(() => mainResolve({ resolve: true }))
-        .catch(() => {})
-        .finally(() => {
-            unsubscribeActiveTween();
-            unsubscribeValidation();
-        });
+    try {
+        await stepFunction[action]();
+        mainResolve({ resolve: true });
+    } catch (error) {
+        console.log(error);
+    } finally {
+        unsubscribeActiveTween();
+        unsubscribeValidation();
+    }
 };
