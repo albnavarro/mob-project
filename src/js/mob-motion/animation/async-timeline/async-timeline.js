@@ -823,14 +823,11 @@ export default class MobAsyncTimeline {
     /**
      * End of timeline: fire the onComplete callback, stop the timeline and resolve the promise of play().
      *
-     * Extracted from #run() so `resume()` can reuse it ( see point 8 of the audit: a suspend on the last step restart
-     * the timeline without checking `repeat` ).
-     *
      * @type {() => void}
      */
     #onTimelineEnd() {
         for (const { cb } of this.#callbackComplete) cb();
-        this.#isStopped = true;
+        this.#transitionToStopped();
 
         if (!this.#currentResolve) return;
 
@@ -1810,6 +1807,16 @@ export default class MobAsyncTimeline {
         this.stop();
 
         return new Promise((resolve, reject) => {
+            /*
+             * In freeMode every tween start form current value in use at the moment
+             *
+             * Reject instead of leaving the promise pending forever.
+             */
+            if (this.#tweenList.length === 0) {
+                reject(MobCore.ANIMATION_STOP_REJECT);
+                return;
+            }
+
             /**
              * Add Tween at start/end if needed
              */
@@ -1821,16 +1828,6 @@ export default class MobAsyncTimeline {
              * start value ( autoSet ).
              */
             if (this.#freeMode) {
-                /*
-                 * In freeMode every tween start form current value in use at the moment
-                 *
-                 * Reject instead of leaving the promise pending forever.
-                 */
-                if (this.#tweenList.length === 0) {
-                    reject(MobCore.ANIMATION_STOP_REJECT);
-                    return;
-                }
-
                 /**
                  * Timeline is already stopped at the top of the method. Start new playing session.
                  */
@@ -1929,10 +1926,6 @@ export default class MobAsyncTimeline {
         return new Promise((thisResolve, thisReject) => {
             const currentResolve = resolve ?? thisResolve;
             const currentReject = reject ?? thisReject;
-            const forceYoYoNow = forceYoYo;
-
-            if (this.#autoSet) this.#addSetBlocks();
-            this.#addNoopSentinels();
 
             /**
              * Skip of there is nothing to run.
@@ -1944,6 +1937,11 @@ export default class MobAsyncTimeline {
                 currentReject(MobCore.ANIMATION_STOP_REJECT);
                 return;
             }
+
+            const forceYoYoNow = forceYoYo;
+
+            if (this.#autoSet) this.#addSetBlocks();
+            this.#addNoopSentinels();
 
             /**
              * Timeline is already stopped at the top of the method. Start new playing session.
@@ -2033,7 +2031,7 @@ export default class MobAsyncTimeline {
      * @type {import('./type.js').AsyncTimelinePause}
      */
     pause() {
-        if (this.#isInPause) return;
+        if (this.#isInPause || this.#isStopped) return;
 
         this.#transitionToPaused();
         this.#pauseAllTween();
@@ -2043,7 +2041,8 @@ export default class MobAsyncTimeline {
      * @type {import('./type.js').AsyncTimelineResume}
      */
     resume() {
-        if (!this.#isInPause && !this.#isInSuspension) return;
+        if ((!this.#isInPause && !this.#isInSuspension) || this.#isStopped)
+            return;
 
         const wasPaused = this.#isInPause;
         const wasSuspended = this.#isInSuspension;
