@@ -86,7 +86,7 @@ export function timlineMixTest() {
         // })
         .createGroup({ waitComplete: false })
         .goTo(tweenBox1, { y: 400 }, { duration: () => durationTest })
-        .goTo(tweenBox2, { rotate: 360 }, { duration: 2000, delay: 1000 })
+        .goTo(tweenBox2, { rotate: 360 }, { duration: 2000, delay: 500 })
         .closeGroup()
         .label({ name: 'label1' })
         .goTo(tweenBox1, { x: -100, rotate: 180 }, { ease: 'easeInElastic' })

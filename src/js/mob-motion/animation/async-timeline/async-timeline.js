@@ -645,6 +645,7 @@ export default class MobAsyncTimeline {
                  */
                 if (delay) {
                     const start = MobCore.getTime();
+                    const groupIndex = this.#currentIndex;
 
                     requestAnimationFrame(() => {
                         this.#loopOnDelay({
@@ -652,6 +653,7 @@ export default class MobAsyncTimeline {
                             deltaTimeOnpause: 0,
                             lastFrameTime: start,
                             delay,
+                            groupIndex,
                             mainReject,
                             mainResolve,
                             previousSessionId,
@@ -875,6 +877,7 @@ export default class MobAsyncTimeline {
      * @param {number} param0.deltaTimeOnpause
      * @param {number} param0.lastFrameTime
      * @param {number} param0.delay
+     * @param {number} param0.groupIndex
      * @param {(value: any) => void} param0.mainReject
      * @param {(value: any) => void} param0.mainResolve
      * @param {number} param0.previousSessionId
@@ -887,6 +890,7 @@ export default class MobAsyncTimeline {
         deltaTimeOnpause,
         lastFrameTime,
         delay,
+        groupIndex,
         mainReject,
         mainResolve,
         previousSessionId,
@@ -928,6 +932,20 @@ export default class MobAsyncTimeline {
             this.#isReverseNext
         ) {
             /**
+             * Promise.race issue: con un delay troppo lungo un tween può tentare di partire dopo che il proprio gruppo
+             * è già stato risolto e la timeline è avanzata nello step successivo.
+             *
+             * Eseguire lo step a questo punto farebbe partire l'azione del gruppo precedente nel contesto del nuovo
+             * gruppo, inquinando lo stato. Abortiamo silenziosamente.
+             */
+            const currentIndex = this.#currentIndex;
+            const isLate = currentIndex !== groupIndex;
+            if (isLate) {
+                mainReject?.({ reason: 'delay overrun' });
+                return;
+            }
+
+            /**
              * Here we resolve single tween promise
              */
             resolveTweenPromise({
@@ -957,6 +975,7 @@ export default class MobAsyncTimeline {
                 deltaTimeOnpause,
                 lastFrameTime: current,
                 delay,
+                groupIndex,
                 mainReject,
                 mainResolve,
                 previousSessionId,
