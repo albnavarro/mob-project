@@ -91,7 +91,7 @@ const getValueInVwVh = ({
  * @param {import('./utils-type.js').scrollTriggerIsInviewPort} obj
  * @returns {boolean}
  */
-export const detectViewPortInterception = ({
+export const detectViewportInterception = ({
     offset,
     height,
     gap,

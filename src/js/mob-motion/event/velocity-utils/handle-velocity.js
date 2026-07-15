@@ -481,7 +481,7 @@ const init = () => {
  *
  *     ```;
  *
- * @param {import('./type').VelocityCallBack} cb
+ * @param {import('./type').VelocityCallback} cb
  * @returns {() => void}
  */
 const addCallback = (cb) => {

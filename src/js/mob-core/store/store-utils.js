@@ -178,9 +178,9 @@ export const checkIfPropIsComputed = ({ instanceId, prop }) => {
     const state = getStateFromMainMap(instanceId);
     if (!state) return false;
 
-    const { callBackComputed } = state;
+    const { callbackComputed } = state;
 
-    const isComputed = [...callBackComputed].some(
+    const isComputed = [...callbackComputed].some(
         ({ prop: currentProp }) => prop === currentProp
     );
 

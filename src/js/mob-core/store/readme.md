@@ -891,7 +891,7 @@ updateMainMap(instanceId, state); // Aggiornamento
 **Punti dove il Pattern è applicato**
 
 - `store-set.js` -> `addToComputedWaitLsit()` -> `computedPropsQueque` ( Set )
-- `store-set.js` -> `fireComputed()` -> `callBackComputed` ( iterazione )
+- `store-set.js` -> `fireComputed()` -> `callbackComputed` ( iterazione )
 - `fire-queque.js` -> `runCallbackQueqe()` -> `waitMap` ( Map globale )
 - `store-watch.js` -> `subscribeWatch()` -> `watcherByProp`, `watcherMetadata`
 - `bind-store.js` -> `bindStoreEntryPoint()` -> `bindInstance` (array push implicito)

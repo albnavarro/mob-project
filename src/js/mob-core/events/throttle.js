@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-this-outside-of-class */
 /* eslint-disable unicorn/no-this-assignment */
 /* eslint-disable @typescript-eslint/no-this-alias */
 

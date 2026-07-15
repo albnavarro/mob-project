@@ -147,7 +147,7 @@ function printDefault() {
  *
  *     ```;
  *
- * @param {import('./event/velocity-utils/type.js').VelocityCallBack} callback - Callback function
+ * @param {import('./event/velocity-utils/type.js').VelocityCallback} callback - Callback function
  * @returns {() => void}
  */
 function useVelocity(callback = () => {}) {

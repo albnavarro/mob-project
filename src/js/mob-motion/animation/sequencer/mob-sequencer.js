@@ -256,19 +256,19 @@ export default class MobSequencer {
             partial,
         });
 
-        const callBackObject = getValueObj(this.#values, 'currentValue');
+        const callbackObject = getValueObj(this.#values, 'currentValue');
 
         syncCallback({
             each: this.#stagger.each,
             useStagger: this.#useStagger,
             isLastDraw,
-            callBackObject,
+            callbackObject,
             callback: this.#callback,
             callbackCache: this.#callbackCache,
             callbackOnStop: this.#callbackOnStop,
         });
 
-        this.#fireAddCallBack(partial);
+        this.#fireAddCallback(partial);
 
         this.#useStagger = true;
         this.#lastPartial = partial;
@@ -312,11 +312,11 @@ export default class MobSequencer {
     }
 
     /**
-     * Fire callBack at specific time
+     * Fire callback at specific time
      *
      * @property {number} [time=0] Default is `0`
      */
-    #fireAddCallBack(time = 0) {
+    #fireAddCallback(time = 0) {
         for (const { fn, time: fnTime } of this.#callbackAdd) {
             /*
              * In forward mode current time must be greater or equal than fn time
@@ -730,7 +730,7 @@ export default class MobSequencer {
     }
 
     /**
-     * Similar to subscribe this callBack is launched when the data calculation stops (when the timeline ends or the
+     * Similar to subscribe this callback is launched when the data calculation stops (when the timeline ends or the
      * scroll trigger is inactive). Useful for applying a different style to an inactive element. A typical example is
      * to remove the teansform3D property:
      *

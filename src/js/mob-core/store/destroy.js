@@ -21,7 +21,7 @@ export const destroyStoreEntryPoint = (instanceId) => {
             `${instanceId} store will be destroyed but is used by another store.`
         );
 
-    state.callBackComputed.clear();
+    state.callbackComputed.clear();
     state.computedPropsQueque.clear();
     state.watcherByProp.clear();
     state.watcherMetadata.clear();

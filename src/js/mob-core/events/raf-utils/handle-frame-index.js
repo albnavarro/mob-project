@@ -35,7 +35,7 @@ const updateKeys = (currentFrameLimit) => {
  */
 const fire = ({ currentFrame, time, fps }) => {
     /**
-     * Get arrays of callBack related to the current currentFrame indexCb is a 'global' variables instead constant to
+     * Get arrays of callback related to the current currentFrame indexCb is a 'global' variables instead constant to
      * reduce garbage collector
      */
     const callabacks = indexCallbackMap.get(currentFrame) ?? [];

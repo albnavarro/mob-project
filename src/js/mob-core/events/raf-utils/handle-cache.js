@@ -60,11 +60,11 @@ const add = (fn = () => {}) => {
  *
  * @param {Object} obj
  * @param {string} obj.id
- * @param {Record<string, number>} obj.callBackObject
+ * @param {Record<string, number>} obj.callbackObject
  * @param {number} obj.frame
  * @returns {void}
  */
-const update = ({ id, callBackObject, frame }) => {
+const update = ({ id, callbackObject, frame }) => {
     if (!subscriberMap.has(id)) return;
 
     /**
@@ -83,7 +83,7 @@ const update = ({ id, callBackObject, frame }) => {
      */
     if (data.has(frameSanitized + currentFrame)) return;
 
-    data.set(frameSanitized + currentFrame, callBackObject);
+    data.set(frameSanitized + currentFrame, callbackObject);
     cacheCoutner++;
 };
 
@@ -218,10 +218,10 @@ const fire = (frameCounter) => {
     for (const value of subscriberMap.values()) {
         const { data, fn, freeze } = value;
 
-        const callBackObject = data.get(frameCounter);
+        const callbackObject = data.get(frameCounter);
 
-        if (callBackObject && !freeze.active) {
-            fn(callBackObject);
+        if (callbackObject && !freeze.active) {
+            fn(callbackObject);
 
             data.delete(frameCounter);
             cacheCoutner--;

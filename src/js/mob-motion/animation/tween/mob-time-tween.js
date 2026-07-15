@@ -297,14 +297,14 @@ export default class MobTimeTween {
         const isSettled = Math.round(this.#timeElapsed) === this.#duration;
 
         // Prepare an obj to pass to the callback
-        const callBackObject = getValueObj(this.#values, 'currentValue');
+        const callbackObject = getValueObj(this.#values, 'currentValue');
 
         if (!this.#pauseStatus) {
             defaultCallback({
                 stagger: this.#stagger,
                 callback: this.#callback,
                 callbackCache: this.#callbackCache,
-                callBackObject: callBackObject,
+                callbackObject: callbackObject,
                 useStagger: this.#useStagger,
             });
         }
@@ -347,7 +347,7 @@ export default class MobTimeTween {
                 callback: this.#callback,
                 callbackCache: this.#callbackCache,
                 callbackOnComplete: this.#callbackOnComplete,
-                callBackObject: callBackObject,
+                callbackObject: callbackObject,
                 stagger: this.#stagger,
                 slowlestStagger: this.#slowlestStagger,
                 fastestStagger: this.#fastestStagger,
@@ -1066,7 +1066,7 @@ export default class MobTimeTween {
     }
 
     /**
-     * Similar to subscribe this callBack is launched when the data calculation stops (when the timeline ends or the
+     * Similar to subscribe this callback is launched when the data calculation stops (when the timeline ends or the
      * scroll trigger is inactive). Useful for applying a different style to an inactive element. A typical example is
      * to remove the teansform3D property:
      *

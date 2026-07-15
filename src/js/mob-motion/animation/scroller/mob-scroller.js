@@ -44,7 +44,7 @@ import {
     getRetReverseValue,
     getStartPoint,
     getValueOnSwitch,
-    detectViewPortInterception,
+    detectViewportInterception,
     processFixedLimit,
     getScrollFunction,
 } from './mob-scroller-utils.js';
@@ -1254,7 +1254,7 @@ export default class MobScroller {
             this.#getScrollerOffset();
         }
 
-        this.#isInViewport = detectViewPortInterception({
+        this.#isInViewport = detectViewportInterception({
             offset: this.#offset,
             height: this.#height,
             gap: this.#gap,

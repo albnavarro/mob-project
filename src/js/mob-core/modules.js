@@ -164,7 +164,7 @@ function shouldMakeSomething() {
 }
 
 /**
- * Execute a callBack within the first available request animation frame. Use this method to modify elements of the DOM
+ * Execute a callback within the first available request animation frame. Use this method to modify elements of the DOM
  *
  * @example
  *     ```javascript

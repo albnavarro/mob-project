@@ -19,10 +19,10 @@ const callbacks = [];
  *
  *     ```;
  *
- * @param {import('./type.js').HandleFrameCallbak} callBack - Callback function
+ * @param {import('./type.js').HandleFrameCallbak} callback - Callback function
  */
-const add = (callBack) => {
-    callbacks.push(callBack);
+const add = (callback) => {
+    callbacks.push(callback);
 };
 
 /**
@@ -31,9 +31,9 @@ const add = (callBack) => {
  * @returns {import('./type.js').HandleFrameArray}
  */
 const get = () => {
-    const callBackArray = [...callbacks];
+    const callbackArray = [...callbacks];
     callbacks.length = 0;
-    return callBackArray;
+    return callbackArray;
 };
 
 /**

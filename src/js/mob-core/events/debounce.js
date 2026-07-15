@@ -1,3 +1,5 @@
+/* eslint-disable unicorn/no-this-outside-of-class */
+
 /**
  * @template T
  * @param {T} fn

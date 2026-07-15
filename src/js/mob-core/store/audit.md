@@ -74,7 +74,7 @@ Per selettori prop (`set/watch/emit`) funziona; ma se l'utente passa per errore 
 
 ---
 
-### #11 — `callBackComputed` come `Set<{prop, keys, fn}>`
+### #11 — `callbackComputed` come `Set<{prop, keys, fn}>`
 
 **File:** `inizialize-instance.js:23`, `store-set.js:747-751`
 
@@ -160,5 +160,5 @@ Annotati per memoria, **non sono bug**:
 | 6      | #4 Bind override semantics    | 🟠       | discussione          |
 | 7      | #7 Dep tracking static        | 🟠       | doc o refactor       |
 | 8      | #9, #10 DX warnings           | 🟡       | xs                   |
-| 9      | #11 callBackComputed → Map    | 🟡       | m                    |
+| 9      | #11 callbackComputed → Map    | 🟡       | m                    |
 | 10     | #12 Rename typos              | 🟡       | s (mass rename)      |

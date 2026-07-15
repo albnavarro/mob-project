@@ -32,7 +32,7 @@ export interface StoreMapValue {
      * - Value: prop
      */
     watcherMetadata: Map<string, string>; // id -> propName
-    callBackComputed: Set<{
+    callbackComputed: Set<{
         prop: string;
         fn: (arg0: Record<string, any>) => void;
         keys: string[];

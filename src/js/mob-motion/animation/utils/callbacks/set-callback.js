@@ -3,7 +3,7 @@ import { MobCore } from '../../../../mob-core';
 /**
  * Add callback to Stack.
  *
- * @type {import('./type').SetCallBack}
+ * @type {import('./type').SetCallback}
  */
 export const updateSubScribers = (currentCallback, arrayOfCallback) => {
     /**
@@ -39,7 +39,7 @@ export const updateSubScribers = (currentCallback, arrayOfCallback) => {
 };
 
 /**
- * @type {import('./type').SetCallBackCache}
+ * @type {import('./type').SetCallbackCache}
  */
 export const updateSubscribersCache = (
     currentCallback,

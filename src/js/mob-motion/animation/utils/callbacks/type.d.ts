@@ -28,7 +28,7 @@ export type DefaultCallback = (arg0: {
     stagger: StaggerObject;
     callback: CallbackDefault;
     callbackCache: CallbackCache;
-    callBackObject: Record<string, number>;
+    callbackObject: Record<string, number>;
     useStagger: boolean;
 }) => void;
 
@@ -38,7 +38,7 @@ export type DefaultCallbackOnComplete = (arg0: {
     callback: CallbackDefault;
     callbackCache: CallbackCache;
     callbackOnComplete: CallbackDefault;
-    callBackObject: Record<string, number>;
+    callbackObject: Record<string, number>;
     slowlestStagger: StaggerFrameIndexObject;
     fastestStagger: StaggerFrameIndexObject;
     useStagger: boolean;
@@ -48,18 +48,18 @@ export type SyncCallback = (arg0: {
     each: number;
     useStagger: boolean;
     isLastDraw: boolean;
-    callBackObject: Record<string, number>;
+    callbackObject: Record<string, number>;
     callback: CallbackDefault;
     callbackCache: CallbackCache;
     callbackOnStop: CallbackDefault;
 }) => void;
 
-export type SetCallBack = (
+export type SetCallback = (
     currentCallback: (arg0: any) => void,
     arrayOfCallback: CallbackDefault
 ) => SetCallbackReturnObject;
 
-export type SetCallBackCache = (
+export type SetCallbackCache = (
     currentCallback: (arg0: any) => void,
     arrayOfCallback: CallbackCache,
     unsubscribeCacheArray: (() => void)[]

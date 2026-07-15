@@ -69,7 +69,7 @@ export type SetStagger = <T extends any[], S extends any[]>(arg0: {
 };
 
 /**
- * Map type. Merge original callBackObject with stagger props: index && frame. Set stagger return callbackObject updated
+ * Map type. Merge original callbackObject with stagger props: index && frame. Set stagger return callbackObject updated
  * ( arrayDefault | arrayOnStop | createStagger )
  */
 type CallbackArrayStagger<Type> = {

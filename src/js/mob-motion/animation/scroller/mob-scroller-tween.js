@@ -217,7 +217,7 @@ export default class MobScrollerTween {
         }
 
         // Prepare an obj to pass to the callback
-        const callBackObject = getValueObj(this.#values, 'currentValue');
+        const callbackObject = getValueObj(this.#values, 'currentValue');
 
         MobCore.useNextTick(() => {
             // Fire callback
@@ -225,7 +225,7 @@ export default class MobScrollerTween {
                 each: this.#stagger.each,
                 useStagger: true,
                 isLastDraw,
-                callBackObject,
+                callbackObject,
                 callback: this.#callback,
                 callbackCache: this.#callbackCache,
                 callbackOnStop: this.#callbackOnStop,
@@ -291,7 +291,7 @@ export default class MobScrollerTween {
     }
 
     /**
-     * Similar to subscribe this callBack is launched when the data calculation stops (when the timeline ends or the
+     * Similar to subscribe this callback is launched when the data calculation stops (when the timeline ends or the
      * scroll trigger is inactive). Useful for applying a different style to an inactive element. A typical example is
      * to remove the teansform3D property:
      *

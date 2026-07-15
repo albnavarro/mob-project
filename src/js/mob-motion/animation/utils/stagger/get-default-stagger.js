@@ -262,13 +262,13 @@ export const getDefaultStagger = ({
     const chunckSizeRow =
         stagger?.grid?.row <= 1 ? arrayDefault.length : stagger.grid.row;
 
-    // main callBack
+    // main callback
     const itemByRow = getItemsByRow(arrayDefault, stagger, chunckSizeCol);
     const staggerArray = itemByRow.map((item) => {
         return item && item !== undefined ? item : { index: 0, frame: 0 };
     });
 
-    // onComplete callBack
+    // onComplete callback
     const itemCompleteByRow = getItemsByRow(
         arrayOnStop,
         stagger,

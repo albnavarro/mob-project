@@ -1,6 +1,6 @@
-export type VelocityMap = Map<string, VelocityCallBack>;
+export type VelocityMap = Map<string, VelocityCallback>;
 
-export type VelocityCallBack = (arg0: VelocityParams) => void;
+export type VelocityCallback = (arg0: VelocityParams) => void;
 
 export interface VelocityParams {
     speed: number;

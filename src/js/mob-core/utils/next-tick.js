@@ -1,20 +1,20 @@
 /** @type{Set<() => any>} */
-const setTimeOutQueque = new Set();
+const settimeOutQueque = new Set();
 
 /**
  * @param {() => void} fn
  * @returns {void}
  */
 export const useNextLoop = (fn) => {
-    setTimeOutQueque.add(fn);
+    settimeOutQueque.add(fn);
 
-    if (setTimeOutQueque.size === 1) {
+    if (settimeOutQueque.size === 1) {
         setTimeout(() => {
-            for (const fn of setTimeOutQueque) {
+            for (const fn of settimeOutQueque) {
                 fn();
             }
 
-            setTimeOutQueque.clear();
+            settimeOutQueque.clear();
         }, 0);
     }
 };

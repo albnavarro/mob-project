@@ -609,13 +609,13 @@ const fireComputed = (instanceId) => {
     const state = getStateFromMainMap(instanceId);
     if (!state) return;
 
-    const { computedPropsQueque, callBackComputed, store, bindInstance } =
+    const { computedPropsQueque, callbackComputed, store, bindInstance } =
         state;
 
     /**
      * Filter computed callback that has some prop changed as dependencies.
      */
-    const computedFiltered = [...(callBackComputed ?? [])].filter(
+    const computedFiltered = [...(callbackComputed ?? [])].filter(
         ({ keys }) => {
             return [...computedPropsQueque].find((current) => {
                 return keys.includes(current);
@@ -696,9 +696,9 @@ export const addToComputedWaitLsit = ({ instanceId, prop }) => {
     const state = getStateFromMainMap(instanceId);
     if (!state) return;
 
-    const { callBackComputed, computedPropsQueque, computedRunning } = state;
+    const { callbackComputed, computedPropsQueque, computedRunning } = state;
 
-    if (!callBackComputed || callBackComputed.size === 0) return;
+    if (!callbackComputed || callbackComputed.size === 0) return;
 
     /**
      * Update computedPropsQueque.
@@ -758,14 +758,14 @@ export const addToComputedWaitLsit = ({ instanceId, prop }) => {
  *
  * @param {string} targetProp - La prop corrente da analizzare.
  * @param {string[]} targetKeys - Le chiavi correnti da analizzare.
- * @param {Set<{ prop: string; fn: (arg0: Record<string, any>) => void; keys: string[] }>} callBackComputed
+ * @param {Set<{ prop: string; fn: (arg0: Record<string, any>) => void; keys: string[] }>} callbackComputed
  * @param {Set<string>} [visited] - Prop giá visitata.
  * @returns {boolean}
  */
 const hasCircularDependencies = (
     targetProp,
     targetKeys,
-    callBackComputed,
+    callbackComputed,
     visited = new Set()
 ) => {
     /**
@@ -790,7 +790,7 @@ const hasCircularDependencies = (
          * - Se `key` è prodotta da un computed, dobbiamo esplorare le dipendenze di QUEL computed (ricorsione).
          * - Così seguiamo la catena: c dipende da b, b dipende da a, a dipende da c? -> CICLO!
          */
-        const computedForKey = [...callBackComputed].find(
+        const computedForKey = [...callbackComputed].find(
             ({ prop }) => prop === key
         );
 
@@ -806,7 +806,7 @@ const hasCircularDependencies = (
             hasCircularDependencies(
                 targetProp,
                 computedForKey.keys,
-                callBackComputed,
+                callbackComputed,
                 visited
             )
         ) {
@@ -827,16 +827,16 @@ const storeComputedAction = ({ instanceId, prop, keys, fn }) => {
     const state = getStateFromMainMap(instanceId);
     if (!state) return;
 
-    const { callBackComputed } = state;
+    const { callbackComputed } = state;
 
-    const hasCircular = hasCircularDependencies(prop, keys, callBackComputed);
+    const hasCircular = hasCircularDependencies(prop, keys, callbackComputed);
 
     if (keys.includes(prop) || hasCircular) {
         storeComputedKeyUsedWarning(keys, getLogStyle());
         return;
     }
 
-    callBackComputed.add({
+    callbackComputed.add({
         prop,
         keys,
         fn,
@@ -844,7 +844,7 @@ const storeComputedAction = ({ instanceId, prop, keys, fn }) => {
 
     updateMainMap(instanceId, {
         ...state,
-        callBackComputed,
+        callbackComputed,
     });
 };
 
@@ -951,7 +951,7 @@ export const storeComputedEntryPoint = ({
     });
 
     /**
-     * Update callBackComputed.
+     * Update callbackComputed.
      */
     storeComputedAction({
         instanceId,
